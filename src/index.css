@@ -1,13 +1,136 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+@font-face {
+    font-family: "proximanova-nova";
+    src: url('./Fonts/proxima-nova.woff2') format('woff2'),
+    url('./Fonts/proxima-nova.woff') format('woff'),
+    url('./Fonts/proxima-nova.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "proximanova-nova";
+    src: url('./Fonts/proxima-nova-two.woff2') format('woff2'),
+    url('./Fonts/proxima-nova-two.woff') format('woff'),
+    url('./Fonts/proxima-nova-two.otf') format('opentype');
+    font-weight: 100;
+    font-style: normal;
+}
+
+
+@font-face {
+    font-family: "proximanova-nova";
+    src: url('./Fonts/proxima-nova-three.woff2') format('woff2'),
+    url('./Fonts/proxima-nova-three.woff') format('woff'),
+    url('./Fonts/proxima-nova-three.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "proximanova-nova";
+    src: url('./Fonts/proxima-nova-thin.woff2') format('woff2'),
+    url('./Fonts/proxima-nova-thin.woff') format('woff'),
+    url('./Fonts/proxima-nova-thin.otf') format('opentype');
+    font-weight: 300;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'proximanova-semiBold';
+    src: url('./Fonts/proximanova-sbold-webfont-webfont.eot');
+    src: url('./Fonts/proximanova-sbold-webfont-webfont.eot?#iefix') format('embedded-opentype'),
+    url('./Fonts/proximanova-sbold-webfont-webfont.woff') format('woff'),
+    url('./Fonts/proximanova-sbold-webfont-webfont.otf') format('opentype'),
+    url('./Fonts/proximanova-sbold-webfont-webfont.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
 }

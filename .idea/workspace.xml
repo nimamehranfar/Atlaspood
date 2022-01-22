@@ -1,7 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="200ae4a2-413a-4eda-9bd3-7e6393833ac7" name="Default Changelist" comment="" />
+    <list default="true" id="200ae4a2-413a-4eda-9bd3-7e6393833ac7" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dictionaries/NM.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/jsLibraryMappings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/locales/en/translation.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/locales/fa/translation.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/web.config" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/Banner.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/Footer.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/Header.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/Menu.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/Slideshow.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/public/Homepage_Image.jpeg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/public/basket.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/public/mail.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/public/main_page_img1.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/public/main_search_icon.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/public/no_image.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/public/person.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/public/phone.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Pages/Home.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Pages/Panel.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/doopsalta2.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/doopsalta2.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/public/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.js" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -12,16 +46,96 @@
       <executable />
     </execution>
   </component>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_DATA_SOURCES" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <option name="HIDDEN_KINDS">
+      <set />
+    </option>
+    <expand />
+    <select />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JavaScript File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="JsBowerSettings">
+    <node-interpreter value="project" />
+    <bower-package value="" />
+    <bower.json value="" />
+  </component>
+  <component name="JsFlowSettings">
+    <service-enabled>true</service-enabled>
+    <exe-path />
+    <other-services-enabled>true</other-services-enabled>
+    <auto-save>true</auto-save>
+  </component>
   <component name="ProjectId" id="22YMzyul9kiEhvy2S0Bw44Y3jZ4" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/locales/fa" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="settings.editor.selected.configurable" value="preferences.sourceCode.JavaScript" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="F:\doopsalta2\public" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="F:\doopsalta2\src\locales\fa" />
+    </key>
+  </component>
+  <component name="RunManager" selected="npm.start">
+    <configuration default="true" type="js.build_tools.npm">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="stop" />
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="build" type="js.build_tools.npm" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="build" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="start" type="js.build_tools.npm" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="start" />
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="npm.start" />
+      <item itemvalue="npm.build" />
+    </list>
   </component>
   <component name="ServiceViewManager">
     <option name="viewStates">
@@ -34,6 +148,7 @@
         </serviceView>
       </list>
     </option>
+    <option name="showServicesTree" value="false" />
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -45,11 +160,89 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1640010333722</updated>
-      <workItem from="1640010335847" duration="2256000" />
+      <workItem from="1640010335847" duration="9115000" />
+      <workItem from="1640026269319" duration="8185000" />
+      <workItem from="1640193391533" duration="8054000" />
+      <workItem from="1640458691505" duration="11766000" />
+      <workItem from="1640475148621" duration="30000" />
+      <workItem from="1640546823996" duration="6768000" />
+      <workItem from="1640717596504" duration="357000" />
+      <workItem from="1640717960813" duration="1849000" />
+      <workItem from="1640719827743" duration="17106000" />
+      <workItem from="1640890984151" duration="11253000" />
+      <workItem from="1641052308270" duration="1225000" />
+      <workItem from="1641144313795" duration="9076000" />
+      <workItem from="1641224193952" duration="1936000" />
+      <workItem from="1641233575162" duration="174000" />
+      <workItem from="1641802800437" duration="1817000" />
+      <workItem from="1641884780655" duration="2280000" />
+      <workItem from="1641930765097" duration="16170000" />
+      <workItem from="1642270621919" duration="10518000" />
+      <workItem from="1642330886727" duration="1477000" />
+      <workItem from="1642443421248" duration="4287000" />
+      <workItem from="1642621920203" duration="17462000" />
+      <workItem from="1642877044208" duration="8903000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="223" y="68" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1640206379644">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="223" y="68" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824@0.0.1536.824" timestamp="1640206379644" />
+    <state x="548" y="118" key="#com.intellij.ide.macro.MacrosDialog" timestamp="1640193489561">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="548" y="118" key="#com.intellij.ide.macro.MacrosDialog/0.0.1536.824@0.0.1536.824" timestamp="1640193489561" />
+    <state x="498" y="193" key="#com.intellij.ide.scriptingContext.ui.PerFileMappingsDialogWrapper" timestamp="1640026294408">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="498" y="193" key="#com.intellij.ide.scriptingContext.ui.PerFileMappingsDialogWrapper/0.0.1536.824@0.0.1536.824" timestamp="1640026294408" />
+    <state x="449" y="149" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1640025866314">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="449" y="149" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1536.824@0.0.1536.824" timestamp="1640025866314" />
+    <state x="548" y="168" key="FileChooserDialogImpl" timestamp="1640025969898">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="548" y="168" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1640025969898" />
+    <state width="1493" height="105" key="GridCell.Tab.0.bottom" timestamp="1642886326068">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="105" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1642886326068" />
+    <state width="1493" height="105" key="GridCell.Tab.0.center" timestamp="1642886326068">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="105" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1642886326068" />
+    <state width="1493" height="105" key="GridCell.Tab.0.left" timestamp="1642886326068">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="105" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1642886326068" />
+    <state width="1493" height="105" key="GridCell.Tab.0.right" timestamp="1642886326068">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="105" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1642886326068" />
+    <state x="215" y="30" key="SettingsEditor" timestamp="1642884765020">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="215" y="30" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1642884765020" />
+    <state x="578" y="330" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1642884966783">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="578" y="330" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1536.824@0.0.1536.824" timestamp="1642884966783" />
+    <state x="425" y="187" key="run.anything.popup" timestamp="1642700642276">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="425" y="187" key="run.anything.popup/0.0.1536.824@0.0.1536.824" timestamp="1642700642276" />
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1642693426627">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1642693426627" />
   </component>
 </project>
