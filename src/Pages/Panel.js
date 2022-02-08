@@ -31,6 +31,11 @@ function Panel() {
                                 {/*<NavDropdown.Divider />*/}
                                 {/*<NavDropdown.Item disabled>Footer</NavDropdown.Item>*/}
                             </NavDropdown>
+                            <NavDropdown title="Curtains" id="navbarScrollingDropdown">
+                                <NavDropdown.Item as={Link} to="/admin/panel/models">Models</NavDropdown.Item>
+                                {/*<NavDropdown.Divider />*/}
+                                {/*<NavDropdown.Item disabled>Footer</NavDropdown.Item>*/}
+                            </NavDropdown>
                             <Nav.Link disabled>Products</Nav.Link>
                         </Nav>
                         <Form className="d-flex">

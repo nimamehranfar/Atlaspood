@@ -2,17 +2,20 @@ import React, {useState} from "react";
 import {BrowserRouter as Router, Routes, Route, Link, Navigate} from "react-router-dom";
 
 import Home from "./Pages/Home";
-import Header from "./Components/Header";
 import Panel from "./Pages/Panel";
 import Menu from "./Components/Menu"
 import Slideshow from "./Components/Slideshow";
 import Banner from "./Components/Banner";
+import Drapery from "./Pages/Drapery";
+import Product from "./Pages/Product";
+import HeaderFooter from "./Pages/HeaderFooter";
+import Models from "./Components/Models";
 
 
-function App() {
+function App({t}) {
     const [user1, setuser] = useState({
         pass: "",
-        success: true
+        success: false
     });
     const inputsHandler = (e) => {
         setuser({[e.target.name]: e.target.value})
@@ -46,12 +49,21 @@ function App() {
                     }
                     {user1.success &&
                     <Routes>
-                        <Route path="/en" element={<Home/>}/>
-                        <Route path="/fa" element={<Home/>}/>
+                        <Route path="/en" element={<HeaderFooter/>}>
+                            <Route path="" element={<Home/>}/>
+                            <Route path="Curtain/:catID" element={<Drapery/>}/>
+                            <Route path="Product/:catID" element={<Product/>}/>
+                        </Route>
+                        <Route path="/fa" element={<HeaderFooter/>}>
+                            <Route path="" element={<Home/>}/>
+                            <Route path="Curtain/:catID" element={<Drapery/>}/>
+                            <Route path="Product/:catID" element={<Product/>}/>
+                        </Route>
                         <Route path="/admin/panel" element={<Panel/>}>
                             <Route path="menu" element={<Menu/>}/>
                             <Route path="slideshow" element={<Slideshow/>}/>
                             <Route path="banner" element={<Banner/>}/>
+                            <Route path="models" element={<Models/>}/>
                         </Route>
                         <Route
                             path="*"

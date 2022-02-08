@@ -1,16 +1,19 @@
 import React, {useEffect} from "react";
 import axios from "axios";
 import {InputGroup, FormControl, Toast, ToastContainer} from "react-bootstrap"
+import Form from "react-bootstrap/Form";
 
 const baseURLGet = "http://atlaspood.ir/api/WebsiteSetting/GetBanner?apiKey=477f46c6-4a17-4163-83cc-29908d";
 const baseURLPost = "http://atlaspood.ir/api/WebsiteSetting/SaveBanner";
 
 function Banner() {
+    
     const [banner, setBanner] = React.useState([]);
     const [bannerList, setBannerList] = React.useState([]);
     const [showToast, setShowToast] = React.useState(false);
     
-    async function getBanner() {
+    
+    function getBanner() {
         axios.get(baseURLGet).then((response) => {
             let arr = response.data;
             setBanner(arr.banner);
@@ -26,8 +29,32 @@ function Banner() {
             let text1 = banner[i].text1;
             let text2 = banner[i].text2;
             let url = banner[i].url;
+            let lang = banner[i].lang;
+            let oneSlide = banner[i].oneSlide;
             
-            bannerLists.push(<li key={"banner" + i} banner_id={i}>
+            if (i===0){
+                bannerLists.push(
+                    <li key={"banner_oneSlide" + i} banner_id={i}>
+                        <Form.Check
+                            type='checkbox'
+                            name="banner_type"
+                            checkbox-choice="oneSlide"
+                            label="All texts in 1 slide?"
+                            defaultChecked={oneSlide === "true" && true}
+                            onChange={(e) => {
+                                const tempBanner = [...banner];
+                                tempBanner.forEach(obj=>{
+                                    obj["oneSlide"]=`${e.target.checked}`;
+                                });
+                                setBanner(tempBanner);
+                            }}
+                        />
+                    </li>
+                );
+            }
+            
+            bannerLists.push(
+                <li key={"banner" + i} banner_id={i}>
                 <label className="input">
                     <input type="text" banner_text_id="text1" banner_id={i} defaultValue={text1} onChange={e => textChanged(e)} placeholder="Type Something..."/>
                     <span className="input__label">Primary Text</span>
@@ -47,6 +74,10 @@ function Banner() {
                     </InputGroup>
                     <span className="input__label">URL</span>
                 </label>
+                <label className="input">
+                    <input type="text" banner_text_id="lang" banner_id={i} defaultValue={lang} onChange={e => textChanged(e)} placeholder="Type 'en' or 'fa'..."/>
+                    <span className="input__label">Language(en or fa)</span>
+                </label>
             </li>);
         }
         setBannerList(bannerLists);
@@ -57,8 +88,9 @@ function Banner() {
         postBannersArray["Value"] = {};
         postBannersArray["Value"]["banner"] = banner;
         postBannersArray["ApiKey"] = window.$apikey;
+        console.log(JSON.stringify(postBannersArray));
         axios.post(baseURLPost, postBannersArray)
-            .then((response) => {
+            .then(() => {
                 setShowToast(true);
             }).catch(err => {
             console.log(err);
@@ -67,7 +99,7 @@ function Banner() {
     
     function addBanner() {
         const tempBanner = [...banner];
-        tempBanner[banner.length] = {"text1": '', "text2": '', "url": ''};
+        tempBanner[banner.length] = {"text1": '', "text2": '', "url": '', "lang": ''};
         setBanner(tempBanner);
     }
     
@@ -85,6 +117,7 @@ function Banner() {
     
     useEffect(() => {
         getBanner();
+        
     }, []);
     
     useEffect(() => {
@@ -119,7 +152,7 @@ function Banner() {
             <Toast onClose={() => setShowToast(false)} bg="success" show={showToast} delay={3000} autohide>
                 <Toast.Header>
                     <img
-                        src="holder.js/20x20?text=%20"
+                        src={"holder.js/20x20?text=%20"}
                         className="rounded me-2"
                         alt=""
                     />

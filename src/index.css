@@ -134,3 +134,118 @@ video {
     font-weight: 400;
     font-style: normal;
 }
+
+@font-face {
+    font-family: 'iransans';
+    src: url('./Fonts/Farsi/IRANSansWeb_Light.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 300;
+}
+
+@font-face {
+    font-family: 'iransans';
+    src: url('./Fonts/Farsi/IRANSansWeb.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: 'iransans';
+    src: url('./Fonts/Farsi/IRANSansWeb_Medium.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 500;
+}
+
+@font-face {
+    font-family: 'iransans';
+    src: url('./Fonts/Farsi/IRANSansWeb_Bold.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 600;
+}
+
+@font-face {
+    font-family: 'yekan';
+    src: url('./Fonts/Farsi/YekanBakh-Light.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 300;
+}
+
+@font-face {
+    font-family: 'yekan';
+    src: url('./Fonts/Farsi/YekanBakh-Regular.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: 'yekan';
+    src: url('./Fonts/Farsi/YekanBakh-Medium.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 500;
+}
+
+@font-face {
+    font-family: 'yekan';
+    src: url('./Fonts/Farsi/YekanBakh-Bold.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 600;
+}
+
+@font-face {
+    font-family: 'sharp';
+    src: url('./Fonts/Farsi/iransharp_light_web.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 300;
+}
+
+@font-face {
+    font-family: 'sharp';
+    src: url('./Fonts/Farsi/iransharp_regular_web.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: 'sharp';
+    src: url('./Fonts/Farsi/iransharp_bold_web.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 600;
+}
+
+@font-face {
+    font-family: 'sahel';
+    src: url('./Fonts/Farsi/Sahel.eot'),
+    url('./Fonts/Farsi/Sahel.eot?#iefix') format('embedded-opentype'),
+    url('./Fonts/Farsi/Sahel.woff') format('woff'),
+    url('./Fonts/Farsi/Sahel.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'sahel';
+    src: url('./Fonts/Farsi/Sahel-Black.eot'),
+    url('./Fonts/Farsi/Sahel-Black.eot?#iefix') format('embedded-opentype'),
+    url('./Fonts/Farsi/Sahel-Black.woff') format('woff'),
+    url('./Fonts/Farsi/Sahel-Black.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'sahel';
+    src: url('./Fonts/Farsi/Sahel-Bold.eot'),
+    url('./Fonts/Farsi/Sahel-Bold.eot?#iefix') format('embedded-opentype'),
+    url('./Fonts/Farsi/Sahel-Bold.woff') format('woff'),
+    url('./Fonts/Farsi/Sahel-Bold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+}
+
+
+@font-face {
+    font-family: 'peyda';
+    src: url('./Fonts/Farsi/peyda.ttf') format('truetype');
+    font-style: normal;
+}
+

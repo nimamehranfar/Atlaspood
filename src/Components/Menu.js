@@ -5,8 +5,13 @@ import SortableTree, {
 } from '@nosferatu500/react-sortable-tree';
 import Form from 'react-bootstrap/Form';
 import {Toast, ToastContainer} from "react-bootstrap";
+import Select from 'react-select';
+
 
 const baseURL = "http://atlaspood.ir/api/WebsiteMenu/GetByChildren?apikey=477f46c6-4a17-4163-83cc-29908d";
+const baseURLPost = "http://atlaspood.ir/api/WebsiteMenu/Save";
+const baseURLDeleteAll = "http://atlaspood.ir/api/WebsiteMenu/DeleteAll?apiKey=477f46c6-4a17-4163-83cc-29908d";
+const baseURLModels = "http://atlaspood.ir/api/SewingModel/GetAll?apiKey=477f46c6-4a17-4163-83cc-29908d";
 
 function Menu() {
     const [menu, setMenu] = React.useState({
@@ -19,6 +24,19 @@ function Menu() {
     
     const [nodeTitle, setNodeTitle] = useState('New Menu');
     const [showToast, setShowToast] = React.useState(false);
+    const [models, setModels] = useState([]);
+    const [options, setOptions] =useState( []);
+    
+    const getOptions = () => {
+        let tempArr = [];
+        for (let i = 50; i < 350; i++) {
+            let tempObj = {};
+            tempObj["value"] = `${i}`;
+            tempObj["label"] = `${i}px`;
+            tempArr.push(tempObj);
+        }
+        setOptions(tempArr);
+    };
     
     
     const getMenu = () => {
@@ -35,17 +53,133 @@ function Menu() {
         });
     };
     
+    const getModels = () => {
+        axios.get(baseURLModels).then((response) => {
+            let arr = response.data;
+            let tempArr = [];
+            arr.forEach(obj => {
+                let tempObj = {};
+                tempObj["value"] = obj["SewingModelId"];
+                tempObj["label"] = obj["ModelENName"];
+                tempArr.push(tempObj);
+            });
+            setModels(tempArr);
+            
+        }).catch(err => {
+            console.log(err);
+        });
+    };
+    
     // function renameKey(obj, oldKey, newKey) {
     //     obj[newKey] = obj[oldKey];
     //     delete obj[oldKey];
     // }
     
-    function updateslide() {
+    function updateMenu() {
+        let postMenuArray = {};
+        postMenuArray["MenuViewList"] = [];
+        postMenuArray["MenuViewList"] = treeDatas.items;
+        postMenuArray["ApiKey"] = window.$apikey;
+        postMenuArray = JSON.parse(JSON.stringify(postMenuArray).split('"title":').join('"MenuEnName":'));
+        postMenuArray = JSON.parse(JSON.stringify(postMenuArray).split('"children":').join('"Children":'));
+    
+        for (let i = 0; i < postMenuArray["MenuViewList"].length; i++) {
+            let Children = postMenuArray["MenuViewList"][i].Children;
+            postMenuArray["MenuViewList"][i].MenuOrder=i;
+            for (let j = 0; j < Children.length; j++) {
+                let subChildren = Children[j].Children;
+                Children[j].MenuOrder=j;
+                for (let k = 0; k < subChildren.length; k++) {
+                    subChildren[k].MenuOrder=k;
+                }
+            }
+        }
+        console.log(postMenuArray);
+        postMenuArray["MenuViewList"].forEach(obj => {
+            obj["Children"].forEach(obj2 => {
+                delete obj2.expanded;
+            });
+            delete obj.expanded;
+        });
+        postMenuArray["MenuViewList"].forEach(obj => {
+            obj["Children"].forEach(obj2 => {
+                delete obj2.WebsiteMenuId;
+            });
+            delete obj.WebsiteMenuId;
+        });
+        postMenuArray["MenuViewList"].forEach(obj => {
+            obj["Children"].forEach(obj2 => {
+                delete obj2.ParentMenu;
+            });
+            delete obj.ParentMenu;
+        });
+        
+        console.log(JSON.stringify(postMenuArray));
+        
+        axios.delete(baseURLDeleteAll).then((delete_response) => {
+            axios.post(baseURLPost, postMenuArray)
+                .then((response) => {
+                    setShowToast(true);
+                }).catch(err => {
+                console.log(err);
+            });
+        }).catch(err => {
+            console.log(err);
+        });
     }
+    
+    const products = [];
+    for (let i = 1; i < 91; i++) {
+        let tempObj = {};
+        tempObj["value"] = `${i}`;
+        tempObj["label"] = `product ${i}`;
+        products.push(tempObj);
+    }
+    const singleOption = ({innerProps, isDisabled, label, isSelected}) =>
+        !isDisabled ? (
+            <div {...innerProps} className="custom_multiselect_option">
+                <input className="multiselect_checkbox" type="checkbox" checked={isSelected} onChange={() => null}/>
+                <label className="multiselect_label">{label}</label>
+            </div>) : null;
+    
+    function makeSelectedObjects(node) {
+        let catString = node["ListOfCategory"];
+        if (catString != null && catString !== "") {
+            let catArr = catString.split(',');
+            let tempArr = [];
+            catArr.forEach(obj => {
+                let tempObj = {};
+                tempObj["value"] = `${obj}`;
+                tempArr.push(tempObj);
+            });
+            return tempArr;
+        } else {
+            return null;
+        }
+    }
+    
+    // function makeSelectedObject_width(node) {
+    //     console.log(options[node["Width"]-50]);
+    //     return options[node["Width"]-50];
+        // let tempWidth = node["Width"];
+        // console.log(options);
+        // if (tempWidth != null && tempWidth !== "") {
+        //     // let tempArr = [];
+        //     let tempObj = {};
+        //     tempObj["value"] = `${tempWidth}`;
+        //     tempObj["label"] = `${tempWidth}px`;
+        //     // tempArr.push(tempObj);
+        //     return tempObj;
+        // } else {
+        //     return null;
+        // }
+    // }
     
     
     useEffect(() => {
         getMenu();
+        getModels();
+        getOptions();
     }, []);
     
     return (<div className="menu_page_container">
@@ -55,50 +189,53 @@ function Menu() {
                 treeData={treeDatas.items}
                 onChange={(treeData) => setTreeData({items: treeData})}
                 generateNodeProps={({node, path}) => ({
-                    buttons: [<label className="input">
-                        <input type="text" value={node["title"]} onChange={(e) => {
-                            node["title"] = e.target.value;
-                            setTreeData({
-                                items: treeDatas.items
-                            });
-                        }}
-                               placeholder="Type Something..."/>
-                        <span className="input__label">EN Title</span>
-                    </label>, <label className="input">
-                        <input type="text" value={node["MenuName"]} onChange={(e) => {
-                            node["MenuName"] = e.target.value;
-                            setTreeData({
-                                items: treeDatas.items
-                            });
-                        }}
-                               placeholder="Type Something..."/>
-                        <span className="input__label">FA Title</span>
-                    </label>, <button className="btn btn-success"
-                                      onClick={() => {
-                                          setTreeData({
-                                              items: addNodeUnderParent({
-                                                  treeData: treeDatas.items, parentKey: path[path.length - 1], expandParent: true, getNodeAtPath, newNode: {
-                                                      title: nodeTitle,
-                                                      children: [],
-                                                      MenuName: "منو جدید",
-                                                      MenuDescription: null,
-                                                      ImageUrl: null,
-                                                      MenuOrder: 0,
-                                                      ParentMenuId: null,
-                                                      OnFooter: false,
-                                                      IsActive: true,
-                                                      ParentMenu: null,
-                                                      ProductGroupId: 1,
-                                                      PageType: "product",
-                                                      PageTypeId: null
-                                                  }, getNodeKey: ({treeIndex}) => treeIndex, ignoreCollapsed: true
-                                              }).treeData
-                                          });
-                                          console.log(treeDatas)
-                                      }}
-                    >
-                        Add Child
-                    </button>, // <button className="btn btn-warning"
+                    buttons: [
+                        <label className="input">
+                            <input type="text" value={node["title"]} onChange={(e) => {
+                                node["title"] = e.target.value;
+                                setTreeData({
+                                    items: treeDatas.items
+                                });
+                            }}
+                                   placeholder="Type Something..."/>
+                            <span className="input__label">EN Title</span>
+                        </label>,
+                        <label className="input">
+                            <input type="text" value={node["MenuName"]} onChange={(e) => {
+                                node["MenuName"] = e.target.value;
+                                setTreeData({
+                                    items: treeDatas.items
+                                });
+                            }}
+                                   placeholder="Type Something..."/>
+                            <span className="input__label">FA Title</span>
+                        </label>,
+                        <button className="btn btn-success"
+                                onClick={() => {
+                                    setTreeData({
+                                        items: addNodeUnderParent({
+                                            treeData: treeDatas.items, parentKey: path[path.length - 1], expandParent: true, getNodeAtPath, newNode: {
+                                                title: nodeTitle,
+                                                children: [],
+                                                MenuName: "منو جدید",
+                                                MenuDescription: null,
+                                                ImageUrl: null,
+                                                MenuOrder: 0,
+                                                ParentMenuId: null,
+                                                OnFooter: false,
+                                                IsActive: true,
+                                                ParentMenu: null,
+                                                CategoryId: 1,
+                                                PageTypeId: 5501,
+                                                Width: 180,
+                                                ListOfCategory: "0001,0310"
+                                            }, getNodeKey: ({treeIndex}) => treeIndex, ignoreCollapsed: true
+                                        }).treeData
+                                    });
+                                }}
+                        >
+                            Add Child
+                        </button>, // <button className="btn btn-warning"
                         //         onClick={() => {
                         //             node.title = nodeTitle;
                         //             setTreeData({
@@ -120,24 +257,26 @@ function Menu() {
                                 }}
                         >
                             Remove
-                        </button>, <label className="input">
-                            <input type="text" value={node["ProductGroupId"]} onChange={(e) => {
-                                node["ProductGroupId"] = e.target.value;
+                        </button>,
+                        <label className="input">
+                            <input type="text" value={node["CategoryId"]} onChange={(e) => {
+                                node["CategoryId"] = e.target.value;
                                 setTreeData({
                                     items: treeDatas.items
                                 });
                             }}
                                    placeholder="Type Something..."/>
                             <span className="input__label">Category ID</span>
-                        </label>, <Form>
-                            <div className="menu_checkbox_container">
+                        </label>,
+                        <Form>
+                            <div className="menu_radio_container">
                                 <span className="input__label">Active?</span>
                                 <Form.Check
                                     type='radio'
                                     name="menu_active"
                                     checkbox-choice="true"
                                     label="Yes"
-                                    defaultChecked
+                                    defaultChecked={node["IsActive"]}
                                     onClick={() => {
                                         node["IsActive"] = true;
                                         setTreeData({
@@ -151,6 +290,7 @@ function Menu() {
                                     name="menu_active"
                                     checkbox-choice="false"
                                     label="No"
+                                    defaultChecked={!node["IsActive"]}
                                     onClick={() => {
                                         node["IsActive"] = false;
                                         setTreeData({
@@ -159,37 +299,98 @@ function Menu() {
                                     }}
                                 />
                             </div>
-                        </Form>, <Form>
-                            <div className="menu_checkbox_container">
+                        </Form>,
+                        <Form>
+                            <div className="menu_radio_container">
                                 <span className="input__label">Type?</span>
                                 <Form.Check
                                     type='radio'
                                     name="menu_type"
                                     checkbox-choice="Product"
                                     label="Product"
-                                    defaultChecked
+                                    defaultChecked={node["PageTypeId"] === 5501 && true}
                                     onClick={() => {
-                                        node["PageType"] = "Product";
+                                        node["PageTypeId"] = 5501;
                                         setTreeData({
                                             items: treeDatas.items
                                         });
+                                        node["ListOfCategory"] = "";
                                     }}
                                 />
                                 
                                 <Form.Check
                                     type='radio'
                                     name="menu_type"
-                                    checkbox-choice="Drapery"
-                                    label="Drapery"
+                                    checkbox-choice="Curtain"
+                                    label="Curtain"
+                                    defaultChecked={node["PageTypeId"] === 5502 && true}
                                     onClick={() => {
-                                        node["PageType"] = "Drapery";
+                                        node["PageTypeId"] = 5502;
                                         setTreeData({
                                             items: treeDatas.items
                                         });
+                                        node["ListOfCategory"] = "";
                                     }}
                                 />
                             </div>
                         </Form>,
+                        node["PageTypeId"] === 5502 &&
+                        <div className="menu_select_category_container">
+                            <span className="input__label">Models</span>
+                            <Select
+                                components={{Option: singleOption}}
+                                onChange={(selected) => {
+                                    node["ListOfCategory"] = "";
+                                    let tempArr = [];
+                                    selected.forEach(obj => {
+                                        tempArr.push(obj["value"]);
+                                    });
+                                    node["ListOfCategory"] = `${tempArr.join(",")}`;
+                                }}
+                                options={models}
+                                isMulti={true}
+                                hideSelectedOptions={false}
+                                closeMenuOnSelect={false}
+                                controlShouldRenderValue={false}
+                                defaultValue={makeSelectedObjects(node)}
+                            />
+                        </div>,
+                        node["PageTypeId"] === 5501 &&
+                        <div className="menu_select_category_container">
+                            <span className="input__label">Products</span>
+                            <Select
+                                components={{Option: singleOption}}
+                                onChange={(selected) => {
+                                    node["ListOfCategory"] = "";
+                                    let tempArr = [];
+                                    selected.forEach(obj => {
+                                        tempArr.push(obj["value"]);
+                                    });
+                                    node["ListOfCategory"] = `${tempArr.join(",")}`;
+                                }}
+                                options={products}
+                                isMulti={true}
+                                hideSelectedOptions={false}
+                                closeMenuOnSelect={false}
+                                controlShouldRenderValue={false}
+                                defaultValue={makeSelectedObjects(node)}
+                            />
+                        </div>,
+                        
+                        <div className="menu_select_container">
+                            <span className="input__label">Menu Width</span>
+                            <Select
+                                onChange={(selected) => {
+                                    node["Width"] = parseInt(selected["value"]);
+                                }}
+                                options={options}
+                                // value={makeSelectedObject_width(node)}
+                            />
+                        </div>,
+                        <div className="menu_width_container">
+                            <span className="input__label">Pre-set Width</span>
+                            <div className="m-auto text-center">{node["Width"]}px</div>
+                        </div>
                     
                     ],
                     
@@ -199,7 +400,7 @@ function Menu() {
         
         <div>
             <button className="btn btn-primary admin_panel_button" onClick={() => {
-                updateslide()
+                updateMenu()
             }}>Save Settings
             </button>
         </div>

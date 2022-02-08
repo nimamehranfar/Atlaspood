@@ -2,37 +2,52 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="200ae4a2-413a-4eda-9bd3-7e6393833ac7" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dictionaries/NM.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/jsLibraryMappings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/locales/en/translation.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/locales/fa/translation.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/web.config" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Components/Banner.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Components/Footer.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Components/Header.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Components/Menu.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Components/Slideshow.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/public/Homepage_Image.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/public/basket.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/public/mail.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/public/main_page_img1.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/public/main_search_icon.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/public/no_image.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/public/person.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/public/phone.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Pages/Home.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Pages/Panel.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/doopsalta2.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/doopsalta2.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/no_image.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/Models.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Fonts/Farsi/IRANSansWeb.ttf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Fonts/Farsi/IRANSansWeb_Bold.ttf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Fonts/Farsi/IRANSansWeb_Light.ttf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Fonts/Farsi/IRANSansWeb_Medium.ttf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Fonts/Farsi/Sahel-Black.eot" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Fonts/Farsi/Sahel-Black.ttf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Fonts/Farsi/Sahel-Black.woff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Fonts/Farsi/Sahel-Bold.eot" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Fonts/Farsi/Sahel-Bold.ttf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Fonts/Farsi/Sahel-Bold.woff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Fonts/Farsi/Sahel.eot" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Fonts/Farsi/Sahel.ttf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Fonts/Farsi/Sahel.woff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Fonts/Farsi/YekanBakh-Bold.ttf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Fonts/Farsi/YekanBakh-Light.ttf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Fonts/Farsi/YekanBakh-Medium.ttf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Fonts/Farsi/YekanBakh-Regular.ttf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Fonts/Farsi/iransharp_bold_web.ttf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Fonts/Farsi/iransharp_light_web.ttf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Fonts/Farsi/iransharp_regular_web.ttf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Fonts/Farsi/peyda.ttf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/public/logofa.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Pages/Drapery.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Pages/HeaderFooter.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Pages/Product.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web(no static file).config" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/NM.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/NM.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/public/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/locales/en/translation.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/en/translation.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/locales/fa/translation.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/fa/translation.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/web.config" beforeDir="false" afterPath="$PROJECT_DIR$/public/web.config" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/Banner.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Banner.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/Footer.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Footer.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/Header.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Header.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/Menu.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Menu.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/Slideshow.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Slideshow.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Images/public/logoen.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/public/logoen.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Pages/Home.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/Home.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Pages/Panel.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/Panel.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.js" afterDir="false" />
     </list>
@@ -81,6 +96,9 @@
     <other-services-enabled>true</other-services-enabled>
     <auto-save>true</auto-save>
   </component>
+  <component name="PackageJsonUpdateNotifier">
+    <dismissed value="$PROJECT_DIR$/package.json" />
+  </component>
   <component name="ProjectId" id="22YMzyul9kiEhvy2S0Bw44Y3jZ4" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
@@ -95,16 +113,17 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/locales/fa" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/public" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="preferences.sourceCode.JavaScript" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="F:\doopsalta2\public" />
+      <recent name="F:\doopsalta2\src\locales\fa" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="F:\doopsalta2\public" />
-    </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="F:\doopsalta2\src\locales\fa" />
     </key>
   </component>
   <component name="RunManager" selected="npm.start">
@@ -182,6 +201,26 @@
       <workItem from="1642443421248" duration="4287000" />
       <workItem from="1642621920203" duration="17462000" />
       <workItem from="1642877044208" duration="8903000" />
+      <workItem from="1642935751204" duration="509000" />
+      <workItem from="1642936266970" duration="9029000" />
+      <workItem from="1643023157562" duration="695000" />
+      <workItem from="1643051265202" duration="6120000" />
+      <workItem from="1643094481606" duration="1486000" />
+      <workItem from="1643145601518" duration="8149000" />
+      <workItem from="1643195602779" duration="17665000" />
+      <workItem from="1643265714801" duration="4913000" />
+      <workItem from="1643298747242" duration="3477000" />
+      <workItem from="1643493772146" duration="9508000" />
+      <workItem from="1643509564612" duration="614000" />
+      <workItem from="1643511563238" duration="77000" />
+      <workItem from="1643618039331" duration="12469000" />
+      <workItem from="1643703119445" duration="608000" />
+      <workItem from="1643724521790" duration="10962000" />
+      <workItem from="1643744323093" duration="3000" />
+      <workItem from="1643791455789" duration="10748000" />
+      <workItem from="1643918388921" duration="10574000" />
+      <workItem from="1644049495693" duration="22472000" />
+      <workItem from="1644225569034" duration="19358000" />
     </task>
     <servers />
   </component>
@@ -212,37 +251,37 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="548" y="168" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1640025969898" />
-    <state width="1493" height="105" key="GridCell.Tab.0.bottom" timestamp="1642886326068">
+    <state width="1493" height="106" key="GridCell.Tab.0.bottom" timestamp="1644294095039">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="105" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1642886326068" />
-    <state width="1493" height="105" key="GridCell.Tab.0.center" timestamp="1642886326068">
+    <state width="1493" height="106" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1644294095039" />
+    <state width="1493" height="106" key="GridCell.Tab.0.center" timestamp="1644294095039">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="105" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1642886326068" />
-    <state width="1493" height="105" key="GridCell.Tab.0.left" timestamp="1642886326068">
+    <state width="1493" height="106" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1644294095039" />
+    <state width="1493" height="106" key="GridCell.Tab.0.left" timestamp="1644294095039">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="105" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1642886326068" />
-    <state width="1493" height="105" key="GridCell.Tab.0.right" timestamp="1642886326068">
+    <state width="1493" height="106" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1644294095039" />
+    <state width="1493" height="106" key="GridCell.Tab.0.right" timestamp="1644294095039">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="105" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1642886326068" />
-    <state x="215" y="30" key="SettingsEditor" timestamp="1642884765020">
+    <state width="1493" height="106" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1644294095039" />
+    <state x="215" y="30" key="SettingsEditor" timestamp="1644097373729">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="215" y="30" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1642884765020" />
-    <state x="578" y="330" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1642884966783">
+    <state x="215" y="30" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1644097373729" />
+    <state x="578" y="330" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1643232603341">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="578" y="330" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1536.824@0.0.1536.824" timestamp="1642884966783" />
-    <state x="425" y="187" key="run.anything.popup" timestamp="1642700642276">
+    <state x="578" y="330" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1536.824@0.0.1536.824" timestamp="1643232603341" />
+    <state x="425" y="187" key="run.anything.popup" timestamp="1643666908548">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="425" y="187" key="run.anything.popup/0.0.1536.824@0.0.1536.824" timestamp="1642700642276" />
-    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1642693426627">
+    <state x="425" y="187" key="run.anything.popup/0.0.1536.824@0.0.1536.824" timestamp="1643666908548" />
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1643838910137">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1642693426627" />
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1643838910137" />
   </component>
 </project>

@@ -1,33 +1,60 @@
 import React, {useEffect} from "react";
 import {Link, useLocation} from "react-router-dom";
-import {ReactComponent as Logo} from '../Images/public/logoen.svg';
+import {ReactComponent as Logoen} from '../Images/public/logoen.svg';
+import {ReactComponent as Logofa} from '../Images/public/logofa.svg';
 import axios from "axios";
-import i18next from "i18next";
+import {FormControl, InputGroup} from "react-bootstrap";
+import {useTranslation} from "react-i18next";
 
 const baseURLGet = "http://atlaspood.ir/api/WebsiteSetting/GetBanner?apiKey=477f46c6-4a17-4163-83cc-29908d";
+const baseURLMenu = "http://atlaspood.ir/api/WebsiteMenu/GetByChildren?apikey=477f46c6-4a17-4163-83cc-29908d";
 
 
 function Header() {
+    const {t, i18n} = useTranslation();
     const location = useLocation();
     const [banner, setBanner] = React.useState([]);
+    const [bannerOneSlide, setBannerOneSlide] = React.useState([]);
     const [bannerItem, setBannerItem] = React.useState({
         text1: "", text2: "", url: "/", nextI: 0
     });
+    const [bannerItemOneSlide, setBannerItemOneSlide] = React.useState([]);
     const [langLocation, setLangLocation] = React.useState({
         locationEN: "/en", locationFA: "/fa"
     });
+    const [pageLanguage, setPageLanguage] = React.useState("");
+    const [menu, setMenu] = React.useState([]);
+    const [menuRender, setMenuRender] = React.useState([]);
     
-    async function getBanner() {
+    function convertToPersian(string_farsi) {
+        let tempString = string_farsi.replace("ي", "ی");
+        tempString = tempString.replace("ي", "ی");
+        tempString = tempString.replace("ي", "ی");
+        tempString = tempString.replace('ك', 'ک');
+        return tempString;
+    }
+    
+    
+    function getBanner() {
         axios.get(baseURLGet).then((response) => {
             let arr = response.data;
-            setBanner(arr.banner);
+            let temparr = [];
+            arr.banner.forEach(obj => {
+                if (obj["lang"] === pageLanguage) {
+                    temparr = [...temparr, obj];
+                }
+            });
+            if (temparr[0].oneSlide === "true") {
+                setBannerOneSlide(temparr);
+            } else
+                setBanner(temparr);
         }).catch(err => {
             console.log(err);
         });
         
     }
     
-    async function renderBanner(bannerIndex) {
+    function renderBanner(bannerIndex) {
         if (bannerIndex === banner.length) bannerIndex = 0;
         let text1 = banner[bannerIndex].text1;
         let text2 = banner[bannerIndex].text2;
@@ -35,8 +62,221 @@ function Header() {
         setBannerItem({text1: text1, text2: text2, url: url, nextI: bannerIndex + 1});
     }
     
+    function renderBannerOneSlide() {
+        const bannerList = [];
+        for (let i = 0; i < bannerOneSlide.length; i++) {
+            let text1 = bannerOneSlide[i].text1;
+            let text2 = bannerOneSlide[i].text2;
+            let url = bannerOneSlide[i].url;
+            
+            bannerList.push(
+                <Link key={"banner" + i} to={"/" + url}>
+                    <span>{text1}</span>&nbsp;
+                    <span className="text_underline">{text2}</span>
+                </Link>
+            );
+        }
+        setBannerItemOneSlide(bannerList);
+    }
+    
+    async function getMenu() {
+        axios.get(baseURLMenu).then((response) => {
+            let arr = response.data;
+            setMenu(arr);
+        }).catch(err => {
+            console.log(err);
+        });
+    }
+    
+    function renderMenu() {
+        
+        let sortedMenu = [];
+        for (let i = 0; i < menu.length; i++) {
+            sortedMenu[menu[i].MenuOrder] = menu[i];
+        }
+        
+        
+        for (let i = 0; i < sortedMenu.length; i++) {
+            let Children = sortedMenu[i].Children;
+            let tempArr = [];
+            for (let j = 0; j < Children.length; j++) {
+                tempArr[Children[j].MenuOrder] = Children[j];
+            }
+            sortedMenu[i].Children = tempArr;
+        }
+        
+        
+        for (let i = 0; i < sortedMenu.length; i++) {
+            let Children = sortedMenu[i].Children;
+            for (let j = 0; j < Children.length; j++) {
+                let subChildren = Children[j].Children;
+                let tempArr = [];
+                for (let k = 0; k < subChildren.length; k++) {
+                    tempArr[subChildren[k].MenuOrder] = subChildren[k];
+                }
+                sortedMenu[i].Children[j].Children = tempArr;
+            }
+        }
+        const menuList = [];
+        for (let i = 0; i < sortedMenu.length; i++) {
+            let MenuName = convertToPersian(sortedMenu[i].MenuName);
+            let MenuEnName = sortedMenu[i].MenuEnName;
+            let IsActive = sortedMenu[i].IsActive;
+            let CategoryId = sortedMenu[i].CategoryId;
+            let PageType = sortedMenu[i].PageType;
+            let PageTypeId = sortedMenu[i].PageTypeId;
+            let Children = sortedMenu[i].Children;
+            
+            const buffer = [];
+            const subMenuList = [];
+            for (let j = 0; j < Children.length; j++) {
+                let subMenuName = convertToPersian(Children[j].MenuName);
+                let subMenuEnName = Children[j].MenuEnName;
+                let subIsActive = Children[j].IsActive;
+                let subCategoryId = Children[j].CategoryId;
+                let subPageType = Children[j].PageType;
+                let subPageTypeId = Children[j].PageTypeId;
+                let subChildren = Children[j].Children;
+                let subWidth = Children[j].Width;
+                
+                if (subChildren.length === 0) {
+                    buffer.push(
+                        <h1 key={"subMenu" + i + j + "noChild" + "title"}
+                            className={`subMenu_title ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                            style={{width: subWidth + "px"}}>{pageLanguage === 'en' ? subMenuEnName : subMenuName}</h1>
+                    );
+                    //
+                    // if (subChildren.length === 0) {
+                    //     subMenuList.push(
+                    //         <div className={`cel-top-menu ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} key={"subMenu" + i + j}>
+                    //             <h1 key={"subMenu" + i + j + "noChild" + "title"}
+                    //                 className={`subMenu_title ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                    //                 style={{width: subWidth + "px"}}>{pageLanguage === 'en' ? subMenuEnName : subMenuName}</h1>
+                    //         </div>
+                    //     );
+                    //
+                } else {
+                    
+                    buffer.push(
+                        <h1 key={"subMenu" + i + j + "title"}
+                            className={`subMenu_title ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                            style={{width: subWidth + "px"}}>{pageLanguage === 'en' ? subMenuEnName : subMenuName}</h1>
+                    );
+                    
+                    let empty_fields = 0;
+                    for (let k = 0; k < subChildren.length; k++) {
+                        let subSubMenuName = convertToPersian(subChildren[k].MenuName);
+                        let subSubMenuEnName = subChildren[k].MenuEnName;
+                        let subSubIsActive = subChildren[k].IsActive;
+                        let subSubCategoryId = subChildren[k].CategoryId;
+                        let subSubPageTypeId = subChildren[k].PageTypeId;
+                        let subSubChildren = subChildren[k].Children;
+                        let subSubWidth = subChildren[k].Width;
+                        let subSubPageType = subSubPageTypeId === 5501 ? "Product" : "Curtain";
+                        
+                        
+                        //
+                        // if (k === 0) {
+                        //     subSubMenuList.push(
+                        //         <h1 key={"subMenu" + i + j + k + "title"}
+                        //             className={`subMenu_title ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                        //             style={{width: subWidth + "px"}}>{pageLanguage === 'en' ? subMenuEnName : subMenuName}</h1>
+                        //     );
+                        // }
+                        
+                        if (subSubMenuEnName === "") {
+                            empty_fields++;
+                        } else {
+                            buffer.push(
+                                <h2 key={"subSubMenu" + i + j + k}>
+                                    <Link className={`subSubMenu ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                                          to={"/" + pageLanguage + "/" + subSubPageType + "/" + subSubCategoryId}>{pageLanguage === 'en' ? subSubMenuEnName : subSubMenuName}</Link>
+                                </h2>);
+                            
+                            // subSubMenuList.push(
+                            //     <h2 key={"subSubMenu" + i + j + k}>
+                            //         <Link className={`subSubMenu ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                            //               to={"/" + pageLanguage + "/" + subSubPageType + "/" + subSubCategoryId}>{pageLanguage === 'en' ? subSubMenuEnName : subSubMenuName}</Link>
+                            //     </h2>);
+                        }
+                    }
+                    for (let emptyCounter = 0; emptyCounter < empty_fields; emptyCounter++) {
+                        buffer.push(
+                            <h2 key={"subSubMenu" + i + j + "empty" + emptyCounter}>
+                            
+                            </h2>);
+                        
+                        // subSubMenuList.push(
+                        //     <h2 key={"subSubMenu" + i + j + "empty" + emptyCounter}>
+                        //
+                        //     </h2>);
+                    }
+                    
+                    
+                    // if (j + 1 < Children.length) {
+                    //     if (subSubMenuList.length + (Children[j + 1].Children).length > 10) {
+                    //         subMenuList.push(
+                    //             <div className={`cel-top-menu ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} key={"subMenu" + i + j}>
+                    //                 {subSubMenuList}
+                    //             </div>);
+                    //         subSubMenuList = [];
+                    //     }
+                    // } else {
+                    //     subMenuList.push(
+                    //         <div className={`cel-top-menu ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} key={"subMenu" + i + j}>
+                    //             {subSubMenuList}
+                    //         </div>);
+                    //     subSubMenuList = [];
+                    // }
+                }
+            }
+            
+            for (let m = 0; m < buffer.length; m += 12) {
+                let subSubMenuList = [];
+                for (let n = m; n < m + 12; n++) {
+                    if (n === buffer.length)
+                        break;
+                    else {
+                        subSubMenuList.push(buffer[n]);
+                    }
+                }
+                subMenuList.push(
+                    <div className={`cel-top-menu ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} key={"subMenu" + i + m}>
+                        {subSubMenuList}
+                    </div>
+                );
+            }
+            
+            // console.log(buffer.length);
+            
+            
+            menuList.push(
+                <li key={"menu" + i}>
+                    <h1 className={`${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>{pageLanguage === 'en' ? MenuEnName : MenuName}</h1>
+                    <div className={`mega ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} style={{display: 'none'}}>
+                        <div className={`sub_menu ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
+                            {subMenuList}
+                        </div>
+                    </div>
+                </li>);
+        }
+        setMenuRender(menuList);
+    }
+    
     useEffect(() => {
-        getBanner();
+        if (pageLanguage !== '') {
+            setBannerItem({
+                text1: "", text2: "", url: "/", nextI: 0
+            });
+            setBannerItemOneSlide([]);
+            setMenuRender([]);
+            // setTimeout(() => {  console.log("World!"); }, 2000);
+            // i18n.changeLanguage(pageLanguage);
+            // getMenu().then(() => {
+            //     getBanner();
+            // });
+            
+        }
         
         const tempLocationEn = location.pathname.split('');
         tempLocationEn[1] = 'e';
@@ -48,13 +288,41 @@ function Header() {
         tempLocationFa[2] = 'a';
         
         setLangLocation({locationEN: tempLocationEn.join(''), locationFA: tempLocationFa.join('')});
-    }, []);
+        
+        const tempLang = location.pathname.split('');
+        setPageLanguage(tempLang.slice(1, 3).join(''));
+        
+    }, [location.pathname]);
     
     useEffect(() => {
-        if (banner.length) {
+        if (pageLanguage !== '') {
+            i18n.changeLanguage(pageLanguage);
+            getMenu().then(() => {
+                getBanner();
+            });
+            document.body.dir = pageLanguage === 'fa' ? "rtl" : "ltr";
+            document.body.className = pageLanguage === 'fa' ? "font_farsi" : "font_en";
+            document.querySelectorAll("html  , body  , div  , span  , applet  , object  , iframe  , h1  , h2  , h3  , h4  , h5  , h6  , p  , blockquote  , pre  , a  , abbr  , acronym  , address  , big  , cite  , code  , del  , dfn  , em  , img  , ins  , kbd  , q  , s  , samp  , small  , strike  , strong  , sub  , sup  , tt  , var  , b  , u  , i  , center  , dl  , dt  , dd  , ol  , ul  , li  , fieldset  , form  , label  , legend  , table  , caption  , tbody  , tfoot  , thead  , tr  , th  , td  , article  , aside  , canvas  , details  , embed  , figure  , figcaption  , footer  , header  , hgroup  , menu  , nav  , output  , ruby  , section  , summary  , time  , mark  , audio  , video").forEach(obj => {
+                if (pageLanguage === 'fa')
+                    obj.classList.add("font_farsi");
+                else if (pageLanguage === 'en')
+                    obj.classList.remove("font_farsi");
+            });
+        }
+        
+    }, [pageLanguage]);
+    
+    useEffect(() => {
+        if (banner.length && pageLanguage !== '') {
             renderBanner(0)
         }
     }, [banner]);
+    
+    useEffect(() => {
+        if (menu.length) {
+            renderMenu()
+        }
+    }, [menu]);
     
     useEffect(() => {
         const timeout = setTimeout(() => {
@@ -67,14 +335,26 @@ function Header() {
         
     }, [bannerItem]);
     
+    useEffect(() => {
+        if (bannerOneSlide.length !== 0 && pageLanguage !== '') {
+            renderBannerOneSlide();
+            // console.log(bannerOneSlide)
+        }
+    }, [bannerOneSlide]);
+    
     return (<div className="header_container padding-clear ">
         <div className="top_header">
             <div className="col-lg-12">
                 <div className="top_title">
+                    {bannerItemOneSlide.length === 0 &&
                     <Link to={"/" + bannerItem.url}>
-                        <span>{bannerItem.text1}</span>
+                        <span>{bannerItem.text1}</span>&nbsp;
                         <span className="text_underline">{bannerItem.text2}</span>
                     </Link>
+                    }
+                    {bannerItemOneSlide.length !== 0 &&
+                    bannerItemOneSlide
+                    }
                 </div>
             </div>
         </div>
@@ -85,13 +365,13 @@ function Header() {
                         <button className="btn-search">
                             <img src={require('../Images/public/main_search_icon.svg')}
                                  className="img-fluid" alt=""/>
-                            <input type="text" className="input-search" placeholder="SEARCH"/>
+                            <input type="text" className={`input-search ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} placeholder={t("Search_placeholder")}/>
                         </button>
                     </div>
                 </div>
-                <div className="Logo"><Link to="/"><Logo/></Link></div>
+                <div className="Logo"><Link to="/">{pageLanguage === 'en' ? <Logoen/> : <Logofa/>}</Link></div>
                 <div className="mid_header_right">
-                    <ul>
+                    <ul className={pageLanguage === 'fa' ? "float_left" : "float_right"}>
                         <li id="login-open">
                             <a href="http://www.doopsalta.com/en/account/login/">
                                 <img src={require('../Images/public/person.svg')} className="img-fluid" alt=""/>
@@ -114,12 +394,15 @@ function Header() {
                             </div>
                         </li>
                     </ul>
-                    <ul className="Lang_change_container">
+                    <ul className={`Lang_change_container ${pageLanguage === 'fa' ? "float_left" : "float_right"}`}>
                         <li className="Lang_change">
-                            <Link to={langLocation.locationEN}  onClick={() => i18next.changeLanguage("en")}>EN</Link>
+                            <Link to={langLocation.locationEN} onClick={() => i18n.changeLanguage("en")}
+                                  style={pageLanguage === 'en' ? {pointerEvents: "none", color: "#383838"} : null}>ENGLISH</Link>
                         </li>
+                        &nbsp;|&nbsp;
                         <li className="Lang_change">
-                            <Link to={langLocation.locationFA}  onClick={() => i18next.changeLanguage("fa")}>FA</Link>
+                            <Link to={langLocation.locationFA} onClick={() => i18n.changeLanguage("fa")}
+                                  style={pageLanguage === 'fa' ? {pointerEvents: "none", color: "#383838"} : null}>فارسی</Link>
                         </li>
                     </ul>
                 </div>
@@ -129,288 +412,7 @@ function Header() {
             <div className="col-lg-12">
                 <div className="menu">
                     <ul>
-                        <li><a>WINDOW TREATMENTS</a>
-                            <div className="mega" style={{display: 'none'}}>
-                                <div className="sub_menu">
-                                    <div className="cel-top-menu">
-                                        <h1><a> Drapery</a></h1>
-                                        <h2><a
-                                            href="http://www.doopsalta.com/en/blind/custom/3A60298/">Custom
-                                            Drapery</a>
-                                        </h2>
-                                        <h2><a href="http://www.doopsalta.com/en/blind/custom/15BD736/">Readymade
-                                            Drapery</a>
-                                        </h2>
-                                        <h1><a>Custom Shades</a></h1>
-                                        <h2><a
-                                            href="http://www.doopsalta.com/en/product/cat/100401/Roman-Shades/">Roman
-                                            Shades</a>
-                                        </h2>
-                                        <h2><a
-                                            href="http://www.doopsalta.com/en/blind/custom/371825D/">Roller
-                                            Shades</a>
-                                        </h2>
-                                        <h2><a href="http://www.doopsalta.com/en/blind/custom/8EBFAB3/">Dual
-                                            Roller Shade</a>
-                                        </h2>
-                                        <h2><a
-                                            href="http://www.doopsalta.com/en/blind/custom/9607BD5/">Zebra
-                                            Shades</a>
-                                        </h2>
-                                        <h2><a
-                                            href="http://www.doopsalta.com/en/blind/custom/0561204/">DK</a>
-                                        </h2>
-                                        <h2
-                                        ><a href="http://www.doopsalta.com/en/blind/custom/BA4CF0A/">Panel
-                                            Track Shades</a>
-                                        </h2>
-                                    </div>
-                                    
-                                    <div className="cel-top-menu"><h1><a>Custom Blinds</a></h1><h2
-                                    ><a
-                                        href="http://www.doopsalta.com/en/product/cat/100301/Wood-Blinds/">Wood
-                                        Blinds</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/blind/custom/B6483D8/">Metal Blinds</a>
-                                    </h2><h1><a>Decorative Treatments</a></h1><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/100501/Valances/">Valances</a>
-                                    </h2><h2><a
-                                        href="http://www.doopsalta.com/en/blind/custom/635C937/">Cornices</a></h2>
-                                        <h1><a>Drapery Hardware</a></h1><h2><a
-                                            href="http://www.doopsalta.com/en/blind/custom/06B1E96/">Metal
-                                            Hardware</a></h2><h2><a
-                                            href="http://www.doopsalta.com/en/product/cat/100602/Wood-Hardware/">Wood
-                                            Hardware</a></h2><h2/>
-                                    </div>
-                                    
-                                    <div className="cel-top-menu"><h1><a>Drapery Accessories</a></h1><h2
-                                    ><a
-                                        href="http://www.doopsalta.com/en/product/cat/100701/Tiebacks/">Tiebacks</a>
-                                    </h2><h2><a
-                                        href="http://www.doopsalta.com/en/blind/custom/417CBAA/">Tassels</a></h2><h2
-                                    ><a
-                                        href="http://www.doopsalta.com/en/product/cat/100703/Fringe/">Fringe</a>
-                                    </h2>
-                                    </div>
-                                
-                                </div>
-                            </div>
-                        </li>
-                        <li><a>FURNITURE</a>
-                            <div className="mega" style={{display: 'none'}}>
-                                <div className="sub_menu">
-                                    <div className="cel-top-menu"><h1><a>Living Room</a></h1><h2>
-                                        <a href="http://www.doopsalta.com/en/product/cat/200101/Sofas/">Sofas</a>
-                                    </h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/200102/Sectional-Sofas/">Sectional
-                                        Sofas</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/200103/Chairs/">Chairs</a>
-                                    </h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/200104/Ottomans/">Ottomans</a>
-                                    </h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/200105/Side-Tables/">Side
-                                        Tables</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/200106/Coffee-Tables/">Coffee
-                                        Tables</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/200107/Consoles/">Consoles</a>
-                                    </h2><h2/><h2/></div>
-                                    <div className="cel-top-menu"><h1><a>Dining</a></h1><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/200201/Dining-Tables/">Dining
-                                        Tables</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/200202/Dining-Chairs/">Dining
-                                        Chairs</a></h2><h1><a>Bedroom</a></h1><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/200301/Beds/">Beds</a></h2><h2
-                                    ><a
-                                        href="http://www.doopsalta.com/en/product/cat/200302/Nightstands/">Nightstands</a>
-                                    </h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/200303/Dressers/">Dressers</a>
-                                    </h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/200304/Shelves/">Shelves</a>
-                                    </h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/200305/Occasional-Chairs/">Occasional
-                                        Chairs</a></h2><h2/></div>
-                                    <div className="cel-top-menu"><h1><a>Pre Teen Bedroom</a></h1><h2
-                                    ><a
-                                        href="http://www.doopsalta.com/en/product/cat/200401/Beds/">Beds</a></h2><h2
-                                    ><a
-                                        href="http://www.doopsalta.com/en/product/cat/200402/Nightstands/">Nightstands</a>
-                                    </h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/200403/Dressers/">Dressers</a>
-                                    </h2><h2><a
-                                        href="http://www.doopsalta.com/en/blind/custom/318E405/">Desks</a></h2><h2
-                                    ><a
-                                        href="http://www.doopsalta.com/en/product/cat/200405/Shelves/">Shelves</a>
-                                    </h2></div>
-                                </div>
-                            </div>
-                        </li>
-                        <li><a>BED &amp; BATH</a>
-                            <div className="mega" style={{display: 'none'}}>
-                                <div className="sub_menu">
-                                    <div className="cel-top-menu"><h1><a>Bedding</a></h1><h2><a
-                                        href="http://www.doopsalta.com/en/product/all/3001/All-Bedding/">All
-                                        Bedding</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/300101/Duvet-Cover-Sets/">Duvet
-                                        Cover Sets</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/300102/Comforter-Sets/">Comforter
-                                        Sets</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/300103/Coverlet-sets/">Coverlet
-                                        sets</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/300104/Sheet-Sets/">Sheet
-                                        Sets</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/300108/Pillowcases/">Pillowcases</a>
-                                    </h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/300105/Decorative-Pillows/">Decorative
-                                        Pillows</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/300106/Blanket-&amp;-Throws/">Blanket &amp; Throws</a>
-                                    </h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/300107/Throw-Beds/">Throw
-                                        Beds</a></h2></div>
-                                    <div className="cel-top-menu"><h1><a>Bedding Basics</a></h1><h2
-                                    ><a
-                                        href="http://www.doopsalta.com/en/product/all/3002/All-Bedding-Basics/">All
-                                        Bedding Basics</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/300201/Pillow-Inserts/">Pillow
-                                        Inserts</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/300202/Duvet-Inserts/">Duvet
-                                        Inserts</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/300203/Mattress-Pads/">Mattress
-                                        Pads</a></h2><h2/><h2/><h2/><h2
-                                    /><h2/></div>
-                                    <div className="cel-top-menu"><h1><a>Bathroom</a></h1><h2><a
-                                        href="http://www.doopsalta.com/en/product/all/3003/All-Bath/">All Bath</a>
-                                    </h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/300301/Bath-Towels/">Bath
-                                        Towels</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/300302/Bath-Rugs/">Bath
-                                        Rugs</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/300303/Bath-Robes/">Bath
-                                        Robes</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/300304/Shower-Curtains/">Shower
-                                        Curtains</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/300305/Bathroom-Accessories/">Bathroom
-                                        Accessories</a></h2></div>
-                                </div>
-                            </div>
-                        </li>
-                        <li><a>TABLETOP &amp; KITCHEN</a>
-                            <div className="mega" style={{display: 'none'}}>
-                                <div className="sub_menu">
-                                    <div className="cel-top-menu"><h1><a>Table Linens</a></h1><h2>
-                                        <a href="http://www.doopsalta.com/en/product/all/4001/All-Table-Linens/">All
-                                            Table Linens</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/400101/Tablecloths/">Tablecloths</a>
-                                    </h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/400102/Runners/">Runners</a>
-                                    </h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/400103/Placemats/">Placemats</a>
-                                    </h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/400104/Napkins/">Napkins</a>
-                                    </h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/400105/Napkin-Holders/">Napkin
-                                        Holders</a></h2><h1><a>Dinnerware</a></h1><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/400201/Dinnerware-Sets/">Dinnerware
-                                        Sets</a></h2></div>
-                                    <div className="cel-top-menu"><h1><a>Kitchen Linens</a></h1><h2
-                                    ><a
-                                        href="http://www.doopsalta.com/en/product/all/4003/All-Kitchen-Linens/">All
-                                        Kitchen Linens</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/400301/Kitchen-Towels/">Kitchen
-                                        Towels</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/400302/Aprons/">Aprons</a>
-                                    </h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/400303/Oven-Mitts/">Oven
-                                        Mitts</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/400304/Potholders/">Potholders</a>
-                                    </h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/400305/Cooking-Pot-Pads/">Cooking
-                                        Pot Pads</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/400306/Bread-Baskets/">Bread
-                                        Baskets</a></h2></div>
-                                </div>
-                            </div>
-                        </li>
-                        <li><a>Decor</a>
-                            <div className="mega" style={{display: 'none'}}>
-                                <div className="sub_menu">
-                                    <div className="cel-top-menu"><h1><a>Home Accessories</a></h1><h2
-                                    ><a
-                                        href="http://www.doopsalta.com/en/product/cat/500101/Candles/">Candles</a>
-                                    </h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/500102/Candle-Holders/">Candle
-                                        Holders</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/500103/Wax-Melts/">Wax
-                                        Melts</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/500104/Aromatherapy-Diffusers/">Aromatherapy
-                                        Diffusers</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/500105/Baskets/">Baskets</a>
-                                    </h2><h2/><h2/><h2/></div>
-                                    <div className="cel-top-menu"><h1><a>Pillows &amp; Throws</a></h1><h2
-                                    ><a
-                                        href="http://www.doopsalta.com/en/product/cat/500201/Decorative-Pillows/">Decorative
-                                        Pillows</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/500202/Pillow-Inserts/">Pillow
-                                        Inserts</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/500203/Throws/">Throws</a>
-                                    </h2><h2/><h1><a>Picnic Essentials</a></h1><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/500301/Picnic-Mats/">Picnic
-                                        Mats</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/500302/Picnic-Blankets/">Picnic
-                                        Blankets</a></h2><h2/></div>
-                                    <div className="cel-top-menu"><h1><a>Home Organization</a></h1><h2
-                                    ><a
-                                        href="http://www.doopsalta.com/en/product/cat/500401/Remote-Control-Holder/">Remote
-                                        Control Holder</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/500402/Jewelry-Holder/">Jewelry
-                                        Holder</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/500403/Shoe-Storage/">Shoe
-                                        Storage</a></h2><h2><a
-                                        href="http://www.doopsalta.com/en/product/cat/500404/Sweater-Storage/">Sweater
-                                        Storage</a></h2></div>
-                                </div>
-                            </div>
-                        </li>
-                        <li><a>Fabric</a>
-                            <div className="mega" style={{display: 'none'}}>
-                                <div className="sub_menu">
-                                    <div className="cel-top-menu"><h1><a>Fabric By The Meter</a></h1></div>
-                                </div>
-                            </div>
-                        </li>
-                        <li><a>Sale</a>
-                            <div className="mega" style={{display: 'none'}}>
-                                <div className="sub_menu">
-                                    <div className="cel-top-menu">
-                                        <h1><a>SALE</a>
-                                        </h1>
-                                        <h2><a
-                                            href="http://www.doopsalta.com/en/product/cat//All-Sale/">All Sale</a>
-                                        </h2>
-                                        <h2><a
-                                            href="http://www.doopsalta.com/en/product/cat//Bedding/">Bedding</a>
-                                        </h2>
-                                        <h2><a
-                                            href="http://www.doopsalta.com/en/product/cat//Bath/">Bath</a>
-                                        </h2>
-                                        <h2
-                                        ><a
-                                            href="http://www.doopsalta.com/en/product/cat//Window-Treatments/">Window
-                                            Treatments</a>
-                                        </h2>
-                                        <h2><a
-                                            href="http://www.doopsalta.com/en/product/cat//Tabletop-&amp;-Kitchen/">Tabletop &amp; Kitchen</a>
-                                        </h2>
-                                        <h2><a
-                                            href="http://www.doopsalta.com/en/product/cat//Decor/">Decor</a></h2><h2
-                                    ><a
-                                        href="http://www.doopsalta.com/en/blind/custom/DE3B6E1/">Furniture</a>
-                                    </h2>
-                                        <h2><a
-                                            href="http://www.doopsalta.com/en/product/cat//Fabrics/">Fabrics</a>
-                                        </h2>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
+                        {menuRender}
                     </ul>
                     <div className="bghover">
                     </div>
