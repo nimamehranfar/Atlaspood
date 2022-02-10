@@ -1,7 +1,8 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import axios from "axios";
 import {InputGroup, FormControl, Toast, ToastContainer} from "react-bootstrap"
 import Form from "react-bootstrap/Form";
+import Select from "react-select";
 
 const baseURLGet = "http://atlaspood.ir/api/WebsiteSetting/GetBanner?apiKey=477f46c6-4a17-4163-83cc-29908d";
 const baseURLPost = "http://atlaspood.ir/api/WebsiteSetting/SaveBanner";
@@ -11,7 +12,18 @@ function Banner() {
     const [banner, setBanner] = React.useState([]);
     const [bannerList, setBannerList] = React.useState([]);
     const [showToast, setShowToast] = React.useState(false);
+    const [options, setOptions] =useState( []);
     
+    const getOptions = () => {
+        let tempArr = [];
+        for (let i = 5; i < 49; i++) {
+            let tempObj = {};
+            tempObj["value"] = `${i}`;
+            tempObj["label"] = `${i}px`;
+            tempArr.push(tempObj);
+        }
+        setOptions(tempArr);
+    };
     
     function getBanner() {
         axios.get(baseURLGet).then((response) => {
@@ -31,8 +43,9 @@ function Banner() {
             let url = banner[i].url;
             let lang = banner[i].lang;
             let oneSlide = banner[i].oneSlide;
+            let fontSize = banner[i].fontSize;
             
-            if (i===0){
+            if (i === 0) {
                 bannerLists.push(
                     <li key={"banner_oneSlide" + i} banner_id={i}>
                         <Form.Check
@@ -43,8 +56,8 @@ function Banner() {
                             defaultChecked={oneSlide === "true" && true}
                             onChange={(e) => {
                                 const tempBanner = [...banner];
-                                tempBanner.forEach(obj=>{
-                                    obj["oneSlide"]=`${e.target.checked}`;
+                                tempBanner.forEach(obj => {
+                                    obj["oneSlide"] = `${e.target.checked}`;
                                 });
                                 setBanner(tempBanner);
                             }}
@@ -55,30 +68,54 @@ function Banner() {
             
             bannerLists.push(
                 <li key={"banner" + i} banner_id={i}>
-                <label className="input">
-                    <input type="text" banner_text_id="text1" banner_id={i} defaultValue={text1} onChange={e => textChanged(e)} placeholder="Type Something..."/>
-                    <span className="input__label">Primary Text</span>
-                </label>
-                <label className="input">
-                    <input type="text" banner_text_id="text2" banner_id={i} defaultValue={text2} onChange={e => textChanged(e)} placeholder="Type Something..."/>
-                    <span className="input__label">Secondary Text</span>
-                </label>
-                <label className="input">
-                    {/*<input type="text"/>*/}
-                    <InputGroup className="">
-                        <InputGroup.Text id="basic-addon3">
-                            https://doopsalta2.com/
-                        </InputGroup.Text>
-                        <FormControl id="basic-url" aria-describedby="basic-addon3" banner_text_id="url" banner_id={i} defaultValue={url} onChange={e => textChanged(e)}
-                                     placeholder="Type Something..."/>
-                    </InputGroup>
-                    <span className="input__label">URL</span>
-                </label>
-                <label className="input">
-                    <input type="text" banner_text_id="lang" banner_id={i} defaultValue={lang} onChange={e => textChanged(e)} placeholder="Type 'en' or 'fa'..."/>
-                    <span className="input__label">Language(en or fa)</span>
-                </label>
-            </li>);
+                    <label className="input">
+                        <input type="text" banner_text_id="text1" banner_id={i} defaultValue={text1} onChange={e => textChanged(e)} placeholder="Type Something..."/>
+                        <span className="input__label">Primary Text</span>
+                    </label>
+                    <label className="input">
+                        <input type="text" banner_text_id="text2" banner_id={i} defaultValue={text2} onChange={e => textChanged(e)} placeholder="Type Something..."/>
+                        <span className="input__label">Secondary Text</span>
+                    </label>
+                    <label className="input">
+                        {/*<input type="text"/>*/}
+                        <InputGroup className="">
+                            <InputGroup.Text id="basic-addon3">
+                                https://doopsalta2.com/
+                            </InputGroup.Text>
+                            <FormControl id="basic-url" aria-describedby="basic-addon3" banner_text_id="url" banner_id={i} defaultValue={url} onChange={e => textChanged(e)}
+                                         placeholder="Type Something..."/>
+                        </InputGroup>
+                        <span className="input__label">URL</span>
+                    </label>
+                    {/*<label className="input">*/}
+                    {/*    <input type="text" banner_text_id="lang" banner_id={i} defaultValue={lang} onChange={e => textChanged(e)} placeholder="Type 'en' or 'fa'..."/>*/}
+                    {/*    <span className="input__label">Language(en or fa)</span>*/}
+                    {/*</label>*/}
+                    <div className="menu_select_container">
+                        <span className="input__label">Language</span>
+                        <Select
+                            onChange={(selected) => {
+                                const tempBanner = [...banner];
+                                tempBanner[i]["lang"] = selected["value"];
+                                setBanner(tempBanner);
+                            }}
+                            options={[{value : "en", label : "en"},{value : "fa", label : "fa"}]}
+                            defaultValue={{value : lang, label : lang}}
+                        />
+                    </div>
+                    <div className="menu_select_container">
+                        <span className="input__label">Font Size</span>
+                        <Select
+                            onChange={(selected) => {
+                                const tempBanner = [...banner];
+                                tempBanner[i]["fontSize"] = parseInt(selected["value"]);
+                                setBanner(tempBanner);
+                            }}
+                            options={options}
+                            defaultValue={{value : fontSize, label : `${fontSize}px`}}
+                        />
+                    </div>
+                </li>);
         }
         setBannerList(bannerLists);
     }
@@ -99,7 +136,7 @@ function Banner() {
     
     function addBanner() {
         const tempBanner = [...banner];
-        tempBanner[banner.length] = {"text1": '', "text2": '', "url": '', "lang": ''};
+        tempBanner[banner.length] = {"text1": '', "text2": '', "url": 'en', "lang": 'en', "oneSlide": 'false', "fontSize": 16};
         setBanner(tempBanner);
     }
     
@@ -117,7 +154,7 @@ function Banner() {
     
     useEffect(() => {
         getBanner();
-        
+        getOptions();
     }, []);
     
     useEffect(() => {
@@ -148,7 +185,7 @@ function Banner() {
             </button>
         </div>
         
-        <ToastContainer className="p-3" position="top-start">
+        <ToastContainer className="p-3 position_fixed" position="top-start">
             <Toast onClose={() => setShowToast(false)} bg="success" show={showToast} delay={3000} autohide>
                 <Toast.Header>
                     <img

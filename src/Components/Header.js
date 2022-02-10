@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useRef} from "react";
 import {Link, useLocation} from "react-router-dom";
 import {ReactComponent as Logoen} from '../Images/public/logoen.svg';
 import {ReactComponent as Logofa} from '../Images/public/logofa.svg';
@@ -25,9 +25,11 @@ function Header() {
     const [pageLanguage, setPageLanguage] = React.useState("");
     const [menu, setMenu] = React.useState([]);
     const [menuRender, setMenuRender] = React.useState([]);
+    const mega = useRef([]);
     
     function convertToPersian(string_farsi) {
         let tempString = string_farsi.replace("ي", "ی");
+        tempString = tempString.replace("ي", "ی");
         tempString = tempString.replace("ي", "ی");
         tempString = tempString.replace("ي", "ی");
         tempString = tempString.replace('ك', 'ک');
@@ -40,7 +42,7 @@ function Header() {
             let arr = response.data;
             let temparr = [];
             arr.banner.forEach(obj => {
-                if (obj["lang"] === pageLanguage) {
+                if (obj["lang"] === location.pathname.split('').slice(1, 3).join('')) {
                     temparr = [...temparr, obj];
                 }
             });
@@ -68,13 +70,22 @@ function Header() {
             let text1 = bannerOneSlide[i].text1;
             let text2 = bannerOneSlide[i].text2;
             let url = bannerOneSlide[i].url;
+            let fontSize = bannerOneSlide[i].fontSize;
             
             bannerList.push(
-                <Link key={"banner" + i} to={"/" + url}>
-                    <span>{text1}</span>&nbsp;
-                    <span className="text_underline">{text2}</span>
+                <Link className="banner_oneSlide_item_container" key={"banner" + i} to={"/" + url} style={{fontSize: fontSize + "px"}}>
+                    <div className={`banner_oneSlide_item ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
+                        <span>{text1}</span>&nbsp;
+                        <span className="text_underline">{text2}</span>
+                    </div>
                 </Link>
             );
+            if (i !== bannerOneSlide.length - 1)
+                bannerList.push(
+                    <span key={"banner_seperator" + i} className="banner_seperator">
+                        &nbsp;|&nbsp;
+                    </span>
+                );
         }
         setBannerItemOneSlide(bannerList);
     }
@@ -89,6 +100,7 @@ function Header() {
     }
     
     function renderMenu() {
+        let pageLanguage = location.pathname.split('').slice(1, 3).join('');
         
         let sortedMenu = [];
         for (let i = 0; i < menu.length; i++) {
@@ -188,9 +200,10 @@ function Header() {
                             empty_fields++;
                         } else {
                             buffer.push(
-                                <h2 key={"subSubMenu" + i + j + k}>
+                                <h2 key={"subSubMenu" + i + j + k} className={`${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
                                     <Link className={`subSubMenu ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
-                                          to={"/" + pageLanguage + "/" + subSubPageType + "/" + subSubCategoryId}>{pageLanguage === 'en' ? subSubMenuEnName : subSubMenuName}</Link>
+                                          to={"/" + pageLanguage + "/" + subSubPageType + "/" + subSubCategoryId}
+                                    onClick={()=>menuClicked(i)}>{pageLanguage === 'en' ? subSubMenuEnName : subSubMenuName}</Link>
                                 </h2>);
                             
                             // subSubMenuList.push(
@@ -202,8 +215,8 @@ function Header() {
                     }
                     for (let emptyCounter = 0; emptyCounter < empty_fields; emptyCounter++) {
                         buffer.push(
-                            <h2 key={"subSubMenu" + i + j + "empty" + emptyCounter}>
-                            
+                            <h2 key={"subSubMenu" + i + j + "empty" + emptyCounter} className={`${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
+                                &nbsp;
                             </h2>);
                         
                         // subSubMenuList.push(
@@ -231,9 +244,9 @@ function Header() {
                 }
             }
             
-            for (let m = 0; m < buffer.length; m += 12) {
+            for (let m = 0; m < buffer.length; m += 13) {
                 let subSubMenuList = [];
-                for (let n = m; n < m + 12; n++) {
+                for (let n = m; n < m + 13; n++) {
                     if (n === buffer.length)
                         break;
                     else {
@@ -253,7 +266,7 @@ function Header() {
             menuList.push(
                 <li key={"menu" + i}>
                     <h1 className={`${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>{pageLanguage === 'en' ? MenuEnName : MenuName}</h1>
-                    <div className={`mega ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} style={{display: 'none'}}>
+                    <div ref={ref => (mega.current=[...mega.current, ref])} className={`mega ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} style={{display: 'none'}}>
                         <div className={`sub_menu ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
                             {subMenuList}
                         </div>
@@ -263,21 +276,13 @@ function Header() {
         setMenuRender(menuList);
     }
     
-    useEffect(() => {
-        if (pageLanguage !== '') {
-            setBannerItem({
-                text1: "", text2: "", url: "/", nextI: 0
-            });
-            setBannerItemOneSlide([]);
-            setMenuRender([]);
-            // setTimeout(() => {  console.log("World!"); }, 2000);
-            // i18n.changeLanguage(pageLanguage);
-            // getMenu().then(() => {
-            //     getBanner();
-            // });
-            
-        }
-        
+    function menuClicked(index){
+        pageLanguage === 'fa' ? mega.current[index].className="mega1 font_farsi" : mega.current[index].className="mega1 font_en";
+        setTimeout(() => { pageLanguage === 'fa' ? mega.current[index].className="mega font_farsi" : mega.current[index].className="mega font_en";  }, 1000);
+        // console.log(mega.current[index])
+    }
+    
+    async function setLang() {
         const tempLocationEn = location.pathname.split('');
         tempLocationEn[1] = 'e';
         tempLocationEn[2] = 'n';
@@ -291,10 +296,33 @@ function Header() {
         
         const tempLang = location.pathname.split('');
         setPageLanguage(tempLang.slice(1, 3).join(''));
+    }
+    
+    useEffect(() => {
+        setLang().then(() => {
+            if (pageLanguage !== '') {
+                // setBannerItem({
+                //     text1: "", text2: "", url: "/", nextI: 0
+                // });
+                // setBannerItemOneSlide([]);
+                // setMenuRender([]);
+                // setTimeout(() => {  console.log("World!"); }, 2000);
+                // i18n.changeLanguage(pageLanguage);
+                // getMenu().then(() => {
+                //     getBanner();
+                // });
+            }
+        });
+        
         
     }, [location.pathname]);
     
     useEffect(() => {
+        setBannerItem({
+            text1: "", text2: "", url: "/", nextI: 0
+        });
+        setBannerItemOneSlide([]);
+        setMenuRender([]);
         if (pageLanguage !== '') {
             i18n.changeLanguage(pageLanguage);
             getMenu().then(() => {
@@ -399,7 +427,7 @@ function Header() {
                             <Link to={langLocation.locationEN} onClick={() => i18n.changeLanguage("en")}
                                   style={pageLanguage === 'en' ? {pointerEvents: "none", color: "#383838"} : null}>ENGLISH</Link>
                         </li>
-                        &nbsp;|&nbsp;
+                        <li className="lang_separator">&nbsp;|&nbsp;</li>
                         <li className="Lang_change">
                             <Link to={langLocation.locationFA} onClick={() => i18n.changeLanguage("fa")}
                                   style={pageLanguage === 'fa' ? {pointerEvents: "none", color: "#383838"} : null}>فارسی</Link>

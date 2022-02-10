@@ -160,7 +160,7 @@ function Slideshow() {
             </button>
         </div>
         
-        <ToastContainer className="p-3" position="top-start">
+        <ToastContainer className="p-3 position_fixed" position="top-start">
             <Toast onClose={() => setShowToast(false)} bg="success" show={showToast} delay={3000} autohide>
                 <Toast.Header>
                     <img

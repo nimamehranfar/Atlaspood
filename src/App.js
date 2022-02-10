@@ -6,10 +6,11 @@ import Panel from "./Pages/Panel";
 import Menu from "./Components/Menu"
 import Slideshow from "./Components/Slideshow";
 import Banner from "./Components/Banner";
-import Drapery from "./Pages/Drapery";
+import Curtain from "./Pages/Curtain";
 import Product from "./Pages/Product";
 import HeaderFooter from "./Pages/HeaderFooter";
 import Models from "./Components/Models";
+import CustomCurtain from "./Pages/CustomCurtain";
 
 
 function App({t}) {
@@ -51,12 +52,14 @@ function App({t}) {
                     <Routes>
                         <Route path="/en" element={<HeaderFooter/>}>
                             <Route path="" element={<Home/>}/>
-                            <Route path="Curtain/:catID" element={<Drapery/>}/>
+                            <Route path="Curtain/:catID/:modelID" element={<CustomCurtain/>}/>
+                            <Route path="Curtain/:catID" element={<Curtain/>}/>
                             <Route path="Product/:catID" element={<Product/>}/>
                         </Route>
                         <Route path="/fa" element={<HeaderFooter/>}>
                             <Route path="" element={<Home/>}/>
-                            <Route path="Curtain/:catID" element={<Drapery/>}/>
+                            <Route path="Curtain/:catID/:modelID" element={<CustomCurtain/>}/>
+                            <Route path="Curtain/:catID" element={<Curtain/>}/>
                             <Route path="Product/:catID" element={<Product/>}/>
                         </Route>
                         <Route path="/admin/panel" element={<Panel/>}>

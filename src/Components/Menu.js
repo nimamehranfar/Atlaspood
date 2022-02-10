@@ -29,7 +29,7 @@ function Menu() {
     
     const getOptions = () => {
         let tempArr = [];
-        for (let i = 50; i < 350; i++) {
+        for (let i = 50; i < 451; i++) {
             let tempObj = {};
             tempObj["value"] = `${i}`;
             tempObj["label"] = `${i}px`;
@@ -43,11 +43,41 @@ function Menu() {
         axios.get(baseURL).then((response) => {
             let arr = response.data;
             // arr.forEach( obj => renameKey( obj, 'MenuEnName', 'title' ) );
-            arr = JSON.parse(JSON.stringify(arr).split('"MenuEnName":').join('"title":'));
-            arr = JSON.parse(JSON.stringify(arr).split('"Children":').join('"children":'));
-            setMenu({menuData: arr});
+            let sortedMenu = [];
+            for (let i = 0; i < arr.length; i++) {
+                sortedMenu[arr[i].MenuOrder] = arr[i];
+            }
+    
+            for (let i = 0; i < sortedMenu.length; i++) {
+                let Children = sortedMenu[i].Children;
+                let tempArr = [];
+                for (let j = 0; j < Children.length; j++) {
+                    tempArr[Children[j].MenuOrder] = Children[j];
+                }
+                sortedMenu[i].Children = tempArr;
+            }
+    
+    
+            for (let i = 0; i < sortedMenu.length; i++) {
+                let Children = sortedMenu[i].Children;
+                for (let j = 0; j < Children.length; j++) {
+                    let subChildren = Children[j].Children;
+                    let tempArr = [];
+                    for (let k = 0; k < subChildren.length; k++) {
+                        tempArr[subChildren[k].MenuOrder] = subChildren[k];
+                    }
+                    sortedMenu[i].Children[j].Children = tempArr;
+                }
+            }
+    
+            sortedMenu = JSON.parse(JSON.stringify(sortedMenu).split('"MenuEnName":').join('"title":'));
+            sortedMenu = JSON.parse(JSON.stringify(sortedMenu).split('"Children":').join('"children":'));
+            
+            
+            
+            // setMenu({menuData: arr});
             // setMenu({menuData: response.data});
-            setTreeData({items: arr})
+            setTreeData({items: sortedMenu})
         }).catch(err => {
             console.log(err);
         });
@@ -404,7 +434,7 @@ function Menu() {
             }}>Save Settings
             </button>
         </div>
-        <ToastContainer className="p-3" position="top-start">
+        <ToastContainer className="p-3 position_fixed" position="top-start">
             <Toast onClose={() => setShowToast(false)} bg="success" show={showToast} delay={3000} autohide>
                 <Toast.Header>
                     <img

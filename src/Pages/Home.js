@@ -52,7 +52,7 @@ function Home() {
             );
         }
         setSlideList(slideLists);
-        console.log(slideLists)
+        // console.log(slideLists)
     }
     
     useEffect(() => {
@@ -80,22 +80,22 @@ function Home() {
             <div className="col-lg-12">
                 <div className="main_page_slide_show">
                     <Carousel activeIndex={index} onSelect={handleSelect} variant="dark" pause="false">
-                        {/*{slideList}*/}
-                        <Carousel.Item interval={4500}>
-                            <img src={main_page_img} className="img-fluid" alt=""/>
-                            <Carousel.Caption>
-                                <h3 className="unselectable">{t("CUSTOM WINDOW COVERING")}</h3>
-                                <p className="unselectable">{t("MADE EASY.")}</p>
-                            </Carousel.Caption>
-                        </Carousel.Item>
-                        <Carousel.Item interval={4500}>
-                            <img src={main_page_img1} className="img-fluid" alt=""/>
-                            
-                            <Carousel.Caption>
-                                {/*<h3>Custom window covering</h3>*/}
-                                {/*<p>make easy.</p>*/}
-                            </Carousel.Caption>
-                        </Carousel.Item>
+                        {slideList}
+                        {/*<Carousel.Item interval={4500}>*/}
+                        {/*    <img src={main_page_img} className="img-fluid" alt=""/>*/}
+                        {/*    <Carousel.Caption>*/}
+                        {/*        <h3 className="unselectable">{t("CUSTOM WINDOW COVERING")}</h3>*/}
+                        {/*        <p className="unselectable">{t("MADE EASY.")}</p>*/}
+                        {/*    </Carousel.Caption>*/}
+                        {/*</Carousel.Item>*/}
+                        {/*<Carousel.Item interval={4500}>*/}
+                        {/*    <img src={main_page_img1} className="img-fluid" alt=""/>*/}
+                        {/*    */}
+                        {/*    <Carousel.Caption>*/}
+                        {/*        /!*<h3>Custom window covering</h3>*!/*/}
+                        {/*        /!*<p>make easy.</p>*!/*/}
+                        {/*    </Carousel.Caption>*/}
+                        {/*</Carousel.Item>*/}
                     </Carousel>
                 </div>
             </div>
