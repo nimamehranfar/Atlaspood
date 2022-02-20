@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="178.864" height="171" viewBox="0 0 178.864 171">
+  <defs>
+    <style>
+      .cls-1, .cls-2, .cls-3, .cls-4 {
+        fill: none;
+      }
+
+      .cls-2, .cls-3, .cls-4, .cls-6 {
+        stroke: #606060;
+      }
+
+      .cls-2 {
+        stroke-width: 2px;
+        stroke-dasharray: 3.32;
+      }
+
+      .cls-3 {
+        stroke-width: 0.8px;
+      }
+
+      .cls-4 {
+        stroke-width: 1.4px;
+      }
+
+      .cls-5 {
+        fill: #606060;
+      }
+
+      .cls-6 {
+        fill: #fff;
+        stroke-width: 1.1px;
+      }
+
+      .cls-7, .cls-8 {
+        stroke: none;
+      }
+
+      .cls-8 {
+        fill: #606060;
+      }
+    </style>
+  </defs>
+  <g id="Group_81" data-name="Group 81" transform="translate(-47.843 3.602)">
+    <rect id="Rectangle_41" data-name="Rectangle 41" class="cls-1" width="122" height="171" transform="translate(76.514 -3.602)"/>
+    <line id="Line_1" data-name="Line 1" class="cls-2" x2="137" transform="translate(69.475 0.296)"/>
+    <g id="Group_29" data-name="Group 29" transform="translate(172.132 64.368) rotate(-90)">
+      <line id="Line_5" data-name="Line 5" class="cls-3" y1="22.385" transform="translate(47.99 2.52)"/>
+      <line id="Line_7" data-name="Line 7" class="cls-4" x2="12.883" transform="translate(49.742 20.698)"/>
+      <g id="Polygon_1" data-name="Polygon 1" class="cls-5" transform="translate(63.876 18.198) rotate(90)">
+        <path class="cls-7" d="M 4.278299808502197 3.599999904632568 L 0.7217000126838684 3.599999904632568 L 2.5 0.7547199726104736 L 4.278299808502197 3.599999904632568 Z"/>
+        <path class="cls-8" d="M 2.5 1.509439945220947 L 1.443399906158447 3.200000047683716 L 3.556600093841553 3.200000047683716 L 2.5 1.509439945220947 M 2.5 0 L 5 4 L 0 4 L 2.5 0 Z"/>
+      </g>
+      <g id="Polygon_2" data-name="Polygon 2" class="cls-5" transform="translate(48.49 23.198) rotate(-90)">
+        <path class="cls-7" d="M 4.278299808502197 3.599999904632568 L 0.7217000126838684 3.599999904632568 L 2.5 0.7547199726104736 L 4.278299808502197 3.599999904632568 Z"/>
+        <path class="cls-8" d="M 2.5 1.509439945220947 L 1.443399906158447 3.200000047683716 L 3.556600093841553 3.200000047683716 L 2.5 1.509439945220947 M 2.5 0 L 5 4 L 0 4 L 2.5 0 Z"/>
+      </g>
+    </g>
+    <g id="Group_32" data-name="Group 32" transform="translate(78.31 16.378) rotate(-90)">
+      <line id="Line_5-2" data-name="Line 5" class="cls-3" y2="22.385" transform="translate(0 0)"/>
+      <line id="Line_7-2" data-name="Line 7" class="cls-4" x2="12.883" transform="translate(1.752 4.207)"/>
+      <g id="Polygon_1-2" data-name="Polygon 1" class="cls-5" transform="translate(15.885 1.707) rotate(90)">
+        <path class="cls-7" d="M 4.278299808502197 3.599999904632568 L 0.7217000126838684 3.599999904632568 L 2.5 0.7547199726104736 L 4.278299808502197 3.599999904632568 Z"/>
+        <path class="cls-8" d="M 2.5 1.509439945220947 L 1.443399906158447 3.200000047683716 L 3.556600093841553 3.200000047683716 L 2.5 1.509439945220947 M 2.5 0 L 5 4 L 0 4 L 2.5 0 Z"/>
+      </g>
+      <g id="Polygon_2-2" data-name="Polygon 2" class="cls-5" transform="translate(0.5 6.707) rotate(-90)">
+        <path class="cls-7" d="M 4.278299808502197 3.599999904632568 L 0.7217000126838684 3.599999904632568 L 2.5 0.7547199726104736 L 4.278299808502197 3.599999904632568 Z"/>
+        <path class="cls-8" d="M 2.5 1.509439945220947 L 1.443399906158447 3.200000047683716 L 3.556600093841553 3.200000047683716 L 2.5 1.509439945220947 M 2.5 0 L 5 4 L 0 4 L 2.5 0 Z"/>
+      </g>
+    </g>
+    <g id="Rectangle_4" data-name="Rectangle 4" class="cls-6" transform="translate(89.503 15.835)">
+      <rect class="cls-7" width="95.067" height="131.563"/>
+      <rect class="cls-1" x="0.55" y="0.55" width="93.967" height="130.463"/>
+    </g>
+    <g id="Rectangle_5" data-name="Rectangle 5" class="cls-6" transform="translate(97.794 24.125)">
+      <rect class="cls-7" width="78.485" height="114.982"/>
+      <rect class="cls-1" x="0.55" y="0.55" width="77.385" height="113.882"/>
+    </g>
+    <rect id="Rectangle_9" data-name="Rectangle 9" class="cls-1" width="178.864" height="151" transform="translate(47.843 -3.602)"/>
+  </g>
+</svg>

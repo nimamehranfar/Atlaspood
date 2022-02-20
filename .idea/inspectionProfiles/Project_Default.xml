@@ -4,19 +4,24 @@
     <inspection_tool class="DuplicatedCode" enabled="true" level="WEAK WARNING" enabled_by_default="true">
       <Languages>
         <language minSize="16" name="Style Sheets" />
-        <language minSize="100" name="JavaScript" />
+        <language minSize="105" name="JavaScript" />
       </Languages>
     </inspection_tool>
     <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myValues">
         <value>
-          <list size="6">
+          <list size="11">
             <item index="0" class="java.lang.String" itemvalue="banner_id" />
             <item index="1" class="java.lang.String" itemvalue="banner_text_id" />
             <item index="2" class="java.lang.String" itemvalue="slide_id" />
             <item index="3" class="java.lang.String" itemvalue="slide_text_id" />
             <item index="4" class="java.lang.String" itemvalue="model_id" />
             <item index="5" class="java.lang.String" itemvalue="model_text_id" />
+            <item index="6" class="java.lang.String" itemvalue="ref-num" />
+            <item index="7" class="java.lang.String" itemvalue="fabric-id" />
+            <item index="8" class="java.lang.String" itemvalue="model-id" />
+            <item index="9" class="java.lang.String" itemvalue="current-state" />
+            <item index="10" class="java.lang.String" itemvalue="variant" />
           </list>
         </value>
       </option>

@@ -131,7 +131,7 @@ function Curtain() {
             getCats();
         }
         
-    }, [pageLanguage, location]);
+    }, [pageLanguage, location.pathname]);
     
     return (
         <div className="Drapery_page_container">

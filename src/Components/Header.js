@@ -2,6 +2,9 @@ import React, {useEffect, useRef} from "react";
 import {Link, useLocation} from "react-router-dom";
 import {ReactComponent as Logoen} from '../Images/public/logoen.svg';
 import {ReactComponent as Logofa} from '../Images/public/logofa.svg';
+import {ReactComponent as Favorite} from '../Images/public/favorite.svg';
+import {ReactComponent as Person} from '../Images/public/person-2.svg';
+import {ReactComponent as Basket} from '../Images/public/basket-2.svg';
 import axios from "axios";
 import {FormControl, InputGroup} from "react-bootstrap";
 import {useTranslation} from "react-i18next";
@@ -215,7 +218,7 @@ function Header() {
                     }
                     for (let emptyCounter = 0; emptyCounter < empty_fields; emptyCounter++) {
                         buffer.push(
-                            <h2 key={"subSubMenu" + i + j + "empty" + emptyCounter} className={`${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
+                            <h2 key={"subSubMenu" + i + j + "empty" + emptyCounter} className={`emptySubMenu ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
                                 &nbsp;
                             </h2>);
                         
@@ -278,7 +281,7 @@ function Header() {
     
     function menuClicked(index){
         pageLanguage === 'fa' ? mega.current[index].className="mega1 font_farsi" : mega.current[index].className="mega1 font_en";
-        setTimeout(() => { pageLanguage === 'fa' ? mega.current[index].className="mega font_farsi" : mega.current[index].className="mega font_en";  }, 1000);
+        setTimeout(() => { pageLanguage === 'fa' ? mega.current[index].className="mega font_farsi" : mega.current[index].className="mega font_en";  }, 1500);
         // console.log(mega.current[index])
     }
     
@@ -400,16 +403,21 @@ function Header() {
                 <div className="Logo"><Link to="/">{pageLanguage === 'en' ? <Logoen/> : <Logofa/>}</Link></div>
                 <div className="mid_header_right">
                     <ul className={pageLanguage === 'fa' ? "float_left" : "float_right"}>
-                        <li id="login-open">
+                        <li className="login-open">
                             <a href="http://www.doopsalta.com/en/account/login/">
-                                <img src={require('../Images/public/person.svg')} className="img-fluid" alt=""/>
+                                <Person/>
+                            </a>
+                        </li>
+                        <li className="favorite">
+                            <a href="http://www.doopsalta.com/en/account/login/">
+                                <Favorite/>
                             </a>
                         </li>
                         <li className="checkout">
                             <a href="http://www.doopsalta.com/en/basket/">
                                 <div className="display_grid">
-                                    <img src={require('../Images/public/basket.svg')} className="img-fluid" alt=""/>
-                                    <div id="count">0</div>
+                                    <Basket/>
+                                    <div className="count">0</div>
                                 </div>
                             </a>
                             <div className="card_menu">

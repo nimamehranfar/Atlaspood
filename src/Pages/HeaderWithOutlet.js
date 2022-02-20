@@ -5,7 +5,7 @@ import {Outlet} from "react-router";
 import i18n from "i18next";
 import {I18nextProvider, useTranslation} from "react-i18next";
 
-function HeaderFooter() {
+function HeaderWithOutlet() {
     const {t} = useTranslation();
     
     return (
@@ -13,11 +13,10 @@ function HeaderFooter() {
             <I18nextProvider i18n={i18n}>
                 <Header/>
                 <Outlet/>
-                <Footer/>
             </I18nextProvider>
         </div>
     
     );
 }
 
-export default HeaderFooter;
+export default HeaderWithOutlet;

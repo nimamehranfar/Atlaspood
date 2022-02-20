@@ -176,6 +176,7 @@ function Menu() {
         let catString = node["ListOfCategory"];
         if (catString != null && catString !== "") {
             let catArr = catString.split(',');
+            // console.log(catArr);
             let tempArr = [];
             catArr.forEach(obj => {
                 let tempObj = {};

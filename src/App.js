@@ -11,6 +11,7 @@ import Product from "./Pages/Product";
 import HeaderFooter from "./Pages/HeaderFooter";
 import Models from "./Components/Models";
 import CustomCurtain from "./Pages/CustomCurtain";
+import HeaderWithOutlet from "./Pages/HeaderWithOutlet";
 
 
 function App({t}) {
@@ -27,10 +28,10 @@ function App({t}) {
             setuser({success: true});
         }
     };
-
+    
     return (
         <Router>
-
+            
             <div className="App">
                 <div className="page_container">
                     {!user1.success &&
@@ -52,16 +53,22 @@ function App({t}) {
                     <Routes>
                         <Route path="/en" element={<HeaderFooter/>}>
                             <Route path="" element={<Home/>}/>
-                            <Route path="Curtain/:catID/:modelID" element={<CustomCurtain/>}/>
                             <Route path="Curtain/:catID" element={<Curtain/>}/>
                             <Route path="Product/:catID" element={<Product/>}/>
                         </Route>
                         <Route path="/fa" element={<HeaderFooter/>}>
                             <Route path="" element={<Home/>}/>
-                            <Route path="Curtain/:catID/:modelID" element={<CustomCurtain/>}/>
                             <Route path="Curtain/:catID" element={<Curtain/>}/>
                             <Route path="Product/:catID" element={<Product/>}/>
                         </Route>
+                        
+                        <Route path="/en" element={<HeaderWithOutlet/>}>
+                            <Route path="Curtain/:catID/:modelID" element={<CustomCurtain/>}/>
+                        </Route>
+                        <Route path="/fa" element={<HeaderWithOutlet/>}>
+                            <Route path="Curtain/:catID/:modelID" element={<CustomCurtain/>}/>
+                        </Route>
+                        
                         <Route path="/admin/panel" element={<Panel/>}>
                             <Route path="menu" element={<Menu/>}/>
                             <Route path="slideshow" element={<Slideshow/>}/>
@@ -74,7 +81,7 @@ function App({t}) {
                         />
                     </Routes>
                     }
-
+                
                 </div>
             </div>
         </Router>

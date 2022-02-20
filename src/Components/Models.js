@@ -82,11 +82,11 @@ function Models() {
                             <span className="input__label">Model EN Name</span>
                         </label>
                         <label className="input">
-                            <input type="text" model_text_id="DiscountDescription" model_id={i} defaultValue={DiscountDescription} placeholder="Type Something..."/>
+                            <input type="text" className="dir_rtl" model_text_id="DiscountDescription" model_id={i} defaultValue={DiscountDescription} onChange={e => textChanged(e)} placeholder="شروع به نوشتن کنید..."/>
                             <span className="input__label">Desc Above Price FA</span>
                         </label>
                         <label className="input">
-                            <input type="text" model_text_id="DiscountEnDescription" model_id={i} defaultValue={DiscountEnDescription} placeholder="Type Something..."/>
+                            <input type="text" model_text_id="DiscountEnDescription" model_id={i} defaultValue={DiscountEnDescription} onChange={e => textChanged(e)} placeholder="Type Something..."/>
                             <span className="input__label">Desc Above Price EN</span>
                         </label>
                     </div>
@@ -97,7 +97,7 @@ function Models() {
                         </label>
                         
                         <label className="input">
-                            <input type="text" model_text_id="DiscountPrice" model_id={i} defaultValue={DiscountPrice} placeholder="Type Something..."/>
+                            <input type="text" model_text_id="DiscountPrice" model_id={i} defaultValue={DiscountPrice} onChange={e => numberChanged(e)} placeholder="Type Something..."/>
                             <span className="input__label">Discount Price</span>
                         </label>
                         <div>
