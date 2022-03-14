@@ -143,7 +143,7 @@ function Curtain() {
                 </Breadcrumb>
             </div>
             <div className="models_title_div">
-                <h1>Custom Drapery</h1>
+                <h1>Custom Zebra Shades</h1>
                 <h2>8 CUSTOM STYLES | 650+ EXCLUSIVE MATERIALS</h2>
             </div>
             <div className="cat_models_list_container">

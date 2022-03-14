@@ -2,10 +2,16 @@
   <dictionary name="NM">
     <words>
       <w>axios</w>
+      <w>bottombar</w>
+      <w>clearfix</w>
+      <w>displayer</w>
       <w>instagram</w>
       <w>multiselect</w>
       <w>navbar</w>
+      <w>persianize</w>
+      <w>persianjs</w>
       <w>slideshow</w>
+      <w>tomans</w>
     </words>
   </dictionary>
 </component>

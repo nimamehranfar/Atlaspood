@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="122" height="156.282" viewBox="0 0 122 156.282">
+  <defs>
+    <style>
+      .cls-1, .cls-2, .cls-4 {
+        fill: none;
+      }
+
+      .cls-1, .cls-2 {
+        stroke: #606060;
+      }
+
+      .cls-1 {
+        stroke-width: 0.8px;
+      }
+
+      .cls-2 {
+        stroke-width: 1.2px;
+      }
+
+      .cls-3 {
+        fill: #606060;
+      }
+
+      .cls-5 {
+        fill: #fff;
+        stroke: #454545;
+        stroke-width: 1.1px;
+      }
+
+      .cls-6, .cls-7 {
+        stroke: none;
+      }
+
+      .cls-7 {
+        fill: #606060;
+      }
+    </style>
+  </defs>
+  <g id="Group_28" data-name="Group 28" transform="translate(-28.932 3.602)">
+    <g id="Group_6" data-name="Group 6" transform="translate(-5.156 4)">
+      <line id="Line_5" data-name="Line 5" class="cls-1" y1="15" transform="translate(47.99 3)"/>
+      <line id="Line_6" data-name="Line 6" class="cls-1" y1="15" transform="translate(142.215 3)"/>
+      <line id="Line_7" data-name="Line 7" class="cls-2" x2="91.273" transform="translate(49.441 8.898)"/>
+      <g id="Polygon_1" data-name="Polygon 1" class="cls-3" transform="translate(141.759 6.5) rotate(90)">
+        <path class="cls-6" d="M 4.278299808502197 3.599999904632568 L 0.7217000126838684 3.599999904632568 L 2.5 0.7547199726104736 L 4.278299808502197 3.599999904632568 Z"/>
+        <path class="cls-7" d="M 2.5 1.509439945220947 L 1.443399906158447 3.200000047683716 L 3.556600093841553 3.200000047683716 L 2.5 1.509439945220947 M 2.5 0 L 5 4 L 0 4 L 2.5 0 Z"/>
+      </g>
+      <g id="Polygon_2" data-name="Polygon 2" class="cls-3" transform="translate(48.466 11.5) rotate(-90)">
+        <path class="cls-6" d="M 4.278299808502197 3.599999904632568 L 0.7217000126838684 3.599999904632568 L 2.5 0.7547199726104736 L 4.278299808502197 3.599999904632568 Z"/>
+        <path class="cls-7" d="M 2.5 1.509439945220947 L 1.443399906158447 3.200000047683716 L 3.556600093841553 3.200000047683716 L 2.5 1.509439945220947 M 2.5 0 L 5 4 L 0 4 L 2.5 0 Z"/>
+      </g>
+    </g>
+    <g id="Group_26" data-name="Group 26" transform="translate(-47.582)">
+      <rect id="Rectangle_41" data-name="Rectangle 41" class="cls-4" width="122" height="151" transform="translate(76.514 -3.602)"/>
+      <g id="Rectangle_4" data-name="Rectangle 4" class="cls-5" transform="translate(89.98 21.116)">
+        <rect class="cls-6" width="95.067" height="131.563"/>
+        <rect class="cls-4" x="0.55" y="0.55" width="93.967" height="130.463"/>
+      </g>
+      <g id="Rectangle_5" data-name="Rectangle 5" class="cls-5" transform="translate(98.271 29.407)">
+        <rect class="cls-6" width="78.485" height="114.982"/>
+        <rect class="cls-4" x="0.55" y="0.55" width="77.385" height="113.882"/>
+      </g>
+    </g>
+  </g>
+</svg>

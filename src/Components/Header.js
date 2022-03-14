@@ -11,6 +11,7 @@ import {useTranslation} from "react-i18next";
 
 const baseURLGet = "http://atlaspood.ir/api/WebsiteSetting/GetBanner?apiKey=477f46c6-4a17-4163-83cc-29908d";
 const baseURLMenu = "http://atlaspood.ir/api/WebsiteMenu/GetByChildren?apikey=477f46c6-4a17-4163-83cc-29908d";
+const baseURLGetPage = "http://atlaspood.ir/api/WebsitePage/GetById";
 
 
 function Header() {
@@ -27,8 +28,10 @@ function Header() {
     });
     const [pageLanguage, setPageLanguage] = React.useState("");
     const [menu, setMenu] = React.useState([]);
+    const [catMenu, setCatMenu] = React.useState([]);
     const [menuRender, setMenuRender] = React.useState([]);
     const mega = useRef([]);
+    
     
     function convertToPersian(string_farsi) {
         let tempString = string_farsi.replace("ي", "ی");
@@ -55,6 +58,41 @@ function Header() {
                 setBanner(temparr);
         }).catch(err => {
             console.log(err);
+        });
+        
+    }
+    
+    function renderCatMenu() {
+        let sortedMenu = [...menu];
+        let promises = [];
+        sortedMenu.forEach(obj => {
+            let Children = obj.Children;
+            Children.forEach(subObj => {
+                let subChildren = subObj.Children;
+                subChildren.forEach(subsubObj => {
+                    let subSubWebsitePageId = subsubObj.WebsitePageId;
+                    if (subSubWebsitePageId === null || subSubWebsitePageId === 0 || subSubWebsitePageId === undefined) {
+                    } else {
+                        promises.push(axios.get(baseURLGetPage, {
+                                params: {
+                                    WebsitePageId: subSubWebsitePageId,
+                                    apiKey: window.$apikey
+                                }
+                            }).then((response) => {
+                                subsubObj["subSubPageTypeId"] = response.data.PageTypeId;
+                                subsubObj["subSubCategoryId"] = response.data.CategoryId;
+                                // console.log("hi");
+                            }).catch(err => {
+                                console.log(err);
+                            })
+                        )
+                    }
+                });
+            });
+        });
+        Promise.all(promises).then(() => {
+            // console.log(sortedMenu);
+            setCatMenu(sortedMenu);
         });
         
     }
@@ -132,14 +170,38 @@ function Header() {
                 sortedMenu[i].Children[j].Children = tempArr;
             }
         }
+        
+        // let sortedCatMenu=[...sortedMenu];
+        sortedMenu.forEach(obj => {
+            let Children = obj.Children;
+            Children.forEach(subObj => {
+                let subChildren = subObj.Children;
+                subChildren.forEach(subsubObj => {
+                    let subSubWebsitePageId = subsubObj.WebsitePageId;
+                    if (subSubWebsitePageId === null || subSubWebsitePageId === 0 || subSubWebsitePageId === undefined)
+                        subSubWebsitePageId = 40;
+                    axios.get(baseURLGetPage, {
+                        params: {
+                            WebsitePageId: subSubWebsitePageId,
+                            apiKey: window.$apikey
+                        }
+                    }).then((response) => {
+                        subsubObj["subSubPageTypeId"] = response.data.PageTypeId;
+                        subsubObj["subSubCategoryId"] = response.data.CategoryId;
+                    }).catch(err => {
+                        console.log(err);
+                    });
+                });
+            });
+        });
+        
+        
         const menuList = [];
         for (let i = 0; i < sortedMenu.length; i++) {
             let MenuName = convertToPersian(sortedMenu[i].MenuName);
             let MenuEnName = sortedMenu[i].MenuEnName;
             let IsActive = sortedMenu[i].IsActive;
-            let CategoryId = sortedMenu[i].CategoryId;
-            let PageType = sortedMenu[i].PageType;
-            let PageTypeId = sortedMenu[i].PageTypeId;
+            let WebsitePageId = sortedMenu[i].WebsitePageId;
             let Children = sortedMenu[i].Children;
             
             const buffer = [];
@@ -148,9 +210,7 @@ function Header() {
                 let subMenuName = convertToPersian(Children[j].MenuName);
                 let subMenuEnName = Children[j].MenuEnName;
                 let subIsActive = Children[j].IsActive;
-                let subCategoryId = Children[j].CategoryId;
-                let subPageType = Children[j].PageType;
-                let subPageTypeId = Children[j].PageTypeId;
+                let subWebsitePageId = Children[j].WebsitePageId;
                 let subChildren = Children[j].Children;
                 let subWidth = Children[j].Width;
                 
@@ -183,10 +243,13 @@ function Header() {
                         let subSubMenuName = convertToPersian(subChildren[k].MenuName);
                         let subSubMenuEnName = subChildren[k].MenuEnName;
                         let subSubIsActive = subChildren[k].IsActive;
-                        let subSubCategoryId = subChildren[k].CategoryId;
-                        let subSubPageTypeId = subChildren[k].PageTypeId;
+                        let subSubWebsitePageId = subChildren[k].WebsitePageId;
                         let subSubChildren = subChildren[k].Children;
                         let subSubWidth = subChildren[k].Width;
+                        let subSubPageTypeId = subChildren[k].subSubPageTypeId;
+                        let subSubCategoryId = subChildren[k].subSubCategoryId;
+                        
+                        
                         let subSubPageType = subSubPageTypeId === 5501 ? "Product" : "Curtain";
                         
                         
@@ -206,7 +269,7 @@ function Header() {
                                 <h2 key={"subSubMenu" + i + j + k} className={`${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
                                     <Link className={`subSubMenu ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                                           to={"/" + pageLanguage + "/" + subSubPageType + "/" + subSubCategoryId}
-                                    onClick={()=>menuClicked(i)}>{pageLanguage === 'en' ? subSubMenuEnName : subSubMenuName}</Link>
+                                          onClick={() => menuClicked(i)}>{pageLanguage === 'en' ? subSubMenuEnName : subSubMenuName}</Link>
                                 </h2>);
                             
                             // subSubMenuList.push(
@@ -269,7 +332,7 @@ function Header() {
             menuList.push(
                 <li key={"menu" + i}>
                     <h1 className={`${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>{pageLanguage === 'en' ? MenuEnName : MenuName}</h1>
-                    <div ref={ref => (mega.current=[...mega.current, ref])} className={`mega ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} style={{display: 'none'}}>
+                    <div ref={ref => (mega.current = [...mega.current, ref])} className={`mega ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} style={{display: 'none'}}>
                         <div className={`sub_menu ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
                             {subMenuList}
                         </div>
@@ -279,9 +342,11 @@ function Header() {
         setMenuRender(menuList);
     }
     
-    function menuClicked(index){
-        pageLanguage === 'fa' ? mega.current[index].className="mega1 font_farsi" : mega.current[index].className="mega1 font_en";
-        setTimeout(() => { pageLanguage === 'fa' ? mega.current[index].className="mega font_farsi" : mega.current[index].className="mega font_en";  }, 1500);
+    function menuClicked(index) {
+        pageLanguage === 'fa' ? mega.current[index].className = "mega1 font_farsi" : mega.current[index].className = "mega1 font_en";
+        setTimeout(() => {
+            pageLanguage === 'fa' ? mega.current[index].className = "mega font_farsi" : mega.current[index].className = "mega font_en";
+        }, 1500);
         // console.log(mega.current[index])
     }
     
@@ -351,9 +416,15 @@ function Header() {
     
     useEffect(() => {
         if (menu.length) {
-            renderMenu()
+            renderCatMenu()
         }
     }, [menu]);
+    
+    useEffect(() => {
+        if (catMenu.length) {
+            renderMenu()
+        }
+    }, [catMenu]);
     
     useEffect(() => {
         const timeout = setTimeout(() => {

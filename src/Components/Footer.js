@@ -92,8 +92,8 @@ function Footer() {
                         <span className="icon-instagram"><i className="fa fa-instagram"/></span>
                     </div>
                     <div className="copyright">
-                        2022 © All Rights Reserved for Atlas Viewer.<a
-                        href="http://www.doopsalta.com/en/page/EF8C077/rules/"> Site Rules</a>
+                        {t("2022 © All Rights Reserved for Atlas Viewer.")}<a
+                        href="http://www.doopsalta.com/en/page/EF8C077/rules/">{t("Site Rules")}</a>
                     </div>
                 </div>
             </div>

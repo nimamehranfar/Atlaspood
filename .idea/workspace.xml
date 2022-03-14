@@ -2,32 +2,57 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="200ae4a2-413a-4eda-9bd3-7e6393833ac7" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/frame_height.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/height_inside_3.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/mount_inside.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/mount_outside.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/shade_mount.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/step3_help_inside.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/step3_help_outside.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/wall_cover.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/width_inside_3.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/public/basket-2.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/public/favorite.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/public/person-2.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Pages/HeaderWithOutlet.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/react-dropdown-select-edited/CHANGELOG.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/react-dropdown-select-edited/LICENSE" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/react-dropdown-select-edited/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/react-dropdown-select-edited/desktop.ini" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/react-dropdown-select-edited/dist/react-dropdown-select.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/react-dropdown-select-edited/lib/components/Clear.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/react-dropdown-select-edited/lib/components/ClickOutside.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/react-dropdown-select-edited/lib/components/Content.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/react-dropdown-select-edited/lib/components/Dropdown.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/react-dropdown-select-edited/lib/components/DropdownHandle.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/react-dropdown-select-edited/lib/components/Input.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/react-dropdown-select-edited/lib/components/Item.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/react-dropdown-select-edited/lib/components/Loading.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/react-dropdown-select-edited/lib/components/NoData.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/react-dropdown-select-edited/lib/components/Option.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/react-dropdown-select-edited/lib/components/Separator.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/react-dropdown-select-edited/lib/constants.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/react-dropdown-select-edited/lib/index.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/react-dropdown-select-edited/lib/util.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/react-dropdown-select-edited/package.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/react-dropdown-select-edited/types.d.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/CustomControl.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/CustomControlMulti.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/CustomDropdown.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/CustomDropdownMulti.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/CustomDropdownMultiWithSearch.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/CustomDropdownWithSearch.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/PopoverStickOnHover.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/Range.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/SelectOptionRange.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/react-select-styles.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/DoubleRoller_Valance_Colors.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/FrameSize.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/metal_valance.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/metal_valance_fabric_insert.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/roller_bottombar_designer.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/public/camera.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/public/close-button.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/NM.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/NM.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/locales/en/translation.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/en/translation.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/locales/fa/translation.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/fa/translation.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/Footer.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Footer.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/Header.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Header.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/Menu.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Menu.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/Models.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Models.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/Zebra.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Zebra.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Pages/Curtain.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/Curtain.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Pages/CustomCurtain.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/CustomCurtain.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Pages/HeaderFooter.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/HeaderFooter.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -208,7 +233,31 @@
       <workItem from="1645064063019" duration="7276000" />
       <workItem from="1645099967984" duration="10363000" />
       <workItem from="1645251667578" duration="9119000" />
-      <workItem from="1645347207979" duration="11648000" />
+      <workItem from="1645347207979" duration="11784000" />
+      <workItem from="1645437752876" duration="14184000" />
+      <workItem from="1645558984226" duration="9656000" />
+      <workItem from="1645634706748" duration="5195000" />
+      <workItem from="1645696912618" duration="9171000" />
+      <workItem from="1645745878507" duration="134000" />
+      <workItem from="1645870738051" duration="14112000" />
+      <workItem from="1645983050055" duration="17995000" />
+      <workItem from="1646053607144" duration="7738000" />
+      <workItem from="1646075322693" duration="991000" />
+      <workItem from="1646237926525" duration="11070000" />
+      <workItem from="1646303171663" duration="9424000" />
+      <workItem from="1646474241188" duration="9501000" />
+      <workItem from="1646574336221" duration="5704000" />
+      <workItem from="1646671536113" duration="14440000" />
+      <workItem from="1646760227157" duration="6284000" />
+      <workItem from="1646796145106" duration="927000" />
+      <workItem from="1646797166628" duration="151000" />
+      <workItem from="1646797483870" duration="609000" />
+      <workItem from="1646820148356" duration="10673000" />
+      <workItem from="1646901582220" duration="561000" />
+      <workItem from="1646902569523" duration="6434000" />
+      <workItem from="1647070217010" duration="10386000" />
+      <workItem from="1647157172035" duration="11389000" />
+      <workItem from="1647263188732" duration="6457000" />
     </task>
     <servers />
   </component>
@@ -243,37 +292,85 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="548" y="168" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1640025969898" />
-    <state width="1493" height="106" key="GridCell.Tab.0.bottom" timestamp="1645387526505">
+    <state width="1493" height="106" key="GridCell.Tab.0.bottom" timestamp="1647289507440">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="106" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1645387526505" />
-    <state width="1493" height="106" key="GridCell.Tab.0.center" timestamp="1645387526505">
+    <state width="1493" height="106" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1647289507440" />
+    <state width="1493" height="106" key="GridCell.Tab.0.center" timestamp="1647289507440">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="106" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1645387526505" />
-    <state width="1493" height="106" key="GridCell.Tab.0.left" timestamp="1645387526505">
+    <state width="1493" height="106" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1647289507440" />
+    <state width="1493" height="106" key="GridCell.Tab.0.left" timestamp="1647289507440">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="106" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1645387526505" />
-    <state width="1493" height="106" key="GridCell.Tab.0.right" timestamp="1645387526505">
+    <state width="1493" height="106" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1647289507440" />
+    <state width="1493" height="106" key="GridCell.Tab.0.right" timestamp="1647289507440">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="106" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1645387526505" />
-    <state x="215" y="30" key="SettingsEditor" timestamp="1645376353552">
+    <state width="1493" height="106" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1647289507440" />
+    <state width="1493" height="261" key="GridCell.Tab.1.bottom" timestamp="1646064566733">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="215" y="30" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1645376353552" />
+    <state width="1493" height="261" key="GridCell.Tab.1.bottom/0.0.1536.824@0.0.1536.824" timestamp="1646064566733" />
+    <state width="1493" height="261" key="GridCell.Tab.1.center" timestamp="1646064566733">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="261" key="GridCell.Tab.1.center/0.0.1536.824@0.0.1536.824" timestamp="1646064566733" />
+    <state width="1493" height="261" key="GridCell.Tab.1.left" timestamp="1646064566733">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="261" key="GridCell.Tab.1.left/0.0.1536.824@0.0.1536.824" timestamp="1646064566733" />
+    <state width="1493" height="261" key="GridCell.Tab.1.right" timestamp="1646064566733">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="261" key="GridCell.Tab.1.right/0.0.1536.824@0.0.1536.824" timestamp="1646064566733" />
+    <state width="1493" height="261" key="GridCell.Tab.2.bottom" timestamp="1646064566733">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="261" key="GridCell.Tab.2.bottom/0.0.1536.824@0.0.1536.824" timestamp="1646064566733" />
+    <state width="1493" height="261" key="GridCell.Tab.2.center" timestamp="1646064566733">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="261" key="GridCell.Tab.2.center/0.0.1536.824@0.0.1536.824" timestamp="1646064566733" />
+    <state width="1493" height="261" key="GridCell.Tab.2.left" timestamp="1646064566733">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="261" key="GridCell.Tab.2.left/0.0.1536.824@0.0.1536.824" timestamp="1646064566733" />
+    <state width="1493" height="261" key="GridCell.Tab.2.right" timestamp="1646064566733">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="261" key="GridCell.Tab.2.right/0.0.1536.824@0.0.1536.824" timestamp="1646064566733" />
+    <state width="1493" height="261" key="GridCell.Tab.3.bottom" timestamp="1646064566733">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="261" key="GridCell.Tab.3.bottom/0.0.1536.824@0.0.1536.824" timestamp="1646064566733" />
+    <state width="1493" height="261" key="GridCell.Tab.3.center" timestamp="1646064566733">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="261" key="GridCell.Tab.3.center/0.0.1536.824@0.0.1536.824" timestamp="1646064566733" />
+    <state width="1493" height="261" key="GridCell.Tab.3.left" timestamp="1646064566733">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="261" key="GridCell.Tab.3.left/0.0.1536.824@0.0.1536.824" timestamp="1646064566733" />
+    <state width="1493" height="261" key="GridCell.Tab.3.right" timestamp="1646064566733">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="261" key="GridCell.Tab.3.right/0.0.1536.824@0.0.1536.824" timestamp="1646064566733" />
+    <state x="215" y="30" key="SettingsEditor" timestamp="1646685445279">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="215" y="30" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1646685445279" />
     <state x="578" y="330" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1644860193851">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="578" y="330" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1536.824@0.0.1536.824" timestamp="1644860193851" />
-    <state x="425" y="187" key="run.anything.popup" timestamp="1644449861674">
+    <state x="425" y="187" key="run.anything.popup" timestamp="1647110004420">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="425" y="187" key="run.anything.popup/0.0.1536.824@0.0.1536.824" timestamp="1644449861674" />
-    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1645327265236">
+    <state x="425" y="187" key="run.anything.popup/0.0.1536.824@0.0.1536.824" timestamp="1647110004420" />
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1646054144292">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1645327265236" />
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1646054144292" />
   </component>
 </project>
