@@ -10,7 +10,7 @@
     <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myValues">
         <value>
-          <list size="17">
+          <list size="26">
             <item index="0" class="java.lang.String" itemvalue="banner_id" />
             <item index="1" class="java.lang.String" itemvalue="banner_text_id" />
             <item index="2" class="java.lang.String" itemvalue="slide_id" />
@@ -28,6 +28,15 @@
             <item index="14" class="java.lang.String" itemvalue="selected" />
             <item index="15" class="java.lang.String" itemvalue="item-selected" />
             <item index="16" class="java.lang.String" itemvalue="default-fabric-photo" />
+            <item index="17" class="java.lang.String" itemvalue="typeofstep" />
+            <item index="18" class="java.lang.String" itemvalue="type-of-step" />
+            <item index="19" class="java.lang.String" itemvalue="cart-id" />
+            <item index="20" class="java.lang.String" itemvalue="cart-ref" />
+            <item index="21" class="java.lang.String" itemvalue="texten" />
+            <item index="22" class="java.lang.String" itemvalue="textfa" />
+            <item index="23" class="java.lang.String" itemvalue="text-en" />
+            <item index="24" class="java.lang.String" itemvalue="text-fa" />
+            <item index="25" class="java.lang.String" itemvalue="cart-custom-text" />
           </list>
         </value>
       </option>

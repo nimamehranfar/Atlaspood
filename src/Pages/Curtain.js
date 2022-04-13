@@ -5,7 +5,7 @@ import {useTranslation} from "react-i18next";
 import parse, {domToReact} from 'html-react-parser';
 import Breadcrumb from 'react-bootstrap/Breadcrumb';
 
-const baseURLCats = "http://atlaspood.ir/api/SewingModel/GetByCategory";
+const baseURLCats = "http://atlaspood.ir/api/WebsitePage/GetDetailByName";
 
 function Curtain() {
     const {t} = useTranslation();
@@ -30,11 +30,11 @@ function Curtain() {
     const getCats = () => {
         axios.get(baseURLCats, {
             params: {
-                categoryId: catID,
+                pageName: catID,
                 apiKey: window.$apikey
             }
         }).then((response) => {
-            setModels(response.data);
+            setModels(response.data.SewingModels);
         }).catch(err => {
             console.log(err);
         });
@@ -134,7 +134,7 @@ function Curtain() {
     }, [pageLanguage, location.pathname]);
     
     return (
-        <div className="Drapery_page_container">
+        <div className={`Drapery_page_container ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
             <div className="breadcrumb_container dir_ltr">
                 <Breadcrumb className="breadcrumb">
                     <Breadcrumb.Item linkAs={Link} className="breadcrumb_item" linkProps={{to: "/" + pageLanguage, className: "breadcrumb_item"}}>Home</Breadcrumb.Item>

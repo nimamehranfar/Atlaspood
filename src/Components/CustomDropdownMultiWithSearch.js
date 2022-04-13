@@ -19,6 +19,11 @@ function CustomDropdownMultiWithSearch({props, state, methods}) {
                         regexp.test(item[props.searchBy] || item[props.labelField])
                     )
                     .map(option => {
+                        let exist="false";
+                        Object.values(state.values).forEach(obj=>{
+                            if(obj.value=== option.value)
+                                exist="true";
+                        });
                         return (
                             <div disabled={option.disabled}
                                  key={option[props.valueField]}
@@ -29,7 +34,7 @@ function CustomDropdownMultiWithSearch({props, state, methods}) {
                                 <input
                                     type="checkbox"
                                     onChange={() => methods.addItem(option)}
-                                    checked={state.values.indexOf(option) !== -1}
+                                    checked={exist}
                                 />
                                 <div>{option[props.labelField]}</div>
                             </div>

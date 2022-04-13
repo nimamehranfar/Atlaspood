@@ -12,6 +12,7 @@ import HeaderFooter from "./Pages/HeaderFooter";
 import Models from "./Components/Models";
 import CustomCurtain from "./Pages/CustomCurtain";
 import HeaderWithOutlet from "./Pages/HeaderWithOutlet";
+import Basket from "./Pages/Basket";
 
 
 function App({t}) {
@@ -55,11 +56,13 @@ function App({t}) {
                             <Route path="" element={<Home/>}/>
                             <Route path="Curtain/:catID" element={<Curtain/>}/>
                             <Route path="Product/:catID" element={<Product/>}/>
+                            <Route path="Basket" element={<Basket/>}/>
                         </Route>
                         <Route path="/fa" element={<HeaderFooter/>}>
                             <Route path="" element={<Home/>}/>
                             <Route path="Curtain/:catID" element={<Curtain/>}/>
                             <Route path="Product/:catID" element={<Product/>}/>
+                            <Route path="Basket" element={<Basket/>}/>
                         </Route>
                         
                         <Route path="/en" element={<HeaderWithOutlet/>}>

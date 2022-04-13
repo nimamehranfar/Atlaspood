@@ -10,6 +10,7 @@ import Dropdown from 'react-bootstrap/Dropdown'
 import Button from 'react-bootstrap/Button'
 // import Select from 'react-select';
 import Select from "react-dropdown-select";
+import ReactImageMagnify from '@blacklab/react-image-magnify';
 
 import {ReactComponent as MountInside} from '../Images/drapery/zebra/mount_inside.svg';
 import {ReactComponent as MountOutside} from '../Images/drapery/zebra/mount_outside.svg';
@@ -23,33 +24,67 @@ import SelectOptionRange from "./SelectOptionRange";
 
 import {ReactComponent as Camera} from '../Images/public/camera.svg';
 import CustomDropdownWithSearch from "./CustomDropdownWithSearch";
+import CustomControlNum from "./CustomControlNum";
+import NumberToPersianWord from "number_to_persian_word";
+import CartInfo from "./CartInfo"
 
 
-const baseURLCats = "http://atlaspood.ir/api/SewingModel/GetByCategory";
+const baseURLCats = "http://atlaspood.ir/api/WebsitePage/GetDetailByName";
+const baseURLModel = "http://atlaspood.ir/api/SewingModel/GetById";
 const baseURLFabrics = "http://atlaspood.ir/api/Sewing/GetModelFabric";
+const baseURLWindowSize = "http://atlaspood.ir/api/Sewing/GetShadeWindowSize";
+const baseURLPrice = "http://atlaspood.ir/api/Sewing/GetSewingOrderPrice";
+const baseURLFreeShipping = "http://atlaspood.ir/api/WebsiteSetting/GetFreeShippingAmount?apiKey=477f46c6-4a17-4163-83cc-29908d";
 
 
 function Zebra({CatID, ModelID}) {
     const {t} = useTranslation();
     const location = useLocation();
+    let pageLanguage = location.pathname.split('').slice(1, 3).join('');
+    const [firstRender, setFirstRender] = useState(true);
     const [catID, setCatID] = useState("");
     const [modelID, setModelID] = useState("");
     const [models, setModels] = useState([]);
+    const [model, setModel] = useState({});
     const [fabrics, setFabrics] = useState([]);
     const [fabricsList, setFabricsList] = useState([]);
     const [defaultFabricPhoto, setDefaultFabricPhoto] = useState(null);
     const [defaultModelName, setDefaultModelName] = useState("");
     const [defaultModelNameFa, setDefaultModelNameFa] = useState("");
+    const [price, setPrice] = useState(0);
+    const [bagPrice, setBagPrice] = useState(0);
+    const [freeShipPrice, setFreeShipPrice] = useState(0);
     const [show, setShow] = useState(false);
     const [searchShow, setSearchShow] = useState(false);
     const [measurementsNextStep, setMeasurementsNextStep] = useState("4");
     const [controlTypeNextStep, setControlTypeNextStep] = useState("5");
+    const [zoomModalHeader, setZoomModalHeader] = useState([]);
     const [zoomModalBody, setZoomModalBody] = useState([]);
-    const [pageLanguage, setPageLanguage] = useState("");
+    const [addCartErr, setAddCartErr] = useState([]);
+    const [cartItems, setCartItems] = useState([]);
+    const [cartAgree, setCartAgree] = useState([]);
+    // const [pageLanguage, setPageLanguage] = useState("");
     const [accordionActiveKey, setAccordionActiveKey] = useState("");
+    const [roomLabelText, setRoomLabelText] = useState("");
+    const [fabricSelected, setFabricSelected] = useState({
+        selectedFabricId: 0,
+        selectedTextEn: "",
+        selectedTextFa: "",
+        selectedColorEn: "",
+        selectedColorFa: "",
+        selectedHasTrim: false,
+        selectedPhoto: ""
+    });
+    const [roomLabelSelect, setRoomLabelSelect] = useState({
+        label: "",
+        value: ""
+    });
     const [stepSelectedValue, setStepSelectedValue] = useState({});
     const [hasTrim, setHasTrim] = useState(false);
+    const [showLabels, setShowLabels] = useState(true);
     const [detailsShow, setDetailsShow] = useState(false);
+    const [windowSize, setWindowSize] = useState("");
+    const [windowSizeBool, setWindowSizeBool] = useState(false);
     const [stepSelectedLabel, setStepSelectedLabel] = useState({});
     const [modals, setModals] = useState([]);
     const [popoverImages, setPopoverImages] = useState([]);
@@ -71,10 +106,30 @@ function Zebra({CatID, ModelID}) {
         "width3": [],
         "height1": [],
         "height2": [],
-        "height3": []
+        "left": [],
+        "right": [],
+        "width": [],
+        "length": [],
+        "width3A": [],
+        "height3C": [],
+        "shadeMount": []
     });
+    const [requiredStep, setRequiredStep] = useState({
+        "1": false,
+        "2": false,
+        "3": false,
+        "4": false,
+        "5": false,
+        "6": false
+    });
+    const [cartValues, setCartValues] = useState({});
+    const [cartStateAgree, setCartStateAgree] = useState(false);
+    const [cartCount, setCartCount] = useState(0);
     
-    const selectedTitle = useRef([]);
+    const [depSet, setDepSet] = useState(new Set(['1', '2', '3', '4', '5', '6']));
+    
+    const inputs = useRef({});
+    const selectedTitle = useRef({});
     const search_input = useRef(null);
     const accordion = useRef(null);
     const filterCheckboxes = useRef({
@@ -83,7 +138,7 @@ function Zebra({CatID, ModelID}) {
         "types": [],
         "prices": []
     });
-    
+    const steps = useRef([]);
     
     function convertToPersian(string_farsi) {
         if (string_farsi !== null && string_farsi !== undefined && string_farsi !== "") {
@@ -120,11 +175,25 @@ function Zebra({CatID, ModelID}) {
     const getCats = () => {
         axios.get(baseURLCats, {
             params: {
-                categoryId: catID,
+                pageName: catID,
                 apiKey: window.$apikey
             }
         }).then((response) => {
-            setModels(response.data);
+            setModels(response.data.SewingModels);
+        }).catch(err => {
+            console.log(err);
+        });
+    };
+    
+    const getModel = () => {
+        axios.get(baseURLModel, {
+            params: {
+                id: modelID,
+                apiKey: window.$apikey
+            }
+        }).then((response) => {
+            setModel(response.data);
+            // console.log(response.data)
         }).catch(err => {
             console.log(err);
         });
@@ -133,6 +202,8 @@ function Zebra({CatID, ModelID}) {
     function renderFabrics() {
         const fabricList = [];
         let count = 0;
+        let pageLanguage1 = location.pathname.split('').slice(1, 3).join('');
+        
         Object.keys(fabrics).forEach((key, index) => {
             let DesignName = convertToPersian(fabrics[key][0].DesignName);
             let DesignEnName = fabrics[key][0].DesignEnName;
@@ -156,26 +227,38 @@ function Zebra({CatID, ModelID}) {
                 let ColorEnName = fabrics[key][j].ColorEnName;
                 
                 fabric.push(
-                    <div className={`radio_group ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key + j}>
-                        <label data-tip={`${pageLanguage === 'en' ? DesignEnName : DesignName}: ${pageLanguage === 'en' ? ColorEnName : ColorName}`}
-                               data-for={"fabric" + key + j} className={`radio_container ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                    <div className={`radio_group ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key + j}>
+                        <label data-tip={`${pageLanguage1 === 'en' ? DesignEnName : DesignName}: ${pageLanguage1 === 'en' ? ColorEnName : ColorName}`}
+                               data-for={"fabric" + key + j} className={`radio_container ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}
                                data-img={`http://www.doopsalta.com/upload/${PhotoPath}`}>
                             <ReactTooltip id={"fabric" + key + j} place="top" type="light" effect="float"/>
                             <input className="radio" type="radio" ref-num="1" default-fabric-photo={FabricOnModelPhotoUrl}
                                    onClick={e => {
-                                       fabricClicked(e, HasTrim);
-                                       selectChanged(e);
+                                       let temp = JSON.parse(JSON.stringify(fabricSelected));
+                                       temp.selectedFabricId = FabricId;
+                                       temp.selectedTextEn = DesignEnName;
+                                       temp.selectedTextFa = DesignName;
+                                       temp.selectedColorEn = ColorEnName;
+                                       temp.selectedColorFa = ColorName;
+                                       temp.selectedHasTrim = HasTrim;
+                                       temp.selectedPhoto = FabricOnModelPhotoUrl;
+                                       setFabricSelected(temp);
+                                       // fabricClicked(e, HasTrim);
+                                       // selectChanged(e);
+                                       // setCart("Fabric", FabricId);
+                                       // setDeps("", "1");
                                    }} name="fabric"
-                                   model-id={modelID} value={pageLanguage === 'en' ? DesignEnName : DesignName} text={pageLanguage === 'en' ? DesignEnName : DesignName}/>
+                                   model-id={modelID} value={FabricId} text-en={DesignEnName} text-fa={DesignName}
+                                   ref={ref => (inputs.current[`1${FabricId}`] = ref)}/>
                             <div className="frame_img">
                                 <img className="img-fluid" src={`http://atlaspood.ir/${PhotoPath}`} alt=""/>
                             </div>
                         </label>
-                        <div className={`fabric_name_container ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
-                            <h1>{pageLanguage === 'en' ? ColorEnName : ColorName}</h1>
+                        <div className={`fabric_name_container ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
+                            <h1>{pageLanguage1 === 'en' ? ColorEnName : ColorName}</h1>
                             <span onClick={() => handleShow(PhotoPath, DesignName, DesignEnName, ColorName, ColorEnName)}><i className="fa fa-search" aria-hidden="true"/></span>
                         </div>
-                        <button className={`swatchButton ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} current-state="0"
+                        <button className={`swatchButton ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} current-state="0"
                                 onClick={e => fabricSwatch(e, FabricId)}>{t("ORDER SWATCH")}</button>
                     </div>
                 );
@@ -183,10 +266,10 @@ function Zebra({CatID, ModelID}) {
             }
             
             fabricList.push(
-                <div className={`material_detail ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key}>
-                    <div className={`material_traits ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
+                <div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key}>
+                    <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
                         <hr/>
-                        <span>{t("DESIGN NAME")}: {pageLanguage === 'en' ? DesignEnName : DesignName}</span>
+                        <span>{t("DESIGN NAME")}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</span>
                     </div>
                     {fabric}
                 </div>
@@ -209,15 +292,33 @@ function Zebra({CatID, ModelID}) {
     
     function handleShow(PhotoPath, DesignName, DesignEnName, ColorName, ColorEnName) {
         const tempDiv = [];
+        const tempDiv1 = [];
         tempDiv.push(
             <div key={PhotoPath} className="zoomImg">
-                <span className="s">{pageLanguage === 'en' ? DesignEnName : DesignName} / {pageLanguage === 'en' ? ColorEnName : ColorName}</span>
                 <div className="imageContainer">
-                    <img className="img-fluid hover-zoom" src={`http://atlaspood.ir/${PhotoPath}`} alt=""/>
+                    <ReactImageMagnify
+                        imageProps={{
+                            alt: '',
+                            isFluidWidth: true,
+                            src: `http://atlaspood.ir/${PhotoPath}`
+                        }}
+                        magnifiedImageProps={{
+                            src: `http://atlaspood.ir/${PhotoPath}`,
+                            width: 800,
+                            height: 800
+                        }}
+                        portalProps={{placement: 'over'}}
+                    />
+                    {/*<img className="img-fluid hover-zoom" src={`http://atlaspood.ir/${PhotoPath}`} alt=""/>*/}
                 </div>
             </div>
         );
+        tempDiv1.push(
+            <span key={1} className="s">{pageLanguage === 'en' ? DesignEnName : DesignName} / {pageLanguage === 'en' ? ColorEnName : ColorName}</span>
+        );
+        
         setZoomModalBody(tempDiv);
+        setZoomModalHeader(tempDiv1);
         setShow(true);
     }
     
@@ -227,14 +328,14 @@ function Zebra({CatID, ModelID}) {
         setModals(tempModals);
     }
     
-    function ContextAwareToggle({stepNum, stepTitle, stepSelected, eventKey, callback}) {
+    function ContextAwareToggle({stepNum, stepTitle, stepSelected, eventKey, callback, stepRef, type, required, cartCustomText}) {
         const {activeEventKey} = useContext(AccordionContext);
         
         const decoratedOnClick = useAccordionButton(
             eventKey,
             () => {
                 callback && callback(eventKey);
-                activeEventKey === eventKey ? setAccordionActiveKey(""):setAccordionActiveKey(eventKey);
+                activeEventKey === eventKey ? setAccordionActiveKey("") : setAccordionActiveKey(eventKey);
                 // setTimeout(() => {
                 //     if (isCurrentEventKey)
                 //         window.scrollTo(window.scrollX, window.scrollY + 0.5);
@@ -246,6 +347,15 @@ function Zebra({CatID, ModelID}) {
         
         const isCurrentEventKey = activeEventKey === eventKey;
         
+        if (stepSelected !== "" && required) {
+            let temp = JSON.parse(JSON.stringify(requiredStep));
+            setTimeout(() => {
+                temp[stepRef] = false;
+                setRequiredStep(temp);
+            }, 1000);
+            
+        }
+        
         return (
             <div
                 className={`w-100 h-100 steps_header ${isCurrentEventKey ? 'steps_header_active' : ''}`}
@@ -254,11 +364,15 @@ function Zebra({CatID, ModelID}) {
                     <div className="steps_header_num">{stepNum}</div>
                 </div>
                 <div className="steps_header_title_container">
-                    <div className="steps_header_title">{stepTitle}</div>
+                    <div className="steps_header_title" type-of-step={type} cart-custom-text={cartCustomText === undefined ? stepTitle : cartCustomText}
+                         ref={ref => (steps.current[stepRef] = ref)}>{stepTitle}</div>
                 </div>
                 <div className="steps_header_selected_container">
-                    <div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{stepSelected}</div>
+                    <div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? stepSelected : null}</div>
                 </div>
+                {required && stepSelected === "" &&
+                <div className="stepRequired"/>
+                }
             </div>
         );
     }
@@ -316,7 +430,7 @@ function Zebra({CatID, ModelID}) {
         setPopoverImages(tempImages);
     }
     
-    function optionSelectChanged_three(obj, refIndex, position, isMin, modalRef) {
+    function optionSelectChanged_three(obj, refIndex, position, isMin, modalRef, postfixEn, postfixFa, pageLang) {
         if (obj !== undefined) {
             let temp = JSON.parse(JSON.stringify(stepSelectedOptions));
             if (temp.labels[refIndex] === undefined)
@@ -331,10 +445,13 @@ function Zebra({CatID, ModelID}) {
                 return e
             }).length === 3) {
                 let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                if (isMin)
-                    tempLabels[refIndex] = temp.labels[refIndex][temp.values[refIndex].indexOf(Math.min(...temp.values[refIndex]))];
-                else
-                    tempLabels[refIndex] = temp.labels[refIndex][temp.values[refIndex].indexOf(Math.max(...temp.values[refIndex]))];
+                if (isMin) {
+                    let tempMin = temp.values[refIndex][temp.values[refIndex].indexOf(Math.min(...temp.values[refIndex]))];
+                    tempLabels[refIndex] = pageLang === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
+                } else {
+                    let tempMax = temp.values[refIndex][temp.values[refIndex].indexOf(Math.max(...temp.values[refIndex]))];
+                    tempLabels[refIndex] = pageLang === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + postfixFa : tempMax + postfixEn;
+                }
                 setStepSelectedLabel(tempLabels);
                 let minValue = Math.min(...temp.values[refIndex]);
                 let maxValue = Math.max(...temp.values[refIndex]);
@@ -345,63 +462,69 @@ function Zebra({CatID, ModelID}) {
         }
     }
     
-    function optionSelectChanged_WidthLength(obj, refIndex, isWidth) {
-        if (isWidth) {
-            let temp = JSON.parse(JSON.stringify(widthLength));
-            temp.width = obj.label;
-            setWidthLength(temp);
-            
-            if (temp.length !== "" && temp.width !== "") {
-                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                tempLabels[refIndex] = `Width: ${temp.width}\u00A0\u00A0\u00A0Length: ${temp.length}`;
-                setStepSelectedLabel(tempLabels);
-            }
-        } else {
-            let temp = JSON.parse(JSON.stringify(widthLength));
-            temp.length = obj.label;
-            setWidthLength(temp);
-            
-            if (temp.length !== "" && temp.width !== "") {
-                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                tempLabels[refIndex] = `Width: ${temp.width}\u00A0\u00A0\u00A0Length: ${temp.length}`;
-                setStepSelectedLabel(tempLabels);
-            }
-        }
-    }
-    
-    function optionSelectChanged_LeftRight(obj, refIndex, isLeft) {
-        if (isLeft) {
-            let temp = JSON.parse(JSON.stringify(leftRight));
-            temp.left = obj.label;
-            setLeftRight(temp);
-            
-            if (temp.right !== "" && temp.left !== "") {
-                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                tempLabels[refIndex] = `Left: ${temp.left}\u00A0\u00A0\u00A0Right: ${temp.right}`;
-                setStepSelectedLabel(tempLabels);
-            }
-        } else {
-            let temp = JSON.parse(JSON.stringify(leftRight));
-            temp.right = obj.label;
-            setLeftRight(temp);
-            
-            if (temp.right !== "" && temp.left !== "") {
-                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                tempLabels[refIndex] = `Left: ${temp.left}\u00A0\u00A0\u00A0Right: ${temp.right}`;
-                setStepSelectedLabel(tempLabels);
+    function optionSelectChanged_WidthLength(obj, refIndex, isWidth, postfixEn, postfixFa, pageLang) {
+        if (obj !== undefined) {
+            if (isWidth) {
+                let temp = JSON.parse(JSON.stringify(widthLength));
+                temp.width = obj.value;
+                setWidthLength(temp);
+                
+                if (temp.length !== "" && temp.width !== "") {
+                    let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                    tempLabels[refIndex] = pageLang === "fa" ? `ارتفاع:  ${NumberToPersianWord.convertEnToPe(`${temp.length}`) + postfixFa}\u00A0\u00A0\u00A0عرض: ${NumberToPersianWord.convertEnToPe(`${temp.width}`) + postfixFa}` : `Left: ${temp.width + postfixEn}\u00A0\u00A0\u00A0Right: ${temp.length + postfixEn}`;
+                    setStepSelectedLabel(tempLabels);
+                }
+            } else {
+                let temp = JSON.parse(JSON.stringify(widthLength));
+                temp.length = obj.value;
+                setWidthLength(temp);
+                
+                if (temp.length !== "" && temp.width !== "") {
+                    let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                    tempLabels[refIndex] = pageLang === "fa" ? `ارتفاع:  ${NumberToPersianWord.convertEnToPe(`${temp.length}`) + postfixFa}\u00A0\u00A0\u00A0عرض: ${NumberToPersianWord.convertEnToPe(`${temp.width}`) + postfixFa}` : `Left: ${temp.width + postfixEn}\u00A0\u00A0\u00A0Right: ${temp.length + postfixEn}`;
+                    setStepSelectedLabel(tempLabels);
+                }
             }
         }
     }
     
-    function optionSelectChanged(refIndex, selected) {
-        let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-        tempLabels[refIndex] = selected.label;
-        setStepSelectedLabel(tempLabels);
-        
-        let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
-        tempValue[refIndex] = selected.value;
-        // console.log(tempValue);
-        setStepSelectedValue(tempValue);
+    function optionSelectChanged_LeftRight(obj, refIndex, isLeft, postfixEn, postfixFa, pageLang) {
+        if (obj !== undefined) {
+            if (isLeft) {
+                let temp = JSON.parse(JSON.stringify(leftRight));
+                temp.left = obj.value;
+                setLeftRight(temp);
+                
+                if (temp.right !== "" && temp.left !== "") {
+                    let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                    tempLabels[refIndex] = pageLang === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp.right}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp.left}`) + postfixFa}` : `Left: ${temp.left + postfixEn}\u00A0\u00A0\u00A0Right: ${temp.right + postfixEn}`;
+                    setStepSelectedLabel(tempLabels);
+                }
+            } else {
+                let temp = JSON.parse(JSON.stringify(leftRight));
+                temp.right = obj.value;
+                setLeftRight(temp);
+                
+                if (temp.right !== "" && temp.left !== "") {
+                    let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                    tempLabels[refIndex] = pageLang === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp.right}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp.left}`) + postfixFa}` : `Left: ${temp.left + postfixEn}\u00A0\u00A0\u00A0Right: ${temp.right + postfixEn}`;
+                    setStepSelectedLabel(tempLabels);
+                }
+            }
+        }
+    }
+    
+    function optionSelectChanged(refIndex, selected, postfixEn, postfixFa, pageLang) {
+        if (selected !== undefined) {
+            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+            tempLabels[refIndex] = pageLang === "fa" ? `${NumberToPersianWord.convertEnToPe(`${selected.value}`) + postfixFa}` : `${selected.value + postfixEn}`;
+            setStepSelectedLabel(tempLabels);
+            
+            let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
+            tempValue[refIndex] = selected.value;
+            // console.log(tempValue);
+            setStepSelectedValue(tempValue);
+        }
     }
     
     function selectChanged(e, nums) {
@@ -410,7 +533,6 @@ function Zebra({CatID, ModelID}) {
         // selectedTitle.current[refIndex].innerHTML = e.target.getAttribute('text');
         let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
         tempLabels[refIndex] = e.target.getAttribute('text');
-        
         
         let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
         tempValue[refIndex] = e.target.value;
@@ -431,10 +553,219 @@ function Zebra({CatID, ModelID}) {
         setStepSelectedValue(tempValue);
     }
     
+    function setBasketNumber(refIndex, numValue, type, minusPlus) {
+        // console.log(refIndex);
+        let temp = [];
+        let typeString = "";
+        let cartObj = {};
+        if (type === 0) {
+            if (localStorage.getItem("cart") !== null) {
+                cartObj = JSON.parse(localStorage.getItem("cart"));
+                temp = cartObj["drapery"];
+                typeString = "drapery";
+            } else {
+                renderCart();
+            }
+        } else if (type === 1) {
+            if (localStorage.getItem("cart") !== null) {
+                cartObj = JSON.parse(localStorage.getItem("cart"));
+                temp = cartObj["product"];
+                typeString = "product";
+            } else {
+                renderCart();
+            }
+        } else {
+            if (localStorage.getItem("cart") !== null) {
+                cartObj = JSON.parse(localStorage.getItem("cart"));
+                temp = cartObj["swatches"];
+                typeString = "swatches";
+            } else {
+                renderCart();
+            }
+        }
+        if (temp !== []) {
+            if (minusPlus !== undefined) {
+                if (temp[refIndex] === undefined) {
+                    temp[refIndex]["qty"] = 1;
+                    cartObj[typeString] = temp;
+                    localStorage.setItem('cart', JSON.stringify(cartObj));
+                    renderCart(cartObj);
+                } else {
+                    if (temp[refIndex]["qty"] + minusPlus <= 0 || temp[refIndex]["qty"] + minusPlus > 10)
+                        setBasketNumber(refIndex, temp[refIndex]["qty"] + minusPlus, type);
+                    else {
+                        temp[refIndex]["qty"] = temp[refIndex]["qty"] + minusPlus;
+                        cartObj[typeString] = temp;
+                        localStorage.setItem('cart', JSON.stringify(cartObj));
+                        renderCart(cartObj);
+                    }
+                }
+            } else {
+                if (numValue > 10) {
+                    temp[refIndex]["qty"] = 10;
+                    cartObj[typeString] = temp;
+                    localStorage.setItem('cart', JSON.stringify(cartObj));
+                    renderCart(cartObj);
+                    
+                } else if (numValue <= 0) {
+                    temp.splice(refIndex, 1);
+                    cartObj[typeString] = temp;
+                    localStorage.setItem('cart', JSON.stringify(cartObj));
+                    renderCart(cartObj);
+                } else {
+                    temp[refIndex]["qty"] = numValue;
+                    cartObj[typeString] = temp;
+                    localStorage.setItem('cart', JSON.stringify(cartObj));
+                    renderCart(cartObj);
+                }
+            }
+        }
+    }
+    
+    function setCart(refIndex, cartValue, delRefs, secondRedIndex, secondCartValue) {
+        let temp = JSON.parse(JSON.stringify(cartValues));
+        temp[refIndex] = cartValue;
+        if (delRefs !== undefined) {
+            let tempArr = delRefs.split(',');
+            tempArr.forEach(ref => {
+                if (ref !== undefined) {
+                    if (temp[ref] !== undefined)
+                        delete temp[ref];
+                }
+            });
+        }
+        if (secondRedIndex !== undefined) {
+            let tempArr1 = secondRedIndex.split(',');
+            tempArr1.forEach((ref, index) => {
+                if (ref !== undefined) {
+                    temp[ref] = secondCartValue[index]
+                }
+            });
+        }
+        // console.log(temp);
+        // console.log(refIndex, cartValue);
+        // setTimeout(() => {
+        setCartValues(temp);
+        // console.log(temp);
+        // }, 1000);
+        let tempPostObj = {};
+        tempPostObj["ApiKey"] = window.$apikey;
+        tempPostObj["WindowCount"] = 1;
+        
+        let cartInfo = JSON.parse(JSON.stringify(CartInfo));
+        
+        Object.keys(temp).forEach(key => {
+            if (temp[key] !== null || temp[key] !== "") {
+                let tempObj = cartInfo.find(obj => obj["cart"] === key);
+                if (tempObj["apiLabel"] !== "") {
+                    if (tempObj["apiValue"] === null) {
+                        tempPostObj[tempObj["apiLabel"]] = temp[key];
+                    } else {
+                        tempPostObj[tempObj["apiLabel"]] = tempObj["apiValue"][temp[key]];
+                    }
+                }
+            }
+        });
+        
+        tempPostObj["SewingOrderDetails"] = [];
+        tempPostObj["SewingOrderDetails"][0] = {};
+        tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
+        tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
+        tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
+        tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
+        tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
+        
+        Object.keys(temp).forEach(key => {
+            if (temp[key] !== null || temp[key] !== "") {
+                let tempObj = cartInfo.find(obj => obj["cart"] === key);
+                if (tempObj["apiLabel2"] !== undefined) {
+                    if (tempObj["apiValue2"] === null) {
+                        tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
+                    } else {
+                        tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                    }
+                }
+            }
+        });
+        
+        
+        if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
+            console.log(JSON.stringify(tempPostObj));
+            axios.post(baseURLPrice, tempPostObj)
+                .then((response) => {
+                    setPrice(response.data);
+                }).catch(err => {
+                setPrice(0);
+                console.log(err);
+            });
+        }
+    }
+    
+    function deleteSpecialSelects(InOut) {
+        let temp = selectCustomValues;
+        let temp2 = JSON.parse(JSON.stringify(stepSelectedOptions));
+        let temp3 = JSON.parse(JSON.stringify(leftRight));
+        setWindowSizeBool(false);
+        
+        if (InOut === 1) {
+            temp.width1 = [];
+            temp.width2 = [];
+            temp.width3 = [];
+            temp.height1 = [];
+            temp.height2 = [];
+            temp.height3 = [];
+            setSelectCustomValues(temp);
+            
+            temp2.labels["3AIn"] = [];
+            temp2.values["3AIn"] = [];
+            temp2.labels["3BIn"] = [];
+            temp2.values["3BIn"] = [];
+            setStepSelectedOptions(temp2);
+        } else if (InOut === 2) {
+            temp.width3A = [];
+            temp.height3C = [];
+            temp.left = [];
+            temp.right = [];
+            temp.shadeMount = [];
+            setSelectCustomValues(temp);
+            
+            temp3.left = "";
+            temp3.right = "";
+            setLeftRight(temp3);
+        } else if (InOut === 3) {
+            temp.width = [];
+            temp.length = [];
+            setSelectCustomValues(temp);
+        } else {
+            temp.width1 = [];
+            temp.width2 = [];
+            temp.width3 = [];
+            temp.height1 = [];
+            temp.height2 = [];
+            temp.height3 = [];
+            temp.width3A = [];
+            temp.height3C = [];
+            temp.left = [];
+            temp.right = [];
+            temp.shadeMount = [];
+            setSelectCustomValues(temp);
+            
+            temp2.labels["3AIn"] = [];
+            temp2.values["3AIn"] = [];
+            temp2.labels["3BIn"] = [];
+            temp2.values["3BIn"] = [];
+            setStepSelectedOptions(temp2);
+            
+            temp3.left = "";
+            temp3.right = "";
+            setLeftRight(temp3);
+        }
+    }
+    
     function selectUncheck(e) {
         let refIndex = e.target.getAttribute('ref-num');
         let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-        tempLabels[refIndex] = "";
+        delete tempLabels[refIndex];
         setStepSelectedLabel(tempLabels);
         
         let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
@@ -444,10 +775,265 @@ function Zebra({CatID, ModelID}) {
         e.target.checked = false;
     }
     
-    function fabricClicked(e, hasTrim) {
-        let defFabricPhoto = e.target.getAttribute('default-fabric-photo');
-        setDefaultFabricPhoto(defFabricPhoto);
+    function setDeps(addDeps, removeDeps) {
+        let depSetTempArr = new Set([...depSet]);
+        if (addDeps !== undefined && addDeps !== "") {
+            let tempArr = addDeps.split(',');
+            tempArr.forEach(dep => {
+                if (dep !== undefined && dep !== "") {
+                    depSetTempArr.add(dep);
+                }
+            });
+        }
+        if (removeDeps !== undefined && removeDeps !== "") {
+            let tempArr = removeDeps.split(',');
+            tempArr.forEach(dep => {
+                if (dep !== undefined && dep !== "") {
+                    depSetTempArr = new Set([...depSetTempArr].filter(x => x !== dep))
+                    // depSetTempArr.delete(dep);
+                }
+            });
+        }
+        // console.log([...new Set(depSet)]);
+        // console.log(depSetTempArr);
+        setDepSet(depSetTempArr);
+    }
+    
+    const doNotShow = ["ModelId", "qty", "Width1", "Height1", "Width2", "Height2", "Width3", "Height3", "RoomNameEn", "RoomNameFa", "hasMeasurements", "Fabric", "PhotoUrl", "RemoteName",
+        "hasPower", "WindowName", "ExtensionLeft", "ExtensionRight", "Height3C", "Width3A", "ShadeMount", "ModelNameEn", "ModelNameFa", "FabricColorEn", "FabricColorFa", "FabricDesignEn", "FabricDesignFa"];
+    
+    function addToCart() {
+        let tempDepSet = [...depSet];
+        let tempNewSet = new Set();
+        let tempErr = [];
+        tempDepSet.forEach(dependency => {
+            tempNewSet.add(dependency.split('')[0]);
+        });
+        
+        if (tempNewSet.size > 0) {
+            let temp = JSON.parse(JSON.stringify(requiredStep));
+            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+            [...tempNewSet].sort(function (a, b) {
+                return a - b
+            }).forEach((dependency, index) => {
+                let type = steps.current[dependency].getAttribute("type-of-step") === "1" ? (pageLanguage === 'fa' ? " را مشخص کنید" : "SPECIFY ") : (pageLanguage === 'fa' ? " را انتخاب کنید" : "SELECT ");
+                tempErr.push(
+                    <li key={index}>
+                        {pageLanguage === 'fa' ? "شما باید " + steps.current[dependency].getAttribute("cart-custom-text") + type : "YOU MUST " + type + steps.current[dependency].getAttribute("cart-custom-text")}
+                    </li>
+                );
+                temp[dependency] = true;
+                delete tempLabels[dependency];
+            });
+            setTimeout(() => {
+                setRequiredStep(temp);
+            }, 500);
+            setStepSelectedLabel(tempLabels);
+            setAddCartErr(tempErr);
+            modalHandleShow("addToCartErr");
+        } else {
+            let cartInfo = JSON.parse(JSON.stringify(CartInfo));
+            let tempArr = [];
+            let temp = [];
+    
+            let roomNameFa = cartValues["RoomNameFa"];
+            let roomName = cartValues["RoomNameEn"];
+            let WindowName = cartValues["WindowName"]===undefined?"":cartValues["WindowName"];
+            Object.keys(cartValues).forEach(key => {
+                let tempObj = cartInfo.find(obj => obj["cart"] === key);
+                if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
+                    let objLabel = "";
+                    if (tempObj["titleValue"] === null) {
+                        if(tempObj["titlePostfix"]===""){
+                            objLabel = t(cartValues[key].toString());
+                        }
+                        else{
+                            objLabel = pageLanguage==="fa"? NumberToPersianWord.convertEnToPe(`${cartValues[key]}`).toString()+t(tempObj["titlePostfix"]):cartValues[key].toString()+t(tempObj["titlePostfix"]);
+                        }
+                        // objLabel = cartValues[key].toString() + tempObj["titlePostfix"];
+                    } else {
+                        if (tempObj["titleValue"][cartValues[key].toString()] === null) {
+                            if(tempObj["titlePostfix"]===""){
+                                objLabel = t(cartValues[key].toString());
+                            }
+                            else{
+                                objLabel = pageLanguage==="fa"? NumberToPersianWord.convertEnToPe(`${cartValues[key]}`).toString()+t(tempObj["titlePostfix"]):cartValues[key].toString()+t(tempObj["titlePostfix"]);
+                            }
+                        } else {
+                            objLabel = t(tempObj["titleValue"][cartValues[key].toString()]);
+                        }
+                    }
+                    temp[tempObj["order"]] =
+                        <li className="cart_agree_item" key={key}>
+                            <h1 className="cart_agree_item_title">{t(tempObj["title"])}&nbsp;</h1>
+                            <h2 className="cart_agree_item_desc">{objLabel}</h2>
+                        </li>;
+                }
+            });
+            tempArr.push(
+                <div key={defaultModelName}>
+                    <h2 className="cart_agree_title2">{pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</h2>
+                    <ul className="cart_agree_items_container">
+                        {temp}
+                        <li className="cart_agree_item">
+                            <h1 className="cart_agree_item_title">{pageLanguage === 'fa' ? "نام اتاق" : "Room Label"}&nbsp;</h1>
+                            <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? roomNameFa+ (WindowName===""?"":" / "+WindowName) :roomName+ (WindowName===""?"":" / "+WindowName)}</h2>
+                        </li>
+                        <li className="cart_agree_item">
+                            <h1 className="cart_agree_item_title">{t("Quantity")}&nbsp;</h1>
+                            <h2 className="cart_agree_item_desc">{t("1")}</h2>
+                        </li>
+                        <li className="cart_agree_item">
+                            <h1 className="cart_agree_item_title">{t("Price (Each)")}&nbsp;</h1>
+                            <h2 className="cart_agree_item_desc">{bagPrice.toLocaleString()} {t("TOMANS")}</h2>
+                        </li>
+                    </ul>
+                </div>
+            );
+            setCartAgree(tempArr);
+            modalHandleShow("cart_modal");
+            // console.log(cartValues);
+            
+        }
+        // modalHandleShow("cart_modal");
+        // renderCart();
+        // setCartStateAgree(true);
+        
+    }
+    
+    function addToCart_agreed() {
+        let customPageCart = {};
+        
+        let tempCartObj = JSON.parse(JSON.stringify(cartValues));
+        // tempCartObj["Type"]=0;
+        tempCartObj["ModelId"] = modelID;
+        tempCartObj["qty"] = 1;
+        // tempCartObj["PhotoUrl"]=`http://atlaspood.ir/${defaultFabricPhoto}`;
+        tempCartObj["ModelNameFa"] = defaultModelNameFa;
+        tempCartObj["ModelNameEn"] = defaultModelName;
+        if (localStorage.getItem("cart") === null) {
+            let newCartObj = {};
+            let newCartArr = [];
+            newCartArr[0] = tempCartObj;
+            newCartObj["drapery"] = newCartArr;
+            newCartObj["product"] = [];
+            newCartObj["swatches"] = [];
+            localStorage.setItem('cart', JSON.stringify(newCartObj));
+            customPageCart = newCartObj;
+        } else {
+            let cartObj = JSON.parse(localStorage.getItem("cart"));
+            if (cartObj["drapery"] === undefined || cartObj["drapery"] === []) {
+                let newCartArr = [];
+                newCartArr[0] = tempCartObj;
+                cartObj["drapery"] = newCartArr;
+                localStorage.setItem('cart', JSON.stringify(cartObj));
+                customPageCart = cartObj;
+            } else {
+                cartObj["drapery"].push(tempCartObj);
+                localStorage.setItem('cart', JSON.stringify(cartObj));
+                customPageCart = cartObj;
+            }
+        }
+        
+        renderCart(customPageCart);
+        setTimeout(() => {
+            // modalHandleShow("cart_modal");
+            setCartStateAgree(true);
+        }, 500);
+        
+    }
+    
+    function renderCart(customPageCart) {
+        let cartObjects = {};
+        if (customPageCart !== undefined) {
+            cartObjects = customPageCart;
+        } else {
+            if (localStorage.getItem("cart") === null) {
+                setCartItems([]);
+                handleClose("cart_modal");
+            } else {
+                cartObjects = JSON.parse(localStorage.getItem("cart"));
+            }
+        }
+        if (cartObjects !== {}) {
+            let temp = [];
+            let cartCount = 0;
+            if (cartObjects["drapery"].length) {
+                cartCount += cartObjects["drapery"].length;
+                cartObjects["drapery"].forEach((obj, index) => {
+                    let roomName = (obj["WindowName"] === undefined || obj["WindowName"] === "") ? "" : " / " + obj["WindowName"];
+                    temp.push(
+                        <li className="custom_cart_item" key={"drapery" + index}>
+                            <div className="custom_cart_item_image_container">
+                                <img src={`http://atlaspood.ir/${obj["PhotoUrl"]}`} alt="" className="custom_cart_item_img img-fluid"/>
+                            </div>
+                            <div className="custom_cart_item_desc">
+                                <div className="custom_cart_item_desc_container">
+                                    <h1 className="custom_cart_item_desc_name">{pageLanguage === 'fa' ? obj["ModelNameFa"] + " سفارشی " : "Custom " + obj["ModelNameEn"]}</h1>
+                                    <button type="button" className="btn-close" aria-label="Close" onClick={() => setBasketNumber(index, 0, 0)}/>
+                                </div>
+                                <div className="custom_cart_item_desc_container">
+                                    <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["FabricDesignFa"] + " / " + obj["FabricColorFa"] : obj["FabricDesignEn"] + " / " + obj["FabricColorEn"]}</h2>
+                                </div>
+                                <div className="custom_cart_item_desc_container">
+                                    <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["RoomNameFa"] + roomName : obj["RoomNameEn"] + roomName}</h2>
+                                </div>
+                                <div className="custom_cart_item_desc_container">
+                                    <div className="custom_cart_item_desc_qty">
+                                        <button type="text" className="basket_qty_minus" onClick={() => setBasketNumber(index, 0, 0, -1)}>–</button>
+                                        <input type="number" className="basket_qty_num" value={obj["qty"]} onChange={(e) => setBasketNumber(index, e.target.value, 0)}/>
+                                        <button type="text" className="basket_qty_plus" onClick={() => setBasketNumber(index, 0, 0, 1)}>+</button>
+                                        {/*<Select*/}
+                                        {/*    className="select"*/}
+                                        {/*    placeholder={t("Please Select")}*/}
+                                        {/*    // portal={document.getElementById('cart_modal')}*/}
+                                        {/*    dropdownPosition="bottom"*/}
+                                        {/*    dropdownHandle={false}*/}
+                                        {/*    dropdownGap={0}*/}
+                                        {/*    values={[qty[pageLanguage].find(opt =>opt.value === `${obj["qty"]}`)]}*/}
+                                        {/*    dropdownRenderer={*/}
+                                        {/*        ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>*/}
+                                        {/*    }*/}
+                                        {/*    contentRenderer={*/}
+                                        {/*        ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="" postfixFa=""/>*/}
+                                        {/*    }*/}
+                                        {/*    // optionRenderer={*/}
+                                        {/*    //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>*/}
+                                        {/*    // }*/}
+                                        {/*    onChange={(selected) => {*/}
+                                        {/*        setBasketNumber(index, selected[0].value, 0);*/}
+                                        {/*    }}*/}
+                                        {/*    options={qty[pageLanguage]}*/}
+                                        {/*/>*/}
+                                    </div>
+                                    <p className="custom_cart_item_end_price">{bagPrice.toLocaleString()} {t("TOMANS")}</p>
+                                </div>
+                            </div>
+                            {/*<div className="custom_cart_item_end">*/}
+                            {/*</div>*/}
+                        </li>
+                    );
+                });
+            }
+            if (temp === []) {
+                handleClose("cart_modal");
+            }
+            setCartItems(temp);
+            setCartCount(cartCount);
+        } else {
+            setCartCount(0);
+        }
+        axios.get(baseURLFreeShipping).then((response) => {
+            setFreeShipPrice(response.data);
+        }).catch(err => {
+            console.log(err);
+        });
+    }
+    
+    function fabricClicked(photo, hasTrim) {
+        setDefaultFabricPhoto(photo);
         setHasTrim(hasTrim);
+        // console.log(hasTrim)
     }
     
     function fabricSwatch(e, fabricId) {
@@ -461,6 +1047,95 @@ function Zebra({CatID, ModelID}) {
             e.target.setAttribute('current-state', "0");
             e.target.className = "swatchButton";
         }
+    }
+    
+    function getWindowSize(InOut) {
+        if (InOut === 1) {
+            let tempPostObj = {};
+            tempPostObj["ApiKey"] = window.$apikey;
+            tempPostObj["RodInstalled"] = true;
+            tempPostObj["IsWalled"] = null;
+            tempPostObj["Width"] = parseInt(stepSelectedOptions.values["3AIn"][0]);
+            tempPostObj["Width2"] = parseInt(stepSelectedOptions.values["3AIn"][1]);
+            tempPostObj["Width3"] = parseInt(stepSelectedOptions.values["3AIn"][2]);
+            tempPostObj["Height"] = parseInt(stepSelectedOptions.values["3BIn"][0]);
+            tempPostObj["Height2"] = parseInt(stepSelectedOptions.values["3BIn"][1]);
+            tempPostObj["Height3"] = parseInt(stepSelectedOptions.values["3BIn"][2]);
+            tempPostObj["LeftWidthExt"] = 0;
+            tempPostObj["RightWidthExt"] = 0;
+            tempPostObj["HeightOfRodMount"] = 0;
+            
+            axios.post(baseURLWindowSize, tempPostObj)
+                .then((response) => {
+                    let tempWindowSize = pageLanguage === "fa" ? `عرض: ${response.data.width}س\u200Cم\u00A0\u00A0\u00A0ارتفاع: ${response.data.height}س\u200Cم` : `Width: ${response.data.width}cm\u00A0\u00A0\u00A0Height: ${response.data.height}cm`;
+                    // setCart("WidthCart", response.data.width);
+                    setCart("HeightCart", response.data.height, "", "WidthCart", [response.data.width]);
+                    setWindowSize(tempWindowSize);
+                }).catch(err => {
+                console.log(err);
+            });
+        } else if (InOut === 2) {
+            let tempPostObj = {};
+            tempPostObj["ApiKey"] = window.$apikey;
+            tempPostObj["RodInstalled"] = true;
+            tempPostObj["IsWalled"] = 1;
+            tempPostObj["Width"] = parseInt(stepSelectedValue["3AOut"]);
+            tempPostObj["Width2"] = 0;
+            tempPostObj["Width3"] = 0;
+            tempPostObj["Height"] = parseInt(stepSelectedValue["3COut"]);
+            tempPostObj["Height2"] = 0;
+            tempPostObj["Height3"] = 0;
+            tempPostObj["LeftWidthExt"] = parseInt(leftRight.left);
+            tempPostObj["RightWidthExt"] = parseInt(leftRight.right);
+            tempPostObj["HeightOfRodMount"] = parseInt(stepSelectedValue["3DOut"]);
+            
+            axios.post(baseURLWindowSize, tempPostObj)
+                .then((response) => {
+                    let tempWindowSize = pageLanguage === "fa" ? `عرض: ${response.data.width}س\u200Cم\u00A0\u00A0\u00A0ارتفاع: ${response.data.height}س\u200Cم` : `Width: ${response.data.width}cm\u00A0\u00A0\u00A0Height: ${response.data.height}cm`;
+                    // setCart("WidthCart", response.data.width);
+                    setCart("HeightCart", response.data.height, "", "WidthCart", [response.data.width]);
+                    setWindowSize(tempWindowSize);
+                }).catch(err => {
+                console.log(err);
+            });
+        }
+        setWindowSizeBool(true);
+    }
+    
+    function roomLabelChanged(changedValue, refIndex, isText) {
+        if (isText) {
+            setRoomLabelText(changedValue);
+            
+            if (roomLabelSelect.label !== "") {
+                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                if (changedValue === "") {
+                    tempLabels[refIndex] = roomLabelSelect.label;
+                } else {
+                    tempLabels[refIndex] = roomLabelSelect.label + " - " + changedValue;
+                }
+                setStepSelectedLabel(tempLabels);
+            }
+        } else {
+            let tempSelect = JSON.parse(JSON.stringify(roomLabelSelect));
+            tempSelect.label = changedValue.label;
+            tempSelect.value = changedValue.value;
+            setRoomLabelSelect(tempSelect);
+            
+            let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
+            tempValue[refIndex] = changedValue.value;
+            setStepSelectedValue(tempValue);
+            
+            if (changedValue.label !== "") {
+                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                if (roomLabelText === "") {
+                    tempLabels[refIndex] = changedValue.label;
+                } else {
+                    tempLabels[refIndex] = changedValue.label + " - " + roomLabelText;
+                }
+                setStepSelectedLabel(tempLabels);
+            }
+        }
+        
     }
     
     const optionsMetalValance = {
@@ -503,6 +1178,35 @@ function Zebra({CatID, ModelID}) {
         
     };
     
+    const qty = {
+        "en": [
+            {value: '0', label: '0'},
+            {value: '1', label: '1'},
+            {value: '2', label: '2'},
+            {value: '3', label: '3'},
+            {value: '4', label: '4'},
+            {value: '5', label: '5'},
+            {value: '6', label: '6'},
+            {value: '7', label: '7'},
+            {value: '8', label: '8'},
+            {value: '9', label: '9'},
+            {value: '10', label: '10'}
+        ],
+        "fa": [
+            {value: '0', label: '۰'},
+            {value: '1', label: '۱'},
+            {value: '2', label: '۲'},
+            {value: '3', label: '۳'},
+            {value: '4', label: '۴'},
+            {value: '5', label: '۵'},
+            {value: '6', label: '۶'},
+            {value: '7', label: '۷'},
+            {value: '8', label: '۸'},
+            {value: '9', label: '۹'},
+            {value: '10', label: '۱۰'}
+        ],
+    };
+    
     const motorChannels = {
         "en": [
             {value: '0', label: '0 (All Products)', disabled: true},
@@ -532,6 +1236,7 @@ function Zebra({CatID, ModelID}) {
         ],
         
     };
+    const [selectedMotorChannels, setSelectedMotorChannels] = useState([motorChannels[pageLanguage].find(opt => opt.value === '0')]);
     
     const colors = {
         "en": [
@@ -621,50 +1326,236 @@ function Zebra({CatID, ModelID}) {
         "en": [
             {value: 'Family Room', label: 'Family Room'},
             {value: 'Den', label: 'Den'},
-            {value: 'Living Room', label: 'Living Room'}
+            {value: 'Living Room', label: 'Living Room'},
+            {value: 'Dining Room', label: 'Dining Room'},
+            {value: 'Kitchen', label: 'Kitchen'},
+            {value: 'Pantry', label: 'Pantry'},
+            {value: 'Breakfast Nook', label: 'Breakfast Nook'},
+            {value: 'Main Bedroom', label: 'Main Bedroom'},
+            {value: 'Bedroom', label: 'Bedroom'},
+            {value: 'Closet', label: 'Closet'},
+            {value: 'Main Bathroom', label: 'Main Bathroom'},
+            {value: 'Bathroom', label: 'Bathroom'},
+            {value: 'Office', label: 'Office'},
+            {value: 'Basement', label: 'Basement'},
+            {value: 'Entry', label: 'Entry'},
+            {value: 'Mud Room', label: 'Mud Room'},
+            {value: 'Hall', label: 'Hall'},
+            {value: 'Media', label: 'Media'},
+            {value: 'Laundry', label: 'Laundry'},
+            {value: 'Nursery', label: 'Nursery'},
+            {value: 'Study', label: 'Study'},
+            {value: 'Garage', label: 'Garage'},
+            {value: 'Attic', label: 'Attic'},
+            {value: 'Powder Room', label: 'Powder Room'},
+            {value: 'Guest Bedroom', label: 'Guest Bedroom'},
+            {value: 'Sunroom', label: 'Sunroom'},
+            {value: 'Playroom', label: 'Playroom'},
+            {value: 'Gym', label: 'Gym'},
+            {value: 'Pool House', label: 'Pool House'},
+            {value: 'ADU', label: 'ADU'},
+            {value: 'Stairway', label: 'Stairway'},
+            {value: 'Other', label: 'Other'}
         ],
         "fa": [
             {value: 'Family Room', label: 'اتاق خانواده'},
             {value: 'Den', label: 'خلوتگاه'},
-            {value: 'Living Room', label: 'اتاق نشیمن'}
+            {value: 'Living Room', label: 'اتاق نشیمن'},
+            {value: 'Dining Room', label: 'غذاخوری'},
+            {value: 'Kitchen', label: 'آشپزخانه'},
+            {value: 'Pantry', label: 'آبدارخانه'},
+            {value: 'Breakfast Nook', label: 'گوشه صبحانه'},
+            {value: 'Main Bedroom', label: 'اتاق خواب اصلی'},
+            {value: 'Bedroom', label: 'اتاق خواب'},
+            {value: 'Closet', label: 'کمد لباس'},
+            {value: 'Main Bathroom', label: 'سرویس بهداشتی اصلی'},
+            {value: 'Bathroom', label: 'سرویس بهداشتی'},
+            {value: 'Office', label: 'دفتر'},
+            {value: 'Basement', label: 'زیر زمین'},
+            {value: 'Entry', label: 'ورودی'},
+            {value: 'Mud Room', label: 'اتاق گلی'},
+            {value: 'Hall', label: 'هال'},
+            {value: 'Media', label: 'رسانه'},
+            {value: 'Laundry', label: 'خشکشویی'},
+            {value: 'Nursery', label: 'مهد کودک'},
+            {value: 'Study', label: 'کتابخانه'},
+            {value: 'Garage', label: 'کاراژ'},
+            {value: 'Attic', label: 'اتاق زیر شیروانی'},
+            {value: 'Powder Room', label: 'توالت زنانه'},
+            {value: 'Guest Bedroom', label: 'اتاق خواب مهمان'},
+            {value: 'Sunroom', label: 'اتاق افتاب رو'},
+            {value: 'Playroom', label: 'اتاق بازی'},
+            {value: 'Gym', label: 'باشگاه'},
+            {value: 'Pool House', label: 'استخر خانه'},
+            {value: 'ADU', label: 'واحد مسکونی لوازم جانبی'},
+            {value: 'Stairway', label: 'راه پله'},
+            {value: 'Other', label: 'دیگر'}
         ],
         
     };
     
     useEffect(() => {
-        const tempLang = location.pathname.split('');
-        setPageLanguage(tempLang.slice(1, 3).join(''));
+        if (fabricSelected.selectedFabricId !== 0) {
+            fabricClicked(fabricSelected.selectedPhoto, fabricSelected.selectedHasTrim);
+            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+            tempLabels["1"] = location.pathname.split('').slice(1, 3).join('') === "fa" ? fabricSelected.selectedTextFa : fabricSelected.selectedTextEn;
+            let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
+            tempValue["1"] = fabricSelected.selectedFabricId;
+            setStepSelectedLabel(tempLabels);
+            setStepSelectedValue(tempValue);
+            // setCart("Fabric", fabricSelected.selectedFabricId);
+            setCart("Fabric", `${fabricSelected.selectedFabricId}`, "", "FabricDesignFa,FabricDesignEn,FabricColorEn,FabricColorFa,PhotoUrl", [fabricSelected.selectedTextFa, fabricSelected.selectedTextEn, fabricSelected.selectedColorEn, fabricSelected.selectedColorFa, fabricSelected.selectedPhoto]);
+            // setCart("PhotoUrl", fabricSelected.selectedPhoto);
+            setDeps("", "1");
+        }
+    }, [fabricSelected]);
+    
+    useEffect(() => {
+        if (firstRender === false) {
+            const tempLang = location.pathname.split('');
+            pageLanguage = tempLang.slice(1, 3).join('');
+            setShowLabels(false);
+            Object.keys(inputs.current).forEach(refObj => {
+                if (inputs.current[refObj] !== null) {
+                    if (inputs.current[refObj].checked) {
+                        inputs.current[refObj].click();
+                    }
+                }
+            });
+            setTimeout(() => {
+                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                let tempObj = {};
+                tempObj["3AOut"] = selectCustomValues.width3A[0];
+                tempObj["3BOut"] = selectCustomValues.left[0];
+                tempObj["3COut"] = selectCustomValues.height3C[0];
+                tempObj["3DOut"] = selectCustomValues.shadeMount[0];
+                tempObj["3AIn"] = selectCustomValues.width1[0];
+                tempObj["3BIn"] = selectCustomValues.height1[0];
+                tempObj["3"] = selectCustomValues.width[0];
+                
+                Object.keys(tempObj).forEach(objKey => {
+                    if (tempObj[objKey] !== undefined) {
+                        if (objKey === "3AIn") {
+                            let temp = JSON.parse(JSON.stringify(stepSelectedOptions));
+                            if (temp.labels[objKey] === undefined)
+                                temp.labels[objKey] = [];
+                            if (temp.values[objKey] === undefined)
+                                temp.values[objKey] = [];
+                            let tempMin = temp.values[objKey][temp.values[objKey].indexOf(Math.min(...temp.values[objKey]))];
+                            tempLabels[objKey] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + "س\u200Cم" : tempMin + "cm";
+                        } else if (objKey === "3BIn") {
+                            let temp = JSON.parse(JSON.stringify(stepSelectedOptions));
+                            if (temp.labels[objKey] === undefined)
+                                temp.labels[objKey] = [];
+                            if (temp.values[objKey] === undefined)
+                                temp.values[objKey] = [];
+                            let tempMax = temp.values[objKey][temp.values[objKey].indexOf(Math.max(...temp.values[objKey]))];
+                            tempLabels[objKey] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + "س\u200Cم" : tempMax + "cm";
+                            
+                        } else if (objKey === "3BOut") {
+                            let temp = JSON.parse(JSON.stringify(leftRight));
+                            
+                            if (temp.right !== "" && temp.left !== "") {
+                                tempLabels[objKey] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp.right}`) + "س\u200Cم"}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp.left}`) + "س\u200Cم"}` : `Left: ${temp.left + "cm"}\u00A0\u00A0\u00A0Right: ${temp.right + "cm"}`;
+                            }
+                        } else if (objKey === "3") {
+                            let temp = JSON.parse(JSON.stringify(widthLength));
+                            
+                            if (temp.length !== "" && temp.width !== "") {
+                                tempLabels[objKey] = pageLanguage === "fa" ? `ارتفاع:  ${NumberToPersianWord.convertEnToPe(`${temp.length}`) + "س\u200Cم"}\u00A0\u00A0\u00A0عرض: ${NumberToPersianWord.convertEnToPe(`${temp.width}`) + "س\u200Cم"}` : `Left: ${temp.width + "cm"}\u00A0\u00A0\u00A0Right: ${temp.length + "cm"}`;
+                            }
+                        } else {
+                            tempLabels[objKey] = pageLanguage === "fa" ? `${NumberToPersianWord.convertEnToPe(`${tempObj[objKey].value}`) + "س\u200Cم"}` : `${tempObj[objKey].value + "cm"}`;
+                        }
+                    }
+                });
+                
+                setTimeout(() => {
+                    setStepSelectedLabel(tempLabels);
+                }, 100);
+                
+                
+                // temp.width1 = [];
+                // temp.width2 = [];
+                // temp.width3 = [];
+                // temp.height1 = [];
+                // temp.height2 = [];
+                // temp.left = [];
+                // temp.right = [];
+                // temp.width = [];
+                // temp.length = [];
+                // temp.width3A = [];
+                // temp.height3C = [];
+                // temp.shadeMount = [];
+                
+                setTimeout(() => {
+                    setShowLabels(true);
+                }, 1000);
+            }, 5000);
+        } else {
+            setFirstRender(false);
+        }
     }, [location.pathname]);
     
     useEffect(() => {
-        if (models.length) {
-            models.forEach(obj => {
-                if (obj.SewingModelId === modelID) {
-                    setDefaultFabricPhoto(obj.DefaultFabricPhotoUrl);
-                    setDefaultModelName(obj.ModelENName);
-                    setDefaultModelNameFa(obj.ModelName);
-                }
-            });
-            getFabrics();
+        if (model !== {}) {
+            // console.log(model);
+            // model.forEach(obj => {
+            //     if (obj.SewingModelId === modelID) {
+            //         setDefaultFabricPhoto(obj.DefaultFabricPhotoUrl);
+            //         setDefaultModelName(obj.ModelENName);
+            //         setDefaultModelNameFa(obj.ModelName);
+            //     }
+            // });
+            setDefaultFabricPhoto(model["DefaultFabricPhotoUrl"]);
+            setDefaultModelName(model["ModelENName"]);
+            setDefaultModelNameFa(model["ModelName"]);
         }
-    }, [models]);
+    }, [model]);
     
     useEffect(() => {
         if (modelID !== '' && catID !== '') {
+            // if(firstRender) {
             getCats();
+            getModel();
+            getFabrics();
+            // setFirstRender(false);
+            // }
         }
-    }, [modelID, catID, pageLanguage, location.pathname]);
+    }, [modelID, catID]);
+    
+    useEffect(() => {
+        if (pageLanguage !== '') {
+            if (stepSelectedValue["2"] === "1" && stepSelectedValue["3"] === "2") {
+                if (stepSelectedOptions.values["3AIn"] !== undefined && stepSelectedOptions.values["3BIn"] !== undefined) {
+                    if (stepSelectedOptions.values["3AIn"].filter(function (e) {
+                        return e
+                    }).length === 3 && stepSelectedOptions.values["3BIn"].filter(function (e) {
+                        return e
+                    }).length === 3) {
+                        getWindowSize(1);
+                    }
+                }
+            } else if (stepSelectedValue["2"] === "2" && stepSelectedValue["3"] === "2") {
+                if (stepSelectedValue["3AOut"] !== undefined && leftRight.right !== "" && leftRight.left !== "" && stepSelectedValue["3COut"] !== undefined && stepSelectedValue["3DOut"] !== undefined) {
+                    getWindowSize(2);
+                }
+            }
+        }
+    }, [stepSelectedValue, leftRight, stepSelectedOptions, pageLanguage]);
     
     useEffect(() => {
         if (Object.keys(fabrics).length) {
-            renderFabrics();
+            setTimeout(() => {
+                renderFabrics();
+            }, 200);
         }
-    }, [fabrics]);
+    }, [fabrics, location.pathname]);
     
     useEffect(() => {
-        setModels([]);
-        setFabrics([]);
-        setFabricsList([]);
+        // setModels([]);
+        // setFabrics([]);
+        // setFabricsList([]);
         if (pageLanguage !== '') {
             setCatID(CatID);
             setModelID(ModelID);
@@ -672,7 +1563,7 @@ function Zebra({CatID, ModelID}) {
     }, [pageLanguage, location.pathname]);
     
     return (
-        <div className="Custom_model_container">
+        <div className={`Custom_model_container ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
             <div className="breadcrumb_container dir_ltr">
                 <Breadcrumb className="breadcrumb">
                     <Breadcrumb.Item linkAs={Link} className="breadcrumb_item" linkProps={{to: "/" + pageLanguage, className: "breadcrumb_item"}}>Home</Breadcrumb.Item>
@@ -688,7 +1579,7 @@ function Zebra({CatID, ModelID}) {
             
             
             <div className="models_title_div">
-                <h1>{/*pageLanguage === 'fa' ? defaultModelNameFa : defaultModelName*/}Custom Zebra Shades</h1>
+                <h1>{defaultModelName === undefined || defaultModelName === "" ? " " : pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</h1>
             </div>
             <div className="model_customize_container">
                 <div className="model_customize_image">
@@ -699,7 +1590,7 @@ function Zebra({CatID, ModelID}) {
                         {/* step 1 */}
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="1" stepNum={t("1")} stepTitle={t("zebra_step1")}
+                                <ContextAwareToggle eventKey="1" stepNum={t("1")} stepTitle={t("zebra_step1")} stepRef="1" type="1" required={requiredStep["1"]}
                                                     stepSelected={stepSelectedLabel["1"] === undefined ? "" : stepSelectedLabel["1"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="1">
@@ -829,7 +1720,7 @@ function Zebra({CatID, ModelID}) {
                                         {fabricsList}
                                         <Modal dialogClassName="zoomModal" show={show} onHide={() => handleClose()}>
                                             <Modal.Header closeButton>
-                                                {/*<Modal.Title>Modal heading</Modal.Title>*/}
+                                                {zoomModalHeader}
                                             </Modal.Header>
                                             <Modal.Body>{zoomModalBody}</Modal.Body>
                                             <Modal.Footer>
@@ -845,7 +1736,7 @@ function Zebra({CatID, ModelID}) {
                         {/* step 2 */}
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="2" stepNum={t("2")} stepTitle={t("zebra_step2")}
+                                <ContextAwareToggle eventKey="2" stepNum={t("2")} stepTitle={t("zebra_step2")} stepRef="2" type="1" required={requiredStep["2"]}
                                                     stepSelected={stepSelectedLabel["2"] === undefined ? "" : stepSelectedLabel["2"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="2">
@@ -856,7 +1747,16 @@ function Zebra({CatID, ModelID}) {
                                             <input className="radio" type="radio" text={t("mount_Inside")} value="1" name="step2" ref-num="2" id="21"
                                                    onClick={e => {
                                                        selectChanged(e, "3AOut,3BOut,3COut,3DOut");
-                                                   }}/>
+                                                       if (stepSelectedValue["3"] === "2") {
+                                                           setDeps("3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3", "2,3AOut,3BOut1,3BOut2,3COut,3DOut");
+                                                           deleteSpecialSelects(2);
+                                                           setCart("Mount", "Inside");
+                                                       } else {
+                                                           setDeps("", "2");
+                                                           setCart("Mount", "Inside");
+                                                       }
+                                                
+                                                   }} ref={ref => (inputs.current["21"] = ref)}/>
                                             <label htmlFor="21">{t("mount_Inside")}</label>
                                         </div>
                                         <div className="box50 radio_style">
@@ -864,7 +1764,15 @@ function Zebra({CatID, ModelID}) {
                                             <input className="radio" type="radio" text={t("mount_Outside")} value="2" name="step2" ref-num="2" id="22"
                                                    onClick={e => {
                                                        selectChanged(e, "3AIn,3BIn");
-                                                   }}/>
+                                                       if (stepSelectedValue["3"] === "2") {
+                                                           setDeps("3AOut,3BOut1,3BOut2,3COut,3DOut", "2,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3");
+                                                           deleteSpecialSelects(1);
+                                                           setCart("Mount", "Outside", "Width1,Width2,Width3,Height1,Height2,Height3");
+                                                       } else {
+                                                           setDeps("", "2");
+                                                           setCart("Mount", "Outside", "Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
+                                                       }
+                                                   }} ref={ref => (inputs.current["22"] = ref)}/>
                                             <label htmlFor="22">{t("mount_Outside")}</label>
                                         </div>
                                         <NextStep eventKey="3">{t("NEXT STEP")}</NextStep>
@@ -876,8 +1784,9 @@ function Zebra({CatID, ModelID}) {
                         {/* step 3 */}
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="3" stepNum={t("3")} stepTitle={t("zebra_step3")}
-                                                    stepSelected={stepSelectedLabel["3"] === undefined ? "" : stepSelectedLabel["3"]}/>
+                                <ContextAwareToggle eventKey="3" stepNum={t("3")} stepTitle={t("zebra_step3")} stepRef="3" type="2" required={requiredStep["3"]}
+                                                    stepSelected={windowSizeBool ? windowSize : (stepSelectedLabel["3"] === undefined ? "" : stepSelectedLabel["3"])}
+                                                    cartCustomText={t("zebra_step3_custom_cart_text")}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="3">
                                 <Card.Body>
@@ -887,22 +1796,33 @@ function Zebra({CatID, ModelID}) {
                                                    onClick={e => {
                                                        selectChanged(e, "3AIn,3BIn,3AOut,3BOut,3COut,3DOut");
                                                        setMeasurementsNextStep("4");
-                                                   }}/>
+                                                       setDeps("31,32", "3,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3,3AOut,3BOut1,3BOut2,3COut,3DOut");
+                                                       deleteSpecialSelects();
+                                                       setCart("hasMeasurements", true, "Width1,Width2,Width3,Height1,Height2,Height3,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
+                                                   }} ref={ref => (inputs.current["31"] = ref)}/>
                                             <label htmlFor="31">{t("I have my own measurements.")}</label>
                                         </div>
                                         <div className="box50 radio_style">
                                             <input className="radio" type="radio" text={t("Calculate my measurements")} value="2" name="step3"
-                                                   ref-num="3" id="32"
+                                                   ref-num="3" id="32" ref={ref => (inputs.current["32"] = ref)}
                                                    onClick={e => {
                                                        if (stepSelectedValue["2"] === undefined) {
                                                            selectUncheck(e);
-                                                           modalHandleShow("noMount")
+                                                           modalHandleShow("noMount");
+                                                           setDeps("3", "31,32");
+                                                           setCart("hasMeasurements", false, "Width,height");
                                                        } else if (stepSelectedValue["2"] === "1") {
+                                                           deleteSpecialSelects(3);
                                                            selectChanged(e);
                                                            setMeasurementsNextStep("3A");
+                                                           setDeps("3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3", "3,3AOut,3BOut1,3BOut2,3COut,3DOut,31,32");
+                                                           setCart("hasMeasurements", false, "Width,Height,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
                                                        } else {
+                                                           deleteSpecialSelects(3);
                                                            selectChanged(e);
                                                            setMeasurementsNextStep("3A");
+                                                           setDeps("3AOut,3BOut1,3BOut2,3COut,3DOut", "3,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3,31,32");
+                                                           setCart("hasMeasurements", false, "Width,Height,Width1,Width2,Width3,Height1,Height2,Height3");
                                                        }
                                                    }}/>
                                             <label htmlFor="32">{t("Calculate my measurements.")}</label>
@@ -912,7 +1832,7 @@ function Zebra({CatID, ModelID}) {
                                         {stepSelectedValue["3"] === "1" &&
                                         <div className="own_measurements_container">
                                             <div className="own_measurements_width">
-                                                <label className="select_label">{t("Width")}</label>
+                                                <label className="select_label">{t("Width")}<p className="farsi_cm">{t("select_cm")}</p></label>
                                                 <div className="select_container select_container_num">
                                                     <Select
                                                         className="select"
@@ -921,24 +1841,30 @@ function Zebra({CatID, ModelID}) {
                                                         dropdownPosition="bottom"
                                                         dropdownHandle={false}
                                                         dropdownGap={0}
+                                                        values={selectCustomValues.width}
                                                         dropdownRenderer={
                                                             ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                         }
                                                         contentRenderer={
-                                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
                                                         }
                                                         // optionRenderer={
                                                         //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                         // }
                                                         onChange={(selected) => {
-                                                            optionSelectChanged_WidthLength(selected[0], "3", true);
+                                                            optionSelectChanged_WidthLength(selected[0], "3", true, "cm", "س\u200Cم", pageLanguage);
+                                                            let temp = selectCustomValues;
+                                                            temp.width = selected;
+                                                            setSelectCustomValues(temp);
+                                                            setDeps("", "31");
+                                                            setCart("Width", selected[0].value);
                                                         }}
-                                                        options={SelectOptionRange(30, 300, 1, "cm", "س\u200Cم" , pageLanguage)}
+                                                        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
                                             <div className="own_measurements_Length">
-                                                <label className="select_label">{t("Length_step3")}</label>
+                                                <label className="select_label">{t("Length_step3")}<p className="farsi_cm">{t("select_cm")}</p></label>
                                                 <div className="select_container select_container_num">
                                                     <Select
                                                         className="select"
@@ -947,19 +1873,25 @@ function Zebra({CatID, ModelID}) {
                                                         dropdownPosition="bottom"
                                                         dropdownHandle={false}
                                                         dropdownGap={0}
+                                                        values={selectCustomValues.length}
                                                         dropdownRenderer={
                                                             ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                         }
                                                         contentRenderer={
-                                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
                                                         }
                                                         // optionRenderer={
                                                         //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                         // }
                                                         onChange={(selected) => {
-                                                            optionSelectChanged_WidthLength(selected[0], "3", false);
+                                                            optionSelectChanged_WidthLength(selected[0], "3", false, "cm", "س\u200Cم", pageLanguage);
+                                                            let temp = selectCustomValues;
+                                                            temp.length = selected;
+                                                            setSelectCustomValues(temp);
+                                                            setDeps("", "32");
+                                                            setCart("Height", selected[0].value);
                                                         }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "س\u200Cم" , pageLanguage)}
+                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -1012,19 +1944,21 @@ function Zebra({CatID, ModelID}) {
                         {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "1" &&
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="3A" stepNum={t("3A")} stepTitle={t("zebra_step3AInside")}
+                                <ContextAwareToggle eventKey="3A" stepNum={t("3A")} stepTitle={t("zebra_step3AInside")} stepRef="3AIn" type="2"
                                                     stepSelected={stepSelectedLabel["3AIn"] === undefined ? "" : stepSelectedLabel["3AIn"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="3A">
                                 <Card.Body>
                                     <div className="card_body">
                                         <div className="box100">
-                                            <p className="step_selection_title">What's your window width?</p>
-                                            <img src={require('../Images/drapery/zebra/width_inside_3.svg')} className="img-fluid" alt=""/>
+                                            <p className="step_selection_title">{t("step3A_title")}</p>
+                                            <img
+                                                src={pageLanguage === 'fa' ? require('../Images/drapery/zebra/width_inside_3_fa.svg') : require('../Images/drapery/zebra/width_inside_3.svg')}
+                                                className="img-fluid" alt=""/>
                                         </div>
                                         <div className="box100 Three_selection_container">
                                             <div className="Three_select_container">
-                                                <label className="select_label">A</label>
+                                                <label className="select_label">{t("step3AIn_A")}<p className="farsi_cm">{t("select_cm")}</p></label>
                                                 <div className="select_container select_container_num">
                                                     <Select
                                                         className="select"
@@ -1047,23 +1981,27 @@ function Zebra({CatID, ModelID}) {
                                                             ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                         }
                                                         contentRenderer={
-                                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
                                                         }
                                                         // optionRenderer={
                                                         //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                         // }
                                                         onChange={(selected) => {
-                                                            optionSelectChanged_three(selected[0], "3AIn", 0, true, "widthDifferent");
-                                                            let temp = selectCustomValues;
-                                                            temp.width1 = selected;
-                                                            setSelectCustomValues(temp);
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged_three(selected[0], "3AIn", 0, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = selectCustomValues;
+                                                                temp.width1 = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3AIn1");
+                                                                setCart("Width1", selected[0].value);
+                                                            }
                                                         }}
-                                                        options={SelectOptionRange(30, 300, 0.5, "cm", pageLanguage)}
+                                                        options={SelectOptionRange(30, 300, 0.5, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
                                             <div className="Three_select_container">
-                                                <label className="select_label">B</label>
+                                                <label className="select_label">{t("step3AIn_B")}<p className="farsi_cm">{t("select_cm")}</p></label>
                                                 <div className="select_container select_container_num">
                                                     <Select
                                                         className="select"
@@ -1086,23 +2024,27 @@ function Zebra({CatID, ModelID}) {
                                                             ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                         }
                                                         contentRenderer={
-                                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
                                                         }
                                                         // optionRenderer={
                                                         //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                         // }
                                                         onChange={(selected) => {
-                                                            optionSelectChanged_three(selected[0], "3AIn", 1, true, "widthDifferent");
-                                                            let temp = selectCustomValues;
-                                                            temp.width2 = selected;
-                                                            setSelectCustomValues(temp);
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged_three(selected[0], "3AIn", 1, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = selectCustomValues;
+                                                                temp.width2 = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3AIn2");
+                                                                setCart("Width2", selected[0].value);
+                                                            }
                                                         }}
-                                                        options={SelectOptionRange(30, 300, 0.5, "cm", "س\u200Cم" , pageLanguage)}
+                                                        options={SelectOptionRange(30, 300, 0.5, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
                                             <div className="Three_select_container">
-                                                <label className="select_label">C</label>
+                                                <label className="select_label">{t("step3AIn_C")}<p className="farsi_cm">{t("select_cm")}</p></label>
                                                 <div className="select_container select_container_num">
                                                     <Select
                                                         className="select"
@@ -1125,18 +2067,22 @@ function Zebra({CatID, ModelID}) {
                                                             ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                         }
                                                         contentRenderer={
-                                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
                                                         }
                                                         // optionRenderer={
                                                         //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                         // }
                                                         onChange={(selected) => {
-                                                            optionSelectChanged_three(selected[0], "3AIn", 2, true, "widthDifferent");
-                                                            let temp = selectCustomValues;
-                                                            temp.width3 = selected;
-                                                            setSelectCustomValues(temp);
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged_three(selected[0], "3AIn", 2, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = selectCustomValues;
+                                                                temp.width3 = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3AIn3");
+                                                                setCart("Width3", selected[0].value);
+                                                            }
                                                         }}
-                                                        options={SelectOptionRange(30, 300, 0.5, "cm", "س\u200Cم" , pageLanguage)}
+                                                        options={SelectOptionRange(30, 300, 0.5, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -1149,8 +2095,7 @@ function Zebra({CatID, ModelID}) {
                                             <div className="help_column help_left_column">
                                                 <p className="help_column_header"/>
                                                 <ul className="help_column_list">
-                                                    <li className="no_listStyle single_line_height">For accurate sizing, measure the horizontal width of inside of the window frame
-                                                        in 3 locations top, middle and bottom.
+                                                    <li className="no_listStyle single_line_height">{t("step3A_help_1")}
                                                     </li>
                                                 </ul>
                                             </div>
@@ -1165,19 +2110,21 @@ function Zebra({CatID, ModelID}) {
                         {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "1" &&
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="3B" stepNum={t("3B")} stepTitle={t("zebra_step3BInside")}
+                                <ContextAwareToggle eventKey="3B" stepNum={t("3B")} stepTitle={t("zebra_step3BInside")} stepRef="3BIn" type="2"
                                                     stepSelected={stepSelectedLabel["3BIn"] === undefined ? "" : stepSelectedLabel["3BIn"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="3B">
                                 <Card.Body>
                                     <div className="card_body">
                                         <div className="box100">
-                                            <p className="step_selection_title">What's your window height?</p>
-                                            <img src={require('../Images/drapery/zebra/height_inside_3.svg')} className="img-fluid" alt=""/>
+                                            <p className="step_selection_title">{t("step3B_title")}</p>
+                                            <img
+                                                src={pageLanguage === 'fa' ? require('../Images/drapery/zebra/height_inside_3_fa.svg') : require('../Images/drapery/zebra/height_inside_3.svg')}
+                                                className="img-fluid" alt=""/>
                                         </div>
                                         <div className="box100 Three_selection_container">
                                             <div className="Three_select_container">
-                                                <label className="select_label">A</label>
+                                                <label className="select_label">{t("step3BIn_A")}<p className="farsi_cm">{t("select_cm")}</p></label>
                                                 <div className="select_container select_container_num">
                                                     <Select
                                                         className="select"
@@ -1200,23 +2147,27 @@ function Zebra({CatID, ModelID}) {
                                                             ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                         }
                                                         contentRenderer={
-                                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
                                                         }
                                                         // optionRenderer={
                                                         //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                         // }
                                                         onChange={(selected) => {
-                                                            optionSelectChanged_three(selected[0], "3BIn", 0, false, "heightDifferent");
-                                                            let temp = selectCustomValues;
-                                                            temp.height1 = selected;
-                                                            setSelectCustomValues(temp);
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged_three(selected[0], "3BIn", 0, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = selectCustomValues;
+                                                                temp.height1 = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3BIn1");
+                                                                setCart("Height1", selected[0].value);
+                                                            }
                                                         }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "س\u200Cم" , pageLanguage)}
+                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
                                             <div className="Three_select_container">
-                                                <label className="select_label">B</label>
+                                                <label className="select_label">{t("step3BIn_B")}<p className="farsi_cm">{t("select_cm")}</p></label>
                                                 <div className="select_container select_container_num">
                                                     <Select
                                                         className="select"
@@ -1239,23 +2190,27 @@ function Zebra({CatID, ModelID}) {
                                                             ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                         }
                                                         contentRenderer={
-                                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
                                                         }
                                                         // optionRenderer={
                                                         //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                         // }
                                                         onChange={(selected) => {
-                                                            optionSelectChanged_three(selected[0], "3BIn", 1, false, "heightDifferent");
-                                                            let temp = selectCustomValues;
-                                                            temp.height2 = selected;
-                                                            setSelectCustomValues(temp);
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged_three(selected[0], "3BIn", 1, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = selectCustomValues;
+                                                                temp.height2 = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3BIn2");
+                                                                setCart("Height2", selected[0].value);
+                                                            }
                                                         }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "س\u200Cم" , pageLanguage)}
+                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
                                             <div className="Three_select_container">
-                                                <label className="select_label">C</label>
+                                                <label className="select_label">{t("step3BIn_C")}<p className="farsi_cm">{t("select_cm")}</p></label>
                                                 <div className="select_container select_container_num">
                                                     <Select
                                                         className="select"
@@ -1278,18 +2233,22 @@ function Zebra({CatID, ModelID}) {
                                                             ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                         }
                                                         contentRenderer={
-                                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
                                                         }
                                                         // optionRenderer={
                                                         //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                         // }
                                                         onChange={(selected) => {
-                                                            optionSelectChanged_three(selected[0], "3BIn", 2, false, "heightDifferent");
-                                                            let temp = selectCustomValues;
-                                                            temp.height3 = selected;
-                                                            setSelectCustomValues(temp);
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged_three(selected[0], "3BIn", 2, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = selectCustomValues;
+                                                                temp.height3 = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3BIn3");
+                                                                setCart("Height3", selected[0].value);
+                                                            }
                                                         }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "س\u200Cم" , pageLanguage)}
+                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -1303,8 +2262,7 @@ function Zebra({CatID, ModelID}) {
                                             <div className="help_column help_left_column">
                                                 <p className="help_column_header"/>
                                                 <ul className="help_column_list">
-                                                    <li className="no_listStyle single_line_height">For accurate sizing, measure the vertical height of inside of the window frame
-                                                        in 3 locations left , middle and right.
+                                                    <li className="no_listStyle single_line_height">{t("step3B_help_1")}
                                                     </li>
                                                 </ul>
                                             </div>
@@ -1319,19 +2277,19 @@ function Zebra({CatID, ModelID}) {
                         {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "2" &&
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="3A" stepNum={t("3A")} stepTitle={t("zebra_step3AOutside")}
+                                <ContextAwareToggle eventKey="3A" stepNum={t("3A")} stepTitle={t("zebra_step3AOutside")} stepRef="3AOut" type="2"
                                                     stepSelected={stepSelectedLabel["3AOut"] === undefined ? "" : stepSelectedLabel["3AOut"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="3A">
                                 <Card.Body>
                                     <div className="card_body">
                                         <div className="box100">
-                                            <p className="step_selection_title">What's your window width?<br/>(Frame outer edge to edge.)</p>
+                                            <p className="step_selection_title">{t("step3A_out_title")}</p>
                                             <img src={require('../Images/drapery/zebra/FrameSize.svg')} className="img-fluid" alt=""/>
                                         </div>
                                         <div className="box100 Three_selection_container">
                                             <div className="box100">
-                                                <label className="select_label">Width</label>
+                                                <label className="select_label">{t("Width")}<p className="farsi_cm">{t("select_cm")}</p></label>
                                                 <div className="select_container select_container_num">
                                                     <Select
                                                         className="select"
@@ -1349,19 +2307,27 @@ function Zebra({CatID, ModelID}) {
                                                                     window.scrollTo(window.scrollX, window.scrollY - 0.5);
                                                             }, 100);
                                                         }}
+                                                        values={selectCustomValues.width3A}
                                                         dropdownRenderer={
                                                             ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                         }
                                                         contentRenderer={
-                                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
                                                         }
                                                         // optionRenderer={
                                                         //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                         // }
                                                         onChange={(selected) => {
-                                                            optionSelectChanged("3AOut", selected[0])
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged("3AOut", selected[0], "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = selectCustomValues;
+                                                                temp.width3A = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3AOut");
+                                                                setCart("Width3A", selected[0].value);
+                                                            }
                                                         }}
-                                                        options={SelectOptionRange(30, 290, 1, "cm", "س\u200Cم" , pageLanguage)}
+                                                        options={SelectOptionRange(30, 290, 1, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -1378,19 +2344,19 @@ function Zebra({CatID, ModelID}) {
                         {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "2" &&
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="3B" stepNum={t("3B")} stepTitle={t("zebra_step3BOutside")}
+                                <ContextAwareToggle eventKey="3B" stepNum={t("3B")} stepTitle={t("zebra_step3BOutside")} stepRef="3BOut" type="2"
                                                     stepSelected={stepSelectedLabel["3BOut"] === undefined ? "" : stepSelectedLabel["3BOut"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="3B">
                                 <Card.Body>
                                     <div className="card_body">
                                         <div className="box100">
-                                            <p className="step_selection_title">How many cm would you like the shade to extend<br/>slightly beyond the window frame?</p>
+                                            <p className="step_selection_title">{t("step3B_out_title")}</p>
                                             <img src={require('../Images/drapery/zebra/wall_cover.svg')} className="img-fluid" alt=""/>
                                         </div>
                                         <div className="box100 Three_selection_container dir_ltr">
                                             <div className="box50">
-                                                <label className="select_label">Left</label>
+                                                <label className="select_label"><p className="farsi_cm">{t("select_cm")}</p>{t("Left")}</label>
                                                 <div className="select_container select_container_num">
                                                     <Select
                                                         className="select"
@@ -1408,24 +2374,32 @@ function Zebra({CatID, ModelID}) {
                                                                     window.scrollTo(window.scrollX, window.scrollY - 0.5);
                                                             }, 100);
                                                         }}
+                                                        values={selectCustomValues.left}
                                                         dropdownRenderer={
                                                             ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                         }
                                                         contentRenderer={
-                                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
                                                         }
                                                         // optionRenderer={
                                                         //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                         // }
                                                         onChange={(selected) => {
-                                                            optionSelectChanged_LeftRight(selected[0], "3BOut", true);
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged_LeftRight(selected[0], "3BOut", true, "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = selectCustomValues;
+                                                                temp.left = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3BOut1");
+                                                                setCart("ExtensionLeft", selected[0].value);
+                                                            }
                                                         }}
-                                                        options={SelectOptionRange(1, 10, 1, "cm", "س\u200Cم" , pageLanguage)}
+                                                        options={SelectOptionRange(1, 10, 1, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
                                             <div className="box50">
-                                                <label className="select_label">Right</label>
+                                                <label className="select_label"><p className="farsi_cm">{t("select_cm")}</p>{t("Right")}</label>
                                                 <div className="select_container select_container_num">
                                                     <Select
                                                         className="select"
@@ -1443,19 +2417,27 @@ function Zebra({CatID, ModelID}) {
                                                                     window.scrollTo(window.scrollX, window.scrollY - 0.5);
                                                             }, 100);
                                                         }}
+                                                        values={selectCustomValues.right}
                                                         dropdownRenderer={
                                                             ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                         }
                                                         contentRenderer={
-                                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
                                                         }
                                                         // optionRenderer={
                                                         //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                         // }
                                                         onChange={(selected) => {
-                                                            optionSelectChanged_LeftRight(selected[0], "3BOut", false);
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged_LeftRight(selected[0], "3BOut", false, "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = selectCustomValues;
+                                                                temp.right = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3BOut2");
+                                                                setCart("ExtensionRight", selected[0].value);
+                                                            }
                                                         }}
-                                                        options={SelectOptionRange(1, 10, 1, "cm", "س\u200Cم" , pageLanguage)}
+                                                        options={SelectOptionRange(1, 10, 1, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -1469,8 +2451,7 @@ function Zebra({CatID, ModelID}) {
                                             <div className="help_column help_left_column">
                                                 <p className="help_column_header"/>
                                                 <ul className="help_column_list">
-                                                    <li className="no_listStyle single_line_height">We recommend extending the shade 4-8cm on each side of the window frame to
-                                                        minimize light gaps.
+                                                    <li className="no_listStyle single_line_height">{t("step3B_out_help_1")}
                                                     </li>
                                                 </ul>
                                             </div>
@@ -1485,19 +2466,19 @@ function Zebra({CatID, ModelID}) {
                         {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "2" &&
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="3C" stepNum={t("3C")} stepTitle={t("zebra_step3COutside")}
+                                <ContextAwareToggle eventKey="3C" stepNum={t("3C")} stepTitle={t("zebra_step3COutside")} stepRef="3COut" type="2"
                                                     stepSelected={stepSelectedLabel["3COut"] === undefined ? "" : stepSelectedLabel["3COut"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="3C">
                                 <Card.Body>
                                     <div className="card_body">
                                         <div className="box100">
-                                            <p className="step_selection_title">What's your window height?<br/>(Frame outer edge to edge.)</p>
+                                            <p className="step_selection_title">{t("step3C_out_title")}</p>
                                             <img src={require('../Images/drapery/zebra/frame_height.svg')} className="img-fluid" alt=""/>
                                         </div>
                                         <div className="box100 Three_selection_container">
                                             <div className="box100">
-                                                <label className="select_label">Height</label>
+                                                <label className="select_label">{t("Height")}<p className="farsi_cm">{t("select_cm")}</p></label>
                                                 <div className="select_container select_container_num">
                                                     <Select
                                                         className="select"
@@ -1515,19 +2496,27 @@ function Zebra({CatID, ModelID}) {
                                                                     window.scrollTo(window.scrollX, window.scrollY - 0.5);
                                                             }, 100);
                                                         }}
+                                                        values={selectCustomValues.height3C}
                                                         dropdownRenderer={
                                                             ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                         }
                                                         contentRenderer={
-                                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
                                                         }
                                                         // optionRenderer={
                                                         //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                         // }
                                                         onChange={(selected) => {
-                                                            optionSelectChanged("3COut", selected[0])
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged("3COut", selected[0], "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = selectCustomValues;
+                                                                temp.height3C = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3COut");
+                                                                setCart("Height3C", selected[0].value);
+                                                            }
                                                         }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "س\u200Cم" , pageLanguage)}
+                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -1544,14 +2533,14 @@ function Zebra({CatID, ModelID}) {
                         {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "2" &&
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="3D" stepNum={t("3D")} stepTitle={t("zebra_step3DOutside")}
+                                <ContextAwareToggle eventKey="3D" stepNum={t("3D")} stepTitle={t("zebra_step3DOutside")} stepRef="3DOut" type="2"
                                                     stepSelected={stepSelectedLabel["3DOut"] === undefined ? "" : stepSelectedLabel["3DOut"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="3D">
                                 <Card.Body>
                                     <div className="card_body">
                                         <div className="box100">
-                                            <p className="step_selection_title">How many cm above window frame<br/>would you like to mount the shade?</p>
+                                            <p className="step_selection_title">{t("step3D_out_title")}</p>
                                             <img src={require('../Images/drapery/zebra/shade_mount.svg')} className="img-fluid" alt=""/>
                                         </div>
                                         <div className="box100 Three_selection_container">
@@ -1574,19 +2563,27 @@ function Zebra({CatID, ModelID}) {
                                                                     window.scrollTo(window.scrollX, window.scrollY - 0.5);
                                                             }, 100);
                                                         }}
+                                                        values={selectCustomValues.shadeMount}
                                                         dropdownRenderer={
                                                             ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                         }
                                                         contentRenderer={
-                                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
                                                         }
                                                         // optionRenderer={
                                                         //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                         // }
                                                         onChange={(selected) => {
-                                                            optionSelectChanged("3DOut", selected[0])
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged("3DOut", selected[0], "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = selectCustomValues;
+                                                                temp.shadeMount = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3DOut");
+                                                                setCart("ShadeMount", selected[0].value);
+                                                            }
                                                         }}
-                                                        options={SelectOptionRange(0, 100, 1, "cm", "س\u200Cم" , pageLanguage)}
+                                                        options={SelectOptionRange(0, 100, 1, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -1599,9 +2596,7 @@ function Zebra({CatID, ModelID}) {
                                             <div className="help_column help_left_column">
                                                 <p className="help_column_header"/>
                                                 <ul className="help_column_list">
-                                                    <li className="no_listStyle single_line_height">We recommend the shade to be mounted at least 15-20cm above window frame to
-                                                        accommodate for shade height when kept completely rolled up and to maximize window exposure. Our standard hardware cannot
-                                                        accommodate a mounting height of less than 10cm. If you need to mount your shades lower than this, please contact us.
+                                                    <li className="no_listStyle single_line_height">{t("step3D_out_help_1")}
                                                     </li>
                                                 </ul>
                                             </div>
@@ -1615,7 +2610,7 @@ function Zebra({CatID, ModelID}) {
                         {/* step 4 */}
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="4" stepNum={t("4")} stepTitle={t("zebra_step4")}
+                                <ContextAwareToggle eventKey="4" stepNum={t("4")} stepTitle={t("zebra_step4")} stepRef="4" type="1" required={requiredStep["4"]}
                                                     stepSelected={stepSelectedLabel["4"] === undefined ? "" : stepSelectedLabel["4"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="4">
@@ -1626,7 +2621,9 @@ function Zebra({CatID, ModelID}) {
                                                    onClick={e => {
                                                        selectChanged(e);
                                                        setControlTypeNextStep("4A");
-                                                   }}/>
+                                                       setDeps("4A,4B", "4,41,411,412");
+                                                       setCart("ControlType", "ContinuousLoop", "hasPower,MotorPosition,RemoteName,MotorChannels");
+                                                   }} ref={ref => (inputs.current["41"] = ref)}/>
                                             <label htmlFor="41">{t("Continuous")}<br/><p>{t("Loop")}</p></label>
                                         </div>
                                         <div className="box50 radio_style">
@@ -1635,7 +2632,9 @@ function Zebra({CatID, ModelID}) {
                                                    onClick={e => {
                                                        selectChanged(e, "41", "4A,4B");
                                                        setControlTypeNextStep("5");
-                                                   }}/>
+                                                       setDeps("41", "4,4A,4B");
+                                                       setCart("ControlType", "Motorized", "ControlPosition,ChainLength");
+                                                   }} ref={ref => (inputs.current["42"] = ref)}/>
                                             <label htmlFor="42">{t("Motorized")}<br/><p className="surcharge_price">{t("Add 200,000 Tomans")}</p></label>
                                         
                                         </div>
@@ -1648,15 +2647,18 @@ function Zebra({CatID, ModelID}) {
                                                     <input className="radio" type="radio" text={t("Yes")} value="1" name="step41" ref-num="41" id="411"
                                                            onClick={e => {
                                                                selectChanged(e);
-                                                           }}/>
+                                                               setDeps("411,412", "41");
+                                                               setCart("hasPower", true);
+                                                           }} ref={ref => (inputs.current["411"] = ref)}/>
                                                     <label htmlFor="411">{t("Yes")}</label>
                                                 </div>
                                                 <div className="box50 radio_style">
                                                     <input className="radio" type="radio" text={t("No")} value="2" name="step41" ref-num="41" id="412"
                                                            onClick={e => {
                                                                selectUncheck(e);
-                                                               modalHandleShow("noPower")
-                                                           }}/>
+                                                               modalHandleShow("noPower");
+                                                               setDeps("41", "411,412");
+                                                           }} ref={ref => (inputs.current["412"] = ref)}/>
                                                     <label htmlFor="412">{t("No")}</label>
                                                 </div>
                                             </div>
@@ -1688,6 +2690,8 @@ function Zebra({CatID, ModelID}) {
                                                         //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                         // }
                                                         onChange={(selected) => {
+                                                            setDeps("", "411");
+                                                            setCart("MotorPosition", selected[0].value);
                                                         }}
                                                         options={MotorPosition[pageLanguage]}
                                                     />
@@ -1699,7 +2703,9 @@ function Zebra({CatID, ModelID}) {
                                                 <span onClick={() => modalHandleShow("learnMore")}>(Learn More)</span>
                                             </div>
                                             <div className="motorized_option_right">
-                                                <input className="Remote_name" type="text" name="Remote_name" placeholder="Enter a name for your remote"/>
+                                                <input className="Remote_name" type="text" name="Remote_name" placeholder="Enter a name for your remote" onChange={(e) => {
+                                                    setCart("RemoteName", e.target.value);
+                                                }}/>
                                             </div>
                                             <div className="motorized_option_left">
                                                 <p>Channel(s)</p>
@@ -1716,7 +2722,7 @@ function Zebra({CatID, ModelID}) {
                                                         dropdownHandle={false}
                                                         dropdownGap={0}
                                                         multi={true}
-                                                        values={[motorChannels[pageLanguage].find(opt => opt.value === '0')]}
+                                                        values={selectedMotorChannels}
                                                         dropdownRenderer={
                                                             ({props, state, methods}) => <CustomDropdownMulti props={props} state={state} methods={methods}/>
                                                         }
@@ -1727,6 +2733,9 @@ function Zebra({CatID, ModelID}) {
                                                         //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                         // }
                                                         onChange={(selected) => {
+                                                            setDeps("", "412");
+                                                            setCart("MotorChannels", selected.map(obj => obj.value));
+                                                            setSelectedMotorChannels(selected);
                                                         }}
                                                         options={motorChannels[pageLanguage]}
                                                     />
@@ -1742,17 +2751,17 @@ function Zebra({CatID, ModelID}) {
                                     <div className="accordion_help">
                                         <div className="help_container">
                                             <div className="help_column help_left_column">
-                                                <p className="help_column_header">Continuous Loop</p>
+                                                <p className="help_column_header">{t("step4_help_1")}</p>
                                                 <ul className="help_column_list">
-                                                    <li>Chain control maintains consistent length</li>
-                                                    <li>Easier to operate larger shades</li>
+                                                    <li>{t("step4_help_2")}</li>
+                                                    <li>{t("step4_help_3")}</li>
                                                 </ul>
                                             </div>
                                             <div className="help_column help_right_column">
-                                                <p className="help_column_header">Motorization</p>
+                                                <p className="help_column_header">{t("step4_help_4")}</p>
                                                 <ul className="help_column_list">
-                                                    <li>Plug in motors</li>
-                                                    <li>Clean aesthetic - no chains</li>
+                                                    <li>{t("step4_help_5")}</li>
+                                                    <li>{t("step4_help_6")}</li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -1766,7 +2775,7 @@ function Zebra({CatID, ModelID}) {
                         {stepSelectedValue["4"] === "1" &&
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="4A" stepNum={t("4A")} stepTitle={t("zebra_step4A")}
+                                <ContextAwareToggle eventKey="4A" stepNum={t("4A")} stepTitle={t("zebra_step4A")} stepRef="4A" type="1"
                                                     stepSelected={stepSelectedLabel["4A"] === undefined ? "" : stepSelectedLabel["4A"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="4A">
@@ -1776,7 +2785,9 @@ function Zebra({CatID, ModelID}) {
                                             <input className="radio" type="radio" text={t("Left")} value="1" name="step4A" ref-num="4A" id="4A1"
                                                    onClick={e => {
                                                        selectChanged(e);
-                                                   }}/>
+                                                       setDeps("", "4A");
+                                                       setCart("ControlPosition", "Left");
+                                                   }} ref={ref => (inputs.current["4A1"] = ref)}/>
                                             <label htmlFor="4A1">{t("Left")}</label>
                                         </div>
                                         <div className="box50 radio_style">
@@ -1784,7 +2795,9 @@ function Zebra({CatID, ModelID}) {
                                                    ref-num="4A" id="4A2"
                                                    onClick={e => {
                                                        selectChanged(e);
-                                                   }}/>
+                                                       setDeps("", "4A");
+                                                       setCart("ControlPosition", "Right");
+                                                   }} ref={ref => (inputs.current["4A2"] = ref)}/>
                                             <label htmlFor="4A2">{t("Right")}</label>
                                         </div>
                                         <NextStep eventKey="4B">{t("NEXT STEP")}</NextStep>
@@ -1796,9 +2809,7 @@ function Zebra({CatID, ModelID}) {
                                             <div className="help_column help_left_column">
                                                 <p className="help_column_header"/>
                                                 <ul className="help_column_list">
-                                                    <li className="no_listStyle single_line_height">Consider the placement of your shade and select a position that's easily
-                                                        accessible for you. "Left" and "Right" refer to your left and right.
-                                                    </li>
+                                                    <li className="no_listStyle single_line_height">{t("step4A_help_1")}</li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -1809,11 +2820,11 @@ function Zebra({CatID, ModelID}) {
                         </Card>
                         }
                         
-                        {/* step 4A */}
+                        {/* step 4B */}
                         {stepSelectedValue["4"] === "1" &&
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="4B" stepNum={t("4B")} stepTitle={t("zebra_step4B")}
+                                <ContextAwareToggle eventKey="4B" stepNum={t("4B")} stepTitle={t("zebra_step4B")} stepRef="4B" type="1"
                                                     stepSelected={stepSelectedLabel["4B"] === undefined ? "" : stepSelectedLabel["4B"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="4B">
@@ -1823,7 +2834,9 @@ function Zebra({CatID, ModelID}) {
                                             <input className="radio" type="radio" text={t("150cm")} value="1" name="step4B" ref-num="4B" id="4B1"
                                                    onClick={e => {
                                                        selectChanged(e);
-                                                   }}/>
+                                                       setDeps("", "4B");
+                                                       setCart("ChainLength", 150);
+                                                   }} ref={ref => (inputs.current["4B1"] = ref)}/>
                                             <label htmlFor="4B1">{t("150cm")}<br/><p>{t("(No extra charge)")}</p></label>
                                         </div>
                                         <div className="box33 radio_style">
@@ -1831,7 +2844,9 @@ function Zebra({CatID, ModelID}) {
                                                    ref-num="4B" id="4B2"
                                                    onClick={e => {
                                                        selectChanged(e);
-                                                   }}/>
+                                                       setDeps("", "4B");
+                                                       setCart("ChainLength", 300);
+                                                   }} ref={ref => (inputs.current["4B2"] = ref)}/>
                                             <label htmlFor="4B2">{t("300cm")}<br/><p className="surcharge_price">{t("Add 200,000 Tomans")}</p></label>
                                         </div>
                                         <div className="box33 radio_style">
@@ -1839,7 +2854,9 @@ function Zebra({CatID, ModelID}) {
                                                    ref-num="4B" id="4B3"
                                                    onClick={e => {
                                                        selectChanged(e);
-                                                   }}/>
+                                                       setDeps("", "4B");
+                                                       setCart("ChainLength", 500);
+                                                   }} ref={ref => (inputs.current["4B3"] = ref)}/>
                                             <label htmlFor="4B3">{t("500cm")}<br/><p className="surcharge_price">{t("Add 200,000 Tomans")}</p></label>
                                         </div>
                                         <NextStep eventKey="5">{t("NEXT STEP")}</NextStep>
@@ -1853,7 +2870,7 @@ function Zebra({CatID, ModelID}) {
                         {/* step 5 */}
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="5" stepNum={t("5")} stepTitle={t("zebra_step5")}
+                                <ContextAwareToggle eventKey="5" stepNum={t("5")} stepTitle={t("zebra_step5")} stepRef="5" type="1" required={requiredStep["5"]}
                                                     stepSelected={stepSelectedLabel["5"] === undefined ? "" : stepSelectedLabel["5"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="5">
@@ -1864,7 +2881,9 @@ function Zebra({CatID, ModelID}) {
                                             <input className="radio" type="radio" text={t("style_Metal Valance")} value="1" name="step5" ref-num="5" id="51"
                                                    onClick={e => {
                                                        selectChanged(e);
-                                                   }}/>
+                                                       setDeps("51", "5,52");
+                                                       setCart("MetalValanceStyle", "MetalValance");
+                                                   }} ref={ref => (inputs.current["51"] = ref)}/>
                                             <label htmlFor="51">{t("style_Metal Valance")}</label>
                                         </div>
                                         <div className="box50 radio_style">
@@ -1873,7 +2892,9 @@ function Zebra({CatID, ModelID}) {
                                                    ref-num="5" id="52"
                                                    onClick={e => {
                                                        selectChanged(e);
-                                                   }}/>
+                                                       setDeps("52", "5,51");
+                                                       setCart("MetalValanceStyle", "MetalValanceFabricInsert");
+                                                   }} ref={ref => (inputs.current["52"] = ref)}/>
                                             <label htmlFor="52">{t("style_Metal Valance")}<br/>{t("style_Fabric Insert")}</label>
                                         
                                         </div>
@@ -1897,6 +2918,8 @@ function Zebra({CatID, ModelID}) {
                                                     //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                     // }
                                                     onChange={(selected) => {
+                                                        setDeps("", "51");
+                                                        setCart("MetalValanceColor", selected[0].value);
                                                     }}
                                                     options={optionsMetalValance[pageLanguage]}
                                                 />
@@ -1921,6 +2944,8 @@ function Zebra({CatID, ModelID}) {
                                                     //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                     // }
                                                     onChange={(selected) => {
+                                                        setDeps("", "52");
+                                                        setCart("MetalValanceColor", selected[0].value);
                                                     }}
                                                     options={optionsMetalValanceFabricInsert[pageLanguage]}
                                                 />
@@ -1933,7 +2958,7 @@ function Zebra({CatID, ModelID}) {
                                     <div className="accordion_help">
                                         <div className="help_container">
                                             <div className="help_column help_left_column">
-                                                <p className="help_column_header">Metal Valance</p>
+                                                <p className="help_column_header">{t("step5_help_1")}</p>
                                                 <ul className="help_column_list">
                                                     <li className="no_listStyle">&nbsp;</li>
                                                     <li className="no_listStyle">
@@ -1949,7 +2974,7 @@ function Zebra({CatID, ModelID}) {
                                                                                                   className="img-fluid" alt=""/>
                                                                                           </div>
                                                                                           <div className="popover_footer">
-                                                                                              <span className="popover_footer_title">Bottom Bar Colors</span>
+                                                                                              <span className="popover_footer_title">{t("step5_popover_1")}</span>
                                                                                               <span className="popover_thumbnails">
                                                                                                   <div>
                                                                                                       <img src={require('../Images/drapery/zebra/DoubleRoller_Valance_Colors.jpg')}
@@ -1970,13 +2995,12 @@ function Zebra({CatID, ModelID}) {
                                                                                       </div>
                                                                                   }/>
                                                             }
-                                                        </span>Available in white, silver or black.
-                                                    </li>
-                                                    <li>Conceals control mechanism.</li>
+                                                        </span>{t("step5_help_2")}</li>
+                                                    <li>{t("step5_help_3")}</li>
                                                 </ul>
                                             </div>
                                             <div className="help_column help_right_column">
-                                                <p className="help_column_header">{t("style_Metal Valance")}<br/>{t("style_Fabric Insert")}</p>
+                                                <p className="help_column_header">{t("step5_help_4")}</p>
                                                 <ul className="help_column_list">
                                                     <li className="no_listStyle">
                                                         <span className="popover_indicator">
@@ -1991,7 +3015,7 @@ function Zebra({CatID, ModelID}) {
                                                                                                   className="img-fluid" alt=""/>
                                                                                           </div>
                                                                                           <div className="popover_footer">
-                                                                                              <span className="popover_footer_title">Bottom Bar Colors</span>
+                                                                                              <span className="popover_footer_title">{t("step5_popover_2")}</span>
                                                                                               <span className="popover_thumbnails">
                                                                                                   <div>
                                                                                                       <img src={require('../Images/drapery/zebra/DoubleRoller_Valance_Colors.jpg')}
@@ -2005,10 +3029,9 @@ function Zebra({CatID, ModelID}) {
                                                                                       </div>
                                                                                   }/>
                                                             }
-                                                        </span>Matching shade fabric inserted in metal valance.
-                                                    </li>
-                                                    <li>Metal valance fabric insert available in white, silver or black frame.</li>
-                                                    <li>Conceals control mechanism.</li>
+                                                        </span>{t("step5_help_5")}</li>
+                                                    <li>{t("step5_help_6")}</li>
+                                                    <li>{t("step5_help_7")}</li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -2028,7 +3051,7 @@ function Zebra({CatID, ModelID}) {
                                                                                                   className="img-fluid" alt=""/>
                                                                                           </div>
                                                                                           <div className="popover_footer">
-                                                                                              <span className="popover_footer_title">Bottom Bar Colors</span>
+                                                                                              <span className="popover_footer_title">{t("step5_popover_3")}</span>
                                                                                               <span className="popover_thumbnails">
                                                                                                   <div>
                                                                                                       <img src={require('../Images/drapery/zebra/roller_bottombar_designer.jpg')}
@@ -2042,8 +3065,7 @@ function Zebra({CatID, ModelID}) {
                                                                                       </div>
                                                                                   }/>
                                                             }
-                                                        </span>Bottom bar is color matched to the metal valance.
-                                                    </li>
+                                                        </span>{t("step5_help_8")}</li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -2055,7 +3077,7 @@ function Zebra({CatID, ModelID}) {
                         {/* step 6 */}
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="6" stepNum={t("6")} stepTitle={t("zebra_step6")}
+                                <ContextAwareToggle eventKey="6" stepNum={t("6")} stepTitle={t("zebra_step6")} stepRef="6" type="2" required={requiredStep["6"]}
                                                     stepSelected={stepSelectedLabel["6"] === undefined ? "" : stepSelectedLabel["6"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="6">
@@ -2070,7 +3092,7 @@ function Zebra({CatID, ModelID}) {
                                                         else
                                                             setDetailsShow(true);
                                                     }}>
-                                                        <span className="details-label unselectable">{detailsShow ? "Hide Details" : "Add Room Image"}</span>
+                                                        <span className="details-label unselectable">{detailsShow ? t("Hide Details") : t("Add Room Image")}</span>
                                                         <span className="details_indicator">
                                                             <i className="arrow_down"/>
                                                         </span>
@@ -2085,22 +3107,21 @@ function Zebra({CatID, ModelID}) {
                                         <div className={`box100 hidden_upload_section ${detailsShow ? "show_upload_section" : ""}`}>
                                             <div className="project-details">
                                                 <div className="project-details-help">
-                                                    <p>Use a photo of the room you are decorating for inspiration and to help you identify the project. You can upload up to 10
-                                                        images of your choice.</p>
+                                                    <p>{t("upload_t1")}</p>
                                                 </div>
                                                 <div className="project-details-help">
-                                                    <p>If you have measurements taken by a professional installer, you can upload a PDF version of them for reference.</p>
+                                                    <p>{t("upload_t2")}</p>
                                                 </div>
                                             </div>
                                             <div className="project-details">
                                                 <div className="btn-upload img_upload_btn">
                                                     <button type="button" className="btn" onClick={e => modalHandleShow("uploadImg")}>
-                                                        Upload Image
+                                                        {t("Upload Image")}
                                                     </button>
                                                 </div>
                                                 <div className="btn-upload">
                                                     <button type="button" className="btn" onClick={e => modalHandleShow("uploadPdf")}>
-                                                        Upload PDF
+                                                        {t("Upload PDF")}
                                                     </button>
                                                 </div>
                                             </div>
@@ -2116,7 +3137,7 @@ function Zebra({CatID, ModelID}) {
                                         </div>
                                         <div className="box100 selectInput_section">
                                             <div className="room_select">
-                                                <label className="select_label">Room</label>
+                                                <label className="select_label">{t("Room")}</label>
                                                 <div className="select_container">
                                                     <Select
                                                         className="select"
@@ -2144,32 +3165,37 @@ function Zebra({CatID, ModelID}) {
                                                         //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                         // }
                                                         onChange={(selected) => {
-                                                            // optionSelectChanged_WidthLength(selected[0], "3", false);
+                                                            setDeps("", "6");
+                                                            roomLabelChanged(selected[0], "6", false);
+                                                            // setCart("RoomNameEn", selected[0].value);
+                                                            setCart("RoomNameFa", rooms["fa"].find(opt => opt.value === selected[0].value).label, "", "RoomNameEn", [selected[0].value]);
                                                         }}
                                                         options={rooms[pageLanguage]}
                                                     />
                                                 </div>
                                             </div>
                                             <div className="room_select">
-                                                <label className="select_label">Window Description</label>
-                                                <input type="text" placeholder="(Optional)" className="form-control window_name" name="order_window_name"/>
+                                                <label className="select_label">{t("Window Description")}</label>
+                                                <input type="text" placeholder={t("(Optional)")} className="form-control window_name" name="order_window_name" value={roomLabelText}
+                                                       onChange={(e) => {
+                                                           roomLabelChanged(e.target.value, "6", true);
+                                                           setCart("WindowName", e.target.value);
+                                                       }}/>
                                             </div>
                                         </div>
                                     </div>
                                     <div className=" accordion_help">
                                         <div className=" help_container">
                                             <div className=" help_column help_left_column">
-                                                <p className=" help_column_header">Room Image</p>
+                                                <p className=" help_column_header">{t("step6_help_1")}</p>
                                                 <ul className=" help_column_list">
-                                                    <li className=" no_listStyle">Upload images of your window</li>
+                                                    <li className=" no_listStyle">{t("step6_help_2")}</li>
                                                 </ul>
                                             </div>
                                             <div className=" help_column help_right_column">
-                                                <p className=" help_column_header">Room/Window Description</p>
+                                                <p className=" help_column_header">{t("step6_help_3")}</p>
                                                 <ul className=" help_column_list">
-                                                    <li className=" no_listStyle">Create a label to help easily identify this treatment when your order arrives. Select a room and
-                                                        enter a brief description of the window’s location.
-                                                    </li>
+                                                    <li className=" no_listStyle">{t("step6_help_4")}</li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -2184,7 +3210,8 @@ function Zebra({CatID, ModelID}) {
             
             {/* Modals */}
             
-            <Modal dialogClassName={`noPower_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} show={modals["noPower"] === undefined ? false : modals["noPower"]}
+            <Modal dialogClassName={`noPower_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                   show={modals["noPower"] === undefined ? false : modals["noPower"]}
                    onHide={() => modalHandleClose(" noPower")}>
                 <Modal.Header closeButton>
                     {/*<Modal.Title>Modal heading</Modal.Title>*/}
@@ -2202,7 +3229,8 @@ function Zebra({CatID, ModelID}) {
                 {/*</Modal.Footer>*/}
             </Modal>
             
-            <Modal dialogClassName={`noMount_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} show={modals["noMount"] === undefined ? false : modals["noMount"]}
+            <Modal dialogClassName={`noMount_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                   show={modals["noMount"] === undefined ? false : modals["noMount"]}
                    onHide={() => modalHandleClose(" noMount")}>
                 <Modal.Header closeButton>
                     {/*<Modal.Title>Modal heading</Modal.Title>*/}
@@ -2220,7 +3248,8 @@ function Zebra({CatID, ModelID}) {
                 {/*</Modal.Footer>*/}
             </Modal>
             
-            <Modal dialogClassName={`learnMore_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} show={modals["learnMore"] === undefined ? false : modals["learnMore"]}
+            <Modal dialogClassName={`learnMore_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                   show={modals["learnMore"] === undefined ? false : modals["learnMore"]}
                    onHide={() => modalHandleClose(" learnMore")}>
                 <Modal.Header closeButton>
                     {/*<Modal.Title>Modal heading</Modal.Title>*/}
@@ -2334,7 +3363,8 @@ function Zebra({CatID, ModelID}) {
                 </Modal.Body>
             </Modal>
             
-            <Modal dialogClassName={`upload_modal uploadImg_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} show={modals["uploadImg"] === undefined ? false : modals["uploadImg"]}
+            <Modal dialogClassName={`upload_modal uploadImg_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                   show={modals["uploadImg"] === undefined ? false : modals["uploadImg"]}
                    onHide={() => {
                        modalHandleClose(" uploadImg");
                        setDetailsShow(false)
@@ -2380,7 +3410,8 @@ function Zebra({CatID, ModelID}) {
                 {/*</Modal.Footer>*/}
             </Modal>
             
-            <Modal dialogClassName={`upload_modal uploadPdf_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} show={modals["uploadPdf"] === undefined ? false : modals["uploadPdf"]}
+            <Modal dialogClassName={`upload_modal uploadPdf_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                   show={modals["uploadPdf"] === undefined ? false : modals["uploadPdf"]}
                    onHide={() => {
                        modalHandleClose(" uploadPdf");
                        setDetailsShow(false)
@@ -2426,10 +3457,10 @@ function Zebra({CatID, ModelID}) {
                 {/*</Modal.Footer>*/}
             </Modal>
             
-            <Modal backdrop="static" keyboard={false} dialogClassName={`warning_modal bigSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} show={modals["widthDifferent"] === undefined ? false : modals["widthDifferent"]}
+            <Modal backdrop="static" keyboard={false} dialogClassName={`warning_modal bigSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                   show={modals["widthDifferent"] === undefined ? false : modals["widthDifferent"]}
                    onHide={() => {
                        modalHandleClose(" widthDifferent");
-                       setDetailsShow(false)
                    }}>
                 <Modal.Header>
                     <div className="required"/>
@@ -2472,11 +3503,36 @@ function Zebra({CatID, ModelID}) {
                 {/*</Modal.Footer>*/}
             </Modal>
             
+            <Modal backdrop="static" keyboard={false} dialogClassName={`addToCartErr bigSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                   show={modals["addToCartErr"] === undefined ? false : modals["addToCartErr"]}
+                   onHide={() => {
+                       modalHandleClose("addToCartErr");
+                   }}>
+                <Modal.Header closeButton>
+                </Modal.Header>
+                <Modal.Body>
+                    <ul className="addToCartErr_list">
+                        {addCartErr}
+                    </ul>
+                    <p>Please call or email one of our expert design consultants who can help you through the process</p>
+                    <p>Design Consultants are available 7 days a week, 9AM-9PM</p>
+                    <p>(021) 88908817 // design@atlaspood.com</p>
+                    
+                    <br/>
+                    <div className="text_center">
+                        <button className="btn btn-new-dark" onClick={() => modalHandleClose("addToCartErr")}>{t("OK")}</button>
+                    </div>
+                
+                </Modal.Body>
+                {/*<Modal.Footer>*/}
+                {/*    */}
+                {/*</Modal.Footer>*/}
+            </Modal>
+            
             <Modal backdrop="static" keyboard={false} dialogClassName={`warning_modal bigSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["heightDifferent"] === undefined ? false : modals["heightDifferent"]}
                    onHide={() => {
                        modalHandleClose(" heightDifferent");
-                       setDetailsShow(false)
                    }}>
                 <Modal.Header>
                     <div className="required"/>
@@ -2519,6 +3575,106 @@ function Zebra({CatID, ModelID}) {
                 {/*</Modal.Footer>*/}
             </Modal>
             
+            <Modal backdrop="static" keyboard={false} className={`cart_modal_container cart_agree_container ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                   dialogClassName={`cart_modal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                   show={modals["cart_modal"] === undefined ? false : modals["cart_modal"]}
+                   onHide={() => {
+                       modalHandleClose("cart_modal");
+                       setCartStateAgree(false);
+                   }} id="cart_modal">
+                {cartStateAgree &&
+                <div className="custom_cart_header_desc">{t("cart_agree_free_ship1")}{freeShipPrice.toLocaleString()}{t("cart_agree_free_ship2")}</div>
+                }
+                <Modal.Header>
+                    {cartStateAgree &&
+                    <span className="custom_cart_title">{t("My Bag")} <h3>({cartCount})</h3></span>
+                    }
+                    {!cartStateAgree &&
+                    <p className="custom_cart_title">&nbsp;</p>
+                    }
+                    <button className="custom_cart_close" onClick={() => {
+                        modalHandleClose("cart_modal");
+                        setCartStateAgree(false);
+                    }}>{t("CONTINUE SHOPPING")}
+                    </button>
+                </Modal.Header>
+                <Modal.Body>
+                    {cartStateAgree &&
+                    <ul className="custom_cart_items_container">
+                        {cartItems}
+                    </ul>
+                    }
+                    
+                    {!cartStateAgree &&
+                    <h1 className="cart_agree_title1">{t("SPECIAL ORDER")}</h1>
+                    }
+                    {!cartStateAgree &&
+                    <h2 className="cart_agree_title2">{t("TERMS OF SALE")}</h2>
+                    }
+                    {!cartStateAgree &&
+                    <span className="cart_agree_desc">{t("cart_agree_desc")}<p
+                        className="return_policy">{t("Return Policy")}</p>.</span>
+                    }
+                    {!cartStateAgree &&
+                    <div>{cartAgree}</div>
+                    }
+                
+                </Modal.Body>
+                <Modal.Footer>
+                    {cartStateAgree &&
+                    <div className="go_to_checkout">
+                        <div className="checkout_button_section">
+                            <span className="checkout_payment_price_detail payment_price_detail">
+                                <h3>{t("SUBTOTAL")}</h3>
+                                <h4>{bagPrice.toLocaleString()} {t("TOMANS")}</h4>
+                            </span>
+                            <Link className="basket_checkout btn" to={"/" + pageLanguage + "/Basket"} onClick={() => {
+                                setCartStateAgree(false);
+                            }}>{t("CHECKOUT")}</Link>
+                        </div>
+                    </div>
+                    }
+                    {!cartStateAgree &&
+                    <div className="go_to_checkout">
+                        <button className="basket_checkout" onClick={() => {
+                            addToCart_agreed();
+                        }}>{t("AGREE & ADD TO BAG")}
+                        </button>
+                    </div>
+                    }
+                </Modal.Footer>
+            </Modal>
+            
+            {/*<Modal backdrop="static" keyboard={false} className={`cart_modal_container cart_agree_container ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}*/}
+            {/*       dialogClassName={`cart_modal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}*/}
+            {/*       show={modals["cart_agree"] === undefined ? false : modals["cart_agree"]}*/}
+            {/*       onHide={() => {*/}
+            {/*           modalHandleClose("cart_agree");*/}
+            {/*       }}>*/}
+            {/*    <Modal.Header closeButton>*/}
+            {/*        /!*<p className="custom_cart_title">My Shopping Bag (1)</p>*!/*/}
+            {/*        /!*<button className="custom_cart_close" onClick={()=>modalHandleClose("cart_agree")}>Close</button>*!/*/}
+            {/*    </Modal.Header>*/}
+            {/*    <Modal.Body>*/}
+            {/*        <h1 className="cart_agree_title1">SPECIAL ORDER</h1>*/}
+            {/*        <h2 className="cart_agree_title2">TERMS OF SALE</h2>*/}
+            {/*        <span className="cart_agree_desc">Special orders begin production immediately upon order placement and are built to your specifications. As a result, the item(s) cannot be cancelled, changed, returned or refunded at any time. See <p*/}
+            {/*            className="return_policy">Return Policy</p>.</span>*/}
+            {/*        {cartAgree}*/}
+            {/*        <div className="cart_agree_button_container">*/}
+            {/*            <button className="cart_agree_button" onClick={() => {*/}
+            {/*                addToCart_agreed();*/}
+            {/*                modalHandleClose("cart_agree");*/}
+            {/*            }}>AGREE & ADD TO BAG*/}
+            {/*            </button>*/}
+            {/*        </div>*/}
+            {/*    */}
+            {/*    </Modal.Body>*/}
+            {/*    /!*<Modal.Footer>*!/*/}
+            {/*    /!*    *!/*/}
+            {/*    /!*</Modal.Footer>*!/*/}
+            {/*</Modal>*/}
+            
             
             <div className={`CustomModelFooter ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
                 <div className="CustomModelFooter_hidden_part"/>
@@ -2529,10 +3685,10 @@ function Zebra({CatID, ModelID}) {
                     <div className="hidden_inner_footer">&nbsp;</div>
                     <div className="footer_price_section">
                         <div className="showPrice">{t("footer_Price")}</div>
-                        <div className="price">0 {t("TOMANS")}</div>
+                        <div className="price">{price.toLocaleString()} {t("TOMANS")}</div>
                     </div>
                     <div className="right_footer">
-                        <input type="submit" className="btn add_to_cart" value={t("footer_Add To Cart")} readOnly/>
+                        <input type="submit" onClick={() => addToCart()} className="btn add_to_cart" value={t("footer_Add To Cart")} readOnly/>
                     </div>
                 </div>
             </div>

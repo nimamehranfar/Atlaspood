@@ -1,0 +1,374 @@
+[
+  {
+    "cart": "HeightCart",
+    "title": "Height",
+    "titleValue": null,
+    "titlePostfix": "cm",
+    "order": 2,
+    "apiLabel": "",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "WidthCart",
+    "title": "Width",
+    "titleValue": null,
+    "titlePostfix": "cm",
+    "order": 1,
+    "apiLabel": "",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "Fabric",
+    "title": "",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": -1,
+    "apiLabel": "",
+    "apiValue": null,
+    "apiLabel2": "FabricId",
+    "apiValue2": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "FabricDesignFa",
+    "title": "Fabric",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": 0,
+    "apiLabel": "",
+    "apiValue": null,
+    "lang": ["fa"]
+  },{
+    "cart": "FabricDesignEn",
+    "title": "Fabric",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": 0,
+    "apiLabel": "",
+    "apiValue": null,
+    "lang": ["en"]
+  },{
+    "cart": "FabricColorEn",
+    "title": "Color",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": 1,
+    "apiLabel": "",
+    "apiValue": null,
+    "lang": ["en"]
+  },{
+    "cart": "FabricColorFa",
+    "title": "Color",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": 1,
+    "apiLabel": "",
+    "apiValue": null,
+    "lang": ["fa"]
+  },{
+    "cart": "PhotoUrl",
+    "title": "",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": -1,
+    "apiLabel": "",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "Mount",
+    "title": "Mount",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": 2,
+    "apiLabel": "IsWalled",
+    "apiValue": {
+      "Inside": null,
+      "Outside": true
+    },
+    "lang": ["en","fa"]
+  },{
+    "cart": "hasMeasurements",
+    "title": "",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": -1,
+    "apiLabel": "",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "Width",
+    "title": "Width",
+    "titleValue": null,
+    "titlePostfix": "cm",
+    "order": 3,
+    "apiLabel": "Width",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "Height",
+    "title": "Height",
+    "titleValue": null,
+    "titlePostfix": "cm",
+    "order": 4,
+    "apiLabel": "Height",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "Width1",
+    "title": "",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": -1,
+    "apiLabel": "Width",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "Width2",
+    "title": "",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": -1,
+    "apiLabel": "Width2",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "Width3",
+    "title": "",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": -1,
+    "apiLabel": "Width3",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "Height1",
+    "title": "",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": -1,
+    "apiLabel": "Height",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "Height2",
+    "title": "",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": -1,
+    "apiLabel": "Height2",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "Height3",
+    "title": "",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": -1,
+    "apiLabel": "Height3",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "Width3A",
+    "title": "",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": -1,
+    "apiLabel": "Width",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "Height3C",
+    "title": "",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": -1,
+    "apiLabel": "Height",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "ExtensionLeft",
+    "title": "",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": -1,
+    "apiLabel": "LeftWidthExt",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "ExtensionRight",
+    "title": "",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": -1,
+    "apiLabel": "RightWidthExt",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "ShadeMount",
+    "title": "",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": -1,
+    "apiLabel": "HeightOfRodMount",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "ControlType",
+    "title": "Control Type",
+    "titleValue": {
+      "ContinuousLoop": "Continuous Loop",
+      "Motorized": null
+    },
+    "titlePostfix": "",
+    "order": 5,
+    "apiLabel": "",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "hasPower",
+    "title": "",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": -1,
+    "apiLabel": "",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "MotorPosition",
+    "title": "Motor Position",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": 6,
+    "apiLabel": "",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "RemoteName",
+    "title": "Remote Name",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": 7,
+    "apiLabel": "",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "MotorChannels",
+    "title": "Motor Channels",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": 8,
+    "apiLabel": "",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "ControlPosition",
+    "title": "Control Position",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": 6,
+    "apiLabel": "",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "ChainLength",
+    "title": "Chain Length",
+    "titleValue": null,
+    "titlePostfix": "cm",
+    "order": 7,
+    "apiLabel": "",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "MetalValanceStyle",
+    "title": "Metal Valance Style",
+    "titleValue": {
+      "MetalValance": "Metal Valance",
+      "MetalValanceFabricInsert": "Metal Valance Fabric Insert"
+    },
+    "titlePostfix": "",
+    "order": 9,
+    "apiLabel": "",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "MetalValanceColor",
+    "title": "Metal Valance Color",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": 10,
+    "apiLabel": "",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "RoomNameFa",
+    "title": "",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": 11,
+    "apiLabel": "",
+    "apiValue": null,
+    "lang": ["fa"]
+  },{
+    "cart": "RoomNameEn",
+    "title": "",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": 11,
+    "apiLabel": "",
+    "apiValue": null,
+    "lang": ["en"]
+  },{
+    "cart": "WindowName",
+    "title": "",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": 12,
+    "apiLabel": "",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "ModelNameEn",
+    "title": "",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": -1,
+    "apiLabel": "",
+    "apiValue": null,
+    "lang": ["en"]
+  },{
+    "cart": "ModelNameFa",
+    "title": "",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": -1,
+    "apiLabel": "",
+    "apiValue": null,
+    "lang": ["fa"]
+  },{
+    "cart": "ModelId",
+    "title": "",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": -1,
+    "apiLabel": "",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+    "cart": "qty",
+    "title": "",
+    "titleValue": null,
+    "titlePostfix": "",
+    "order": -1,
+    "apiLabel": "",
+    "apiValue": null,
+    "lang": ["en","fa"]
+  },{
+  "cart": "",
+  "title": "",
+  "titleValue": null,
+  "titlePostfix": "",
+  "order": -1,
+  "apiLabel": "",
+  "apiValue": null,
+  "lang": ["en","fa"]
+  }
+]

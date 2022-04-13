@@ -20,9 +20,14 @@ function CustomDropdownWithSearch({props, state, methods}) {
                         regexp.test(item[props.searchBy] || item[props.labelField])
                     )
                     .map(option => {
+                        let exist="false";
+                        Object.values(state.values).forEach(obj=>{
+                            if(obj.value=== option.value)
+                                exist="true";
+                        });
                         return (
                             <div className="select_item"
-                                 item-selected={state.values.indexOf(option) !== -1 ? "true" : "false"}
+                                 item-selected={exist}
                                  disabled={option.disabled}
                                  key={option[props.valueField]}
                                  onClick={

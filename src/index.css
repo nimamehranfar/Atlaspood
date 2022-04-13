@@ -125,13 +125,14 @@ video {
 }
 
 @font-face {
-    font-family: 'proximanova-semiBold';
+    font-family: 'proximanova-nova';
+    /*font-family: 'proximanova-semiBold';*/
     src: url('./Fonts/proximanova-sbold-webfont-webfont.eot');
     src: url('./Fonts/proximanova-sbold-webfont-webfont.eot?#iefix') format('embedded-opentype'),
     url('./Fonts/proximanova-sbold-webfont-webfont.woff') format('woff'),
     url('./Fonts/proximanova-sbold-webfont-webfont.otf') format('opentype'),
     url('./Fonts/proximanova-sbold-webfont-webfont.ttf') format('truetype');
-    font-weight: 400;
+    font-weight: 500;
     font-style: normal;
 }
 

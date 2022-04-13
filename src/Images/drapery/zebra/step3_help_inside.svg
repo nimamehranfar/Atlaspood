@@ -4,9 +4,9 @@
 	@font-face {
     font-family: "proximanova-nova";
 
-    src: url('http://www.doopsalta.com/asset/fonts/proxima-nova-three.woff2') format('woff2'),
-        url('http://www.doopsalta.com/asset/fonts/proxima-nova-three.woff') format('woff'),
-        url('http://www.doopsalta.com/asset/fonts/proxima-nova-three.otf') format('opentype');
+    src: url('http://doopsalta2.com/Fonts/proxima-nova-three.woff2') format('woff2'),
+        url('http://doopsalta2.com/Fonts/proxima-nova-three.woff') format('woff'),
+        url('http://doopsalta2.com/Fonts/proxima-nova-three.otf') format('opentype');
     font-style: normal;
 	}
 	

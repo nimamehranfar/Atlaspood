@@ -62,40 +62,40 @@ function Header() {
         
     }
     
-    function renderCatMenu() {
-        let sortedMenu = [...menu];
-        let promises = [];
-        sortedMenu.forEach(obj => {
-            let Children = obj.Children;
-            Children.forEach(subObj => {
-                let subChildren = subObj.Children;
-                subChildren.forEach(subsubObj => {
-                    let subSubWebsitePageId = subsubObj.WebsitePageId;
-                    if (subSubWebsitePageId === null || subSubWebsitePageId === 0 || subSubWebsitePageId === undefined) {
-                    } else {
-                        promises.push(axios.get(baseURLGetPage, {
-                                params: {
-                                    WebsitePageId: subSubWebsitePageId,
-                                    apiKey: window.$apikey
-                                }
-                            }).then((response) => {
-                                subsubObj["subSubPageTypeId"] = response.data.PageTypeId;
-                                subsubObj["subSubCategoryId"] = response.data.CategoryId;
-                                // console.log("hi");
-                            }).catch(err => {
-                                console.log(err);
-                            })
-                        )
-                    }
-                });
-            });
-        });
-        Promise.all(promises).then(() => {
-            // console.log(sortedMenu);
-            setCatMenu(sortedMenu);
-        });
-        
-    }
+    // function renderCatMenu() {
+    //     let sortedMenu = [...menu];
+    //     let promises = [];
+    //     sortedMenu.forEach(obj => {
+    //         let Children = obj.Children;
+    //         Children.forEach(subObj => {
+    //             let subChildren = subObj.Children;
+    //             subChildren.forEach(subsubObj => {
+    //                 let subSubWebsitePageId = subsubObj.WebsitePageId;
+    //                 if (subSubWebsitePageId === null || subSubWebsitePageId === 0 || subSubWebsitePageId === undefined) {
+    //                 } else {
+    //                     promises.push(axios.get(baseURLGetPage, {
+    //                             params: {
+    //                                 WebsitePageId: subSubWebsitePageId,
+    //                                 apiKey: window.$apikey
+    //                             }
+    //                         }).then((response) => {
+    //                             subsubObj["subSubPageTypeId"] = response.data.PageTypeId;
+    //                             subsubObj["subSubCategoryId"] = response.data.CategoryId;
+    //                             // console.log("hi");
+    //                         }).catch(err => {
+    //                             console.log(err);
+    //                         })
+    //                     )
+    //                 }
+    //             });
+    //         });
+    //     });
+    //     Promise.all(promises).then(() => {
+    //         // console.log(sortedMenu);
+    //         setCatMenu(sortedMenu);
+    //     });
+    //
+    // }
     
     function renderBanner(bannerIndex) {
         if (bannerIndex === banner.length) bannerIndex = 0;
@@ -172,29 +172,29 @@ function Header() {
         }
         
         // let sortedCatMenu=[...sortedMenu];
-        sortedMenu.forEach(obj => {
-            let Children = obj.Children;
-            Children.forEach(subObj => {
-                let subChildren = subObj.Children;
-                subChildren.forEach(subsubObj => {
-                    let subSubWebsitePageId = subsubObj.WebsitePageId;
-                    if (subSubWebsitePageId === null || subSubWebsitePageId === 0 || subSubWebsitePageId === undefined)
-                        subSubWebsitePageId = 40;
-                    axios.get(baseURLGetPage, {
-                        params: {
-                            WebsitePageId: subSubWebsitePageId,
-                            apiKey: window.$apikey
-                        }
-                    }).then((response) => {
-                        subsubObj["subSubPageTypeId"] = response.data.PageTypeId;
-                        subsubObj["subSubCategoryId"] = response.data.CategoryId;
-                    }).catch(err => {
-                        console.log(err);
-                    });
-                });
-            });
-        });
-        
+        // sortedMenu.forEach(obj => {
+        //     let Children = obj.Children;
+        //     Children.forEach(subObj => {
+        //         let subChildren = subObj.Children;
+        //         subChildren.forEach(subsubObj => {
+        //             let subSubWebsitePageId = subsubObj.WebsitePageId;
+        //             if (subSubWebsitePageId === null || subSubWebsitePageId === 0 || subSubWebsitePageId === undefined)
+        //                 subSubWebsitePageId = 40;
+        //             axios.get(baseURLGetPage, {
+        //                 params: {
+        //                     WebsitePageId: subSubWebsitePageId,
+        //                     apiKey: window.$apikey
+        //                 }
+        //             }).then((response) => {
+        //                 subsubObj["subSubPageTypeId"] = response.data.PageTypeId;
+        //                 subsubObj["subSubCategoryId"] = response.data.CategoryId;
+        //             }).catch(err => {
+        //                 console.log(err);
+        //             });
+        //         });
+        //     });
+        // });
+        //
         
         const menuList = [];
         for (let i = 0; i < sortedMenu.length; i++) {
@@ -246,8 +246,8 @@ function Header() {
                         let subSubWebsitePageId = subChildren[k].WebsitePageId;
                         let subSubChildren = subChildren[k].Children;
                         let subSubWidth = subChildren[k].Width;
-                        let subSubPageTypeId = subChildren[k].subSubPageTypeId;
-                        let subSubCategoryId = subChildren[k].subSubCategoryId;
+                        let subSubPageTypeId = subChildren[k].PageTypeId;
+                        let subSubCategoryId = subChildren[k].PageName;
                         
                         
                         let subSubPageType = subSubPageTypeId === 5501 ? "Product" : "Curtain";
@@ -398,12 +398,12 @@ function Header() {
             });
             document.body.dir = pageLanguage === 'fa' ? "rtl" : "ltr";
             document.body.className = pageLanguage === 'fa' ? "font_farsi" : "font_en";
-            document.querySelectorAll("html  , body  , div  , span  , applet  , object  , iframe  , h1  , h2  , h3  , h4  , h5  , h6  , p  , blockquote  , pre  , a  , abbr  , acronym  , address  , big  , cite  , code  , del  , dfn  , em  , img  , ins  , kbd  , q  , s  , samp  , small  , strike  , strong  , sub  , sup  , tt  , var  , b  , u  , i  , center  , dl  , dt  , dd  , ol  , ul  , li  , fieldset  , form  , label  , legend  , table  , caption  , tbody  , tfoot  , thead  , tr  , th  , td  , article  , aside  , canvas  , details  , embed  , figure  , figcaption  , footer  , header  , hgroup  , menu  , nav  , output  , ruby  , section  , summary  , time  , mark  , audio  , video").forEach(obj => {
-                if (pageLanguage === 'fa')
-                    obj.classList.add("font_farsi");
-                else if (pageLanguage === 'en')
-                    obj.classList.remove("font_farsi");
-            });
+            // document.querySelectorAll("html  , body  , div  , span  , applet  , object  , iframe  , h1  , h2  , h3  , h4  , h5  , h6  , p  , blockquote  , pre  , a  , abbr  , acronym  , address  , big  , cite  , code  , del  , dfn  , em  , img  , ins  , kbd  , q  , s  , samp  , small  , strike  , strong  , sub  , sup  , tt  , var  , b  , u  , i  , center  , dl  , dt  , dd  , ol  , ul  , li  , fieldset  , form  , label  , legend  , table  , caption  , tbody  , tfoot  , thead  , tr  , th  , td  , article  , aside  , canvas  , details  , embed  , figure  , figcaption  , footer  , header  , hgroup  , menu  , nav  , output  , ruby  , section  , summary  , time  , mark  , audio  , video").forEach(obj => {
+            //     if (pageLanguage === 'fa')
+            //         obj.classList.add("font_farsi");
+            //     else if (pageLanguage === 'en')
+            //         obj.classList.remove("font_farsi");
+            // });
         }
         
     }, [pageLanguage]);
@@ -416,15 +416,15 @@ function Header() {
     
     useEffect(() => {
         if (menu.length) {
-            renderCatMenu()
+            renderMenu()
         }
     }, [menu]);
     
-    useEffect(() => {
-        if (catMenu.length) {
-            renderMenu()
-        }
-    }, [catMenu]);
+    // useEffect(() => {
+    //     if (catMenu.length) {
+    //         renderMenu()
+    //     }
+    // }, [catMenu]);
     
     useEffect(() => {
         const timeout = setTimeout(() => {
@@ -444,89 +444,90 @@ function Header() {
         }
     }, [bannerOneSlide]);
     
-    return (<div className="header_container padding-clear ">
-        <div className="top_header">
-            <div className="col-lg-12">
-                <div className="top_title">
-                    {bannerItemOneSlide.length === 0 &&
-                    <Link to={"/" + bannerItem.url}>
-                        <span>{bannerItem.text1}</span>&nbsp;
-                        <span className="text_underline">{bannerItem.text2}</span>
-                    </Link>
-                    }
-                    {bannerItemOneSlide.length !== 0 &&
-                    bannerItemOneSlide
-                    }
-                </div>
-            </div>
-        </div>
-        <div className="mid_header">
-            <div className="col-lg-12">
-                <div className="mid_header_left">
-                    <div className="search-box">
-                        <button className="btn-search">
-                            <img src={require('../Images/public/main_search_icon.svg')}
-                                 className="img-fluid" alt=""/>
-                            <input type="text" className={`input-search ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} placeholder={t("Search_placeholder")}/>
-                        </button>
-                    </div>
-                </div>
-                <div className="Logo"><Link to="/">{pageLanguage === 'en' ? <Logoen/> : <Logofa/>}</Link></div>
-                <div className="mid_header_right">
-                    <ul className={pageLanguage === 'fa' ? "float_left" : "float_right"}>
-                        <li className="login-open">
-                            <a href="http://www.doopsalta.com/en/account/login/">
-                                <Person/>
-                            </a>
-                        </li>
-                        <li className="favorite">
-                            <a href="http://www.doopsalta.com/en/account/login/">
-                                <Favorite/>
-                            </a>
-                        </li>
-                        <li className="checkout">
-                            <a href="http://www.doopsalta.com/en/basket/">
-                                <div className="display_grid">
-                                    <Basket/>
-                                    <div className="count">0</div>
-                                </div>
-                            </a>
-                            <div className="card_menu">
-                                <div className="card_menu_title">
-                                    <span>Shopping Cart</span>
-                                </div>
-                                <Link className="card_button" to="/">Swatches (<span id="swatch">0</span>)</Link>
-                                <Link className="card_button" to="/">Product (<span id="procount">0</span>)</Link>
-                                <Link className="card_button" to="/">Go To Cart</Link>
-                            </div>
-                        </li>
-                    </ul>
-                    <ul className={`Lang_change_container ${pageLanguage === 'fa' ? "float_left" : "float_right"}`}>
-                        <li className="Lang_change">
-                            <Link to={langLocation.locationEN} onClick={() => i18n.changeLanguage("en")}
-                                  style={pageLanguage === 'en' ? {pointerEvents: "none", color: "#383838"} : null}>ENGLISH</Link>
-                        </li>
-                        <li className="lang_separator">&nbsp;|&nbsp;</li>
-                        <li className="Lang_change">
-                            <Link to={langLocation.locationFA} onClick={() => i18n.changeLanguage("fa")}
-                                  style={pageLanguage === 'fa' ? {pointerEvents: "none", color: "#383838"} : null}>فارسی</Link>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div className="bottom_header">
-            <div className="col-lg-12">
-                <div className="menu">
-                    <ul>
-                        {menuRender}
-                    </ul>
-                    <div className="bghover">
+    return (
+        <div className={`header_container padding-clear ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
+            <div className="top_header">
+                <div className="col-lg-12">
+                    <div className="top_title">
+                        {bannerItemOneSlide.length === 0 &&
+                        <Link to={"/" + bannerItem.url}>
+                            <span>{bannerItem.text1}</span>&nbsp;
+                            <span className="text_underline">{bannerItem.text2}</span>
+                        </Link>
+                        }
+                        {bannerItemOneSlide.length !== 0 &&
+                        bannerItemOneSlide
+                        }
                     </div>
                 </div>
             </div>
-        </div>
-    </div>);
+            <div className="mid_header">
+                <div className="col-lg-12">
+                    <div className="mid_header_left">
+                        <div className="search-box">
+                            <button className="btn-search">
+                                <img src={require('../Images/public/main_search_icon.svg')}
+                                     className="img-fluid" alt=""/>
+                                <input type="text" className={`input-search ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} placeholder={t("Search_placeholder")}/>
+                            </button>
+                        </div>
+                    </div>
+                    <div className="Logo"><Link to="/">{pageLanguage === 'en' ? <Logoen/> : <Logofa/>}</Link></div>
+                    <div className="mid_header_right">
+                        <ul className={pageLanguage === 'fa' ? "float_left" : "float_right"}>
+                            <li className="login-open">
+                                <a href="http://www.doopsalta.com/en/account/login/">
+                                    <Person/>
+                                </a>
+                            </li>
+                            <li className="favorite">
+                                <a href="http://www.doopsalta.com/en/account/login/">
+                                    <Favorite/>
+                                </a>
+                            </li>
+                            <li className="checkout">
+                                <Link to={"/" + pageLanguage + "/Basket"}>
+                                    <div className="display_grid">
+                                        <Basket/>
+                                        <div className="count">0</div>
+                                    </div>
+                                </Link>
+                                <div className="card_menu">
+                                    <div className="card_menu_title">
+                                        <span>Shopping Bag</span>
+                                    </div>
+                                    <Link className="card_button" to="/">Swatches (<span id="swatch">0</span>)</Link>
+                                    <Link className="card_button" to="/">Product (<span id="procount">0</span>)</Link>
+                                    <Link className="card_button" to="/">Go To Bag</Link>
+                                </div>
+                            </li>
+                        </ul>
+                        <ul className={`Lang_change_container ${pageLanguage === 'fa' ? "float_left" : "float_right"}`}>
+                            <li className="Lang_change">
+                                <Link to={langLocation.locationEN} onClick={() => i18n.changeLanguage("en")}
+                                      style={pageLanguage === 'en' ? {pointerEvents: "none", color: "#383838"} : null}>ENGLISH</Link>
+                            </li>
+                            <li className="lang_separator">&nbsp;|&nbsp;</li>
+                            <li className="Lang_change">
+                                <Link to={langLocation.locationFA} onClick={() => i18n.changeLanguage("fa")}
+                                      style={pageLanguage === 'fa' ? {pointerEvents: "none", color: "#383838"} : null}>فارسی</Link>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div className="bottom_header">
+                <div className="col-lg-12">
+                    <div className="menu">
+                        <ul>
+                            {menuRender}
+                        </ul>
+                        <div className="bghover">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>);
 }
 
 export default Header;
