@@ -1,16 +1,18 @@
 import React from "react";
+import {useTranslation} from "react-i18next";
 
 function CustomDropdownMultiWithSearch({props, state, methods}) {
     const regexp = new RegExp(state.search, "i");
+    const {t} = useTranslation();
     
     return (
-        <div>
+        <div className={props.className}>
             <div>
                 <input
                     type="text"
                     value={state.search}
                     onChange={methods.setSearch}
-                    placeholder="Type anything"
+                    placeholder={t("Type anything")}
                 />
             </div>
             <div>

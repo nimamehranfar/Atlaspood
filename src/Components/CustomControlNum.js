@@ -8,7 +8,8 @@ function CustomControlNum({props, state, methods,postfix, postfixFa}) {
     return (
         <div className="select_control_container" onClick={() => methods.dropDown('toggle')}>
             <span>{state.values.length > 0 ? (location.pathname.split('').slice(1, 3).join('')==="fa"? NumberToPersianWord.convertEnToPe(`${state.values[0]["value"]}`)+postfixFa:state.values[0]["value"]+postfix) : props.placeholder}</span>
-            <i className="select_control_handle_close"/>
+            {/*<i className="select_control_handle_close"/>*/}
+            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg')} alt=""/>
         </div>
     );
 }

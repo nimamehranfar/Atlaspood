@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {Link, useLocation} from "react-router-dom";
 import Breadcrumb from "react-bootstrap/Breadcrumb";
@@ -6,8 +6,10 @@ import {func} from "prop-types";
 import axios from "axios";
 import CartInfo from "../Components/CartInfo";
 import NumberToPersianWord from "number_to_persian_word";
+import GetPrice from "../Components/GetPrice";
 
 const baseURLGetAllModels = "http://atlaspood.ir/api/SewingModel/GetAll?apiKey=477f46c6-4a17-4163-83cc-29908d";
+const baseURLPrice = "http://atlaspood.ir/api/Sewing/GetSewingOrderPrice";
 
 
 function Basket() {
@@ -26,6 +28,7 @@ function Basket() {
     const [swatchesList, setSwatchesList] = useState([]);
     const [swatchesCount, setSwatchesCount] = useState(0);
     const [cartChanged, setCartChanged] = useState(0);
+    const draperyRef = useRef([]);
     
     function setBasketNumber(refIndex, numValue, type, minusPlus) {
         let temp = [];
@@ -74,19 +77,39 @@ function Basket() {
                     }
                 }
             } else {
-                if (numValue > 10) {
-                    temp[refIndex]["qty"] = 10;
-                    cartObj[typeString] = temp;
-                    localStorage.setItem('cart', JSON.stringify(cartObj));
-                    setCartChanged(cartChanged + 1);
-                    
-                } else if (numValue <= 0) {
-                    temp.splice(refIndex, 1);
-                    cartObj[typeString] = temp;
-                    localStorage.setItem('cart', JSON.stringify(cartObj));
-                    setCartChanged(cartChanged + 1);
+                // console.log(numValue);
+                if (!isNaN(numValue) || numValue === 10 || numValue === "10") {
+                    if (parseInt(numValue) > 10) {
+                        temp[refIndex]["qty"] = 10;
+                        cartObj[typeString] = temp;
+                        localStorage.setItem('cart', JSON.stringify(cartObj));
+                        setCartChanged(cartChanged + 1);
+                        
+                    } else if (parseInt(numValue) <= 0) {
+                        // let loadingArr=[];
+                        // loadingArr.push(
+                        //     <li key="loading">
+                        //         <div className="lds-dual-ring"/>
+                        //     </li>
+                        // );
+                        // setDraperyList(loadingArr);
+                        // console.log(draperyRef.current,refIndex,typeof(refIndex));
+                        draperyRef.current[refIndex].className = "drapery_basket_item is_loading";
+                        setTimeout(() => {
+                            draperyRef.current[refIndex].className = "drapery_basket_item";
+                            temp.splice(refIndex, 1);
+                            cartObj[typeString] = temp;
+                            localStorage.setItem('cart', JSON.stringify(cartObj));
+                            setCartChanged(cartChanged + 1);
+                        }, 1500);
+                    } else {
+                        temp[refIndex]["qty"] = parseInt(numValue);
+                        cartObj[typeString] = temp;
+                        localStorage.setItem('cart', JSON.stringify(cartObj));
+                        setCartChanged(cartChanged + 1);
+                    }
                 } else {
-                    temp[refIndex]["qty"] = numValue;
+                    temp[refIndex]["qty"] = 1;
                     cartObj[typeString] = temp;
                     localStorage.setItem('cart', JSON.stringify(cartObj));
                     setCartChanged(cartChanged + 1);
@@ -151,118 +174,199 @@ function Basket() {
     
     useEffect(() => {
         if (drapery.length) {
+            let tempDrapery=drapery;
             let cartInfo = JSON.parse(JSON.stringify(CartInfo));
             let temp = [];
+            let delArr=[];
             
-            drapery.forEach((obj, index) => {
-                let fabricColorFa = obj["FabricColorFa"];
-                let fabricColor = obj["FabricColorEn"];
-                let fabricDesignFa = obj["FabricDesignFa"];
-                let fabricDesign = obj["FabricDesignEn"];
-                let defaultModelNameFa = obj["ModelNameFa"];
-                let defaultModelName = obj["ModelNameEn"];
-                let roomNameFa = obj["RoomNameFa"];
-                let roomName = obj["RoomNameEn"];
-                let WindowName = obj["WindowName"]===undefined?"":obj["WindowName"];
-                let photoUrl = obj["PhotoUrl"];
+            let draperiesTotalPrice = 0;
+            let promiseArr = [];
+    
+            tempDrapery.forEach((obj, index) => {
+                let tempPostObj = {};
+                tempPostObj["ApiKey"] = window.$apikey;
+                let cartInfo = JSON.parse(JSON.stringify(CartInfo));
                 
-                // const desc = Object.entries(obj).map(([key, value]) => {
-                //     if (doNotShow.indexOf(key) > -1)
-                //         return null;
-                //     else {
-                //         return (
-                //             <div className="basket_item_title_desc" key={key}>
-                //                 <h3>{key}&nbsp;</h3>
-                //                 <h4>{value.toString()}</h4>
-                //             </div>
-                //         );
-                //     }
-                // });
-                
-                let desc = [];
                 Object.keys(obj).forEach(key => {
                     let tempObj = cartInfo.find(obj => obj["cart"] === key);
-                    if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
-                        let objLabel = "";
-                        if (tempObj["titleValue"] === null) {
-                            if(tempObj["titlePostfix"]===""){
-                                objLabel = t(obj[key].toString());
-                            }
-                            else{
-                                objLabel = pageLanguage==="fa"? NumberToPersianWord.convertEnToPe(`${obj[key]}`).toString()+t(tempObj["titlePostfix"]):obj[key].toString()+t(tempObj["titlePostfix"]);
-                            }
-                        } else {
-                            if (tempObj["titleValue"][obj[key].toString()] === null) {
-                                if(tempObj["titlePostfix"]===""){
-                                    objLabel = t(obj[key].toString());
-                                }
-                                else{
-                                    objLabel = pageLanguage==="fa"? NumberToPersianWord.convertEnToPe(`${obj[key]}`).toString()+t(tempObj["titlePostfix"]):obj[key].toString()+t(tempObj["titlePostfix"]);
-                                }
+                    if(tempObj===undefined){
+                        delArr.push(index);
+                    }else {
+                        if (tempObj["apiLabel"] !== "") {
+                            if (tempObj["apiValue"] === null) {
+                                tempPostObj[tempObj["apiLabel"]] = obj[key];
                             } else {
-                                objLabel = t(tempObj["titleValue"][obj[key].toString()]);
+                                tempPostObj[tempObj["apiLabel"]] = tempObj["apiValue"][obj[key]];
                             }
                         }
-                        desc[tempObj["order"]] =
-                            <div className="basket_item_title_desc" key={key}>
-                                <h3>{t(tempObj["title"])}&nbsp;</h3>
-                                <h4>{objLabel}</h4>
-                            </div>
                     }
                 });
+                tempPostObj["SewingOrderDetails"] = [];
+                tempPostObj["SewingOrderDetails"][0] = {};
+                tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
+                tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
+                tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
+                tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
+    
+                Object.keys(obj).forEach(key => {
+                    let tempObj = cartInfo.find(obj => obj["cart"] === key);
+                    if(tempObj===undefined){
+                        if(delArr.indexOf(index) <= -1)
+                            delArr.push(index);
+                    }else {
+                        if (tempObj["apiLabel2"] !== undefined) {
+                            if (tempObj["apiValue2"] === null) {
+                                tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = obj[key];
+                            } else {
+                                tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][obj[key]];
+                            }
+                        }
+                    }
+                });
+    
+                tempPostObj["SewingOrderDetails"][0]["Accessories"]=[];
+                Object.keys(obj).forEach(key => {
+                    if (obj[key] !== null || obj[key] !== "") {
+                        let tempObj = cartInfo.find(obj => obj["cart"] === key);
+                        if (tempObj["apiAcc"] !== undefined) {
+                            if (tempObj["apiAcc"] === true) {
+                                tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][obj[key]]);
+                            } else {
+                    
+                            }
+                        }
+                    }
+                });
+                tempPostObj["SewingOrderDetails"][0]["Accessories"]=tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
+                    return el != null;
+                });
+    
+                if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
+                    promiseArr[index] = axios.post(baseURLPrice, tempPostObj);
+                }
                 
-                temp.push(
-                    <li className="drapery_basket_item" key={index}>
-                    <span className="basket_item_title">
-                        <div className="basket_item_image_container">
-                            <img src={`http://atlaspood.ir/${photoUrl}`} alt="" className="basket_item_img"/>
-                        </div>
-                        <div className="basket_item_title_container">
-                            <div className="basket_item_title_name">{pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</div>
-                            {/*<div className="basket_item_title_desc">*/}
-                            {/*    <h3>Fabric Material & Color&nbsp;&nbsp;&nbsp;&nbsp;</h3>*/}
-                            {/*    <h4>{pageLanguage === 'fa' ? fabricDesignFa + " / " + fabricColorFa : fabricDesign + " / " + fabricColor}</h4>*/}
-                            {/*</div>*/}
-                            {desc}
-                            <div className="basket_item_title_desc">
-                                <h3>{pageLanguage === 'fa' ? "نام اتاق" : "Room Label"}&nbsp;</h3>
-                                <h4>{pageLanguage === 'fa' ? roomNameFa+ (WindowName===""?"":" / "+WindowName) :roomName+ (WindowName===""?"":" / "+WindowName)}</h4>
+            });
+            delArr.forEach(el=>{
+                tempDrapery.splice(el,1);
+            });
+            Promise.all(promiseArr).then(function (values) {
+                // console.log(values);
+                tempDrapery.forEach((obj, index) => {
+                    let desc=[];
+                    let fabricColorFa = obj["FabricColorFa"];
+                    let fabricColor = obj["FabricColorEn"];
+                    let fabricDesignFa = obj["FabricDesignFa"];
+                    let fabricDesign = obj["FabricDesignEn"];
+                    let defaultModelNameFa = obj["ModelNameFa"];
+                    let defaultModelName = obj["ModelNameEn"];
+                    let roomNameFa = obj["RoomNameFa"];
+                    let roomName = obj["RoomNameEn"];
+                    let WindowName = obj["WindowName"] === undefined ? "" : obj["WindowName"];
+                    let photoUrl = obj["PhotoUrl"];
+                    let ModelId = obj["ModelId"];
+                    obj["price"] = values[index].data["price"];
+                    draperiesTotalPrice += obj["price"];
+    
+                    Object.keys(obj).forEach(key => {
+                        let tempObj = cartInfo.find(obj => obj["cart"] === key);
+                        if(tempObj===undefined){
+                            delArr.push(index);
+                        }else {
+                            if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
+                                let objLabel = "";
+                                if (tempObj["titleValue"] === null) {
+                                    if (tempObj["titlePostfix"] === "") {
+                                        objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(obj[key].toString())}`).toString() : t(obj[key].toString());
+                                    } else {
+                                        objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${obj[key]}`).toString() + t(tempObj["titlePostfix"]) : obj[key].toString() + t(tempObj["titlePostfix"]);
+                                    }
+                                } else {
+                                    if (tempObj["titleValue"][obj[key].toString()] === null) {
+                                        if (tempObj["titlePostfix"] === "") {
+                                            objLabel = t(obj[key].toString());
+                                        } else {
+                                            objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${obj[key]}`).toString() + t(tempObj["titlePostfix"]) : obj[key].toString() + t(tempObj["titlePostfix"]);
+                                        }
+                                    } else {
+                                        objLabel = t(tempObj["titleValue"][obj[key].toString()]);
+                                    }
+                                }
+                                desc[tempObj["order"]] =
+                                    <div className="basket_item_title_desc" key={key}>
+                                        <h3>{t(tempObj["title"])}&nbsp;</h3>
+                                        <h4>{objLabel}</h4>
+                                    </div>
+                            }
+                        }
+                    });
+                    
+                    temp[index] =
+                        <li className="drapery_basket_item" key={index} ref={ref => (draperyRef.current[index]=ref)}>
+                        <span className="basket_item_title">
+                            <div className="basket_item_image_container">
+                                <img src={`http://atlaspood.ir/${photoUrl}`} alt="" className="basket_item_img"/>
                             </div>
-                            <div className="basket_item_desc_button">
-                                <button className="basket_desc_button">{t("EDIT")}</button>
-                                <button className="basket_desc_button" onClick={() => copyItem(index)}>{t("COPY")}</button>
-                            </div>
-                            <div className="basket_item_delivery_section">
-                                <div className="basket_item_delivery_avail">
-                                    <h1 className="basket_item_delivery_title">{t("AVAILABILITY")}</h1>
-                                    <h2 className="basket_item_delivery_desc">{t("AVAILABILITY_desc")}</h2>
+                            <div className="basket_item_title_container">
+                                <div className="basket_item_title_name">{pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</div>
+                                {/*<div className="basket_item_title_desc">*/}
+                                {/*    <h3>Fabric Material & Color&nbsp;&nbsp;&nbsp;&nbsp;</h3>*/}
+                                {/*    <h4>{pageLanguage === 'fa' ? fabricDesignFa + " / " + fabricColorFa : fabricDesign + " / " + fabricColor}</h4>*/}
+                                {/*</div>*/}
+                                {desc}
+                                <div className="basket_item_title_desc">
+                                    <h3>{pageLanguage === 'fa' ? "نام اتاق" : "Room Label"}&nbsp;</h3>
+                                    <h4>{pageLanguage === 'fa' ? roomNameFa + (WindowName === "" ? "" : " / " + WindowName) : roomName + (WindowName === "" ? "" : " / " + WindowName)}</h4>
                                 </div>
-                                <div className="basket_item_delivery_return">
-                                    <h1 className="basket_item_delivery_title">{t("RETURNS")}</h1>
-                                    <h2 className="basket_item_delivery_desc">{t("RETURNS_desc")}<p>{t("Return Policy")}</p></h2>
+                                <div className="basket_item_desc_button">
+                                    <button className="basket_desc_button">{t("EDIT")}</button>
+                                    <button className="basket_desc_button" onClick={() => copyItem(index)}>{t("COPY")}</button>
+                                </div>
+                                <div className="basket_item_delivery_section">
+                                    <div className="basket_item_delivery_avail">
+                                        <h1 className="basket_item_delivery_title">{t("AVAILABILITY")}</h1>
+                                        <h2 className="basket_item_delivery_desc">{t("AVAILABILITY_desc")}</h2>
+                                    </div>
+                                    <div className="basket_item_delivery_return">
+                                        <h1 className="basket_item_delivery_title">{t("RETURNS")}</h1>
+                                        <h2 className="basket_item_delivery_desc">{t("RETURNS_desc")}<p>{t("Return Policy")}</p></h2>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </span>
-                        <span className="basket_item_price">{totalPrice.toLocaleString()} {t("TOMANS")}</span>
-                        <span className="basket_item_qty">
+                        </span>
+                            <span
+                                className="basket_item_price">{GetPrice((obj["price"]/obj["qty"]),pageLanguage,t("TOMANS"))}</span>
+                            <span className="basket_item_qty">
                         <div className="basket_item_qty_numbers">
                             <button type="text" className="basket_qty_minus" onClick={() => setBasketNumber(index, 0, 0, -1)}>–</button>
-                            <input type="number" className="basket_qty_num" value={obj["qty"]} onChange={(e) => setBasketNumber(index, e.target.value, 0)}/>
+                            <input type="text" className="basket_qty_num" value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${obj["qty"]}`) : obj["qty"]}
+                                   onChange={(e) => setBasketNumber(index, NumberToPersianWord.convertPeToEn(`${e.target.value}`), 0)}/>
                             <button type="text" className="basket_qty_plus" onClick={() => setBasketNumber(index, 0, 0, 1)}>+</button>
                         </div>
                         <div className="basket_item_qty_button">
                             <button className="basket_button basket_button_remove" onClick={() => setBasketNumber(index, 0, 0)}>{t("X REMOVE")}</button>
                         </div>
                         <div className="basket_item_qty_button">
-                            <button className="basket_button basket_button_edit">{t("+ WISHLIST")}</button>
+                            <button className="basket_button basket_button_edit"><p>+</p>&nbsp;<h4>{t("WISHLIST")}</h4></button>
                         </div>
                     </span>
-                        <span className="basket_item_total">{totalPrice.toLocaleString()} {t("TOMANS")}</span>
-                    </li>
-                );
+                            <span
+                                className="basket_item_total">{GetPrice(obj["price"],pageLanguage,t("TOMANS"))}</span>
+                        </li>;
+                });
+                setDraperyList(temp);
+                if (localStorage.getItem("cart") !== null) {
+                    let cartObjects=JSON.parse(localStorage.getItem("cart"));
+                    cartObjects["drapery"]=tempDrapery;
+                    localStorage.setItem('cart', JSON.stringify(cartObjects));
+                } else {
+                    setCart({});
+                }
+                setTotalPrice(draperiesTotalPrice);
+        
+            }).catch(err => {
+                console.log(err);
             });
-            setDraperyList(temp);
+            
         }
     }, [drapery]);
     
@@ -283,7 +387,7 @@ function Basket() {
             
             <div className="basket_container">
                 <div className="basket_title_container">
-                    <h1 className="basket_title">{t("Shopping Bag")} ({draperyCount + productCount + swatchesCount})</h1>
+                    <h1 className="basket_title">{t("Shopping Bag")} ({pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${draperyCount + productCount + swatchesCount}`) : draperyCount + productCount + swatchesCount})</h1>
                     <h3 className="basket_title_link">{t("CONTINUE SHOPPING")}</h3>
                 </div>
                 <div className="basket_flex">
@@ -369,9 +473,9 @@ function Basket() {
                     <div className="checkout_button_section">
                         <span className="checkout_payment_price_detail payment_price_detail">
                             <h3>{t("SUBTOTAL")}</h3>
-                            <h4>{totalPrice.toLocaleString()} {t("TOMANS")}</h4>
+                            <h4>{GetPrice(totalPrice,pageLanguage,t("TOMANS"))}</h4>
                         </span>
-                        <button className="basket_checkout">{t("CHECKOUT NOW")}</button>
+                        <Link to={"/" + pageLanguage + "/Checkout"} className="basket_checkout">{t("CHECKOUT NOW")}</Link>
                     </div>
                 </div>
             </div>

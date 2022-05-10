@@ -4,6 +4,7 @@ import axios from "axios";
 import {useTranslation} from "react-i18next";
 import parse, {domToReact} from 'html-react-parser';
 import Breadcrumb from 'react-bootstrap/Breadcrumb';
+import GetPrice from "../Components/GetPrice";
 
 const baseURLCats = "http://atlaspood.ir/api/WebsitePage/GetDetailByName";
 
@@ -54,12 +55,20 @@ function Curtain() {
             let DiscountPrice = models[i].DiscountPrice;
             let PhotoUrl = models[i].PhotoUrl;
             let DefaultFabricPhotoUrl = models[i].DefaultFabricPhotoUrl;
+            let discount=StartPrice !== DiscountPrice;
             
             if (Description === null || Description === undefined || Description === "") {
                 Description = ""
             }
             if (ENDescription === null || ENDescription === undefined || ENDescription === "") {
                 ENDescription = ""
+            }
+            
+            if (DiscountDescription === null || DiscountDescription === undefined || DiscountDescription === "") {
+                DiscountDescription = ""
+            }
+            if (DiscountEnDescription === null || DiscountEnDescription === undefined || DiscountEnDescription === "") {
+                DiscountEnDescription = ""
             }
             
             const options = {
@@ -93,9 +102,14 @@ function Curtain() {
                             <div className={`model_info_price_section ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
                                 <p>{pageLanguage === 'en' ? DiscountEnDescription : DiscountDescription}</p>
                                 <h3>{t("prices from")}</h3>
-                                <span className={`model_info_price ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>{StartPrice} TOMANS</span>
+                                <span className={`${discount ? "model_info_price" : ""} ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>{GetPrice(StartPrice,pageLanguage,t("TOMANS"))}</span>
+                                {discount &&
                                 <span>&nbsp;|&nbsp;</span>
-                                <span className={`model_info_price_off ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>{DiscountPrice} TOMANS</span>
+                                }
+                                {discount &&
+                                <span
+                                    className={`model_info_price_off ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>{GetPrice(DiscountPrice, pageLanguage, t("TOMANS"))}</span>
+                                }
                             </div>
                         </div>
                         <div className={`model_info_description_section ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
@@ -107,7 +121,7 @@ function Curtain() {
                             {/*    {keyFeatures}*/}
                             {/*</div>*/}
                         </div>
-                        <Link to={"/" + pageLanguage + "/Curtain/" + catID + "/" + SewingModelId} className={`btn_normal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>Start Customizing</Link>
+                        <Link to={"/" + pageLanguage + "/Curtain/" + catID + "/" + SewingModelId} className={`btn_normal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>{t("Start Customizing")}</Link>
                     </div>
                 </li>
             );

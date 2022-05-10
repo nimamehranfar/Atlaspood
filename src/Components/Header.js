@@ -217,7 +217,7 @@ function Header() {
                 if (subChildren.length === 0) {
                     buffer.push(
                         <h1 key={"subMenu" + i + j + "noChild" + "title"}
-                            className={`subMenu_title ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                            className="subMenu_title"
                             style={{width: subWidth + "px"}}>{pageLanguage === 'en' ? subMenuEnName : subMenuName}</h1>
                     );
                     //
@@ -234,7 +234,7 @@ function Header() {
                     
                     buffer.push(
                         <h1 key={"subMenu" + i + j + "title"}
-                            className={`subMenu_title ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                            className="subMenu_title"
                             style={{width: subWidth + "px"}}>{pageLanguage === 'en' ? subMenuEnName : subMenuName}</h1>
                     );
                     
@@ -266,8 +266,8 @@ function Header() {
                             empty_fields++;
                         } else {
                             buffer.push(
-                                <h2 key={"subSubMenu" + i + j + k} className={`${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
-                                    <Link className={`subSubMenu ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                                <h2 key={"subSubMenu" + i + j + k}>
+                                    <Link className="subSubMenu"
                                           to={"/" + pageLanguage + "/" + subSubPageType + "/" + subSubCategoryId}
                                           onClick={() => menuClicked(i)}>{pageLanguage === 'en' ? subSubMenuEnName : subSubMenuName}</Link>
                                 </h2>);
@@ -281,7 +281,7 @@ function Header() {
                     }
                     for (let emptyCounter = 0; emptyCounter < empty_fields; emptyCounter++) {
                         buffer.push(
-                            <h2 key={"subSubMenu" + i + j + "empty" + emptyCounter} className={`emptySubMenu ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
+                            <h2 key={"subSubMenu" + i + j + "empty" + emptyCounter} className="emptySubMenu">
                                 &nbsp;
                             </h2>);
                         
@@ -320,7 +320,7 @@ function Header() {
                     }
                 }
                 subMenuList.push(
-                    <div className={`cel-top-menu ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} key={"subMenu" + i + m}>
+                    <div className="cel-top-menu" key={"subMenu" + i + m}>
                         {subSubMenuList}
                     </div>
                 );
@@ -331,9 +331,9 @@ function Header() {
             
             menuList.push(
                 <li key={"menu" + i}>
-                    <h1 className={`${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>{pageLanguage === 'en' ? MenuEnName : MenuName}</h1>
-                    <div ref={ref => (mega.current = [...mega.current, ref])} className={`mega ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} style={{display: 'none'}}>
-                        <div className={`sub_menu ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
+                    <h1>{pageLanguage === 'en' ? MenuEnName : MenuName}</h1>
+                    <div ref={ref => (mega.current[i] = ref)} className="mega" style={{display: 'none'}}>
+                        <div className="sub_menu">
                             {subMenuList}
                         </div>
                     </div>
@@ -343,10 +343,10 @@ function Header() {
     }
     
     function menuClicked(index) {
-        pageLanguage === 'fa' ? mega.current[index].className = "mega1 font_farsi" : mega.current[index].className = "mega1 font_en";
+        mega.current[index].className = "mega1";
         setTimeout(() => {
-            pageLanguage === 'fa' ? mega.current[index].className = "mega font_farsi" : mega.current[index].className = "mega font_en";
-        }, 1500);
+            mega.current[index].className = "mega";
+        }, 1000);
         // console.log(mega.current[index])
     }
     

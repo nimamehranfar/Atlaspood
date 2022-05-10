@@ -4,7 +4,7 @@ function CustomDropdown({props, state, methods}) {
     const regexp = new RegExp(state.search, "i");
     
     return (
-        <div>
+        <div className={props.className}>
             <div className="select_item_container">
                 {props.options
                     .filter(item =>
