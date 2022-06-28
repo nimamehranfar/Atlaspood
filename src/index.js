@@ -1,5 +1,5 @@
 import i18n from "i18next";
-import { I18nextProvider } from 'react-i18next';
+import {I18nextProvider} from 'react-i18next';
 import React, {Suspense} from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
@@ -13,6 +13,8 @@ import '@nosferatu500/react-sortable-tree/style.css';
 import {useTranslation, initReactI18next} from "react-i18next";
 import LanguageDetector from 'i18next-browser-languagedetector';
 import HttpApi from 'i18next-http-backend';
+import store from "./store";
+import {Provider} from "react-redux";
 
 window.$apikey = "477f46c6-4a17-4163-83cc-29908d";
 
@@ -39,7 +41,7 @@ i18n
 
 export default i18n;
 
-const loadingMarkup=(
+const loadingMarkup = (
     <div className="py-4 text-center">
         <h1>Loading ...</h1>
     </div>
@@ -48,7 +50,9 @@ const loadingMarkup=(
 ReactDOM.render(<Suspense fallback={loadingMarkup}>
     <React.StrictMode>
         <I18nextProvider i18n={i18n}>
-        <App/>
+            <Provider store={store}>
+                <App/>
+            </Provider>
         </I18nextProvider>
     </React.StrictMode>
 </Suspense>, document.getElementById('root'));

@@ -250,3 +250,10 @@ video {
     font-style: normal;
 }
 
+@font-face {
+    font-family: 'adobe-caslon-pro';
+    src: url('./Fonts/adobe-caslon-pro.otf') format('opentype'),
+    url('./Fonts/adobe-caslon-pro.woff') format('woff');
+    font-style: normal;
+}
+

@@ -6,15 +6,15 @@ import {useTranslation} from "react-i18next";
 import {useLocation} from "react-router-dom";
 import axios from "axios";
 
-const baseURLGet = "http://atlaspood.ir/api/WebsiteSetting/GetSlider?apiKey=477f46c6-4a17-4163-83cc-29908d";
+const baseURLGet = "http://api.atlaspood.ir/WebsiteSetting/GetSlider?apiKey=477f46c6-4a17-4163-83cc-29908d";
 
 
 
 function Home() {
     const [index, setIndex] = useState(0);
     const {t} = useTranslation();
-    const [pageLanguage, setPageLanguage] = React.useState("");
     const location = useLocation();
+    const [pageLanguage, setPageLanguage] = React.useState(location.pathname.split('').slice(1, 3).join(''));
     const [slide, setSlide] = React.useState([]);
     const [slideList, setSlideList] = React.useState([]);
     
@@ -43,7 +43,7 @@ function Home() {
             
             slideLists.push(
                 <Carousel.Item interval={4500} key={"slide" + i} slide_id={i} className={`unselectable ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
-                    <img src={(url === undefined || url === null || url === "")? `${process.env.PUBLIC_URL}/no_image.svg` : `http://atlaspood.ir${url}`} className={`img-fluid ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} alt=""/>
+                    <img src={(url === undefined || url === null || url === "")? `${process.env.PUBLIC_URL}/no_image.svg` : `http://api.atlaspood.ir${url}`} className={`img-fluid ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} alt=""/>
                     <Carousel.Caption className={`unselectable ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
                         <h3 className={`unselectable ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>{pageLanguage === 'en' ? text1EN : text1}</h3>
                         <p className={`unselectable ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>{pageLanguage === 'en' ? text2EN : text2}</p>

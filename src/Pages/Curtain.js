@@ -6,15 +6,15 @@ import parse, {domToReact} from 'html-react-parser';
 import Breadcrumb from 'react-bootstrap/Breadcrumb';
 import GetPrice from "../Components/GetPrice";
 
-const baseURLCats = "http://atlaspood.ir/api/WebsitePage/GetDetailByName";
+const baseURLCats = "http://api.atlaspood.ir/WebsitePage/GetDetailByName";
 
 function Curtain() {
     const {t} = useTranslation();
     const location = useLocation();
+    const [pageLanguage, setPageLanguage] = React.useState(location.pathname.split('').slice(1, 3).join(''));
     const {catID} = useParams();
     const [models, setModels] = useState([]);
     const [modelList, setModelList] = React.useState([]);
-    const [pageLanguage, setPageLanguage] = React.useState("");
     
     function convertToPersian(string_farsi) {
         if (string_farsi !== null && string_farsi !== undefined && string_farsi !== "") {
@@ -55,7 +55,7 @@ function Curtain() {
             let DiscountPrice = models[i].DiscountPrice;
             let PhotoUrl = models[i].PhotoUrl;
             let DefaultFabricPhotoUrl = models[i].DefaultFabricPhotoUrl;
-            let discount=StartPrice !== DiscountPrice;
+            let discount = StartPrice !== DiscountPrice;
             
             if (Description === null || Description === undefined || Description === "") {
                 Description = ""
@@ -71,57 +71,91 @@ function Curtain() {
                 DiscountEnDescription = ""
             }
             
+            // const options = {
+            //     replace: domNode => {
+            //         if (domNode.name === 'h1') {
+            //             return <h1 className={`model_info_description_title`}>{domToReact(domNode.children, options)}</h1>;
+            //         } else if (domNode.name === 'p') {
+            //             return <p className={`model_info_description_body`}>{domToReact(domNode.children, options)}</p>;
+            //         } else if (domNode.name === 'h2') {
+            //             return <h2
+            //                 className={`model_info_description_key_features`}>{domToReact(domNode.children, options)}</h2>;
+            //         } else if (domNode.name === 'ul') {
+            //             return <ul className={`model_info_description_bullets`}>{domToReact(domNode.children, options)}</ul>;
+            //         } else if (domNode.name === 'li') {
+            //             return <li
+            //                 className={`model_info_description_key_features_item`}>{domToReact(domNode.children, options)}</li>;
+            //         } else
+            //             return null;
+            //     }
+            // };
+            
             const options = {
                 replace: domNode => {
                     if (domNode.name === 'h1') {
-                        return <h1 className={`model_info_description_title ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>{domToReact(domNode.children, options)}</h1>;
+                        return <h1 className={`model_item_info_description_title`}>{domToReact(domNode.children, options)}</h1>;
                     } else if (domNode.name === 'p') {
-                        return <p className={`model_info_description_body ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>{domToReact(domNode.children, options)}</p>;
+                        return <p className={`model_item_info_description_body`}>{domToReact(domNode.children, options)}</p>;
                     } else if (domNode.name === 'h2') {
-                        return <h2
-                            className={`model_info_description_key_features ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>{domToReact(domNode.children, options)}</h2>;
+                        return <h2 className={`model_item_info_description_key_features`}/>;
                     } else if (domNode.name === 'ul') {
-                        return <ul className={`model_info_description_bullets ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>{domToReact(domNode.children, options)}</ul>;
+                        return <ul className={`model_item_info_description_bullets`}/>;
                     } else if (domNode.name === 'li') {
-                        return <li
-                            className={`model_info_description_key_features_item ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>{domToReact(domNode.children, options)}</li>;
+                        return <li className={`model_item_info_description_key_features_item`}/>;
                     } else
                         return null;
                 }
             };
             
             modelLists.push(
-                <li key={"model" + i} model_id={i} className={`${i % 2 === 0 ? "model_color_1" : "model_color_2"} ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
-                    <Link to={"/" + pageLanguage + "/Curtain/" + catID + "/" + SewingModelId} className={`model_image_container ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
-                        <img src={PhotoUrl === null ? `${process.env.PUBLIC_URL}/no_image.svg` : `http://atlaspood.ir${PhotoUrl}`} className="img-fluid" alt=""/>
+                <li key={"model" + i} model_id={i} className={`${i % 2 === 0 ? "model_color_1" : "model_color_2"}`}>
+                    <Link to={"/" + pageLanguage + "/Curtain/" + catID + "/" + SewingModelId} className={`model_image_container`}>
+                        <img src={PhotoUrl === null ? `${process.env.PUBLIC_URL}/no_image.svg` : `http://api.atlaspood.ir${PhotoUrl}`} className="img-fluid" alt=""/>
                     </Link>
-                    <div className={`model_info_container ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
-                        <div className={`model_info_price_title ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
+                    <div className={`model_info_container`}>
+                        {/*<div className={`model_info_price_title`}>*/}
+                        {/*    <Link to={"/" + pageLanguage + "/Curtain/" + catID + "/" + SewingModelId}*/}
+                        {/*          className={`model_info_title`}>{pageLanguage === 'en' ? ModelENName : ModelName}</Link>*/}
+                        {/*    <div className={`model_info_price_section`}>*/}
+                        {/*        <p>{pageLanguage === 'en' ? DiscountEnDescription : DiscountDescription}</p>*/}
+                        {/*        <h3>{t("prices from")}</h3>*/}
+                        {/*        <span className={`${discount ? "model_info_price" : ""}}`}>{GetPrice(StartPrice, pageLanguage, t("TOMANS"))}</span>*/}
+                        {/*        {discount &&*/}
+                        {/*        <span>&nbsp;|&nbsp;</span>*/}
+                        {/*        }*/}
+                        {/*        {discount &&*/}
+                        {/*        <span*/}
+                        {/*            className={`model_info_price_off`}>{GetPrice(DiscountPrice, pageLanguage, t("TOMANS"))}</span>*/}
+                        {/*        }*/}
+                        {/*    </div>*/}
+                        {/*</div>*/}
+                        {/*<div className={`model_info_description_section`}>*/}
+                        {/*    {pageLanguage === 'en' ? parse(ENDescription, options) : parse(Description, options)}*/}
+                        {/*    /!*<h1 className={`model_info_description_title ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>DRAMATIC WITH DEEP FOLDS</h2>*!/*/}
+                        {/*    /!*<p className={`model_info_description_body ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>Featuring hand-pressed grommets. Perfect for stylish,*!/*/}
+                        {/*    /!*    modern interiors.</p>*!/*/}
+                        {/*    /!*<div className={`model_info_description_bullets ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>*!/*/}
+                        {/*    /!*    {keyFeatures}*!/*/}
+                        {/*    /!*</div>*!/*/}
+                        {/*</div>*/}
+                        {/*<Link to={"/" + pageLanguage + "/Curtain/" + catID + "/" + SewingModelId} className={`btn_normal`}>{t("Start Customizing")}</Link>*/}
+                        <div className="model_item_info_container">
                             <Link to={"/" + pageLanguage + "/Curtain/" + catID + "/" + SewingModelId}
-                                  className={`model_info_title ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>{pageLanguage === 'en' ? ModelENName : ModelName}</Link>
-                            <div className={`model_info_price_section ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
-                                <p>{pageLanguage === 'en' ? DiscountEnDescription : DiscountDescription}</p>
-                                <h3>{t("prices from")}</h3>
-                                <span className={`${discount ? "model_info_price" : ""} ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>{GetPrice(StartPrice,pageLanguage,t("TOMANS"))}</span>
-                                {discount &&
-                                <span>&nbsp;|&nbsp;</span>
-                                }
-                                {discount &&
-                                <span
-                                    className={`model_info_price_off ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>{GetPrice(DiscountPrice, pageLanguage, t("TOMANS"))}</span>
-                                }
+                                  className="model_item_info_title">{pageLanguage === 'en' ? ModelENName : ModelName}</Link>
+                            <h3 className="model_item_info_price_from">{t("prices from")}</h3>
+                            <span className={`${discount ? "model_item_info_price model_item_info_price2" : "model_item_info_price"}}`}>{GetPrice(StartPrice, pageLanguage, t("TOMANS"))}</span>
+                            {discount &&
+                            <span>&nbsp;|&nbsp;</span>
+                            }
+                            {discount &&
+                            <span className={`model_item_info_price_off`}>{GetPrice(DiscountPrice, pageLanguage, t("TOMANS"))}</span>
+                            }
+                            <div className={`model_item_info_description_section`}>
+                                {pageLanguage === 'en' ? parse(ENDescription, options) : parse(Description, options)}
                             </div>
+                            <Link to={"/" + pageLanguage + "/Curtain/" + catID + "/" + SewingModelId} className="btn_normal model_item_btn_normal">{t("Start" +
+                                " Customizing")}</Link>
                         </div>
-                        <div className={`model_info_description_section ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
-                            {pageLanguage === 'en' ? parse(ENDescription, options) : parse(Description, options)}
-                            {/*<h1 className={`model_info_description_title ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>DRAMATIC WITH DEEP FOLDS</h2>*/}
-                            {/*<p className={`model_info_description_body ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>Featuring hand-pressed grommets. Perfect for stylish,*/}
-                            {/*    modern interiors.</p>*/}
-                            {/*<div className={`model_info_description_bullets ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>*/}
-                            {/*    {keyFeatures}*/}
-                            {/*</div>*/}
-                        </div>
-                        <Link to={"/" + pageLanguage + "/Curtain/" + catID + "/" + SewingModelId} className={`btn_normal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>{t("Start Customizing")}</Link>
                     </div>
                 </li>
             );
@@ -149,16 +183,16 @@ function Curtain() {
     
     return (
         <div className={`Drapery_page_container ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
-            <div className="breadcrumb_container dir_ltr">
-                <Breadcrumb className="breadcrumb">
-                    <Breadcrumb.Item linkAs={Link} className="breadcrumb_item" linkProps={{to: "/" + pageLanguage, className: "breadcrumb_item"}}>Home</Breadcrumb.Item>
-                    <Breadcrumb.Item linkAs={Link} className="breadcrumb_item"
-                                     linkProps={{to: location, className: "breadcrumb_item breadcrumb_item_current"}}>{catID}</Breadcrumb.Item>
-                </Breadcrumb>
-            </div>
+            {/*<div className="breadcrumb_container dir_ltr">*/}
+            {/*    <Breadcrumb className="breadcrumb">*/}
+            {/*        <Breadcrumb.Item linkAs={Link} className="breadcrumb_item" linkProps={{to: "/" + pageLanguage, className: "breadcrumb_item"}}>Home</Breadcrumb.Item>*/}
+            {/*        <Breadcrumb.Item linkAs={Link} className="breadcrumb_item"*/}
+            {/*                         linkProps={{to: location, className: "breadcrumb_item breadcrumb_item_current"}}>{catID}</Breadcrumb.Item>*/}
+            {/*    </Breadcrumb>*/}
+            {/*</div>*/}
             <div className="models_title_div">
-                <h1>Custom Zebra Shades</h1>
-                <h2>8 CUSTOM STYLES | 650+ EXCLUSIVE MATERIALS</h2>
+                <h1>{t("model_zebra_temp1")}</h1>
+                <h2>{t("model_zebra_temp2")}</h2>
             </div>
             <div className="cat_models_list_container">
                 <hr/>

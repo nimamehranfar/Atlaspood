@@ -5,9 +5,9 @@ import {InputGroup, FormControl, Toast, ToastContainer} from "react-bootstrap"
 import {ReactComponent as noImage} from '../Images/public/no_image.svg';
 import Draggable from "react-draggable";
 
-const baseURLGet = "http://atlaspood.ir/api/WebsiteSetting/GetSlider?apiKey=477f46c6-4a17-4163-83cc-29908d";
-const baseURLPost = "http://atlaspood.ir/api/WebsiteSetting/SaveSlider";
-const baseURLUpload = "http://atlaspood.ir/api/WebsiteSetting/ImageUploder";
+const baseURLGet = "http://api.atlaspood.ir/WebsiteSetting/GetSlider?apiKey=477f46c6-4a17-4163-83cc-29908d";
+const baseURLPost = "http://api.atlaspood.ir/WebsiteSetting/SaveSlider";
+const baseURLUpload = "http://api.atlaspood.ir/WebsiteSetting/ImageUploder";
 
 function Slideshow() {
     const [slide, setslide] = React.useState([]);
@@ -40,7 +40,7 @@ function Slideshow() {
                     {/*<Draggable>*/}
                     {/*    <div>Draggable Text</div>*/}
                     {/*</Draggable>*/}
-                    <img src={(url === undefined || url === null || url === "")? `${process.env.PUBLIC_URL}/no_image.svg` : `http://atlaspood.ir${url}`} className="img-fluid" alt=""/>
+                    <img src={(url === undefined || url === null || url === "")? `${process.env.PUBLIC_URL}/no_image.svg` : `http://api.atlaspood.ir${url}`} className="img-fluid" alt=""/>
                 </div>
                 <input
                     type="file"

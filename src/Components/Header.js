@@ -1,22 +1,28 @@
-import React, {useEffect, useRef} from "react";
-import {Link, useLocation} from "react-router-dom";
+import React, {useEffect, useRef, useState} from "react";
+import {Link, useLocation, useNavigate} from "react-router-dom";
 import {ReactComponent as Logoen} from '../Images/public/logoen.svg';
 import {ReactComponent as Logofa} from '../Images/public/logofa.svg';
 import {ReactComponent as Favorite} from '../Images/public/favorite.svg';
 import {ReactComponent as Person} from '../Images/public/person-2.svg';
 import {ReactComponent as Basket} from '../Images/public/basket-2.svg';
 import axios from "axios";
-import {FormControl, InputGroup} from "react-bootstrap";
 import {useTranslation} from "react-i18next";
+import Modal from "react-bootstrap/Modal";
+import {useDispatch, useSelector} from "react-redux";
+import {HideLoginModal, LOGOUT, ShowLoginModal} from "../Actions/types";
 
-const baseURLGet = "http://atlaspood.ir/api/WebsiteSetting/GetBanner?apiKey=477f46c6-4a17-4163-83cc-29908d";
-const baseURLMenu = "http://atlaspood.ir/api/WebsiteMenu/GetByChildren?apikey=477f46c6-4a17-4163-83cc-29908d";
-const baseURLGetPage = "http://atlaspood.ir/api/WebsitePage/GetById";
+const baseURLGet = "http://api.atlaspood.ir/WebsiteSetting/GetBanner?apiKey=477f46c6-4a17-4163-83cc-29908d";
+const baseURLMenu = "http://api.atlaspood.ir/WebsiteMenu/GetByChildren?apikey=477f46c6-4a17-4163-83cc-29908d";
+const baseURLGetPage = "http://api.atlaspood.ir/WebsitePage/GetById";
 
 
 function Header() {
     const {t, i18n} = useTranslation();
     const location = useLocation();
+    const [pageLanguage, setPageLanguage] = React.useState(location.pathname.split('').slice(1, 3).join(''));
+    const {isLoggedIn, user, showLogin} = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
+    let navigate = useNavigate();
     const [banner, setBanner] = React.useState([]);
     const [bannerOneSlide, setBannerOneSlide] = React.useState([]);
     const [bannerItem, setBannerItem] = React.useState({
@@ -26,10 +32,32 @@ function Header() {
     const [langLocation, setLangLocation] = React.useState({
         locationEN: "/en", locationFA: "/fa"
     });
-    const [pageLanguage, setPageLanguage] = React.useState("");
     const [menu, setMenu] = React.useState([]);
     const [catMenu, setCatMenu] = React.useState([]);
     const [menuRender, setMenuRender] = React.useState([]);
+    const [modals, setModals] = useState([]);
+    const [currentPage, setCurrentPage] = useState({
+        level1:"",
+        level2:"",
+        level3:""
+    });
+    const [loginInfo, setLoginInfo] = useState({
+        email: "",
+        password: "",
+        remember: false
+    });
+    const [registerInfo, setRegisterInfo] = useState({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        password: "",
+        passwordConfirm: "",
+        news:true
+    });
+    const [passwordMatch, setPasswordMatch] = useState(false);
+    const [showRegister, setShowRegister] = useState(false);
+    
     const mega = useRef([]);
     
     
@@ -366,6 +394,18 @@ function Header() {
         setPageLanguage(tempLang.slice(1, 3).join(''));
     }
     
+    function modalHandleClose(modalName) {
+        let tempModals = [...modals];
+        tempModals[modalName] = false;
+        setModals(tempModals);
+    }
+    
+    function modalHandleShow(modalName) {
+        let tempModals = [...modals];
+        tempModals[modalName] = true;
+        setModals(tempModals);
+    }
+    
     useEffect(() => {
         setLang().then(() => {
             if (pageLanguage !== '') {
@@ -381,6 +421,13 @@ function Header() {
                 // });
             }
         });
+        let currentPageInfo=JSON.parse(JSON.stringify(currentPage));
+        currentPageInfo.level1=location.pathname.split("/")[2];
+        currentPageInfo.level2=location.pathname.split("/")[3];
+        currentPageInfo.level3=location.pathname.split("/")[4];
+        // console.log(currentPageInfo.level3);
+        setCurrentPage(currentPageInfo);
+        
         
         
     }, [location.pathname]);
@@ -468,20 +515,32 @@ function Header() {
                             <button className="btn-search">
                                 <img src={require('../Images/public/main_search_icon.svg')}
                                      className="img-fluid" alt=""/>
-                                <input type="text" className={`input-search ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} placeholder={t("Search_placeholder")}/>
+                                <input type="text" className={`input-search ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} placeholder={t("Search_placeholder")} autoComplete="new-search"/>
                             </button>
                         </div>
                     </div>
                     <div className="Logo"><Link to="/">{pageLanguage === 'en' ? <Logoen/> : <Logofa/>}</Link></div>
                     <div className="mid_header_right">
-                        <ul className={pageLanguage === 'fa' ? "float_left" : "float_right"}>
-                            <li className="login-open">
-                                <a href="http://www.doopsalta.com/en/account/login/">
-                                    <Person/>
-                                </a>
+                        <ul className={pageLanguage === 'fa' ? "float_left icons" : "float_right icons"}>
+                            {currentPage.level1 === "Curtain" && currentPage.level3 !== undefined &&
+                            <li className="login-open" onClick={() => {
+                                if(isLoggedIn) {
+                                    navigate("/" + pageLanguage+"/Account");
+                                }
+                                else{
+                                    dispatch({
+                                        type: ShowLoginModal,
+                                    })
+                                }
+                            }}>
+                                <Person/>
                             </li>
+                            }
+                            {!(currentPage.level1 === "Curtain" && currentPage.level3 !== undefined) &&
+                            <Link className="login-open" to={isLoggedIn? "/" + pageLanguage+"/Account":"/" + pageLanguage +"/User"}><Person/></Link>
+                            }
                             <li className="favorite">
-                                <a href="http://www.doopsalta.com/en/account/login/">
+                                <a href="https://www.doopsalta.com/en/account/login/">
                                     <Favorite/>
                                 </a>
                             </li>
@@ -527,7 +586,154 @@ function Header() {
                     </div>
                 </div>
             </div>
-        </div>);
+            
+            
+            {/* Modals */}
+            
+            <Modal backdrop="static" keyboard={false} dialogClassName={`login_modal fullSizeModal login_page_container ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                   show={showLogin}
+                   onHide={() => dispatch({
+                       type: HideLoginModal,
+                   })}>
+                <Modal.Header closeButton>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="logo_container">
+                        <div className="Logo">
+                            <Link to="/">{pageLanguage === 'en' ? <Logoen/> : <Logofa/>}</Link>
+                        </div>
+                    </div>
+                    <div className="login_register_container">
+                        <div className="login_container">
+                            <div className="login_inside_container">
+                                <h1 className="login_title">SIGN IN TO YOUR ACCOUNT</h1>
+                                <input type="text" placeholder={t("Email Address*")} className="form-control" name="Email" value={loginInfo.email}
+                                       onChange={(e) => {
+                                           let temp = JSON.parse(JSON.stringify(loginInfo));
+                                           temp.email = e.target.value;
+                                           setLoginInfo(temp);
+                                       }}/>
+                                <input type="password" placeholder={t("Password*")} className="form-control form-control-password" name="Password" value={loginInfo.password}
+                                       onChange={(e) => {
+                                           let temp = JSON.parse(JSON.stringify(loginInfo));
+                                           temp.password = e.target.value;
+                                           setLoginInfo(temp);
+                                       }}/>
+                                <div className="remember_forgot_container">
+                                    <div className="remember_container">
+                                        <label className="remember_label">
+                                            <input type="checkbox" value={loginInfo.remember}
+                                                   onChange={(e) => {
+                                                       let temp = JSON.parse(JSON.stringify(loginInfo));
+                                                       temp.remember = e.target.value;
+                                                       setLoginInfo(temp);
+                                                   }}/>
+                                            Remember Me
+                                        </label>
+                                    </div>
+                                    <div className="forgot text_underline">Forgot your password?</div>
+                                </div>
+                                <div className="login_btn_container">
+                                    {/*<button className="login_btn btn btn-new-dark">SIGN IN</button>*/}
+                                    <Link to={"/" + pageLanguage + "/Account"} className="login_btn btn btn-new-dark">SIGN IN</Link>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="register_container">
+                            <div className="register_inside_container">
+                                <h1 className="login_title">CREATE AN ACCOUNT</h1>
+                                <p className="login_text">Create an account and enjoy:</p>
+                                <ul className="register_list">
+                                    <li className="register_list_item">Easier order tracking</li>
+                                    <li className="register_list_item">Speedier Checkout</li>
+                                    <li className="register_list_item">Saved payment and shipping information</li>
+                                </ul>
+                                {!showRegister && <button className="register_btn btn" onClick={() => setShowRegister(true)}>LET'S GO</button>}
+                                {showRegister && <div className="register_section_container">
+                                    <div className="register_section_item">
+                                        <input type="text" placeholder={t("First Name*")} className="form-control" name="Email" value={registerInfo.firstName}
+                                               onChange={(e) => {
+                                                   let temp = JSON.parse(JSON.stringify(registerInfo));
+                                                   temp.firstName = e.target.value;
+                                                   setRegisterInfo(temp);
+                                               }}/>
+                                    </div>
+                                    <div className="register_section_item">
+                                        <input type="text" placeholder={t("Last Name*")} className="form-control" name="Email" value={registerInfo.lastName}
+                                               onChange={(e) => {
+                                                   let temp = JSON.parse(JSON.stringify(registerInfo));
+                                                   temp.lastName = e.target.value;
+                                                   setRegisterInfo(temp);
+                                               }}/>
+                                    </div>
+                                    <div className="register_section_item">
+                                        <input type="text" placeholder={t("Email Address*")} className="form-control" name="Email" value={registerInfo.email}
+                                               onChange={(e) => {
+                                                   let temp = JSON.parse(JSON.stringify(registerInfo));
+                                                   temp.email = e.target.value;
+                                                   setRegisterInfo(temp);
+                                               }}/>
+                                    </div>
+                                    <div className="register_section_item">
+                                        <input type="number" placeholder={t("Mobile Number (Optional)")} className="form-control" name="Email" value={registerInfo.phone}
+                                               onChange={(e) => {
+                                                   let temp = JSON.parse(JSON.stringify(registerInfo));
+                                                   temp.phone = e.target.value;
+                                                   setRegisterInfo(temp);
+                                               }}/>
+                                    </div>
+                                    <div className="register_section_item">
+                                        <input type="password" placeholder={t("Password*")} className="form-control form-control-password" name="Register_Password"
+                                               value={registerInfo.password}
+                                               onChange={(e) => {
+                                                   let temp = JSON.parse(JSON.stringify(registerInfo));
+                                                   temp.password = e.target.value;
+                                                   setRegisterInfo(temp);
+                                                   if (temp.password === temp.passwordConfirm)
+                                                       setPasswordMatch(true);
+                                                   else
+                                                       setPasswordMatch(false);
+                                               }}/>
+                                    </div>
+                                    <div className="register_section_item">
+                                        <input type="password" placeholder={t("Confirm Password*")} className="form-control form-control-password" name="Register_PasswordConfirm"
+                                               value={registerInfo.passwordConfirm}
+                                               onChange={(e) => {
+                                                   let temp = JSON.parse(JSON.stringify(registerInfo));
+                                                   temp.passwordConfirm = e.target.value;
+                                                   setRegisterInfo(temp);
+                                                   if (temp.password === temp.passwordConfirm)
+                                                       setPasswordMatch(true);
+                                                   else
+                                                       setPasswordMatch(false);
+                                               }}/>
+                                    </div>
+                                    <div className="news_signup">
+                                        <label className="news_signup_label">
+                                            <input type="checkbox" checked={registerInfo.news}
+                                                   onChange={(e) => {
+                                                       let temp = JSON.parse(JSON.stringify(registerInfo));
+                                                       temp.news = e.target.checked;
+                                                       setRegisterInfo(temp);
+                                                   }}/>
+                                            Sign-up to be the first to know about new collections, exclusive sales and special events.
+                                        </label>
+                                    </div>
+                                    <div className="login_btn_container">
+                                        <button className="login_btn btn btn-new-dark">CREATE AN ACCOUNT</button>
+                                    </div>
+                                </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </Modal.Body>
+            </Modal>
+        
+        </div>
+    
+    
+    );
 }
 
 export default Header;

@@ -11,6 +11,7 @@ import Button from 'react-bootstrap/Button'
 // import Select from 'react-select';
 import Select from "react-dropdown-select";
 import ReactImageMagnify from '@blacklab/react-image-magnify';
+import Header from "./Header";
 
 import {ReactComponent as MountInside} from '../Images/drapery/zebra/mount_inside.svg';
 import {ReactComponent as MountOutside} from '../Images/drapery/zebra/mount_outside.svg';
@@ -28,14 +29,18 @@ import CustomControlNum from "./CustomControlNum";
 import NumberToPersianWord from "number_to_persian_word";
 import CartInfo from "./CartInfo"
 import GetPrice from "./GetPrice";
+import {useDispatch, useSelector} from "react-redux";
+import {HideLoginModal, ShowLoginModal} from "../Actions/types";
+import authHeader from "../Services/auth-header";
+import SaveUserProject from "./SaveUserProject";
 
 
-const baseURLCats = "http://atlaspood.ir/api/WebsitePage/GetDetailByName";
-const baseURLModel = "http://atlaspood.ir/api/SewingModel/GetById";
-const baseURLFabrics = "http://atlaspood.ir/api/Sewing/GetModelFabric";
-const baseURLWindowSize = "http://atlaspood.ir/api/Sewing/GetWindowSize";
-const baseURLPrice = "http://atlaspood.ir/api/Sewing/GetSewingOrderPrice";
-const baseURLFreeShipping = "http://atlaspood.ir/api/WebsiteSetting/GetFreeShippingAmount?apiKey=477f46c6-4a17-4163-83cc-29908d";
+const baseURLCats = "http://api.atlaspood.ir/WebsitePage/GetDetailByName";
+const baseURLModel = "http://api.atlaspood.ir/SewingModel/GetById";
+const baseURLFabrics = "http://api.atlaspood.ir/Sewing/GetModelFabric";
+const baseURLWindowSize = "http://api.atlaspood.ir/Sewing/GetWindowSize";
+const baseURLPrice = "http://api.atlaspood.ir/Sewing/GetSewingOrderPrice";
+const baseURLFreeShipping = "http://api.atlaspood.ir/WebsiteSetting/GetFreeShippingAmount?apiKey=477f46c6-4a17-4163-83cc-29908d";
 
 
 function Zebra({CatID, ModelID}) {
@@ -45,6 +50,8 @@ function Zebra({CatID, ModelID}) {
     const [firstRender, setFirstRender] = useState(true);
     const [catID, setCatID] = useState("");
     const [modelID, setModelID] = useState("");
+    const {isLoggedIn, user, showLogin} = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
     const [models, setModels] = useState([]);
     const [model, setModel] = useState({});
     const [modelAccessories, setModelAccessories] = useState({});
@@ -82,6 +89,7 @@ function Zebra({CatID, ModelID}) {
         label: "",
         value: ""
     });
+    const [roomLabelComplete, setRoomLabelComplete] = useState(false);
     const [stepSelectedValue, setStepSelectedValue] = useState({});
     const [hasTrim, setHasTrim] = useState(false);
     const [showLabels, setShowLabels] = useState(true);
@@ -246,7 +254,7 @@ function Zebra({CatID, ModelID}) {
                     <div className={`radio_group ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key + j}>
                         <label data-tip={`${pageLanguage1 === 'en' ? DesignEnName : DesignName}: ${pageLanguage1 === 'en' ? ColorEnName : ColorName}`}
                                data-for={"fabric" + key + j} className={`radio_container ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}
-                               data-img={`http://www.doopsalta.com/upload/${PhotoPath}`}>
+                               data-img={`https://www.doopsalta.com/upload/${PhotoPath}`}>
                             {/*<ReactTooltip id={"fabric" + key + j} place="top" type="light" effect="float"/>*/}
                             <input className="radio" type="radio" ref-num="1" default-fabric-photo={FabricOnModelPhotoUrl}
                                    onClick={e => {
@@ -267,7 +275,7 @@ function Zebra({CatID, ModelID}) {
                                    model-id={modelID} value={FabricId} text-en={DesignEnName} text-fa={DesignName}
                                    ref={ref => (inputs.current[`1${FabricId}`] = ref)}/>
                             <div className="frame_img">
-                                <img className="img-fluid" src={`http://atlaspood.ir/${PhotoPath}`} alt=""/>
+                                <img className="img-fluid" src={`http://api.atlaspood.ir/${PhotoPath}`} alt=""/>
                             </div>
                         </label>
                         <div className={`fabric_name_container ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
@@ -316,16 +324,16 @@ function Zebra({CatID, ModelID}) {
                         imageProps={{
                             alt: '',
                             isFluidWidth: true,
-                            src: `http://atlaspood.ir/${PhotoPath}`
+                            src: `http://api.atlaspood.ir/${PhotoPath}`
                         }}
                         magnifiedImageProps={{
-                            src: `http://atlaspood.ir/${PhotoPath}`,
+                            src: `http://api.atlaspood.ir/${PhotoPath}`,
                             width: 800,
                             height: 800
                         }}
                         portalProps={{placement: 'over'}}
                     />
-                    {/*<img className="img-fluid hover-zoom" src={`http://atlaspood.ir/${PhotoPath}`} alt=""/>*/}
+                    {/*<img className="img-fluid hover-zoom" src={`http://api.atlaspood.ir/${PhotoPath}`} alt=""/>*/}
                 </div>
             </div>
         );
@@ -743,8 +751,8 @@ function Zebra({CatID, ModelID}) {
                                 return e
                             }).length === 3) {
                                 getWindowSize(response.data["Width"], response.data["Height"]);
-                                temp["HeightCart"] = cartValue;
-                                temp["WidthCart"] = cartValue;
+                                temp["WidthCart"] = response.data["Width"];
+                                temp["HeightCart"] = response.data["Height"];
                             }
                         }
                     } else if (stepSelectedValue["2"] === "2" && stepSelectedValue["3"] === "2") {
@@ -901,7 +909,7 @@ function Zebra({CatID, ModelID}) {
                     );
                 }
             });
-    
+            
             tempNewSet = new Set();
             
             tempDepSet.forEach(dependency => {
@@ -1077,7 +1085,7 @@ function Zebra({CatID, ModelID}) {
         // tempCartObj["Type"]=0;
         tempCartObj["ModelId"] = modelID;
         tempCartObj["qty"] = 1;
-        // tempCartObj["PhotoUrl"]=`http://atlaspood.ir/${defaultFabricPhoto}`;
+        // tempCartObj["PhotoUrl"]=`http://api.atlaspood.ir/${defaultFabricPhoto}`;
         tempCartObj["ModelNameFa"] = defaultModelNameFa;
         tempCartObj["ModelNameEn"] = defaultModelName;
         if (localStorage.getItem("cart") === null) {
@@ -1202,7 +1210,7 @@ function Zebra({CatID, ModelID}) {
                         temp1[index] =
                             <li className="custom_cart_item" key={"drapery" + index} ref={ref => (draperyRef.current[index] = ref)}>
                                 <div className="custom_cart_item_image_container">
-                                    <img src={`http://atlaspood.ir/${obj["PhotoUrl"]}`} alt="" className="custom_cart_item_img img-fluid"/>
+                                    <img src={`http://api.atlaspood.ir/${obj["PhotoUrl"]}`} alt="" className="custom_cart_item_img img-fluid"/>
                                 </div>
                                 <div className="custom_cart_item_desc">
                                     <div className="custom_cart_item_desc_container">
@@ -1239,6 +1247,10 @@ function Zebra({CatID, ModelID}) {
             }
             
             
+            if (cartObjects["drapery"].length + cartObjects["product"].length + cartObjects["swatches"].length === 0) {
+                modalHandleClose("cart_modal");
+                setCartStateAgree(false);
+            }
         } else {
             setCartCount(0);
         }
@@ -1247,6 +1259,10 @@ function Zebra({CatID, ModelID}) {
         }).catch(err => {
             console.log(err);
         });
+    }
+    
+    function addToProjects() {
+    
     }
     
     function fabricClicked(photo, hasTrim) {
@@ -1731,18 +1747,18 @@ function Zebra({CatID, ModelID}) {
     
     return (
         <div className={`Custom_model_container ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
-            <div className="breadcrumb_container dir_ltr">
-                <Breadcrumb className="breadcrumb">
-                    <Breadcrumb.Item linkAs={Link} className="breadcrumb_item" linkProps={{to: "/" + pageLanguage, className: "breadcrumb_item"}}>Home</Breadcrumb.Item>
-                    <Breadcrumb.Item linkAs={Link} className="breadcrumb_item"
-                                     linkProps={{
-                                         to: "/" + pageLanguage + "/Curtain/" + catID,
-                                         className: "breadcrumb_item breadcrumb_item_current"
-                                     }}>{catID}</Breadcrumb.Item>
-                    <Breadcrumb.Item linkAs={Link} className="breadcrumb_item"
-                                     linkProps={{to: location, className: "breadcrumb_item breadcrumb_item_current"}}>{defaultModelName}</Breadcrumb.Item>
-                </Breadcrumb>
-            </div>
+            {/*<div className="breadcrumb_container dir_ltr">*/}
+            {/*    <Breadcrumb className="breadcrumb">*/}
+            {/*        <Breadcrumb.Item linkAs={Link} className="breadcrumb_item" linkProps={{to: "/" + pageLanguage, className: "breadcrumb_item"}}>Home</Breadcrumb.Item>*/}
+            {/*        <Breadcrumb.Item linkAs={Link} className="breadcrumb_item"*/}
+            {/*                         linkProps={{*/}
+            {/*                             to: "/" + pageLanguage + "/Curtain/" + catID,*/}
+            {/*                             className: "breadcrumb_item breadcrumb_item_current"*/}
+            {/*                         }}>{catID}</Breadcrumb.Item>*/}
+            {/*        <Breadcrumb.Item linkAs={Link} className="breadcrumb_item"*/}
+            {/*                         linkProps={{to: location, className: "breadcrumb_item breadcrumb_item_current"}}>{defaultModelName}</Breadcrumb.Item>*/}
+            {/*    </Breadcrumb>*/}
+            {/*</div>*/}
             
             
             <div className="models_title_div">
@@ -1750,7 +1766,7 @@ function Zebra({CatID, ModelID}) {
             </div>
             <div className="model_customize_container">
                 <div className="model_customize_image">
-                    <img src={`http://atlaspood.ir/${defaultFabricPhoto}`} className="img-fluid" alt=""/>
+                    <img src={`http://api.atlaspood.ir/${defaultFabricPhoto}`} className="img-fluid" alt=""/>
                 </div>
                 <div className={`model_customize_section ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
                     <Accordion ref={accordion} flush activeKey={accordionActiveKey}>
@@ -1795,7 +1811,7 @@ function Zebra({CatID, ModelID}) {
                                                     <Dropdown autoClose="outside" title="">
                                                         <Dropdown.Toggle className="dropdown_btn">
                                                             <p>{t("filter_Color")}</p>
-                                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg')} alt=""/>
+                                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu className="filter_color_items">
                                                             {colors[location.pathname.split('').slice(1, 3).join('')].map((obj, index) => (
@@ -1819,7 +1835,7 @@ function Zebra({CatID, ModelID}) {
                                                     <Dropdown autoClose="outside" title="">
                                                         <Dropdown.Toggle className="dropdown_btn">
                                                             <p>{t("filter_Pattern")}</p>
-                                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg')} alt=""/>
+                                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
                                                             {patterns[location.pathname.split('').slice(1, 3).join('')].map((obj, index) => (
@@ -1843,7 +1859,7 @@ function Zebra({CatID, ModelID}) {
                                                     <Dropdown autoClose="outside" title="">
                                                         <Dropdown.Toggle className="dropdown_btn">
                                                             <p>{t("filter_Type")}</p>
-                                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg')} alt=""/>
+                                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
                                                             {types[location.pathname.split('').slice(1, 3).join('')].map((obj, index) => (
@@ -1866,7 +1882,7 @@ function Zebra({CatID, ModelID}) {
                                                     <Dropdown autoClose="outside" title="">
                                                         <Dropdown.Toggle className="dropdown_btn">
                                                             <p>{t("filter_Price")}</p>
-                                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg')} alt=""/>
+                                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
                                                             {prices[location.pathname.split('').slice(1, 3).join('')].map((obj, index) => (
@@ -1914,7 +1930,7 @@ function Zebra({CatID, ModelID}) {
                                 <Card.Body>
                                     <div className="card_body card_body_radio">
                                         <div className="box50 radio_style">
-                                            <img src={require('../Images/drapery/zebra/mount_inside.svg')} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/zebra/mount_inside.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("mount_Inside")} value="1" name="step2" ref-num="2" id="21"
                                                    onClick={e => {
                                                        selectChanged(e, "3AOut,3BOut,3COut,3DOut");
@@ -1931,7 +1947,7 @@ function Zebra({CatID, ModelID}) {
                                             <label htmlFor="21">{t("mount_Inside")}</label>
                                         </div>
                                         <div className="box50 radio_style">
-                                            <img src={require('../Images/drapery/zebra/mount_outside.svg')} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/zebra/mount_outside.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("mount_Outside")} value="2" name="step2" ref-num="2" id="22"
                                                    onClick={e => {
                                                        selectChanged(e, "3AIn,3BIn");
@@ -2163,7 +2179,7 @@ function Zebra({CatID, ModelID}) {
                                         <div className="box100">
                                             <p className="step_selection_title">{t("step3A_title")}</p>
                                             <img
-                                                src={pageLanguage === 'fa' ? require('../Images/drapery/zebra/width_inside_3_fa.svg') : require('../Images/drapery/zebra/width_inside_3.svg')}
+                                                src={pageLanguage === 'fa' ? require('../Images/drapery/zebra/width_inside_3_fa.svg').default : require('../Images/drapery/zebra/width_inside_3.svg').default}
                                                 className="img-fluid" alt=""/>
                                         </div>
                                         <div className="box100 Three_selection_container">
@@ -2329,7 +2345,7 @@ function Zebra({CatID, ModelID}) {
                                         <div className="box100">
                                             <p className="step_selection_title">{t("step3B_title")}</p>
                                             <img
-                                                src={pageLanguage === 'fa' ? require('../Images/drapery/zebra/height_inside_3_fa.svg') : require('../Images/drapery/zebra/height_inside_3.svg')}
+                                                src={pageLanguage === 'fa' ? require('../Images/drapery/zebra/height_inside_3_fa.svg').default : require('../Images/drapery/zebra/height_inside_3.svg').default}
                                                 className="img-fluid" alt=""/>
                                         </div>
                                         <div className="box100 Three_selection_container">
@@ -2495,7 +2511,7 @@ function Zebra({CatID, ModelID}) {
                                     <div className="card_body">
                                         <div className="box100">
                                             <p className="step_selection_title">{t("step3A_out_title")}</p>
-                                            <img src={require('../Images/drapery/zebra/FrameSize.svg')} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/zebra/FrameSize.svg').default} className="img-fluid" alt=""/>
                                         </div>
                                         <div className="box100 Three_selection_container">
                                             <div className="box100">
@@ -2562,7 +2578,7 @@ function Zebra({CatID, ModelID}) {
                                     <div className="card_body">
                                         <div className="box100">
                                             <p className="step_selection_title">{t("step3B_out_title")}</p>
-                                            <img src={require('../Images/drapery/zebra/wall_cover.svg')} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/zebra/wall_cover.svg').default} className="img-fluid" alt=""/>
                                         </div>
                                         <div className="box100 Three_selection_container dir_ltr">
                                             <div className="box50">
@@ -2684,7 +2700,7 @@ function Zebra({CatID, ModelID}) {
                                     <div className="card_body">
                                         <div className="box100">
                                             <p className="step_selection_title">{t("step3C_out_title")}</p>
-                                            <img src={require('../Images/drapery/zebra/frame_height.svg')} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/zebra/frame_height.svg').default} className="img-fluid" alt=""/>
                                         </div>
                                         <div className="box100 Three_selection_container">
                                             <div className="box100">
@@ -2751,7 +2767,7 @@ function Zebra({CatID, ModelID}) {
                                     <div className="card_body">
                                         <div className="box100">
                                             <p className="step_selection_title">{t("step3D_out_title")}</p>
-                                            <img src={require('../Images/drapery/zebra/shade_mount.svg')} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/zebra/shade_mount.svg').default} className="img-fluid" alt=""/>
                                         </div>
                                         <div className="box100 Three_selection_container">
                                             <div className="box100">
@@ -2846,7 +2862,7 @@ function Zebra({CatID, ModelID}) {
                                                        setCart("ControlType", "Motorized", "ControlPosition,ChainLength");
                                                    }} ref={ref => (inputs.current["42"] = ref)}/>
                                             <label htmlFor="42">{t("Motorized")}<br/><p
-                                                className="surcharge_price">{t("Add ")}{Object.keys(modelAccessories).length !== 0 ? GetPrice(modelAccessories["1"]["61500508"]["price"], pageLanguage, t("TOMANS")) : null}</p>
+                                                className="surcharge_price">{t("Add ")}{Object.keys(modelAccessories).length !== 0 ? (modelAccessories["1"] ? (modelAccessories["1"]["61500508"] ? GetPrice(modelAccessories["1"]["61500508"]["price"], pageLanguage, t("TOMANS")) : null) : null) : null}</p>
                                             </label>
                                         
                                         </div>
@@ -3012,6 +3028,7 @@ function Zebra({CatID, ModelID}) {
                                 <Card.Body>
                                     <div className="card_body card_body_radio">
                                         <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/zebra/position_left.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("Left")} value="1" name="step4A" ref-num="4A" id="4A1"
                                                    onClick={e => {
                                                        selectChanged(e);
@@ -3021,6 +3038,7 @@ function Zebra({CatID, ModelID}) {
                                             <label htmlFor="4A1">{t("Left")}</label>
                                         </div>
                                         <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/zebra/position_right.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("Right")} value="2" name="step4A"
                                                    ref-num="4A" id="4A2"
                                                    onClick={e => {
@@ -3078,7 +3096,7 @@ function Zebra({CatID, ModelID}) {
                                                        setCart("ChainLength", "300");
                                                    }} ref={ref => (inputs.current["4B2"] = ref)}/>
                                             <label htmlFor="4B2">{t("300cm")}<br/><p
-                                                className="surcharge_price">{t("Add ")}{Object.keys(modelAccessories).length !== 0 ? GetPrice(modelAccessories["3"]["90908901"]["price"], pageLanguage, t("TOMANS")) : null}</p>
+                                                className="surcharge_price">{t("Add ")}{Object.keys(modelAccessories).length !== 0 ? (modelAccessories["3"] ? (modelAccessories["3"]["90908901"] ? GetPrice(modelAccessories["3"]["90908901"]["price"], pageLanguage, t("TOMANS")) : null) : null) : null}</p>
                                             </label>
                                         </div>
                                         <div className="box33 radio_style">
@@ -3090,7 +3108,7 @@ function Zebra({CatID, ModelID}) {
                                                        setCart("ChainLength", "500");
                                                    }} ref={ref => (inputs.current["4B3"] = ref)}/>
                                             <label htmlFor="4B3">{t("500cm")}<br/><p
-                                                className="surcharge_price">{t("Add ")}{Object.keys(modelAccessories).length !== 0 ? GetPrice(modelAccessories["3"]["90908902"]["price"], pageLanguage, t("TOMANS")) : null}</p>
+                                                className="surcharge_price">{t("Add ")}{Object.keys(modelAccessories).length !== 0 ? (modelAccessories["3"] ? (modelAccessories["3"]["90908902"] ? GetPrice(modelAccessories["3"]["90908902"]["price"], pageLanguage, t("TOMANS")) : null) : null) : null}</p>
                                             </label>
                                         </div>
                                         <NextStep eventKey="5">{t("NEXT STEP")}</NextStep>
@@ -3111,7 +3129,7 @@ function Zebra({CatID, ModelID}) {
                                 <Card.Body>
                                     <div className="card_body card_body_radio">
                                         <div className="box50 radio_style">
-                                            <img src={require('../Images/drapery/zebra/metal_valance.svg')} className="img-fluid mb-3" alt=""/>
+                                            <img src={require('../Images/drapery/zebra/metal_valance.svg').default} className="img-fluid mb-3" alt=""/>
                                             <input className="radio" type="radio" text={t("style_Metal Valance")} value="1" name="step5" ref-num="5" id="51"
                                                    onClick={e => {
                                                        selectChanged(e);
@@ -3121,7 +3139,7 @@ function Zebra({CatID, ModelID}) {
                                             <label htmlFor="51">{t("style_Metal Valance")}</label>
                                         </div>
                                         <div className="box50 radio_style">
-                                            <img src={require('../Images/drapery/zebra/metal_valance_fabric_insert.svg')} className="img-fluid mb-3" alt=""/>
+                                            <img src={require('../Images/drapery/zebra/metal_valance_fabric_insert.svg').default} className="img-fluid mb-3" alt=""/>
                                             <input className="radio" type="radio" text={t("style_Metal Valance") + " " + t("style_Fabric Insert")} value="2" name="step5"
                                                    ref-num="5" id="52"
                                                    onClick={e => {
@@ -3223,7 +3241,7 @@ function Zebra({CatID, ModelID}) {
                                                         <span className="popover_indicator">
                                                             {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
                                                                                   children={<object className="popover_camera" type="image/svg+xml"
-                                                                                                    data={require('../Images/public/camera.svg')}/>}
+                                                                                                    data={require('../Images/public/camera.svg').default}/>}
                                                                                   component={
                                                                                       <div className="clearfix">
                                                                                           <div className="popover_image clearfix">
@@ -3264,7 +3282,7 @@ function Zebra({CatID, ModelID}) {
                                                         <span className="popover_indicator">
                                                             {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
                                                                                   children={<object className="popover_camera" type="image/svg+xml"
-                                                                                                    data={require('../Images/public/camera.svg')}/>}
+                                                                                                    data={require('../Images/public/camera.svg').default}/>}
                                                                                   component={
                                                                                       <div id="popover_content_step5help2" className="clearfix">
                                                                                           <div className="popover_image clearfix">
@@ -3300,7 +3318,7 @@ function Zebra({CatID, ModelID}) {
                                                         <span className="popover_indicator">
                                                             {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
                                                                                   children={<object className="popover_camera" type="image/svg+xml"
-                                                                                                    data={require('../Images/public/camera.svg')}/>}
+                                                                                                    data={require('../Images/public/camera.svg').default}/>}
                                                                                   component={
                                                                                       <div id="popover_content_step5help2" className="clearfix">
                                                                                           <div className="popover_image clearfix">
@@ -3353,7 +3371,7 @@ function Zebra({CatID, ModelID}) {
                                                         <span className="details-label unselectable">{detailsShow ? t("Hide Details") : t("Add Room Image")}</span>
                                                         <span className="details_indicator">
                                                             {/*<i className="arrow_down"/>*/}
-                                                            <img className="arrow_down img-fluid" src={require('../Images/public/arrow_down.svg')} alt=""/>
+                                                            <img className="arrow_down img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
                                                         </span>
                                                     </div>
                                                     <div className="uploaded_images_section">
@@ -3405,6 +3423,7 @@ function Zebra({CatID, ModelID}) {
                                                         dropdownPosition="bottom"
                                                         dropdownHandle={false}
                                                         dropdownGap={0}
+                                                        values={roomLabelSelect.value !== "" ? [rooms[pageLanguage].find(opt => opt.value === roomLabelSelect.value)] : []}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
                                                             window.scrollTo(window.scrollX, window.scrollY + 0.5);
@@ -3438,6 +3457,7 @@ function Zebra({CatID, ModelID}) {
                                                 <input type="text" placeholder={t("(Optional)")} className="form-control window_name" name="order_window_name" value={roomLabelText}
                                                        onChange={(e) => {
                                                            roomLabelChanged(e.target.value, "6", true);
+                                                           setRoomLabelComplete(true);
                                                            setCart("WindowName", e.target.value);
                                                        }}/>
                                             </div>
@@ -3538,7 +3558,8 @@ function Zebra({CatID, ModelID}) {
                     <div className="measurementsHelp_modal_img_section">
                         <p className="measurementsHelp_modal_title">{t("HOW TO MEASURE FOR ZEBRA SHADES")}</p>
                         <p className="measurementsHelp_modal_img_title">{t("Inside Mount")}</p>
-                        <object className="measurementsHelp_modal_img" type="image/svg+xml" data={require('../Images/drapery/zebra/step3_help_inside.svg')}/>
+                        <object className="measurementsHelp_modal_img" type="image/svg+xml"
+                                data={pageLanguage === 'fa' ? require('../Images/drapery/zebra/step3_help_inside_fa.svg').default : require('../Images/drapery/zebra/step3_help_inside.svg').default}/>
                     </div>
                     <div className="accordion_help measurementsHelp_modal_help_section">
                         <div className="help_container">
@@ -3585,7 +3606,8 @@ function Zebra({CatID, ModelID}) {
                     
                     <div className="measurementsHelp_modal_img_section">
                         <p className="measurementsHelp_modal_img_title">{t("Outside Mount")}</p>
-                        <object className="measurementsHelp_modal_img" type="image/svg+xml" data={require('../Images/drapery/zebra/step3_help_outside.svg')}/>
+                        <object className="measurementsHelp_modal_img" type="image/svg+xml"
+                                data={pageLanguage === 'fa' ? require('../Images/drapery/zebra/step3_help_outside_fa.svg').default : require('../Images/drapery/zebra/step3_help_outside.svg').default}/>
                     </div>
                     <div className="accordion_help measurementsHelp_modal_help_section">
                         <div className="help_container">
@@ -3842,7 +3864,8 @@ function Zebra({CatID, ModelID}) {
                        setCartStateAgree(false);
                    }} id="cart_modal">
                 {cartStateAgree &&
-                <div className="custom_cart_header_desc">{`${(freeShipPrice - totalCartPrice) > 0 ? `${t("cart_agree_free_ship1")}${pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${freeShipPrice - totalCartPrice}`) : freeShipPrice - totalCartPrice}${t("cart_agree_free_ship2")}` : `${t("cart_agree_free_ship")}`}`}</div>
+                <div
+                    className="custom_cart_header_desc">{`${(freeShipPrice - totalCartPrice) > 0 ? `${t("cart_agree_free_ship1")}${pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${GetPrice(freeShipPrice - totalCartPrice, pageLanguage, t("TOMANS"))}`) : GetPrice(freeShipPrice - totalCartPrice, pageLanguage, t("TOMANS"))}${t("cart_agree_free_ship2")}` : `${t("cart_agree_free_ship")}`}`}</div>
                 }
                 <Modal.Header>
                     {cartStateAgree &&
@@ -3904,6 +3927,96 @@ function Zebra({CatID, ModelID}) {
                 </Modal.Footer>
             </Modal>
             
+            <Modal backdrop="static" keyboard={false}
+                   className={`cart_modal_container cart_agree_container add_to_project_modal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                   dialogClassName={`cart_modal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                   show={modals["add_to_project_modal"] === undefined ? false : modals["add_to_project_modal"]}
+                   onHide={() => {
+                       modalHandleClose("add_to_project_modal");
+                   }} id="add_to_project_modal">
+                <Modal.Header closeButton>
+                </Modal.Header>
+                <Modal.Body>
+                    {roomLabelComplete &&
+                    <div className="add_to_project_container">
+                        <h2 className="project_added_text">1 ITEM ADDED TO YOUR PROJECTS</h2>
+                        <Link className="add_to_project_btn btn" to={"/" + pageLanguage + "/Account/Projects"}>{t("VIEW PROJECTS")}</Link>
+                        <button className="continue_shopping_btn" onClick={() => {
+                            modalHandleClose("add_to_project_modal");
+                        }}>{t("CONTINUE SHOPPING")}
+                        </button>
+                    </div>
+                    }
+                    
+                    {!roomLabelComplete &&
+                    <div className="add_to_project_container2">
+                        <h2 className="project_added_text">Please select a room name and window description in order to save this item</h2>
+                        <div className="box100 selectInput_section">
+                            <div className="room_select">
+                                <label className="select_label">{t("Room")}</label>
+                                <div className="select_container">
+                                    <Select
+                                        className="select"
+                                        placeholder={t("Please Select")}
+                                        // portal={document.getElementById('add_to_project_modal')}
+                                        dropdownPosition="bottom"
+                                        dropdownHandle={false}
+                                        dropdownGap={0}
+                                        values={roomLabelSelect.value !== "" ? [rooms[pageLanguage].find(opt => opt.value === roomLabelSelect.value)] : []}
+                                        onDropdownOpen={() => {
+                                            let temp1 = window.scrollY;
+                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
+                                            setTimeout(() => {
+                                                let temp2 = window.scrollY;
+                                                if (temp2 === temp1)
+                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
+                                            }, 100);
+                                        }}
+                                        dropdownRenderer={
+                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                        }
+                                        contentRenderer={
+                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                        }
+                                        // optionRenderer={
+                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                        // }
+                                        onChange={(selected) => {
+                                            setDeps("", "6");
+                                            roomLabelChanged(selected[0], "6", false);
+                                            // setCart("RoomNameEn", selected[0].value);
+                                            setCart("RoomNameFa", rooms["fa"].find(opt => opt.value === selected[0].value).label, "", "RoomNameEn", [selected[0].value]);
+                                        }}
+                                        options={rooms[pageLanguage]}
+                                    />
+                                </div>
+                            </div>
+                            <div className="room_select">
+                                <label className="select_label">{t("Window Description")}</label>
+                                <input type="text" placeholder={t("(Optional)")} className="form-control window_name" name="order_window_name" value={roomLabelText}
+                                       onChange={(e) => {
+                                           roomLabelChanged(e.target.value, "6", true);
+                                           setCart("WindowName", e.target.value);
+                                       }}/>
+                            </div>
+                        </div>
+                        <button className="continue_shopping_btn" onClick={() => {
+                            if (roomLabelSelect.value !== "") {
+                                if(SaveUserProject(depSet,cartValues,`${modelID}`,price,defaultModelName,defaultModelNameFa)) {
+                                    setRoomLabelComplete(true);
+                                }
+                                else{
+        
+                                }
+                            }
+                        }}>{t("SAVE ITEM")}
+                        </button>
+                    </div>
+                    }
+                
+                </Modal.Body>
+            </Modal>
+            
             {/*<Modal backdrop="static" keyboard={false} className={`cart_modal_container cart_agree_container ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}*/}
             {/*       dialogClassName={`cart_modal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}*/}
             {/*       show={modals["cart_agree"] === undefined ? false : modals["cart_agree"]}*/}
@@ -3939,7 +4052,25 @@ function Zebra({CatID, ModelID}) {
                 <div className="CustomModelFooter_hidden_part"/>
                 <div className="CustomModelFooter_visible_part">
                     <div className="left_footer">
-                        <button className="save_to_acc">{t("footer_Save To")}<br/>{t("footer_My Account")}</button>
+                        <button className="save_to_acc" onClick={() => {
+                            if (isLoggedIn) {
+                                if (roomLabelComplete) {
+                                    if(SaveUserProject(depSet,cartValues,`${modelID}`,price,defaultModelName,defaultModelNameFa)) {
+                                        modalHandleShow("add_to_project_modal");
+                                    }
+                                    else{
+                                    
+                                    }
+                                } else {
+                                    modalHandleShow("add_to_project_modal");
+                                }
+                            } else {
+                                dispatch({
+                                    type: ShowLoginModal,
+                                });
+                            }
+                            
+                        }}>{t("footer_Save To")}<br/>{t("footer_My Account")}</button>
                     </div>
                     <div className="hidden_inner_footer">&nbsp;</div>
                     <div className="footer_price_section">

@@ -9,9 +9,9 @@ import Zebra from "../Components/Zebra";
 function CustomCurtain() {
     const {t} = useTranslation();
     const location = useLocation();
+    const [pageLanguage, setPageLanguage] = React.useState(location.pathname.split('').slice(1, 3).join(''));
     const {catID} = useParams();
     const {modelID} = useParams();
-    const [pageLanguage, setPageLanguage] = React.useState("");
     const [pageModel, setPageModel] = React.useState([]);
     
     function convertToPersian(string_farsi) {

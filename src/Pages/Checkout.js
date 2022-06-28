@@ -17,13 +17,13 @@ import Tooltip from "bootstrap/js/src/tooltip";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import PopoverStickOnHover from "../Components/PopoverStickOnHover";
 
-const baseURLPrice = "http://atlaspood.ir/api/Sewing/GetSewingOrderPrice";
+const baseURLPrice = "http://api.atlaspood.ir/Sewing/GetSewingOrderPrice";
 
 
 function Checkout() {
     const {t, i18n} = useTranslation();
-    const [pageLanguage, setPageLanguage] = React.useState("");
     const location = useLocation();
+    const [pageLanguage, setPageLanguage] = React.useState(location.pathname.split('').slice(1, 3).join(''));
     const [totalPrice, setTotalPrice] = useState(0);
     const [shippingPrice, setShippingPrice] = useState(0);
     const [cart, setCart] = useState({});
@@ -48,11 +48,58 @@ function Checkout() {
     });
     const [passwordsEnable, setPasswordsEnable] = useState(false);
     const [passwordMatch, setPasswordMatch] = useState(false);
+    const [passwordNotValidState, setPasswordNotValidState] = useState(0);
+    const [passwordNotValid, setPasswordNotValid] = useState(false);
+    const [showPasswordValidation, setShowPasswordValidation] = useState(false);
+    const [passwordValidation, setPasswordValidation] = useState({
+        count:false,
+        lowercase:false,
+        uppercase:false,
+        numbers:false
+    });
     
     const [address1, setAddress1] = useState({});
     const [address2Enable, setAddress2Enable] = useState(false);
     const [address2, setAddress2] = useState({});
     const [bank, setBank] = useState(1);
+    
+    function checkPasswordStrength(user_password) {
+        let temp = JSON.parse(JSON.stringify(passwordValidation));
+        if (user_password.length > 20) {
+            setPasswordNotValidState(0);
+        } else if (user_password.length < 8) {
+            setPasswordNotValidState(0);
+        } else {
+            let matchedCase = [];
+            matchedCase.push("[A-Z]");      // Uppercase
+            matchedCase.push("[a-z]");      // Lowercase
+            matchedCase.push("[0-9]");      // Numbers
+            let count = 0;
+            for (let i = 0; i < matchedCase.length; i++) {
+                if (new RegExp(matchedCase[i]).test(user_password)) {
+                    count++;
+                }
+            }
+            if (count === 3) {
+                setPasswordNotValidState(1);
+                setPasswordNotValid(false);
+            }
+            else{
+                setPasswordNotValidState(0);
+            }
+        }
+        
+        temp.count = user_password.length <= 20 && user_password.length >= 8;
+        
+        temp.uppercase = new RegExp("[A-Z]").test(user_password);
+        
+        temp.lowercase = new RegExp("[a-z]").test(user_password);
+        
+        temp.numbers = new RegExp("[0-9]").test(user_password);
+        
+        setPasswordValidation(temp);
+        
+    }
     
     function setBasketNumber(refIndex, numValue, type, minusPlus) {
         let temp = [];
@@ -332,7 +379,7 @@ function Checkout() {
                     temp[index]=
                         <li className="checkout_item_container" key={index}>
                             <div className="checkout_item_image_container">
-                                <img src={`http://atlaspood.ir/${photoUrl}`} alt="" className="checkout_item_img"/>
+                                <img src={`http://api.atlaspood.ir/${photoUrl}`} alt="" className="checkout_item_img"/>
                                 <p className="checkout_item_image_qty">{pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${obj["qty"]}`) : obj["qty"]}</p>
                             </div>
                             <div className="checkout_item_desc_container">
@@ -383,13 +430,13 @@ function Checkout() {
             <div className="checkout_container">
                 <div className="checkout_left">
                     <div className="Logo"><Link to="/">{pageLanguage === 'en' ? <Logoen/> : <Logofa/>}</Link></div>
-                    <div className="breadcrumb_container dir_ltr">
-                        <Breadcrumb className="breadcrumb">
-                            <Breadcrumb.Item linkAs={Link} className="breadcrumb_item" linkProps={{to: "/" + pageLanguage, className: "breadcrumb_item"}}>Home</Breadcrumb.Item>
-                            <Breadcrumb.Item linkAs={Link} className="breadcrumb_item"
-                                             linkProps={{to: location, className: "breadcrumb_item breadcrumb_item_current"}}>Checkout</Breadcrumb.Item>
-                        </Breadcrumb>
-                    </div>
+                    {/*<div className="breadcrumb_container dir_ltr">*/}
+                    {/*    <Breadcrumb className="breadcrumb">*/}
+                    {/*        <Breadcrumb.Item linkAs={Link} className="breadcrumb_item" linkProps={{to: "/" + pageLanguage, className: "breadcrumb_item"}}>Home</Breadcrumb.Item>*/}
+                    {/*        <Breadcrumb.Item linkAs={Link} className="breadcrumb_item"*/}
+                    {/*                         linkProps={{to: location, className: "breadcrumb_item breadcrumb_item_current"}}>Checkout</Breadcrumb.Item>*/}
+                    {/*    </Breadcrumb>*/}
+                    {/*</div>*/}
                     
                     
                     <div className="checkout_left_container">
@@ -550,13 +597,31 @@ function Checkout() {
                                                onChange={(e) => {
                                                    let temp = JSON.parse(JSON.stringify(loginInfo));
                                                    temp.password = e.target.value;
+                                                   temp.password = e.target.value.replace(/\s/g, '');
+                                                   temp.password = temp.password.replace(/[^0-9A-Za-z\s]/g, '');
                                                    setLoginInfo(temp);
                                                    if (temp.password === temp.passwordConfirm)
                                                        setPasswordMatch(true);
                                                    else
                                                        setPasswordMatch(false);
                                                    setAddress2Enable(false);
-                                               }}/>
+                                                   checkPasswordStrength(temp.password);
+                                               }}
+                                               onClick={()=>setShowPasswordValidation(true)}
+                                        />
+                                        {showPasswordValidation && <div className="input_not_valid_password ">
+                                            <h2 className="input_not_valid_password_title">{t("Your password must contain:")}</h2>
+                                            <ul className="input_not_valid_password_list">
+                                                <li className={"input_not_valid_password_item " + (passwordValidation.count ? "input_not_valid_password_item_check" : "")}>{t("password_required_text1")}
+                                                </li>
+                                                <li className={"input_not_valid_password_item " + (passwordValidation.lowercase ? "input_not_valid_password_item_check" : "")}>{t("password_required_text2")}
+                                                </li>
+                                                <li className={"input_not_valid_password_item " + (passwordValidation.uppercase ? "input_not_valid_password_item_check" : "")}>{t("password_required_text3")}
+                                                </li>
+                                                <li className={"input_not_valid_password_item " + (passwordValidation.numbers ? "input_not_valid_password_item_check" : "")}>{t("password_required_text4")}</li>
+                                            </ul>
+                                        </div>
+                                        }
                                     </div>
                                     <div className="checkout_left_info_flex_right">
                                         <input type="password" placeholder={t("Confirm Password*")} className="form-control form-control-password" name="PasswordConfirm" value={loginInfo.passwordConfirm}
@@ -578,14 +643,14 @@ function Checkout() {
                                     <div className="checkout_left_info_flex">
                                         <div className="checkout_left_info_flex_radios">
                                             <div className="radio_style">
-                                                <input className="radio" type="radio" value={!address2Enable} name="checkout_address" id="1"
+                                                <input className="radio" type="radio" checked={!address2Enable} name="checkout_address" id="1"
                                                        onClick={e => {
                                                            setAddress2Enable(false);
                                                        }}/>
                                                 <label htmlFor="1">{t("SHIP TO ABOVE ADDRESS")}</label>
                                             </div>
                                             <div className="radio_style">
-                                                <input className="radio" type="radio" value={address2Enable} name="checkout_address" id="2"
+                                                <input className="radio" type="radio" checked={address2Enable} name="checkout_address" id="2"
                                                        onClick={e => {
                                                            setAddress2Enable(true);
                                                        }
@@ -600,15 +665,15 @@ function Checkout() {
                             
                             
                             {passwordsEnable && passwordMatch && address2Enable &&
-                            <div className="checkout_left_info_shipping_address">
-                                <div className="checkout_left_info_flex checkout_left_info_flex_title">
-                                    <div className="checkout_left_info_flex_left">
-                                        <h1 className="checkout_left_info_title">
-                                        </h1>
-                                    </div>
-                                    <div className="checkout_left_info_flex_right">
-                                    </div>
-                                </div>
+                            <div className="checkout_left_info_shipping_address checkout_left_info_shipping_address2">
+                                {/*<div className="checkout_left_info_flex checkout_left_info_flex_title">*/}
+                                {/*    <div className="checkout_left_info_flex_left">*/}
+                                {/*        <h1 className="checkout_left_info_title">*/}
+                                {/*        </h1>*/}
+                                {/*    </div>*/}
+                                {/*    <div className="checkout_left_info_flex_right">*/}
+                                {/*    </div>*/}
+                                {/*</div>*/}
                                 <div className="checkout_left_info_flex">
                                     <div className="checkout_left_info_flex_left">
                                         <input type="text" placeholder={t("First Name*")} className="form-control" name="Name2" value={address2["Name"]}
@@ -770,7 +835,7 @@ function Checkout() {
                                     <button className="checkout_payment_button">{t("Continue to Payment")}</button>
                                 </div>
                                 <div className="checkout_left_info_flex_right">
-                                    <Link to={"/" + pageLanguage + "/Basket"} className="checkout_payment_button_return">{t("Return to Bag")}<i className="arrow-back"/></Link>
+                                    <Link to={"/" + pageLanguage + "/Basket"} className="checkout_payment_button_return"><span>{t("Return to Bag")}</span><i className="arrow-back"/></Link>
                                 </div>
                             </div>
                         </div>
@@ -792,7 +857,7 @@ function Checkout() {
                             {discountApplied &&
                             <div className="discount_applied_container">
                                 <span className="discount_applied">
-                                    <img src={require('../Images/public/tag.png')} className="img-fluid discount_applied_img" alt=""/>
+                                    <img src={require('../Images/public/discount.svg').default} className="img-fluid discount_applied_img" alt=""/>
                                     <p className="discount_applied_text">{discountAppliedText}</p>
                                     <button className="discount_applied_remove" onClick={() => removeDiscount()}>X</button>
                                 </span>
@@ -806,7 +871,7 @@ function Checkout() {
                             </span>
                             <span className="checkout_right_price_sub payment_price_detail">
                                 <h3>{t("SHIPPING")}</h3>
-                                <h4>{shippingPrice>0? GetPrice(shippingPrice,pageLanguage,t("TOMANS")):`FREE`}</h4>
+                                <h4>{shippingPrice>0? GetPrice(shippingPrice,pageLanguage,t("TOMANS")):t("FREE")}</h4>
                             </span>
                         </div>
                         <div className="checkout_right_price_detail">

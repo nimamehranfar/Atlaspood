@@ -9,14 +9,14 @@ import Select from 'react-select';
 import Modal from "react-bootstrap/Modal";
 
 
-const baseURL = "http://atlaspood.ir/api/WebsiteMenu/GetByChildren?apikey=477f46c6-4a17-4163-83cc-29908d";
-const baseURLPost = "http://atlaspood.ir/api/WebsiteMenu/Save";
-const baseURLDeleteAll = "http://atlaspood.ir/api/WebsiteMenu/DeleteAll?apiKey=477f46c6-4a17-4163-83cc-29908d";
-const baseURLModels = "http://atlaspood.ir/api/SewingModel/GetAll?apiKey=477f46c6-4a17-4163-83cc-29908d";
-const baseURLGetPage = "http://atlaspood.ir/api/WebsitePage/GetById";
-const baseURLAddPage = "http://atlaspood.ir/api/WebsitePage/Add";
-const baseURLEditPage = "http://atlaspood.ir/api/WebsitePage/Edit";
-const baseURLDeletePage = "http://atlaspood.ir/api/WebsitePage/Delete";
+const baseURL = "http://api.atlaspood.ir/WebsiteMenu/GetByChildren?apikey=477f46c6-4a17-4163-83cc-29908d";
+const baseURLPost = "http://api.atlaspood.ir/WebsiteMenu/Save";
+const baseURLDeleteAll = "http://api.atlaspood.ir/WebsiteMenu/DeleteAll?apiKey=477f46c6-4a17-4163-83cc-29908d";
+const baseURLModels = "http://api.atlaspood.ir/SewingModel/GetAll?apiKey=477f46c6-4a17-4163-83cc-29908d";
+const baseURLGetPage = "http://api.atlaspood.ir/WebsitePage/GetById";
+const baseURLAddPage = "http://api.atlaspood.ir/WebsitePage/Add";
+const baseURLEditPage = "http://api.atlaspood.ir/WebsitePage/Edit";
+const baseURLDeletePage = "http://api.atlaspood.ir/WebsitePage/Delete";
 
 function Menu() {
     const [menu, setMenu] = React.useState({
@@ -612,11 +612,7 @@ function Menu() {
             <ToastContainer className="p-3 position_fixed" position="top-start">
                 <Toast onClose={() => setShowToast(false)} bg="success" show={showToast} delay={3000} autohide>
                     <Toast.Header>
-                        <img
-                            src="holder.js/20x20?text=%20"
-                            className="rounded me-2"
-                            alt=""
-                        />
+                        <img className="rounded me-2"/>
                         <strong className="me-auto">Success</strong>
                         {/*<small>couple of seconds ago</small>*/}
                     </Toast.Header>

@@ -8,14 +8,14 @@ import CartInfo from "../Components/CartInfo";
 import NumberToPersianWord from "number_to_persian_word";
 import GetPrice from "../Components/GetPrice";
 
-const baseURLGetAllModels = "http://atlaspood.ir/api/SewingModel/GetAll?apiKey=477f46c6-4a17-4163-83cc-29908d";
-const baseURLPrice = "http://atlaspood.ir/api/Sewing/GetSewingOrderPrice";
+const baseURLGetAllModels = "http://api.atlaspood.ir/SewingModel/GetAll?apiKey=477f46c6-4a17-4163-83cc-29908d";
+const baseURLPrice = "http://api.atlaspood.ir/Sewing/GetSewingOrderPrice";
 
 
 function Basket() {
     const {t} = useTranslation();
-    const [pageLanguage, setPageLanguage] = React.useState("");
     const location = useLocation();
+    const [pageLanguage, setPageLanguage] = React.useState(location.pathname.split('').slice(1, 3).join(''));
     const [totalPrice, setTotalPrice] = useState(0);
     const [cart, setCart] = useState({});
     const [drapery, setDrapery] = useState([]);
@@ -174,14 +174,14 @@ function Basket() {
     
     useEffect(() => {
         if (drapery.length) {
-            let tempDrapery=drapery;
+            let tempDrapery = drapery;
             let cartInfo = JSON.parse(JSON.stringify(CartInfo));
             let temp = [];
-            let delArr=[];
+            let delArr = [];
             
             let draperiesTotalPrice = 0;
             let promiseArr = [];
-    
+            
             tempDrapery.forEach((obj, index) => {
                 let tempPostObj = {};
                 tempPostObj["ApiKey"] = window.$apikey;
@@ -189,9 +189,9 @@ function Basket() {
                 
                 Object.keys(obj).forEach(key => {
                     let tempObj = cartInfo.find(obj => obj["cart"] === key);
-                    if(tempObj===undefined){
+                    if (tempObj === undefined) {
                         delArr.push(index);
-                    }else {
+                    } else {
                         if (tempObj["apiLabel"] !== "") {
                             if (tempObj["apiValue"] === null) {
                                 tempPostObj[tempObj["apiLabel"]] = obj[key];
@@ -207,13 +207,13 @@ function Basket() {
                 tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
                 tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
                 tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
-    
+                
                 Object.keys(obj).forEach(key => {
                     let tempObj = cartInfo.find(obj => obj["cart"] === key);
-                    if(tempObj===undefined){
-                        if(delArr.indexOf(index) <= -1)
+                    if (tempObj === undefined) {
+                        if (delArr.indexOf(index) <= -1)
                             delArr.push(index);
-                    }else {
+                    } else {
                         if (tempObj["apiLabel2"] !== undefined) {
                             if (tempObj["apiValue2"] === null) {
                                 tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = obj[key];
@@ -223,8 +223,8 @@ function Basket() {
                         }
                     }
                 });
-    
-                tempPostObj["SewingOrderDetails"][0]["Accessories"]=[];
+                
+                tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
                 Object.keys(obj).forEach(key => {
                     if (obj[key] !== null || obj[key] !== "") {
                         let tempObj = cartInfo.find(obj => obj["cart"] === key);
@@ -232,27 +232,27 @@ function Basket() {
                             if (tempObj["apiAcc"] === true) {
                                 tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][obj[key]]);
                             } else {
-                    
+                            
                             }
                         }
                     }
                 });
-                tempPostObj["SewingOrderDetails"][0]["Accessories"]=tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
+                tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
                     return el != null;
                 });
-    
+                
                 if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
                     promiseArr[index] = axios.post(baseURLPrice, tempPostObj);
                 }
                 
             });
-            delArr.forEach(el=>{
-                tempDrapery.splice(el,1);
+            delArr.forEach(el => {
+                tempDrapery.splice(el, 1);
             });
             Promise.all(promiseArr).then(function (values) {
                 // console.log(values);
                 tempDrapery.forEach((obj, index) => {
-                    let desc=[];
+                    let desc = [];
                     let fabricColorFa = obj["FabricColorFa"];
                     let fabricColor = obj["FabricColorEn"];
                     let fabricDesignFa = obj["FabricDesignFa"];
@@ -266,12 +266,12 @@ function Basket() {
                     let ModelId = obj["ModelId"];
                     obj["price"] = values[index].data["price"];
                     draperiesTotalPrice += obj["price"];
-    
+                    
                     Object.keys(obj).forEach(key => {
                         let tempObj = cartInfo.find(obj => obj["cart"] === key);
-                        if(tempObj===undefined){
+                        if (tempObj === undefined) {
                             delArr.push(index);
-                        }else {
+                        } else {
                             if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
                                 let objLabel = "";
                                 if (tempObj["titleValue"] === null) {
@@ -301,10 +301,10 @@ function Basket() {
                     });
                     
                     temp[index] =
-                        <li className="drapery_basket_item" key={index} ref={ref => (draperyRef.current[index]=ref)}>
+                        <li className="drapery_basket_item" key={index} ref={ref => (draperyRef.current[index] = ref)}>
                         <span className="basket_item_title">
                             <div className="basket_item_image_container">
-                                <img src={`http://atlaspood.ir/${photoUrl}`} alt="" className="basket_item_img"/>
+                                <img src={`http://api.atlaspood.ir/${photoUrl}`} alt="" className="basket_item_img"/>
                             </div>
                             <div className="basket_item_title_container">
                                 <div className="basket_item_title_name">{pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</div>
@@ -334,13 +334,15 @@ function Basket() {
                             </div>
                         </span>
                             <span
-                                className="basket_item_price">{GetPrice((obj["price"]/obj["qty"]),pageLanguage,t("TOMANS"))}</span>
+                                className="basket_item_price">{GetPrice((obj["price"] / obj["qty"]), pageLanguage, t("TOMANS"))}</span>
                             <span className="basket_item_qty">
                         <div className="basket_item_qty_numbers">
-                            <button type="text" className="basket_qty_minus" onClick={() => setBasketNumber(index, 0, 0, -1)}>–</button>
+                            <button type="text" className="basket_qty_minus" onClick={() => setBasketNumber(index, 0, 0, -1)}><img
+                                src={require('../Images/public/minus.svg').default} alt="" className="qty_math_icon"/></button>
                             <input type="text" className="basket_qty_num" value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${obj["qty"]}`) : obj["qty"]}
-                                   onChange={(e) => setBasketNumber(index, NumberToPersianWord.convertPeToEn(`${e.target.value}`), 0)}/>
-                            <button type="text" className="basket_qty_plus" onClick={() => setBasketNumber(index, 0, 0, 1)}>+</button>
+                                   onChange={(e) => setBasketNumber(index, NumberToPersianWord.convertPeToEn(`${e.target.value}`), 0)} readOnly/>
+                            <button type="text" className="basket_qty_plus" onClick={() => setBasketNumber(index, 0, 0, 1)}><img src={require('../Images/public/plus.svg').default}
+                                                                                                                                 alt="" className="qty_math_icon"/></button>
                         </div>
                         <div className="basket_item_qty_button">
                             <button className="basket_button basket_button_remove" onClick={() => setBasketNumber(index, 0, 0)}>{t("X REMOVE")}</button>
@@ -348,21 +350,21 @@ function Basket() {
                         <div className="basket_item_qty_button">
                             <button className="basket_button basket_button_edit"><p>+</p>&nbsp;<h4>{t("WISHLIST")}</h4></button>
                         </div>
-                    </span>
+                            </span>
                             <span
-                                className="basket_item_total">{GetPrice(obj["price"],pageLanguage,t("TOMANS"))}</span>
+                                className="basket_item_total">{GetPrice(obj["price"], pageLanguage, t("TOMANS"))}</span>
                         </li>;
                 });
                 setDraperyList(temp);
                 if (localStorage.getItem("cart") !== null) {
-                    let cartObjects=JSON.parse(localStorage.getItem("cart"));
-                    cartObjects["drapery"]=tempDrapery;
+                    let cartObjects = JSON.parse(localStorage.getItem("cart"));
+                    cartObjects["drapery"] = tempDrapery;
                     localStorage.setItem('cart', JSON.stringify(cartObjects));
                 } else {
                     setCart({});
                 }
                 setTotalPrice(draperiesTotalPrice);
-        
+                
             }).catch(err => {
                 console.log(err);
             });
@@ -377,13 +379,13 @@ function Basket() {
     
     return (
         <div className={`basket_page_container ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
-            <div className="breadcrumb_container dir_ltr">
-                <Breadcrumb className="breadcrumb">
-                    <Breadcrumb.Item linkAs={Link} className="breadcrumb_item" linkProps={{to: "/" + pageLanguage, className: "breadcrumb_item"}}>Home</Breadcrumb.Item>
-                    <Breadcrumb.Item linkAs={Link} className="breadcrumb_item" linkProps={{to: location, className: "breadcrumb_item breadcrumb_item_current"}}>Shopping
-                        Bag</Breadcrumb.Item>
-                </Breadcrumb>
-            </div>
+            {/*<div className="breadcrumb_container dir_ltr">*/}
+            {/*    <Breadcrumb className="breadcrumb">*/}
+            {/*        <Breadcrumb.Item linkAs={Link} className="breadcrumb_item" linkProps={{to: "/" + pageLanguage, className: "breadcrumb_item"}}>Home</Breadcrumb.Item>*/}
+            {/*        <Breadcrumb.Item linkAs={Link} className="breadcrumb_item" linkProps={{to: location, className: "breadcrumb_item breadcrumb_item_current"}}>Shopping*/}
+            {/*            Bag</Breadcrumb.Item>*/}
+            {/*    </Breadcrumb>*/}
+            {/*</div>*/}
             
             <div className="basket_container">
                 <div className="basket_title_container">
@@ -473,7 +475,7 @@ function Basket() {
                     <div className="checkout_button_section">
                         <span className="checkout_payment_price_detail payment_price_detail">
                             <h3>{t("SUBTOTAL")}</h3>
-                            <h4>{GetPrice(totalPrice,pageLanguage,t("TOMANS"))}</h4>
+                            <h4>{GetPrice(totalPrice, pageLanguage, t("TOMANS"))}</h4>
                         </span>
                         <Link to={"/" + pageLanguage + "/Checkout"} className="basket_checkout">{t("CHECKOUT NOW")}</Link>
                     </div>

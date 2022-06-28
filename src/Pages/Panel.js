@@ -50,7 +50,7 @@ function Panel() {
                     </Navbar.Collapse>
                 </Container>
             </Navbar>
-            <Outlet />
+            <Outlet/>
         </div>
     );
 }

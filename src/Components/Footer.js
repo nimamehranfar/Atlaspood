@@ -5,7 +5,7 @@ import {useTranslation} from "react-i18next";
 function Footer() {
     const { t } = useTranslation();
     const location = useLocation();
-    const [pageLanguage, setPageLanguage] = React.useState("");
+    const [pageLanguage, setPageLanguage] = React.useState(location.pathname.split('').slice(1, 3).join(''));
     
     useEffect(() => {
         const tempLang = location.pathname.split('');
@@ -93,7 +93,7 @@ function Footer() {
                     </div>
                     <div className="copyright">
                         {t("2022 © All Rights Reserved for Atlas Viewer.")}<a
-                        href="http://www.doopsalta.com/en/page/EF8C077/rules/">{t("Site Rules")}</a>
+                        href="https://www.doopsalta.com/en/page/EF8C077/rules/">{t("Site Rules")}</a>
                     </div>
                 </div>
             </div>

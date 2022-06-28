@@ -3,8 +3,8 @@ import axios from "axios";
 import {InputGroup, FormControl, Toast, ToastContainer} from "react-bootstrap"
 import {Editor} from '@tinymce/tinymce-react';
 
-const baseURLGet = "http://atlaspood.ir/api/SewingModel/GetAll?apiKey=477f46c6-4a17-4163-83cc-29908d";
-const baseURLPost = "http://atlaspood.ir/api/SewingModel/Edit";
+const baseURLGet = "http://api.atlaspood.ir/SewingModel/GetAll?apiKey=477f46c6-4a17-4163-83cc-29908d";
+const baseURLPost = "http://api.atlaspood.ir/SewingModel/Edit";
 
 function Models() {
     

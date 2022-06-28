@@ -1,5 +1,6 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {BrowserRouter as Router, Routes, Route, Link, Navigate} from "react-router-dom";
+import {useSelector} from 'react-redux';
 
 import Home from "./Pages/Home";
 import Panel from "./Pages/Panel";
@@ -15,6 +16,15 @@ import HeaderWithOutlet from "./Pages/HeaderWithOutlet";
 import Basket from "./Pages/Basket";
 import Checkout from "./Pages/Checkout";
 import NoHeaderNoFooter from "./Pages/NoHeaderNoFooter";
+import Projects from "./Pages/Projects";
+import RegisterLogin from "./Pages/RegisterLogin";
+import AccountLayout from "./Pages/AccountLayout";
+import Settings from "./Components/Settings";
+import AddressBook from "./Components/AddressBook";
+import OrderHistory from "./Components/OrderHistory";
+import OrderDetails from "./Components/OrderDetails";
+import Reset from "./Pages/Reset";
+import ConfirmEmail from "./Pages/ConfirmEmail";
 
 
 function App({t}) {
@@ -32,9 +42,14 @@ function App({t}) {
         }
     };
     
+    const {isLoggedIn, user, showLogin} = useSelector((state) => state.auth);
+    
+    useEffect(() => {
+        // console.log(isLoggedIn);
+    }, [isLoggedIn]);
+    
     return (
         <Router>
-            
             <div className="App">
                 <div className="page_container">
                     {!user1.success &&
@@ -59,12 +74,30 @@ function App({t}) {
                             <Route path="Curtain/:catID" element={<Curtain/>}/>
                             <Route path="Product/:catID" element={<Product/>}/>
                             <Route path="Basket" element={<Basket/>}/>
+                            <Route path="User" element={isLoggedIn ? <Navigate to="/en/Account"/> :<RegisterLogin/>}/>
+                            <Route path="User/Reset/:resetId" element={<Reset/>}/>
+                            <Route path="Account" element={isLoggedIn ? <AccountLayout/> : <Navigate to="/en/User"/>}>
+                                <Route path="" element={<Settings/>}/>
+                                <Route path="Projects" element={<Projects/>}/>
+                                <Route path="AddressBook" element={<AddressBook/>}/>
+                                <Route path="OrderHistory" element={<OrderHistory/>}/>
+                                <Route path="OrderDetails/:orderID" element={<OrderDetails/>}/>
+                            </Route>
                         </Route>
                         <Route path="/fa" element={<HeaderFooter/>}>
                             <Route path="" element={<Home/>}/>
                             <Route path="Curtain/:catID" element={<Curtain/>}/>
                             <Route path="Product/:catID" element={<Product/>}/>
                             <Route path="Basket" element={<Basket/>}/>
+                            <Route path="User" element={isLoggedIn ? <Navigate to="/fa/Account"/> :<RegisterLogin/>}/>
+                            <Route path="User/Reset/:resetId" element={<Reset/>}/>
+                            <Route path="Account" element={isLoggedIn ? <AccountLayout/> : <Navigate to="/fa/User"/>}>
+                                <Route path="" element={<Settings/>}/>
+                                <Route path="Projects" element={<Projects/>}/>
+                                <Route path="AddressBook" element={<AddressBook/>}/>
+                                <Route path="OrderHistory" element={<OrderHistory/>}/>
+                                <Route path="OrderDetails/:orderID" element={<OrderDetails/>}/>
+                            </Route>
                         </Route>
                         
                         <Route path="/en" element={<HeaderWithOutlet/>}>
@@ -76,11 +109,12 @@ function App({t}) {
                         
                         <Route path="/en" element={<NoHeaderNoFooter/>}>
                             <Route path="Checkout" element={<Checkout/>}/>
+                            <Route path="User/Activate/:activeId" element={<ConfirmEmail/>}/>
                         </Route>
                         <Route path="/fa" element={<NoHeaderNoFooter/>}>
                             <Route path="Checkout" element={<Checkout/>}/>
+                            <Route path="User/Activate/:activeId" element={<ConfirmEmail/>}/>
                         </Route>
-                        
                         
                         
                         <Route path="/admin/panel" element={<Panel/>}>
