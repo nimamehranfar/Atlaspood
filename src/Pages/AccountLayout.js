@@ -5,6 +5,7 @@ import {Outlet} from "react-router";
 import {LOGIN, LOGOUT} from "../Actions/types";
 import {useDispatch} from "react-redux";
 import jwt from 'jwt-decode'
+import store from "../store";
 
 
 function AccountLayout() {
@@ -21,7 +22,8 @@ function AccountLayout() {
         if (localStorage.getItem("user") !== null) {
             localStorage.removeItem("user");
         }
-        dispatch({
+        
+        store.dispatch({
             type: LOGOUT,
         });
         navigate("/" + pageLanguage)
@@ -34,7 +36,7 @@ function AccountLayout() {
         if (localStorage.getItem("user") !== null)
         {
             let tempObj=JSON.parse(localStorage.getItem("user"));
-            setUserName(jwt(tempObj["access_token"])["DisplayName"]);
+            setUserName(jwt(tempObj["access_token"])["FirstName"]);
         }
         
     }, [location.pathname]);

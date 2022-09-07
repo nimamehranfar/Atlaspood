@@ -27,6 +27,7 @@
     "jwt-decode": "^3.1.2",
     "number_to_persian_word": "^1.5.3",
     "prop-types": "latest",
+    "qs": "^6.11.0",
     "react": "^17.0.2",
     "react-bootstrap": "^2.0.4",
     "react-dom": "^17.0.2",

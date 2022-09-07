@@ -1,15 +1,17 @@
 import React, {useEffect, useRef, useState} from "react";
 import {useTranslation} from "react-i18next";
-import {useNavigate, useLocation} from "react-router-dom";
+import {useNavigate, useLocation, useParams} from "react-router-dom";
 import axios from "axios";
 import {Toast, ToastContainer} from "react-bootstrap";
-import {LOGIN} from "../Actions/types";
-import { useDispatch } from "react-redux";
+import {LOGIN, REGISTER} from "../Actions/types";
+import {useDispatch} from "react-redux";
 import {removeNodeAtPath} from "@nosferatu500/react-sortable-tree";
 
-const baseURLLogin = "http://api.atlaspood.ir/login";
-const baseURLRegister = "http://api.atlaspood.ir/user/register";
-const baseURLCheckEmail = "http://api.atlaspood.ir/user/UserNameIsAvailable";
+const baseUrl = "https://api.atlaspood.ir/user/Activate";
+const baseURLLogin = "https://api.atlaspood.ir/login";
+const baseURLRegister = "https://api.atlaspood.ir/user/register";
+const baseURLCheckEmail = "https://api.atlaspood.ir/user/UserNameIsAvailable";
+const baseURLReset = "https://api.atlaspood.ir/user/SendResetPasswordEmail";
 
 
 function RegisterLogin() {
@@ -18,6 +20,7 @@ function RegisterLogin() {
     const [pageLanguage, setPageLanguage] = React.useState(location.pathname.split('').slice(1, 3).join(''));
     let navigate = useNavigate();
     const dispatch = useDispatch();
+    const {activeId} = useParams();
     const [forgotEmail, setForgotEmail] = useState("");
     const [resetPage, setResetPage] = useState(false);
     
@@ -45,52 +48,54 @@ function RegisterLogin() {
     const [passwordNotValid, setPasswordNotValid] = useState(false);
     const [showPasswordValidation, setShowPasswordValidation] = useState(false);
     const [passwordValidation, setPasswordValidation] = useState({
-        count:false,
-        lowercase:false,
-        uppercase:false,
-        numbers:false
+        count: false,
+        lowercase: false,
+        uppercase: false,
+        numbers: false
     });
     const [firstNotExist, setFirstNotExist] = useState(false);
     const [lastNotExist, setLastNotExist] = useState(false);
     const [emailNotExist, setEmailNotExist] = useState(false);
     const [mobileNotExist, setMobileNotExist] = useState(false);
     
+    const [showOverlay, setShowOverlay] = useState(false);
+    const signIn = useRef(null);
+    
     const mobileError = {
         "en": [
-            {error:"Enter the 11 digit number"},
-            {error:"Mobile number must start with 0"}
+            {error: "Please enter a valid mobile."},
+            {error: "Please enter a valid mobile."}
         ],
         "fa": [
-            {error:"لطفا عددی ۱۱ رقمی وارد کنید"},
-            {error:"شماره موبایل باید با عدد ۰ شروع شود"}
+            {error: "لطفا شماره موبایل معتبری وارد کنید."},
+            {error: "لطفا شماره موبایل معتبری وارد کنید."}
         ],
-
+        
     };
     
     const emailError = {
         "en": [
-            {error:"Please include an '@' in the email address."},
-            {error:"A part following '@' should not contain the symbol '@'."},
-            {error:"Please enter a part followed by '@'."},
-            {error:"Please enter a part following '@'."},
-            {error:"Please include an '.' in the part following '@'."},
-            {error:"'.' is used at a wrong position"},
-            {error:"Please enter a part followed by '.'."},
-            {error:"The email is invalid."},
-            {error:"This email address is already associated with an account."}
+            {error: "Please include an '@' in the email address."},
+            {error: "A part following '@' should not contain the symbol '@'."},
+            {error: "Please enter a part followed by '@'."},
+            {error: "Please enter a part following '@'."},
+            {error: "Please include an '.' in the part following '@'."},
+            {error: "'.' is used at a wrong position"},
+            {error: "Please enter a part followed by '.'."},
+            {error: "The email is invalid."},
+            {error: "This email address is already associated with an account."}
         ],
         "fa": [
-            {error:"ایمیل شما بایستی نماد '@' داشته باشد."},
-            {error:"بخش پس از '@' نباید دارای نماد '@' باشد."},
-            {error:"بخش قبل از '@' را وارد کنید."},
-            {error:"بخش پس از '@' را وارد کنید."},
-            {error:"لطفا یک '.' را در قسمت بعد '@' وارد کنید."},
-            {error:"'.' در مکان نادرستی استفاده شده است."},
-            {error:"بخش پس از '.' را وارد کنید."},
-            {error:"ایمیل نادرست میباشد."},
-            {error:"این آدرس ایمیل با حساب کاربری دیگری مرتبط است."}
+            {error: "ایمیل شما بایستی نماد '@' داشته باشد."},
+            {error: "بخش پس از '@' نباید دارای نماد '@' باشد."},
+            {error: "بخش قبل از '@' را وارد کنید."},
+            {error: "بخش پس از '@' را وارد کنید."},
+            {error: "لطفا یک '.' را در قسمت بعد '@' وارد کنید."},
+            {error: "'.' در مکان نادرستی استفاده شده است."},
+            {error: "بخش پس از '.' را وارد کنید."},
+            {error: "ایمیل نادرست میباشد."},
+            {error: "این آدرس ایمیل با حساب کاربری دیگری مرتبط است."}
         ],
-
     };
     
     // const [showToast_register_ok, setShowToast_register_ok] = React.useState(false);
@@ -102,38 +107,30 @@ function RegisterLogin() {
     const [successText, setSuccessText] = React.useState("");
     
     const validateEmail = (email) => {
-        if(email.match(
+        if (email.match(
             /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{1,}))$/
-        )){
+        )) {
             return true;
-        }
-        else{
-            if(!email.includes('@')){
-               setEmailErrorState(0);
-            }
-            else{
+        } else {
+            if (!email.includes('@')) {
+                setEmailErrorState(0);
+            } else {
                 const myArray = email.split("@");
-                if(myArray.length-1>1){
+                if (myArray.length - 1 > 1) {
                     setEmailErrorState(1);
-                }
-                else if(myArray[0]===""){
+                } else if (myArray[0] === "") {
                     setEmailErrorState(2);
-                }
-                else if(myArray[1]===""){
+                } else if (myArray[1] === "") {
                     setEmailErrorState(3);
-                }
-                else if(!myArray[1].includes('.')){
+                } else if (!myArray[1].includes('.')) {
                     setEmailErrorState(4);
-                }
-                else{
+                } else {
                     const myArray2 = myArray[1].split(".");
-                    if(myArray2[0]===""){
+                    if (myArray2[0] === "") {
                         setEmailErrorState(5);
-                    }
-                    else if(myArray2.pop()===""){
+                    } else if (myArray2.pop() === "") {
                         setEmailErrorState(6);
-                    }
-                    else{
+                    } else {
                         setEmailErrorState(7);
                     }
                 }
@@ -143,16 +140,17 @@ function RegisterLogin() {
     };
     
     function validateNumber(user_number) {
-        if(user_number.length !== 11){
-            setMobileNotExist(true);
+        if (user_number.length !== 11) {
+            // setMobileNotExist(true);
             setMobileErrorState(0);
-        }
-        else if(!/^0[0-9].*$/.test(user_number)){
-            setMobileNotExist(true);
+            return false;
+        } else if (!/^0[0-9].*$/.test(user_number)) {
+            // setMobileNotExist(true);
             setMobileErrorState(1);
-        }
-        else{
+            return false;
+        } else {
             setMobileNotExist(false);
+            return true;
         }
     }
     
@@ -176,8 +174,7 @@ function RegisterLogin() {
             if (count === 3) {
                 setPasswordNotValidState(1);
                 setPasswordNotValid(false);
-            }
-            else{
+            } else {
                 setPasswordNotValidState(0);
             }
         }
@@ -196,7 +193,7 @@ function RegisterLogin() {
     
     function registerUser() {
         
-        if(passwordNotValidState===0){
+        if (passwordNotValidState === 0) {
             setPasswordNotValid(true);
         }
         
@@ -204,21 +201,26 @@ function RegisterLogin() {
             setPasswordMatchNotValid(true);
         }
         
-        if(registerInfo.firstName.length===0){
+        if (registerInfo.firstName.length === 0) {
             setFirstNotExist(true);
         }
         
-        if(registerInfo.lastName.length===0){
+        if (registerInfo.lastName.length === 0) {
             setLastNotExist(true);
         }
+        if (registerInfo.phone === "") {
+            setMobileNotExist(false);
+        } else if (!validateNumber(registerInfo.phone)) {
+            setMobileNotExist(true);
+        } else {
+            setMobileNotExist(false);
+        }
         
-        if(registerInfo.email.length===0){
+        if (registerInfo.email.length === 0) {
             setEmailNotExist(true);
-        }
-        else if (!validateEmail(registerInfo.email)) {
+        } else if (!validateEmail(registerInfo.email)) {
             setEmailNotValid(true);
-        }
-        else {
+        } else {
             let promise1 = new Promise((resolve, reject) => {
                 axios.get(baseURLCheckEmail, {
                     params: {
@@ -240,7 +242,7 @@ function RegisterLogin() {
                 });
             });
             promise1.then(() => {
-                if (passwordMatch && passwordNotValidState === 1 && registerInfo.email.length !== 0 && registerInfo.lastName.length !== 0 && registerInfo.firstName.length !== 0) {
+                if (passwordMatch && passwordNotValidState === 1 && registerInfo.email.length !== 0 && registerInfo.lastName.length !== 0 && registerInfo.firstName.length !== 0 && (registerInfo.phone === "" || validateNumber(registerInfo.phone))) {
                     setBtn_disabled(true);
                     let tempPostObj = {};
                     tempPostObj["Email"] = registerInfo.email;
@@ -248,13 +250,16 @@ function RegisterLogin() {
                     tempPostObj["FirstName"] = registerInfo.firstName;
                     tempPostObj["LastName"] = registerInfo.lastName;
                     tempPostObj["Mobile"] = registerInfo.phone;
+                    if (tempPostObj["Mobile"] === "") {
+                        tempPostObj["Mobile"] = null;
+                    }
                     axios.post(baseURLRegister, tempPostObj)
                         .then((response) => {
                             // setShowToast_register_ok(true);
-                            setSuccessText(t("verify_email_sent"));
+                            // setSuccessText(t("verify_email_sent"));
                             window.scrollTo(0, 0);
                             setTimeout(() => {
-                                // loginUser(registerInfo.email, registerInfo.password)
+                                loginUser(registerInfo.email, registerInfo.password, true);
                                 setBtn_disabled(false);
                             }, 1000);
                         }).catch(err => {
@@ -271,12 +276,13 @@ function RegisterLogin() {
         }
     }
     
-    function loginUser(email = loginInfo.email, password = loginInfo.password) {
+    function loginUser(email = loginInfo.email, password = loginInfo.password, isRegister) {
         setBtn_disabled(true);
         // let tempPostObj = {};
         // tempPostObj["username"] = loginInfo.email;
         // tempPostObj["password"] = loginInfo.password;
         // tempPostObj["grant_type"] = "password";
+        signIn.current.innerHTML=t("Please wait");
         
         const formData = new URLSearchParams();
         formData.append("username", email);
@@ -289,20 +295,28 @@ function RegisterLogin() {
         })
             .then((response) => {
                 
-                if (loginInfo.remember) {
-                    localStorage.setItem('user', JSON.stringify(response.data));
-                } else {
-                    let tempObj = response.data;
-                    delete tempObj["refresh_token"];
-                    localStorage.setItem('user', JSON.stringify(tempObj));
-                }
+                // if (loginInfo.remember) {
+                localStorage.setItem('user', JSON.stringify(response.data));
+                // } else {
+                //     let tempObj = response.data;
+                //     delete tempObj["refresh_token"];
+                //     localStorage.setItem('user', JSON.stringify(tempObj));
+                // }
                 // setShowToast_login_ok(true);
                 setTimeout(() => {
-                    dispatch({
-                        type: LOGIN,
-                        payload: { user: response.data },
-                    });
+                    if (isRegister) {
+                        dispatch({
+                            type: REGISTER,
+                            payload: {user: response.data},
+                        });
+                    } else {
+                        dispatch({
+                            type: LOGIN,
+                            payload: {user: response.data},
+                        });
+                    }
                 }, 3000);
+                
             }).catch(err => {
             console.log(err);
             // setShowToast_login_fail(true);
@@ -313,37 +327,83 @@ function RegisterLogin() {
         });
     }
     
+    function sendResetPasswordRequest() {
+        axios.post(baseURLReset, {}, {
+            params: {
+                userName: forgotEmail
+            }
+        }).then((response) => {
+            setSuccessText(t("update_password_sent"));
+        }).catch(err => {
+            setErrorText(t("Invalid email for reset"));
+        });
+    }
+    
+    function verifyEmail() {
+        axios.post(baseUrl, {}, {
+            params: {
+                ActivationCode: activeId
+            }
+        }).then((response) => {
+            localStorage.setItem('user', JSON.stringify(response.data));
+            setSuccessText("Your email verified, Redirecting ...");
+            setTimeout(() => {
+                dispatch({
+                    type: LOGIN,
+                    payload: {user: response.data},
+                });
+                navigate("/" + pageLanguage + "/Account");
+            }, 2000);
+        }).catch(err => {
+            console.log(err);
+            setSuccessText("Invalid Activation code, Redirecting ...");
+            setTimeout(() => {
+                navigate("/" + pageLanguage + "/User");
+                setBtn_disabled(false);
+                setSuccessText("");
+                setShowOverlay(false);
+            }, 2000);
+        });
+    }
+    
     useEffect(() => {
         const tempLang = location.pathname.split('');
         setPageLanguage(tempLang.slice(1, 3).join(''));
+        if (activeId !== undefined) {
+            setShowOverlay(true);
+            setBtn_disabled(true);
+            setSuccessText("Verifying your email ...");
+            verifyEmail();
+        }
     }, [location.pathname]);
     
     useEffect(() => {
-        if(errorText!=="")
+        if (errorText !== "")
             setSuccessText("");
     }, [errorText]);
     
     useEffect(() => {
-        if(successText!=="")
+        if (successText !== "")
             setErrorText("");
     }, [successText]);
     
     useEffect(() => {
-        if(emailNotExist)
+        if (emailNotExist)
             setEmailNotValid(false);
     }, [emailNotExist]);
     
     useEffect(() => {
-        if(emailNotValid)
+        if (emailNotValid)
             setEmailNotExist(false);
     }, [emailNotValid]);
     
     return (
         <div className={`login_page_container ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
-            {!resetPage && errorText!==""&&
+            {showOverlay && <div className="invisible_overlay">&nbsp;</div>}
+            {!resetPage && errorText !== "" &&
             <div className="login_page_error_text">{errorText}</div>
             }
-            {!resetPage && successText!==""&&
+            {!resetPage && successText !== "" &&
             <div className="login_page_success_text">{successText}</div>
             }
             {!resetPage &&
@@ -358,6 +418,7 @@ function RegisterLogin() {
                                    setLoginInfo(temp);
                                }}/>
                         <input type="password" placeholder={t("Password*")} className="form-control form-control-password" name="Password" value={loginInfo.password}
+                               autoComplete="new-password"
                                onChange={(e) => {
                                    let temp = JSON.parse(JSON.stringify(loginInfo));
                                    temp.password = e.target.value;
@@ -365,21 +426,21 @@ function RegisterLogin() {
                                }}/>
                         <div className="remember_forgot_container">
                             <div className="remember_container">
-                                <label className="remember_label">
-                                    <input type="checkbox" value={loginInfo.remember}
-                                           onChange={(e) => {
-                                               let temp = JSON.parse(JSON.stringify(loginInfo));
-                                               temp.remember = e.target.value;
-                                               setLoginInfo(temp);
-                                           }}/>
-                                    {t("Remember Me")}
-                                </label>
+                                {/*<label className="remember_label">*/}
+                                {/*    <input type="checkbox" value={loginInfo.remember}*/}
+                                {/*           onChange={(e) => {*/}
+                                {/*               let temp = JSON.parse(JSON.stringify(loginInfo));*/}
+                                {/*               temp.remember = e.target.value;*/}
+                                {/*               setLoginInfo(temp);*/}
+                                {/*           }}/>*/}
+                                {/*    {t("Remember Me")}*/}
+                                {/*</label>*/}
                             </div>
-                            <div className="forgot text_underline" onClick={()=>setResetPage(true)}>{t("Forgot your password?")}</div>
+                            <div className="forgot text_underline" onClick={() => setResetPage(true)}>{t("Forgot your password?")}</div>
                         </div>
                         <div className="login_btn_container">
                             {/*<button className="login_btn btn btn-new-dark">SIGN IN</button>*/}
-                            <button className="login_btn btn btn-new-dark" onClick={() => loginUser()} disabled={btn_disabled}>{t("SIGN IN")}</button>
+                            <button className="login_btn btn btn-new-dark" onClick={() => loginUser()} disabled={btn_disabled} ref={signIn}>{t("SIGN IN")}</button>
                         </div>
                     </div>
                 </div>
@@ -395,61 +456,66 @@ function RegisterLogin() {
                         {!showRegister && <button className="register_btn btn" onClick={() => setShowRegister(true)}>{t("LET'S GO")}</button>}
                         {showRegister && <div className="register_section_container">
                             <div className="register_section_item">
-                                <input type="text" placeholder={t("First Name*")} className={"form-control " + (firstNotExist ? "password_not_valid" : "")} name="name" value={registerInfo.firstName}
+                                <input type="text" placeholder={t("First Name*")} className={"form-control " + (firstNotExist ? "password_not_valid" : "")} name="name"
+                                       value={registerInfo.firstName}
                                        onChange={(e) => {
                                            let temp = JSON.parse(JSON.stringify(registerInfo));
                                            temp.firstName = e.target.value;
                                            setRegisterInfo(temp);
-                                           if(e.target.value.length>0){
+                                           if (e.target.value.length > 0) {
                                                setFirstNotExist(false);
                                            }
                                        }}/>
                                 {firstNotExist && <div className="input_not_valid">{t("First Name Required.")}</div>}
                             </div>
                             <div className="register_section_item">
-                                <input type="text" placeholder={t("Last Name*")} className={"form-control " + (lastNotExist ? "password_not_valid" : "")} name="lastName" value={registerInfo.lastName}
+                                <input type="text" placeholder={t("Last Name*")} className={"form-control " + (lastNotExist ? "password_not_valid" : "")} name="lastName"
+                                       value={registerInfo.lastName}
                                        onChange={(e) => {
                                            let temp = JSON.parse(JSON.stringify(registerInfo));
                                            temp.lastName = e.target.value;
                                            setRegisterInfo(temp);
-                                           if(e.target.value.length>0){
+                                           if (e.target.value.length > 0) {
                                                setLastNotExist(false);
                                            }
                                        }}/>
                                 {lastNotExist && <div className="input_not_valid">{t("Last Name Required.")}</div>}
                             </div>
                             <div className="register_section_item">
-                                <input type="email" placeholder={t("Email*")} className={"form-control " + (emailNotValid||emailNotExist ? "password_not_valid" : "")} name="Email"
+                                <input type="email" placeholder={t("Email*")} className={"form-control " + (emailNotValid || emailNotExist ? "password_not_valid" : "")}
+                                       name="Email"
                                        value={registerInfo.email}
                                        onChange={(e) => {
                                            let temp = JSON.parse(JSON.stringify(registerInfo));
                                            temp.email = e.target.value;
                                            setRegisterInfo(temp);
-                                           if(e.target.value.length>0){
+                                           if (e.target.value.length > 0) {
                                                setEmailNotExist(false);
                                                if (validateEmail(e.target.value)) {
                                                    setEmailNotValid(false);
                                                }
                                            }
-                                           
                                        }}/>
                                 {emailNotValid && <div className="input_not_valid">{emailError[pageLanguage][emailErrorState]["error"]}</div>}
                                 {emailNotExist && <div className="input_not_valid">{t("Email Required.")}</div>}
                             </div>
                             <div className="register_section_item">
-                                <input type="text" placeholder={t("Mobile Number (Optional)")} className={"form-control " + (mobileNotExist ? "password_not_valid" : "")} name="mobile" value={registerInfo.phone}
+                                <input type="text" placeholder={t("Mobile Number (Optional)")} className={"form-control " + (mobileNotExist ? "password_not_valid" : "")}
+                                       name="mobile" value={registerInfo.phone}
                                        onChange={(e) => {
                                            let temp = JSON.parse(JSON.stringify(registerInfo));
-                                           temp.phone = e.target.value.replace(/\D/g,'').replace(/[^0-9]/g, "");
+                                           temp.phone = e.target.value.replace(/\D/g, '').replace(/[^0-9]/g, "");
                                            setRegisterInfo(temp);
                                            validateNumber(e.target.value.toString());
                                        }}/>
                                 {mobileNotExist && <div className="input_not_valid">{mobileError[pageLanguage][mobileErrorState]["error"]}</div>}
                             </div>
                             <div className="register_section_item">
-                                <input type="password" placeholder={t("Password*")} className={"form-control form-control-password " + (passwordNotValid ? "password_not_valid" : "")}
+                                <input type="password" placeholder={t("Password*")}
+                                       className={"form-control form-control-password " + (passwordNotValid ? "password_not_valid" : "")}
                                        name="Register_Password"
                                        value={registerInfo.password}
+                                       autoComplete="new-password"
                                        onChange={(e) => {
                                            let temp = JSON.parse(JSON.stringify(registerInfo));
                                            temp.password = e.target.value.replace(/\s/g, '');
@@ -462,18 +528,43 @@ function RegisterLogin() {
                                                setPasswordMatch(false);
                                            checkPasswordStrength(temp.password);
                                        }}
-                                       onClick={()=>setShowPasswordValidation(true)}
+                                       onClick={() => setShowPasswordValidation(true)}
                                 />
                                 {showPasswordValidation && <div className="input_not_valid_password ">
                                     <h2 className="input_not_valid_password_title">{t("Your password must contain:")}</h2>
                                     <ul className="input_not_valid_password_list">
-                                        <li className={"input_not_valid_password_item " + (passwordValidation.count ? "input_not_valid_password_item_check" : "")}>{t("password_required_text1")}
+                                        <li className={"input_not_valid_password_item " + (passwordValidation.count ? "input_not_valid_password_item_check" : "")}>
+                                            <span>
+                                            {passwordValidation.count &&
+                                            <img className="checkmark1 img-fluid" src={require('../Images/public/checkmark1.png')} alt=""/>
+                                            }
+                                                {t("password_required_text1")}
+                                            </span>
                                         </li>
-                                        <li className={"input_not_valid_password_item " + (passwordValidation.lowercase ? "input_not_valid_password_item_check" : "")}>{t("password_required_text2")}
+                                        <li className={"input_not_valid_password_item " + (passwordValidation.lowercase ? "input_not_valid_password_item_check" : "")}>
+                                            <span>
+                                            {passwordValidation.lowercase &&
+                                            <img className="checkmark1 img-fluid" src={require('../Images/public/checkmark1.png')} alt=""/>
+                                            }
+                                                {t("password_required_text2")}
+                                            </span>
                                         </li>
-                                        <li className={"input_not_valid_password_item " + (passwordValidation.uppercase ? "input_not_valid_password_item_check" : "")}>{t("password_required_text3")}
+                                        <li className={"input_not_valid_password_item " + (passwordValidation.uppercase ? "input_not_valid_password_item_check" : "")}>
+                                            <span>
+                                            {passwordValidation.uppercase &&
+                                            <img className="checkmark1 img-fluid" src={require('../Images/public/checkmark1.png')} alt=""/>
+                                            }
+                                                {t("password_required_text3")}
+                                            </span>
                                         </li>
-                                        <li className={"input_not_valid_password_item " + (passwordValidation.numbers ? "input_not_valid_password_item_check" : "")}>{t("password_required_text4")}</li>
+                                        <li className={"input_not_valid_password_item " + (passwordValidation.numbers ? "input_not_valid_password_item_check" : "")}>
+                                            <span>
+                                            {passwordValidation.numbers &&
+                                            <img className="checkmark1 img-fluid" src={require('../Images/public/checkmark1.png')} alt=""/>
+                                            }
+                                                {t("password_required_text4")}
+                                            </span>
+                                        </li>
                                     </ul>
                                 </div>
                                 }
@@ -486,6 +577,7 @@ function RegisterLogin() {
                                 <input type="password" placeholder={t("Confirm Password*")}
                                        className={"form-control form-control-password " + (passwordMatchNotValid ? "password_not_valid" : "")} name="Register_PasswordConfirm"
                                        value={registerInfo.passwordConfirm}
+                                       autoComplete="new-password"
                                        onChange={(e) => {
                                            let temp = JSON.parse(JSON.stringify(registerInfo));
                                            temp.passwordConfirm = e.target.value;
@@ -500,15 +592,29 @@ function RegisterLogin() {
                                 </div>}
                             </div>
                             <div className="news_signup">
-                                <label className="news_signup_label">
+                                {/*<label className="news_signup_label">*/}
+                                {/*    <input type="checkbox" checked={registerInfo.news}*/}
+                                {/*           onChange={(e) => {*/}
+                                {/*               let temp = JSON.parse(JSON.stringify(registerInfo));*/}
+                                {/*               temp.news = e.target.checked;*/}
+                                {/*               setRegisterInfo(temp);*/}
+                                {/*           }}/>*/}
+                                {/*</label>*/}
+                                <div className="checkbox_style">
                                     <input type="checkbox" checked={registerInfo.news}
                                            onChange={(e) => {
                                                let temp = JSON.parse(JSON.stringify(registerInfo));
                                                temp.news = e.target.checked;
                                                setRegisterInfo(temp);
-                                           }}/>
+                                           }} id="registerInfonews"/>
+                                    <label htmlFor="registerInfonews" className="checkbox_label">
+                                        <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
+                                             alt=""/>
+                                    </label>
+                                    <span className="checkbox_text news_signup_label">
                                     {t("signup to email")}
-                                </label>
+                                    </span>
+                                </div>
                             </div>
                             <div className="login_btn_container">
                                 <button className="login_btn btn btn-new-dark" onClick={() => registerUser()} disabled={btn_disabled}>{t("CREATE AN ACCOUNT")}</button>
@@ -519,7 +625,7 @@ function RegisterLogin() {
                 </div>
             </div>
             }
-    
+            
             {resetPage &&
             <div className="Forgot_page_container login_register_container">
                 <div className="login_container">
@@ -530,11 +636,11 @@ function RegisterLogin() {
                                onChange={(e) => {
                                    setForgotEmail(e.target.value);
                                }}/>
-            
+                        
                         <div className="login_btn_container">
                             {/*<button className="login_btn btn btn-new-dark">SIGN IN</button>*/}
-                            <button className="login_btn btn btn-new-dark" onClick={()=>{
-                                setSuccessText(t("update_password_sent"));
+                            <button className="login_btn btn btn-new-dark" onClick={() => {
+                                sendResetPasswordRequest();
                                 setResetPage(false);
                             }}>{t("SUBMIT")}</button>
                         </div>

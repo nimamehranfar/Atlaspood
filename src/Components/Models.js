@@ -2,9 +2,10 @@ import React, {useEffect, useRef, useState} from "react";
 import axios from "axios";
 import {InputGroup, FormControl, Toast, ToastContainer} from "react-bootstrap"
 import {Editor} from '@tinymce/tinymce-react';
+import authHeader from "../Services/auth-header";
 
-const baseURLGet = "http://api.atlaspood.ir/SewingModel/GetAll?apiKey=477f46c6-4a17-4163-83cc-29908d";
-const baseURLPost = "http://api.atlaspood.ir/SewingModel/Edit";
+const baseURLGet = "https://api.atlaspood.ir/SewingModel/GetAll?apiKey=477f46c6-4a17-4163-83cc-29908d";
+const baseURLPost = "https://api.atlaspood.ir/SewingModel/Edit";
 
 function Models() {
     
@@ -235,7 +236,8 @@ function Models() {
         console.log(model[e.target.getAttribute('model_id')]);
         const config = {
             headers: {
-                'content-type': 'multipart/form-data'
+                'content-type': 'multipart/form-data',
+                ...authHeader()
             }
         };
         axios.post(baseURLPost, formData, config)

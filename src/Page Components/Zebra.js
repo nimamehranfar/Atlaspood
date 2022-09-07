@@ -1,4 +1,4 @@
-import {Link, useLocation, useParams} from "react-router-dom";
+import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 import React, {useContext, useEffect, useRef, useState} from "react";
 import axios from "axios";
 import {useTranslation} from "react-i18next";
@@ -11,48 +11,72 @@ import Button from 'react-bootstrap/Button'
 // import Select from 'react-select';
 import Select from "react-dropdown-select";
 import ReactImageMagnify from '@blacklab/react-image-magnify';
-import Header from "./Header";
+import * as qs from 'qs'
 
 import {ReactComponent as MountInside} from '../Images/drapery/zebra/mount_inside.svg';
 import {ReactComponent as MountOutside} from '../Images/drapery/zebra/mount_outside.svg';
 import Form from "react-bootstrap/Form";
-import PopoverStickOnHover from "./PopoverStickOnHover";
-import CustomControl from "./CustomControl";
-import CustomControlMulti from "./CustomControlMulti";
-import CustomDropdown from "./CustomDropdown";
-import CustomDropdownMulti from "./CustomDropdownMulti";
-import SelectOptionRange from "./SelectOptionRange";
+import PopoverStickOnHover from "../Components/PopoverStickOnHover";
+import CustomControl from "../Components/CustomControl";
+import CustomControlMulti from "../Components/CustomControlMulti";
+import CustomDropdown from "../Components/CustomDropdown";
+import CustomDropdownMulti from "../Components/CustomDropdownMulti";
+import SelectOptionRange from "../Components/SelectOptionRange";
 
 import {ReactComponent as Camera} from '../Images/public/camera.svg';
-import CustomDropdownWithSearch from "./CustomDropdownWithSearch";
-import CustomControlNum from "./CustomControlNum";
+import CustomDropdownWithSearch from "../Components/CustomDropdownWithSearch";
+import CustomControlNum from "../Components/CustomControlNum";
 import NumberToPersianWord from "number_to_persian_word";
-import CartInfo from "./CartInfo"
-import GetPrice from "./GetPrice";
+// import CartInfo from "../Components/CartInfo"
+import UserProjects from "../Components/UserProjects";
+import GetPrice from "../Components/GetPrice";
 import {useDispatch, useSelector} from "react-redux";
-import {HideLoginModal, ShowLoginModal} from "../Actions/types";
+import {HideLogin2Modal, HideLoginModal, LOGIN, LOGOUT, ShowLogin2Modal, ShowLoginModal} from "../Actions/types";
 import authHeader from "../Services/auth-header";
-import SaveUserProject from "./SaveUserProject";
+import SaveUserProject from "../Components/SaveUserProject";
+import {refreshToken} from "../Services/auth.service";
+import GetUserProjectData from "../Components/GetUserProjectData";
+import setGetDeps from "../Components/setGetDeps";
+import ModalLogin from "../Components/ModalLogin";
+import AddProjectToCart from "../Components/AddProjectToCart";
+import GetMeasurementArray from "../Components/GetMeasurementArray";
+import GetSewingFilters from "../Components/GetSewingFilters";
 
 
-const baseURLCats = "http://api.atlaspood.ir/WebsitePage/GetDetailByName";
-const baseURLModel = "http://api.atlaspood.ir/SewingModel/GetById";
-const baseURLFabrics = "http://api.atlaspood.ir/Sewing/GetModelFabric";
-const baseURLWindowSize = "http://api.atlaspood.ir/Sewing/GetWindowSize";
-const baseURLPrice = "http://api.atlaspood.ir/Sewing/GetSewingOrderPrice";
-const baseURLFreeShipping = "http://api.atlaspood.ir/WebsiteSetting/GetFreeShippingAmount?apiKey=477f46c6-4a17-4163-83cc-29908d";
+const baseURLCats = "https://api.atlaspood.ir/WebsitePage/GetDetailByName";
+const baseURLModel = "https://api.atlaspood.ir/SewingModel/GetById";
+const baseURLFabrics = "https://api.atlaspood.ir/Sewing/GetModelFabric";
+const baseURLWindowSize = "https://api.atlaspood.ir/Sewing/GetWindowSize";
+const baseURLPrice = "https://api.atlaspood.ir/Sewing/GetSewingOrderPrice";
+const baseURLFreeShipping = "https://api.atlaspood.ir/WebsiteSetting/GetFreeShippingAmount";
+const baseURGetProject = "https://api.atlaspood.ir/SewingPreorder/GetById";
+const baseURLGetCart = "https://api.atlaspood.ir/cart/GetAll";
+const baseURLUploadImg = "https://api.atlaspood.ir/SewingOrderAttachment/ImageUpload";
+const baseURLUploadPdf = "https://api.atlaspood.ir/SewingOrderAttachment/PdfUpload";
+const baseURLDeleteFile = "https://api.atlaspood.ir/SewingOrderAttachment/Delete";
+const baseURLEditProject = "https://api.atlaspood.ir/SewingPreorder/Edit";
+const baseURLDeleteBasketProject = "https://api.atlaspood.ir/Cart/DeleteItem";
+
+const baseURLFilterColor = "https://api.atlaspood.ir/Color/GetBaseColors";
+const baseURLFilterPattern = "https://api.atlaspood.ir/Sewing/GetModelPatternType";
+const baseURLFilterType = "https://api.atlaspood.ir/Sewing/GetModelDesignType";
+const baseURLFilterPrice = "https://api.atlaspood.ir/BaseType/GetPriceLevel";
 
 
-function Zebra({CatID, ModelID}) {
+function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     const {t} = useTranslation();
     const location = useLocation();
     let pageLanguage = location.pathname.split('').slice(1, 3).join('');
     const [firstRender, setFirstRender] = useState(true);
-    const [catID, setCatID] = useState("");
-    const [modelID, setModelID] = useState("");
-    const {isLoggedIn, user, showLogin} = useSelector((state) => state.auth);
+    const [catID, setCatID] = useState(CatID);
+    const [modelID, setModelID] = useState(ModelID);
+    const [projectId, setProjectId] = useState(ProjectId);
+    const [editIndex, setEditIndex] = useState(EditIndex);
+    const {isLoggedIn, isRegistered, user, showLogin} = useSelector((state) => state.auth);
+    let navigate = useNavigate();
     const dispatch = useDispatch();
     const [models, setModels] = useState([]);
+    const [projectData, setProjectData] = useState({});
     const [model, setModel] = useState({});
     const [modelAccessories, setModelAccessories] = useState({});
     const [fabrics, setFabrics] = useState([]);
@@ -65,9 +89,11 @@ function Zebra({CatID, ModelID}) {
     const [totalCartPrice, setTotalCartPrice] = useState(0);
     const [freeShipPrice, setFreeShipPrice] = useState(0);
     const [show, setShow] = useState(false);
+    const [searchText, setSearchText] = useState("");
     const [searchShow, setSearchShow] = useState(false);
     const [measurementsNextStep, setMeasurementsNextStep] = useState("4");
     const [controlTypeNextStep, setControlTypeNextStep] = useState("5");
+    const [projectModalState, setProjectModalState] = useState(0);
     const [zoomModalHeader, setZoomModalHeader] = useState([]);
     const [zoomModalBody, setZoomModalBody] = useState([]);
     const [addCartErr, setAddCartErr] = useState([]);
@@ -143,13 +169,16 @@ function Zebra({CatID, ModelID}) {
     });
     const [cartValues, setCartValues] = useState({});
     const [cartStateAgree, setCartStateAgree] = useState(false);
+    const [cartAgreeDescription, setCartAgreeDescription] = useState(false);
     const [cartCount, setCartCount] = useState(0);
+    const [cartProjectIndex, setCartProjectIndex] = useState(-1);
     const [cartDraperies, setCartDraperies] = useState({
         "count": 0,
         "list": []
     });
+    const [saveProjectCount, setSaveProjectCount] = useState(0);
     
-    const [depSet, setDepSet] = useState(new Set(['1', '2', '3', '4', '5', '6']));
+    const [depSet, setDepSet] = useState(new Set(['1', '2', '3', '4', '5', '61', '62']));
     
     const inputs = useRef({});
     const selectedTitle = useRef({});
@@ -163,6 +192,59 @@ function Zebra({CatID, ModelID}) {
     });
     const steps = useRef([]);
     const draperyRef = useRef([]);
+    
+    const [filterChanged, setFilterChanged] = useState({
+        filter: 0,
+        filter_id: undefined,
+        isDelete: false
+    });
+    
+    const [filterColors, setFilterColors] = useState([]);
+    const [filterPatterns, setFilterPatterns] = useState([]);
+    const [filterTypes, setFilterTypes] = useState([]);
+    const [filterPrices, setFilterPrices] = useState([]);
+    
+    const [step1, setStep1] = useState("");
+    const [step2, setStep2] = useState("");
+    const [step21, setStep21] = useState("");
+    const [step3, setStep3] = useState("");
+    const [step4, setStep4] = useState("");
+    const [step41, setStep41] = useState("");
+    const [step4A, setStep4A] = useState("");
+    const [step4B, setStep4B] = useState("");
+    const [step5, setStep5] = useState("");
+    const [remoteName, setRemoteName] = useState("");
+    const [selectedValanceColor1, setSelectedValanceColor1] = useState([]);
+    const [selectedValanceColor2, setSelectedValanceColor2] = useState([]);
+    const [selectedRoomLabel, setSelectedRoomLabel] = useState([]);
+    
+    const [savedProjectRoomLabel, setSavedProjectRoomLabel] = useState("");
+    const [savedProjectRoomText, setSavedProjectRoomText] = useState("");
+    
+    const [selectedFile, setSelectedFile] = useState();
+    const [selectedFileName, setSelectedFileName] = useState("");
+    const [editedFileName, setEditedFileName] = useState("");
+    const [uploadedImagesList, setUploadedImagesList] = useState([]);
+    const [uploadedImagesNamesList, setUploadedImagesNamesList] = useState([]);
+    const [uploadedPDFNameList, setUploadedPDFNameList] = useState([]);
+    const [uploadedImagesFile, setUploadedImagesFile] = useState([]);
+    const [uploadedPDFFile, setUploadedPDFFile] = useState([]);
+    const [uploadedImagesURL, setUploadedImagesURL] = useState([]);
+    const [uploadedPDFURL, setUploadedPDFURL] = useState([]);
+    
+    const [sewingColors, setSewingColors] = useState([]);
+    const [sewingPatterns, setSewingPatterns] = useState([]);
+    const [sewingTypes, setSewingTypes] = useState([]);
+    const [sewingPrices, setSewingPrices] = useState([]);
+    
+    const [deleteUploadImageUrl, setDeleteUploadImageUrl] = useState("");
+    const [deleteUploadPdfUrl, setDeleteUploadPdfUrl] = useState("");
+    const [deleteUploadImageIndex, setDeleteUploadImageIndex] = useState(-1);
+    const [deleteUploadPdfIndex, setDeleteUploadPdfIndex] = useState(-1);
+    
+    const [addingLoading, setAddingLoading] = useState(false);
+    const [savingLoading, setSavingLoading] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
     
     function convertToPersian(string_farsi) {
         if (string_farsi !== null && string_farsi !== undefined && string_farsi !== "") {
@@ -179,8 +261,7 @@ function Zebra({CatID, ModelID}) {
     const getFabrics = () => {
         axios.get(baseURLFabrics, {
             params: {
-                modelId: modelID,
-                apiKey: window.$apikey
+                modelId: modelID
             }
         }).then((response) => {
             let tempFabrics = [];
@@ -196,11 +277,88 @@ function Zebra({CatID, ModelID}) {
         });
     };
     
+    function getFabricsWithFilter() {
+        let paramObj = {modelId: modelID, searchString: searchText};
+        
+        let promise1 = new Promise((resolve, reject) => {
+            if (filterColors.length > 0) {
+                paramObj["colorIds"] = [];
+                filterColors.forEach((filter_id, index) => {
+                    paramObj["colorIds"] = [...paramObj["colorIds"], filter_id];
+                    if (index === filterColors.length - 1) {
+                        resolve();
+                    }
+                });
+            } else {
+                resolve();
+            }
+        });
+        let promise2 = new Promise((resolve, reject) => {
+            if (filterPatterns.length > 0) {
+                paramObj["patternTypeIds"] = [];
+                filterPatterns.forEach((filter_id, index) => {
+                    paramObj["patternTypeIds"] = [...paramObj["patternTypeIds"], filter_id];
+                    if (index === filterPatterns.length - 1) {
+                        resolve();
+                    }
+                });
+            } else {
+                resolve();
+            }
+        });
+        let promise3 = new Promise((resolve, reject) => {
+            if (filterTypes.length > 0) {
+                paramObj["typeIds"] = [];
+                filterTypes.forEach((filter_id, index) => {
+                    paramObj["typeIds"] = [...paramObj["typeIds"], filter_id];
+                    if (index === filterTypes.length - 1) {
+                        resolve();
+                    }
+                });
+            } else {
+                resolve();
+            }
+        });
+        let promise4 = new Promise((resolve, reject) => {
+            if (filterPrices.length > 0) {
+                paramObj["priceLevelIds"] = [];
+                filterPrices.forEach((filter_id, index) => {
+                    paramObj["priceLevelIds"] = [...paramObj["priceLevelIds"], filter_id];
+                    if (index === filterPrices.length - 1) {
+                        resolve();
+                    }
+                });
+            } else {
+                resolve();
+            }
+        });
+        
+        Promise.all([promise1, promise2, promise3, promise4]).then(() => {
+            // console.log(filterColors,paramObj);
+            axios.get(baseURLFabrics, {
+                params: paramObj,
+                paramsSerializer: params => {
+                    return qs.stringify(params, {arrayFormat: 'repeat'})
+                }
+            }).then((response) => {
+                let tempFabrics = [];
+                response.data.forEach(obj => {
+                    if (tempFabrics[obj["DesignEnName"]] === "" || tempFabrics[obj["DesignEnName"]] === undefined || tempFabrics[obj["DesignEnName"]] === null || tempFabrics[obj["DesignEnName"]] === [])
+                        tempFabrics[obj["DesignEnName"]] = [];
+                    tempFabrics[obj["DesignEnName"]].push(obj);
+                });
+                
+                setFabrics(tempFabrics);
+            }).catch(err => {
+                console.log(err);
+            });
+        })
+    }
+    
     const getCats = () => {
         axios.get(baseURLCats, {
             params: {
-                pageName: catID,
-                apiKey: window.$apikey
+                pageName: catID
             }
         }).then((response) => {
             setModels(response.data.SewingModels);
@@ -212,8 +370,7 @@ function Zebra({CatID, ModelID}) {
     const getModel = () => {
         axios.get(baseURLModel, {
             params: {
-                id: modelID,
-                apiKey: window.$apikey
+                id: modelID
             }
         }).then((response) => {
             setModel(response.data);
@@ -250,6 +407,8 @@ function Zebra({CatID, ModelID}) {
                 let ColorName = convertToPersian(fabrics[key][j].ColorName);
                 let ColorEnName = fabrics[key][j].ColorEnName;
                 
+                // console.log(step1 === `${FabricId}`, step1, `${FabricId}`, FabricId);
+                
                 fabric.push(
                     <div className={`radio_group ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key + j}>
                         <label data-tip={`${pageLanguage1 === 'en' ? DesignEnName : DesignName}: ${pageLanguage1 === 'en' ? ColorEnName : ColorName}`}
@@ -257,7 +416,8 @@ function Zebra({CatID, ModelID}) {
                                data-img={`https://www.doopsalta.com/upload/${PhotoPath}`}>
                             {/*<ReactTooltip id={"fabric" + key + j} place="top" type="light" effect="float"/>*/}
                             <input className="radio" type="radio" ref-num="1" default-fabric-photo={FabricOnModelPhotoUrl}
-                                   onClick={e => {
+                                   onChange={e => {
+                                       // console.log("hi1");
                                        let temp = JSON.parse(JSON.stringify(fabricSelected));
                                        temp.selectedFabricId = FabricId;
                                        temp.selectedTextEn = DesignEnName;
@@ -269,13 +429,13 @@ function Zebra({CatID, ModelID}) {
                                        setFabricSelected(temp);
                                        // fabricClicked(e, HasTrim);
                                        // selectChanged(e);
-                                       // setCart("Fabric", FabricId);
+                                       // setCart("FabricId", FabricId);
                                        // setDeps("", "1");
                                    }} name="fabric"
-                                   model-id={modelID} value={FabricId} text-en={DesignEnName} text-fa={DesignName}
+                                   model-id={modelID} value={FabricId} text-en={DesignEnName} text-fa={DesignName} checked={`${FabricId}` === step1}
                                    ref={ref => (inputs.current[`1${FabricId}`] = ref)}/>
                             <div className="frame_img">
-                                <img className="img-fluid" src={`http://api.atlaspood.ir/${PhotoPath}`} alt=""/>
+                                <img className="img-fluid" src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
                             </div>
                         </label>
                         <div className={`fabric_name_container ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
@@ -308,12 +468,6 @@ function Zebra({CatID, ModelID}) {
         setShow(false);
     }
     
-    function modalHandleClose(modalName) {
-        let tempModals = [...modals];
-        tempModals[modalName] = false;
-        setModals(tempModals);
-    }
-    
     function handleShow(PhotoPath, DesignName, DesignEnName, ColorName, ColorEnName) {
         const tempDiv = [];
         const tempDiv1 = [];
@@ -324,16 +478,16 @@ function Zebra({CatID, ModelID}) {
                         imageProps={{
                             alt: '',
                             isFluidWidth: true,
-                            src: `http://api.atlaspood.ir/${PhotoPath}`
+                            src: `https://api.atlaspood.ir/${PhotoPath}`
                         }}
                         magnifiedImageProps={{
-                            src: `http://api.atlaspood.ir/${PhotoPath}`,
+                            src: `https://api.atlaspood.ir/${PhotoPath}`,
                             width: 800,
                             height: 800
                         }}
                         portalProps={{placement: 'over'}}
                     />
-                    {/*<img className="img-fluid hover-zoom" src={`http://api.atlaspood.ir/${PhotoPath}`} alt=""/>*/}
+                    {/*<img className="img-fluid hover-zoom" src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>*/}
                 </div>
             </div>
         );
@@ -344,6 +498,12 @@ function Zebra({CatID, ModelID}) {
         setZoomModalBody(tempDiv);
         setZoomModalHeader(tempDiv1);
         setShow(true);
+    }
+    
+    function modalHandleClose(modalName) {
+        let tempModals = [...modals];
+        tempModals[modalName] = false;
+        setModals(tempModals);
     }
     
     function modalHandleShow(modalName) {
@@ -362,9 +522,9 @@ function Zebra({CatID, ModelID}) {
                 activeEventKey === eventKey ? setAccordionActiveKey("") : setAccordionActiveKey(eventKey);
                 // setTimeout(() => {
                 //     if (isCurrentEventKey)
-                //         window.scrollTo(window.scrollX, window.scrollY + 0.5);
+                //         window.scrollTo(window.scrollX, window.scrollY + 1);
                 //     else
-                //         window.scrollTo(window.screenX, window.scrollY - 0.5)
+                //         window.scrollTo(window.screenX, window.scrollY - 1)
                 // }, 500);
             },
         );
@@ -401,19 +561,19 @@ function Zebra({CatID, ModelID}) {
         );
     }
     
-    function NextStep({children, eventKey, callback}) {
+    function NextStep({children, eventKey, callback, onClick}) {
         const decoratedOnClick = useAccordionButton(
             eventKey,
             () => {
                 callback && callback(eventKey);
                 setAccordionActiveKey(eventKey);
                 // setTimeout(() => {
-                //     window.scrollTo(window.scrollX, window.scrollY + 0.5);
+                //     window.scrollTo(window.scrollX, window.scrollY + 1);
                 // }, 500);
             },
         );
         return (
-            <div className="nextStep_area">
+            <div className="nextStep_area" onClick={onClick}>
                 <div className="nextStep" onClick={decoratedOnClick}>{children}</div>
             </div>
         );
@@ -437,14 +597,29 @@ function Zebra({CatID, ModelID}) {
                 obj.checked = false;
         });
         search_input.current.value = "";
-        setSearchShow(false)
+        setSearchShow(false);
+        
+        setFilterColors([]);
+        setFilterPatterns([]);
+        setFilterTypes([]);
+        setFilterPrices([]);
     }
     
     function clearFilters(e) {
         let refIndex = e.target.getAttribute('text');
         filterCheckboxes.current[refIndex].forEach(obj => {
             obj.checked = false;
-        })
+        });
+        
+        if (e.target.getAttribute('text') === "colors") {
+            setFilterColors([]);
+        } else if (e.target.getAttribute('text') === "patterns") {
+            setFilterPatterns([]);
+        } else if (e.target.getAttribute('text') === "types") {
+            setFilterTypes([]);
+        } else {
+            setFilterPrices([]);
+        }
     }
     
     function popoverThumbnailHover(e) {
@@ -577,77 +752,171 @@ function Zebra({CatID, ModelID}) {
         setStepSelectedValue(tempValue);
     }
     
-    function setBasketNumber(refIndex, numValue, type, minusPlus) {
-        // console.log(refIndex);
-        let temp = [];
-        let typeString = "";
-        let cartObj = {};
-        if (type === 0) {
-            if (localStorage.getItem("cart") !== null) {
-                cartObj = JSON.parse(localStorage.getItem("cart"));
-                temp = cartObj["drapery"];
-                typeString = "drapery";
-            } else {
-                renderCart();
-            }
-        } else if (type === 1) {
-            if (localStorage.getItem("cart") !== null) {
-                cartObj = JSON.parse(localStorage.getItem("cart"));
-                temp = cartObj["product"];
-                typeString = "product";
-            } else {
-                renderCart();
+    function setBasketNumber(cart, refIndex, numValue, type, minusPlus) {
+        // console.log(cart,refIndex, numValue, type, minusPlus);
+        if (isLoggedIn) {
+            let temp = JSON.parse(JSON.stringify(cart))["CartDetails"];
+            let tempProjectContainer = temp.find(opt => opt["CartDetailId"] === refIndex);
+            
+            if (Object.keys(tempProjectContainer).length !== 0) {
+                let tempProject = tempProjectContainer["SewingPreorder"];
+                if (minusPlus !== undefined) {
+                    if (tempProject["Count"] + minusPlus <= 0 || tempProject["Count"] + minusPlus > 10)
+                        setBasketNumber(cart, refIndex, tempProject["Count"] + minusPlus, type);
+                    else {
+                        tempProject["Count"] = tempProject["Count"] + minusPlus;
+                        editBasketProject(tempProject);
+                    }
+                } else {
+                    if (numValue === "") {
+                        tempProject["Count"] = 1;
+                        editBasketProject(tempProject);
+                    } else if (!isNaN(numValue) || numValue === 10 || numValue === "10") {
+                        if (parseInt(numValue) > 10) {
+                            tempProject["Count"] = 10;
+                            editBasketProject(tempProject);
+                            
+                        } else if (parseInt(numValue) <= 0) {
+                            deleteBasketProject(refIndex);
+                        } else {
+                            tempProject["Count"] = parseInt(numValue);
+                            editBasketProject(tempProject);
+                        }
+                    }
+                }
             }
         } else {
-            if (localStorage.getItem("cart") !== null) {
-                cartObj = JSON.parse(localStorage.getItem("cart"));
-                temp = cartObj["swatches"];
-                typeString = "swatches";
-            } else {
-                renderCart();
-            }
-        }
-        if (temp !== []) {
-            if (minusPlus !== undefined) {
-                if (temp[refIndex] === undefined) {
-                    temp[refIndex]["qty"] = 1;
-                    cartObj[typeString] = temp;
-                    localStorage.setItem('cart', JSON.stringify(cartObj));
-                    renderCart(cartObj);
+            // console.log(refIndex);
+            let temp = [];
+            let typeString = "";
+            let cartObj = {};
+            if (type === 0) {
+                if (localStorage.getItem("cart") !== null) {
+                    cartObj = JSON.parse(localStorage.getItem("cart"));
+                    temp = cartObj["drapery"];
+                    typeString = "drapery";
                 } else {
-                    if (temp[refIndex]["qty"] + minusPlus <= 0 || temp[refIndex]["qty"] + minusPlus > 10)
-                        setBasketNumber(refIndex, temp[refIndex]["qty"] + minusPlus, type);
-                    else {
-                        temp[refIndex]["qty"] = temp[refIndex]["qty"] + minusPlus;
+                    renderCart();
+                }
+            } else if (type === 1) {
+                if (localStorage.getItem("cart") !== null) {
+                    cartObj = JSON.parse(localStorage.getItem("cart"));
+                    temp = cartObj["product"];
+                    typeString = "product";
+                } else {
+                    renderCart();
+                }
+            } else {
+                if (localStorage.getItem("cart") !== null) {
+                    cartObj = JSON.parse(localStorage.getItem("cart"));
+                    temp = cartObj["swatches"];
+                    typeString = "swatches";
+                } else {
+                    renderCart();
+                }
+            }
+            if (temp.length > 0) {
+                if (minusPlus !== undefined) {
+                    if (temp[refIndex] === undefined) {
+                        cartObj[typeString] = temp;
+                        localStorage.setItem('cart', JSON.stringify(cartObj));
+                        renderCart(cartObj);
+                    } else {
+                        if (temp[refIndex]["Count"] + minusPlus <= 0 || temp[refIndex]["Count"] + minusPlus > 10)
+                            setBasketNumber(refIndex, temp[refIndex]["Count"] + minusPlus);
+                        else {
+                            temp[refIndex]["Count"] = temp[refIndex]["Count"] + minusPlus;
+                            temp[refIndex]["PreorderText"]["WindowCount"] = temp[refIndex]["Count"];
+                            cartObj[typeString] = temp;
+                            localStorage.setItem('cart', JSON.stringify(cartObj));
+                            renderCart(cartObj);
+                        }
+                    }
+                } else {
+                    if (!isNaN(numValue) || numValue === 10 || numValue === "10") {
+                        if (numValue > 10) {
+                            temp[refIndex]["Count"] = 10;
+                            temp[refIndex]["PreorderText"]["WindowCount"] = temp[refIndex]["Count"];
+                            cartObj[typeString] = temp;
+                            localStorage.setItem('cart', JSON.stringify(cartObj));
+                            renderCart(cartObj);
+                            
+                        } else if (numValue <= 0) {
+                            draperyRef.current[refIndex].className = "custom_cart_item is_loading";
+                            setTimeout(() => {
+                                draperyRef.current[refIndex].className = "custom_cart_item";
+                                temp.splice(refIndex, 1);
+                                cartObj[typeString] = temp;
+                                localStorage.setItem('cart', JSON.stringify(cartObj));
+                                renderCart(cartObj);
+                            }, 1500);
+                        } else {
+                            temp[refIndex]["Count"] = numValue;
+                            temp[refIndex]["PreorderText"]["WindowCount"] = temp[refIndex]["Count"];
+                            cartObj[typeString] = temp;
+                            localStorage.setItem('cart', JSON.stringify(cartObj));
+                            renderCart(cartObj);
+                        }
+                    } else {
+                        temp[refIndex]["Count"] = 1;
+                        temp[refIndex]["PreorderText"]["WindowCount"] = temp[refIndex]["Count"];
                         cartObj[typeString] = temp;
                         localStorage.setItem('cart', JSON.stringify(cartObj));
                         renderCart(cartObj);
                     }
                 }
-            } else {
-                if (numValue > 10) {
-                    temp[refIndex]["qty"] = 10;
-                    cartObj[typeString] = temp;
-                    localStorage.setItem('cart', JSON.stringify(cartObj));
-                    renderCart(cartObj);
-                    
-                } else if (numValue <= 0) {
-                    draperyRef.current[refIndex].className = "custom_cart_item is_loading";
-                    setTimeout(() => {
-                        draperyRef.current[refIndex].className = "custom_cart_item";
-                        temp.splice(refIndex, 1);
-                        cartObj[typeString] = temp;
-                        localStorage.setItem('cart', JSON.stringify(cartObj));
-                        renderCart(cartObj);
-                    }, 1500);
-                } else {
-                    temp[refIndex]["qty"] = numValue;
-                    cartObj[typeString] = temp;
-                    localStorage.setItem('cart', JSON.stringify(cartObj));
-                    renderCart(cartObj);
-                }
             }
         }
+    }
+    
+    
+    function editBasketProject(projectObj) {
+        projectObj["PreorderText"]["WindowCount"] = projectObj["Count"];
+        axios.post(baseURLEditProject, projectObj, {
+            headers: authHeader()
+        })
+            .then(() => {
+                renderCart();
+            }).catch(err => {
+            if (err.response.status === 401) {
+                refreshToken().then((response2) => {
+                    if (response2 !== false) {
+                        editBasketProject(projectObj);
+                    } else {
+                        navigate("/" + pageLanguage);
+                    }
+                });
+            }
+        });
+    }
+    
+    function deleteBasketProject(refIndex) {
+        draperyRef.current[refIndex].className = "custom_cart_item is_loading";
+        axios.delete(baseURLDeleteBasketProject, {
+            params: {
+                detailId: refIndex
+            },
+            headers: authHeader()
+        }).then((response) => {
+            if (draperyRef.current[refIndex]) {
+                draperyRef.current[refIndex].className = "custom_cart_item";
+            }
+            renderCart();
+        }).catch(err => {
+            if (err.response.status === 401) {
+                refreshToken().then((response2) => {
+                    if (response2 !== false) {
+                        deleteBasketProject(refIndex);
+                    } else {
+                        navigate("/" + pageLanguage);
+                    }
+                });
+            } else {
+                if (draperyRef.current[refIndex]) {
+                    draperyRef.current[refIndex].className = "custom_cart_item";
+                }
+            }
+        });
     }
     
     function setCart(refIndex, cartValue, delRefs, secondRedIndex, secondCartValue) {
@@ -670,23 +939,23 @@ function Zebra({CatID, ModelID}) {
                 }
             });
         }
-        // console.log(temp);
+        // console.log(temp,refIndex,cartValue);
         // console.log(refIndex, cartValue);
         // setTimeout(() => {
         // console.log(temp);
         // }, 1000);
         let tempPostObj = {};
-        tempPostObj["ApiKey"] = window.$apikey;
         tempPostObj["WindowCount"] = 1;
         tempPostObj["SewingModelId"] = `${modelID}`;
         
-        let cartInfo = JSON.parse(JSON.stringify(CartInfo));
+        let userProjects = JSON.parse(JSON.stringify(UserProjects))[`${modelID}`]["data"];
         
         Object.keys(temp).forEach(key => {
             if (temp[key] !== null || temp[key] !== "") {
-                let tempObj = cartInfo.find(obj => obj["cart"] === key);
+                let tempObj = userProjects.find(obj => obj["cart"] === key);
                 if (tempObj === undefined) {
-                    window.location.reload();
+                    console.log(key);
+                    // window.location.reload();
                 } else {
                     if (tempObj["apiLabel"] !== "") {
                         if (tempObj["apiValue"] === null) {
@@ -709,12 +978,15 @@ function Zebra({CatID, ModelID}) {
         
         Object.keys(temp).forEach(key => {
             if (temp[key] !== null || temp[key] !== "") {
-                let tempObj = cartInfo.find(obj => obj["cart"] === key);
-                if (tempObj["apiLabel2"] !== undefined) {
-                    if (tempObj["apiValue2"] === null) {
-                        tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
-                    } else {
-                        tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                let tempObj = userProjects.find(obj => obj["cart"] === key);
+                // console.log(key,userProjects.find(obj => obj["cart"] === key));
+                if (tempObj) {
+                    if (tempObj["apiLabel2"] !== undefined) {
+                        if (tempObj["apiValue2"] === null) {
+                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
+                        } else {
+                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                        }
                     }
                 }
             }
@@ -722,12 +994,14 @@ function Zebra({CatID, ModelID}) {
         tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
         Object.keys(temp).forEach(key => {
             if (temp[key] !== null || temp[key] !== "") {
-                let tempObj = cartInfo.find(obj => obj["cart"] === key);
-                if (tempObj["apiAcc"] !== undefined) {
-                    if (tempObj["apiAcc"] === true) {
-                        tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
-                    } else {
-                    
+                let tempObj = userProjects.find(obj => obj["cart"] === key);
+                if (tempObj) {
+                    if (tempObj["apiAcc"] !== undefined) {
+                        if (tempObj["apiAcc"] === true) {
+                            tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
+                        } else {
+                        
+                        }
                     }
                 }
             }
@@ -736,46 +1010,164 @@ function Zebra({CatID, ModelID}) {
             return el != null;
         });
         
-        if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined && stepSelectedValue["2"] !== undefined && stepSelectedValue["3"] !== undefined) {
-            // console.log(JSON.stringify(tempPostObj));
-            axios.post(baseURLPrice, tempPostObj)
-                .then((response) => {
-                    setPrice(response.data["price"]);
-                    
-                    // setCart("HeightCart", totalHeight, "", "WidthCart", [totalWidth]);
-                    if (stepSelectedValue["2"] === "1" && stepSelectedValue["3"] === "2") {
-                        if (stepSelectedOptions.values["3AIn"] !== undefined && stepSelectedOptions.values["3BIn"] !== undefined) {
-                            if (stepSelectedOptions.values["3AIn"].filter(function (e) {
-                                return e
-                            }).length === 3 && stepSelectedOptions.values["3BIn"].filter(function (e) {
-                                return e
-                            }).length === 3) {
+        let promise2 = new Promise((resolve, reject) => {
+            if (stepSelectedValue["3"] !== undefined) {
+                if (tempPostObj["SewingOrderDetails"][0]["FabricId"] === undefined) {
+                    delete tempPostObj["SewingOrderDetails"];
+                }
+                // if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined && stepSelectedValue["2"] !== undefined && stepSelectedValue["3"] !== undefined) {
+                // console.log(JSON.stringify(tempPostObj));
+                axios.post(baseURLPrice, tempPostObj)
+                    .then((response) => {
+                        setPrice(response.data["price"]);
+                        
+                        // console.log("1");
+                        
+                        // setCart("HeightCart", totalHeight, "", "WidthCart", [totalWidth]);
+                        if (stepSelectedValue["2"] === "1" && stepSelectedValue["3"] === "2") {
+                            if (temp["Width1"] !== undefined && temp["Width2"] !== undefined && temp["Width3"] !== undefined && temp["Height1"] !== undefined && temp["Height2"] !== undefined && temp["Height3"] !== undefined) {
+                                // console.log("2");
                                 getWindowSize(response.data["Width"], response.data["Height"]);
                                 temp["WidthCart"] = response.data["Width"];
                                 temp["HeightCart"] = response.data["Height"];
+                                
                             }
-                        }
-                    } else if (stepSelectedValue["2"] === "2" && stepSelectedValue["3"] === "2") {
-                        if (stepSelectedValue["3AOut"] !== undefined && leftRight.right !== "" && leftRight.left !== "" && stepSelectedValue["3COut"] !== undefined && stepSelectedValue["3DOut"] !== undefined) {
+                        } else if (stepSelectedValue["2"] === "2" && stepSelectedValue["3"] === "2") {
+                            if (temp["Width3A"] !== undefined && temp["Height3C"] !== undefined && temp["ExtensionRight"] !== undefined && temp["ExtensionLeft"] !== undefined && temp["ShadeMount"] !== undefined) {
+                                getWindowSize(response.data["Width"], response.data["Height"]);
+                                temp["WidthCart"] = response.data["Width"];
+                                temp["HeightCart"] = response.data["Height"];
+                                // console.log("3");
+                            }
+                        } else {
                             getWindowSize(response.data["Width"], response.data["Height"]);
                             temp["WidthCart"] = response.data["Width"];
                             temp["HeightCart"] = response.data["Height"];
+                            // console.log("4");
                         }
+                        resolve();
+                    }).catch(err => {
+                    setPrice(0);
+                    if (temp["HeightCart"] !== undefined)
+                        delete temp["HeightCart"];
+                    if (temp["WidthCart"] !== undefined)
+                        delete temp["WidthCart"];
+                    resolve();
+                    // console.log(err);
+                });
+            } else {
+                resolve();
+            }
+        });
+        promise2.then(() => {
+            setCartValues(temp);
+        });
+    }
+    
+    function measureWindowSize() {
+        
+        let promise2 = new Promise((resolve, reject) => {
+            let temp = JSON.parse(JSON.stringify(cartValues));
+            let tempPostObj = {};
+            tempPostObj["WindowCount"] = 1;
+            tempPostObj["SewingModelId"] = `${modelID}`;
+            
+            let userProjects = JSON.parse(JSON.stringify(UserProjects))[`${modelID}`]["data"];
+            
+            Object.keys(temp).forEach(key => {
+                if (temp[key] !== null || temp[key] !== "") {
+                    let tempObj = userProjects.find(obj => obj["cart"] === key);
+                    if (tempObj === undefined) {
+                        window.location.reload();
                     } else {
+                        if (tempObj["apiLabel"] !== "") {
+                            if (tempObj["apiValue"] === null) {
+                                tempPostObj[tempObj["apiLabel"]] = temp[key];
+                            } else {
+                                tempPostObj[tempObj["apiLabel"]] = tempObj["apiValue"][temp[key]];
+                            }
+                        }
+                    }
+                }
+            });
+            
+            tempPostObj["SewingOrderDetails"] = [];
+            tempPostObj["SewingOrderDetails"][0] = {};
+            tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
+            tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
+            tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
+            tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
+            tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
+            
+            Object.keys(temp).forEach(key => {
+                if (temp[key] !== null || temp[key] !== "") {
+                    let tempObj = userProjects.find(obj => obj["cart"] === key);
+                    if (tempObj["apiLabel2"] !== undefined) {
+                        if (tempObj["apiValue2"] === null) {
+                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
+                        } else {
+                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                        }
+                    }
+                }
+            });
+            tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
+            Object.keys(temp).forEach(key => {
+                if (temp[key] !== null || temp[key] !== "") {
+                    let tempObj = userProjects.find(obj => obj["cart"] === key);
+                    if (tempObj["apiAcc"] !== undefined) {
+                        if (tempObj["apiAcc"] === true) {
+                            tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
+                        } else {
+                        
+                        }
+                    }
+                }
+            });
+            tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
+                return el != null;
+            });
+            
+            if (stepSelectedValue["3"] !== undefined) {
+                if (tempPostObj["SewingOrderDetails"][0]["FabricId"] === undefined) {
+                    delete tempPostObj["SewingOrderDetails"];
+                }
+                // if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined && stepSelectedValue["2"] !== undefined && stepSelectedValue["3"] !== undefined) {
+                // console.log(JSON.stringify(tempPostObj));
+                axios.post(baseURLPrice, tempPostObj)
+                    .then((response) => {
+                        setPrice(response.data["price"]);
+                        
+                        // setCart("HeightCart", totalHeight, "", "WidthCart", [totalWidth]);
                         getWindowSize(response.data["Width"], response.data["Height"]);
                         temp["WidthCart"] = response.data["Width"];
                         temp["HeightCart"] = response.data["Height"];
-                    }
-                }).catch(err => {
-                setPrice(0);
-                if (temp["HeightCart"] !== undefined)
-                    delete temp["HeightCart"];
-                if (temp["WidthCart"] !== undefined)
-                    delete temp["WidthCart"];
-                // console.log(err);
-            });
-        }
-        setCartValues(temp);
+                        setCartValues(temp);
+                        setTimeout(() => {
+                            resolve();
+                        }, 1000);
+                    }).catch(err => {
+                    setPrice(0);
+                    if (temp["HeightCart"] !== undefined)
+                        delete temp["HeightCart"];
+                    if (temp["WidthCart"] !== undefined)
+                        delete temp["WidthCart"];
+                    // console.log(err);
+                    setCartValues(temp);
+                    setTimeout(() => {
+                        reject();
+                    }, 1000);
+                });
+            } else {
+                reject();
+            }
+            
+        });
+        promise2.then(() => {
+            return true;
+        }).catch(() => {
+            return false;
+        });
     }
     
     function deleteSpecialSelects(InOut) {
@@ -876,7 +1268,7 @@ function Zebra({CatID, ModelID}) {
         setDepSet(depSetTempArr);
     }
     
-    const doNotShow = ["ModelId", "qty", "Width1", "Height1", "Width2", "Height2", "Width3", "Height3", "RoomNameEn", "RoomNameFa", "calcMeasurements", "Fabric", "PhotoUrl", "RemoteName",
+    const doNotShow = ["ModelId", "qty", "Width1", "Height1", "Width2", "Height2", "Width3", "Height3", "RoomNameEn", "RoomNameFa", "calcMeasurements", "FabricId", "PhotoUrl", "RemoteName",
         "hasPower", "WindowName", "ExtensionLeft", "ExtensionRight", "Height3C", "Width3A", "ShadeMount", "ModelNameEn", "ModelNameFa", "FabricColorEn", "FabricColorFa", "FabricDesignEn", "FabricDesignFa"];
     
     function addToCart() {
@@ -886,10 +1278,10 @@ function Zebra({CatID, ModelID}) {
         tempDepSet.forEach(dependency => {
             tempNewSet.add(dependency.split('')[0]);
             // tempNewSet.add(dependency);
-            // console.log(dependency)
         });
         
         if (tempNewSet.size > 0) {
+            setAddingLoading(false);
             let temp = JSON.parse(JSON.stringify(requiredStep));
             let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
             [...tempNewSet].sort(function (a, b) {
@@ -937,20 +1329,30 @@ function Zebra({CatID, ModelID}) {
             setStepSelectedLabel(tempLabels);
             setAddCartErr(tempErr);
             modalHandleShow("addToCartErr");
+        } else if (cartValues["HeightCart"] === undefined || cartValues["WidthCart"] === undefined) {
+            // console.log(cartValues);
+            if (measureWindowSize()) {
+                addToCart();
+            } else {
+                setAddingLoading(false);
+            }
         } else {
-            let cartInfo = JSON.parse(JSON.stringify(CartInfo));
+            // console.log(cartValues,"hi");
+            let userProjects = JSON.parse(JSON.stringify(UserProjects))[`${modelID}`]["data"];
             let tempArr = [];
             let temp1 = [];
             let temp = JSON.parse(JSON.stringify(cartValues));
             let tempPostObj = {};
             let tempBagPrice = 0;
             
-            tempPostObj["ApiKey"] = window.$apikey;
+            
+            // tempPostObj["ApiKey"] = window.$apikey;
             tempPostObj["WindowCount"] = 1;
             tempPostObj["SewingModelId"] = `${modelID}`;
             Object.keys(temp).forEach(key => {
                 if (temp[key] !== null || temp[key] !== "") {
-                    let tempObj = cartInfo.find(obj => obj["cart"] === key);
+                    let tempObj = userProjects.find(obj => obj["cart"] === key);
+                    // console.log(key,tempObj);
                     if (tempObj["apiLabel"] !== "") {
                         if (tempObj["apiValue"] === null) {
                             tempPostObj[tempObj["apiLabel"]] = temp[key];
@@ -960,6 +1362,7 @@ function Zebra({CatID, ModelID}) {
                     }
                 }
             });
+            
             tempPostObj["SewingOrderDetails"] = [];
             tempPostObj["SewingOrderDetails"][0] = {};
             tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
@@ -969,7 +1372,7 @@ function Zebra({CatID, ModelID}) {
             tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
             Object.keys(temp).forEach(key => {
                 if (temp[key] !== null || temp[key] !== "") {
-                    let tempObj = cartInfo.find(obj => obj["cart"] === key);
+                    let tempObj = userProjects.find(obj => obj["cart"] === key);
                     if (tempObj["apiLabel2"] !== undefined) {
                         if (tempObj["apiValue2"] === null) {
                             tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
@@ -982,7 +1385,7 @@ function Zebra({CatID, ModelID}) {
             tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
             Object.keys(temp).forEach(key => {
                 if (temp[key] !== null || temp[key] !== "") {
-                    let tempObj = cartInfo.find(obj => obj["cart"] === key);
+                    let tempObj = userProjects.find(obj => obj["cart"] === key);
                     if (tempObj["apiAcc"] !== undefined) {
                         if (tempObj["apiAcc"] === true) {
                             tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
@@ -1005,18 +1408,19 @@ function Zebra({CatID, ModelID}) {
                         temp["price"] = response.data["price"];
                         // console.log(response.data);
                         
-                        
                         let roomNameFa = cartValues["RoomNameFa"];
                         let roomName = cartValues["RoomNameEn"];
                         let WindowName = cartValues["WindowName"] === undefined ? "" : cartValues["WindowName"];
                         Object.keys(cartValues).forEach(key => {
-                            let tempObj = cartInfo.find(obj => obj["cart"] === key);
+                            let tempObj = userProjects.find(obj => obj["cart"] === key);
                             if (tempObj === undefined) {
                                 window.location.reload();
                             } else {
-                                if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
+                                if (key === "HeightCart" || key === "WidthCart") {
+                                
+                                } else if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
                                     let objLabel = "";
-                                    if (tempObj["titleValue"] === null) {
+                                    if (tempObj["titleValue"] === null || true) {
                                         if (tempObj["titlePostfix"] === "") {
                                             objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(cartValues[key].toString())}`).toString() : t(cartValues[key].toString());
                                         } else {
@@ -1024,6 +1428,7 @@ function Zebra({CatID, ModelID}) {
                                         }
                                         // objLabel = cartValues[key].toString() + tempObj["titlePostfix"];
                                     } else {
+                                        // console.log(tempObj["titleValue"],tempObj["titleValue"][cartValues[key].toString()],cartValues[key]);
                                         if (tempObj["titleValue"][cartValues[key].toString()] === null) {
                                             if (tempObj["titlePostfix"] === "") {
                                                 objLabel = t(cartValues[key].toString());
@@ -1042,10 +1447,12 @@ function Zebra({CatID, ModelID}) {
                                 }
                             }
                         });
+                        
                         tempArr.push(
                             <div key={defaultModelName}>
-                                <h2 className="cart_agree_title2">{pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</h2>
+                                <h2 className="cart_agree_title">{pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</h2>
                                 <ul className="cart_agree_items_container">
+                                    <GetMeasurementArray modelId={`${modelID}`} cartValues={cartValues}/>
                                     {temp1}
                                     <li className="cart_agree_item">
                                         <h1 className="cart_agree_item_title">{pageLanguage === 'fa' ? "نام اتاق" : "Room Label"}&nbsp;</h1>
@@ -1061,14 +1468,33 @@ function Zebra({CatID, ModelID}) {
                         setCartAgree(tempArr);
                         modalHandleShow("cart_modal");
                         setCartValues(temp);
+                        setAddingLoading(false);
                         
                     }).catch(err => {
-                    setPrice(0);
-                    setBagPrice(0);
-                    temp["price"] = 0;
-                    setCartValues(temp);
-                    console.log(err);
+                    if (err.response.status === 401) {
+                        refreshToken().then((response2) => {
+                            if (response2 !== false) {
+                                addToCart();
+                            } else {
+                                setPrice(0);
+                                setBagPrice(0);
+                                temp["price"] = 0;
+                                setCartValues(temp);
+                                setAddingLoading(false);
+                                navigate("/" + pageLanguage + "/User");
+                            }
+                        });
+                    } else {
+                        setPrice(0);
+                        setBagPrice(0);
+                        temp["price"] = 0;
+                        setCartValues(temp);
+                        setAddingLoading(false);
+                    }
+                    
                 });
+            } else {
+                setAddingLoading(false);
             }
             // console.log(cartValues);
         }
@@ -1079,143 +1505,88 @@ function Zebra({CatID, ModelID}) {
     }
     
     function addToCart_agreed() {
-        let customPageCart = {};
-        
-        let tempCartObj = JSON.parse(JSON.stringify(cartValues));
-        // tempCartObj["Type"]=0;
-        tempCartObj["ModelId"] = modelID;
-        tempCartObj["qty"] = 1;
-        // tempCartObj["PhotoUrl"]=`http://api.atlaspood.ir/${defaultFabricPhoto}`;
-        tempCartObj["ModelNameFa"] = defaultModelNameFa;
-        tempCartObj["ModelNameEn"] = defaultModelName;
-        if (localStorage.getItem("cart") === null) {
-            let newCartObj = {};
-            let newCartArr = [];
-            newCartArr[0] = tempCartObj;
-            newCartObj["drapery"] = newCartArr;
-            newCartObj["product"] = [];
-            newCartObj["swatches"] = [];
-            localStorage.setItem('cart', JSON.stringify(newCartObj));
-            customPageCart = newCartObj;
-        } else {
-            let cartObj = JSON.parse(localStorage.getItem("cart"));
-            if (cartObj["drapery"] === undefined || cartObj["drapery"] === []) {
-                let newCartArr = [];
-                newCartArr[0] = tempCartObj;
-                cartObj["drapery"] = newCartArr;
-                localStorage.setItem('cart', JSON.stringify(cartObj));
-                customPageCart = cartObj;
+        AddProjectToCart(cartValues, `${modelID}`, price, defaultModelName, defaultModelNameFa, [uploadedImagesFile, uploadedImagesURL, uploadedPDFFile, uploadedPDFURL], (projectId && projectId !== "") ? projectId : cartProjectIndex, editIndex, navigate, isLoggedIn).then((temp) => {
+            if (temp === 401) {
+                addToCart_agreed();
+            } else if (temp) {
+                setCartAgreeDescription(false);
+                renderCart(temp);
+                setTimeout(() => {
+                    // modalHandleShow("cart_modal");
+                    setCartStateAgree(true);
+                }, 500);
+                setAddingLoading(false);
             } else {
-                cartObj["drapery"].push(tempCartObj);
-                localStorage.setItem('cart', JSON.stringify(cartObj));
-                customPageCart = cartObj;
+                setAddingLoading(false);
+                setCartAgreeDescription(false);
             }
-        }
-        
-        renderCart(customPageCart);
-        setTimeout(() => {
-            // modalHandleShow("cart_modal");
-            setCartStateAgree(true);
-        }, 500);
-        
+        }).catch(() => {
+            setAddingLoading(false);
+            setCartAgreeDescription(false);
+        });
     }
     
     function renderCart(customPageCart) {
         let cartObjects = {};
-        if (customPageCart !== undefined) {
-            cartObjects = customPageCart;
-        } else {
-            if (localStorage.getItem("cart") === null) {
-                setCartItems([]);
-                handleClose("cart_modal");
+        let promise2 = new Promise((resolve, reject) => {
+            if (customPageCart !== undefined) {
+                cartObjects = customPageCart;
+                resolve();
             } else {
-                cartObjects = JSON.parse(localStorage.getItem("cart"));
+                if (isLoggedIn) {
+                    axios.get(baseURLGetCart, {
+                        headers: authHeader()
+                    }).then((response) => {
+                        cartObjects = response.data;
+                        resolve();
+                    }).catch(err => {
+                        if (err.response.status === 401) {
+                            refreshToken().then((response2) => {
+                                if (response2 !== false) {
+                                    renderCart(customPageCart);
+                                } else {
+                                    navigate("/" + pageLanguage + "/User");
+                                }
+                            });
+                        } else {
+                            modalHandleClose("cart_modal");
+                            reject();
+                        }
+                    });
+                } else {
+                    if (localStorage.getItem("cart") === null) {
+                        setCartItems([]);
+                        modalHandleClose("cart_modal");
+                        reject();
+                    } else {
+                        cartObjects = JSON.parse(localStorage.getItem("cart"));
+                        resolve();
+                    }
+                }
             }
-        }
-        if (cartObjects !== {}) {
+        });
+        promise2.then(() => {
             let temp1 = [];
             let cartCount = 0;
-            if (cartObjects["drapery"].length) {
-                cartCount += cartObjects["drapery"].length;
-                let draperiesTotalPrice = 0;
-                let promiseArr = [];
+            if (isLoggedIn) {
+                cartCount += cartObjects["CartDetails"].length;
+                let draperiesTotalPrice = cartObjects["TotalAmount"];
                 
-                cartObjects["drapery"].forEach((obj, index) => {
-                    let tempPostObj = {};
-                    tempPostObj["ApiKey"] = window.$apikey;
-                    let cartInfo = JSON.parse(JSON.stringify(CartInfo));
-                    let temp = obj;
-                    
-                    Object.keys(temp).forEach(key => {
-                        if (temp[key] !== null || temp[key] !== "") {
-                            let tempObj = cartInfo.find(obj => obj["cart"] === key);
-                            if (tempObj["apiLabel"] !== "") {
-                                if (tempObj["apiValue"] === null) {
-                                    tempPostObj[tempObj["apiLabel"]] = temp[key];
-                                } else {
-                                    tempPostObj[tempObj["apiLabel"]] = tempObj["apiValue"][temp[key]];
-                                }
-                            }
-                        }
-                    });
-                    
-                    tempPostObj["SewingOrderDetails"] = [];
-                    tempPostObj["SewingOrderDetails"][0] = {};
-                    tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
-                    tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
-                    tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
-                    tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
-                    tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
-                    
-                    Object.keys(temp).forEach(key => {
-                        if (temp[key] !== null || temp[key] !== "") {
-                            let tempObj = cartInfo.find(obj => obj["cart"] === key);
-                            if (tempObj["apiLabel2"] !== undefined) {
-                                if (tempObj["apiValue2"] === null) {
-                                    tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
-                                } else {
-                                    tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
-                                }
-                            }
-                        }
-                    });
-                    
-                    tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
-                    Object.keys(temp).forEach(key => {
-                        if (temp[key] !== null || temp[key] !== "") {
-                            let tempObj = cartInfo.find(obj => obj["cart"] === key);
-                            if (tempObj["apiAcc"] !== undefined) {
-                                if (tempObj["apiAcc"] === true) {
-                                    tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
-                                } else {
-                                
-                                }
-                            }
-                        }
-                    });
-                    tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
-                        return el != null;
-                    });
-                    
-                    if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
-                        promiseArr[index] = axios.post(baseURLPrice, tempPostObj);
-                    }
-                });
-                Promise.all(promiseArr).then(function (values) {
-                    // console.log(values);
-                    cartObjects["drapery"].forEach((obj, index) => {
-                        obj["price"] = values[index].data["price"];
-                        draperiesTotalPrice += obj["price"];
+                let promise2 = new Promise((resolve, reject) => {
+                    for (let i = 0; i < cartObjects["CartDetails"].length; i++) {
+                        let obj = cartObjects["CartDetails"][i]["SewingPreorder"]["PreorderText"];
+                        
                         let roomName = (obj["WindowName"] === undefined || obj["WindowName"] === "") ? "" : " / " + obj["WindowName"];
-                        temp1[index] =
-                            <li className="custom_cart_item" key={"drapery" + index} ref={ref => (draperyRef.current[index] = ref)}>
+                        temp1[i] =
+                            <li className="custom_cart_item" key={"drapery" + i} ref={ref => (draperyRef.current[cartObjects["CartDetails"][i]["CartDetailId"]] = ref)}>
                                 <div className="custom_cart_item_image_container">
-                                    <img src={`http://api.atlaspood.ir/${obj["PhotoUrl"]}`} alt="" className="custom_cart_item_img img-fluid"/>
+                                    <img src={`https://api.atlaspood.ir/${obj["PhotoUrl"]}`} alt="" className="custom_cart_item_img img-fluid"/>
                                 </div>
                                 <div className="custom_cart_item_desc">
                                     <div className="custom_cart_item_desc_container">
                                         <h1 className="custom_cart_item_desc_name">{pageLanguage === 'fa' ? obj["ModelNameFa"] + " سفارشی " : "Custom " + obj["ModelNameEn"]}</h1>
-                                        <button type="button" className="btn-close" aria-label="Close" onClick={() => setBasketNumber(index, 0, 0)}/>
+                                        <button type="button" className="btn-close" aria-label="Close"
+                                                onClick={() => setBasketNumber(cartObjects, cartObjects["CartDetails"][i]["CartDetailId"], 0, 0)}/>
                                     </div>
                                     <div className="custom_cart_item_desc_container">
                                         <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["FabricDesignFa"] + " / " + obj["FabricColorFa"] : obj["FabricDesignEn"] + " / " + obj["FabricColorEn"]}</h2>
@@ -1225,44 +1596,184 @@ function Zebra({CatID, ModelID}) {
                                     </div>
                                     <div className="custom_cart_item_desc_container">
                                         <div className="custom_cart_item_desc_qty">
-                                            <button type="text" className="basket_qty_minus" onClick={() => setBasketNumber(index, 0, 0, -1)}>–</button>
+                                            <button type="text" className="basket_qty_minus"
+                                                    onClick={() => setBasketNumber(cartObjects, cartObjects["CartDetails"][i]["CartDetailId"], 0, 0, -1)}>–
+                                            </button>
                                             <input type="text" className="basket_qty_num"
-                                                   value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${obj["qty"]}`) : obj["qty"]}
-                                                   onChange={(e) => setBasketNumber(index, NumberToPersianWord.convertPeToEn(`${e.target.value}`), 0)}/>
-                                            <button type="text" className="basket_qty_plus" onClick={() => setBasketNumber(index, 0, 0, 1)}>+</button>
+                                                   value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${cartObjects["CartDetails"][i]["SewingPreorder"]["Count"]}`) : cartObjects["CartDetails"][i]["SewingPreorder"]["Count"]}
+                                                   onChange={(e) => setBasketNumber(cartObjects, cartObjects["CartDetails"][i]["CartDetailId"], NumberToPersianWord.convertPeToEn(`${e.target.value}`))}/>
+                                            <button type="text" className="basket_qty_plus"
+                                                    onClick={() => setBasketNumber(cartObjects, cartObjects["CartDetails"][i]["CartDetailId"], 0, 0, 1)}>+
+                                            </button>
                                         </div>
                                         <p className="custom_cart_item_end_price">{GetPrice(obj["price"], pageLanguage, t("TOMANS"))}</p>
                                     </div>
                                 </div>
                             </li>;
-                    });
+                        if (i === cartObjects["CartDetails"].length - 1) {
+                            resolve();
+                        }
+                    }
+                });
+                promise2.then(() => {
                     setCartItems(temp1);
                     setCartCount(cartCount);
-                    localStorage.setItem('cart', JSON.stringify(cartObjects));
+                    localStorage.removeItem("cart");
                     setTotalCartPrice(draperiesTotalPrice);
-                    
-                }).catch(err => {
-                    console.log(err);
                 });
+                if (cartObjects["CartDetails"].length === 0) {
+                    modalHandleClose("cart_modal");
+                    setCartStateAgree(false);
+                }
+            } else {
+                if (cartObjects["drapery"].length) {
+                    cartCount += cartObjects["drapery"].length;
+                    let draperiesTotalPrice = 0;
+                    let promiseArr = [];
+                    
+                    cartObjects["drapery"].forEach((obj, index) => {
+                        promiseArr[index] = new Promise((resolve, reject) => {
+                            let tempPostObj = {};
+                            // tempPostObj["ApiKey"] = window.$apikey;
+                            if (obj["PreorderText"] === undefined) {
+                                localStorage.removeItem("cart");
+                            } else {
+                                let userProjects = JSON.parse(JSON.stringify(UserProjects))[obj["PreorderText"]["SewingModelId"]]["data"];
+                                // let temp = obj["PreorderText"];
+                                GetUserProjectData(obj).then((temp) => {
+                                    tempPostObj["WindowCount"] = 1;
+                                    tempPostObj["SewingModelId"] = `${modelID}`;
+                                    Object.keys(temp).forEach(key => {
+                                        if (temp[key] !== null || temp[key] !== "") {
+                                            let tempObj = userProjects.find(obj => obj["cart"] === key);
+                                            // console.log(key,tempObj);
+                                            if (tempObj["apiLabel"] !== "") {
+                                                if (tempObj["apiValue"] === null) {
+                                                    tempPostObj[tempObj["apiLabel"]] = temp[key];
+                                                } else {
+                                                    tempPostObj[tempObj["apiLabel"]] = tempObj["apiValue"][temp[key]];
+                                                }
+                                            }
+                                        }
+                                    });
+                                    
+                                    tempPostObj["SewingOrderDetails"] = [];
+                                    tempPostObj["SewingOrderDetails"][0] = {};
+                                    tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
+                                    tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
+                                    tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
+                                    tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
+                                    tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
+                                    Object.keys(temp).forEach(key => {
+                                        if (temp[key] !== null || temp[key] !== "") {
+                                            let tempObj = userProjects.find(obj => obj["cart"] === key);
+                                            if (tempObj["apiLabel2"] !== undefined) {
+                                                if (tempObj["apiValue2"] === null) {
+                                                    tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
+                                                } else {
+                                                    tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                                                }
+                                            }
+                                        }
+                                    });
+                                    tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
+                                    Object.keys(temp).forEach(key => {
+                                        if (temp[key] !== null || temp[key] !== "") {
+                                            let tempObj = userProjects.find(obj => obj["cart"] === key);
+                                            if (tempObj["apiAcc"] !== undefined) {
+                                                if (tempObj["apiAcc"] === true) {
+                                                    tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
+                                                } else {
+                                                
+                                                }
+                                            }
+                                        }
+                                    });
+                                    tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
+                                        return el != null;
+                                    });
+                                    
+                                    // delete tempPostObj["SewingOrderDetails"][0]["SewingModelId"];
+                                    // delete tempPostObj["SewingModelId"];
+                                    tempPostObj["SewingModelId"] = tempPostObj["SewingOrderDetails"][0]["SewingModelId"];
+                                    
+                                    if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
+                                        axios.post(baseURLPrice, tempPostObj).then((response) => {
+                                            resolve(response);
+                                        }).catch(err => {
+                                            resolve(false);
+                                            // console.log("hi2");
+                                        });
+                                    } else {
+                                        // console.log("hi3");
+                                        resolve(false);
+                                    }
+                                }).catch(err => {
+                                    // console.log("hi3");
+                                    resolve(false);
+                                });
+                            }
+                        });
+                    });
+                    Promise.all(promiseArr).then(function (values) {
+                        // console.log(values);
+                        cartObjects["drapery"].forEach((obj1, index) => {
+                            let obj = obj1["PreorderText"];
+                            obj["price"] = values[index].data["price"] / obj1["Count"];
+                            obj1["price"] = values[index].data["price"] / obj1["Count"];
+                            draperiesTotalPrice += values[index].data["price"];
+                            let roomName = (obj["WindowName"] === undefined || obj["WindowName"] === "") ? "" : " / " + obj["WindowName"];
+                            temp1[index] =
+                                <li className="custom_cart_item" key={"drapery" + index} ref={ref => (draperyRef.current[index] = ref)}>
+                                    <div className="custom_cart_item_image_container">
+                                        <img src={`https://api.atlaspood.ir/${obj["PhotoUrl"]}`} alt="" className="custom_cart_item_img img-fluid"/>
+                                    </div>
+                                    <div className="custom_cart_item_desc">
+                                        <div className="custom_cart_item_desc_container">
+                                            <h1 className="custom_cart_item_desc_name">{pageLanguage === 'fa' ? obj["ModelNameFa"] + " سفارشی " : "Custom " + obj["ModelNameEn"]}</h1>
+                                            <button type="button" className="btn-close" aria-label="Close" onClick={() => setBasketNumber(undefined, index, 0, 0)}/>
+                                        </div>
+                                        <div className="custom_cart_item_desc_container">
+                                            <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["FabricDesignFa"] + " / " + obj["FabricColorFa"] : obj["FabricDesignEn"] + " / " + obj["FabricColorEn"]}</h2>
+                                        </div>
+                                        <div className="custom_cart_item_desc_container">
+                                            <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["RoomNameFa"] + roomName : obj["RoomNameEn"] + roomName}</h2>
+                                        </div>
+                                        <div className="custom_cart_item_desc_container">
+                                            <div className="custom_cart_item_desc_qty">
+                                                <button type="text" className="basket_qty_minus" onClick={() => setBasketNumber(undefined, index, 0, 0, -1)}>–</button>
+                                                <input type="text" className="basket_qty_num"
+                                                       value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${obj1["Count"]}`) : obj1["Count"]}
+                                                       onChange={(e) => setBasketNumber(undefined, index, NumberToPersianWord.convertPeToEn(`${e.target.value}`), 0)}/>
+                                                <button type="text" className="basket_qty_plus" onClick={() => setBasketNumber(undefined, index, 0, 0, 1)}>+</button>
+                                            </div>
+                                            <p className="custom_cart_item_end_price">{GetPrice(obj1["price"] * obj1["Count"], pageLanguage, t("TOMANS"))}</p>
+                                        </div>
+                                    </div>
+                                </li>;
+                        });
+                        setCartItems(temp1);
+                        setCartCount(cartCount);
+                        localStorage.setItem('cart', JSON.stringify(cartObjects));
+                        setTotalCartPrice(draperiesTotalPrice);
+                        
+                    }).catch(err => {
+                        console.log(err);
+                    });
+                }
+                if (cartObjects["drapery"].length + cartObjects["product"].length + cartObjects["swatches"].length === 0) {
+                    setCartCount(0);
+                    modalHandleClose("cart_modal");
+                    setCartStateAgree(false);
+                }
             }
             
-            
-            if (cartObjects["drapery"].length + cartObjects["product"].length + cartObjects["swatches"].length === 0) {
-                modalHandleClose("cart_modal");
-                setCartStateAgree(false);
-            }
-        } else {
-            setCartCount(0);
-        }
+        });
         axios.get(baseURLFreeShipping).then((response) => {
             setFreeShipPrice(response.data);
         }).catch(err => {
             console.log(err);
         });
-    }
-    
-    function addToProjects() {
-    
     }
     
     function fabricClicked(photo, hasTrim) {
@@ -1285,7 +1796,7 @@ function Zebra({CatID, ModelID}) {
     }
     
     function getWindowSize(totalWidth, totalHeight) {
-        let tempWindowSize = pageLanguage === "fa" ? `عرض: ${totalWidth}س\u200Cم\u00A0\u00A0\u00A0ارتفاع: ${totalHeight}س\u200Cم` : `Width: ${totalWidth}cm\u00A0\u00A0\u00A0Height: ${totalHeight}cm`;
+        let tempWindowSize = pageLanguage === "fa" ? `عرض: ${NumberToPersianWord.convertEnToPe(totalWidth.toString())}س\u200Cم\u00A0\u00A0\u00A0ارتفاع: ${NumberToPersianWord.convertEnToPe(totalHeight.toString())}س\u200Cم` : `Width: ${totalWidth}cm\u00A0\u00A0\u00A0Height: ${totalHeight}cm`;
         setWindowSize(tempWindowSize);
         setWindowSizeBool(true);
         // console.log(totalWidth,totalHeight);
@@ -1293,8 +1804,6 @@ function Zebra({CatID, ModelID}) {
     
     function roomLabelChanged(changedValue, refIndex, isText) {
         if (isText) {
-            setRoomLabelText(changedValue);
-            
             if (roomLabelSelect.label !== "") {
                 let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
                 if (changedValue === "") {
@@ -1325,6 +1834,729 @@ function Zebra({CatID, ModelID}) {
             }
         }
         
+    }
+    
+    function uploadImg(file) {
+        setSelectedFile(file);
+        setSelectedFileName(file.name);
+    }
+    
+    function submitUploadedFile(PDFOrImg) {
+        setIsUploading(true);
+        let extensionSearch = /(?:\.([^.]+))?$/;
+        let extension = extensionSearch.exec(selectedFile.name)[1];
+        let newFile = new File([selectedFile], editedFileName === "" ? selectedFile.name : editedFileName + "." + extension, {type: `${selectedFile.type}`});
+        
+        // console.log(selectedFile,newFile,editedFileName,selectedFile.name);
+        if (PDFOrImg === 1) {
+            const formData = new FormData();
+            formData.append("File", newFile);
+            formData.append("UserFileName", newFile.name);
+            const config = {
+                headers: {
+                    'content-type': 'multipart/form-data',
+                    ...authHeader()
+                }
+            };
+            axios.post(baseURLUploadPdf, formData, config)
+                .then((response) => {
+                    setIsUploading(false);
+                    // console.log(response.data);
+                    addUploadFileUrl(response.data, newFile.name, PDFOrImg, newFile);
+                    setSelectedFile(undefined);
+                    setSelectedFileName("");
+                    setEditedFileName("");
+                    modalHandleClose("uploadPdf");
+                    setDetailsShow(false);
+                }).catch(err => {
+                if (err.response.status === 401) {
+                    refreshToken().then((response2) => {
+                        if (response2 !== false) {
+                            submitUploadedFile(PDFOrImg);
+                        } else {
+                            setIsUploading(false);
+                            setSelectedFile(undefined);
+                            setSelectedFileName("");
+                            setEditedFileName("");
+                            modalHandleClose("uploadPdf");
+                            setDetailsShow(false);
+                            
+                            dispatch({
+                                type: ShowLogin2Modal,
+                            });
+                        }
+                    });
+                } else {
+                    setIsUploading(false);
+                    console.log("not uploaded")
+                }
+            });
+        } else {
+            const formData = new FormData();
+            formData.append("File", newFile);
+            formData.append("UserFileName", newFile.name);
+            const config = {
+                headers: {
+                    'content-type': 'multipart/form-data',
+                    ...authHeader()
+                }
+            };
+            axios.post(baseURLUploadImg, formData, config)
+                .then((response) => {
+                    // console.log(response.data);
+                    setIsUploading(false);
+                    addUploadFileUrl(response.data, newFile.name, PDFOrImg, newFile);
+                    setSelectedFile(undefined);
+                    setSelectedFileName("");
+                    setEditedFileName("");
+                    modalHandleClose(" uploadImg");
+                    setDetailsShow(false);
+                }).catch(err => {
+                if (err.response.status === 401) {
+                    refreshToken().then((response2) => {
+                        if (response2 !== false) {
+                            submitUploadedFile(PDFOrImg);
+                        } else {
+                            setIsUploading(false);
+                            setSelectedFile(undefined);
+                            setSelectedFileName("");
+                            setEditedFileName("");
+                            modalHandleClose(" uploadImg");
+                            setDetailsShow(false);
+                            
+                            dispatch({
+                                type: ShowLogin2Modal,
+                            });
+                        }
+                    });
+                } else {
+                    setIsUploading(false);
+                    console.log("not uploaded")
+                }
+            });
+        }
+    }
+    
+    function addUploadFileUrl(fileUrl, imageName, PDFOrImg, newFile) {
+        if (fileUrl) {
+            if (PDFOrImg === 1) {
+                let tempArrayNames = [...uploadedPDFNameList];
+                let tempArrayFiles = [...uploadedPDFFile];
+                let tempArrayURLs = [...uploadedPDFURL];
+                let freeIndex = tempArrayNames.findIndex(Object.is.bind(null, undefined));
+                if (freeIndex === -1) {
+                    freeIndex = tempArrayNames.length;
+                }
+                tempArrayNames[freeIndex] = <li className="uploaded_name_item" key={freeIndex}>
+                    <i className="fa fa-file"/>
+                    <span className="uploaded_name_item_text">{imageName.replace(/\.[^/.]+$/, "")}</span>
+                    <span className="uploaded_name_item_x" onClick={() => {
+                        setDeleteUploaded(fileUrl, freeIndex, PDFOrImg);
+                    }}>X</span>
+                </li>;
+                
+                tempArrayFiles[freeIndex] = newFile.name;
+                tempArrayURLs[freeIndex] = fileUrl;
+                
+                setUploadedPDFURL(tempArrayURLs);
+                setUploadedPDFFile(tempArrayFiles);
+                setUploadedPDFNameList(tempArrayNames);
+            } else {
+                let tempArray = uploadedImagesList;
+                let freeIndex = tempArray.findIndex(Object.is.bind(null, undefined));
+                if (freeIndex === -1) {
+                    freeIndex = tempArray.length;
+                }
+                tempArray[freeIndex] = <li className="uploaded_image_item" key={freeIndex}>
+                    <img src={`https://api.atlaspood.ir/${fileUrl}`} className="img-fluid" alt=""/>
+                </li>;
+                setUploadedImagesList(tempArray);
+                
+                let tempArrayNames = [...uploadedImagesNamesList];
+                let tempArrayFiles = [...uploadedImagesFile];
+                let tempArrayURLs = [...uploadedImagesURL];
+                tempArrayNames[freeIndex] = <li className="uploaded_name_item" key={freeIndex}>
+                    <i className="fa fa-file"/>
+                    <span className="uploaded_name_item_text">{imageName.replace(/\.[^/.]+$/, "")}</span>
+                    <span className="uploaded_name_item_x" onClick={() => {
+                        setDeleteUploaded(fileUrl, freeIndex, PDFOrImg);
+                    }}>X</span>
+                </li>;
+                tempArrayFiles[freeIndex] = newFile.name;
+                tempArrayURLs[freeIndex] = fileUrl;
+                
+                setUploadedImagesURL(tempArrayURLs);
+                setUploadedImagesFile(tempArrayFiles);
+                setUploadedImagesNamesList(tempArrayNames);
+            }
+        }
+        
+        /* test */
+        else {
+            let tempArray = [...uploadedImagesList];
+            let freeIndex = tempArray.findIndex(Object.is.bind(null, undefined));
+            if (freeIndex === -1) {
+                freeIndex = tempArray.length;
+            }
+            // console.log(freeIndex);
+            tempArray[freeIndex] = <li className="uploaded_image_item" key={freeIndex}>
+                <img src={`https://api.atlaspood.ir/${defaultFabricPhoto}`} className="img-fluid" alt=""/>
+            </li>;
+            // console.log(tempArray);
+            setUploadedImagesList(tempArray);
+            
+            
+            let tempArrayNames = [...uploadedImagesNamesList];
+            tempArrayNames[freeIndex] = <li className="uploaded_name_item" key={freeIndex}>
+                <i className="fa fa-file"/>
+                <span className="uploaded_name_item_text">{imageName.replace(/\.[^/.]+$/, "")}</span>
+                <span className="uploaded_name_item_x" onClick={() => {
+                    setDeleteUploaded(fileUrl, freeIndex, PDFOrImg);
+                }}>X</span>
+            </li>;
+            setUploadedImagesNamesList(tempArrayNames);
+        }
+    }
+    
+    function setDeleteUploaded(fileUrl, freeIndex, PDFOrImg) {
+        // console.log(fileUrl, freeIndex, PDFOrImg);
+        
+        if (PDFOrImg === 1) {
+            setDeleteUploadPdfUrl(fileUrl);
+            setDeleteUploadPdfIndex(freeIndex);
+        } else {
+            setDeleteUploadImageUrl(fileUrl);
+            setDeleteUploadImageIndex(freeIndex);
+        }
+    }
+    
+    function deleteUploadedImg(uploadedImagesList1, uploadedImagesNamesList1, fileUrl, index) {
+        let promise2 = new Promise((resolve, reject) => {
+            if (fileUrl !== "") {
+                axios.delete(baseURLDeleteFile, {
+                    params: {
+                        url: fileUrl
+                    },
+                    headers: authHeader()
+                }).then((response) => {
+                    resolve();
+                }).catch(err => {
+                    if (err.response.status === 401) {
+                        refreshToken().then((response2) => {
+                            if (response2 !== false) {
+                                deleteUploadedImg(uploadedImagesList1, uploadedImagesNamesList1, fileUrl, index);
+                                reject();
+                            } else {
+                                resolve();
+                            }
+                        });
+                    } else {
+                        resolve();
+                    }
+                });
+            } else {
+                resolve();
+            }
+        });
+        promise2.then(() => {
+            let tempArray = [...uploadedImagesList1];
+            let tempArrayNames = [...uploadedImagesNamesList1];
+            let tempArrayFiles = [...uploadedImagesFile];
+            let tempArrayURLs = [...uploadedImagesURL];
+            
+            delete tempArray[index];
+            delete tempArrayNames[index];
+            delete tempArrayFiles[index];
+            delete tempArrayURLs[index];
+            
+            setUploadedImagesURL(tempArrayURLs);
+            setUploadedImagesFile(tempArrayFiles);
+            setUploadedImagesList(tempArray);
+            setUploadedImagesNamesList(tempArrayNames);
+            setDeleteUploadImageUrl("");
+            setDeleteUploadImageIndex(-1);
+        });
+    }
+    
+    function deleteUploadedPdf(uploadedPdfsNamesList1, fileUrl, index) {
+        let promise2 = new Promise((resolve, reject) => {
+            if (fileUrl !== "") {
+                axios.delete(baseURLDeleteFile, {
+                    params: {
+                        url: fileUrl
+                    },
+                    headers: authHeader()
+                }).then((response) => {
+                    resolve();
+                }).catch(err => {
+                    if (err.response.status === 401) {
+                        refreshToken().then((response2) => {
+                            if (response2 !== false) {
+                                deleteUploadedPdf(uploadedPdfsNamesList1, fileUrl, index);
+                                reject();
+                            } else {
+                                resolve();
+                            }
+                        });
+                    } else {
+                        resolve();
+                    }
+                });
+            } else {
+                resolve();
+            }
+        });
+        promise2.then(() => {
+            let tempArrayNames = [...uploadedPdfsNamesList1];
+            let tempArrayFiles = [...uploadedPDFFile];
+            let tempArrayURLs = [...uploadedPDFURL];
+            
+            delete tempArrayNames[index];
+            delete tempArrayFiles[index];
+            delete tempArrayURLs[index];
+            
+            setUploadedPDFURL(tempArrayURLs);
+            setUploadedPDFFile(tempArrayFiles);
+            setUploadedPDFNameList(tempArrayNames);
+            setDeleteUploadImageUrl("");
+            setDeleteUploadImageIndex(-1);
+        });
+    }
+    
+    function getProjectDetail(basketId) {
+        axios.get(baseURGetProject, {
+            params: {
+                id: basketId ? basketId : projectId
+            },
+            headers: authHeader()
+        }).then((response) => {
+            setProjectDetails(response.data, basketId);
+        }).catch(err => {
+            if (err.response.status === 401) {
+                refreshToken().then((response2) => {
+                    if (response2 !== false) {
+                        getProjectDetail();
+                    } else {
+                        navigate("/" + pageLanguage + "/Curtain/" + catID + "/" + modelID);
+                    }
+                });
+            } else {
+                navigate("/" + pageLanguage + "/Curtain/" + catID + "/" + modelID);
+            }
+        });
+    }
+    
+    function setProjectDetails(data, editIndex, changeLang) {
+        if (data && Object.keys(data).length !== 0) {
+            setProjectData(data);
+        }
+        
+        let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+        let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
+        let selectValues = JSON.parse(JSON.stringify(selectCustomValues));
+        let tempSelect = JSON.parse(JSON.stringify(roomLabelSelect));
+        let depSetTempArr = new Set([...depSet]);
+        
+        let postfixFa = "س\u200Cم";
+        let postfixEn = "cm";
+        
+        GetUserProjectData(data, isLoggedIn, editIndex, changeLang).then((temp) => {
+            if (editIndex !== undefined && Object.keys(temp).length !== 0) {
+                setCartProjectIndex(editIndex);
+            }
+            setCartValues(temp);
+            
+            let tempFabric = {};
+            let promise2 = new Promise((resolve, reject) => {
+                if (temp["FabricId"]) {
+                    axios.get(baseURLFabrics, {
+                        params: {
+                            modelId: modelID
+                        }
+                    }).then((response) => {
+                        response.data.forEach(obj => {
+                            if (obj["FabricId"] === temp["FabricId"]) {
+                                tempFabric = obj;
+                            }
+                        });
+                        resolve();
+                    }).catch(err => {
+                        console.log(err);
+                        reject();
+                    });
+                } else {
+                    reject();
+                }
+            });
+            promise2.then(() => {
+                if (tempFabric !== {}) {
+                    let temp1 = JSON.parse(JSON.stringify(fabricSelected));
+                    temp1.selectedFabricId = tempFabric.FabricId;
+                    temp1.selectedTextEn = tempFabric.DesignEnName;
+                    temp1.selectedTextFa = tempFabric.DesignName;
+                    temp1.selectedColorEn = tempFabric.ColorEnName;
+                    temp1.selectedColorFa = tempFabric.ColorName;
+                    temp1.selectedHasTrim = tempFabric.HasTrim;
+                    temp1.selectedPhoto = tempFabric.FabricOnModelPhotoUrl;
+                    setFabricSelected(temp1);
+                    // fabricClicked(tempFabric["FabricOnModelPhotoUrl"], tempFabric["HasTrim"]);
+                    tempLabels["1"] = location.pathname.split('').slice(1, 3).join('') === "fa" ? tempFabric["DesignName"] + "/" + tempFabric["ColorName"] : tempFabric["DesignEnName"] + "/" + tempFabric["ColorEnName"];
+                    tempValue["1"] = temp["FabricId"];
+                    depSetTempArr = new Set([...setGetDeps("", "1", depSetTempArr)]);
+                    // console.log(depSetTempArr);
+                    // setStep1(temp["FabricId"]);
+                    setStepSelectedLabel(tempLabels);
+                    setStepSelectedValue(tempValue);
+                    promise2.reject();
+                }
+            }).catch(() => {
+                    // console.log(temp);
+                    if (temp["Mount"]) {
+                        setStep2(temp["Mount"]);
+                        if (temp["Mount"] === "Inside") {
+                            setStep21("true");
+                            let refIndex = inputs.current["21"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["21"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["21"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "2", depSetTempArr)]);
+                        } else {
+                            
+                            let refIndex = inputs.current["22"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["22"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["22"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "2", depSetTempArr)]);
+                        }
+                        setStepSelectedLabel(tempLabels);
+                        setStepSelectedValue(tempValue);
+                    }
+                    
+                    if (temp["calcMeasurements"] !== undefined) {
+                        // console.log(temp["calcMeasurements"].toString());
+                        setStep3(temp["calcMeasurements"].toString());
+                        if (!temp["calcMeasurements"]) {
+                            let refIndex = inputs.current["31"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["31"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["31"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            
+                            selectValues["width"] = temp["Width"] ? [{value: temp["Width"]}] : [];
+                            selectValues["length"] = temp["Height"] ? [{value: temp["Height"]}] : [];
+                            depSetTempArr = new Set([...setGetDeps((temp["Width"] ? "" : "31,") + (temp["Height"] ? "" : "32,"), "3", depSetTempArr)]);
+                            setSelectCustomValues(selectValues);
+                            
+                        } else {
+                            let refIndex = inputs.current["32"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["32"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["32"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            if (temp["Mount"]) {
+                                if (temp["Mount"] === "Inside") {
+                                    // console.log(temp);
+                                    let tempWidth=changeLang? temp["Width1"] :temp["Width"];
+                                    let tempHeight=changeLang? temp["Height1"] :temp["Height"];
+                                    
+                                    selectValues["width1"] = tempWidth ? [{value: tempWidth}] : [];
+                                    selectValues["width2"] = temp["Width2"] ? [{value: temp["Width2"]}] : [];
+                                    selectValues["width3"] = temp["Width3"] ? [{value: temp["Width3"]}] : [];
+                                    selectValues["height1"] = tempHeight ? [{value: tempHeight}] : [];
+                                    selectValues["height2"] = temp["Height2"] ? [{value: temp["Height2"]}] : [];
+                                    selectValues["height3"] = temp["Height3"] ? [{value: temp["Height3"]}] : [];
+                                    if (tempWidth && temp["Width2"] && temp["Width3"]) {
+                                        let tempMin = Math.min(tempWidth, temp["Width2"], temp["Width3"]);
+                                        tempLabels["3AIn"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
+                                    }
+                                    if (tempHeight && temp["Height2"] && temp["Height3"]) {
+                                        let tempMax = Math.max(tempHeight, temp["Height2"], temp["Height3"]);
+                                        tempLabels["3BIn"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + postfixFa : tempMax + postfixEn;
+                                    }
+                                    
+                                    depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "3AIn1,") + (temp["Width2"] ? "" : "3AIn2,") + (temp["Width3"] ? "" : "3AIn3,") + (tempHeight ? "" : "3BIn1,") + (temp["Height2"] ? "" : "3BIn2,") + (temp["Height3"] ? "" : "3BIn3,"), "3", depSetTempArr)]);
+                                    setSelectCustomValues(selectValues);
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                } else {
+                                    let tempWidth=changeLang? temp["Width3A"] :temp["Width"];
+                                    let tempHeight=changeLang? temp["Height3C"] :temp["Height"];
+                                    
+                                    // console.log(temp,tempWidth,tempHeight);
+                                    
+                                    selectValues["width3A"] = tempWidth ? [{value: tempWidth}] : [];
+                                    if (tempWidth) {
+                                        tempLabels["3AOut"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                    }
+                                    selectValues["height3C"] = tempHeight ? [{value: tempHeight}] : [];
+                                    if (tempHeight) {
+                                        tempLabels["3COut"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
+                                    }
+                                    selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
+                                    selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                    if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
+                                        tempLabels["3BOut"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
+                                    }
+                                    selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
+                                    if (temp["ShadeMount"] !== undefined) {
+                                        tempLabels["3DOut"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["ShadeMount"]}`) + postfixFa : temp["ShadeMount"] + postfixEn;
+                                    }
+                                    
+                                    depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "3AOut,") + (tempHeight ? "" : "3COut,") + (temp["ExtensionLeft"] !== undefined ? "" : "3BOut1,") + (temp["ExtensionRight"] !== undefined ? "" : "3BOut2,") + (temp["ShadeMount"] !== undefined ? "" : "3DOut,"), "3", depSetTempArr)]);
+                                    setSelectCustomValues(selectValues);
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                }
+                            }
+                        }
+                    }
+                    if (temp["WidthCart"] && temp["HeightCart"]) {
+                        getWindowSize(temp["WidthCart"], temp["HeightCart"]);
+                    }
+                    
+                    if (temp["ControlType"]) {
+                        setStep4(temp["ControlType"]);
+                        if (temp["ControlType"] === "Continuous Loop") {
+                            let refIndex = inputs.current["41"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["41"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["41"].value;
+                            
+                            depSetTempArr = new Set([...setGetDeps((temp["ControlPosition"] ? "" : "4A,") + (temp["ChainLength"] ? "" : "4B,"), "4", depSetTempArr)]);
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            
+                            if (temp["ControlPosition"]) {
+                                setStep4A(temp["ControlPosition"].toString());
+                                if (temp["ControlPosition"] === "Left") {
+                                    let refIndex = inputs.current["4A1"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["4A1"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["4A1"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                } else {
+                                    
+                                    let refIndex = inputs.current["4A2"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["4A2"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["4A2"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                }
+                            }
+                            
+                            if (temp["ChainLength"]) {
+                                setStep4B(temp["ChainLength"].toString());
+                                if (temp["ChainLength"].toString() === "150") {
+                                    let refIndex = inputs.current["4B1"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["4B1"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["4B1"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                } else if (temp["ChainLength"].toString() === "300") {
+                                    let refIndex = inputs.current["4B2"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["4B2"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["4B2"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                } else {
+                                    let refIndex = inputs.current["4B3"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["4B3"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["4B3"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                }
+                            }
+                            
+                        } else {
+                            let refIndex = inputs.current["42"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["42"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["42"].value;
+                            
+                            depSetTempArr = new Set([...setGetDeps((temp["hasPower"] ? (temp["MotorPosition"] ? "" : "411,") : "41,"), "4", depSetTempArr)]);
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            if (temp["hasPower"] !== undefined) {
+                                setStep41(temp["hasPower"].toString());
+                                let refIndex = inputs.current["411"].getAttribute('ref-num');
+                                tempLabels[refIndex] = inputs.current["411"].getAttribute('text');
+                                tempValue[refIndex] = inputs.current["411"].value;
+                                setStepSelectedLabel(tempLabels);
+                                setStepSelectedValue(tempValue);
+                                
+                                setSelectedMotorPosition(temp["MotorPosition"] ? [{
+                                    value: temp["MotorPosition"],
+                                    label: MotorPosition[pageLanguage].find(opt => opt.value === temp["MotorPosition"]).label
+                                }] : []);
+                                setRemoteName(temp["RemoteName"] ? temp["RemoteName"] : "");
+                                setSelectedMotorChannels(temp["MotorChannels"] ? temp["MotorChannels"].map(item => ({
+                                    value: item,
+                                    label: motorChannels[pageLanguage].find(opt => opt.value === item).label
+                                })) : []);
+                            }
+                        }
+                    }
+                    
+                    if (temp["MetalValanceStyle"]) {
+                        setStep5(temp["MetalValanceStyle"]);
+                        
+                        if (temp["MetalValanceStyle"] === "MetalValance") {
+                            let refIndex = inputs.current["51"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["51"].getAttribute('text') + (temp["MetalValanceColor"] ? "/" + optionsMetalValance[pageLanguage].find(opt => opt.value === temp["MetalValanceColor"]).label : "");
+                            tempValue[refIndex] = inputs.current["51"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            setSelectedValanceColor1(temp["MetalValanceColor"] ? [{
+                                value: temp["MetalValanceColor"],
+                                label: optionsMetalValance[pageLanguage].find(opt => opt.value === temp["MetalValanceColor"]).label
+                            }] : []);
+                            depSetTempArr = new Set([...setGetDeps((temp["MetalValanceColor"] ? "" : "51,"), "5", depSetTempArr)]);
+                        } else {
+                            let refIndex = inputs.current["52"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["52"].getAttribute('text') + (temp["MetalValanceColor"] ? "/" + temp["MetalValanceColor"] : "");
+                            tempValue[refIndex] = inputs.current["52"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            setSelectedValanceColor2(temp["MetalValanceColor"] ? [{
+                                value: temp["MetalValanceColor"],
+                                label: optionsMetalValance[pageLanguage].find(opt => opt.value === temp["MetalValanceColor"]).label
+                            }] : []);
+                            depSetTempArr = new Set([...setGetDeps((temp["MetalValanceColor"] ? "" : "52,"), "5", depSetTempArr)]);
+                        }
+                    }
+                    if (temp["RoomNameEn"]) {
+                        setSavedProjectRoomLabel(temp["RoomNameEn"]);
+                        
+                        depSetTempArr = new Set([...setGetDeps("", "61", depSetTempArr)]);
+                        setSelectedRoomLabel(temp["RoomNameEn"] ? [{
+                            value: temp["RoomNameEn"],
+                            label: rooms[pageLanguage].find(opt => opt.value === temp["RoomNameEn"]).label
+                        }] : []);
+                        tempSelect.label = rooms[pageLanguage].find(opt => opt.value === temp["RoomNameEn"]).label;
+                        tempSelect.value = temp["RoomNameEn"];
+                        setRoomLabelSelect(tempSelect);
+                        if (temp["WindowName"] === undefined || (temp["WindowName"] && temp["WindowName"] === "")) {
+                            tempLabels["6"] = tempSelect.label;
+                        } else if (temp["WindowName"]) {
+                            tempLabels["6"] = tempSelect.label + " - " + temp["WindowName"];
+                        }
+                        setStepSelectedLabel(tempLabels);
+                    }
+                    if (temp["WindowName"] && temp["WindowName"] !== "") {
+                        setSavedProjectRoomText(temp["WindowName"]);
+                        depSetTempArr = new Set([...setGetDeps("", "62", depSetTempArr)]);
+                        setRoomLabelText(temp["WindowName"]);
+                    }
+                    
+                    if (temp["uploadedImagesURL"] && temp["uploadedImagesURL"].length > 0) {
+                        setUploadedImagesURL(temp["uploadedImagesURL"]);
+                        setUploadedImagesFile(temp["uploadedImagesFile"]);
+                        let tempArrayNames = [];
+                        let tempArray = [];
+                        
+                        let promise3 = new Promise((resolve, reject) => {
+                            temp["uploadedImagesFile"].forEach((obj, index) => {
+                                tempArrayNames[index] = <li className="uploaded_name_item" key={index}>
+                                    <i className="fa fa-file"/>
+                                    <span className="uploaded_name_item_text">{obj.replace(/\.[^/.]+$/, "")}</span>
+                                    <span className="uploaded_name_item_x" onClick={() => {
+                                        setDeleteUploaded(temp["uploadedImagesURL"][index], index, 2);
+                                    }}>X</span>
+                                </li>;
+                                
+                                tempArray[index] = <li className="uploaded_image_item" key={index}>
+                                    <img src={`https://api.atlaspood.ir/${temp["uploadedImagesURL"][index]}`} className="img-fluid" alt=""/>
+                                </li>;
+                                
+                                if (index === temp["uploadedImagesFile"].length - 1) {
+                                    resolve();
+                                }
+                            });
+                        });
+                        
+                        promise3.then(() => {
+                            setUploadedImagesNamesList(tempArrayNames);
+                            setUploadedImagesList(tempArray);
+                        });
+                        
+                    }
+                    if (temp["uploadedPDFURL"] && temp["uploadedPDFURL"].length > 0) {
+                        setUploadedPDFURL(temp["uploadedPDFURL"]);
+                        setUploadedPDFFile(temp["uploadedPDFFile"]);
+                        let tempArrayNames = [];
+                        
+                        let promise3 = new Promise((resolve, reject) => {
+                            temp["uploadedPDFFile"].forEach((obj, index) => {
+                                tempArrayNames[index] = <li className="uploaded_name_item" key={index}>
+                                    <i className="fa fa-file"/>
+                                    <span className="uploaded_name_item_text">{obj.replace(/\.[^/.]+$/, "")}</span>
+                                    <span className="uploaded_name_item_x" onClick={() => {
+                                        setDeleteUploaded(temp["uploadedPDFURL"][index], index, 1);
+                                    }}>X</span>
+                                </li>;
+                                if (index === temp["uploadedPDFFile"].length - 1) {
+                                    resolve();
+                                }
+                            });
+                        });
+                        
+                        promise3.then(() => {
+                            setUploadedPDFNameList(tempArrayNames);
+                        });
+                    }
+                    
+                    setDepSet(depSetTempArr);
+                    setStepSelectedLabel(tempLabels);
+                    setStepSelectedValue(tempValue);
+                    
+                }
+            );
+        });
+    }
+    
+    function filterSelected(filter, filterId, isDelete) {
+        // console.log(filterColors, filterPatterns, filterPatterns, filterPrices);
+        if (filter === 1) {
+            if (isDelete) {
+                setFilterColors([
+                    ...filterColors,
+                    filterId
+                ]);
+            } else {
+                setFilterColors(
+                    filterColors.filter((id1) => id1 !== filterId),
+                );
+            }
+        } else if (filter === 2) {
+            if (isDelete) {
+                setFilterPatterns([
+                    ...filterPatterns,
+                    filterId
+                ]);
+            } else {
+                setFilterPatterns(
+                    filterPatterns.filter((id1) => id1 !== filterId),
+                );
+            }
+        } else if (filter === 3) {
+            if (isDelete) {
+                setFilterTypes([
+                    ...filterTypes,
+                    filterId
+                ]);
+            } else {
+                setFilterTypes(
+                    filterTypes.filter((id1) => id1 !== filterId),
+                );
+            }
+        } else {
+            if (isDelete) {
+                setFilterPrices([
+                    ...filterPrices,
+                    filterId
+                ]);
+            } else {
+                setFilterPrices(
+                    filterPrices.filter((id1) => id1 !== filterId),
+                );
+            }
+        }
     }
     
     const optionsMetalValance = {
@@ -1426,6 +2658,7 @@ function Zebra({CatID, ModelID}) {
         
     };
     const [selectedMotorChannels, setSelectedMotorChannels] = useState([motorChannels[pageLanguage].find(opt => opt.value === '0')]);
+    const [selectedMotorPosition, setSelectedMotorPosition] = useState([]);
     
     const colors = {
         "en": [
@@ -1451,8 +2684,7 @@ function Zebra({CatID, ModelID}) {
             {value: 'Grey', label: 'خاکستری'},
             {value: 'Orange', label: 'نارنجی'},
             {value: 'Pink', label: 'صورتی'}
-        ],
-        
+        ]
     };
     
     const patterns = {
@@ -1473,8 +2705,7 @@ function Zebra({CatID, ModelID}) {
             {value: 'Modern', label: 'مدرن'},
             {value: 'Solid', label: 'یکرنگ'},
             {value: 'Stripes', label: 'راه راه'}
-        ],
-        
+        ]
     };
     
     const types = {
@@ -1493,22 +2724,20 @@ function Zebra({CatID, ModelID}) {
             {value: 'Print', label: 'چاپی'},
             {value: 'Silk', label: 'ابریشمی'},
             {value: 'Velvet', label: 'مخملی'}
-        ],
-        
+        ]
     };
     
     const prices = {
         "en": [
-            {value: '$', label: '$'},
-            {value: '$$', label: '$$'},
-            {value: '$$$', label: '$$$'}
+            {value: 'standard', label: 'standard'},
+            {value: 'premium', label: 'premium'},
+            {value: 'Luxe', label: 'Luxe'}
         ],
         "fa": [
-            {value: '$', label: '$'},
-            {value: '$$', label: '$$'},
-            {value: '$$$', label: '$$$'}
-        ],
-        
+            {value: 'standard', label: 'معمولی'},
+            {value: 'premium', label: 'اعلاء'},
+            {value: 'Luxe', label: 'تجملی'}
+        ]
     };
     
     const rooms = {
@@ -1584,7 +2813,7 @@ function Zebra({CatID, ModelID}) {
     };
     
     useEffect(() => {
-        if (fabricSelected.selectedFabricId !== 0) {
+        if (fabricSelected.selectedFabricId && fabricSelected.selectedFabricId !== 0) {
             fabricClicked(fabricSelected.selectedPhoto, fabricSelected.selectedHasTrim);
             let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
             tempLabels["1"] = location.pathname.split('').slice(1, 3).join('') === "fa" ? fabricSelected.selectedTextFa + "/" + fabricSelected.selectedColorFa : fabricSelected.selectedTextEn + "/" + fabricSelected.selectedColorEn;
@@ -1592,99 +2821,147 @@ function Zebra({CatID, ModelID}) {
             tempValue["1"] = fabricSelected.selectedFabricId;
             setStepSelectedLabel(tempLabels);
             setStepSelectedValue(tempValue);
-            // setCart("Fabric", fabricSelected.selectedFabricId);
-            setCart("Fabric", `${fabricSelected.selectedFabricId}`, "", "FabricDesignFa,FabricDesignEn,FabricColorEn,FabricColorFa,PhotoUrl", [fabricSelected.selectedTextFa, fabricSelected.selectedTextEn, fabricSelected.selectedColorEn, fabricSelected.selectedColorFa, fabricSelected.selectedPhoto]);
+            // setCart("FabricId", fabricSelected.selectedFabricId);
+            setCart("FabricId", `${fabricSelected.selectedFabricId}`, "", "FabricDesignFa,FabricDesignEn,FabricColorEn,FabricColorFa,PhotoUrl", [fabricSelected.selectedTextFa, fabricSelected.selectedTextEn, fabricSelected.selectedColorEn, fabricSelected.selectedColorFa, fabricSelected.selectedPhoto]);
             // setCart("PhotoUrl", fabricSelected.selectedPhoto);
             setDeps("", "1");
+            setStep1(fabricSelected.selectedFabricId.toString());
         }
     }, [fabricSelected]);
     
     useEffect(() => {
-        if (firstRender === false) {
-            const tempLang = location.pathname.split('');
-            pageLanguage = tempLang.slice(1, 3).join('');
-            setShowLabels(false);
-            Object.keys(inputs.current).forEach(refObj => {
-                if (inputs.current[refObj] !== null) {
-                    if (inputs.current[refObj].checked) {
-                        inputs.current[refObj].click();
-                    }
-                }
-            });
-            setTimeout(() => {
-                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                let tempObj = {};
-                tempObj["3AOut"] = selectCustomValues.width3A[0];
-                tempObj["3BOut"] = selectCustomValues.left[0];
-                tempObj["3COut"] = selectCustomValues.height3C[0];
-                tempObj["3DOut"] = selectCustomValues.shadeMount[0];
-                tempObj["3AIn"] = selectCustomValues.width1[0];
-                tempObj["3BIn"] = selectCustomValues.height1[0];
-                tempObj["3"] = selectCustomValues.width[0];
-                
-                Object.keys(tempObj).forEach(objKey => {
-                    if (tempObj[objKey] !== undefined) {
-                        if (objKey === "3AIn") {
-                            let temp = JSON.parse(JSON.stringify(stepSelectedOptions));
-                            if (temp.labels[objKey] === undefined)
-                                temp.labels[objKey] = [];
-                            if (temp.values[objKey] === undefined)
-                                temp.values[objKey] = [];
-                            let tempMin = temp.values[objKey][temp.values[objKey].indexOf(Math.min(...temp.values[objKey]))];
-                            tempLabels[objKey] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + "س\u200Cم" : tempMin + "cm";
-                        } else if (objKey === "3BIn") {
-                            let temp = JSON.parse(JSON.stringify(stepSelectedOptions));
-                            if (temp.labels[objKey] === undefined)
-                                temp.labels[objKey] = [];
-                            if (temp.values[objKey] === undefined)
-                                temp.values[objKey] = [];
-                            let tempMax = temp.values[objKey][temp.values[objKey].indexOf(Math.max(...temp.values[objKey]))];
-                            tempLabels[objKey] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + "س\u200Cم" : tempMax + "cm";
-                            
-                        } else if (objKey === "3BOut") {
-                            let temp = JSON.parse(JSON.stringify(leftRight));
-                            
-                            if (temp.right !== "" && temp.left !== "") {
-                                tempLabels[objKey] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp.right}`) + "س\u200Cم"}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp.left}`) + "س\u200Cم"}` : `Left: ${temp.left + "cm"}\u00A0\u00A0\u00A0Right: ${temp.right + "cm"}`;
-                            }
-                        } else if (objKey === "3") {
-                            let temp = JSON.parse(JSON.stringify(widthLength));
-                            
-                            if (temp.length !== "" && temp.width !== "") {
-                                tempLabels[objKey] = pageLanguage === "fa" ? `ارتفاع:  ${NumberToPersianWord.convertEnToPe(`${temp.length}`) + "س\u200Cم"}\u00A0\u00A0\u00A0عرض: ${NumberToPersianWord.convertEnToPe(`${temp.width}`) + "س\u200Cم"}` : `Left: ${temp.width + "cm"}\u00A0\u00A0\u00A0Right: ${temp.length + "cm"}`;
-                            }
+        renderFabrics();
+    }, [step1]);
+    // useEffect(() => {
+    //     if (firstRender === false) {
+    //         const tempLang = location.pathname.split('');
+    //         pageLanguage = tempLang.slice(1, 3).join('');
+    //         setShowLabels(false);
+    //         Object.keys(inputs.current).forEach(refObj => {
+    //             if (inputs.current[refObj] !== null) {
+    //                 if (inputs.current[refObj].checked) {
+    //                     inputs.current[refObj].click();
+    //                 }
+    //             }
+    //         });
+    //         setTimeout(() => {
+    //             let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+    //             let tempObj = {};
+    //             tempObj["3AOut"] = selectCustomValues.width3A[0];
+    //             tempObj["3BOut"] = selectCustomValues.left[0];
+    //             tempObj["3COut"] = selectCustomValues.height3C[0];
+    //             tempObj["3DOut"] = selectCustomValues.shadeMount[0];
+    //             tempObj["3AIn"] = selectCustomValues.width1[0];
+    //             tempObj["3BIn"] = selectCustomValues.height1[0];
+    //             tempObj["3"] = selectCustomValues.width[0];
+    //
+    //             Object.keys(tempObj).forEach(objKey => {
+    //                 if (tempObj[objKey] !== undefined) {
+    //                     if (objKey === "3AIn") {
+    //                         let temp = JSON.parse(JSON.stringify(stepSelectedOptions));
+    //                         if (temp.labels[objKey] === undefined)
+    //                             temp.labels[objKey] = [];
+    //                         if (temp.values[objKey] === undefined)
+    //                             temp.values[objKey] = [];
+    //                         let tempMin = temp.values[objKey][temp.values[objKey].indexOf(Math.min(...temp.values[objKey]))];
+    //                         tempLabels[objKey] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + "س\u200Cم" : tempMin + "cm";
+    //                     } else if (objKey === "3BIn") {
+    //                         let temp = JSON.parse(JSON.stringify(stepSelectedOptions));
+    //                         if (temp.labels[objKey] === undefined)
+    //                             temp.labels[objKey] = [];
+    //                         if (temp.values[objKey] === undefined)
+    //                             temp.values[objKey] = [];
+    //                         let tempMax = temp.values[objKey][temp.values[objKey].indexOf(Math.max(...temp.values[objKey]))];
+    //                         tempLabels[objKey] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + "س\u200Cم" : tempMax + "cm";
+    //
+    //                     } else if (objKey === "3BOut") {
+    //                         let temp = JSON.parse(JSON.stringify(leftRight));
+    //
+    //                         if (temp.right !== "" && temp.left !== "") {
+    //                             tempLabels[objKey] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp.right}`) + "س\u200Cم"}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp.left}`) + "س\u200Cم"}` : `Left: ${temp.left + "cm"}\u00A0\u00A0\u00A0Right: ${temp.right + "cm"}`;
+    //                         }
+    //                     } else if (objKey === "3") {
+    //                         let temp = JSON.parse(JSON.stringify(widthLength));
+    //
+    //                         if (temp.length !== "" && temp.width !== "") {
+    //                             tempLabels[objKey] = pageLanguage === "fa" ? `ارتفاع:  ${NumberToPersianWord.convertEnToPe(`${temp.length}`) + "س\u200Cم"}\u00A0\u00A0\u00A0عرض: ${NumberToPersianWord.convertEnToPe(`${temp.width}`) + "س\u200Cم"}` : `Left: ${temp.width + "cm"}\u00A0\u00A0\u00A0Right: ${temp.length + "cm"}`;
+    //                         }
+    //                     } else {
+    //                         tempLabels[objKey] = pageLanguage === "fa" ? `${NumberToPersianWord.convertEnToPe(`${tempObj[objKey].value}`) + "س\u200Cم"}` : `${tempObj[objKey].value + "cm"}`;
+    //                     }
+    //                 }
+    //             });
+    //
+    //             setTimeout(() => {
+    //                 setStepSelectedLabel(tempLabels);
+    //             }, 100);
+    //
+    //
+    //             // temp.width1 = [];
+    //             // temp.width2 = [];
+    //             // temp.width3 = [];
+    //             // temp.height1 = [];
+    //             // temp.height2 = [];
+    //             // temp.left = [];
+    //             // temp.right = [];
+    //             // temp.width = [];
+    //             // temp.length = [];
+    //             // temp.width3A = [];
+    //             // temp.height3C = [];
+    //             // temp.shadeMount = [];
+    //
+    //             setTimeout(() => {
+    //                 setShowLabels(true);
+    //             }, 1000);
+    //         }, 5000);
+    //     } else {
+    //         setFirstRender(false);
+    //     }
+    // }, [location.pathname]);
+    
+    useEffect(() => {
+        // console.log("hi2");
+        if ((projectModalState === 2 && isLoggedIn) || (saveProjectCount !== 0 && isLoggedIn)) {
+            if (roomLabelText !== "" && selectedRoomLabel.length) {
+                if (projectId && projectId !== "") {
+                    SaveUserProject(depSet, cartValues, [uploadedImagesFile, uploadedImagesURL, uploadedPDFFile, uploadedPDFURL], `${modelID}`, price, defaultModelName, defaultModelNameFa, projectData).then((temp) => {
+                        if (temp === 401) {
+                            setSaveProjectCount(saveProjectCount + 1);
+                        } else if (temp) {
+                            setProjectModalState(1);
+                            setSavingLoading(false);
                         } else {
-                            tempLabels[objKey] = pageLanguage === "fa" ? `${NumberToPersianWord.convertEnToPe(`${tempObj[objKey].value}`) + "س\u200Cم"}` : `${tempObj[objKey].value + "cm"}`;
+                            console.log("project not saved!");
+                            setSavingLoading(false);
                         }
-                    }
-                });
-                
-                setTimeout(() => {
-                    setStepSelectedLabel(tempLabels);
-                }, 100);
-                
-                
-                // temp.width1 = [];
-                // temp.width2 = [];
-                // temp.width3 = [];
-                // temp.height1 = [];
-                // temp.height2 = [];
-                // temp.left = [];
-                // temp.right = [];
-                // temp.width = [];
-                // temp.length = [];
-                // temp.width3A = [];
-                // temp.height3C = [];
-                // temp.shadeMount = [];
-                
-                setTimeout(() => {
-                    setShowLabels(true);
-                }, 1000);
-            }, 5000);
-        } else {
-            setFirstRender(false);
+                    }).catch(() => {
+                        // console.log("hi6");
+                        setProjectModalState(2);
+                        setSavingLoading(false);
+                    });
+                } else {
+                    SaveUserProject(depSet, cartValues, [uploadedImagesFile, uploadedImagesURL, uploadedPDFFile, uploadedPDFURL], `${modelID}`, price, defaultModelName, defaultModelNameFa).then((temp) => {
+                        if (temp === 401) {
+                            setSaveProjectCount(saveProjectCount + 1);
+                        } else if (temp) {
+                            setProjectModalState(1);
+                            setSavingLoading(false);
+                        } else {
+                            console.log("project not saved!");
+                            setSavingLoading(false);
+                        }
+                    }).catch((err) => {
+                        // console.log("hi5",err);
+                        setProjectModalState(2);
+                        setSavingLoading(false);
+                    });
+                }
+            } else {
+                setProjectModalState(0);
+                modalHandleShow("add_to_project_modal");
+            }
         }
-    }, [location.pathname]);
+    }, [isLoggedIn, saveProjectCount]);
     
     useEffect(() => {
         if (Object.keys(model).length !== 0) {
@@ -1705,20 +2982,36 @@ function Zebra({CatID, ModelID}) {
                 });
                 tempObj[obj["SewingModelAccessoryId"]] = tempObj2;
             });
-            // console.log(tempObj);
             setModelAccessories(tempObj);
             setDefaultFabricPhoto(model["DefaultFabricPhotoUrl"]);
+            setCart("PhotoUrl", model["DefaultFabricPhotoUrl"]);
             setDefaultModelName(model["ModelENName"]);
             setDefaultModelNameFa(model["ModelName"]);
         }
     }, [model]);
     
     useEffect(() => {
+        if (deleteUploadImageIndex !== -1) {
+            if (deleteUploadImageUrl !== "") {
+                deleteUploadedImg(uploadedImagesList, uploadedImagesNamesList, deleteUploadImageUrl, deleteUploadImageIndex);
+            }
+        }
+    }, [deleteUploadImageUrl]);
+    
+    useEffect(() => {
+        if (deleteUploadPdfIndex !== -1) {
+            if (deleteUploadPdfUrl !== "") {
+                deleteUploadedPdf(uploadedPDFNameList, deleteUploadPdfUrl, deleteUploadPdfIndex);
+            }
+        }
+    }, [deleteUploadPdfUrl]);
+    
+    useEffect(() => {
         if (modelID !== '' && catID !== '') {
             // if(firstRender) {
             getCats();
             getModel();
-            getFabrics();
+            // getFabrics();
             // setFirstRender(false);
             // }
         }
@@ -1727,23 +3020,183 @@ function Zebra({CatID, ModelID}) {
     
     useEffect(() => {
         if (Object.keys(fabrics).length) {
-            setTimeout(() => {
-                renderFabrics();
-            }, 1000);
+            renderFabrics();
+        } else {
+            setFabricsList([]);
         }
     }, [fabrics, location.pathname]);
+    
+    useEffect(() => {
+        if (filterChanged["filter"] !== 0) {
+            filterSelected(filterChanged["filter"], filterChanged["filter_id"], filterChanged["isDelete"]);
+            
+            setFilterChanged({
+                filter: 0,
+                filter_id: undefined,
+                isDelete: false
+            });
+        }
+    }, [filterChanged]);
+    
+    useEffect(() => {
+        getFabricsWithFilter();
+    }, [filterColors, filterPatterns, filterTypes, filterPrices, searchText]);
     
     useEffect(() => {
         // setModels([]);
         // setFabrics([]);
         // setFabricsList([]);
         if (pageLanguage !== '') {
-            setCatID(CatID);
-            setModelID(ModelID);
             setSelectedMotorChannels([motorChannels[pageLanguage].find(opt => opt.value === '0')]);
-            
         }
+        GetSewingFilters(1, `${modelID}`).then((temp) => {
+            setSewingColors(temp[location.pathname.split('').slice(1, 3).join('')].map((obj, index) => (
+                <Dropdown.Item as={Button} key={index}>
+                    <label className="dropdown_label">
+                        <input type="checkbox" filter-id={obj.value}
+                               ref={ref => (filterCheckboxes.current["colors"] = [...filterCheckboxes.current["colors"], ref])}
+                               onChange={(e) => {
+                                   setFilterChanged({
+                                       filter: 1,
+                                       filter_id: e.target.getAttribute("filter-id"),
+                                       isDelete: e.target.checked
+                                   });
+                               }} id={"dropdown_color" + obj.value + index}/>
+                        <label htmlFor={"dropdown_color" + obj.value + index} className="checkbox_label">
+                            <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')} alt=""/>
+                        </label>
+                        {obj.label}
+                    </label>
+                </Dropdown.Item>
+            )));
+        });
+        GetSewingFilters(2, `${modelID}`).then((temp) => {
+            setSewingPatterns(temp[location.pathname.split('').slice(1, 3).join('')].map((obj, index) => (
+                <Dropdown.Item as={Button} key={index}>
+                    <label className="dropdown_label">
+                        <input type="checkbox" filter-id={obj.value}
+                               ref={ref => (filterCheckboxes.current["patterns"] = [...filterCheckboxes.current["patterns"], ref])}
+                               onChange={(e) => {
+                                   setFilterChanged({
+                                       filter: 2,
+                                       filter_id: e.target.getAttribute("filter-id"),
+                                       isDelete: e.target.checked
+                                   });
+                               }} id={"dropdown_pattern" + obj.value + index}/>
+                        <label htmlFor={"dropdown_pattern" + obj.value + index} className="checkbox_label">
+                            <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')} alt=""/>
+                        </label>
+                        {obj.label}
+                    </label>
+                </Dropdown.Item>
+            )));
+        });
+        GetSewingFilters(3, `${modelID}`).then((temp) => {
+            setSewingTypes(temp[location.pathname.split('').slice(1, 3).join('')].map((obj, index) => (
+                <Dropdown.Item as={Button} key={index}>
+                    <label className="dropdown_label">
+                        <input type="checkbox" filter-id={obj.value}
+                               ref={ref => (filterCheckboxes.current["types"] = [...filterCheckboxes.current["types"], ref])}
+                               onChange={(e) => {
+                                   setFilterChanged({
+                                       filter: 3,
+                                       filter_id: e.target.getAttribute("filter-id"),
+                                       isDelete: e.target.checked
+                                   });
+                               }} id={"dropdown_type" + obj.value + index}/>
+                        <label htmlFor={"dropdown_type" + obj.value + index} className="checkbox_label">
+                            <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')} alt=""/>
+                        </label>
+                        {obj.label}
+                    </label>
+                </Dropdown.Item>
+            )));
+        });
+        GetSewingFilters(4, `${modelID}`).then((temp) => {
+            setSewingPrices(temp[location.pathname.split('').slice(1, 3).join('')].map((obj, index) => (
+                <Dropdown.Item as={Button} key={index}>
+                    <label className="dropdown_label">
+                        <input type="checkbox" filter-id={obj.value}
+                               ref={ref => (filterCheckboxes.current["prices"] = [...filterCheckboxes.current["prices"], ref])}
+                               onChange={(e) => {
+                                   setFilterChanged({
+                                       filter: 4,
+                                       filter_id: e.target.getAttribute("filter-id"),
+                                       isDelete: e.target.checked
+                                   });
+                               }} id={"dropdown_price" + obj.value + index}/>
+                        <label htmlFor={"dropdown_price" + obj.value + index} className="checkbox_label">
+                            <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')} alt=""/>
+                        </label>
+                        {obj.label}
+                    </label>
+                </Dropdown.Item>
+            )));
+        });
     }, [pageLanguage, location.pathname]);
+    
+    useEffect(() => {
+        if (Object.keys(cartValues).length !== 0) {
+            cartValues["SewingModelId"] = `${modelID}`;
+            sessionStorage.setItem("cartValues", JSON.stringify(cartValues));
+            if (editIndex) {
+                sessionStorage.setItem("editIndex", JSON.stringify(editIndex));
+            }
+            if (projectId) {
+                sessionStorage.setItem("projectId", JSON.stringify(projectId));
+            }
+        }
+    }, [cartValues]);
+    
+    useEffect(() => {
+        if (sessionStorage.getItem("cartValues") !== null && editIndex === undefined && projectId === undefined) {
+            let tempCartValues = {};
+            let tempEditIndex;
+            let tempProjectId;
+            if (sessionStorage.getItem("cartValues") !== null) {
+                tempCartValues = JSON.parse(sessionStorage.getItem("cartValues"));
+                if (Object.keys(tempCartValues).length !== 0) {
+                    if (tempCartValues["SewingModelId"] && tempCartValues["SewingModelId"] === `${modelID}`) {
+                        setStepSelectedLabel({});
+                        setProjectDetails(tempCartValues, undefined, true);
+                    }
+                }
+            }
+            if (sessionStorage.getItem("editIndex") !== null) {
+                tempEditIndex = JSON.parse(sessionStorage.getItem("editIndex") && sessionStorage.getItem("editIndex").toUpperCase() !== "UNDEFINED");
+                setEditIndex(tempEditIndex);
+            }
+            if (sessionStorage.getItem("projectId") !== null && sessionStorage.getItem("projectId").toUpperCase() !== "UNDEFINED") {
+                tempProjectId = JSON.parse(sessionStorage.getItem("projectId"));
+                setProjectId(tempProjectId);
+            }
+            sessionStorage.clear();
+        }
+    }, []);
+    
+    
+    useEffect(() => {
+        if (editIndex && editIndex !== "") {
+            if (isLoggedIn) {
+                getProjectDetail(editIndex);
+            } else {
+                if (localStorage.getItem("cart") !== null) {
+                    if (JSON.parse(localStorage.getItem("cart"))["drapery"] !== undefined) {
+                        setProjectDetails(JSON.parse(localStorage.getItem("cart"))["drapery"][editIndex], editIndex);
+                    } else {
+                        navigate("/" + pageLanguage + "/Curtain/" + catID + "/" + modelID);
+                    }
+                } else {
+                    navigate("/" + pageLanguage + "/Curtain/" + catID + "/" + modelID);
+                }
+            }
+        } else if (projectId && projectId !== "") {
+            getProjectDetail();
+        } else if (Object.keys(cartValues).length !== 0) {
+            setStepSelectedLabel({});
+            setProjectDetails(cartValues, undefined, true)
+        }
+    }, [location.pathname]);
     
     return (
         <div className={`Custom_model_container ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
@@ -1766,7 +3219,9 @@ function Zebra({CatID, ModelID}) {
             </div>
             <div className="model_customize_container">
                 <div className="model_customize_image">
-                    <img src={`http://api.atlaspood.ir/${defaultFabricPhoto}`} className="img-fluid" alt=""/>
+                    {defaultFabricPhoto &&
+                    <img src={`https://api.atlaspood.ir/${defaultFabricPhoto}`} className="img-fluid" alt=""/>
+                    }
                 </div>
                 <div className={`model_customize_section ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
                     <Accordion ref={accordion} flush activeKey={accordionActiveKey}>
@@ -1784,13 +3239,14 @@ function Zebra({CatID, ModelID}) {
                                                 <div className="search_box">
                                                     <input type="text" placeholder={t("Search for product Name/Code")}
                                                            className="form-control search_input"
-                                                           name="search_input" defaultValue=""
+                                                           name="search_input" value={searchText}
                                                            ref={search_input}
                                                            onChange={(e) => {
                                                                if (e.target.value !== "")
                                                                    setSearchShow(true);
                                                                else
                                                                    setSearchShow(false);
+                                                               setSearchText(e.target.value);
                                                            }}/>
                                                     {searchShow &&
                                                     <div className="clear-icon-container" onClick={() => {
@@ -1814,19 +3270,13 @@ function Zebra({CatID, ModelID}) {
                                                             <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu className="filter_color_items">
-                                                            {colors[location.pathname.split('').slice(1, 3).join('')].map((obj, index) => (
-                                                                <Dropdown.Item as={Button} key={index}>
-                                                                    <label className="dropdown_label">
-                                                                        <input type="checkbox" value={obj.value}
-                                                                               ref={ref => (filterCheckboxes.current["colors"] = [...filterCheckboxes.current["colors"], ref])}/>
-                                                                        {obj.label}
-                                                                    </label>
-                                                                </Dropdown.Item>
-                                                            ))}
+                                                            <div className="filter_items_container">
+                                                                {sewingColors}
+                                                            </div>
                                                             <div className="filter_inside_button_section">
                                                                 <div className="clear_inside_filter" text="colors"
                                                                      onClick={(e) => clearFilters(e)}>{t("filter_Clear Filters")}</div>
-                                                                <div className="done_inside_filter">{t("filter_Done")}</div>
+                                                                <Dropdown.Toggle as="div" className="done_inside_filter">{t("filter_Done")}</Dropdown.Toggle>
                                                             </div>
                                                         </Dropdown.Menu>
                                                     </Dropdown>
@@ -1838,19 +3288,13 @@ function Zebra({CatID, ModelID}) {
                                                             <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
-                                                            {patterns[location.pathname.split('').slice(1, 3).join('')].map((obj, index) => (
-                                                                <Dropdown.Item as={Button} key={index}>
-                                                                    <label className="dropdown_label">
-                                                                        <input type="checkbox" value={obj.value}
-                                                                               ref={ref => (filterCheckboxes.current["patterns"] = [...filterCheckboxes.current["patterns"], ref])}/>
-                                                                        {obj.label}
-                                                                    </label>
-                                                                </Dropdown.Item>
-                                                            ))}
+                                                            <div className="filter_items_container">
+                                                                {sewingPatterns}
+                                                            </div>
                                                             <div className="filter_inside_button_section">
                                                                 <div className="clear_inside_filter" text="patterns"
                                                                      onClick={(e) => clearFilters(e)}>{t("filter_Clear Filters")}</div>
-                                                                <div className="done_inside_filter">{t("filter_Done")}</div>
+                                                                <Dropdown.Toggle as="div" className="done_inside_filter">{t("filter_Done")}</Dropdown.Toggle>
                                                             </div>
                                                         </Dropdown.Menu>
                                                     </Dropdown>
@@ -1862,18 +3306,12 @@ function Zebra({CatID, ModelID}) {
                                                             <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
-                                                            {types[location.pathname.split('').slice(1, 3).join('')].map((obj, index) => (
-                                                                <Dropdown.Item as={Button} key={index}>
-                                                                    <label className="dropdown_label">
-                                                                        <input type="checkbox" value={obj.value}
-                                                                               ref={ref => (filterCheckboxes.current["types"] = [...filterCheckboxes.current["types"], ref])}/>
-                                                                        {obj.label}
-                                                                    </label>
-                                                                </Dropdown.Item>
-                                                            ))}
+                                                            <div className="filter_items_container">
+                                                                {sewingTypes}
+                                                            </div>
                                                             <div className="filter_inside_button_section">
                                                                 <div className="clear_inside_filter" text="types" onClick={(e) => clearFilters(e)}>{t("filter_Clear Filters")}</div>
-                                                                <div className="done_inside_filter">{t("filter_Done")}</div>
+                                                                <Dropdown.Toggle as="div" className="done_inside_filter">{t("filter_Done")}</Dropdown.Toggle>
                                                             </div>
                                                         </Dropdown.Menu>
                                                     </Dropdown>
@@ -1885,26 +3323,25 @@ function Zebra({CatID, ModelID}) {
                                                             <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
-                                                            {prices[location.pathname.split('').slice(1, 3).join('')].map((obj, index) => (
-                                                                <Dropdown.Item as={Button} key={index}>
-                                                                    <label className="dropdown_label">
-                                                                        <input type="checkbox" value={obj.value}
-                                                                               ref={ref => (filterCheckboxes.current["prices"] = [...filterCheckboxes.current["prices"], ref])}/>
-                                                                        {obj.label}
-                                                                    </label>
-                                                                </Dropdown.Item>
-                                                            ))}
+                                                            <div className="filter_items_container">
+                                                                <div className="price_filter_description">Pricing tiers determine the upholstery cost of our furniture prices. All
+                                                                    swatch samples ship free no matter the tier.
+                                                                </div>
+                                                                {sewingPrices}
+                                                            </div>
                                                             <div className="filter_inside_button_section">
                                                                 <div className="clear_inside_filter" text="prices"
                                                                      onClick={(e) => clearFilters(e)}>{t("filter_Clear Filters")}</div>
-                                                                <div className="done_inside_filter">{t("filter_Done")}</div>
+                                                                <Dropdown.Toggle as="div" className="done_inside_filter">{t("filter_Done")}</Dropdown.Toggle>
                                                             </div>
                                                         </Dropdown.Menu>
                                                     </Dropdown>
                                                 </div>
                                             </div>
                                         </div>
-                                        {fabricsList}
+                                        <div className="fabrics_list_container">
+                                            {fabricsList}
+                                        </div>
                                         <Modal dialogClassName="zoomModal" show={show} onHide={() => handleClose()}>
                                             <Modal.Header closeButton>
                                                 {zoomModalHeader}
@@ -1931,15 +3368,17 @@ function Zebra({CatID, ModelID}) {
                                     <div className="card_body card_body_radio">
                                         <div className="box50 radio_style">
                                             <img src={require('../Images/drapery/zebra/mount_inside.svg').default} className="img-fluid" alt=""/>
-                                            <input className="radio" type="radio" text={t("mount_Inside")} value="1" name="step2" ref-num="2" id="21"
-                                                   onClick={e => {
+                                            <input className="radio" type="radio" text={t("mount_Inside")} value="1" name="step2" ref-num="2" id="21" checked={step2 === "Inside"}
+                                                   onChange={e => {
                                                        selectChanged(e, "3AOut,3BOut,3COut,3DOut");
+                                                       setStep2("Inside");
+                                                       setStep21("");
                                                        if (stepSelectedValue["3"] === "2") {
-                                                           setDeps("3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3", "2,3AOut,3BOut1,3BOut2,3COut,3DOut");
+                                                           setDeps("3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3,21", "2,3AOut,3BOut1,3BOut2,3COut,3DOut");
                                                            deleteSpecialSelects(2);
                                                            setCart("Mount", "Inside");
                                                        } else {
-                                                           setDeps("", "2");
+                                                           setDeps("21", "2");
                                                            setCart("Mount", "Inside");
                                                        }
                                                 
@@ -1948,21 +3387,58 @@ function Zebra({CatID, ModelID}) {
                                         </div>
                                         <div className="box50 radio_style">
                                             <img src={require('../Images/drapery/zebra/mount_outside.svg').default} className="img-fluid" alt=""/>
-                                            <input className="radio" type="radio" text={t("mount_Outside")} value="2" name="step2" ref-num="2" id="22"
-                                                   onClick={e => {
+                                            <input className="radio" type="radio" text={t("mount_Outside")} value="2" name="step2" ref-num="2" id="22" checked={step2 === "Outside"}
+                                                   onChange={e => {
                                                        selectChanged(e, "3AIn,3BIn");
+                                                       setStep2("Outside");
+                                                       setStep21("");
                                                        if (stepSelectedValue["3"] === "2") {
-                                                           setDeps("3AOut,3BOut1,3BOut2,3COut,3DOut", "2,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3");
+                                                           setDeps("3AOut,3BOut1,3BOut2,3COut,3DOut", "2,21,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3");
                                                            deleteSpecialSelects(1);
                                                            setCart("Mount", "Outside", "Width1,Width2,Width3,Height1,Height2,Height3");
                                                        } else {
-                                                           setDeps("", "2");
+                                                           setDeps("", "2,21");
                                                            setCart("Mount", "Outside", "Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
                                                        }
                                                    }} ref={ref => (inputs.current["22"] = ref)}/>
                                             <label htmlFor="22">{t("mount_Outside")}</label>
                                         </div>
-                                        <NextStep eventKey="3">{t("NEXT STEP")}</NextStep>
+                                        {stepSelectedValue["2"] === "1" &&
+                                        <div className="secondary_options same_row_selection">
+                                            <div className="card-body-display-flex">
+                                                <div className="checkbox_style checkbox_style_step2">
+                                                    <input type="checkbox" value="1" name="step21" ref-num="21" checked={step21 === "true"} onChange={(e) => {
+                                                        if (e.target.checked) {
+                                                            selectChanged(e);
+                                                            setStep21("true");
+                                                            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                            let refIndex = inputs.current["21"].getAttribute('ref-num');
+                                                            tempLabels[refIndex] = inputs.current["21"].getAttribute('text');
+                                                            setStepSelectedLabel(tempLabels);
+                                                            setDeps("", "21");
+                                                        } else {
+                                                            selectUncheck(e);
+                                                            setStep21("");
+                                                            // modalHandleShow("noPower");
+                                                            setDeps("21", "");
+                                                        }
+                                                    }} id="211" ref={ref => (inputs.current["211"] = ref)}/>
+                                                    <label htmlFor="211" className="checkbox_label">
+                                                        <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
+                                                             alt=""/>
+                                                    </label>
+                                                    <span className="checkbox_text">
+                                                        {t("inside_checkbox_title")}
+                                                    </span>
+                                                </div>
+                                            
+                                            </div>
+                                        </div>
+                                        }
+                                        <NextStep eventKey="3" onClick={() => {
+                                            if (stepSelectedValue["2"] === "1" && step21 !== "true")
+                                                modalHandleShow("noInsideUnderstand");
+                                        }}>{t("NEXT STEP")}</NextStep>
                                     </div>
                                     <div className="accordion_help">
                                         <div className="help_container">
@@ -2001,7 +3477,9 @@ function Zebra({CatID, ModelID}) {
                                     <div className="card_body card_body_radio">
                                         <div className="box50 radio_style">
                                             <input className="radio" type="radio" text={t("I have my own measurements")} value="1" name="step3" ref-num="3" id="31"
+                                                   checked={step3 === "false"}
                                                    onChange={e => {
+                                                       setStep3("false");
                                                        selectChanged(e, "3AIn,3BIn,3AOut,3BOut,3COut,3DOut");
                                                        setMeasurementsNextStep("4");
                                                        setDeps("31,32", "3,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3,3AOut,3BOut1,3BOut2,3COut,3DOut");
@@ -2011,21 +3489,24 @@ function Zebra({CatID, ModelID}) {
                                             <label htmlFor="31">{t("I have my own measurements.")}</label>
                                         </div>
                                         <div className="box50 radio_style">
-                                            <input className="radio" type="radio" text={t("Calculate my measurements")} value="2" name="step3"
+                                            <input className="radio" type="radio" text={t("Calculate my measurements")} value="2" name="step3" checked={step3 === "true"}
                                                    ref-num="3" id="32" ref={ref => (inputs.current["32"] = ref)}
                                                    onChange={e => {
                                                        if (stepSelectedValue["2"] === undefined) {
+                                                           setStep3("");
                                                            selectUncheck(e);
                                                            modalHandleShow("noMount");
                                                            setDeps("3", "31,32");
                                                            setCart("calcMeasurements", true, "Width,height");
                                                        } else if (stepSelectedValue["2"] === "1") {
+                                                           setStep3("true");
                                                            deleteSpecialSelects(3);
                                                            selectChanged(e);
                                                            setMeasurementsNextStep("3A");
                                                            setDeps("3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3", "3,3AOut,3BOut1,3BOut2,3COut,3DOut,31,32");
                                                            setCart("calcMeasurements", true, "Width,Height,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
                                                        } else {
+                                                           setStep3("true");
                                                            deleteSpecialSelects(3);
                                                            selectChanged(e);
                                                            setMeasurementsNextStep("3A");
@@ -2052,11 +3533,11 @@ function Zebra({CatID, ModelID}) {
                                                         values={selectCustomValues.width}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
                                                             }, 100);
                                                         }}
                                                         dropdownRenderer={
@@ -2076,7 +3557,7 @@ function Zebra({CatID, ModelID}) {
                                                             setDeps("", "31");
                                                             setCart("Width", selected[0].value);
                                                         }}
-                                                        options={SelectOptionRange(30, 300, 0.5, "cm", "", pageLanguage)}
+                                                        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -2093,11 +3574,11 @@ function Zebra({CatID, ModelID}) {
                                                         values={selectCustomValues.length}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
                                                             }, 100);
                                                         }}
                                                         dropdownRenderer={
@@ -2117,7 +3598,7 @@ function Zebra({CatID, ModelID}) {
                                                             setDeps("", "32");
                                                             setCart("Height", selected[0].value);
                                                         }}
-                                                        options={SelectOptionRange(30, 400, 0.5, "cm", "", pageLanguage)}
+                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -2195,11 +3676,11 @@ function Zebra({CatID, ModelID}) {
                                                         dropdownGap={0}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
                                                             }, 100);
                                                         }}
                                                         values={selectCustomValues.width1}
@@ -2222,7 +3703,7 @@ function Zebra({CatID, ModelID}) {
                                                                 setCart("Width1", selected[0].value);
                                                             }
                                                         }}
-                                                        options={SelectOptionRange(30, 300, 0.5, "cm", "", pageLanguage)}
+                                                        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -2238,11 +3719,11 @@ function Zebra({CatID, ModelID}) {
                                                         dropdownGap={0}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
                                                             }, 100);
                                                         }}
                                                         values={selectCustomValues.width2}
@@ -2265,7 +3746,7 @@ function Zebra({CatID, ModelID}) {
                                                                 setCart("Width2", selected[0].value);
                                                             }
                                                         }}
-                                                        options={SelectOptionRange(30, 300, 0.5, "cm", "", pageLanguage)}
+                                                        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -2281,11 +3762,11 @@ function Zebra({CatID, ModelID}) {
                                                         dropdownGap={0}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
                                                             }, 100);
                                                         }}
                                                         values={selectCustomValues.width3}
@@ -2308,7 +3789,7 @@ function Zebra({CatID, ModelID}) {
                                                                 setCart("Width3", selected[0].value);
                                                             }
                                                         }}
-                                                        options={SelectOptionRange(30, 300, 0.5, "cm", "", pageLanguage)}
+                                                        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -2361,11 +3842,11 @@ function Zebra({CatID, ModelID}) {
                                                         dropdownGap={0}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
                                                             }, 100);
                                                         }}
                                                         values={selectCustomValues.height1}
@@ -2388,7 +3869,7 @@ function Zebra({CatID, ModelID}) {
                                                                 setCart("Height1", selected[0].value);
                                                             }
                                                         }}
-                                                        options={SelectOptionRange(30, 400, 0.5, "cm", "", pageLanguage)}
+                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -2404,11 +3885,11 @@ function Zebra({CatID, ModelID}) {
                                                         dropdownGap={0}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
                                                             }, 100);
                                                         }}
                                                         values={selectCustomValues.height2}
@@ -2431,7 +3912,7 @@ function Zebra({CatID, ModelID}) {
                                                                 setCart("Height2", selected[0].value);
                                                             }
                                                         }}
-                                                        options={SelectOptionRange(30, 400, 0.5, "cm", "", pageLanguage)}
+                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -2447,11 +3928,11 @@ function Zebra({CatID, ModelID}) {
                                                         dropdownGap={0}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
                                                             }, 100);
                                                         }}
                                                         values={selectCustomValues.height3}
@@ -2474,7 +3955,7 @@ function Zebra({CatID, ModelID}) {
                                                                 setCart("Height3", selected[0].value);
                                                             }
                                                         }}
-                                                        options={SelectOptionRange(30, 400, 0.5, "cm", "", pageLanguage)}
+                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -2526,11 +4007,11 @@ function Zebra({CatID, ModelID}) {
                                                         dropdownGap={0}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
                                                             }, 100);
                                                         }}
                                                         values={selectCustomValues.width3A}
@@ -2553,7 +4034,7 @@ function Zebra({CatID, ModelID}) {
                                                                 setCart("Width3A", selected[0].value);
                                                             }
                                                         }}
-                                                        options={SelectOptionRange(30, 290, 0.5, "cm", "", pageLanguage)}
+                                                        options={SelectOptionRange(30, 290, 1, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -2593,11 +4074,11 @@ function Zebra({CatID, ModelID}) {
                                                         dropdownGap={0}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
                                                             }, 100);
                                                         }}
                                                         values={selectCustomValues.left}
@@ -2636,11 +4117,11 @@ function Zebra({CatID, ModelID}) {
                                                         dropdownGap={0}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
                                                             }, 100);
                                                         }}
                                                         values={selectCustomValues.right}
@@ -2715,11 +4196,11 @@ function Zebra({CatID, ModelID}) {
                                                         dropdownGap={0}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
                                                             }, 100);
                                                         }}
                                                         values={selectCustomValues.height3C}
@@ -2742,7 +4223,7 @@ function Zebra({CatID, ModelID}) {
                                                                 setCart("Height3C", selected[0].value);
                                                             }
                                                         }}
-                                                        options={SelectOptionRange(30, 400, 0.5, "cm", "", pageLanguage)}
+                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -2782,11 +4263,11 @@ function Zebra({CatID, ModelID}) {
                                                         dropdownGap={0}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
                                                             }, 100);
                                                         }}
                                                         values={selectCustomValues.shadeMount}
@@ -2844,19 +4325,23 @@ function Zebra({CatID, ModelID}) {
                                     <div className="card_body card_body_radio">
                                         <div className="box50 radio_style">
                                             <input className="radio" type="radio" text={t("Continuous") + " " + t("Loop")} value="1" name="step4" ref-num="4" id="41"
-                                                   onClick={e => {
+                                                   checked={step4 === "Continuous Loop"}
+                                                   onChange={e => {
                                                        selectChanged(e);
+                                                       setStep4("Continuous Loop");
+                                                       setStep41("false");
                                                        setControlTypeNextStep("4A");
                                                        setDeps("4A,4B", "4,41,411");
-                                                       setCart("ControlType", "ContinuousLoop", "hasPower,MotorPosition,RemoteName,MotorChannels");
+                                                       setCart("ControlType", "Continuous Loop", "hasPower,MotorPosition,RemoteName,MotorChannels");
                                                    }} ref={ref => (inputs.current["41"] = ref)}/>
                                             <label htmlFor="41">{t("Continuous")}<br/><p>{t("Loop")}</p></label>
                                         </div>
                                         <div className="box50 radio_style">
-                                            <input className="radio" type="radio" text={t("Motorized")} value="2" name="step4"
+                                            <input className="radio" type="radio" text={t("Motorized")} value="2" name="step4" checked={step4 === "Motorized"}
                                                    ref-num="4" id="42"
-                                                   onClick={e => {
+                                                   onChange={e => {
                                                        selectChanged(e, "41", "4A,4B");
+                                                       setStep4("Motorized");
                                                        setControlTypeNextStep("5");
                                                        setDeps("41", "4,4A,4B");
                                                        setCart("ControlType", "Motorized", "ControlPosition,ChainLength");
@@ -2868,27 +4353,57 @@ function Zebra({CatID, ModelID}) {
                                         </div>
                                         {stepSelectedValue["4"] === "2" &&
                                         <div className="secondary_options same_row_selection">
-                                            <hr/>
-                                            <p className="no_power_title">{t("Motor_title")}</p>
+                                            {/*<hr/>*/}
+                                            {/*<p className="no_power_title">{t("Motor_title")}</p>*/}
                                             <div className="card-body-display-flex">
-                                                <div className="box50 radio_style">
-                                                    <input className="radio" type="radio" text={t("Yes")} value="1" name="step41" ref-num="41" id="411"
-                                                           onClick={e => {
-                                                               selectChanged(e);
-                                                               setDeps("411", "41");
-                                                               setCart("hasPower", true, "", "MotorChannels", [selectedMotorChannels.map(obj => obj.value)]);
-                                                           }} ref={ref => (inputs.current["411"] = ref)}/>
-                                                    <label htmlFor="411">{t("Yes")}</label>
+                                                {/*<div className="box50 radio_style">*/}
+                                                {/*    <input className="radio" type="radio" text={t("Yes")} value="1" name="step41" ref-num="41" id="411" checked={step41 === "true"}*/}
+                                                {/*           onChange={e => {*/}
+                                                {/*               selectChanged(e);*/}
+                                                {/*               setStep41("true");*/}
+                                                {/*               setDeps("411", "41");*/}
+                                                {/*               setCart("hasPower", true, "", "MotorChannels", [selectedMotorChannels.map(obj => obj.value)]);*/}
+                                                {/*           }} ref={ref => (inputs.current["411"] = ref)}/>*/}
+                                                {/*    <label htmlFor="411">{t("Yes")}</label>*/}
+                                                {/*</div>*/}
+                                                {/*<div className="box50 radio_style">*/}
+                                                {/*    <input className="radio" type="radio" text={t("No")} value="2" name="step41" ref-num="41" id="412"*/}
+                                                {/*           onClick={e => {*/}
+                                                {/*               selectUncheck(e);*/}
+                                                {/*               setStep41("");*/}
+                                                {/*               modalHandleShow("noPower");*/}
+                                                {/*               setDeps("41", "411");*/}
+                                                {/*           }} ref={ref => (inputs.current["412"] = ref)}/>*/}
+                                                {/*    <label htmlFor="412">{t("No")}</label>*/}
+                                                {/*</div>*/}
+                                                <div className="width_max checkbox_style">
+                                                    <input type="checkbox" value="1" name="step41" ref-num="41" checked={step41 === "true"} onChange={(e) => {
+                                                        if (e.target.checked) {
+                                                            selectChanged(e);
+                                                            setStep41("true");
+                                                            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                            let refIndex = inputs.current["42"].getAttribute('ref-num');
+                                                            tempLabels[refIndex] = inputs.current["42"].getAttribute('text');
+                                                            setStepSelectedLabel(tempLabels);
+                                                            setSelectedMotorPosition([]);
+                                                            setDeps("411", "41");
+                                                            setCart("hasPower", true, "", "MotorChannels", [selectedMotorChannels.map(obj => obj.value)]);
+                                                        } else {
+                                                            selectUncheck(e);
+                                                            setStep41("");
+                                                            // modalHandleShow("noPower");
+                                                            setDeps("41", "411");
+                                                        }
+                                                    }} id="411" ref={ref => (inputs.current["411"] = ref)}/>
+                                                    <label htmlFor="411" className="checkbox_label">
+                                                        <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
+                                                             alt=""/>
+                                                    </label>
+                                                    <span className="checkbox_text">
+                                                        {t("Motor_title")}
+                                                    </span>
                                                 </div>
-                                                <div className="box50 radio_style">
-                                                    <input className="radio" type="radio" text={t("No")} value="2" name="step41" ref-num="41" id="412"
-                                                           onClick={e => {
-                                                               selectUncheck(e);
-                                                               modalHandleShow("noPower");
-                                                               setDeps("41", "411");
-                                                           }} ref={ref => (inputs.current["412"] = ref)}/>
-                                                    <label htmlFor="412">{t("No")}</label>
-                                                </div>
+                                            
                                             </div>
                                         </div>
                                         }
@@ -2908,13 +4423,14 @@ function Zebra({CatID, ModelID}) {
                                                         dropdownPosition="bottom"
                                                         dropdownHandle={false}
                                                         dropdownGap={0}
+                                                        values={selectedMotorPosition}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
                                                             }, 100);
                                                         }}
                                                         dropdownRenderer={
@@ -2929,6 +4445,9 @@ function Zebra({CatID, ModelID}) {
                                                         onChange={(selected) => {
                                                             setDeps("", "411");
                                                             setCart("MotorPosition", selected[0].value);
+                                                            if (selected[0]) {
+                                                                setSelectedMotorPosition(selected);
+                                                            }
                                                         }}
                                                         options={MotorPosition[pageLanguage]}
                                                     />
@@ -2940,8 +4459,10 @@ function Zebra({CatID, ModelID}) {
                                                 <span onClick={() => modalHandleShow("learnMore")}>{t("(Learn More)")}</span>
                                             </div>
                                             <div className="motorized_option_right">
-                                                <input className="Remote_name" type="text" name="Remote_name" placeholder={t("Enter a name for your remote")} onChange={(e) => {
+                                                <input className="Remote_name" type="text" name="Remote_name" value={remoteName}
+                                                       placeholder={t("Enter a name for your remote")} onChange={(e) => {
                                                     setCart("RemoteName", e.target.value);
+                                                    setRemoteName(e.target.value);
                                                 }}/>
                                             </div>
                                             <div className="motorized_option_left">
@@ -2962,11 +4483,11 @@ function Zebra({CatID, ModelID}) {
                                                         values={selectedMotorChannels}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
                                                             }, 100);
                                                         }}
                                                         dropdownRenderer={
@@ -3007,6 +4528,7 @@ function Zebra({CatID, ModelID}) {
                                                 <p className="help_column_header">{t("step4_help_4")}</p>
                                                 <ul className="help_column_list">
                                                     <li>{t("step4_help_5")}</li>
+                                                    <li>{t("step4_help_5.5")}</li>
                                                     <li>{t("step4_help_6")}</li>
                                                 </ul>
                                             </div>
@@ -3026,12 +4548,13 @@ function Zebra({CatID, ModelID}) {
                             </Card.Header>
                             <Accordion.Collapse eventKey="4A">
                                 <Card.Body>
-                                    <div className="card_body card_body_radio">
+                                    <div className="card_body card_body_radio special_farsi_card_body">
                                         <div className="box50 radio_style">
                                             <img src={require('../Images/drapery/zebra/position_left.svg').default} className="img-fluid" alt=""/>
-                                            <input className="radio" type="radio" text={t("Left")} value="1" name="step4A" ref-num="4A" id="4A1"
-                                                   onClick={e => {
+                                            <input className="radio" type="radio" text={t("Left")} value="1" name="step4A" ref-num="4A" id="4A1" checked={step4A === "Left"}
+                                                   onChange={e => {
                                                        selectChanged(e);
+                                                       setStep4A("Left");
                                                        setDeps("", "4A");
                                                        setCart("ControlPosition", "Left");
                                                    }} ref={ref => (inputs.current["4A1"] = ref)}/>
@@ -3040,9 +4563,10 @@ function Zebra({CatID, ModelID}) {
                                         <div className="box50 radio_style">
                                             <img src={require('../Images/drapery/zebra/position_right.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("Right")} value="2" name="step4A"
-                                                   ref-num="4A" id="4A2"
-                                                   onClick={e => {
+                                                   ref-num="4A" id="4A2" checked={step4A === "Right"}
+                                                   onChange={e => {
                                                        selectChanged(e);
+                                                       setStep4A("Right");
                                                        setDeps("", "4A");
                                                        setCart("ControlPosition", "Right");
                                                    }} ref={ref => (inputs.current["4A2"] = ref)}/>
@@ -3079,19 +4603,21 @@ function Zebra({CatID, ModelID}) {
                                 <Card.Body>
                                     <div className="card_body card_body_radio">
                                         <div className="box33 radio_style">
-                                            <input className="radio" type="radio" text={t("150cm")} value="1" name="step4B" ref-num="4B" id="4B1"
-                                                   onClick={e => {
+                                            <input className="radio" type="radio" text={t("150cm")} value="1" name="step4B" ref-num="4B" id="4B1" checked={step4B === "150"}
+                                                   onChange={e => {
                                                        selectChanged(e);
+                                                       setStep4B("150");
                                                        setDeps("", "4B");
                                                        setCart("ChainLength", "150");
                                                    }} ref={ref => (inputs.current["4B1"] = ref)}/>
-                                            <label htmlFor="4B1">{t("150cm")}<br/><p>{t("(No extra charge)")}</p></label>
+                                            <label htmlFor="4B1">{t("150cm")}<br/><p className="no_surcharge_price">{t("(No extra charge)")}</p></label>
                                         </div>
                                         <div className="box33 radio_style">
                                             <input className="radio" type="radio" text={t("300cm")} value="2" name="step4B"
-                                                   ref-num="4B" id="4B2"
-                                                   onClick={e => {
+                                                   ref-num="4B" id="4B2" checked={step4B === "300"}
+                                                   onChange={e => {
                                                        selectChanged(e);
+                                                       setStep4B("300");
                                                        setDeps("", "4B");
                                                        setCart("ChainLength", "300");
                                                    }} ref={ref => (inputs.current["4B2"] = ref)}/>
@@ -3101,9 +4627,10 @@ function Zebra({CatID, ModelID}) {
                                         </div>
                                         <div className="box33 radio_style">
                                             <input className="radio" type="radio" text={t("500cm")} value="3" name="step4B"
-                                                   ref-num="4B" id="4B3"
-                                                   onClick={e => {
+                                                   ref-num="4B" id="4B3" checked={step4B === "500"}
+                                                   onChange={e => {
                                                        selectChanged(e);
+                                                       setStep4B("500");
                                                        setDeps("", "4B");
                                                        setCart("ChainLength", "500");
                                                    }} ref={ref => (inputs.current["4B3"] = ref)}/>
@@ -3131,8 +4658,10 @@ function Zebra({CatID, ModelID}) {
                                         <div className="box50 radio_style">
                                             <img src={require('../Images/drapery/zebra/metal_valance.svg').default} className="img-fluid mb-3" alt=""/>
                                             <input className="radio" type="radio" text={t("style_Metal Valance")} value="1" name="step5" ref-num="5" id="51"
-                                                   onClick={e => {
+                                                   checked={step5 === "MetalValance"}
+                                                   onChange={e => {
                                                        selectChanged(e);
+                                                       setStep5("MetalValance");
                                                        setDeps("51", "5,52");
                                                        setCart("MetalValanceStyle", "MetalValance");
                                                    }} ref={ref => (inputs.current["51"] = ref)}/>
@@ -3141,15 +4670,16 @@ function Zebra({CatID, ModelID}) {
                                         <div className="box50 radio_style">
                                             <img src={require('../Images/drapery/zebra/metal_valance_fabric_insert.svg').default} className="img-fluid mb-3" alt=""/>
                                             <input className="radio" type="radio" text={t("style_Metal Valance") + " " + t("style_Fabric Insert")} value="2" name="step5"
-                                                   ref-num="5" id="52"
-                                                   onClick={e => {
+                                                   ref-num="5" id="52" checked={step5 === "MetalValanceFabricInsert"}
+                                                   onChange={e => {
                                                        selectChanged(e);
+                                                       setStep5("MetalValanceFabricInsert");
                                                        setDeps("52", "5,51");
                                                        setCart("MetalValanceStyle", "MetalValanceFabricInsert");
                                                    }} ref={ref => (inputs.current["52"] = ref)}/>
                                             <label htmlFor="52">{t("style_Metal Valance")}<br/>{t("style_Fabric Insert")}</label>
-                                        
                                         </div>
+                                        {(stepSelectedValue["5"] === "1" || stepSelectedValue["5"] === "2") &&
                                         <div className="selection_section">
                                             <div className="select_container">
                                                 {stepSelectedValue["5"] === "1" &&
@@ -3160,13 +4690,14 @@ function Zebra({CatID, ModelID}) {
                                                     dropdownPosition="bottom"
                                                     dropdownHandle={false}
                                                     dropdownGap={0}
+                                                    values={selectedValanceColor1}
                                                     onDropdownOpen={() => {
                                                         let temp1 = window.scrollY;
-                                                        window.scrollTo(window.scrollX, window.scrollY + 0.5);
+                                                        window.scrollTo(window.scrollX, window.scrollY + 1);
                                                         setTimeout(() => {
                                                             let temp2 = window.scrollY;
                                                             if (temp2 === temp1)
-                                                                window.scrollTo(window.scrollX, window.scrollY - 0.5);
+                                                                window.scrollTo(window.scrollX, window.scrollY - 1);
                                                         }, 100);
                                                     }}
                                                     dropdownRenderer={
@@ -3179,11 +4710,13 @@ function Zebra({CatID, ModelID}) {
                                                     //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                     // }
                                                     onChange={(selected) => {
-                                                        setDeps("", "51");
-                                                        setCart("MetalValanceColor", selected[0].value);
-                                                        let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                        tempLabels["5"] = t("style_Metal Valance") + "/" + selected[0].label;
-                                                        setStepSelectedLabel(tempLabels);
+                                                        if (selected.length) {
+                                                            setDeps("", "51");
+                                                            setCart("MetalValanceColor", selected[0].value);
+                                                            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                            tempLabels["5"] = t("style_Metal Valance") + "/" + selected[0].label;
+                                                            setStepSelectedLabel(tempLabels);
+                                                        }
                                                     }}
                                                     options={optionsMetalValance[pageLanguage]}
                                                 />
@@ -3198,13 +4731,14 @@ function Zebra({CatID, ModelID}) {
                                                     dropdownPosition="bottom"
                                                     dropdownHandle={false}
                                                     dropdownGap={0}
+                                                    values={selectedValanceColor2}
                                                     onDropdownOpen={() => {
                                                         let temp1 = window.scrollY;
-                                                        window.scrollTo(window.scrollX, window.scrollY + 0.5);
+                                                        window.scrollTo(window.scrollX, window.scrollY + 1);
                                                         setTimeout(() => {
                                                             let temp2 = window.scrollY;
                                                             if (temp2 === temp1)
-                                                                window.scrollTo(window.scrollX, window.scrollY - 0.5);
+                                                                window.scrollTo(window.scrollX, window.scrollY - 1);
                                                         }, 100);
                                                     }}
                                                     dropdownRenderer={
@@ -3217,18 +4751,20 @@ function Zebra({CatID, ModelID}) {
                                                     //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                     // }
                                                     onChange={(selected) => {
-                                                        setDeps("", "52");
-                                                        setCart("MetalValanceColor", selected[0].value);
-                                                        let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                        tempLabels["5"] = t("style_Metal Valance") + " " + t("style_Fabric Insert") + "/" + selected[0].label;
-                                                        setStepSelectedLabel(tempLabels);
+                                                        if (selected.length) {
+                                                            setDeps("", "52");
+                                                            setCart("MetalValanceColor", selected[0].value);
+                                                            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                            tempLabels["5"] = t("style_Metal Valance") + " " + t("style_Fabric Insert") + "/" + selected[0].label;
+                                                            setStepSelectedLabel(tempLabels);
+                                                        }
                                                     }}
                                                     options={optionsMetalValanceFabricInsert[pageLanguage]}
                                                 />
                                                 }
                                             </div>
-                                        
                                         </div>
+                                        }
                                         <NextStep eventKey="6">{t("NEXT STEP")}</NextStep>
                                     </div>
                                     <div className="accordion_help">
@@ -3375,7 +4911,8 @@ function Zebra({CatID, ModelID}) {
                                                         </span>
                                                     </div>
                                                     <div className="uploaded_images_section">
-                                                        <ul className="upload_results clearfix">
+                                                        <ul className="upload_results">
+                                                            {uploadedImagesList}
                                                         </ul>
                                                     </div>
                                                 </div>
@@ -3392,12 +4929,28 @@ function Zebra({CatID, ModelID}) {
                                             </div>
                                             <div className="project-details">
                                                 <div className="btn-upload img_upload_btn">
-                                                    <button type="button" className="btn" onClick={e => modalHandleShow("uploadImg")}>
+                                                    <button type="button" className="btn" onClick={e => {
+                                                        if (isLoggedIn) {
+                                                            modalHandleShow("uploadImg");
+                                                        } else {
+                                                            dispatch({
+                                                                type: ShowLogin2Modal,
+                                                            })
+                                                        }
+                                                    }}>
                                                         {t("Upload Image")}
                                                     </button>
                                                 </div>
                                                 <div className="btn-upload">
-                                                    <button type="button" className="btn" onClick={e => modalHandleShow("uploadPdf")}>
+                                                    <button type="button" className="btn" onClick={e => {
+                                                        if (isLoggedIn) {
+                                                            modalHandleShow("uploadPdf");
+                                                        } else {
+                                                            dispatch({
+                                                                type: ShowLogin2Modal,
+                                                            })
+                                                        }
+                                                    }}>
                                                         {t("Upload PDF")}
                                                     </button>
                                                 </div>
@@ -3406,9 +4959,11 @@ function Zebra({CatID, ModelID}) {
                                         <div className="box100 uploaded_name_section">
                                             <div className="mid_upload">
                                                 <ul className="upload_names_images">
+                                                    {uploadedImagesNamesList}
                                                 </ul>
                                                 <br/>
                                                 <ul className="upload_names_pdfs">
+                                                    {uploadedPDFNameList}
                                                 </ul>
                                             </div>
                                         </div>
@@ -3423,14 +4978,14 @@ function Zebra({CatID, ModelID}) {
                                                         dropdownPosition="bottom"
                                                         dropdownHandle={false}
                                                         dropdownGap={0}
-                                                        values={roomLabelSelect.value !== "" ? [rooms[pageLanguage].find(opt => opt.value === roomLabelSelect.value)] : []}
+                                                        values={selectedRoomLabel}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
                                                             }, 100);
                                                         }}
                                                         dropdownRenderer={
@@ -3443,8 +4998,9 @@ function Zebra({CatID, ModelID}) {
                                                         //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                         // }
                                                         onChange={(selected) => {
-                                                            setDeps("", "6");
+                                                            setDeps("", "61");
                                                             roomLabelChanged(selected[0], "6", false);
+                                                            setSelectedRoomLabel(selected);
                                                             // setCart("RoomNameEn", selected[0].value);
                                                             setCart("RoomNameFa", rooms["fa"].find(opt => opt.value === selected[0].value).label, "", "RoomNameEn", [selected[0].value]);
                                                         }}
@@ -3454,10 +5010,15 @@ function Zebra({CatID, ModelID}) {
                                             </div>
                                             <div className="room_select">
                                                 <label className="select_label">{t("Window Description")}</label>
-                                                <input type="text" placeholder={t("(Optional)")} className="form-control window_name" name="order_window_name" value={roomLabelText}
+                                                <input type="text" placeholder={t("Window Description")} className="form-control window_name" name="order_window_name"
+                                                       value={roomLabelText}
                                                        onChange={(e) => {
+                                                           if (e.target.value === "")
+                                                               setDeps("62", "");
+                                                           else
+                                                               setDeps("", "62");
                                                            roomLabelChanged(e.target.value, "6", true);
-                                                           setRoomLabelComplete(true);
+                                                           setRoomLabelText(e.target.value);
                                                            setCart("WindowName", e.target.value);
                                                        }}/>
                                             </div>
@@ -3508,6 +5069,25 @@ function Zebra({CatID, ModelID}) {
                 {/*</Modal.Footer>*/}
             </Modal>
             
+            <Modal dialogClassName={`noInsideUnderstand_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                   show={modals["noInsideUnderstand"] === undefined ? false : modals["noInsideUnderstand"]}
+                   onHide={() => modalHandleClose(" noInsideUnderstand")}>
+                <Modal.Header closeButton>
+                    {/*<Modal.Title>Modal heading</Modal.Title>*/}
+                </Modal.Header>
+                <Modal.Body>
+                    <p>{t("modal_select_mount")}</p>
+                    
+                    {/*<br/>*/}
+                    {/*<div className=" text_center">*/}
+                    {/*    <button className=" btn btn-new-dark" onClick={() => modalHandleClose(" noMount")}>{t("CONTINUE")}</button>*/}
+                    {/*</div>*/}
+                </Modal.Body>
+                {/*<Modal.Footer>*/}
+                {/*    */}
+                {/*</Modal.Footer>*/}
+            </Modal>
+            
             <Modal dialogClassName={`noMount_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["noMount"] === undefined ? false : modals["noMount"]}
                    onHide={() => modalHandleClose(" noMount")}>
@@ -3550,7 +5130,7 @@ function Zebra({CatID, ModelID}) {
             
             <Modal backdrop="static" keyboard={false} dialogClassName={`measurementsHelp_modal largeSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["measurementsHelp"] === undefined ? false : modals["measurementsHelp"]}
-                   onHide={() => modalHandleClose("measurementsHelp")}>
+                   onHide={() => modalHandleClose("measurementsHelp")} scrollable={true}>
                 <Modal.Header closeButton>
                     {/*<Modal.Title>Modal heading</Modal.Title>*/}
                 </Modal.Header>
@@ -3568,6 +5148,7 @@ function Zebra({CatID, ModelID}) {
                                 <ul className="help_column_list">
                                     <li>{t("modal_help_1")}</li>
                                     <li>{t("modal_help_2")}</li>
+                                    <li>{t("modal_help_2.5")}</li>
                                     <li>{t("modal_help_3")}</li>
                                 </ul>
                             </div>
@@ -3647,6 +5228,9 @@ function Zebra({CatID, ModelID}) {
             <Modal dialogClassName={`upload_modal uploadImg_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["uploadImg"] === undefined ? false : modals["uploadImg"]}
                    onHide={() => {
+                       setSelectedFile(undefined);
+                       setSelectedFileName("");
+                       setEditedFileName("");
                        modalHandleClose(" uploadImg");
                        setDetailsShow(false)
                    }}>
@@ -3654,37 +5238,83 @@ function Zebra({CatID, ModelID}) {
                     {/*<Modal.Title>Modal heading</Modal.Title>*/}
                 </Modal.Header>
                 <Modal.Body>
-                    <h2>Upload Your Image</h2>
-                    <p className="file_size_description">Your image size must be smaller than 5MB. Acceptable formats:<br/> .gif, .jpg, or .png file.</p>
-                    <div className="controls">
-                        <div className="modal_upload_section">
-                            <div className="modal_upload_item">
-                                <label htmlFor="image-upload-btn" className="btn btn-new-gray file-upload-btn">
-                                    Choose File
-                                    <input type="file" className="custom-file file-upload" name="file" id="image-upload-btn" accept="image/png,image/jpeg,image/jpg"/>
-                                </label>
-                                <div className="file-name file-upload-btn">No File Chosen</div>
+                    <div onDragOver={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }}
+                         onDrop={(e) => {
+                             e.preventDefault();
+                             e.stopPropagation();
+                        
+                             const {files} = e.dataTransfer;
+                        
+                             if (files && files.length && (files[0].type === "image/jpg" || files[0].type === "image/jpeg" || files[0].type === "image/png")) {
+                                 uploadImg(files[0]);
+                             } else {
+                                 setSelectedFile(undefined);
+                                 setSelectedFileName("");
+                             }
+                         }}>
+                        <h2>Upload Your Image</h2>
+                        <p className="file_size_description">Your image size must be smaller than 5MB. Acceptable formats:<br/> .gif, .jpg, or .png file.</p>
+                        <div className="controls">
+                            <div className="modal_upload_section">
+                                <div className="modal_upload_item">
+                                    <label htmlFor="image-upload-btn" className="btn btn-new-gray file-upload-btn">
+                                        Choose File
+                                        <input type="file" className="custom-file file-upload" id="image-upload-btn" name="file" accept="image/png,image/jpeg,image/jpg"
+                                               onChange={(e) => {
+                                                   if (e.target.files && e.target.files.length) {
+                                                       uploadImg(e.target.files[0]);
+                                                   } else {
+                                                       setSelectedFile(undefined);
+                                                       setSelectedFileName("");
+                                                   }
+                                               }}
+                                               onDragOver={(e) => {
+                                                   e.preventDefault();
+                                                   e.stopPropagation();
+                                               }}
+                                               onDrop={(e) => {
+                                                   e.preventDefault();
+                                                   e.stopPropagation();
+                                            
+                                                   const {files} = e.dataTransfer;
+                                            
+                                                   if (files && files.length && (files[0].type === "image/jpg" || files[0].type === "image/jpeg" || files[0].type === "image/png")) {
+                                                       uploadImg(files[0]);
+                                                   } else {
+                                                       setSelectedFile(undefined);
+                                                       setSelectedFileName("");
+                                                   }
+                                               }}
+                                        />
+                                    </label>
+                                    <div className="file-name file-upload-btn">{selectedFileName === "" ? "No File Chosen" : selectedFileName}</div>
+                                </div>
+                                <div className="modal_upload_item">
+                                    <input className="file_name_text" type="text" value={editedFileName} onChange={(e) => setEditedFileName(e.target.value)}
+                                           placeholder="Image Name"/>
+                                </div>
                             </div>
-                            <div className="modal_upload_item">
-                                <input className="file_name_text" type="text" name="file_title" placeholder="Image Name"/>
+                        </div>
+                        <div className="controls">
+                            <div className="modal_button_section">
+                                <button className="btn btn-new-gray" onClick={() => {
+                                    setSelectedFile(undefined);
+                                    setSelectedFileName("");
+                                    setEditedFileName("");
+                                    modalHandleClose("uploadImg");
+                                    setDetailsShow(false)
+                                }}>Cancel
+                                </button>
+                                <div className="btn btn-new-dark image_submit file-upload-btn btn-disabled" onClick={() => {
+                                    submitUploadedFile(2);
+                                }} disabled={selectedFileName === "" || isUploading}>{isUploading ? t("UPLOADING...") : t("Upload Image")}
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div className="controls">
-                        <div className="modal_button_section">
-                            <button className="btn btn-new-gray" onClick={() => {
-                                modalHandleClose(" uploadImg");
-                                setDetailsShow(false)
-                            }}>Cancel
-                            </button>
-                            <div className="btn btn-new-dark image_submit file-upload-btn btn-disabled" onClick={() => {
-                                modalHandleClose(" uploadImg");
-                                setDetailsShow(false)
-                            }}>Upload Image
-                            </div>
-                        </div>
-                    </div>
-                
                 </Modal.Body>
                 {/*<Modal.Footer>*/}
                 {/*    */}
@@ -3701,37 +5331,82 @@ function Zebra({CatID, ModelID}) {
                     {/*<Modal.Title>Modal heading</Modal.Title>*/}
                 </Modal.Header>
                 <Modal.Body>
-                    <h2>Upload Your PDF</h2>
-                    <p className="file_size_description">Your pdf size must be smaller than 5MB.</p>
-                    <div className="controls">
-                        <div className="modal_upload_section">
-                            <div className="modal_upload_item">
-                                <label htmlFor="file-upload-btn" className="btn btn-new-gray file-upload-btn">
-                                    Choose File
-                                    <input type="file" className="custom-file file-upload" name="file" id="file-upload-btn" accept="image/png,image/jpeg,image/jpg"/>
-                                </label>
-                                <div className="file-name file-upload-btn">No File Chosen</div>
+                    <div onDragOver={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }}
+                         onDrop={(e) => {
+                             e.preventDefault();
+                             e.stopPropagation();
+                        
+                             const {files} = e.dataTransfer;
+                        
+                             if (files && files.length && files[0].type === "application/pdf") {
+                                 uploadImg(files[0]);
+                             } else {
+                                 setSelectedFile(undefined);
+                                 setSelectedFileName("");
+                             }
+                         }}>
+                        <h2>Upload Your PDF</h2>
+                        <p className="file_size_description">Your pdf size must be smaller than 5MB.</p>
+                        <div className="controls">
+                            <div className="modal_upload_section">
+                                <div className="modal_upload_item">
+                                    <label htmlFor="file-upload-btn" className="btn btn-new-gray file-upload-btn">
+                                        Choose File
+                                        <input type="file" className="custom-file file-upload" name="file" id="file-upload-btn" accept="application/pdf"
+                                               onChange={(e) => {
+                                                   if (e.target.files && e.target.files.length) {
+                                                       uploadImg(e.target.files[0]);
+                                                   } else {
+                                                       setSelectedFile(undefined);
+                                                       setSelectedFileName("");
+                                                   }
+                                               }}
+                                               onDragOver={(e) => {
+                                                   e.preventDefault();
+                                                   e.stopPropagation();
+                                               }}
+                                               onDrop={(e) => {
+                                                   e.preventDefault();
+                                                   e.stopPropagation();
+                                            
+                                                   const {files} = e.dataTransfer;
+                                            
+                                                   if (files && files.length && files[0].type === "application/pdf") {
+                                                       uploadImg(files[0]);
+                                                   } else {
+                                                       setSelectedFile(undefined);
+                                                       setSelectedFileName("");
+                                                   }
+                                               }}/>
+                                    </label>
+                                    <div className="file-name file-upload-btn">{selectedFileName === "" ? "No File Chosen" : selectedFileName}</div>
+                                </div>
+                                <div className="modal_upload_item">
+                                    <input className="file_name_text" type="text" value={editedFileName} onChange={(e) => setEditedFileName(e.target.value)}
+                                           placeholder="PDF Name"/>
+                                </div>
                             </div>
-                            <div className="modal_upload_item">
-                                <input className="file_name_text" type="text" name="file_title" placeholder="PDF Name"/>
+                        </div>
+                        <div className="controls">
+                            <div className="modal_button_section">
+                                <button className="btn btn-new-gray" onClick={() => {
+                                    setSelectedFile(undefined);
+                                    setSelectedFileName("");
+                                    setEditedFileName("");
+                                    modalHandleClose("uploadPdf");
+                                    setDetailsShow(false)
+                                }}>Cancel
+                                </button>
+                                <div className="btn btn-new-dark image_submit file-upload-btn btn-disabled" onClick={() => {
+                                    submitUploadedFile(1);
+                                }} disabled={selectedFileName === "" || isUploading}>{isUploading ? t("UPLOADING...") : t("Upload PDF")}
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div className="controls">
-                        <div className="modal_button_section">
-                            <button className="btn btn-new-gray" onClick={() => {
-                                modalHandleClose(" uploadPdf");
-                                setDetailsShow(false)
-                            }}>Cancel
-                            </button>
-                            <div className="btn btn-new-dark image_submit file-upload-btn btn-disabled" onClick={() => {
-                                modalHandleClose(" uploadPdf");
-                                setDetailsShow(false)
-                            }}>Upload PDF
-                            </div>
-                        </div>
-                    </div>
-                
                 </Modal.Body>
                 {/*<Modal.Footer>*/}
                 {/*    */}
@@ -3741,11 +5416,11 @@ function Zebra({CatID, ModelID}) {
             <Modal backdrop="static" keyboard={false} dialogClassName={`warning_modal bigSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["widthDifferent"] === undefined ? false : modals["widthDifferent"]}
                    onHide={() => {
-                       modalHandleClose(" widthDifferent");
+                       modalHandleClose("widthDifferent");
                    }}>
                 <Modal.Header>
-                    <div className="required"/>
-                    <p>Confirm Width Discrepancies</p>
+                    {/*<div className="required"/>*/}
+                    <p>{t("WIDTH DISCREPANCIES")}</p>
                 </Modal.Header>
                 <Modal.Body>
                     <p>We noticed that there’s quite a difference in some of your measurements, and this could affect the fit of your custom shades.</p>
@@ -3771,7 +5446,7 @@ function Zebra({CatID, ModelID}) {
                             setStepSelectedLabel(tempLabels);
                         }}>CHANGE MEASUREMENTS
                         </button>
-                        <button className="btn btn-danger" onClick={() => {
+                        <button className="btn white_btn" onClick={() => {
                             modalHandleClose("widthDifferent");
                             setAccordionActiveKey("3B");
                         }}>I AGREE, CONTINUE ANYWAY
@@ -3816,8 +5491,8 @@ function Zebra({CatID, ModelID}) {
                        modalHandleClose(" heightDifferent");
                    }}>
                 <Modal.Header>
-                    <div className="required"/>
-                    <p>Confirm Height Discrepancies</p>
+                    {/*<div className="required"/>*/}
+                    <p>{t("HEIGHT DISCREPANCIES")}</p>
                 </Modal.Header>
                 <Modal.Body>
                     <p>We noticed that there’s quite a difference in some of your measurements, and this could affect the fit of your custom shades.</p>
@@ -3843,7 +5518,7 @@ function Zebra({CatID, ModelID}) {
                             setStepSelectedLabel(tempLabels);
                         }}>CHANGE MEASUREMENTS
                         </button>
-                        <button className="btn btn-danger" onClick={() => {
+                        <button className="btn white_btn" onClick={() => {
                             modalHandleClose("heightDifferent");
                             setAccordionActiveKey("4");
                         }}>I AGREE, CONTINUE ANYWAY
@@ -3888,24 +5563,45 @@ function Zebra({CatID, ModelID}) {
                     }
                     
                     {!cartStateAgree &&
-                    <h1 className="cart_agree_title1">{t("SPECIAL ORDER")}</h1>
+                    <h1 className="cart_agree_title1">{t("REVIEW ORDER")}</h1>
                     }
                     {!cartStateAgree &&
                     <h2 className="cart_agree_title2">{t("TERMS OF SALE")}</h2>
                     }
                     {!cartStateAgree &&
-                    <span className="cart_agree_desc">{t("cart_agree_desc")}<p
-                        className="return_policy">{t("Return Policy")}</p>.</span>
-                    }
-                    {!cartStateAgree &&
                     <div>{cartAgree}</div>
                     }
-                
+                    {!cartStateAgree &&
+                    <span className="cart_agree_desc">
+                        <div className="checkbox_style">
+                            <input type="checkbox" checked={cartAgreeDescription} onChange={(e) => {
+                                setCartAgreeDescription(e.target.checked);
+                            }} id="cartAgreeDescription"/>
+                            <label htmlFor="cartAgreeDescription" className="checkbox_label">
+                                <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
+                                     alt=""/>
+                            </label>
+                            <span className="checkbox_text">
+                                {t("cart_agree_desc")}
+                                <p className="return_policy">{t("Return Policy")}</p>.
+                            </span>
+                        </div>
+                    </span>
+                    }
+                    {!cartStateAgree &&
+                    <div className="go_to_checkout">
+                        <button className="basket_checkout" onClick={() => {
+                            setAddingLoading(true);
+                            addToCart_agreed();
+                        }} disabled={addingLoading || !cartAgreeDescription}>{addingLoading ? t("ADDING...") : t("AGREE & ADD TO BAG")}
+                        </button>
+                    </div>
+                    }
                 </Modal.Body>
                 <Modal.Footer>
                     {cartStateAgree &&
                     <div className="go_to_checkout">
-                        <div className="checkout_button_section">
+                        <div className="checkout_button_section small_checkout_button_section">
                             <span className="checkout_payment_price_detail payment_price_detail">
                                 <h3>{t("SUBTOTAL")}</h3>
                                 <h4>{GetPrice(totalCartPrice, pageLanguage, t("TOMANS"))}</h4>
@@ -3914,14 +5610,6 @@ function Zebra({CatID, ModelID}) {
                                 setCartStateAgree(false);
                             }}>{t("CHECKOUT")}</Link>
                         </div>
-                    </div>
-                    }
-                    {!cartStateAgree &&
-                    <div className="go_to_checkout">
-                        <button className="basket_checkout" onClick={() => {
-                            addToCart_agreed();
-                        }}>{t("AGREE & ADD TO BAG")}
-                        </button>
                     </div>
                     }
                 </Modal.Footer>
@@ -3937,20 +5625,9 @@ function Zebra({CatID, ModelID}) {
                 <Modal.Header closeButton>
                 </Modal.Header>
                 <Modal.Body>
-                    {roomLabelComplete &&
-                    <div className="add_to_project_container">
-                        <h2 className="project_added_text">1 ITEM ADDED TO YOUR PROJECTS</h2>
-                        <Link className="add_to_project_btn btn" to={"/" + pageLanguage + "/Account/Projects"}>{t("VIEW PROJECTS")}</Link>
-                        <button className="continue_shopping_btn" onClick={() => {
-                            modalHandleClose("add_to_project_modal");
-                        }}>{t("CONTINUE SHOPPING")}
-                        </button>
-                    </div>
-                    }
-                    
-                    {!roomLabelComplete &&
+                    {projectModalState === 0 &&
                     <div className="add_to_project_container2">
-                        <h2 className="project_added_text">Please select a room name and window description in order to save this item</h2>
+                        <h2 className="project_added_text">{t("Please select a room name")}</h2>
                         <div className="box100 selectInput_section">
                             <div className="room_select">
                                 <label className="select_label">{t("Room")}</label>
@@ -3958,20 +5635,20 @@ function Zebra({CatID, ModelID}) {
                                     <Select
                                         className="select"
                                         placeholder={t("Please Select")}
-                                        // portal={document.getElementById('add_to_project_modal')}
+                                        // portal={document.body}
                                         dropdownPosition="bottom"
                                         dropdownHandle={false}
                                         dropdownGap={0}
-                                        values={roomLabelSelect.value !== "" ? [rooms[pageLanguage].find(opt => opt.value === roomLabelSelect.value)] : []}
-                                        onDropdownOpen={() => {
-                                            let temp1 = window.scrollY;
-                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
-                                            setTimeout(() => {
-                                                let temp2 = window.scrollY;
-                                                if (temp2 === temp1)
-                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
-                                            }, 100);
-                                        }}
+                                        values={selectedRoomLabel}
+                                        // onDropdownOpen={() => {
+                                        //     let temp1 = window.scrollY;
+                                        //     window.scrollTo(window.scrollX, window.scrollY + 1);
+                                        //     setTimeout(() => {
+                                        //         let temp2 = window.scrollY;
+                                        //         if (temp2 === temp1)
+                                        //             window.scrollTo(window.scrollX, window.scrollY - 1);
+                                        //     }, 100);
+                                        // }}
                                         dropdownRenderer={
                                             ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                         }
@@ -3982,8 +5659,9 @@ function Zebra({CatID, ModelID}) {
                                         //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                         // }
                                         onChange={(selected) => {
-                                            setDeps("", "6");
+                                            setDeps("", "61");
                                             roomLabelChanged(selected[0], "6", false);
+                                            setSelectedRoomLabel(selected);
                                             // setCart("RoomNameEn", selected[0].value);
                                             setCart("RoomNameFa", rooms["fa"].find(opt => opt.value === selected[0].value).label, "", "RoomNameEn", [selected[0].value]);
                                         }}
@@ -3993,27 +5671,80 @@ function Zebra({CatID, ModelID}) {
                             </div>
                             <div className="room_select">
                                 <label className="select_label">{t("Window Description")}</label>
-                                <input type="text" placeholder={t("(Optional)")} className="form-control window_name" name="order_window_name" value={roomLabelText}
+                                <input type="text" placeholder={t("Window Description")} className="form-control window_name" name="order_window_name"
+                                       value={roomLabelText}
                                        onChange={(e) => {
+                                           if (e.target.value === "")
+                                               setDeps("62", "");
+                                           else
+                                               setDeps("", "62");
                                            roomLabelChanged(e.target.value, "6", true);
+                                           setRoomLabelText(e.target.value);
                                            setCart("WindowName", e.target.value);
                                        }}/>
                             </div>
                         </div>
+                        {!!(roomLabelText !== "" && selectedRoomLabel.length) &&
+                        <button className="save_item_btn btn-new-dark"
+                                onClick={() => {
+                                    if (roomLabelText !== "" && selectedRoomLabel.length) {
+                                        setSavingLoading(true);
+                                        if (projectId && projectId !== "") {
+                                            SaveUserProject(depSet, cartValues, [uploadedImagesFile, uploadedImagesURL, uploadedPDFFile, uploadedPDFURL], `${modelID}`, price, defaultModelName, defaultModelNameFa, projectData).then((temp) => {
+                                                if (temp === 401) {
+                                                    setSaveProjectCount(saveProjectCount + 1);
+                                                } else if (temp) {
+                                                    modalHandleShow("add_to_project_modal");
+                                                    setProjectModalState(1);
+                                                    setSavingLoading(false);
+                                                } else {
+                                                    console.log("project not saved!");
+                                                    setSavingLoading(false);
+                                                }
+                                            }).catch(() => {
+                                                // console.log("hi4");
+                                                setProjectModalState(2);
+                                                setSavingLoading(false);
+                                            });
+                                        } else {
+                                            SaveUserProject(depSet, cartValues, [uploadedImagesFile, uploadedImagesURL, uploadedPDFFile, uploadedPDFURL], `${modelID}`, price, defaultModelName, defaultModelNameFa).then((temp) => {
+                                                if (temp === 401) {
+                                                    setSaveProjectCount(saveProjectCount + 1);
+                                                } else if (temp) {
+                                                    setProjectModalState(1);
+                                                    setSavingLoading(false);
+                                                } else {
+                                                    console.log("project not saved!");
+                                                    setSavingLoading(false);
+                                                }
+                                            }).catch((err) => {
+                                                // console.log("hi3",);
+                                                setProjectModalState(2);
+                                                setSavingLoading(false);
+                                            });
+                                        }
+                                    } else {
+                                        setProjectModalState(0);
+                                    }
+                                }} disabled={savingLoading}>{savingLoading ? t("SAVING...") : t("SAVE ITEM")}
+                        </button>
+                        }
+                    </div>
+                    }
+                    {projectModalState === 1 &&
+                    <div className="add_to_project_container">
+                        <h2 className="project_added_text">{t("1 ITEM ADDED TO YOUR PROJECTS")}</h2>
+                        <Link className="add_to_project_btn btn" to={"/" + pageLanguage + "/Account/Projects"}>{t("VIEW PROJECTS")}</Link>
                         <button className="continue_shopping_btn" onClick={() => {
-                            if (roomLabelSelect.value !== "") {
-                                if(SaveUserProject(depSet,cartValues,`${modelID}`,price,defaultModelName,defaultModelNameFa)) {
-                                    setRoomLabelComplete(true);
-                                }
-                                else{
-        
-                                }
-                            }
-                        }}>{t("SAVE ITEM")}
+                            modalHandleClose("add_to_project_modal");
+                        }}>{t("CONTINUE SHOPPING")}
                         </button>
                     </div>
                     }
-                
+                    
+                    {projectModalState === 2 &&
+                    <ModalLogin/>
+                    }
                 </Modal.Body>
             </Modal>
             
@@ -4053,24 +5784,51 @@ function Zebra({CatID, ModelID}) {
                 <div className="CustomModelFooter_visible_part">
                     <div className="left_footer">
                         <button className="save_to_acc" onClick={() => {
-                            if (isLoggedIn) {
-                                if (roomLabelComplete) {
-                                    if(SaveUserProject(depSet,cartValues,`${modelID}`,price,defaultModelName,defaultModelNameFa)) {
+                            if (roomLabelText !== "" && selectedRoomLabel.length) {
+                                setSavingLoading(true);
+                                if (projectId && projectId !== "") {
+                                    SaveUserProject(depSet, cartValues, [uploadedImagesFile, uploadedImagesURL, uploadedPDFFile, uploadedPDFURL], `${modelID}`, price, defaultModelName, defaultModelNameFa, projectData).then((temp) => {
+                                        if (temp === 401) {
+                                            setSaveProjectCount(saveProjectCount + 1);
+                                        } else if (temp) {
+                                            modalHandleShow("add_to_project_modal");
+                                            setProjectModalState(1);
+                                            setSavingLoading(false);
+                                        } else {
+                                            console.log("project not saved!");
+                                            setSavingLoading(false);
+                                        }
+                                    }).catch(() => {
+                                        // console.log("hi2");
+                                        setProjectModalState(2);
                                         modalHandleShow("add_to_project_modal");
-                                    }
-                                    else{
-                                    
-                                    }
+                                        setSavingLoading(false);
+                                    });
                                 } else {
-                                    modalHandleShow("add_to_project_modal");
+                                    SaveUserProject(depSet, cartValues, [uploadedImagesFile, uploadedImagesURL, uploadedPDFFile, uploadedPDFURL], `${modelID}`, price, defaultModelName, defaultModelNameFa).then((temp) => {
+                                        if (temp === 401) {
+                                            console.log("hi1");
+                                            setSaveProjectCount(saveProjectCount + 1);
+                                        } else if (temp) {
+                                            modalHandleShow("add_to_project_modal");
+                                            setProjectModalState(1);
+                                            setSavingLoading(false);
+                                        } else {
+                                            console.log("project not saved!");
+                                            setSavingLoading(false);
+                                        }
+                                    }).catch(() => {
+                                        // console.log("hi1");
+                                        setProjectModalState(2);
+                                        modalHandleShow("add_to_project_modal");
+                                        setSavingLoading(false);
+                                    });
                                 }
                             } else {
-                                dispatch({
-                                    type: ShowLoginModal,
-                                });
+                                setProjectModalState(0);
+                                modalHandleShow("add_to_project_modal");
                             }
-                            
-                        }}>{t("footer_Save To")}<br/>{t("footer_My Account")}</button>
+                        }} disabled={savingLoading}>{savingLoading ? t("SAVING...") : t("footer_Save To")}<br/>{savingLoading ? "" : t("footer_My Account")}</button>
                     </div>
                     <div className="hidden_inner_footer">&nbsp;</div>
                     <div className="footer_price_section">
@@ -4078,7 +5836,11 @@ function Zebra({CatID, ModelID}) {
                         <div className="price">{GetPrice(price, pageLanguage, t("TOMANS"))}</div>
                     </div>
                     <div className="right_footer">
-                        <input type="submit" onClick={() => addToCart()} className="btn add_to_cart" value={t("footer_Add To Cart")} readOnly/>
+                        <input type="submit" onClick={() => {
+                            setAddingLoading(true);
+                            addToCart();
+                        }} className="btn add_to_cart" disabled={addingLoading} value={addingLoading ? t("ADDING...") : t("footer_Add" +
+                            " To Cart")} readOnly/>
                     </div>
                 </div>
             </div>

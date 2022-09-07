@@ -4,8 +4,8 @@ import {InputGroup, FormControl, Toast, ToastContainer} from "react-bootstrap"
 import Form from "react-bootstrap/Form";
 import Select from "react-select";
 
-const baseURLGet = "http://api.atlaspood.ir/WebsiteSetting/GetBanner?apiKey=477f46c6-4a17-4163-83cc-29908d";
-const baseURLPost = "http://api.atlaspood.ir/WebsiteSetting/SaveBanner";
+const baseURLGet = "https://api.atlaspood.ir/WebsiteSetting/GetBanner?apiKey=477f46c6-4a17-4163-83cc-29908d";
+const baseURLPost = "https://api.atlaspood.ir/WebsiteSetting/SaveBanner";
 
 function Banner() {
     

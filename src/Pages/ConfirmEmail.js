@@ -6,7 +6,7 @@ import {LOGIN} from "../Actions/types";
 import {useDispatch} from "react-redux";
 
 
-const baseUrl = "http://api.doopsalta2.com/user/EmailConfirm";
+const baseUrl = "https://api.atlaspood.ir/user/Activate";
 
 
 function ConfirmEmail() {

@@ -2,97 +2,118 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="200ae4a2-413a-4eda-9bd3-7e6393833ac7" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Actions/auth.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Actions/types.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Components/AddressBook.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Components/OrderDetails.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Components/OrderHistory.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Components/SaveUserProject.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Components/Settings.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Components/UserProjects.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Fonts/adobe-caslon-pro-three.otf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Fonts/adobe-caslon-pro-three.woff" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Fonts/adobe-caslon-pro-three.woff2" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Fonts/adobe-caslon-pro-two.otf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Fonts/adobe-caslon-pro-two.woff" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Fonts/adobe-caslon-pro-two.woff2" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Fonts/adobe-caslon-pro.otf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Fonts/adobe-caslon-pro.woff" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Fonts/adobe-caslon-pro.woff2" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/position_left.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/position_right.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/step3_help_inside_fa.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/step3_help_outside_fa.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/public/discount.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/public/minus.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/public/plus.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Pages/AccountLayout.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Pages/ConfirmEmail.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Pages/Projects.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Pages/RegisterLogin.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Pages/Reset.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Services/auth-header.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Services/auth.service.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/history.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/redux/auth.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/redux/index.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/store.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/web - http to https.config" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/win-acme.v2.1.22.1267.x64.trimmed/Scripts/EasyDNS.ps1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/win-acme.v2.1.22.1267.x64.trimmed/Scripts/ImportADFS.ps1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/win-acme.v2.1.22.1267.x64.trimmed/Scripts/ImportAzureADApplicationProxy.ps1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/win-acme.v2.1.22.1267.x64.trimmed/Scripts/ImportAzureApplicationGateway.ps1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/win-acme.v2.1.22.1267.x64.trimmed/Scripts/ImportExchange.ps1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/win-acme.v2.1.22.1267.x64.trimmed/Scripts/ImportExchange.v2.ps1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/win-acme.v2.1.22.1267.x64.trimmed/Scripts/ImportJKS.ps1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/win-acme.v2.1.22.1267.x64.trimmed/Scripts/ImportKemp.ps1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/win-acme.v2.1.22.1267.x64.trimmed/Scripts/ImportRDGateway.ps1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/win-acme.v2.1.22.1267.x64.trimmed/Scripts/ImportRDListener.ps1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/win-acme.v2.1.22.1267.x64.trimmed/Scripts/ImportRDS.ps1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/win-acme.v2.1.22.1267.x64.trimmed/Scripts/ImportRDSFull.ps1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/win-acme.v2.1.22.1267.x64.trimmed/Scripts/ImportSSTP.ps1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/win-acme.v2.1.22.1267.x64.trimmed/Scripts/ImportWinRM.ps1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/win-acme.v2.1.22.1267.x64.trimmed/Scripts/ImportWinRM.v2.ps1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/win-acme.v2.1.22.1267.x64.trimmed/Scripts/ImportWindowsAdminCenter.ps1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/win-acme.v2.1.22.1267.x64.trimmed/Scripts/PSRDSCerts.bat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/win-acme.v2.1.22.1267.x64.trimmed/Scripts/PSScript.bat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/win-acme.v2.1.22.1267.x64.trimmed/Scripts/microsoft-dns.ps1" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/win-acme.v2.1.22.1267.x64.trimmed/Web_Config.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/win-acme.v2.1.22.1267.x64.trimmed/public_suffix_list.dat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/win-acme.v2.1.22.1267.x64.trimmed/settings_default.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/win-acme.v2.1.22.1267.x64.trimmed/version.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/win-acme.v2.1.22.1267.x64.trimmed/wacs.exe" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/win-acme/Web_Config.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/win-acme/wacs.exe" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Emails/Emails.zip" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Emails/confirmed.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Emails/forgot.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Emails/validation.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/AddProjectToCart.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/CustomControlFiles.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/CustomControlStaticPlaceholder.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/GetMeasurementArray.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/GetSewingFilters.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/GetUserProjectData.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/ModalLogin.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/setGetDeps.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/BracketColorRound1.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/BracketColorSquare1.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/Colonial.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/FrameSize.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/GunMetal.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/RegularRoll1a.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/RegularRoll2.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/ReverseRoll1a.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/ReverseRoll2.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/SatinBrass.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/SatinNickel.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/Scallop.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/SewnIn.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/Standard.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/Wave.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/bottom_bar_exposed_designer.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/bottom_bar_sewn_in.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/bracket_type_round.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/bracket_type_square.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/designer.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/frame_height.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/height_inside_3.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/height_inside_3_fa.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/mount_inside.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/mount_outside.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/position_left.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/position_right.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/roll_fabric_insert.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/roll_metal_valance.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/roll_regular.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/roll_reverse.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/roll_reverse.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/roll_upholstered_valance.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/roller_help_MetalValance.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/roller_help_NoValance.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/roller_help_UphosteredValance.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/shade_mount.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/step3_help_inside.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/step3_help_inside_fa.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/step3_help_outside.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/step3_help_outside_fa.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/wall_cover.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/width_inside_3.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/width_inside_3_fa.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/public/alert.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/public/attention.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/public/checkmark1.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/public/checkmark1.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/public/checkmark1_checkbox.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/public/checkmark2.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/public/checkmark3.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/public/emailImage.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/public/logoen.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Page Components/Roller.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Page Components/Zebra.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/dictionaries/NM.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/NM.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/favicon.ico" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/public/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/locales/en/translation.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/en/translation.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/locales/fa/translation.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/fa/translation.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/web.config" beforeDir="false" afterPath="$PROJECT_DIR$/public/web.config" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Actions/auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Actions/auth.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Actions/types.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Actions/types.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/AddressBook.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/AddressBook.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/Banner.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Banner.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/CustomControl.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/CustomControl.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/CustomControlMulti.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/CustomControlMulti.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/CustomControlNum.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/CustomControlNum.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/Footer.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Footer.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/Header.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Header.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/Menu.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Menu.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/Models.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Models.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/OrderDetails.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/OrderDetails.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/PopoverStickOnHover.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/PopoverStickOnHover.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/SaveUserProject.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/SaveUserProject.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/Settings.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Settings.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/Slideshow.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Slideshow.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/Zebra.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Zebra.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/UserProjects.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/UserProjects.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/Zebra.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/cartInfo.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/cartInfo.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Images/drapery/zebra/mount_inside.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/mount_inside.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Images/drapery/zebra/mount_outside.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/mount_outside.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Images/drapery/zebra/step3_help_inside.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/step3_help_inside.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Images/drapery/zebra/step3_help_inside_fa.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/step3_help_inside_fa.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Images/drapery/zebra/step3_help_outside.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/step3_help_outside.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Images/drapery/zebra/step3_help_outside_fa.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/step3_help_outside_fa.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Pages/AccountLayout.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/AccountLayout.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Pages/Basket.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/Basket.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Pages/Checkout.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/Checkout.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Pages/ConfirmEmail.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/ConfirmEmail.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Pages/Curtain.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/Curtain.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Pages/CustomCurtain.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/CustomCurtain.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Pages/Home.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/Home.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Pages/Panel.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/Panel.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Pages/Projects.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/Projects.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Pages/RegisterLogin.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/RegisterLogin.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Pages/Reset.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/Reset.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Services/auth.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Services/auth.service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/redux/auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/redux/auth.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web - http to https.config" beforeDir="false" afterPath="$PROJECT_DIR$/web - http to https.config" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -123,6 +144,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="tsconfig.json" />
+        <option value="TypeScript File" />
         <option value="JavaScript File" />
       </list>
     </option>
@@ -144,6 +166,7 @@
   <component name="PackageJsonUpdateNotifier">
     <dismissed value="$PROJECT_DIR$/package.json" />
   </component>
+  <component name="PhpDebugGeneral" listening_started="true" />
   <component name="ProjectId" id="22YMzyul9kiEhvy2S0Bw44Y3jZ4" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
@@ -161,6 +184,7 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$/public" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
+    <property name="ts.external.directory.path" value="C:\Program Files\JetBrains\PhpStorm 2019.3.1\plugins\JavaScriptLanguage\jsLanguageServicesImpl\external" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -198,8 +222,8 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="npm.start" />
       <item itemvalue="npm.build" />
+      <item itemvalue="npm.start" />
     </list>
   </component>
   <component name="ServiceViewManager">
@@ -378,6 +402,69 @@
       <workItem from="1656136704795" duration="14272000" />
       <workItem from="1656257643522" duration="29362000" />
       <workItem from="1656443036437" duration="390000" />
+      <workItem from="1656444756634" duration="925000" />
+      <workItem from="1656481524954" duration="8926000" />
+      <workItem from="1656605275924" duration="8842000" />
+      <workItem from="1656865578379" duration="4614000" />
+      <workItem from="1656962845562" duration="11640000" />
+      <workItem from="1657126313938" duration="9576000" />
+      <workItem from="1657232245556" duration="5719000" />
+      <workItem from="1657394631056" duration="7130000" />
+      <workItem from="1657554020964" duration="9139000" />
+      <workItem from="1657731016504" duration="6721000" />
+      <workItem from="1657824282509" duration="6780000" />
+      <workItem from="1657859354405" duration="252000" />
+      <workItem from="1657860789723" duration="594000" />
+      <workItem from="1657962713287" duration="6117000" />
+      <workItem from="1658007905262" duration="746000" />
+      <workItem from="1658099202407" duration="4227000" />
+      <workItem from="1658109214845" duration="8000" />
+      <workItem from="1658111580419" duration="557000" />
+      <workItem from="1658212716339" duration="8463000" />
+      <workItem from="1658295046414" duration="1990000" />
+      <workItem from="1658321465900" duration="6183000" />
+      <workItem from="1658383235869" duration="653000" />
+      <workItem from="1658455539055" duration="1655000" />
+      <workItem from="1658625229474" duration="5590000" />
+      <workItem from="1658740810075" duration="6735000" />
+      <workItem from="1658841920219" duration="8061000" />
+      <workItem from="1658948077275" duration="6802000" />
+      <workItem from="1659023739013" duration="4995000" />
+      <workItem from="1659207921686" duration="3700000" />
+      <workItem from="1659272677434" duration="15153000" />
+      <workItem from="1659332573585" duration="5351000" />
+      <workItem from="1659396490412" duration="3000" />
+      <workItem from="1659458731516" duration="7663000" />
+      <workItem from="1659546825367" duration="6853000" />
+      <workItem from="1659590994483" duration="8608000" />
+      <workItem from="1659784430098" duration="9907000" />
+      <workItem from="1660058289795" duration="7103000" />
+      <workItem from="1660153625957" duration="7223000" />
+      <workItem from="1660245605089" duration="8563000" />
+      <workItem from="1660396265431" duration="6144000" />
+      <workItem from="1660500174933" duration="6522000" />
+      <workItem from="1660590909432" duration="6739000" />
+      <workItem from="1660666765224" duration="11643000" />
+      <workItem from="1660740482510" duration="3000" />
+      <workItem from="1660768386486" duration="10333000" />
+      <workItem from="1660845598959" duration="4195000" />
+      <workItem from="1661013309421" duration="9617000" />
+      <workItem from="1661085855214" duration="6802000" />
+      <workItem from="1661144404083" duration="7400000" />
+      <workItem from="1661195419320" duration="2256000" />
+      <workItem from="1661232641119" duration="2729000" />
+      <workItem from="1661367828609" duration="6081000" />
+      <workItem from="1661454311783" duration="7613000" />
+      <workItem from="1661622133196" duration="9104000" />
+      <workItem from="1661699202605" duration="11497000" />
+      <workItem from="1661790378738" duration="7147000" />
+      <workItem from="1661882744248" duration="6216000" />
+      <workItem from="1661921887796" duration="596000" />
+      <workItem from="1661985945579" duration="6387000" />
+      <workItem from="1662021362621" duration="2692000" />
+      <workItem from="1662212217104" duration="10290000" />
+      <workItem from="1662403245536" duration="17194000" />
+      <workItem from="1662563015313" duration="12081000" />
     </task>
     <servers />
   </component>
@@ -392,101 +479,93 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="520" y="216" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1536.824@0.0.1536.824" timestamp="1654974923337" />
-    <state x="499" y="160" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1655138344727">
+    <state x="499" y="160" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1658455725355">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="499" y="160" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1536.824@0.0.1536.824" timestamp="1655138344727" />
-    <state x="549" y="168" key="FileChooserDialogImpl" timestamp="1649878763459">
+    <state x="499" y="160" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1536.824@0.0.1536.824" timestamp="1658455725355" />
+    <state width="1493" height="106" key="GridCell.Tab.0.bottom" timestamp="1662580330917">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="549" y="168" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1649878763459" />
-    <state width="1493" height="106" key="GridCell.Tab.0.bottom" timestamp="1656443429946">
+    <state width="1493" height="106" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1662580330917" />
+    <state width="1493" height="106" key="GridCell.Tab.0.center" timestamp="1662580330917">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="106" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1656443429946" />
-    <state width="1493" height="106" key="GridCell.Tab.0.center" timestamp="1656443429946">
+    <state width="1493" height="106" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1662580330917" />
+    <state width="1493" height="106" key="GridCell.Tab.0.left" timestamp="1662580330917">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="106" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1656443429946" />
-    <state width="1493" height="106" key="GridCell.Tab.0.left" timestamp="1656443429946">
+    <state width="1493" height="106" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1662580330917" />
+    <state width="1493" height="106" key="GridCell.Tab.0.right" timestamp="1662580330917">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="106" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1656443429946" />
-    <state width="1493" height="106" key="GridCell.Tab.0.right" timestamp="1656443429946">
+    <state width="1493" height="106" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1662580330917" />
+    <state width="1493" height="261" key="GridCell.Tab.1.bottom" timestamp="1659467785857">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="106" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1656443429946" />
-    <state width="1493" height="261" key="GridCell.Tab.1.bottom" timestamp="1656439949410">
+    <state width="1493" height="261" key="GridCell.Tab.1.bottom/0.0.1536.824@0.0.1536.824" timestamp="1659467785857" />
+    <state width="1493" height="261" key="GridCell.Tab.1.center" timestamp="1659467785857">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="261" key="GridCell.Tab.1.bottom/0.0.1536.824@0.0.1536.824" timestamp="1656439949410" />
-    <state width="1493" height="261" key="GridCell.Tab.1.center" timestamp="1656439949410">
+    <state width="1493" height="261" key="GridCell.Tab.1.center/0.0.1536.824@0.0.1536.824" timestamp="1659467785857" />
+    <state width="1493" height="261" key="GridCell.Tab.1.left" timestamp="1659467785857">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="261" key="GridCell.Tab.1.center/0.0.1536.824@0.0.1536.824" timestamp="1656439949410" />
-    <state width="1493" height="261" key="GridCell.Tab.1.left" timestamp="1656439949410">
+    <state width="1493" height="261" key="GridCell.Tab.1.left/0.0.1536.824@0.0.1536.824" timestamp="1659467785857" />
+    <state width="1493" height="261" key="GridCell.Tab.1.right" timestamp="1659467785857">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="261" key="GridCell.Tab.1.left/0.0.1536.824@0.0.1536.824" timestamp="1656439949410" />
-    <state width="1493" height="261" key="GridCell.Tab.1.right" timestamp="1656439949410">
+    <state width="1493" height="261" key="GridCell.Tab.1.right/0.0.1536.824@0.0.1536.824" timestamp="1659467785857" />
+    <state width="1493" height="261" key="GridCell.Tab.2.bottom" timestamp="1659467785857">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="261" key="GridCell.Tab.1.right/0.0.1536.824@0.0.1536.824" timestamp="1656439949410" />
-    <state width="1493" height="261" key="GridCell.Tab.2.bottom" timestamp="1656439949410">
+    <state width="1493" height="261" key="GridCell.Tab.2.bottom/0.0.1536.824@0.0.1536.824" timestamp="1659467785857" />
+    <state width="1493" height="261" key="GridCell.Tab.2.center" timestamp="1659467785857">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="261" key="GridCell.Tab.2.bottom/0.0.1536.824@0.0.1536.824" timestamp="1656439949410" />
-    <state width="1493" height="261" key="GridCell.Tab.2.center" timestamp="1656439949410">
+    <state width="1493" height="261" key="GridCell.Tab.2.center/0.0.1536.824@0.0.1536.824" timestamp="1659467785857" />
+    <state width="1493" height="261" key="GridCell.Tab.2.left" timestamp="1659467785857">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="261" key="GridCell.Tab.2.center/0.0.1536.824@0.0.1536.824" timestamp="1656439949410" />
-    <state width="1493" height="261" key="GridCell.Tab.2.left" timestamp="1656439949410">
+    <state width="1493" height="261" key="GridCell.Tab.2.left/0.0.1536.824@0.0.1536.824" timestamp="1659467785857" />
+    <state width="1493" height="261" key="GridCell.Tab.2.right" timestamp="1659467785857">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="261" key="GridCell.Tab.2.left/0.0.1536.824@0.0.1536.824" timestamp="1656439949410" />
-    <state width="1493" height="261" key="GridCell.Tab.2.right" timestamp="1656439949410">
+    <state width="1493" height="261" key="GridCell.Tab.2.right/0.0.1536.824@0.0.1536.824" timestamp="1659467785857" />
+    <state width="1493" height="261" key="GridCell.Tab.3.bottom" timestamp="1659467785857">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="261" key="GridCell.Tab.2.right/0.0.1536.824@0.0.1536.824" timestamp="1656439949410" />
-    <state width="1493" height="261" key="GridCell.Tab.3.bottom" timestamp="1656439949410">
+    <state width="1493" height="261" key="GridCell.Tab.3.bottom/0.0.1536.824@0.0.1536.824" timestamp="1659467785857" />
+    <state width="1493" height="261" key="GridCell.Tab.3.center" timestamp="1659467785857">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="261" key="GridCell.Tab.3.bottom/0.0.1536.824@0.0.1536.824" timestamp="1656439949410" />
-    <state width="1493" height="261" key="GridCell.Tab.3.center" timestamp="1656439949410">
+    <state width="1493" height="261" key="GridCell.Tab.3.center/0.0.1536.824@0.0.1536.824" timestamp="1659467785857" />
+    <state width="1493" height="261" key="GridCell.Tab.3.left" timestamp="1659467785857">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="261" key="GridCell.Tab.3.center/0.0.1536.824@0.0.1536.824" timestamp="1656439949410" />
-    <state width="1493" height="261" key="GridCell.Tab.3.left" timestamp="1656439949410">
+    <state width="1493" height="261" key="GridCell.Tab.3.left/0.0.1536.824@0.0.1536.824" timestamp="1659467785857" />
+    <state width="1493" height="261" key="GridCell.Tab.3.right" timestamp="1659467785857">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="261" key="GridCell.Tab.3.left/0.0.1536.824@0.0.1536.824" timestamp="1656439949410" />
-    <state width="1493" height="261" key="GridCell.Tab.3.right" timestamp="1656439949410">
+    <state width="1493" height="261" key="GridCell.Tab.3.right/0.0.1536.824@0.0.1536.824" timestamp="1659467785857" />
+    <state x="578" y="330" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1658747890909">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="261" key="GridCell.Tab.3.right/0.0.1536.824@0.0.1536.824" timestamp="1656439949410" />
-    <state x="215" y="30" key="SettingsEditor" timestamp="1650421059475">
+    <state x="578" y="330" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1536.824@0.0.1536.824" timestamp="1658747890909" />
+    <state x="617" y="99" width="815" height="606" key="find.popup" timestamp="1662565817986">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="215" y="30" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1650421059475" />
-    <state x="578" y="330" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1655838834216">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state x="578" y="330" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1536.824@0.0.1536.824" timestamp="1655838834216" />
-    <state x="398" y="109" width="740" height="606" key="find.popup" timestamp="1656347515093">
-      <screen x="0" y="0" width="1536" height="824" />
-    </state>
-    <state x="398" y="109" width="740" height="606" key="find.popup/0.0.1536.824@0.0.1536.824" timestamp="1656347515093" />
+    <state x="617" y="99" width="815" height="606" key="find.popup/0.0.1536.824@0.0.1536.824" timestamp="1662565817986" />
     <state x="510" y="44" key="refactoring.ChangeSignatureDialog" timestamp="1654979096925">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="510" y="44" key="refactoring.ChangeSignatureDialog/0.0.1536.824@0.0.1536.824" timestamp="1654979096925" />
-    <state x="425" y="187" width="672" height="677" key="run.anything.popup" timestamp="1656439452806">
+    <state x="425" y="187" width="672" height="677" key="run.anything.popup" timestamp="1662571309663">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="425" y="187" width="672" height="677" key="run.anything.popup/0.0.1536.824@0.0.1536.824" timestamp="1656439452806" />
-    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1655840492183">
+    <state x="425" y="187" width="672" height="677" key="run.anything.popup/0.0.1536.824@0.0.1536.824" timestamp="1662571309663" />
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1661151791757">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1655840492183" />
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1661151791757" />
   </component>
 </project>

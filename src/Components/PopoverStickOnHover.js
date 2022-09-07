@@ -71,7 +71,7 @@ PopoverStickOnHover.propTypes = {
     onMouseEnter: PropTypes.func,
     component: PropTypes.node.isRequired,
     placement: PropTypes.string.isRequired,
-    classNames: PropTypes.string.isRequired,
+    // classNames: PropTypes.string.isRequired,
 };
 
 PopoverStickOnHover.defaultProps = {

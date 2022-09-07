@@ -1,17 +1,21 @@
-import {Link, useLocation, useParams} from "react-router-dom";
+import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
-import axios from "axios";
 import {useTranslation} from "react-i18next";
-import Breadcrumb from 'react-bootstrap/Breadcrumb';
-import Zebra from "../Components/Zebra";
+import Zebra from "../Page Components/Zebra";
+import Roller from "../Page Components/Roller";
+import {useSelector} from "react-redux";
 
 
 function CustomCurtain() {
     const {t} = useTranslation();
     const location = useLocation();
     const [pageLanguage, setPageLanguage] = React.useState(location.pathname.split('').slice(1, 3).join(''));
+    let navigate = useNavigate();
+    const {isLoggedIn, isRegistered, user, showLogin} = useSelector((state) => state.auth);
     const {catID} = useParams();
     const {modelID} = useParams();
+    const {projectId} = useParams();
+    const {editIndex} = useParams();
     const [pageModel, setPageModel] = React.useState([]);
     
     function convertToPersian(string_farsi) {
@@ -28,7 +32,11 @@ function CustomCurtain() {
     
     const setPage = () => {
         if (modelID === "0303") {
-            setPageModel(<Zebra CatID={catID} ModelID={modelID}/>)
+            // console.log(projectId,editCart,localStorage.getItem("edit_project") !== null);
+            setPageModel(<Zebra CatID={catID} ModelID={modelID} ProjectId={projectId} EditIndex={editIndex}/>)
+        }
+        else if(modelID === "0324") {
+            setPageModel(<Roller CatID={catID} ModelID={modelID} ProjectId={projectId} EditIndex={editIndex}/>)
         }
         
     };
@@ -39,9 +47,30 @@ function CustomCurtain() {
     }, [location.pathname]);
     
     useEffect(() => {
-        if (pageLanguage !== '') {
-            setPage();
+        if(editIndex!==undefined) {
+            if(isLoggedIn){
+                if (pageLanguage !== "") {
+                    setPage();
+                }
+            }
+            else if (localStorage.getItem("cart") !== null && JSON.parse(localStorage.getItem("cart"))["drapery"] !== undefined) {
+                if (pageLanguage !== "") {
+                    setPage();
+                }
+            }
+            else{
+                if (pageLanguage !== "") {
+                    navigate("/" + pageLanguage+"/Curtain/"+catID+"/"+modelID);
+                    setPage();
+                }
+            }
         }
+        else{
+            if (pageLanguage !== "") {
+                setPage();
+            }
+        }
+        
         
     }, [pageLanguage, location.pathname]);
     

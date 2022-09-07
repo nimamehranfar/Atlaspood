@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {BrowserRouter as Router, Routes, Route, Link, Navigate} from "react-router-dom";
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import Home from "./Pages/Home";
 import Panel from "./Pages/Panel";
@@ -25,9 +25,12 @@ import OrderHistory from "./Components/OrderHistory";
 import OrderDetails from "./Components/OrderDetails";
 import Reset from "./Pages/Reset";
 import ConfirmEmail from "./Pages/ConfirmEmail";
+import {refreshToken} from "./Services/auth.service";
+import {CLEAR_REGISTER, LOGIN, LOGOUT, REGISTER} from "./Actions/types";
 
 
 function App({t}) {
+    const dispatch = useDispatch();
     const [user1, setuser] = useState({
         pass: "",
         success: false
@@ -37,19 +40,57 @@ function App({t}) {
     };
     onsubmit = (event) => {
         event.preventDefault();
-        if (user1.pass === "atlas1400") {
+        if (user1.pass === "1401atlas") {
             setuser({success: true});
         }
     };
     
-    const {isLoggedIn, user, showLogin} = useSelector((state) => state.auth);
+    const {isLoggedIn, isRegistered, user, showLogin} = useSelector((state) => state.auth);
+    const [showPage, setShowPage] = useState(false);
     
     useEffect(() => {
-        // console.log(isLoggedIn);
-    }, [isLoggedIn]);
+        if (isLoggedIn) {
+            refreshToken().then((response2) => {
+                if (response2 !== false) {
+                } else {
+                }
+                setShowPage(true);
+            });
+        }
+        else{
+            setShowPage(true);
+        }
+    }, []);
+    
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (isLoggedIn) {
+                refreshToken().then((response2) => {
+                    if (response2 !== false) {
+                    } else {
+                    }
+                });
+            }
+            else{
+            }
+        }, 300000);
+    
+        return () => clearInterval(interval);
+    }, []);
+    
+    useEffect(() => {
+        if (isRegistered) {
+            setTimeout(() => {
+                dispatch({
+                    type: CLEAR_REGISTER
+                });
+            }, 5000);
+        }
+    }, [isRegistered]);
     
     return (
         <Router>
+            {showPage &&
             <div className="App">
                 <div className="page_container">
                     {!user1.success &&
@@ -74,9 +115,10 @@ function App({t}) {
                             <Route path="Curtain/:catID" element={<Curtain/>}/>
                             <Route path="Product/:catID" element={<Product/>}/>
                             <Route path="Basket" element={<Basket/>}/>
-                            <Route path="User" element={isLoggedIn ? <Navigate to="/en/Account"/> :<RegisterLogin/>}/>
-                            <Route path="User/Reset/:resetId" element={<Reset/>}/>
-                            <Route path="Account" element={isLoggedIn ? <AccountLayout/> : <Navigate to="/en/User"/>}>
+                            <Route path="User" element={isRegistered ? <Navigate replace to="/en/Account"/> : (isLoggedIn ? <Navigate to="/en/Account/OrderHistory"/> : <RegisterLogin/>)}/>
+                            <Route path="User/NewUser" element={<Navigate replace to="/en/User"/>}/>
+                            <Route path="User/Reset/:emailId/:resetId" element={<Reset/>}/>
+                            <Route path="Account" element={isLoggedIn ? <AccountLayout/> : <Navigate replace to="/en/User"/>}>
                                 <Route path="" element={<Settings/>}/>
                                 <Route path="Projects" element={<Projects/>}/>
                                 <Route path="AddressBook" element={<AddressBook/>}/>
@@ -89,9 +131,10 @@ function App({t}) {
                             <Route path="Curtain/:catID" element={<Curtain/>}/>
                             <Route path="Product/:catID" element={<Product/>}/>
                             <Route path="Basket" element={<Basket/>}/>
-                            <Route path="User" element={isLoggedIn ? <Navigate to="/fa/Account"/> :<RegisterLogin/>}/>
-                            <Route path="User/Reset/:resetId" element={<Reset/>}/>
-                            <Route path="Account" element={isLoggedIn ? <AccountLayout/> : <Navigate to="/fa/User"/>}>
+                            <Route path="User" element={isLoggedIn ? <Navigate replace to="/fa/Account"/> : <RegisterLogin/>}/>
+                            <Route path="User/NewUser" element={<Navigate replace to="/fa/User"/>}/>
+                            <Route path="User/Reset/:emailId/:resetId" element={<Reset/>}/>
+                            <Route path="Account" element={isLoggedIn ? <AccountLayout/> : <Navigate replace to="/fa/User"/>}>
                                 <Route path="" element={<Settings/>}/>
                                 <Route path="Projects" element={<Projects/>}/>
                                 <Route path="AddressBook" element={<AddressBook/>}/>
@@ -99,24 +142,28 @@ function App({t}) {
                                 <Route path="OrderDetails/:orderID" element={<OrderDetails/>}/>
                             </Route>
                         </Route>
-                        
+                
                         <Route path="/en" element={<HeaderWithOutlet/>}>
                             <Route path="Curtain/:catID/:modelID" element={<CustomCurtain/>}/>
+                            <Route path="Curtain/:catID/:modelID/Saved-Projects/:projectId" element={<CustomCurtain/>}/>
+                            <Route path="Curtain/:catID/:modelID/Bag-Projects/:editIndex" element={<CustomCurtain/>}/>
+                            <Route path="Checkout" element={<Checkout/>}/>
                         </Route>
                         <Route path="/fa" element={<HeaderWithOutlet/>}>
                             <Route path="Curtain/:catID/:modelID" element={<CustomCurtain/>}/>
-                        </Route>
-                        
-                        <Route path="/en" element={<NoHeaderNoFooter/>}>
+                            <Route path="Curtain/:catID/:modelID/Saved-Projects/:projectId" element={<CustomCurtain/>}/>
+                            <Route path="Curtain/:catID/:modelID/Bag-Projects/:editIndex" element={<CustomCurtain/>}/>
                             <Route path="Checkout" element={<Checkout/>}/>
+                        </Route>
+                
+                        <Route path="/en" element={<NoHeaderNoFooter/>}>
                             <Route path="User/Activate/:activeId" element={<ConfirmEmail/>}/>
                         </Route>
                         <Route path="/fa" element={<NoHeaderNoFooter/>}>
-                            <Route path="Checkout" element={<Checkout/>}/>
                             <Route path="User/Activate/:activeId" element={<ConfirmEmail/>}/>
                         </Route>
-                        
-                        
+                
+                
                         <Route path="/admin/panel" element={<Panel/>}>
                             <Route path="menu" element={<Menu/>}/>
                             <Route path="slideshow" element={<Slideshow/>}/>
@@ -125,13 +172,14 @@ function App({t}) {
                         </Route>
                         <Route
                             path="*"
-                            element={<Navigate to="/en"/>}
+                            element={<Navigate replace to="/en"/>}
                         />
                     </Routes>
                     }
-                
+        
                 </div>
             </div>
+            }
         </Router>
     );
 }

@@ -54,7 +54,7 @@ function OrderDetails() {
                     <div className="order_history_detail_body_item_details_section">
                         <span className="basket_item_title">
                             <div className="basket_item_image_container">
-                                <img src="http://api.atlaspood.ir/Content/Images/Product/2021/2021-11-17/90909302/90909302_0303.jpg" alt="" className="basket_item_img"/>
+                                <img src="https://api.atlaspood.ir/Content/Images/Product/2021/2021-11-17/90909302/90909302_0303.jpg" alt="" className="basket_item_img"/>
                             </div>
                             <div className="basket_item_title_container">
                                 <div className="basket_item_title_name">Custom ZEBRA SHADES</div>

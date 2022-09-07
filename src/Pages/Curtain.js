@@ -6,7 +6,7 @@ import parse, {domToReact} from 'html-react-parser';
 import Breadcrumb from 'react-bootstrap/Breadcrumb';
 import GetPrice from "../Components/GetPrice";
 
-const baseURLCats = "http://api.atlaspood.ir/WebsitePage/GetDetailByName";
+const baseURLCats = "https://api.atlaspood.ir/WebsitePage/GetDetailByName";
 
 function Curtain() {
     const {t} = useTranslation();
@@ -15,6 +15,8 @@ function Curtain() {
     const {catID} = useParams();
     const [models, setModels] = useState([]);
     const [modelList, setModelList] = React.useState([]);
+    const [defaultModelName, setDefaultModelName] = useState("");
+    const [defaultModelNameFa, setDefaultModelNameFa] = useState("");
     
     function convertToPersian(string_farsi) {
         if (string_farsi !== null && string_farsi !== undefined && string_farsi !== "") {
@@ -56,6 +58,10 @@ function Curtain() {
             let PhotoUrl = models[i].PhotoUrl;
             let DefaultFabricPhotoUrl = models[i].DefaultFabricPhotoUrl;
             let discount = StartPrice !== DiscountPrice;
+    
+    
+            setDefaultModelName(ModelENName);
+            setDefaultModelNameFa(ModelName);
             
             if (Description === null || Description === undefined || Description === "") {
                 Description = ""
@@ -109,8 +115,8 @@ function Curtain() {
             
             modelLists.push(
                 <li key={"model" + i} model_id={i} className={`${i % 2 === 0 ? "model_color_1" : "model_color_2"}`}>
-                    <Link to={"/" + pageLanguage + "/Curtain/" + catID + "/" + SewingModelId} className={`model_image_container`}>
-                        <img src={PhotoUrl === null ? `${process.env.PUBLIC_URL}/no_image.svg` : `http://api.atlaspood.ir${PhotoUrl}`} className="img-fluid" alt=""/>
+                    <Link to={"/" + pageLanguage + "/Curtain/" + catID + "/" + SewingModelId} className={`model_image_container`} onClick={()=>sessionStorage.clear()}>
+                        <img src={PhotoUrl === null ? `${process.env.PUBLIC_URL}/no_image.svg` : `https://api.atlaspood.ir${PhotoUrl}`} className="img-fluid" alt=""/>
                     </Link>
                     <div className={`model_info_container`}>
                         {/*<div className={`model_info_price_title`}>*/}
@@ -153,7 +159,7 @@ function Curtain() {
                             <div className={`model_item_info_description_section`}>
                                 {pageLanguage === 'en' ? parse(ENDescription, options) : parse(Description, options)}
                             </div>
-                            <Link to={"/" + pageLanguage + "/Curtain/" + catID + "/" + SewingModelId} className="btn_normal model_item_btn_normal">{t("Start" +
+                            <Link to={"/" + pageLanguage + "/Curtain/" + catID + "/" + SewingModelId} className="btn_normal model_item_btn_normal" onClick={()=>sessionStorage.clear()}>{t("Start" +
                                 " Customizing")}</Link>
                         </div>
                     </div>
@@ -191,7 +197,8 @@ function Curtain() {
             {/*    </Breadcrumb>*/}
             {/*</div>*/}
             <div className="models_title_div">
-                <h1>{t("model_zebra_temp1")}</h1>
+                <h1>{defaultModelName === undefined || defaultModelName === "" ? " " : pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</h1>
+                {/*<h1>{t("model_zebra_temp1")}</h1>*/}
                 <h2>{t("model_zebra_temp2")}</h2>
             </div>
             <div className="cat_models_list_container">

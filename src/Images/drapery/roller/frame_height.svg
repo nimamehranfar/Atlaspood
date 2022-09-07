@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="117.569" height="164" viewBox="0 0 117.569 164">
+  <defs>
+    <style>
+      .cls-1, .cls-2, .cls-3 {
+        fill: none;
+      }
+
+      .cls-2, .cls-3 {
+        stroke: #606060;
+      }
+
+      .cls-2 {
+        stroke-width: 0.7px;
+      }
+
+      .cls-3 {
+        stroke-width: 1.2px;
+      }
+
+      .cls-4 {
+        fill: #606060;
+      }
+
+      .cls-5 {
+        fill: #fff;
+        stroke: #454545;
+        stroke-width: 1.1px;
+      }
+
+      .cls-6, .cls-7 {
+        stroke: none;
+      }
+
+      .cls-7 {
+        fill: #606060;
+      }
+    </style>
+  </defs>
+  <g id="Group_33" data-name="Group 33" transform="translate(-77.945 -4.398)">
+    <rect id="Rectangle_41" data-name="Rectangle 41" class="cls-1" width="117.568" height="164" transform="translate(77.946 4.398)"/>
+    <g id="Group_35" data-name="Group 35" transform="translate(99.536 -31.788) rotate(90)">
+      <line id="Line_5" data-name="Line 5" class="cls-2" y1="18.591" transform="translate(47.99 3)"/>
+      <line id="Line_6" data-name="Line 6" class="cls-2" y1="18.591" transform="translate(178.825 3)"/>
+      <line id="Line_7" data-name="Line 7" class="cls-3" x2="125.566" transform="translate(50.581 17.31)"/>
+      <g id="Polygon_1" data-name="Polygon 1" class="cls-4" transform="translate(178.01 14.338) rotate(90)">
+        <path class="cls-6" d="M 5.587347507476807 6.740784168243408 L 0.6095922589302063 6.740784168243408 L 3.098469972610474 1.004879474639893 L 5.587347507476807 6.740784168243408 Z"/>
+        <path class="cls-7" d="M 3.098469972610474 2.009778022766113 L 1.219194412231445 6.340784072875977 L 4.977745532989502 6.340784072875977 L 3.098469972610474 2.009778022766113 M 3.098469972610474 3.814697265625e-06 L 6.196939945220947 7.14078426361084 L 0 7.14078426361084 L 3.098469972610474 3.814697265625e-06 Z"/>
+      </g>
+      <g id="Polygon_2" data-name="Polygon 2" class="cls-4" transform="translate(48.84 20.535) rotate(-90)">
+        <path class="cls-6" d="M 5.587347507476807 6.740784168243408 L 0.6095922589302063 6.740784168243408 L 3.098469972610474 1.004879474639893 L 5.587347507476807 6.740784168243408 Z"/>
+        <path class="cls-7" d="M 3.098469972610474 2.009778022766113 L 1.219194412231445 6.340784072875977 L 4.977745532989502 6.340784072875977 L 3.098469972610474 2.009778022766113 M 3.098469972610474 3.814697265625e-06 L 6.196939945220947 7.14078426361084 L 0 7.14078426361084 L 3.098469972610474 3.814697265625e-06 Z"/>
+      </g>
+    </g>
+    <g id="Rectangle_4" data-name="Rectangle 4" class="cls-5" transform="translate(89.503 15.835)">
+      <rect class="cls-6" width="95.067" height="131.563"/>
+      <rect class="cls-1" x="0.55" y="0.55" width="93.967" height="130.463"/>
+    </g>
+    <g id="Rectangle_5" data-name="Rectangle 5" class="cls-5" transform="translate(97.794 24.126)">
+      <rect class="cls-6" width="78.485" height="114.982"/>
+      <rect class="cls-1" x="0.55" y="0.55" width="77.385" height="113.882"/>
+    </g>
+  </g>
+</svg>

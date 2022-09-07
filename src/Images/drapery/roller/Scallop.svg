@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="173" height="167" viewBox="15 10 145 150">
+  <defs>
+    <style>
+      .cls-1, .cls-4 {
+        fill: none;
+      }
+
+      .cls-2 {
+        fill: #c6c6c6;
+      }
+
+      .cls-3 {
+        fill: #fff;
+      }
+
+      .cls-4 {
+        stroke: #606060;
+        stroke-width: 1.1px;
+      }
+
+      .cls-5 {
+        stroke: none;
+      }
+    </style>
+  </defs>
+  <g id="Group_88" data-name="Group 88" transform="translate(257.762 -115.937)">
+    <rect id="Rectangle_59" data-name="Rectangle 59" class="cls-1" width="173" height="167" transform="translate(-257.762 115.937)"/>
+    <rect id="Rectangle_60" data-name="Rectangle 60" class="cls-2" width="86.7" height="82.733" transform="translate(-214.762 138.337)"/>
+    <g id="Group_91" data-name="Group 91">
+      <ellipse id="Ellipse_28" data-name="Ellipse 28" class="cls-2" cx="10.75" cy="8" rx="10.75" ry="8" transform="translate(-148.539 210.938)"/>
+      <ellipse id="Ellipse_29" data-name="Ellipse 29" class="cls-2" cx="10.75" cy="8" rx="10.75" ry="8" transform="translate(-170.872 210.938)"/>
+      <ellipse id="Ellipse_30" data-name="Ellipse 30" class="cls-2" cx="10.75" cy="8" rx="10.75" ry="8" transform="translate(-193.206 210.938)"/>
+      <ellipse id="Ellipse_31" data-name="Ellipse 31" class="cls-2" cx="10.75" cy="8" rx="10.75" ry="8" transform="translate(-215.539 210.938)"/>
+    </g>
+    <ellipse id="Ellipse_32" data-name="Ellipse 32" class="cls-3" cx="1" cy="1.5" rx="1" ry="1.5" transform="translate(-149.962 220.438)"/>
+    <ellipse id="Ellipse_33" data-name="Ellipse 33" class="cls-3" cx="1" cy="1.5" rx="1" ry="1.5" transform="translate(-172.289 220.438)"/>
+    <ellipse id="Ellipse_34" data-name="Ellipse 34" class="cls-3" cx="1" cy="1.5" rx="1" ry="1.5" transform="translate(-194.621 220.438)"/>
+    <g id="Rectangle_58" data-name="Rectangle 58" class="cls-4" transform="translate(-225.191 128.444)">
+      <rect class="cls-5" width="107.531" height="140.475"/>
+      <rect class="cls-1" x="0.55" y="0.55" width="106.431" height="139.375"/>
+    </g>
+    <g id="Rectangle_57" data-name="Rectangle 57" class="cls-4" transform="translate(-215.814 137.297)">
+      <rect class="cls-5" width="88.776" height="122.77"/>
+      <rect class="cls-1" x="0.55" y="0.55" width="87.676" height="121.67"/>
+    </g>
+  </g>
+</svg>

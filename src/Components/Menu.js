@@ -5,18 +5,23 @@ import SortableTree, {
 } from '@nosferatu500/react-sortable-tree';
 import Form from 'react-bootstrap/Form';
 import {Toast, ToastContainer} from "react-bootstrap";
-import Select from 'react-select';
+// import Select from 'react-select';
 import Modal from "react-bootstrap/Modal";
+import authHeader from "../Services/auth-header";
+import CustomDropdownMulti from "./CustomDropdownMulti";
+import CustomControlMulti from "./CustomControlMulti";
+
+import Select from "react-dropdown-select";
 
 
-const baseURL = "http://api.atlaspood.ir/WebsiteMenu/GetByChildren?apikey=477f46c6-4a17-4163-83cc-29908d";
-const baseURLPost = "http://api.atlaspood.ir/WebsiteMenu/Save";
-const baseURLDeleteAll = "http://api.atlaspood.ir/WebsiteMenu/DeleteAll?apiKey=477f46c6-4a17-4163-83cc-29908d";
-const baseURLModels = "http://api.atlaspood.ir/SewingModel/GetAll?apiKey=477f46c6-4a17-4163-83cc-29908d";
-const baseURLGetPage = "http://api.atlaspood.ir/WebsitePage/GetById";
-const baseURLAddPage = "http://api.atlaspood.ir/WebsitePage/Add";
-const baseURLEditPage = "http://api.atlaspood.ir/WebsitePage/Edit";
-const baseURLDeletePage = "http://api.atlaspood.ir/WebsitePage/Delete";
+const baseURL = "https://api.atlaspood.ir/WebsiteMenu/GetByChildren?apikey=477f46c6-4a17-4163-83cc-29908d";
+const baseURLPost = "https://api.atlaspood.ir/WebsiteMenu/Save";
+const baseURLDeleteAll = "https://api.atlaspood.ir/WebsiteMenu/DeleteAll?apiKey=477f46c6-4a17-4163-83cc-29908d";
+const baseURLModels = "https://api.atlaspood.ir/SewingModel/GetAll?apiKey=477f46c6-4a17-4163-83cc-29908d";
+const baseURLGetPage = "https://api.atlaspood.ir/WebsitePage/GetById";
+const baseURLAddPage = "https://api.atlaspood.ir/WebsitePage/Add";
+const baseURLEditPage = "https://api.atlaspood.ir/WebsitePage/Edit";
+const baseURLDeletePage = "https://api.atlaspood.ir/WebsitePage/Delete";
 
 function Menu() {
     const [menu, setMenu] = React.useState({
@@ -50,7 +55,7 @@ function Menu() {
     function handleShow(WebsitePageId) {
         axios.get(baseURLGetPage, {
             params: {
-                WebsitePageId: WebsitePageId,
+                pageId: WebsitePageId,
                 apiKey: window.$apikey
             }
         }).then((response) => {
@@ -123,8 +128,54 @@ function Menu() {
                             <input type="hidden" name="models" ref={modelRef} defaultValue={ListOfCategory}/>
                             <div className="menu_select_category_container">
                                 <span className="input__label">Models</span>
+                                {/*<Select*/}
+                                {/*    components={{Option: singleOption}}*/}
+                                {/*    onChange={(selected) => {*/}
+                                {/*        if (selected.length) {*/}
+                                {/*            let tempArr = [];*/}
+                                {/*            selected.forEach(obj => {*/}
+                                {/*                tempArr.push(obj["value"]);*/}
+                                {/*            });*/}
+                                {/*            // setPageEditCatListModels({models: tempArr});*/}
+                                {/*            modelRef.current.value = `${tempArr.join(",")}`;*/}
+                                {/*        }*/}
+                                {/*    }}*/}
+                                {/*    name="pageEditModal"*/}
+                                {/*    options={models}*/}
+                                {/*    isMulti={true}*/}
+                                {/*    hideSelectedOptions={false}*/}
+                                {/*    closeMenuOnSelect={false}*/}
+                                {/*    controlShouldRenderValue={false}*/}
+                                {/*    defaultValue={makeSelectedObjects(ListOfCategory)}*/}
+                                {/*    // menuIsOpen={true}*/}
+                                {/*/>*/}
                                 <Select
-                                    components={{Option: singleOption}}
+                                    className="select select_motor_channels"
+                                    placeholder="Please Select"
+                                    // portal={document.body}
+                                    dropdownPosition="bottom"
+                                    dropdownHandle={false}
+                                    dropdownGap={0}
+                                    multi={true}
+                                    values={makeSelectedObjects(ListOfCategory)}
+                                    onDropdownOpen={() => {
+                                        let temp1 = window.scrollY;
+                                        window.scrollTo(window.scrollX, window.scrollY + 0.5);
+                                        setTimeout(() => {
+                                            let temp2 = window.scrollY;
+                                            if (temp2 === temp1)
+                                                window.scrollTo(window.scrollX, window.scrollY - 0.5);
+                                        }, 100);
+                                    }}
+                                    dropdownRenderer={
+                                        ({props, state, methods}) => <CustomDropdownMulti props={props} state={state} methods={methods}/>
+                                    }
+                                    contentRenderer={
+                                        ({props, state, methods}) => <CustomControlMulti props={props} state={state} methods={methods}/>
+                                    }
+                                    // optionRenderer={
+                                    //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                    // }
                                     onChange={(selected) => {
                                         if (selected.length) {
                                             let tempArr = [];
@@ -135,13 +186,7 @@ function Menu() {
                                             modelRef.current.value = `${tempArr.join(",")}`;
                                         }
                                     }}
-                                    name="pageEditModal"
                                     options={models}
-                                    isMulti={true}
-                                    hideSelectedOptions={false}
-                                    closeMenuOnSelect={false}
-                                    controlShouldRenderValue={false}
-                                    defaultValue={makeSelectedObjects(ListOfCategory)}
                                 />
                             </div>
     
@@ -197,7 +242,9 @@ function Menu() {
         tempPostObj["ListOfCategory"] = parseInt(e.target.menuType.value) === 5502 ? modelRef.current.value : productRef.current.value;
         
         console.log(JSON.stringify(tempPostObj));
-        axios.post(baseURLEditPage, tempPostObj)
+        axios.post(baseURLEditPage, tempPostObj,{
+            headers:authHeader()
+        })
             .then(() => {
                 handleClose();
                 setShowToast(true);
@@ -325,8 +372,12 @@ function Menu() {
         
         console.log(JSON.stringify(postMenuArray));
         
-        axios.delete(baseURLDeleteAll).then((delete_response) => {
-            axios.post(baseURLPost, postMenuArray)
+        axios.delete(baseURLDeleteAll,{
+            headers:authHeader()
+        }).then((delete_response) => {
+            axios.post(baseURLPost, postMenuArray,{
+                headers:authHeader()
+            })
                 .then((response) => {
                     setShowToast(true);
                 }).catch(err => {
@@ -364,7 +415,7 @@ function Menu() {
             });
             return tempArr;
         } else {
-            return null;
+            return [];
         }
     }
     
@@ -483,7 +534,8 @@ function Menu() {
                                             params: {
                                                 id: node["WebsitePageId"],
                                                 apiKey: window.$apikey
-                                            }
+                                            },
+                                            headers:authHeader()
                                         }).then((response) => {
                                             setTreeData({
                                                 items: removeNodeAtPath({
@@ -564,7 +616,9 @@ function Menu() {
                                             tempObj["HtmlEnContent"] = "";
                                             tempObj["PageTypeId"] = 5501;
                                             tempObj["ColumnCount"] = 0;
-                                            axios.post(baseURLAddPage, tempObj)
+                                            axios.post(baseURLAddPage, tempObj,{
+                                                headers:authHeader()
+                                            })
                                                 .then((response) => {
                                                     node["WebsitePageId"] = response.data;
                                                     setTreeData({

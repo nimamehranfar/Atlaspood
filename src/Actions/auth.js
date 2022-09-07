@@ -63,7 +63,5 @@ export const login = (email, password) => (dispatch) => {
 };
 export const logout = () => (dispatch) => {
     user_logout();
-    dispatch({
-        type: LOGOUT,
-    });
+    
 };
