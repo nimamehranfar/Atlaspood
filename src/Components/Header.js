@@ -12,6 +12,9 @@ import {useDispatch, useSelector} from "react-redux";
 import {HideLogin2Modal, HideLoginModal, LOGIN, LOGOUT, REGISTER, ShowLoginModal} from "../Actions/types";
 import ModalLogin from "./ModalLogin";
 import SaveUserProject from "./SaveUserProject";
+import GetUserProjectData from "./GetUserProjectData";
+import AddProjectToCart from "./AddProjectToCart";
+import UserProjects from "./UserProjects";
 
 const baseURLGet = "https://api.atlaspood.ir/WebsiteSetting/GetBanner?apiKey=477f46c6-4a17-4163-83cc-29908d";
 const baseURLMenu = "https://api.atlaspood.ir/WebsiteMenu/GetByChildren?apikey=477f46c6-4a17-4163-83cc-29908d";
@@ -826,6 +829,39 @@ function Header() {
             dispatch({
                 type: HideLogin2Modal,
             })
+        }
+        if(isLoggedIn && localStorage.getItem("cart") !== null){
+            let tempDrapery=JSON.parse(localStorage.getItem("cart"))["drapery"];
+            if (tempDrapery !== undefined) {
+                let tempDrapery2=JSON.parse(JSON.stringify(tempDrapery));
+                tempDrapery2.forEach((obj,index)=>{
+                    GetUserProjectData(obj).then((temp) => {
+                        let projectObj=obj["PreorderText"];
+                        AddProjectToCart(temp, projectObj["SewingModelId"], projectObj["price"], temp["ModelNameEn"], temp["ModelNameFa"], [temp["uploadedImagesFile"]?temp["uploadedImagesFile"]:[], temp["uploadedImagesURL"]?temp["uploadedImagesURL"]:[], temp["uploadedPDFFile"]?temp["uploadedPDFFile"]:[], temp["uploadedPDFURL"]?temp["uploadedPDFURL"]:[]], projectObj["SewingPreorderId"], undefined, navigate, true).then((temp2) => {
+                            if (temp2 === 401) {
+                            } else if (temp2) {
+                                tempDrapery.splice(index, 1);
+                            } else {
+                                console.log("project not added");
+                            }
+                            if(tempDrapery.length===0){
+                                localStorage.removeItem("cart");
+                            }
+                            else if(index===tempDrapery2.length-1){
+                                let newCartObj = {};
+                                newCartObj["drapery"] = tempDrapery;
+                                newCartObj["product"] = [];
+                                newCartObj["swatches"] = [];
+                                localStorage.setItem('cart', JSON.stringify(newCartObj));
+                            }
+                        }).catch(()=>{
+                            tempDrapery.splice(index, 1);
+                        });
+                    }).catch(()=>{
+                        tempDrapery.splice(index, 1);
+                    });
+                });
+            }
         }
     }, [isLoggedIn]);
     

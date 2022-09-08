@@ -22,6 +22,7 @@ async function AddProjectToCart(cartValues, SewingModelId, price, ModelNameEn, M
         let userProjects = JSON.parse(JSON.stringify(UserProjects))[SewingModelId]["data"];
         let temp = JSON.parse(JSON.stringify(cartValues));
         let isCompleted = true;
+        // console.log(cartValues, SewingModelId, price, ModelNameEn, ModelNameFa, Files, cartProjectIndex, editIndex, isLoggedIn);
     
         let tempPostObj = {};
         tempPostObj["SewingModelId"] = SewingModelId;

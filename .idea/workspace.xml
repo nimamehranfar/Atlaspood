@@ -2,119 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="200ae4a2-413a-4eda-9bd3-7e6393833ac7" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Emails/Emails.zip" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Emails/confirmed.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Emails/forgot.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Emails/validation.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Components/AddProjectToCart.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Components/CustomControlFiles.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Components/CustomControlStaticPlaceholder.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Components/GetMeasurementArray.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Components/GetSewingFilters.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Components/GetUserProjectData.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Components/ModalLogin.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Components/setGetDeps.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/BracketColorRound1.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/BracketColorSquare1.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/Colonial.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/FrameSize.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/GunMetal.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/RegularRoll1a.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/RegularRoll2.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/ReverseRoll1a.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/ReverseRoll2.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/SatinBrass.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/SatinNickel.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/Scallop.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/SewnIn.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/Standard.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/Wave.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/bottom_bar_exposed_designer.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/bottom_bar_sewn_in.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/bracket_type_round.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/bracket_type_square.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/designer.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/frame_height.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/height_inside_3.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/height_inside_3_fa.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/mount_inside.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/mount_outside.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/position_left.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/position_right.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/roll_fabric_insert.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/roll_metal_valance.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/roll_regular.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/roll_reverse.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/roll_reverse.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/roll_upholstered_valance.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/roller_help_MetalValance.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/roller_help_NoValance.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/roller_help_UphosteredValance.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/shade_mount.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/step3_help_inside.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/step3_help_inside_fa.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/step3_help_outside.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/step3_help_outside_fa.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/wall_cover.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/width_inside_3.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/roller/width_inside_3_fa.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/public/alert.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/public/attention.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/public/checkmark1.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/public/checkmark1.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/public/checkmark1_checkbox.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/public/checkmark2.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/public/checkmark3.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/public/emailImage.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/public/logoen.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Page Components/Roller.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Page Components/Zebra.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/NM.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/NM.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/public/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/locales/en/translation.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/en/translation.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/locales/fa/translation.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/fa/translation.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/web.config" beforeDir="false" afterPath="$PROJECT_DIR$/public/web.config" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Actions/auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Actions/auth.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Actions/types.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Actions/types.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/AddressBook.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/AddressBook.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/Banner.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Banner.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/AddProjectToCart.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/AddProjectToCart.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/Header.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Header.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/Menu.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Menu.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/Models.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Models.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/OrderDetails.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/OrderDetails.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/PopoverStickOnHover.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/PopoverStickOnHover.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/SaveUserProject.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/SaveUserProject.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/Settings.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Settings.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/Slideshow.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Slideshow.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/UserProjects.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/UserProjects.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/Zebra.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/cartInfo.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/cartInfo.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/zebra/mount_inside.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/mount_inside.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/zebra/mount_outside.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/mount_outside.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/zebra/step3_help_inside.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/step3_help_inside.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/zebra/step3_help_inside_fa.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/step3_help_inside_fa.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/zebra/step3_help_outside.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/step3_help_outside.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/zebra/step3_help_outside_fa.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/step3_help_outside_fa.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Pages/AccountLayout.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/AccountLayout.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Pages/Basket.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/Basket.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Pages/Checkout.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/Checkout.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Pages/ConfirmEmail.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/ConfirmEmail.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Pages/Curtain.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/Curtain.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Pages/CustomCurtain.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/CustomCurtain.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Pages/Home.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/Home.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Pages/Projects.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/Projects.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Pages/RegisterLogin.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/RegisterLogin.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Pages/Reset.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/Reset.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Services/auth.service.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Services/auth.service.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/redux/auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/redux/auth.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web - http to https.config" beforeDir="false" afterPath="$PROJECT_DIR$/web - http to https.config" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -465,6 +358,7 @@
       <workItem from="1662212217104" duration="10290000" />
       <workItem from="1662403245536" duration="17194000" />
       <workItem from="1662563015313" duration="12081000" />
+      <workItem from="1662628762020" duration="8031000" />
     </task>
     <servers />
   </component>
@@ -483,22 +377,22 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="499" y="160" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1536.824@0.0.1536.824" timestamp="1658455725355" />
-    <state width="1493" height="106" key="GridCell.Tab.0.bottom" timestamp="1662580330917">
+    <state width="1493" height="106" key="GridCell.Tab.0.bottom" timestamp="1662664207267">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="106" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1662580330917" />
-    <state width="1493" height="106" key="GridCell.Tab.0.center" timestamp="1662580330917">
+    <state width="1493" height="106" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1662664207267" />
+    <state width="1493" height="106" key="GridCell.Tab.0.center" timestamp="1662664207267">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="106" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1662580330917" />
-    <state width="1493" height="106" key="GridCell.Tab.0.left" timestamp="1662580330917">
+    <state width="1493" height="106" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1662664207267" />
+    <state width="1493" height="106" key="GridCell.Tab.0.left" timestamp="1662664207267">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="106" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1662580330917" />
-    <state width="1493" height="106" key="GridCell.Tab.0.right" timestamp="1662580330917">
+    <state width="1493" height="106" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1662664207267" />
+    <state width="1493" height="106" key="GridCell.Tab.0.right" timestamp="1662664207267">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state width="1493" height="106" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1662580330917" />
+    <state width="1493" height="106" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1662664207267" />
     <state width="1493" height="261" key="GridCell.Tab.1.bottom" timestamp="1659467785857">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
@@ -551,10 +445,10 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="578" y="330" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1536.824@0.0.1536.824" timestamp="1658747890909" />
-    <state x="617" y="99" width="815" height="606" key="find.popup" timestamp="1662565817986">
+    <state x="617" y="99" width="815" height="606" key="find.popup" timestamp="1662663088656">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="617" y="99" width="815" height="606" key="find.popup/0.0.1536.824@0.0.1536.824" timestamp="1662565817986" />
+    <state x="617" y="99" width="815" height="606" key="find.popup/0.0.1536.824@0.0.1536.824" timestamp="1662663088656" />
     <state x="510" y="44" key="refactoring.ChangeSignatureDialog" timestamp="1654979096925">
       <screen x="0" y="0" width="1536" height="824" />
     </state>

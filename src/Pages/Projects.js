@@ -522,7 +522,7 @@ function Projects() {
                         temp["price"] = response.data["price"];
                         // console.log(response.data);
                         
-                        projectObj["Price"] = response.data["price"];
+                        projectObj["price"] = response.data["price"];
                         projectObj["PreorderText"]["price"] = response.data["price"];
                         setBagProjectObject(projectObj);
                         
@@ -581,7 +581,7 @@ function Projects() {
                         setCartAgree(tempArr);
                         setCartStateAgree(true);
                         modalHandleShow("cart_modal");
-                        AddProjectToCart(temp, projectObj["SewingModelId"], projectObj["Price"], temp["ModelNameEn"], temp["ModelNameFa"], [temp["uploadedImagesFile"]?temp["uploadedImagesFile"]:[], temp["uploadedImagesURL"]?temp["uploadedImagesURL"]:[], temp["uploadedPDFFile"]?temp["uploadedPDFFile"]:[], temp["uploadedPDFURL"]?temp["uploadedPDFURL"]:[]], projectObj["SewingPreorderId"], undefined, navigate, true).then((temp2) => {
+                        AddProjectToCart(temp, projectObj["SewingModelId"], projectObj["price"], temp["ModelNameEn"], temp["ModelNameFa"], [temp["uploadedImagesFile"]?temp["uploadedImagesFile"]:[], temp["uploadedImagesURL"]?temp["uploadedImagesURL"]:[], temp["uploadedPDFFile"]?temp["uploadedPDFFile"]:[], temp["uploadedPDFURL"]?temp["uploadedPDFURL"]:[]], projectObj["SewingPreorderId"], undefined, navigate, true).then((temp2) => {
                             if (temp2 === 401) {
                                 addProjectToBag(projectObj, index);
                             } else if (temp2) {
@@ -622,7 +622,7 @@ function Projects() {
     
     function addToCart_agreed(projectObj) {
         GetUserProjectData(projectObj, true).then((temp) => {
-            AddProjectToCart(temp, projectObj["SewingModelId"], projectObj["Price"], temp["ModelNameEn"], temp["ModelNameFa"], [temp["uploadedImagesFile"]?temp["uploadedImagesFile"]:[], temp["uploadedImagesURL"]?temp["uploadedImagesURL"]:[], temp["uploadedPDFFile"]?temp["uploadedPDFFile"]:[], temp["uploadedPDFURL"]?temp["uploadedPDFURL"]:[]], projectObj["SewingPreorderId"], undefined, navigate, true).then((temp2) => {
+            AddProjectToCart(temp, projectObj["SewingModelId"], projectObj["price"], temp["ModelNameEn"], temp["ModelNameFa"], [temp["uploadedImagesFile"]?temp["uploadedImagesFile"]:[], temp["uploadedImagesURL"]?temp["uploadedImagesURL"]:[], temp["uploadedPDFFile"]?temp["uploadedPDFFile"]:[], temp["uploadedPDFURL"]?temp["uploadedPDFURL"]:[]], projectObj["SewingPreorderId"], undefined, navigate, true).then((temp2) => {
                 if (temp2) {
                     renderCart(temp2);
                     setTimeout(() => {

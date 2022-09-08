@@ -4482,7 +4482,7 @@ body .add_to_project_modal .react-dropdown-select-dropdown {
     width: 100%;
     justify-content: space-between;
     align-items: baseline;
-    height: 45%;
+    height: 42%;
 }
 
 .checkout_item_details {
@@ -4490,6 +4490,7 @@ body .add_to_project_modal .react-dropdown-select-dropdown {
     cursor: pointer;
     /*font-weight: 400;*/
     font-size: 0.875rem;
+    letter-spacing: normal;
 }
 
 .checkout_item_name {
@@ -4591,14 +4592,18 @@ body .add_to_project_modal .react-dropdown-select-dropdown {
 .discount_applied_container {
     width: 100%;
     margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2%;
 }
 
 .discount_applied {
-    min-width: 30%;
-    width: max-content;
+    min-width: 32%;
+    width: 32%;
     height: 2.375rem;
     display: flex;
-    padding: 0.625rem;
+    padding: 0.5rem;
+    margin-bottom: 0.625rem;
     background-color: #c2c1be;
     justify-content: space-between;
     align-items: center;
@@ -6544,6 +6549,7 @@ body .add_to_project_modal .react-dropdown-select-dropdown {
 
 .checkout_item_desc_container .dropdown{
     /*position: unset;*/
+    height: 30%;
 }
 
 .font_farsi .basket_view_detail_popover .basket_item_title_desc{
@@ -6641,5 +6647,21 @@ body .add_to_project_modal .react-dropdown-select-dropdown {
 }
 
 .cart_agree_desc .checkbox_text{
+    font-size: 0.875rem;
+}
+
+.checkout_item_price_section{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.checkout_item_price_without_discount{
+    text-decoration: line-through;
+    color: #949494;
+}
+
+.checkout_item_discount{
+    margin-block-end: 0;
     font-size: 0.875rem;
 }

@@ -34,6 +34,8 @@ const baseURLGetAddress = "https://api.atlaspood.ir/user/GetAddress";
 const baseURLGetStates = "https://api.atlaspood.ir/City/GetStates";
 const baseURLGetCities = "https://api.atlaspood.ir/City/GetCities/";
 const baseURLGetCart = "https://api.atlaspood.ir/cart/GetAll";
+const baseURLAddDiscount = "https://api.atlaspood.ir/Cart/AddDiscountCode";
+const baseURLDeleteDiscount = "https://api.atlaspood.ir/Cart/DeleteDiscountCode";
 
 
 function Checkout() {
@@ -50,6 +52,7 @@ function Checkout() {
     const [shippingPrice, setShippingPrice] = useState(0);
     const [cart, setCart] = useState({});
     const [drapery, setDrapery] = useState([]);
+    const [discounts, setDiscounts] = useState([]);
     const [draperyList, setDraperyList] = useState([]);
     const [draperyCount, setDraperyCount] = useState(0);
     const [product, setProduct] = useState([]);
@@ -60,8 +63,7 @@ function Checkout() {
     const [swatchesCount, setSwatchesCount] = useState(0);
     const [cartChanged, setCartChanged] = useState(0);
     const [discount, setDiscount] = useState("");
-    const [discountApplied, setDiscountApplied] = useState(false);
-    const [discountAppliedText, setDiscountAppliedText] = useState("");
+    const [discountList, setDiscountList] = useState([]);
     
     const [loginInfo, setLoginInfo] = useState({
         email: "",
@@ -272,14 +274,46 @@ function Checkout() {
     
     function checkDiscount() {
         let discountText = discount;
-        setDiscountApplied(true);
-        setDiscountAppliedText(discountText);
-        setDiscount("");
+        axios.post(baseURLAddDiscount, {}, {
+            params: {
+                code: discountText
+            },
+            headers: authHeader()
+        }).then((response) => {
+            setDiscount("");
+            setCartChanged(cartChanged + 1);
+        }).catch(err => {
+            if (err.response.status === 401) {
+                refreshToken().then((response2) => {
+                    if (response2 !== false) {
+                        checkDiscount();
+                    } else {
+                    }
+                });
+            } else {
+            }
+        });
     }
     
-    function removeDiscount() {
-        setDiscountApplied(false);
-        setDiscountAppliedText("");
+    function removeDiscount(discountText) {
+        axios.delete(baseURLAddDiscount, {
+            params: {
+                code: discountText
+            },
+            headers: authHeader()
+        }).then((response) => {
+            setCartChanged(cartChanged + 1);
+        }).catch(err => {
+            if (err.response.status === 401) {
+                refreshToken().then((response2) => {
+                    if (response2 !== false) {
+                        removeDiscount(discountText);
+                    } else {
+                    }
+                });
+            } else {
+            }
+        });
     }
     
     function setAddress(num, refIndex, value) {
@@ -327,24 +361,24 @@ function Checkout() {
         let arrayObj = userAddress.map(item => {
             return {
                 value: item["CustomerAddressId"],
-                label: `${t("Iran")} ${pageLanguage==="fa"?item["CityName"]:item["CityEnName"]} ${item["Address"]} ${item["Address2"]} ${item["ZipCode"]}`
+                label: `${t("Iran")} ${pageLanguage === "fa" ? item["CityName"] : item["CityEnName"]} ${item["Address"]} ${item["Address2"]} ${item["ZipCode"]}`
             };
         });
         
-        let finalArray=[{
+        let finalArray = [{
             value: -1,
             label: "Create a new address"
         }];
         setUserAddressRender([...finalArray, ...arrayObj]);
         setHasAddress(true);
-    
+        
         let tempIndex = userAddress.findIndex(opt => opt["IsDefault"] === true);
-        if(tempIndex===-1){
-            tempIndex=0
+        if (tempIndex === -1) {
+            tempIndex = 0
         }
         if (localStorage.getItem("user") !== null && isLoggedIn) {
             let tempObj = JSON.parse(localStorage.getItem("user"));
-    
+            
             setAddress1({
                 id: "",
                 Name: `${jwt(tempObj["access_token"])["FirstName"]}`,
@@ -360,9 +394,8 @@ function Checkout() {
             setTempCityId(userAddress[tempIndex]["CityId"]);
             setTimeout(() => {
                 setSelectedState(states.find(opt => opt.value === userAddress[tempIndex]["ZoneNo"]) ? [states.find(opt => opt.value === userAddress[tempIndex]["ZoneNo"])] : []);
-                if(states.find(opt => opt.value === userAddress[tempIndex]["ZoneNo"])){
-                }
-                else{
+                if (states.find(opt => opt.value === userAddress[tempIndex]["ZoneNo"])) {
+                } else {
                     setSelectedCity([]);
                     setCities([]);
                 }
@@ -408,10 +441,9 @@ function Checkout() {
                         setTempCity([]);
                         setTimeout(() => {
                             // console.log(tempValue);
-                            setSelectedCity(arrayObj.find(opt => opt.value === tempValue)?[arrayObj.find(opt => opt.value === tempValue)]:[]);
+                            setSelectedCity(arrayObj.find(opt => opt.value === tempValue) ? [arrayObj.find(opt => opt.value === tempValue)] : []);
                         }, 50);
-                    }
-                    else if (tempCity.length) {
+                    } else if (tempCity.length) {
                         let tempValue = tempCity[0].value;
                         setTempCity([]);
                         setTimeout(() => {
@@ -447,12 +479,12 @@ function Checkout() {
     
     function setAllAddress(tempValue) {
         let tempIndex = userAddress.findIndex(opt => opt["CustomerAddressId"] === tempValue);
-        if(tempIndex===-1){
+        if (tempIndex === -1) {
             clearAddressFields();
         }
         if (localStorage.getItem("user") !== null && isLoggedIn) {
             let tempObj = JSON.parse(localStorage.getItem("user"));
-    
+            
             setAddress1({
                 id: "",
                 Name: userAddress[tempIndex]["FirstName"],
@@ -464,13 +496,12 @@ function Checkout() {
                 ZipCode: userAddress[tempIndex]["ZipCode"],
                 PhoneNumber: userAddress[tempIndex]["Mobile"]
             });
-    
+            
             setTempCityId(userAddress[tempIndex]["CityId"]);
             setTimeout(() => {
                 setSelectedState(states.find(opt => opt.value === userAddress[tempIndex]["ZoneNo"]) ? [states.find(opt => opt.value === userAddress[tempIndex]["ZoneNo"])] : []);
-                if(states.find(opt => opt.value === userAddress[tempIndex]["ZoneNo"])){
-                }
-                else{
+                if (states.find(opt => opt.value === userAddress[tempIndex]["ZoneNo"])) {
+                } else {
                     setSelectedCity([]);
                     setCities([]);
                 }
@@ -523,6 +554,7 @@ function Checkout() {
             if (isLoggedIn) {
                 setTotalPrice(cart["TotalAmount"]);
                 setDrapery(cart["CartDetails"]);
+                setDiscounts(cart["DiscountCodes"]);
                 setDraperyCount(cart["CartDetails"].length);
                 // console.log(cart["CartDetails"].length);
             } else {
@@ -577,7 +609,7 @@ function Checkout() {
                     obj["price"] = drapery[i]["UnitPrice"];
                     obj["price"] = drapery[i]["UnitPrice"];
                     obj["qty"] = drapery[i]["Count"];
-                
+                    
                     if (projectDataObj) {
                         let promise1 = new Promise((resolve, reject) => {
                             projectDataObj["data"].forEach((tempObj, index) => {
@@ -604,12 +636,12 @@ function Checkout() {
                                             }
                                         }
                                         desc[tempObj["order"]] =
-                                            <div className="basket_item_title_desc" key={tempObj+tempObj["order"]}>
+                                            <div className="basket_item_title_desc" key={tempObj + tempObj["order"]}>
                                                 <h3>{t(tempObj["title"])}&nbsp;</h3>
                                                 <h4>{objLabel}</h4>
                                             </div>;
                                     }
-                                
+                                    
                                     if (index === projectDataObj["data"].length - 1) {
                                         resolve();
                                     }
@@ -618,10 +650,10 @@ function Checkout() {
                                         resolve();
                                     }
                                 }
-                            
+                                
                             });
                         });
-                    
+                        
                         promise1.then(() => {
                             // console.log(desc);
                             temp[i] =
@@ -633,8 +665,10 @@ function Checkout() {
                                     <div className="checkout_item_desc_container">
                                         <div className="checkout_item">
                                             <h1 className="checkout_item_name">{pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</h1>
-                                            <span
-                                                className="checkout_item_price">{GetPrice(obj["price"], pageLanguage, t("TOMANS"))}</span>
+                                            <div className="checkout_item_price_section">
+                                                <span className={`checkout_item_price ${drapery[i]["Discount"] !== 0 ? "checkout_item_price_without_discount" : ""}`}>{GetPrice(obj["price"], pageLanguage, t("TOMANS"))}</span>
+                                                <span className="checkout_item_price">{GetPrice(obj["price"] - drapery[i]["Discount"], pageLanguage, t("TOMANS"))}</span>
+                                            </div>
                                         </div>
                                         {/*<PopoverStickOnHover classNames="checkout_view_detail_popover"*/}
                                         {/*                     placement="bottom"*/}
@@ -644,7 +678,7 @@ function Checkout() {
                                         {/*                             {desc}*/}
                                         {/*                         </div>*/}
                                         {/*                     }/>*/}
-                                        <Dropdown autoClose="outside" title="" align={{ sm: pageLanguage==="fa"?"end":"start" }}>
+                                        <Dropdown autoClose="outside" title="" align={{sm: pageLanguage === "fa" ? "end" : "start"}}>
                                             <Dropdown.Toggle className="basket_item_title_dropdown_btn">
                                                 <h2 className="checkout_item_details">{t("View Details")}</h2>
                                                 <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
@@ -655,6 +689,7 @@ function Checkout() {
                                                 </div>
                                             </Dropdown.Menu>
                                         </Dropdown>
+                                        <span className="checkout_item_discount">{t('Discount')} ({GetPrice(drapery[i]["Discount"], pageLanguage, t("TOMANS"))})</span>
                                     </div>
                                 </li>;
                         });
@@ -673,15 +708,15 @@ function Checkout() {
                 // let cartInfo = JSON.parse(JSON.stringify(CartInfo));
                 let temp = [];
                 let delArr = [];
-        
+                
                 let draperiesTotalPrice = 0;
                 let promiseArr = [];
-        
+                
                 tempDrapery.forEach((obj, index) => {
                     let tempPostObj = {};
                     let userProjects = JSON.parse(JSON.stringify(UserProjects))[obj["PreorderText"]["SewingModelId"]]["data"];
                     // let obj = obj1["PreorderText"];
-    
+                    
                     promiseArr[index] = new Promise((resolve, reject) => {
                         GetUserProjectData(obj).then((temp) => {
                             tempPostObj["WindowCount"] = 1;
@@ -699,7 +734,7 @@ function Checkout() {
                                     }
                                 }
                             });
-        
+                            
                             tempPostObj["SewingOrderDetails"] = [];
                             tempPostObj["SewingOrderDetails"][0] = {};
                             tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
@@ -727,7 +762,7 @@ function Checkout() {
                                         if (tempObj["apiAcc"] === true) {
                                             tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
                                         } else {
-                        
+                                        
                                         }
                                     }
                                 }
@@ -735,11 +770,11 @@ function Checkout() {
                             tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
                                 return el != null;
                             });
-        
+                            
                             // delete tempPostObj["SewingOrderDetails"][0]["SewingModelId"];
                             // delete tempPostObj["SewingModelId"];
                             tempPostObj["SewingModelId"] = tempPostObj["SewingOrderDetails"][0]["SewingModelId"];
-        
+                            
                             if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
                                 axios.post(baseURLPrice, tempPostObj).then((response) => {
                                     resolve(response);
@@ -757,13 +792,13 @@ function Checkout() {
                         });
                     });
                 });
-        
+                
                 delArr.forEach(el => {
                     tempDrapery.splice(el, 1);
                 });
-        
+                
                 Promise.all(promiseArr).then(function (values) {
-            
+                    
                     tempDrapery.forEach((obj1, index) => {
                         let obj = obj1["PreorderText"];
                         let fabricColorFa = obj["FabricColorFa"];
@@ -777,10 +812,10 @@ function Checkout() {
                         let WindowName = obj["WindowName"] === undefined ? "" : obj["WindowName"];
                         let photoUrl = obj["PhotoUrl"];
                         let desc = [];
-                        obj["price"] = values[index].data["price"]/obj1["Count"];
-                        obj1["price"] = values[index].data["price"]/obj1["Count"];
+                        obj["price"] = values[index].data["price"] / obj1["Count"];
+                        obj1["price"] = values[index].data["price"] / obj1["Count"];
                         draperiesTotalPrice += values[index].data["price"];
-                
+                        
                         Object.keys(obj).forEach(key => {
                             let userProjects = JSON.parse(JSON.stringify(UserProjects))[obj["SewingModelId"]]["data"];
                             let tempObj = userProjects.find(obj => obj["apiLabel"] === key);
@@ -815,7 +850,7 @@ function Checkout() {
                                 }
                             }
                         });
-                
+                        
                         temp[index] =
                             <li className="checkout_item_container" key={index}>
                                 <div className="checkout_item_image_container">
@@ -825,8 +860,7 @@ function Checkout() {
                                 <div className="checkout_item_desc_container">
                                     <div className="checkout_item">
                                         <h1 className="checkout_item_name">{pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</h1>
-                                        <span
-                                            className="checkout_item_price">{GetPrice(obj1["price"]* obj1["Count"], pageLanguage, t("TOMANS"))}</span>
+                                        <span className="checkout_item_price">{GetPrice(obj1["price"] * obj1["Count"], pageLanguage, t("TOMANS"))}</span>
                                     </div>
                                     {/*<PopoverStickOnHover classNames="basket_view_detail_popover"*/}
                                     {/*                      placement="bottom"*/}
@@ -836,7 +870,7 @@ function Checkout() {
                                     {/*                              {desc}*/}
                                     {/*                          </div>*/}
                                     {/*                      }/>*/}
-                                    <Dropdown autoClose="outside" title="" align={{ sm: pageLanguage==="fa"?"end":"start" }}>
+                                    <Dropdown autoClose="outside" title="" align={{sm: pageLanguage === "fa" ? "end" : "start"}}>
                                         <Dropdown.Toggle className="basket_item_title_dropdown_btn">
                                             <h2 className="checkout_item_details">{t("View Details")}</h2>
                                             <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
@@ -847,7 +881,6 @@ function Checkout() {
                                             </div>
                                         </Dropdown.Menu>
                                     </Dropdown>
-                                    
                                 </div>
                             </li>;
                     });
@@ -863,10 +896,36 @@ function Checkout() {
                 }).catch(err => {
                     console.log(err);
                 });
-        
+                
             }
         }
     }, [drapery]);
+    
+    useEffect(() => {
+        if (discounts.length > 0) {
+            let tempDiscounts = JSON.parse(JSON.stringify(discounts));
+            let tempArr = [];
+            let promise1 = new Promise((resolve, reject) => {
+                tempDiscounts.forEach((tempObj, index) => {
+                    tempArr[index] =
+                        <span className="discount_applied">
+                            <img src={require('../Images/public/discount.svg').default} className="img-fluid discount_applied_img" alt=""/>
+                            <p className="discount_applied_text">{tempObj["Code"]}</p>
+                            <button className="btn-close discount_applied_remove" onClick={() => removeDiscount(tempObj["Code"])}/>
+                        </span>;
+                    
+                    if (index === tempDiscounts.length - 1) {
+                        resolve();
+                    }
+                });
+            });
+            
+            promise1.then(() => {
+                setDiscountList(tempArr);
+            });
+        }
+    }, [discounts]);
+    
     
     useEffect(() => {
         const tempLang = location.pathname.split('');
@@ -907,7 +966,7 @@ function Checkout() {
                                     </div>
                                     <div className="checkout_left_info_flex_right">
                                         {!isLoggedIn &&
-                                        <span className="checkout_left_info_text" onClick={()=>dispatch({
+                                        <span className="checkout_left_info_text" onClick={() => dispatch({
                                             type: ShowLoginModal,
                                         })}>{t("Already have an account? ")}<p>{t("Log in")}</p></span>
                                         }
@@ -975,10 +1034,9 @@ function Checkout() {
                                                 onChange={(selected) => {
                                                     if (selected.length) {
                                                         setSelectedAddress(selected);
-                                                        if(selected[0].value===-1){
+                                                        if (selected[0].value === -1) {
                                                             clearAddressFields();
-                                                        }
-                                                        else {
+                                                        } else {
                                                             setAllAddress(selected[0].value);
                                                         }
                                                     }
@@ -1390,15 +1448,11 @@ function Checkout() {
                                     <button className="checkout_right_discount_apply" disabled={discount === ""} onClick={() => checkDiscount()}>{t("Apply")}</button>
                                 </div>
                             </div>
-                            {discountApplied &&
+                            
                             <div className="discount_applied_container">
-                                <span className="discount_applied">
-                                    <img src={require('../Images/public/discount.svg').default} className="img-fluid discount_applied_img" alt=""/>
-                                    <p className="discount_applied_text">{discountAppliedText}</p>
-                                    <button className="btn-close discount_applied_remove" onClick={() => removeDiscount()}/>
-                                </span>
+                                {discountList}
                             </div>
-                            }
+                        
                         </div>
                         <div className="checkout_right_price_detail">
                             <span className="checkout_right_price_sub payment_price_detail">
