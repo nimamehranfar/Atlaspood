@@ -606,6 +606,7 @@ function Checkout() {
                     let WindowName = obj["WindowName"] === undefined ? "" : obj["WindowName"];
                     let photoUrl = obj["PhotoUrl"];
                     let ModelId = obj["ModelId"];
+                    let hasDiscount = drapery[i]["Discount"] > 0;
                     obj["price"] = drapery[i]["UnitPrice"];
                     obj["price"] = drapery[i]["UnitPrice"];
                     obj["qty"] = drapery[i]["Count"];
@@ -662,12 +663,14 @@ function Checkout() {
                                         <img src={`https://api.atlaspood.ir/${photoUrl}`} alt="" className="checkout_item_img"/>
                                         <p className="checkout_item_image_qty">{pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${obj["qty"]}`) : obj["qty"]}</p>
                                     </div>
-                                    <div className="checkout_item_desc_container">
+                                    <div className={`checkout_item_desc_container  ${!hasDiscount ? "checkout_item_desc_container_without_discount" : ""}`}>
                                         <div className="checkout_item">
                                             <h1 className="checkout_item_name">{pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</h1>
                                             <div className="checkout_item_price_section">
-                                                <span className={`checkout_item_price ${drapery[i]["Discount"] !== 0 ? "checkout_item_price_without_discount" : ""}`}>{GetPrice(obj["price"], pageLanguage, t("TOMANS"))}</span>
-                                                <span className="checkout_item_price">{GetPrice(obj["price"] - drapery[i]["Discount"], pageLanguage, t("TOMANS"))}</span>
+                                                <span
+                                                    className={`checkout_item_price ${hasDiscount ? "checkout_item_price_with_discount" : ""}`}>{GetPrice(obj["price"], pageLanguage, t("TOMANS"))}</span>
+                                                {hasDiscount &&
+                                                <span className="checkout_item_price">{GetPrice(obj["price"] - drapery[i]["Discount"], pageLanguage, t("TOMANS"))}</span>}
                                             </div>
                                         </div>
                                         {/*<PopoverStickOnHover classNames="checkout_view_detail_popover"*/}
@@ -689,7 +692,8 @@ function Checkout() {
                                                 </div>
                                             </Dropdown.Menu>
                                         </Dropdown>
-                                        <span className="checkout_item_discount">{t('Discount')} ({GetPrice(drapery[i]["Discount"], pageLanguage, t("TOMANS"))})</span>
+                                        {hasDiscount &&
+                                        <span className="checkout_item_discount">{t('Discount')} (-{GetPrice(drapery[i]["Discount"], pageLanguage, t("TOMANS"))})</span>}
                                     </div>
                                 </li>;
                         });

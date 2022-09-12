@@ -96,6 +96,8 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     const [projectModalState, setProjectModalState] = useState(0);
     const [zoomModalHeader, setZoomModalHeader] = useState([]);
     const [zoomModalBody, setZoomModalBody] = useState([]);
+    const [swatchId, setSwatchId] = useState(0);
+    const [hasSwatchId, setHasSwatchId] = useState(false);
     const [addCartErr, setAddCartErr] = useState([]);
     const [cartItems, setCartItems] = useState([]);
     const [cartAgree, setCartAgree] = useState([]);
@@ -383,7 +385,13 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     function renderFabrics() {
         const fabricList = [];
         let count = 0;
+        let cartObj={};
+        let temp=[];
         let pageLanguage1 = location.pathname.split('').slice(1, 3).join('');
+        if (localStorage.getItem("cart") !== null) {
+            cartObj = JSON.parse(localStorage.getItem("cart"));
+            temp = cartObj["swatches"];
+        }
         
         Object.keys(fabrics).forEach((key, index) => {
             let DesignName = convertToPersian(fabrics[key][0].DesignName);
@@ -392,7 +400,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
             const fabric = [];
             for (let j = 0; j < fabrics[key].length; j++) {
                 let FabricId = fabrics[key][j].FabricId;
-                
+                // console.log(fabrics,key);
                 let PhotoPath = "";
                 fabrics[key][j].FabricPhotos.forEach(obj => {
                     if (obj.PhotoTypeId === 4702)
@@ -406,7 +414,16 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                 let DesignRaportWidth = fabrics[key][j].DesignRaportWidth;
                 let ColorName = convertToPersian(fabrics[key][j].ColorName);
                 let ColorEnName = fabrics[key][j].ColorEnName;
-                
+                let SwatchId = fabrics[key][j].SwatchId?fabrics[key][j].SwatchId:1;
+                let HasSwatchId=false;
+                if(temp.length>0) {
+                    let index = temp.findIndex(object => {
+                        return object["SwatchId"] === SwatchId;
+                    });
+                    if(index!==-1) {
+                        HasSwatchId=true;
+                    }
+                }
                 // console.log(step1 === `${FabricId}`, step1, `${FabricId}`, FabricId);
                 
                 fabric.push(
@@ -440,10 +457,13 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                         </label>
                         <div className={`fabric_name_container ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
                             <h1>{pageLanguage1 === 'en' ? ColorEnName : ColorName}</h1>
-                            <span onClick={() => handleShow(PhotoPath, DesignName, DesignEnName, ColorName, ColorEnName)}><i className="fa fa-search" aria-hidden="true"/></span>
+                            <span onClick={() => {
+                                handleShow(PhotoPath, DesignName, DesignEnName, ColorName, ColorEnName,SwatchId);
+                                setHasSwatchId(HasSwatchId);
+                            }}><i className="fa fa-search" aria-hidden="true"/></span>
                         </div>
-                        <button className={`swatchButton ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} current-state="0"
-                                onClick={e => fabricSwatch(e, FabricId)}>{t("ORDER SWATCH")}</button>
+                        <button className={`swatchButton ${HasSwatchId? "activeSwatch":""} ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} current-state={HasSwatchId? "1":"0"}
+                                onClick={e => fabricSwatch(e, SwatchId)}>{HasSwatchId? t("SWATCH IN CART"):t("ORDER SWATCH")}</button>
                     </div>
                 );
                 
@@ -468,7 +488,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
         setShow(false);
     }
     
-    function handleShow(PhotoPath, DesignName, DesignEnName, ColorName, ColorEnName) {
+    function handleShow(PhotoPath, DesignName, DesignEnName, ColorName, ColorEnName,SwatchId) {
         const tempDiv = [];
         const tempDiv1 = [];
         tempDiv.push(
@@ -497,6 +517,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
         
         setZoomModalBody(tempDiv);
         setZoomModalHeader(tempDiv1);
+        setSwatchId(SwatchId);
         setShow(true);
     }
     
@@ -1782,16 +1803,40 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
         // console.log(hasTrim)
     }
     
-    function fabricSwatch(e, fabricId) {
+    function fabricSwatch(e, SwatchId) {
         let currentState = e.target.getAttribute('current-state');
-        if (currentState === "0") {
-            e.target.innerHTML = t("SWATCH IN CART");
-            e.target.setAttribute('current-state', "1");
-            e.target.className = "swatchButton activeSwatch";
+        let cartObj={};
+        let temp=[];
+        if (localStorage.getItem("cart") !== null) {
+            cartObj = JSON.parse(localStorage.getItem("cart"));
+            temp = cartObj["swatches"];
         } else {
-            e.target.innerHTML = t("ORDER SWATCH");
-            e.target.setAttribute('current-state', "0");
-            e.target.className = "swatchButton";
+            cartObj["drapery"]=[];
+            cartObj["product"]=[];
+            cartObj["swatches"]=[];
+        }
+        if (currentState === "0") {
+            temp.push({"SwatchId":SwatchId,"Count":1});
+        } else {
+            if(temp.length>0) {
+                let index = temp.findIndex(object => {
+                    return object["SwatchId"] === SwatchId;
+                });
+                if(index!==-1) {
+                    temp.splice(index, 1);
+                }
+            }
+        }
+        cartObj["swatches"]=temp;
+        localStorage.setItem('cart', JSON.stringify(cartObj));
+        renderFabrics();
+        if(show){
+            if(currentState === "0"){
+                setHasSwatchId(true);
+            }
+            else{
+                setHasSwatchId(false);
+            }
         }
     }
     
@@ -3348,7 +3393,8 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                             </Modal.Header>
                                             <Modal.Body>{zoomModalBody}</Modal.Body>
                                             <Modal.Footer>
-                                                <button className="swatchButton" current-state="0" onClick={e => fabricSwatch(e)}>{t("ORDER SWATCH")}</button>
+                                                <button className={`swatchButton ${hasSwatchId? "activeSwatch":""} ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} current-state={hasSwatchId? "1":"0"}
+                                                        onClick={e => fabricSwatch(e, swatchId)}>{hasSwatchId? t("SWATCH IN CART"):t("ORDER SWATCH")}</button>
                                             </Modal.Footer>
                                         </Modal>
                                         <NextStep eventKey="2">{t("NEXT STEP")}</NextStep>
@@ -3373,10 +3419,12 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                        selectChanged(e, "3AOut,3BOut,3COut,3DOut");
                                                        setStep2("Inside");
                                                        setStep21("");
+                                                       setMeasurementsNextStep("4");
                                                        if (stepSelectedValue["3"] === "2") {
-                                                           setDeps("3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3,21", "2,3AOut,3BOut1,3BOut2,3COut,3DOut");
+                                                           setDeps("21", "2,3AOut,3BOut1,3BOut2,3COut,3DOut");
                                                            deleteSpecialSelects(2);
                                                            setCart("Mount", "Inside");
+                                                           setStep3("");
                                                        } else {
                                                            setDeps("21", "2");
                                                            setCart("Mount", "Inside");
@@ -3415,12 +3463,23 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                             let refIndex = inputs.current["21"].getAttribute('ref-num');
                                                             tempLabels[refIndex] = inputs.current["21"].getAttribute('text');
                                                             setStepSelectedLabel(tempLabels);
-                                                            setDeps("", "21");
+                                                            if (stepSelectedValue["3"] === "2") {
+                                                                setDeps("3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3", "21");
+                                                            }
+                                                            else{
+                                                                setDeps("", "21");
+                                                            }
                                                         } else {
-                                                            selectUncheck(e);
                                                             setStep21("");
                                                             // modalHandleShow("noPower");
-                                                            setDeps("21", "");
+                                                            
+                                                            if (stepSelectedValue["3"] === "2") {
+                                                                setStep3("");
+                                                                setDeps("21,3", "3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3");
+                                                            }
+                                                            else{
+                                                                setDeps("21", "3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3");
+                                                            }
                                                         }
                                                     }} id="211" ref={ref => (inputs.current["211"] = ref)}/>
                                                     <label htmlFor="211" className="checkbox_label">
@@ -3497,14 +3556,23 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                            selectUncheck(e);
                                                            modalHandleShow("noMount");
                                                            setDeps("3", "31,32");
-                                                           setCart("calcMeasurements", true, "Width,height");
+                                                           setCart("calcMeasurements", true, "Width,height,calcMeasurements");
                                                        } else if (stepSelectedValue["2"] === "1") {
-                                                           setStep3("true");
-                                                           deleteSpecialSelects(3);
-                                                           selectChanged(e);
-                                                           setMeasurementsNextStep("3A");
-                                                           setDeps("3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3", "3,3AOut,3BOut1,3BOut2,3COut,3DOut,31,32");
-                                                           setCart("calcMeasurements", true, "Width,Height,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
+                                                           if (stepSelectedValue["2"] === "1" && step21 !== "true") {
+                                                               modalHandleShow("noInsideUnderstand");
+                                                               setStep3("");
+                                                               selectUncheck(e);
+                                                               setDeps("3", "31,32");
+                                                               setCart("calcMeasurements", true, "Width,height,calcMeasurements");
+                                                           }
+                                                           else {
+                                                               setStep3("true");
+                                                               deleteSpecialSelects(3);
+                                                               selectChanged(e);
+                                                               setMeasurementsNextStep("3A");
+                                                               setDeps("3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3", "3,3AOut,3BOut1,3BOut2,3COut,3DOut,31,32");
+                                                               setCart("calcMeasurements", true, "Width,Height,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
+                                                           }
                                                        } else {
                                                            setStep3("true");
                                                            deleteSpecialSelects(3);
@@ -3648,7 +3716,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                         </Card>
                         
                         {/* step 3A inside */}
-                        {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "1" &&
+                        {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "1" && step21 === "true" &&
                         <Card>
                             <Card.Header>
                                 <ContextAwareToggle eventKey="3A" stepNum={t("3A")} stepTitle={t("zebra_step3AInside")} stepRef="3AIn" type="2" required={requiredStep["3AIn"]}
@@ -3814,7 +3882,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                         }
                         
                         {/* step 3B inside */}
-                        {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "1" &&
+                        {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "1" && step21 === "true" &&
                         <Card>
                             <Card.Header>
                                 <ContextAwareToggle eventKey="3B" stepNum={t("3B")} stepTitle={t("zebra_step3BInside")} stepRef="3BIn" type="2" required={requiredStep["3BIn"]}

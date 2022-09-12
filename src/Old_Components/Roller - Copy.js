@@ -4,18 +4,11 @@ import axios from "axios";
 import {useTranslation} from "react-i18next";
 import Breadcrumb from 'react-bootstrap/Breadcrumb';
 import {Accordion, AccordionContext, Card, useAccordionButton} from "react-bootstrap"
-import ReactTooltip from 'react-tooltip';
 import Modal from 'react-bootstrap/Modal';
 import Dropdown from 'react-bootstrap/Dropdown'
 import Button from 'react-bootstrap/Button'
-// import Select from 'react-select';
 import Select from "react-dropdown-select";
 import ReactImageMagnify from '@blacklab/react-image-magnify';
-import * as qs from 'qs'
-
-import {ReactComponent as MountInside} from '../Images/drapery/zebra/mount_inside.svg';
-import {ReactComponent as MountOutside} from '../Images/drapery/zebra/mount_outside.svg';
-import Form from "react-bootstrap/Form";
 import PopoverStickOnHover from "../Components/PopoverStickOnHover";
 import CustomControl from "../Components/CustomControl";
 import CustomControlMulti from "../Components/CustomControlMulti";
@@ -23,15 +16,13 @@ import CustomDropdown from "../Components/CustomDropdown";
 import CustomDropdownMulti from "../Components/CustomDropdownMulti";
 import SelectOptionRange from "../Components/SelectOptionRange";
 
-import {ReactComponent as Camera} from '../Images/public/camera.svg';
 import CustomDropdownWithSearch from "../Components/CustomDropdownWithSearch";
 import CustomControlNum from "../Components/CustomControlNum";
 import NumberToPersianWord from "number_to_persian_word";
-// import CartInfo from "../Components/CartInfo"
-import UserProjects from "../Components/UserProjects";
+import CartInfo from "../Components/CartInfo"
 import GetPrice from "../Components/GetPrice";
 import {useDispatch, useSelector} from "react-redux";
-import {HideLogin2Modal, HideLoginModal, LOGIN, LOGOUT, ShowLogin2Modal, ShowLoginModal} from "../Actions/types";
+import {HideLoginModal, LOGIN, LOGOUT, ShowLoginModal} from "../Actions/types";
 import authHeader from "../Services/auth-header";
 import SaveUserProject from "../Components/SaveUserProject";
 import {refreshToken} from "../Services/auth.service";
@@ -39,8 +30,6 @@ import GetUserProjectData from "../Components/GetUserProjectData";
 import setGetDeps from "../Components/setGetDeps";
 import ModalLogin from "../Components/ModalLogin";
 import AddProjectToCart from "../Components/AddProjectToCart";
-import GetMeasurementArray from "../Components/GetMeasurementArray";
-import GetSewingFilters from "../Components/GetSewingFilters";
 
 
 const baseURLCats = "https://api.atlaspood.ir/WebsitePage/GetDetailByName";
@@ -48,22 +37,12 @@ const baseURLModel = "https://api.atlaspood.ir/SewingModel/GetById";
 const baseURLFabrics = "https://api.atlaspood.ir/Sewing/GetModelFabric";
 const baseURLWindowSize = "https://api.atlaspood.ir/Sewing/GetWindowSize";
 const baseURLPrice = "https://api.atlaspood.ir/Sewing/GetSewingOrderPrice";
-const baseURLFreeShipping = "https://api.atlaspood.ir/WebsiteSetting/GetFreeShippingAmount";
+const baseURLFreeShipping = "https://api.atlaspood.ir/WebsiteSetting/GetFreeShippingAmount?apiKey=477f46c6-4a17-4163-83cc-29908d";
 const baseURGetProject = "https://api.atlaspood.ir/SewingPreorder/GetById";
 const baseURLGetCart = "https://api.atlaspood.ir/cart/GetAll";
-const baseURLUploadImg = "https://api.atlaspood.ir/SewingOrderAttachment/ImageUpload";
-const baseURLUploadPdf = "https://api.atlaspood.ir/SewingOrderAttachment/PdfUpload";
-const baseURLDeleteFile = "https://api.atlaspood.ir/SewingOrderAttachment/Delete";
-const baseURLEditProject = "https://api.atlaspood.ir/SewingPreorder/Edit";
-const baseURLDeleteBasketProject = "https://api.atlaspood.ir/Cart/DeleteItem";
-
-const baseURLFilterColor = "https://api.atlaspood.ir/Color/GetBaseColors";
-const baseURLFilterPattern = "https://api.atlaspood.ir/Sewing/GetModelPatternType";
-const baseURLFilterType = "https://api.atlaspood.ir/Sewing/GetModelDesignType";
-const baseURLFilterPrice = "https://api.atlaspood.ir/BaseType/GetPriceLevel";
 
 
-function Roller({CatID, ModelID, ProjectId, EditIndex}) {
+function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
     const {t} = useTranslation();
     const location = useLocation();
     let pageLanguage = location.pathname.split('').slice(1, 3).join('');
@@ -89,7 +68,6 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
     const [totalCartPrice, setTotalCartPrice] = useState(0);
     const [freeShipPrice, setFreeShipPrice] = useState(0);
     const [show, setShow] = useState(false);
-    const [searchText, setSearchText] = useState("");
     const [searchShow, setSearchShow] = useState(false);
     const [measurementsNextStep, setMeasurementsNextStep] = useState("4");
     const [controlTypeNextStep, setControlTypeNextStep] = useState("5");
@@ -101,7 +79,6 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
     const [addCartErr, setAddCartErr] = useState([]);
     const [cartItems, setCartItems] = useState([]);
     const [cartAgree, setCartAgree] = useState([]);
-    // const [pageLanguage, setPageLanguage] = useState("");
     const [accordionActiveKey, setAccordionActiveKey] = useState("");
     const [roomLabelText, setRoomLabelText] = useState("");
     const [fabricSelected, setFabricSelected] = useState({
@@ -171,14 +148,12 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
     });
     const [cartValues, setCartValues] = useState({});
     const [cartStateAgree, setCartStateAgree] = useState(false);
-    const [cartAgreeDescription, setCartAgreeDescription] = useState(false);
     const [cartCount, setCartCount] = useState(0);
     const [cartProjectIndex, setCartProjectIndex] = useState(-1);
     const [cartDraperies, setCartDraperies] = useState({
         "count": 0,
         "list": []
     });
-    const [saveProjectCount, setSaveProjectCount] = useState(0);
     
     const [depSet, setDepSet] = useState(new Set(['1', '2', '3', '4', '5', '6', '71', '72']));
     
@@ -195,20 +170,9 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
     const steps = useRef([]);
     const draperyRef = useRef([]);
     
-    const [filterChanged, setFilterChanged] = useState({
-        filter: 0,
-        filter_id: undefined,
-        isDelete: false
-    });
-    
-    const [filterColors, setFilterColors] = useState([]);
-    const [filterPatterns, setFilterPatterns] = useState([]);
-    const [filterTypes, setFilterTypes] = useState([]);
-    const [filterPrices, setFilterPrices] = useState([]);
     
     const [step1, setStep1] = useState("");
     const [step2, setStep2] = useState("");
-    const [step21, setStep21] = useState("");
     const [step3, setStep3] = useState("");
     const [step4, setStep4] = useState("");
     const [step41, setStep41] = useState("");
@@ -228,31 +192,6 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
     const [savedProjectRoomLabel, setSavedProjectRoomLabel] = useState("");
     const [savedProjectRoomText, setSavedProjectRoomText] = useState("");
     
-    const [selectedFile, setSelectedFile] = useState();
-    const [selectedFileName, setSelectedFileName] = useState("");
-    const [editedFileName, setEditedFileName] = useState("");
-    const [uploadedImagesList, setUploadedImagesList] = useState([]);
-    const [uploadedImagesNamesList, setUploadedImagesNamesList] = useState([]);
-    const [uploadedPDFNameList, setUploadedPDFNameList] = useState([]);
-    const [uploadedImagesFile, setUploadedImagesFile] = useState([]);
-    const [uploadedPDFFile, setUploadedPDFFile] = useState([]);
-    const [uploadedImagesURL, setUploadedImagesURL] = useState([]);
-    const [uploadedPDFURL, setUploadedPDFURL] = useState([]);
-    
-    const [sewingColors, setSewingColors] = useState([]);
-    const [sewingPatterns, setSewingPatterns] = useState([]);
-    const [sewingTypes, setSewingTypes] = useState([]);
-    const [sewingPrices, setSewingPrices] = useState([]);
-    
-    const [deleteUploadImageUrl, setDeleteUploadImageUrl] = useState("");
-    const [deleteUploadPdfUrl, setDeleteUploadPdfUrl] = useState("");
-    const [deleteUploadImageIndex, setDeleteUploadImageIndex] = useState(-1);
-    const [deleteUploadPdfIndex, setDeleteUploadPdfIndex] = useState(-1);
-    
-    const [addingLoading, setAddingLoading] = useState(false);
-    const [savingLoading, setSavingLoading] = useState(false);
-    const [isUploading, setIsUploading] = useState(false);
-    
     function convertToPersian(string_farsi) {
         if (string_farsi !== null && string_farsi !== undefined && string_farsi !== "") {
             let tempString = string_farsi.replace("ي", "ی");
@@ -268,7 +207,8 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
     const getFabrics = () => {
         axios.get(baseURLFabrics, {
             params: {
-                modelId: modelID
+                modelId: modelID,
+                apiKey: window.$apikey
             }
         }).then((response) => {
             let tempFabrics = [];
@@ -284,88 +224,11 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
         });
     };
     
-    function getFabricsWithFilter() {
-        let paramObj = {modelId: modelID, searchString: searchText};
-        
-        let promise1 = new Promise((resolve, reject) => {
-            if (filterColors.length > 0) {
-                paramObj["colorIds"] = [];
-                filterColors.forEach((filter_id, index) => {
-                    paramObj["colorIds"] = [...paramObj["colorIds"], filter_id];
-                    if (index === filterColors.length - 1) {
-                        resolve();
-                    }
-                });
-            } else {
-                resolve();
-            }
-        });
-        let promise2 = new Promise((resolve, reject) => {
-            if (filterPatterns.length > 0) {
-                paramObj["patternTypeIds"] = [];
-                filterPatterns.forEach((filter_id, index) => {
-                    paramObj["patternTypeIds"] = [...paramObj["patternTypeIds"], filter_id];
-                    if (index === filterPatterns.length - 1) {
-                        resolve();
-                    }
-                });
-            } else {
-                resolve();
-            }
-        });
-        let promise3 = new Promise((resolve, reject) => {
-            if (filterTypes.length > 0) {
-                paramObj["typeIds"] = [];
-                filterTypes.forEach((filter_id, index) => {
-                    paramObj["typeIds"] = [...paramObj["typeIds"], filter_id];
-                    if (index === filterTypes.length - 1) {
-                        resolve();
-                    }
-                });
-            } else {
-                resolve();
-            }
-        });
-        let promise4 = new Promise((resolve, reject) => {
-            if (filterPrices.length > 0) {
-                paramObj["priceLevelIds"] = [];
-                filterPrices.forEach((filter_id, index) => {
-                    paramObj["priceLevelIds"] = [...paramObj["priceLevelIds"], filter_id];
-                    if (index === filterPrices.length - 1) {
-                        resolve();
-                    }
-                });
-            } else {
-                resolve();
-            }
-        });
-        
-        Promise.all([promise1, promise2, promise3, promise4]).then(() => {
-            // console.log(filterColors,paramObj);
-            axios.get(baseURLFabrics, {
-                params: paramObj,
-                paramsSerializer: params => {
-                    return qs.stringify(params, {arrayFormat: 'repeat'})
-                }
-            }).then((response) => {
-                let tempFabrics = [];
-                response.data.forEach(obj => {
-                    if (tempFabrics[obj["DesignEnName"]] === "" || tempFabrics[obj["DesignEnName"]] === undefined || tempFabrics[obj["DesignEnName"]] === null || tempFabrics[obj["DesignEnName"]] === [])
-                        tempFabrics[obj["DesignEnName"]] = [];
-                    tempFabrics[obj["DesignEnName"]].push(obj);
-                });
-                
-                setFabrics(tempFabrics);
-            }).catch(err => {
-                console.log(err);
-            });
-        })
-    }
-    
     const getCats = () => {
         axios.get(baseURLCats, {
             params: {
-                pageName: catID
+                pageName: catID,
+                apiKey: window.$apikey
             }
         }).then((response) => {
             setModels(response.data.SewingModels);
@@ -377,7 +240,8 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
     const getModel = () => {
         axios.get(baseURLModel, {
             params: {
-                id: modelID
+                id: modelID,
+                apiKey: window.$apikey
             }
         }).then((response) => {
             setModel(response.data);
@@ -475,6 +339,12 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
         setShow(false);
     }
     
+    function modalHandleClose(modalName) {
+        let tempModals = [...modals];
+        tempModals[modalName] = false;
+        setModals(tempModals);
+    }
+    
     function handleShow(PhotoPath, DesignName, DesignEnName, ColorName, ColorEnName) {
         const tempDiv = [];
         const tempDiv1 = [];
@@ -507,12 +377,6 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
         setShow(true);
     }
     
-    function modalHandleClose(modalName) {
-        let tempModals = [...modals];
-        tempModals[modalName] = false;
-        setModals(tempModals);
-    }
-    
     function modalHandleShow(modalName) {
         let tempModals = [...modals];
         tempModals[modalName] = true;
@@ -529,9 +393,9 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                 activeEventKey === eventKey ? setAccordionActiveKey("") : setAccordionActiveKey(eventKey);
                 // setTimeout(() => {
                 //     if (isCurrentEventKey)
-                //         window.scrollTo(window.scrollX, window.scrollY + 1);
+                //         window.scrollTo(window.scrollX, window.scrollY + 0.5);
                 //     else
-                //         window.scrollTo(window.screenX, window.scrollY - 1)
+                //         window.scrollTo(window.screenX, window.scrollY - 0.5)
                 // }, 500);
             },
         );
@@ -568,19 +432,19 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
         );
     }
     
-    function NextStep({children, eventKey, callback, onClick}) {
+    function NextStep({children, eventKey, callback}) {
         const decoratedOnClick = useAccordionButton(
             eventKey,
             () => {
                 callback && callback(eventKey);
                 setAccordionActiveKey(eventKey);
                 // setTimeout(() => {
-                //     window.scrollTo(window.scrollX, window.scrollY + 1);
+                //     window.scrollTo(window.scrollX, window.scrollY + 0.5);
                 // }, 500);
             },
         );
         return (
-            <div className="nextStep_area" onClick={onClick}>
+            <div className="nextStep_area">
                 <div className="nextStep" onClick={decoratedOnClick}>{children}</div>
             </div>
         );
@@ -604,29 +468,14 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                 obj.checked = false;
         });
         search_input.current.value = "";
-        setSearchShow(false);
-        
-        setFilterColors([]);
-        setFilterPatterns([]);
-        setFilterTypes([]);
-        setFilterPrices([]);
+        setSearchShow(false)
     }
     
     function clearFilters(e) {
         let refIndex = e.target.getAttribute('text');
         filterCheckboxes.current[refIndex].forEach(obj => {
             obj.checked = false;
-        });
-        
-        if (e.target.getAttribute('text') === "colors") {
-            setFilterColors([]);
-        } else if (e.target.getAttribute('text') === "patterns") {
-            setFilterPatterns([]);
-        } else if (e.target.getAttribute('text') === "types") {
-            setFilterTypes([]);
-        } else {
-            setFilterPrices([]);
-        }
+        })
     }
     
     function popoverThumbnailHover(e) {
@@ -759,40 +608,11 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
         setStepSelectedValue(tempValue);
     }
     
-    function setBasketNumber(cart, refIndex, numValue, type, minusPlus) {
-        // console.log(cart,refIndex, numValue, type, minusPlus);
-        if (isLoggedIn) {
-            let temp = JSON.parse(JSON.stringify(cart))["CartDetails"];
-            let tempProjectContainer = temp.find(opt => opt["CartDetailId"] === refIndex);
-            
-            if (Object.keys(tempProjectContainer).length !== 0) {
-                let tempProject = tempProjectContainer["SewingPreorder"];
-                if (minusPlus !== undefined) {
-                    if (tempProject["Count"] + minusPlus <= 0 || tempProject["Count"] + minusPlus > 10)
-                        setBasketNumber(cart, refIndex, tempProject["Count"] + minusPlus, type);
-                    else {
-                        tempProject["Count"] = tempProject["Count"] + minusPlus;
-                        editBasketProject(tempProject);
-                    }
-                } else {
-                    if (numValue === "") {
-                        tempProject["Count"] = 1;
-                        editBasketProject(tempProject);
-                    } else if (!isNaN(numValue) || numValue === 10 || numValue === "10") {
-                        if (parseInt(numValue) > 10) {
-                            tempProject["Count"] = 10;
-                            editBasketProject(tempProject);
-                            
-                        } else if (parseInt(numValue) <= 0) {
-                            deleteBasketProject(refIndex);
-                        } else {
-                            tempProject["Count"] = parseInt(numValue);
-                            editBasketProject(tempProject);
-                        }
-                    }
-                }
-            }
-        } else {
+    function setBasketNumber(refIndex, numValue, type, minusPlus) {
+        if(isLoggedIn){
+        
+        }
+        else {
             // console.log(refIndex);
             let temp = [];
             let typeString = "";
@@ -822,51 +642,41 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                     renderCart();
                 }
             }
-            if (temp.length > 0) {
+            if (temp !== []) {
                 if (minusPlus !== undefined) {
                     if (temp[refIndex] === undefined) {
+                        temp[refIndex]["qty"] = 1;
                         cartObj[typeString] = temp;
                         localStorage.setItem('cart', JSON.stringify(cartObj));
                         renderCart(cartObj);
                     } else {
-                        if (temp[refIndex]["Count"] + minusPlus <= 0 || temp[refIndex]["Count"] + minusPlus > 10)
-                            setBasketNumber(refIndex, temp[refIndex]["Count"] + minusPlus);
+                        if (temp[refIndex]["qty"] + minusPlus <= 0 || temp[refIndex]["qty"] + minusPlus > 10)
+                            setBasketNumber(refIndex, temp[refIndex]["qty"] + minusPlus, type);
                         else {
-                            temp[refIndex]["Count"] = temp[refIndex]["Count"] + minusPlus;
-                            temp[refIndex]["PreorderText"]["WindowCount"] = temp[refIndex]["Count"];
+                            temp[refIndex]["qty"] = temp[refIndex]["qty"] + minusPlus;
                             cartObj[typeString] = temp;
                             localStorage.setItem('cart', JSON.stringify(cartObj));
                             renderCart(cartObj);
                         }
                     }
                 } else {
-                    if (!isNaN(numValue) || numValue === 10 || numValue === "10") {
-                        if (numValue > 10) {
-                            temp[refIndex]["Count"] = 10;
-                            temp[refIndex]["PreorderText"]["WindowCount"] = temp[refIndex]["Count"];
+                    if (numValue > 10) {
+                        temp[refIndex]["qty"] = 10;
+                        cartObj[typeString] = temp;
+                        localStorage.setItem('cart', JSON.stringify(cartObj));
+                        renderCart(cartObj);
+                        
+                    } else if (numValue <= 0) {
+                        draperyRef.current[refIndex].className = "custom_cart_item is_loading";
+                        setTimeout(() => {
+                            draperyRef.current[refIndex].className = "custom_cart_item";
+                            temp.splice(refIndex, 1);
                             cartObj[typeString] = temp;
                             localStorage.setItem('cart', JSON.stringify(cartObj));
                             renderCart(cartObj);
-                            
-                        } else if (numValue <= 0) {
-                            draperyRef.current[refIndex].className = "custom_cart_item is_loading";
-                            setTimeout(() => {
-                                draperyRef.current[refIndex].className = "custom_cart_item";
-                                temp.splice(refIndex, 1);
-                                cartObj[typeString] = temp;
-                                localStorage.setItem('cart', JSON.stringify(cartObj));
-                                renderCart(cartObj);
-                            }, 1500);
-                        } else {
-                            temp[refIndex]["Count"] = numValue;
-                            temp[refIndex]["PreorderText"]["WindowCount"] = temp[refIndex]["Count"];
-                            cartObj[typeString] = temp;
-                            localStorage.setItem('cart', JSON.stringify(cartObj));
-                            renderCart(cartObj);
-                        }
+                        }, 1500);
                     } else {
-                        temp[refIndex]["Count"] = 1;
-                        temp[refIndex]["PreorderText"]["WindowCount"] = temp[refIndex]["Count"];
+                        temp[refIndex]["qty"] = numValue;
                         cartObj[typeString] = temp;
                         localStorage.setItem('cart', JSON.stringify(cartObj));
                         renderCart(cartObj);
@@ -874,56 +684,6 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                 }
             }
         }
-    }
-    
-    
-    function editBasketProject(projectObj) {
-        projectObj["PreorderText"]["WindowCount"] = projectObj["Count"];
-        axios.post(baseURLEditProject, projectObj, {
-            headers: authHeader()
-        })
-            .then(() => {
-                renderCart();
-            }).catch(err => {
-            if (err.response.status === 401) {
-                refreshToken().then((response2) => {
-                    if (response2 !== false) {
-                        editBasketProject(projectObj);
-                    } else {
-                        navigate("/" + pageLanguage);
-                    }
-                });
-            }
-        });
-    }
-    
-    function deleteBasketProject(refIndex) {
-        draperyRef.current[refIndex].className = "custom_cart_item is_loading";
-        axios.delete(baseURLDeleteBasketProject, {
-            params: {
-                detailId: refIndex
-            },
-            headers: authHeader()
-        }).then((response) => {
-            if (draperyRef.current[refIndex]) {
-                draperyRef.current[refIndex].className = "custom_cart_item";
-            }
-            renderCart();
-        }).catch(err => {
-            if (err.response.status === 401) {
-                refreshToken().then((response2) => {
-                    if (response2 !== false) {
-                        deleteBasketProject(refIndex);
-                    } else {
-                        navigate("/" + pageLanguage);
-                    }
-                });
-            } else {
-                if (draperyRef.current[refIndex]) {
-                    draperyRef.current[refIndex].className = "custom_cart_item";
-                }
-            }
-        });
     }
     
     function setCart(refIndex, cartValue, delRefs, secondRedIndex, secondCartValue) {
@@ -946,23 +706,23 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                 }
             });
         }
-        // console.log(temp,refIndex,cartValue);
+        // console.log(temp);
         // console.log(refIndex, cartValue);
         // setTimeout(() => {
         // console.log(temp);
         // }, 1000);
         let tempPostObj = {};
+        tempPostObj["ApiKey"] = window.$apikey;
         tempPostObj["WindowCount"] = 1;
         tempPostObj["SewingModelId"] = `${modelID}`;
         
-        let userProjects = JSON.parse(JSON.stringify(UserProjects))[`${modelID}`]["data"];
+        let cartInfo = JSON.parse(JSON.stringify(CartInfo))[`${modelID}`]["data"];
         
         Object.keys(temp).forEach(key => {
             if (temp[key] !== null || temp[key] !== "") {
-                let tempObj = userProjects.find(obj => obj["cart"] === key);
+                let tempObj = cartInfo.find(obj => obj["cart"] === key);
                 if (tempObj === undefined) {
-                    console.log(key);
-                    // window.location.reload();
+                    window.location.reload();
                 } else {
                     if (tempObj["apiLabel"] !== "") {
                         if (tempObj["apiValue"] === null) {
@@ -985,15 +745,12 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
         
         Object.keys(temp).forEach(key => {
             if (temp[key] !== null || temp[key] !== "") {
-                let tempObj = userProjects.find(obj => obj["cart"] === key);
-                // console.log(key,userProjects.find(obj => obj["cart"] === key));
-                if (tempObj) {
-                    if (tempObj["apiLabel2"] !== undefined) {
-                        if (tempObj["apiValue2"] === null) {
-                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
-                        } else {
-                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
-                        }
+                let tempObj = cartInfo.find(obj => obj["cart"] === key);
+                if (tempObj["apiLabel2"] !== undefined) {
+                    if (tempObj["apiValue2"] === null) {
+                        tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
+                    } else {
+                        tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
                     }
                 }
             }
@@ -1001,14 +758,12 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
         tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
         Object.keys(temp).forEach(key => {
             if (temp[key] !== null || temp[key] !== "") {
-                let tempObj = userProjects.find(obj => obj["cart"] === key);
-                if (tempObj) {
-                    if (tempObj["apiAcc"] !== undefined) {
-                        if (tempObj["apiAcc"] === true) {
-                            tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
-                        } else {
-                        
-                        }
+                let tempObj = cartInfo.find(obj => obj["cart"] === key);
+                if (tempObj["apiAcc"] !== undefined) {
+                    if (tempObj["apiAcc"] === true) {
+                        tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
+                    } else {
+                    
                     }
                 }
             }
@@ -1017,164 +772,46 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
             return el != null;
         });
         
-        let promise2 = new Promise((resolve, reject) => {
-            if (stepSelectedValue["3"] !== undefined) {
-                if (tempPostObj["SewingOrderDetails"][0]["FabricId"] === undefined) {
-                    delete tempPostObj["SewingOrderDetails"];
-                }
-                // if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined && stepSelectedValue["2"] !== undefined && stepSelectedValue["3"] !== undefined) {
-                // console.log(JSON.stringify(tempPostObj));
-                axios.post(baseURLPrice, tempPostObj)
-                    .then((response) => {
-                        setPrice(response.data["price"]);
-                        
-                        // console.log("1");
-                        
-                        // setCart("HeightCart", totalHeight, "", "WidthCart", [totalWidth]);
-                        if (stepSelectedValue["2"] === "1" && stepSelectedValue["3"] === "2") {
-                            if (temp["Width1"] !== undefined && temp["Width2"] !== undefined && temp["Width3"] !== undefined && temp["Height1"] !== undefined && temp["Height2"] !== undefined && temp["Height3"] !== undefined) {
-                                // console.log("2");
+        if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined && stepSelectedValue["2"] !== undefined && stepSelectedValue["3"] !== undefined) {
+            // console.log(JSON.stringify(tempPostObj));
+            axios.post(baseURLPrice, tempPostObj)
+                .then((response) => {
+                    setPrice(response.data["price"]);
+                    
+                    // setCart("HeightCart", totalHeight, "", "WidthCart", [totalWidth]);
+                    if (stepSelectedValue["2"] === "1" && stepSelectedValue["3"] === "2") {
+                        if (stepSelectedOptions.values["3AIn"] !== undefined && stepSelectedOptions.values["3BIn"] !== undefined) {
+                            if (stepSelectedOptions.values["3AIn"].filter(function (e) {
+                                return e
+                            }).length === 3 && stepSelectedOptions.values["3BIn"].filter(function (e) {
+                                return e
+                            }).length === 3) {
                                 getWindowSize(response.data["Width"], response.data["Height"]);
                                 temp["WidthCart"] = response.data["Width"];
                                 temp["HeightCart"] = response.data["Height"];
-                                
                             }
-                        } else if (stepSelectedValue["2"] === "2" && stepSelectedValue["3"] === "2") {
-                            if (temp["Width3A"] !== undefined && temp["Height3C"] !== undefined && temp["ExtensionRight"] !== undefined && temp["ExtensionLeft"] !== undefined && temp["ShadeMount"] !== undefined) {
-                                getWindowSize(response.data["Width"], response.data["Height"]);
-                                temp["WidthCart"] = response.data["Width"];
-                                temp["HeightCart"] = response.data["Height"];
-                                // console.log("3");
-                            }
-                        } else {
+                        }
+                    } else if (stepSelectedValue["2"] === "2" && stepSelectedValue["3"] === "2") {
+                        if (stepSelectedValue["3AOut"] !== undefined && leftRight.right !== "" && leftRight.left !== "" && stepSelectedValue["3COut"] !== undefined && stepSelectedValue["3DOut"] !== undefined) {
                             getWindowSize(response.data["Width"], response.data["Height"]);
                             temp["WidthCart"] = response.data["Width"];
                             temp["HeightCart"] = response.data["Height"];
-                            // console.log("4");
                         }
-                        resolve();
-                    }).catch(err => {
-                    setPrice(0);
-                    if (temp["HeightCart"] !== undefined)
-                        delete temp["HeightCart"];
-                    if (temp["WidthCart"] !== undefined)
-                        delete temp["WidthCart"];
-                    resolve();
-                    // console.log(err);
-                });
-            } else {
-                resolve();
-            }
-        });
-        promise2.then(() => {
-            setCartValues(temp);
-        });
-    }
-    
-    function measureWindowSize() {
-        
-        let promise2 = new Promise((resolve, reject) => {
-            let temp = JSON.parse(JSON.stringify(cartValues));
-            let tempPostObj = {};
-            tempPostObj["WindowCount"] = 1;
-            tempPostObj["SewingModelId"] = `${modelID}`;
-            
-            let userProjects = JSON.parse(JSON.stringify(UserProjects))[`${modelID}`]["data"];
-            
-            Object.keys(temp).forEach(key => {
-                if (temp[key] !== null || temp[key] !== "") {
-                    let tempObj = userProjects.find(obj => obj["cart"] === key);
-                    if (tempObj === undefined) {
-                        window.location.reload();
                     } else {
-                        if (tempObj["apiLabel"] !== "") {
-                            if (tempObj["apiValue"] === null) {
-                                tempPostObj[tempObj["apiLabel"]] = temp[key];
-                            } else {
-                                tempPostObj[tempObj["apiLabel"]] = tempObj["apiValue"][temp[key]];
-                            }
-                        }
-                    }
-                }
-            });
-            
-            tempPostObj["SewingOrderDetails"] = [];
-            tempPostObj["SewingOrderDetails"][0] = {};
-            tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
-            tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
-            tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
-            tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
-            tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
-            
-            Object.keys(temp).forEach(key => {
-                if (temp[key] !== null || temp[key] !== "") {
-                    let tempObj = userProjects.find(obj => obj["cart"] === key);
-                    if (tempObj["apiLabel2"] !== undefined) {
-                        if (tempObj["apiValue2"] === null) {
-                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
-                        } else {
-                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
-                        }
-                    }
-                }
-            });
-            tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
-            Object.keys(temp).forEach(key => {
-                if (temp[key] !== null || temp[key] !== "") {
-                    let tempObj = userProjects.find(obj => obj["cart"] === key);
-                    if (tempObj["apiAcc"] !== undefined) {
-                        if (tempObj["apiAcc"] === true) {
-                            tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
-                        } else {
-                        
-                        }
-                    }
-                }
-            });
-            tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
-                return el != null;
-            });
-            
-            if (stepSelectedValue["3"] !== undefined) {
-                if (tempPostObj["SewingOrderDetails"][0]["FabricId"] === undefined) {
-                    delete tempPostObj["SewingOrderDetails"];
-                }
-                // if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined && stepSelectedValue["2"] !== undefined && stepSelectedValue["3"] !== undefined) {
-                // console.log(JSON.stringify(tempPostObj));
-                axios.post(baseURLPrice, tempPostObj)
-                    .then((response) => {
-                        setPrice(response.data["price"]);
-                        
-                        // setCart("HeightCart", totalHeight, "", "WidthCart", [totalWidth]);
                         getWindowSize(response.data["Width"], response.data["Height"]);
                         temp["WidthCart"] = response.data["Width"];
                         temp["HeightCart"] = response.data["Height"];
-                        setCartValues(temp);
-                        setTimeout(() => {
-                            resolve();
-                        }, 1000);
-                    }).catch(err => {
-                    setPrice(0);
-                    if (temp["HeightCart"] !== undefined)
-                        delete temp["HeightCart"];
-                    if (temp["WidthCart"] !== undefined)
-                        delete temp["WidthCart"];
-                    // console.log(err);
-                    setCartValues(temp);
-                    setTimeout(() => {
-                        reject();
-                    }, 1000);
-                });
-            } else {
-                reject();
-            }
-            
-        });
-        promise2.then(() => {
-            return true;
-        }).catch(() => {
-            return false;
-        });
+                    }
+                }).catch(err => {
+                setPrice(0);
+                if (temp["HeightCart"] !== undefined)
+                    delete temp["HeightCart"];
+                if (temp["WidthCart"] !== undefined)
+                    delete temp["WidthCart"];
+                // console.log(err);
+            });
+        }
+        setCartValues(temp);
     }
     
     function deleteSpecialSelects(InOut) {
@@ -1285,10 +922,10 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
         tempDepSet.forEach(dependency => {
             tempNewSet.add(dependency.split('')[0]);
             // tempNewSet.add(dependency);
+            // console.log(dependency)
         });
         
         if (tempNewSet.size > 0) {
-            setAddingLoading(false);
             let temp = JSON.parse(JSON.stringify(requiredStep));
             let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
             [...tempNewSet].sort(function (a, b) {
@@ -1336,30 +973,20 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
             setStepSelectedLabel(tempLabels);
             setAddCartErr(tempErr);
             modalHandleShow("addToCartErr");
-        } else if (cartValues["HeightCart"] === undefined || cartValues["WidthCart"] === undefined) {
-            // console.log(cartValues);
-            if (measureWindowSize()) {
-                addToCart();
-            } else {
-                setAddingLoading(false);
-            }
         } else {
-            // console.log(cartValues,"hi");
-            let userProjects = JSON.parse(JSON.stringify(UserProjects))[`${modelID}`]["data"];
+            let cartInfo = JSON.parse(JSON.stringify(CartInfo))[`${modelID}`]["data"];
             let tempArr = [];
             let temp1 = [];
             let temp = JSON.parse(JSON.stringify(cartValues));
             let tempPostObj = {};
             let tempBagPrice = 0;
             
-            
-            // tempPostObj["ApiKey"] = window.$apikey;
+            tempPostObj["ApiKey"] = window.$apikey;
             tempPostObj["WindowCount"] = 1;
             tempPostObj["SewingModelId"] = `${modelID}`;
             Object.keys(temp).forEach(key => {
                 if (temp[key] !== null || temp[key] !== "") {
-                    let tempObj = userProjects.find(obj => obj["cart"] === key);
-                    // console.log(key,tempObj);
+                    let tempObj = cartInfo.find(obj => obj["cart"] === key);
                     if (tempObj["apiLabel"] !== "") {
                         if (tempObj["apiValue"] === null) {
                             tempPostObj[tempObj["apiLabel"]] = temp[key];
@@ -1369,7 +996,6 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                     }
                 }
             });
-            
             tempPostObj["SewingOrderDetails"] = [];
             tempPostObj["SewingOrderDetails"][0] = {};
             tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
@@ -1379,7 +1005,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
             tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
             Object.keys(temp).forEach(key => {
                 if (temp[key] !== null || temp[key] !== "") {
-                    let tempObj = userProjects.find(obj => obj["cart"] === key);
+                    let tempObj = cartInfo.find(obj => obj["cart"] === key);
                     if (tempObj["apiLabel2"] !== undefined) {
                         if (tempObj["apiValue2"] === null) {
                             tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
@@ -1392,7 +1018,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
             tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
             Object.keys(temp).forEach(key => {
                 if (temp[key] !== null || temp[key] !== "") {
-                    let tempObj = userProjects.find(obj => obj["cart"] === key);
+                    let tempObj = cartInfo.find(obj => obj["cart"] === key);
                     if (tempObj["apiAcc"] !== undefined) {
                         if (tempObj["apiAcc"] === true) {
                             tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
@@ -1415,19 +1041,18 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                         temp["price"] = response.data["price"];
                         // console.log(response.data);
                         
+                        
                         let roomNameFa = cartValues["RoomNameFa"];
                         let roomName = cartValues["RoomNameEn"];
                         let WindowName = cartValues["WindowName"] === undefined ? "" : cartValues["WindowName"];
                         Object.keys(cartValues).forEach(key => {
-                            let tempObj = userProjects.find(obj => obj["cart"] === key);
+                            let tempObj = cartInfo.find(obj => obj["cart"] === key);
                             if (tempObj === undefined) {
                                 window.location.reload();
                             } else {
-                                if (key === "HeightCart" || key === "WidthCart") {
-                                
-                                } else if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
+                                if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
                                     let objLabel = "";
-                                    if (tempObj["titleValue"] === null || true) {
+                                    if (tempObj["titleValue"] === null) {
                                         if (tempObj["titlePostfix"] === "") {
                                             objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(cartValues[key].toString())}`).toString() : t(cartValues[key].toString());
                                         } else {
@@ -1435,7 +1060,6 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                         }
                                         // objLabel = cartValues[key].toString() + tempObj["titlePostfix"];
                                     } else {
-                                        // console.log(tempObj["titleValue"],tempObj["titleValue"][cartValues[key].toString()],cartValues[key]);
                                         if (tempObj["titleValue"][cartValues[key].toString()] === null) {
                                             if (tempObj["titlePostfix"] === "") {
                                                 objLabel = t(cartValues[key].toString());
@@ -1454,12 +1078,10 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                 }
                             }
                         });
-                        
                         tempArr.push(
                             <div key={defaultModelName}>
-                                <h2 className="cart_agree_title">{pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</h2>
+                                <h2 className="cart_agree_title2">{pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</h2>
                                 <ul className="cart_agree_items_container">
-                                    <GetMeasurementArray modelId={`${modelID}`} cartValues={cartValues}/>
                                     {temp1}
                                     <li className="cart_agree_item">
                                         <h1 className="cart_agree_item_title">{pageLanguage === 'fa' ? "نام اتاق" : "Room Label"}&nbsp;</h1>
@@ -1475,33 +1097,14 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                         setCartAgree(tempArr);
                         modalHandleShow("cart_modal");
                         setCartValues(temp);
-                        setAddingLoading(false);
                         
                     }).catch(err => {
-                    if (err.response.status === 401) {
-                        refreshToken().then((response2) => {
-                            if (response2 !== false) {
-                                addToCart();
-                            } else {
-                                setPrice(0);
-                                setBagPrice(0);
-                                temp["price"] = 0;
-                                setCartValues(temp);
-                                setAddingLoading(false);
-                                navigate("/" + pageLanguage + "/User");
-                            }
-                        });
-                    } else {
-                        setPrice(0);
-                        setBagPrice(0);
-                        temp["price"] = 0;
-                        setCartValues(temp);
-                        setAddingLoading(false);
-                    }
-                    
+                    setPrice(0);
+                    setBagPrice(0);
+                    temp["price"] = 0;
+                    setCartValues(temp);
+                    console.log(err);
                 });
-            } else {
-                setAddingLoading(false);
             }
             // console.log(cartValues);
         }
@@ -1512,24 +1115,15 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
     }
     
     function addToCart_agreed() {
-        AddProjectToCart(cartValues, `${modelID}`, price, defaultModelName, defaultModelNameFa, [uploadedImagesFile, uploadedImagesURL, uploadedPDFFile, uploadedPDFURL], (projectId && projectId !== "") ? projectId : cartProjectIndex, editIndex, navigate, isLoggedIn).then((temp) => {
-            if (temp === 401) {
-                addToCart_agreed();
-            } else if (temp) {
-                setCartAgreeDescription(false);
+        let customPageCart = {};
+        AddProjectToCart(cartValues, `${modelID}`, price, defaultModelName, defaultModelNameFa, cartProjectIndex,navigate, isLoggedIn).then((temp) => {
+            if (temp) {
                 renderCart(temp);
                 setTimeout(() => {
                     // modalHandleShow("cart_modal");
                     setCartStateAgree(true);
                 }, 500);
-                setAddingLoading(false);
-            } else {
-                setAddingLoading(false);
-                setCartAgreeDescription(false);
             }
-        }).catch(() => {
-            setAddingLoading(false);
-            setCartAgreeDescription(false);
         });
     }
     
@@ -1552,12 +1146,11 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                 if (response2 !== false) {
                                     renderCart(customPageCart);
                                 } else {
-                                    navigate("/" + pageLanguage + "/User");
                                 }
                             });
                         } else {
-                            modalHandleClose("cart_modal");
                             reject();
+                            modalHandleClose("cart_modal");
                         }
                     });
                 } else {
@@ -1573,162 +1166,80 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
             }
         });
         promise2.then(() => {
-            let temp1 = [];
-            let cartCount = 0;
-            if (isLoggedIn) {
-                cartCount += cartObjects["CartDetails"].length;
-                let draperiesTotalPrice = cartObjects["TotalAmount"];
-                
-                let promise2 = new Promise((resolve, reject) => {
-                    for (let i = 0; i < cartObjects["CartDetails"].length; i++) {
-                        let obj = cartObjects["CartDetails"][i]["SewingPreorder"]["PreorderText"];
-                        
-                        let roomName = (obj["WindowName"] === undefined || obj["WindowName"] === "") ? "" : " / " + obj["WindowName"];
-                        temp1[i] =
-                            <li className="custom_cart_item" key={"drapery" + i} ref={ref => (draperyRef.current[cartObjects["CartDetails"][i]["CartDetailId"]] = ref)}>
-                                <div className="custom_cart_item_image_container">
-                                    <img src={`https://api.atlaspood.ir/${obj["PhotoUrl"]}`} alt="" className="custom_cart_item_img img-fluid"/>
-                                </div>
-                                <div className="custom_cart_item_desc">
-                                    <div className="custom_cart_item_desc_container">
-                                        <h1 className="custom_cart_item_desc_name">{pageLanguage === 'fa' ? obj["ModelNameFa"] + " سفارشی " : "Custom " + obj["ModelNameEn"]}</h1>
-                                        <button type="button" className="btn-close" aria-label="Close"
-                                                onClick={() => setBasketNumber(cartObjects, cartObjects["CartDetails"][i]["CartDetailId"], 0, 0)}/>
-                                    </div>
-                                    <div className="custom_cart_item_desc_container">
-                                        <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["FabricDesignFa"] + " / " + obj["FabricColorFa"] : obj["FabricDesignEn"] + " / " + obj["FabricColorEn"]}</h2>
-                                    </div>
-                                    <div className="custom_cart_item_desc_container">
-                                        <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["RoomNameFa"] + roomName : obj["RoomNameEn"] + roomName}</h2>
-                                    </div>
-                                    <div className="custom_cart_item_desc_container">
-                                        <div className="custom_cart_item_desc_qty">
-                                            <button type="text" className="basket_qty_minus"
-                                                    onClick={() => setBasketNumber(cartObjects, cartObjects["CartDetails"][i]["CartDetailId"], 0, 0, -1)}>–
-                                            </button>
-                                            <input type="text" className="basket_qty_num"
-                                                   value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${cartObjects["CartDetails"][i]["SewingPreorder"]["Count"]}`) : cartObjects["CartDetails"][i]["SewingPreorder"]["Count"]}
-                                                   onChange={(e) => setBasketNumber(cartObjects, cartObjects["CartDetails"][i]["CartDetailId"], NumberToPersianWord.convertPeToEn(`${e.target.value}`))}/>
-                                            <button type="text" className="basket_qty_plus"
-                                                    onClick={() => setBasketNumber(cartObjects, cartObjects["CartDetails"][i]["CartDetailId"], 0, 0, 1)}>+
-                                            </button>
-                                        </div>
-                                        <p className="custom_cart_item_end_price">{GetPrice(obj["price"], pageLanguage, t("TOMANS"))}</p>
-                                    </div>
-                                </div>
-                            </li>;
-                        if (i === cartObjects["CartDetails"].length - 1) {
-                            resolve();
-                        }
-                    }
-                });
-                promise2.then(() => {
-                    setCartItems(temp1);
-                    setCartCount(cartCount);
-                    localStorage.removeItem("cart");
-                    setTotalCartPrice(draperiesTotalPrice);
-                });
-                if (cartObjects["CartDetails"].length === 0) {
-                    modalHandleClose("cart_modal");
-                    setCartStateAgree(false);
-                }
-            } else {
-                if (cartObjects["drapery"].length) {
-                    cartCount += cartObjects["drapery"].length;
+            if (cartObjects !== {}) {
+                let temp1 = [];
+                let cartCount = 0;
+                if (isLoggedIn) {
+                    cartCount += cartObjects["CartDetails"].length;
                     let draperiesTotalPrice = 0;
                     let promiseArr = [];
                     
-                    cartObjects["drapery"].forEach((obj, index) => {
-                        promiseArr[index] = new Promise((resolve, reject) => {
-                            let tempPostObj = {};
-                            // tempPostObj["ApiKey"] = window.$apikey;
-                            if (obj["PreorderText"] === undefined) {
-                                localStorage.removeItem("cart");
-                            } else {
-                                let userProjects = JSON.parse(JSON.stringify(UserProjects))[obj["PreorderText"]["SewingModelId"]]["data"];
-                                // let temp = obj["PreorderText"];
-                                GetUserProjectData(obj).then((temp) => {
-                                    tempPostObj["WindowCount"] = 1;
-                                    tempPostObj["SewingModelId"] = `${modelID}`;
-                                    Object.keys(temp).forEach(key => {
-                                        if (temp[key] !== null || temp[key] !== "") {
-                                            let tempObj = userProjects.find(obj => obj["cart"] === key);
-                                            // console.log(key,tempObj);
-                                            if (tempObj["apiLabel"] !== "") {
-                                                if (tempObj["apiValue"] === null) {
-                                                    tempPostObj[tempObj["apiLabel"]] = temp[key];
-                                                } else {
-                                                    tempPostObj[tempObj["apiLabel"]] = tempObj["apiValue"][temp[key]];
-                                                }
-                                            }
-                                        }
-                                    });
-                                    
-                                    tempPostObj["SewingOrderDetails"] = [];
-                                    tempPostObj["SewingOrderDetails"][0] = {};
-                                    tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
-                                    tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
-                                    tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
-                                    tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
-                                    tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
-                                    Object.keys(temp).forEach(key => {
-                                        if (temp[key] !== null || temp[key] !== "") {
-                                            let tempObj = userProjects.find(obj => obj["cart"] === key);
-                                            if (tempObj["apiLabel2"] !== undefined) {
-                                                if (tempObj["apiValue2"] === null) {
-                                                    tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
-                                                } else {
-                                                    tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
-                                                }
-                                            }
-                                        }
-                                    });
-                                    tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
-                                    Object.keys(temp).forEach(key => {
-                                        if (temp[key] !== null || temp[key] !== "") {
-                                            let tempObj = userProjects.find(obj => obj["cart"] === key);
-                                            if (tempObj["apiAcc"] !== undefined) {
-                                                if (tempObj["apiAcc"] === true) {
-                                                    tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
-                                                } else {
-                                                
-                                                }
-                                            }
-                                        }
-                                    });
-                                    tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
-                                        return el != null;
-                                    });
-                                    
-                                    // delete tempPostObj["SewingOrderDetails"][0]["SewingModelId"];
-                                    // delete tempPostObj["SewingModelId"];
-                                    tempPostObj["SewingModelId"] = tempPostObj["SewingOrderDetails"][0]["SewingModelId"];
-                                    
-                                    if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
-                                        axios.post(baseURLPrice, tempPostObj).then((response) => {
-                                            resolve(response);
-                                        }).catch(err => {
-                                            resolve(false);
-                                            // console.log("hi2");
-                                        });
+                    cartObjects["CartDetails"]["preorderText"].forEach((obj, index) => {
+                        let tempPostObj = {};
+                        tempPostObj["ApiKey"] = window.$apikey;
+                        let cartInfo = JSON.parse(JSON.stringify(CartInfo))[obj["ModelId"]]["data"];
+                        let temp = obj;
+                        
+                        Object.keys(temp).forEach(key => {
+                            if (temp[key] !== null || temp[key] !== "") {
+                                let tempObj = cartInfo.find(obj => obj["cart"] === key);
+                                if (tempObj["apiLabel"] !== "") {
+                                    if (tempObj["apiValue"] === null) {
+                                        tempPostObj[tempObj["apiLabel"]] = temp[key];
                                     } else {
-                                        // console.log("hi3");
-                                        resolve(false);
+                                        tempPostObj[tempObj["apiLabel"]] = tempObj["apiValue"][temp[key]];
                                     }
-                                }).catch(err => {
-                                    // console.log("hi3");
-                                    resolve(false);
-                                });
+                                }
                             }
                         });
+                        
+                        tempPostObj["SewingOrderDetails"] = [];
+                        tempPostObj["SewingOrderDetails"][0] = {};
+                        tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
+                        tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
+                        tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
+                        tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
+                        tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
+                        
+                        Object.keys(temp).forEach(key => {
+                            if (temp[key] !== null || temp[key] !== "") {
+                                let tempObj = cartInfo.find(obj => obj["cart"] === key);
+                                if (tempObj["apiLabel2"] !== undefined) {
+                                    if (tempObj["apiValue2"] === null) {
+                                        tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
+                                    } else {
+                                        tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                                    }
+                                }
+                            }
+                        });
+                        
+                        tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
+                        Object.keys(temp).forEach(key => {
+                            if (temp[key] !== null || temp[key] !== "") {
+                                let tempObj = cartInfo.find(obj => obj["cart"] === key);
+                                if (tempObj["apiAcc"] !== undefined) {
+                                    if (tempObj["apiAcc"] === true) {
+                                        tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
+                                    } else {
+                                    
+                                    }
+                                }
+                            }
+                        });
+                        tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
+                            return el != null;
+                        });
+                        
+                        if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
+                            promiseArr[index] = axios.post(baseURLPrice, tempPostObj);
+                        }
                     });
                     Promise.all(promiseArr).then(function (values) {
                         // console.log(values);
-                        cartObjects["drapery"].forEach((obj1, index) => {
-                            let obj = obj1["PreorderText"];
-                            obj["price"] = values[index].data["price"] / obj1["Count"];
-                            obj1["price"] = values[index].data["price"] / obj1["Count"];
-                            draperiesTotalPrice += values[index].data["price"];
+                        cartObjects["CartDetails"]["preorderText"].forEach((obj, index) => {
+                            obj["price"] = values[index].data["price"];
+                            draperiesTotalPrice += obj["price"];
                             let roomName = (obj["WindowName"] === undefined || obj["WindowName"] === "") ? "" : " / " + obj["WindowName"];
                             temp1[index] =
                                 <li className="custom_cart_item" key={"drapery" + index} ref={ref => (draperyRef.current[index] = ref)}>
@@ -1738,7 +1249,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                     <div className="custom_cart_item_desc">
                                         <div className="custom_cart_item_desc_container">
                                             <h1 className="custom_cart_item_desc_name">{pageLanguage === 'fa' ? obj["ModelNameFa"] + " سفارشی " : "Custom " + obj["ModelNameEn"]}</h1>
-                                            <button type="button" className="btn-close" aria-label="Close" onClick={() => setBasketNumber(undefined, index, 0, 0)}/>
+                                            <button type="button" className="btn-close" aria-label="Close" onClick={() => setBasketNumber(index, 0, 0)}/>
                                         </div>
                                         <div className="custom_cart_item_desc_container">
                                             <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["FabricDesignFa"] + " / " + obj["FabricColorFa"] : obj["FabricDesignEn"] + " / " + obj["FabricColorEn"]}</h2>
@@ -1748,31 +1259,150 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                         </div>
                                         <div className="custom_cart_item_desc_container">
                                             <div className="custom_cart_item_desc_qty">
-                                                <button type="text" className="basket_qty_minus" onClick={() => setBasketNumber(undefined, index, 0, 0, -1)}>–</button>
+                                                <button type="text" className="basket_qty_minus" onClick={() => setBasketNumber(index, 0, 0, -1)}>–</button>
                                                 <input type="text" className="basket_qty_num"
-                                                       value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${obj1["Count"]}`) : obj1["Count"]}
-                                                       onChange={(e) => setBasketNumber(undefined, index, NumberToPersianWord.convertPeToEn(`${e.target.value}`), 0)}/>
-                                                <button type="text" className="basket_qty_plus" onClick={() => setBasketNumber(undefined, index, 0, 0, 1)}>+</button>
+                                                       value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${obj["qty"]}`) : obj["qty"]}
+                                                       onChange={(e) => setBasketNumber(index, NumberToPersianWord.convertPeToEn(`${e.target.value}`), 0)}/>
+                                                <button type="text" className="basket_qty_plus" onClick={() => setBasketNumber(index, 0, 0, 1)}>+</button>
                                             </div>
-                                            <p className="custom_cart_item_end_price">{GetPrice(obj1["price"] * obj1["Count"], pageLanguage, t("TOMANS"))}</p>
+                                            <p className="custom_cart_item_end_price">{GetPrice(obj["price"], pageLanguage, t("TOMANS"))}</p>
                                         </div>
                                     </div>
                                 </li>;
                         });
                         setCartItems(temp1);
                         setCartCount(cartCount);
-                        localStorage.setItem('cart', JSON.stringify(cartObjects));
+                        localStorage.removeItem("cart");
                         setTotalCartPrice(draperiesTotalPrice);
                         
                     }).catch(err => {
                         console.log(err);
                     });
+                    
+                    if (cartObjects["CartDetails"].length === 0) {
+                        modalHandleClose("cart_modal");
+                        setCartStateAgree(false);
+                    }
+                } else {
+                    if (cartObjects["drapery"].length) {
+                        cartCount += cartObjects["drapery"].length;
+                        let draperiesTotalPrice = 0;
+                        let promiseArr = [];
+                        
+                        cartObjects["drapery"].forEach((obj, index) => {
+                            let tempPostObj = {};
+                            tempPostObj["ApiKey"] = window.$apikey;
+                            let cartInfo = JSON.parse(JSON.stringify(CartInfo))[obj["ModelId"]]["data"];
+                            let temp = obj;
+                            
+                            Object.keys(temp).forEach(key => {
+                                if (temp[key] !== null || temp[key] !== "") {
+                                    let tempObj = cartInfo.find(obj => obj["cart"] === key);
+                                    if (tempObj["apiLabel"] !== "") {
+                                        if (tempObj["apiValue"] === null) {
+                                            tempPostObj[tempObj["apiLabel"]] = temp[key];
+                                        } else {
+                                            tempPostObj[tempObj["apiLabel"]] = tempObj["apiValue"][temp[key]];
+                                        }
+                                    }
+                                }
+                            });
+                            
+                            tempPostObj["SewingOrderDetails"] = [];
+                            tempPostObj["SewingOrderDetails"][0] = {};
+                            tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
+                            tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
+                            tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
+                            tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
+                            tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
+                            
+                            Object.keys(temp).forEach(key => {
+                                if (temp[key] !== null || temp[key] !== "") {
+                                    let tempObj = cartInfo.find(obj => obj["cart"] === key);
+                                    if (tempObj["apiLabel2"] !== undefined) {
+                                        if (tempObj["apiValue2"] === null) {
+                                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
+                                        } else {
+                                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                                        }
+                                    }
+                                }
+                            });
+                            
+                            tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
+                            Object.keys(temp).forEach(key => {
+                                if (temp[key] !== null || temp[key] !== "") {
+                                    let tempObj = cartInfo.find(obj => obj["cart"] === key);
+                                    if (tempObj["apiAcc"] !== undefined) {
+                                        if (tempObj["apiAcc"] === true) {
+                                            tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
+                                        } else {
+                                        
+                                        }
+                                    }
+                                }
+                            });
+                            tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
+                                return el != null;
+                            });
+                            
+                            if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
+                                promiseArr[index] = axios.post(baseURLPrice, tempPostObj);
+                            }
+                        });
+                        Promise.all(promiseArr).then(function (values) {
+                            // console.log(values);
+                            cartObjects["drapery"].forEach((obj, index) => {
+                                obj["price"] = values[index].data["price"];
+                                draperiesTotalPrice += obj["price"];
+                                let roomName = (obj["WindowName"] === undefined || obj["WindowName"] === "") ? "" : " / " + obj["WindowName"];
+                                temp1[index] =
+                                    <li className="custom_cart_item" key={"drapery" + index} ref={ref => (draperyRef.current[index] = ref)}>
+                                        <div className="custom_cart_item_image_container">
+                                            <img src={`https://api.atlaspood.ir/${obj["PhotoUrl"]}`} alt="" className="custom_cart_item_img img-fluid"/>
+                                        </div>
+                                        <div className="custom_cart_item_desc">
+                                            <div className="custom_cart_item_desc_container">
+                                                <h1 className="custom_cart_item_desc_name">{pageLanguage === 'fa' ? obj["ModelNameFa"] + " سفارشی " : "Custom " + obj["ModelNameEn"]}</h1>
+                                                <button type="button" className="btn-close" aria-label="Close" onClick={() => setBasketNumber(index, 0, 0)}/>
+                                            </div>
+                                            <div className="custom_cart_item_desc_container">
+                                                <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["FabricDesignFa"] + " / " + obj["FabricColorFa"] : obj["FabricDesignEn"] + " / " + obj["FabricColorEn"]}</h2>
+                                            </div>
+                                            <div className="custom_cart_item_desc_container">
+                                                <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["RoomNameFa"] + roomName : obj["RoomNameEn"] + roomName}</h2>
+                                            </div>
+                                            <div className="custom_cart_item_desc_container">
+                                                <div className="custom_cart_item_desc_qty">
+                                                    <button type="text" className="basket_qty_minus" onClick={() => setBasketNumber(index, 0, 0, -1)}>–</button>
+                                                    <input type="text" className="basket_qty_num"
+                                                           value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${obj["qty"]}`) : obj["qty"]}
+                                                           onChange={(e) => setBasketNumber(index, NumberToPersianWord.convertPeToEn(`${e.target.value}`), 0)}/>
+                                                    <button type="text" className="basket_qty_plus" onClick={() => setBasketNumber(index, 0, 0, 1)}>+</button>
+                                                </div>
+                                                <p className="custom_cart_item_end_price">{GetPrice(obj["price"], pageLanguage, t("TOMANS"))}</p>
+                                            </div>
+                                        </div>
+                                    </li>;
+                            });
+                            setCartItems(temp1);
+                            setCartCount(cartCount);
+                            localStorage.setItem('cart', JSON.stringify(cartObjects));
+                            setTotalCartPrice(draperiesTotalPrice);
+                            
+                        }).catch(err => {
+                            console.log(err);
+                        });
+                    }
+                    
+                    
+                    if (cartObjects["drapery"].length + cartObjects["product"].length + cartObjects["swatches"].length === 0) {
+                        modalHandleClose("cart_modal");
+                        setCartStateAgree(false);
+                    }
                 }
-                if (cartObjects["drapery"].length + cartObjects["product"].length + cartObjects["swatches"].length === 0) {
-                    setCartCount(0);
-                    modalHandleClose("cart_modal");
-                    setCartStateAgree(false);
-                }
+            } else {
+                setCartCount(0);
             }
             
         });
@@ -1781,6 +1411,10 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
         }).catch(err => {
             console.log(err);
         });
+    }
+    
+    function addToProjects() {
+    
     }
     
     function fabricClicked(photo, hasTrim) {
@@ -1803,7 +1437,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
     }
     
     function getWindowSize(totalWidth, totalHeight) {
-        let tempWindowSize = pageLanguage === "fa" ? `عرض: ${NumberToPersianWord.convertEnToPe(totalWidth.toString())}س\u200Cم\u00A0\u00A0\u00A0ارتفاع: ${NumberToPersianWord.convertEnToPe(totalHeight.toString())}س\u200Cم` : `Width: ${totalWidth}cm\u00A0\u00A0\u00A0Height: ${totalHeight}cm`;
+        let tempWindowSize = pageLanguage === "fa" ? `عرض: ${totalWidth}س\u200Cم\u00A0\u00A0\u00A0ارتفاع: ${totalHeight}س\u200Cم` : `Width: ${totalWidth}cm\u00A0\u00A0\u00A0Height: ${totalHeight}cm`;
         setWindowSize(tempWindowSize);
         setWindowSizeBool(true);
         // console.log(totalWidth,totalHeight);
@@ -1843,308 +1477,21 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
         
     }
     
-    function uploadImg(file) {
-        setSelectedFile(file);
-        setSelectedFileName(file.name);
-    }
-    
-    function submitUploadedFile(PDFOrImg) {
-        setIsUploading(true);
-        let extensionSearch = /(?:\.([^.]+))?$/;
-        let extension = extensionSearch.exec(selectedFile.name)[1];
-        let newFile = new File([selectedFile], editedFileName === "" ? selectedFile.name : editedFileName + "." + extension, {type: `${selectedFile.type}`});
-        
-        // console.log(selectedFile,newFile,editedFileName,selectedFile.name);
-        if (PDFOrImg === 1) {
-            const formData = new FormData();
-            formData.append("File", newFile);
-            formData.append("UserFileName", newFile.name);
-            const config = {
-                headers: {
-                    'content-type': 'multipart/form-data',
-                    ...authHeader()
-                }
-            };
-            axios.post(baseURLUploadPdf, formData, config)
-                .then((response) => {
-                    setIsUploading(false);
-                    // console.log(response.data);
-                    addUploadFileUrl(response.data, newFile.name, PDFOrImg, newFile);
-                    setSelectedFile(undefined);
-                    setSelectedFileName("");
-                    setEditedFileName("");
-                    modalHandleClose("uploadPdf");
-                    setDetailsShow(false);
-                }).catch(err => {
-                if (err.response.status === 401) {
-                    refreshToken().then((response2) => {
-                        if (response2 !== false) {
-                            submitUploadedFile(PDFOrImg);
-                        } else {
-                            setIsUploading(false);
-                            setSelectedFile(undefined);
-                            setSelectedFileName("");
-                            setEditedFileName("");
-                            modalHandleClose("uploadPdf");
-                            setDetailsShow(false);
-                            
-                            dispatch({
-                                type: ShowLogin2Modal,
-                            });
-                        }
-                    });
-                } else {
-                    setIsUploading(false);
-                    console.log("not uploaded")
-                }
-            });
-        } else {
-            const formData = new FormData();
-            formData.append("File", newFile);
-            formData.append("UserFileName", newFile.name);
-            const config = {
-                headers: {
-                    'content-type': 'multipart/form-data',
-                    ...authHeader()
-                }
-            };
-            axios.post(baseURLUploadImg, formData, config)
-                .then((response) => {
-                    // console.log(response.data);
-                    setIsUploading(false);
-                    addUploadFileUrl(response.data, newFile.name, PDFOrImg, newFile);
-                    setSelectedFile(undefined);
-                    setSelectedFileName("");
-                    setEditedFileName("");
-                    modalHandleClose(" uploadImg");
-                    setDetailsShow(false);
-                }).catch(err => {
-                if (err.response.status === 401) {
-                    refreshToken().then((response2) => {
-                        if (response2 !== false) {
-                            submitUploadedFile(PDFOrImg);
-                        } else {
-                            setIsUploading(false);
-                            setSelectedFile(undefined);
-                            setSelectedFileName("");
-                            setEditedFileName("");
-                            modalHandleClose(" uploadImg");
-                            setDetailsShow(false);
-                            
-                            dispatch({
-                                type: ShowLogin2Modal,
-                            });
-                        }
-                    });
-                } else {
-                    setIsUploading(false);
-                    console.log("not uploaded")
-                }
-            });
-        }
-    }
-    
-    function addUploadFileUrl(fileUrl, imageName, PDFOrImg, newFile) {
-        if (fileUrl) {
-            if (PDFOrImg === 1) {
-                let tempArrayNames = [...uploadedPDFNameList];
-                let tempArrayFiles = [...uploadedPDFFile];
-                let tempArrayURLs = [...uploadedPDFURL];
-                let freeIndex = tempArrayNames.findIndex(Object.is.bind(null, undefined));
-                if (freeIndex === -1) {
-                    freeIndex = tempArrayNames.length;
-                }
-                tempArrayNames[freeIndex] = <li className="uploaded_name_item" key={freeIndex}>
-                    <i className="fa fa-file"/>
-                    <span className="uploaded_name_item_text">{imageName.replace(/\.[^/.]+$/, "")}</span>
-                    <span className="uploaded_name_item_x" onClick={() => {
-                        setDeleteUploaded(fileUrl, freeIndex, PDFOrImg);
-                    }}>X</span>
-                </li>;
-                
-                tempArrayFiles[freeIndex] = newFile.name;
-                tempArrayURLs[freeIndex] = fileUrl;
-                
-                setUploadedPDFURL(tempArrayURLs);
-                setUploadedPDFFile(tempArrayFiles);
-                setUploadedPDFNameList(tempArrayNames);
-            } else {
-                let tempArray = uploadedImagesList;
-                let freeIndex = tempArray.findIndex(Object.is.bind(null, undefined));
-                if (freeIndex === -1) {
-                    freeIndex = tempArray.length;
-                }
-                tempArray[freeIndex] = <li className="uploaded_image_item" key={freeIndex}>
-                    <img src={`https://api.atlaspood.ir/${fileUrl}`} className="img-fluid" alt=""/>
-                </li>;
-                setUploadedImagesList(tempArray);
-                
-                let tempArrayNames = [...uploadedImagesNamesList];
-                let tempArrayFiles = [...uploadedImagesFile];
-                let tempArrayURLs = [...uploadedImagesURL];
-                tempArrayNames[freeIndex] = <li className="uploaded_name_item" key={freeIndex}>
-                    <i className="fa fa-file"/>
-                    <span className="uploaded_name_item_text">{imageName.replace(/\.[^/.]+$/, "")}</span>
-                    <span className="uploaded_name_item_x" onClick={() => {
-                        setDeleteUploaded(fileUrl, freeIndex, PDFOrImg);
-                    }}>X</span>
-                </li>;
-                tempArrayFiles[freeIndex] = newFile.name;
-                tempArrayURLs[freeIndex] = fileUrl;
-                
-                setUploadedImagesURL(tempArrayURLs);
-                setUploadedImagesFile(tempArrayFiles);
-                setUploadedImagesNamesList(tempArrayNames);
-            }
-        }
-        
-        /* test */
-        else {
-            let tempArray = [...uploadedImagesList];
-            let freeIndex = tempArray.findIndex(Object.is.bind(null, undefined));
-            if (freeIndex === -1) {
-                freeIndex = tempArray.length;
-            }
-            // console.log(freeIndex);
-            tempArray[freeIndex] = <li className="uploaded_image_item" key={freeIndex}>
-                <img src={`https://api.atlaspood.ir/${defaultFabricPhoto}`} className="img-fluid" alt=""/>
-            </li>;
-            // console.log(tempArray);
-            setUploadedImagesList(tempArray);
-            
-            
-            let tempArrayNames = [...uploadedImagesNamesList];
-            tempArrayNames[freeIndex] = <li className="uploaded_name_item" key={freeIndex}>
-                <i className="fa fa-file"/>
-                <span className="uploaded_name_item_text">{imageName.replace(/\.[^/.]+$/, "")}</span>
-                <span className="uploaded_name_item_x" onClick={() => {
-                    setDeleteUploaded(fileUrl, freeIndex, PDFOrImg);
-                }}>X</span>
-            </li>;
-            setUploadedImagesNamesList(tempArrayNames);
-        }
-    }
-    
-    function setDeleteUploaded(fileUrl, freeIndex, PDFOrImg) {
-        // console.log(fileUrl, freeIndex, PDFOrImg);
-        
-        if (PDFOrImg === 1) {
-            setDeleteUploadPdfUrl(fileUrl);
-            setDeleteUploadPdfIndex(freeIndex);
-        } else {
-            setDeleteUploadImageUrl(fileUrl);
-            setDeleteUploadImageIndex(freeIndex);
-        }
-    }
-    
-    function deleteUploadedImg(uploadedImagesList1, uploadedImagesNamesList1, fileUrl, index) {
-        let promise2 = new Promise((resolve, reject) => {
-            if (fileUrl !== "") {
-                axios.delete(baseURLDeleteFile, {
-                    params: {
-                        url: fileUrl
-                    },
-                    headers: authHeader()
-                }).then((response) => {
-                    resolve();
-                }).catch(err => {
-                    if (err.response.status === 401) {
-                        refreshToken().then((response2) => {
-                            if (response2 !== false) {
-                                deleteUploadedImg(uploadedImagesList1, uploadedImagesNamesList1, fileUrl, index);
-                                reject();
-                            } else {
-                                resolve();
-                            }
-                        });
-                    } else {
-                        resolve();
-                    }
-                });
-            } else {
-                resolve();
-            }
-        });
-        promise2.then(() => {
-            let tempArray = [...uploadedImagesList1];
-            let tempArrayNames = [...uploadedImagesNamesList1];
-            let tempArrayFiles = [...uploadedImagesFile];
-            let tempArrayURLs = [...uploadedImagesURL];
-            
-            delete tempArray[index];
-            delete tempArrayNames[index];
-            delete tempArrayFiles[index];
-            delete tempArrayURLs[index];
-            
-            setUploadedImagesURL(tempArrayURLs);
-            setUploadedImagesFile(tempArrayFiles);
-            setUploadedImagesList(tempArray);
-            setUploadedImagesNamesList(tempArrayNames);
-            setDeleteUploadImageUrl("");
-            setDeleteUploadImageIndex(-1);
-        });
-    }
-    
-    function deleteUploadedPdf(uploadedPdfsNamesList1, fileUrl, index) {
-        let promise2 = new Promise((resolve, reject) => {
-            if (fileUrl !== "") {
-                axios.delete(baseURLDeleteFile, {
-                    params: {
-                        url: fileUrl
-                    },
-                    headers: authHeader()
-                }).then((response) => {
-                    resolve();
-                }).catch(err => {
-                    if (err.response.status === 401) {
-                        refreshToken().then((response2) => {
-                            if (response2 !== false) {
-                                deleteUploadedPdf(uploadedPdfsNamesList1, fileUrl, index);
-                                reject();
-                            } else {
-                                resolve();
-                            }
-                        });
-                    } else {
-                        resolve();
-                    }
-                });
-            } else {
-                resolve();
-            }
-        });
-        promise2.then(() => {
-            let tempArrayNames = [...uploadedPdfsNamesList1];
-            let tempArrayFiles = [...uploadedPDFFile];
-            let tempArrayURLs = [...uploadedPDFURL];
-            
-            delete tempArrayNames[index];
-            delete tempArrayFiles[index];
-            delete tempArrayURLs[index];
-            
-            setUploadedPDFURL(tempArrayURLs);
-            setUploadedPDFFile(tempArrayFiles);
-            setUploadedPDFNameList(tempArrayNames);
-            setDeleteUploadImageUrl("");
-            setDeleteUploadImageIndex(-1);
-        });
-    }
-    
-    function getProjectDetail(basketId) {
+    function getProjectDetail() {
         axios.get(baseURGetProject, {
             params: {
-                id: basketId ? basketId : projectId
+                id: projectId
             },
             headers: authHeader()
         }).then((response) => {
-            setProjectDetails(response.data, basketId);
+            setProjectDetails(response.data);
         }).catch(err => {
             if (err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         getProjectDetail();
                     } else {
-                        navigate("/" + pageLanguage + "/Curtain/" + catID + "/" + modelID);
+                        navigate("/" + pageLanguage);
                     }
                 });
             } else {
@@ -2153,8 +1500,8 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
         });
     }
     
-    function setProjectDetails(data, editIndex, changeLang) {
-        if (data && Object.keys(data).length !== 0) {
+    function setProjectDetails(data, editIndex) {
+        if (data && data !== {}) {
             setProjectData(data);
         }
         
@@ -2167,7 +1514,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
         let postfixFa = "س\u200Cم";
         let postfixEn = "cm";
         
-        GetUserProjectData(data, isLoggedIn, editIndex, changeLang).then((temp) => {
+        GetUserProjectData(data, isLoggedIn, editIndex).then((temp) => {
             if (editIndex !== undefined && Object.keys(temp).length !== 0) {
                 setCartProjectIndex(editIndex);
             }
@@ -2221,7 +1568,6 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                     if (temp["Mount"]) {
                         setStep2(temp["Mount"]);
                         if (temp["Mount"] === "Inside") {
-                            setStep21("true");
                             let refIndex = inputs.current["21"].getAttribute('ref-num');
                             tempLabels[refIndex] = inputs.current["21"].getAttribute('text');
                             tempValue[refIndex] = inputs.current["21"].value;
@@ -2260,54 +1606,45 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                             setStepSelectedValue(tempValue);
                             if (temp["Mount"]) {
                                 if (temp["Mount"] === "Inside") {
-                                    // console.log(temp);
-                                    let tempWidth=changeLang? temp["Width1"] :temp["Width"];
-                                    let tempHeight=changeLang? temp["Height1"] :temp["Height"];
-                                    
-                                    selectValues["width1"] = tempWidth ? [{value: tempWidth}] : [];
+                                    selectValues["width1"] = temp["Width"] ? [{value: temp["Width"]}] : [];
                                     selectValues["width2"] = temp["Width2"] ? [{value: temp["Width2"]}] : [];
                                     selectValues["width3"] = temp["Width3"] ? [{value: temp["Width3"]}] : [];
-                                    selectValues["height1"] = tempHeight ? [{value: tempHeight}] : [];
+                                    selectValues["height1"] = temp["Height"] ? [{value: temp["Height"]}] : [];
                                     selectValues["height2"] = temp["Height2"] ? [{value: temp["Height2"]}] : [];
                                     selectValues["height3"] = temp["Height3"] ? [{value: temp["Height3"]}] : [];
-                                    if (tempWidth && temp["Width2"] && temp["Width3"]) {
-                                        let tempMin = Math.min(tempWidth, temp["Width2"], temp["Width3"]);
+                                    if (temp["Width"] && temp["Width2"] && temp["Width3"]) {
+                                        let tempMin = Math.min(temp["Width"], temp["Width2"], temp["Width3"]);
                                         tempLabels["3AIn"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
                                     }
-                                    if (tempHeight && temp["Height2"] && temp["Height3"]) {
-                                        let tempMax = Math.max(tempHeight, temp["Height2"], temp["Height3"]);
+                                    if (temp["Height"] && temp["Height2"] && temp["Height3"]) {
+                                        let tempMax = Math.max(temp["Height"], temp["Height2"], temp["Height3"]);
                                         tempLabels["3BIn"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + postfixFa : tempMax + postfixEn;
                                     }
                                     
-                                    depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "3AIn1,") + (temp["Width2"] ? "" : "3AIn2,") + (temp["Width3"] ? "" : "3AIn3,") + (tempHeight ? "" : "3BIn1,") + (temp["Height2"] ? "" : "3BIn2,") + (temp["Height3"] ? "" : "3BIn3,"), "3", depSetTempArr)]);
+                                    depSetTempArr = new Set([...setGetDeps((temp["Width"] ? "" : "3AIn1,") + (temp["Width2"] ? "" : "3AIn2,") + (temp["Width3"] ? "" : "3AIn3,") + (temp["Height"] ? "" : "3BIn1,") + (temp["Height2"] ? "" : "3BIn2,") + (temp["Height3"] ? "" : "3BIn3,"), "3", depSetTempArr)]);
                                     setSelectCustomValues(selectValues);
                                     setStepSelectedLabel(tempLabels);
                                     setStepSelectedValue(tempValue);
                                 } else {
-                                    let tempWidth=changeLang? temp["Width3A"] :temp["Width"];
-                                    let tempHeight=changeLang? temp["Height3C"] :temp["Height"];
-                                    
-                                    // console.log(temp,tempWidth,tempHeight);
-                                    
-                                    selectValues["width3A"] = tempWidth ? [{value: tempWidth}] : [];
-                                    if (tempWidth) {
-                                        tempLabels["3AOut"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                    selectValues["width3A"] = temp["Width"] ? [{value: temp["Width"]}] : [];
+                                    if (temp["Width"]) {
+                                        tempLabels["3AOut"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["Width"]}`) + postfixFa : temp["Width"] + postfixEn;
                                     }
-                                    selectValues["height3C"] = tempHeight ? [{value: tempHeight}] : [];
-                                    if (tempHeight) {
-                                        tempLabels["3COut"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
+                                    selectValues["height3C"] = temp["Height"] ? [{value: temp["Height"]}] : [];
+                                    if (temp["Height"]) {
+                                        tempLabels["3COut"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["Height"]}`) + postfixFa : temp["Height"] + postfixEn;
                                     }
                                     selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
                                     selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
-                                    if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
+                                    if (temp["ExtensionLeft"] && temp["ExtensionRight"]) {
                                         tempLabels["3BOut"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
                                     }
                                     selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
-                                    if (temp["ShadeMount"] !== undefined) {
+                                    if (temp["ShadeMount"]) {
                                         tempLabels["3DOut"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["ShadeMount"]}`) + postfixFa : temp["ShadeMount"] + postfixEn;
                                     }
                                     
-                                    depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "3AOut,") + (tempHeight ? "" : "3COut,") + (temp["ExtensionLeft"] !== undefined ? "" : "3BOut1,") + (temp["ExtensionRight"] !== undefined ? "" : "3BOut2,") + (temp["ShadeMount"] !== undefined ? "" : "3DOut,"), "3", depSetTempArr)]);
+                                    depSetTempArr = new Set([...setGetDeps((temp["Width"] ? "" : "3AOut,") + (temp["Height"] ? "" : "3COut,") + (temp["ExtensionLeft"] ? "" : "3BOut1,") + (temp["ExtensionRight"] ? "" : "3BOut2,") + (temp["ShadeMount"] ? "" : "3DOut,"), "3", depSetTempArr)]);
                                     setSelectCustomValues(selectValues);
                                     setStepSelectedLabel(tempLabels);
                                     setStepSelectedValue(tempValue);
@@ -2399,168 +1736,168 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                             }
                         }
                     }
-    
-                if (temp["Headrail"]) {
-                    setStep5(temp["Headrail"]);
-        
-                    if (temp["Headrail"] === "MetalValance") {
-                        let refIndex = inputs.current["53"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["53"].getAttribute('text') + (temp["MetalValanceColor"] ? "/" + temp["MetalValanceColor"] : "");
-                        tempValue[refIndex] = inputs.current["53"].value;
-                        setStepSelectedLabel(tempLabels);
-                        setStepSelectedValue(tempValue);
-                        setSelectedValanceColor1(temp["MetalValanceColor"] ? [{
-                            value: temp["MetalValanceColor"],
-                            label: optionsMetalValance[pageLanguage].find(opt => opt.value === temp["MetalValanceColor"]).label
-                        }] : []);
-                        depSetTempArr = new Set([...setGetDeps((temp["MetalValanceColor"] ? "" : "53,"), "5", depSetTempArr)]);
-                    } else if (temp["Headrail"] === "MetalValanceFabricInsert") {
-                        let refIndex = inputs.current["54"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["54"].getAttribute('text') + (temp["MetalValanceColor"] ? "/" + temp["MetalValanceColor"] : "");
-                        tempValue[refIndex] = inputs.current["54"].value;
-                        setStepSelectedLabel(tempLabels);
-                        setStepSelectedValue(tempValue);
-                        setSelectedValanceColor2(temp["MetalValanceColor"] ? [{
-                            value: temp["MetalValanceColor"],
-                            label: optionsMetalValance[pageLanguage].find(opt => opt.value === temp["MetalValanceColor"]).label
-                        }] : []);
-                        depSetTempArr = new Set([...setGetDeps((temp["MetalValanceColor"] ? "" : "54,"), "5", depSetTempArr)]);
-                    } else if (temp["Headrail"] === "Upholstered") {
-                        let refIndex = inputs.current["52"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["52"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["52"].value;
-                        setStepSelectedLabel(tempLabels);
-                        setStepSelectedValue(tempValue);
-                        depSetTempArr = new Set([...setGetDeps("", "5", depSetTempArr)]);
-                    } else {
-                        let refIndex = inputs.current["51"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["51"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["51"].value;
-                        setStepSelectedLabel(tempLabels);
-                        setStepSelectedValue(tempValue);
-                        depSetTempArr = new Set([...setGetDeps((temp["RollType"] ? "" : "5A,") + (temp["BracketType"] ? "" : "5B,") + (temp["BracketColor"] ? "" : "5C,"), "5", depSetTempArr)]);
-            
-                        if (temp["RollType"]) {
-                            setStep5A(temp["RollType"]);
-                            if (temp["RollType"] === "Regular") {
-                                let refIndex = inputs.current["5A1"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["5A1"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["5A1"].value;
-                                setStepSelectedLabel(tempLabels);
-                                setStepSelectedValue(tempValue);
-                                depSetTempArr = new Set([...setGetDeps("", "5A", depSetTempArr)]);
-                            } else {
-                                let refIndex = inputs.current["5A2"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["5A2"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["5A2"].value;
-                                setStepSelectedLabel(tempLabels);
-                                setStepSelectedValue(tempValue);
-                                depSetTempArr = new Set([...setGetDeps("", "5A", depSetTempArr)]);
+                    
+                    if (temp["Headrail"]) {
+                        setStep5(temp["Headrail"]);
+                        
+                        if (temp["Headrail"] === "MetalValance") {
+                            let refIndex = inputs.current["53"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["53"].getAttribute('text') + (temp["MetalValanceColor"] ? "/" + temp["MetalValanceColor"] : "");
+                            tempValue[refIndex] = inputs.current["53"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            setSelectedValanceColor1(temp["MetalValanceColor"] ? [{
+                                value: temp["MetalValanceColor"],
+                                label: optionsMetalValance[pageLanguage].find(opt => opt.value === temp["MetalValanceColor"]).label
+                            }] : []);
+                            depSetTempArr = new Set([...setGetDeps((temp["MetalValanceColor"] ? "" : "53,"), "5", depSetTempArr)]);
+                        } else if (temp["Headrail"] === "MetalValanceFabricInsert") {
+                            let refIndex = inputs.current["54"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["54"].getAttribute('text') + (temp["MetalValanceColor"] ? "/" + temp["MetalValanceColor"] : "");
+                            tempValue[refIndex] = inputs.current["54"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            setSelectedValanceColor2(temp["MetalValanceColor"] ? [{
+                                value: temp["MetalValanceColor"],
+                                label: optionsMetalValance[pageLanguage].find(opt => opt.value === temp["MetalValanceColor"]).label
+                            }] : []);
+                            depSetTempArr = new Set([...setGetDeps((temp["MetalValanceColor"] ? "" : "54,"), "5", depSetTempArr)]);
+                        } else if (temp["Headrail"] === "Upholstered") {
+                            let refIndex = inputs.current["52"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["52"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["52"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            depSetTempArr = new Set([...setGetDeps("", "5", depSetTempArr)]);
+                        } else {
+                            let refIndex = inputs.current["51"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["51"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["51"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            depSetTempArr = new Set([...setGetDeps((temp["RollType"] ? "" : "5A,") + (temp["BracketType"] ? "" : "5B,") + (temp["BracketColor"] ? "" : "5C,"), "5", depSetTempArr)]);
+                            
+                            if (temp["RollType"]) {
+                                setStep5A(temp["RollType"]);
+                                if (temp["RollType"] === "Regular") {
+                                    let refIndex = inputs.current["5A1"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["5A1"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["5A1"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                    depSetTempArr = new Set([...setGetDeps("", "5A", depSetTempArr)]);
+                                } else {
+                                    let refIndex = inputs.current["5A2"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["5A2"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["5A2"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                    depSetTempArr = new Set([...setGetDeps("", "5A", depSetTempArr)]);
+                                }
                             }
-                        }
-                        if (temp["BracketType"]) {
-                            setStep5B(temp["BracketType"]);
-                            if (temp["BracketType"] === "Round Edge") {
-                                let refIndex = inputs.current["5B1"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["5B1"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["5B1"].value;
-                                setStepSelectedLabel(tempLabels);
-                                setStepSelectedValue(tempValue);
-                                depSetTempArr = new Set([...setGetDeps("", "5B", depSetTempArr)]);
-                            } else {
-                                let refIndex = inputs.current["5B2"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["5B2"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["5B2"].value;
-                                setStepSelectedLabel(tempLabels);
-                                setStepSelectedValue(tempValue);
-                                depSetTempArr = new Set([...setGetDeps("", "5B", depSetTempArr)]);
+                            if (temp["BracketType"]) {
+                                setStep5B(temp["BracketType"]);
+                                if (temp["BracketType"] === "Round Edge") {
+                                    let refIndex = inputs.current["5B1"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["5B1"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["5B1"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                    depSetTempArr = new Set([...setGetDeps("", "5B", depSetTempArr)]);
+                                } else {
+                                    let refIndex = inputs.current["5B2"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["5B2"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["5B2"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                    depSetTempArr = new Set([...setGetDeps("", "5B", depSetTempArr)]);
+                                }
                             }
-                        }
-                        if (temp["BracketColor"]) {
-                            setStep5C(temp["BracketColor"]);
-                            if (temp["BracketColor"] === "Satin Brass") {
-                                let refIndex = inputs.current["5C1"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["5C1"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["5C1"].value;
-                                setStepSelectedLabel(tempLabels);
-                                setStepSelectedValue(tempValue);
-                                depSetTempArr = new Set([...setGetDeps("", "5C", depSetTempArr)]);
-                            } else if (temp["BracketColor"] === "Satin Nickel") {
-                                let refIndex = inputs.current["5C2"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["5C2"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["5C2"].value;
-                                setStepSelectedLabel(tempLabels);
-                                setStepSelectedValue(tempValue);
-                                depSetTempArr = new Set([...setGetDeps("", "5C", depSetTempArr)]);
-                            } else {
-                                let refIndex = inputs.current["5C3"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["5C3"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["5C3"].value;
-                                setStepSelectedLabel(tempLabels);
-                                setStepSelectedValue(tempValue);
-                                depSetTempArr = new Set([...setGetDeps("", "5C", depSetTempArr)]);
-                            }
-                        }
-                    }
-                }
-    
-                if (temp["HemStyle"]) {
-                    setStep6(temp["HemStyle"]);
-        
-                    if (temp["HemStyle"] === "Scallop") {
-                        let refIndex = inputs.current["62"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["62"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["62"].value;
-                        setStepSelectedLabel(tempLabels);
-                        setStepSelectedValue(tempValue);
-                        depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
-                    } else if (temp["HemStyle"] === "Wave") {
-                        let refIndex = inputs.current["63"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["63"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["63"].value;
-                        setStepSelectedLabel(tempLabels);
-                        setStepSelectedValue(tempValue);
-                        depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
-                    } else if (temp["HemStyle"] === "Colonial") {
-                        let refIndex = inputs.current["64"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["64"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["64"].value;
-                        setStepSelectedLabel(tempLabels);
-                        setStepSelectedValue(tempValue);
-                        depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
-                    } else {
-                        let refIndex = inputs.current["61"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["61"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["61"].value;
-                        setStepSelectedLabel(tempLabels);
-                        setStepSelectedValue(tempValue);
-                        depSetTempArr = new Set([...setGetDeps((temp["RollType"] ? "" : "6A,"), "6", depSetTempArr)]);
-            
-                        if (temp["BottomBarStyle"]) {
-                            setStep6A(temp["BottomBarStyle"]);
-                            if (temp["BottomBarStyle"] === "Sewn-In") {
-                                let refIndex = inputs.current["6A1"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["6A1"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["6A1"].value;
-                                setStepSelectedLabel(tempLabels);
-                                setStepSelectedValue(tempValue);
-                                depSetTempArr = new Set([...setGetDeps("", "6A", depSetTempArr)]);
-                            } else {
-                                let refIndex = inputs.current["6A2"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["6A2"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["6A2"].value;
-                                setStepSelectedLabel(tempLabels);
-                                setStepSelectedValue(tempValue);
-                                depSetTempArr = new Set([...setGetDeps("", "6A", depSetTempArr)]);
+                            if (temp["BracketColor"]) {
+                                setStep5C(temp["BracketColor"]);
+                                if (temp["BracketColor"] === "Satin Brass") {
+                                    let refIndex = inputs.current["5C1"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["5C1"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["5C1"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                    depSetTempArr = new Set([...setGetDeps("", "5C", depSetTempArr)]);
+                                } else if (temp["BracketColor"] === "Satin Nickel") {
+                                    let refIndex = inputs.current["5C2"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["5C2"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["5C2"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                    depSetTempArr = new Set([...setGetDeps("", "5C", depSetTempArr)]);
+                                } else {
+                                    let refIndex = inputs.current["5C3"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["5C3"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["5C3"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                    depSetTempArr = new Set([...setGetDeps("", "5C", depSetTempArr)]);
+                                }
                             }
                         }
                     }
-                }
-    
-                if (temp["RoomNameEn"]) {
+                    
+                    if (temp["HemStyle"]) {
+                        setStep6(temp["HemStyle"]);
+                        
+                        if (temp["HemStyle"] === "Scallop") {
+                            let refIndex = inputs.current["62"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["62"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["62"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
+                        } else if (temp["HemStyle"] === "Wave") {
+                            let refIndex = inputs.current["63"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["63"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["63"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
+                        } else if (temp["HemStyle"] === "Colonial") {
+                            let refIndex = inputs.current["64"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["64"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["64"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
+                        } else {
+                            let refIndex = inputs.current["61"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["61"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["61"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            depSetTempArr = new Set([...setGetDeps((temp["RollType"] ? "" : "6A,"), "6", depSetTempArr)]);
+                            
+                            if (temp["BottomBarStyle"]) {
+                                setStep6A(temp["BottomBarStyle"]);
+                                if (temp["BottomBarStyle"] === "Sewn-In") {
+                                    let refIndex = inputs.current["6A1"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["6A1"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["6A1"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                    depSetTempArr = new Set([...setGetDeps("", "6A", depSetTempArr)]);
+                                } else {
+                                    let refIndex = inputs.current["6A2"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["6A2"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["6A2"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                    depSetTempArr = new Set([...setGetDeps("", "6A", depSetTempArr)]);
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (temp["RoomNameEn"]) {
                         setSavedProjectRoomLabel(temp["RoomNameEn"]);
                         
-                        depSetTempArr = new Set([...setGetDeps("", "61", depSetTempArr)]);
+                        depSetTempArr = new Set([...setGetDeps("", "71", depSetTempArr)]);
                         setSelectedRoomLabel(temp["RoomNameEn"] ? [{
                             value: temp["RoomNameEn"],
                             label: rooms[pageLanguage].find(opt => opt.value === temp["RoomNameEn"]).label
@@ -2569,73 +1906,16 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                         tempSelect.value = temp["RoomNameEn"];
                         setRoomLabelSelect(tempSelect);
                         if (temp["WindowName"] === undefined || (temp["WindowName"] && temp["WindowName"] === "")) {
-                            tempLabels["6"] = tempSelect.label;
+                            tempLabels["7"] = tempSelect.label;
                         } else if (temp["WindowName"]) {
-                            tempLabels["6"] = tempSelect.label + " - " + temp["WindowName"];
+                            tempLabels["7"] = tempSelect.label + " - " + temp["WindowName"];
                         }
                         setStepSelectedLabel(tempLabels);
                     }
                     if (temp["WindowName"] && temp["WindowName"] !== "") {
                         setSavedProjectRoomText(temp["WindowName"]);
-                        depSetTempArr = new Set([...setGetDeps("", "62", depSetTempArr)]);
+                        depSetTempArr = new Set([...setGetDeps("", "72", depSetTempArr)]);
                         setRoomLabelText(temp["WindowName"]);
-                    }
-                    
-                    if (temp["uploadedImagesURL"] && temp["uploadedImagesURL"].length > 0) {
-                        setUploadedImagesURL(temp["uploadedImagesURL"]);
-                        setUploadedImagesFile(temp["uploadedImagesFile"]);
-                        let tempArrayNames = [];
-                        let tempArray = [];
-                        
-                        let promise3 = new Promise((resolve, reject) => {
-                            temp["uploadedImagesFile"].forEach((obj, index) => {
-                                tempArrayNames[index] = <li className="uploaded_name_item" key={index}>
-                                    <i className="fa fa-file"/>
-                                    <span className="uploaded_name_item_text">{obj.replace(/\.[^/.]+$/, "")}</span>
-                                    <span className="uploaded_name_item_x" onClick={() => {
-                                        setDeleteUploaded(temp["uploadedImagesURL"][index], index, 2);
-                                    }}>X</span>
-                                </li>;
-                                
-                                tempArray[index] = <li className="uploaded_image_item" key={index}>
-                                    <img src={`https://api.atlaspood.ir/${temp["uploadedImagesURL"][index]}`} className="img-fluid" alt=""/>
-                                </li>;
-                                
-                                if (index === temp["uploadedImagesFile"].length - 1) {
-                                    resolve();
-                                }
-                            });
-                        });
-                        
-                        promise3.then(() => {
-                            setUploadedImagesNamesList(tempArrayNames);
-                            setUploadedImagesList(tempArray);
-                        });
-                        
-                    }
-                    if (temp["uploadedPDFURL"] && temp["uploadedPDFURL"].length > 0) {
-                        setUploadedPDFURL(temp["uploadedPDFURL"]);
-                        setUploadedPDFFile(temp["uploadedPDFFile"]);
-                        let tempArrayNames = [];
-                        
-                        let promise3 = new Promise((resolve, reject) => {
-                            temp["uploadedPDFFile"].forEach((obj, index) => {
-                                tempArrayNames[index] = <li className="uploaded_name_item" key={index}>
-                                    <i className="fa fa-file"/>
-                                    <span className="uploaded_name_item_text">{obj.replace(/\.[^/.]+$/, "")}</span>
-                                    <span className="uploaded_name_item_x" onClick={() => {
-                                        setDeleteUploaded(temp["uploadedPDFURL"][index], index, 1);
-                                    }}>X</span>
-                                </li>;
-                                if (index === temp["uploadedPDFFile"].length - 1) {
-                                    resolve();
-                                }
-                            });
-                        });
-                        
-                        promise3.then(() => {
-                            setUploadedPDFNameList(tempArrayNames);
-                        });
                     }
                     
                     setDepSet(depSetTempArr);
@@ -2645,55 +1925,6 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                 }
             );
         });
-    }
-    
-    function filterSelected(filter, filterId, isDelete) {
-        // console.log(filterColors, filterPatterns, filterPatterns, filterPrices);
-        if (filter === 1) {
-            if (isDelete) {
-                setFilterColors([
-                    ...filterColors,
-                    filterId
-                ]);
-            } else {
-                setFilterColors(
-                    filterColors.filter((id1) => id1 !== filterId),
-                );
-            }
-        } else if (filter === 2) {
-            if (isDelete) {
-                setFilterPatterns([
-                    ...filterPatterns,
-                    filterId
-                ]);
-            } else {
-                setFilterPatterns(
-                    filterPatterns.filter((id1) => id1 !== filterId),
-                );
-            }
-        } else if (filter === 3) {
-            if (isDelete) {
-                setFilterTypes([
-                    ...filterTypes,
-                    filterId
-                ]);
-            } else {
-                setFilterTypes(
-                    filterTypes.filter((id1) => id1 !== filterId),
-                );
-            }
-        } else {
-            if (isDelete) {
-                setFilterPrices([
-                    ...filterPrices,
-                    filterId
-                ]);
-            } else {
-                setFilterPrices(
-                    filterPrices.filter((id1) => id1 !== filterId),
-                );
-            }
-        }
     }
     
     const optionsMetalValance = {
@@ -2821,7 +2052,8 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
             {value: 'Grey', label: 'خاکستری'},
             {value: 'Orange', label: 'نارنجی'},
             {value: 'Pink', label: 'صورتی'}
-        ]
+        ],
+        
     };
     
     const patterns = {
@@ -2842,7 +2074,8 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
             {value: 'Modern', label: 'مدرن'},
             {value: 'Solid', label: 'یکرنگ'},
             {value: 'Stripes', label: 'راه راه'}
-        ]
+        ],
+        
     };
     
     const types = {
@@ -2861,7 +2094,8 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
             {value: 'Print', label: 'چاپی'},
             {value: 'Silk', label: 'ابریشمی'},
             {value: 'Velvet', label: 'مخملی'}
-        ]
+        ],
+        
     };
     
     const prices = {
@@ -2874,7 +2108,8 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
             {value: 'standard', label: 'معمولی'},
             {value: 'premium', label: 'اعلاء'},
             {value: 'Luxe', label: 'تجملی'}
-        ]
+        ],
+        
     };
     
     const rooms = {
@@ -3057,40 +2292,27 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
     // }, [location.pathname]);
     
     useEffect(() => {
-        // console.log("hi2");
-        if ((projectModalState === 2 && isLoggedIn) || (saveProjectCount !== 0 && isLoggedIn)) {
+        if (projectModalState === 2 && isLoggedIn) {
             if (roomLabelText !== "" && selectedRoomLabel.length) {
                 if (projectId && projectId !== "") {
-                    SaveUserProject(depSet, cartValues, [uploadedImagesFile, uploadedImagesURL, uploadedPDFFile, uploadedPDFURL], `${modelID}`, price, defaultModelName, defaultModelNameFa, projectData).then((temp) => {
-                        if (temp === 401) {
-                            setSaveProjectCount(saveProjectCount + 1);
-                        } else if (temp) {
+                    SaveUserProject(depSet, cartValues, `${modelID}`, price, defaultModelName, defaultModelNameFa, projectData).then((temp) => {
+                        if (temp) {
                             setProjectModalState(1);
-                            setSavingLoading(false);
                         } else {
                             console.log("project not saved!");
-                            setSavingLoading(false);
                         }
                     }).catch(() => {
-                        // console.log("hi6");
                         setProjectModalState(2);
-                        setSavingLoading(false);
                     });
                 } else {
-                    SaveUserProject(depSet, cartValues, [uploadedImagesFile, uploadedImagesURL, uploadedPDFFile, uploadedPDFURL], `${modelID}`, price, defaultModelName, defaultModelNameFa).then((temp) => {
-                        if (temp === 401) {
-                            setSaveProjectCount(saveProjectCount + 1);
-                        } else if (temp) {
+                    SaveUserProject(depSet, cartValues, `${modelID}`, price, defaultModelName, defaultModelNameFa).then((temp) => {
+                        if (temp) {
                             setProjectModalState(1);
-                            setSavingLoading(false);
                         } else {
                             console.log("project not saved!");
-                            setSavingLoading(false);
                         }
-                    }).catch((err) => {
-                        // console.log("hi5",err);
+                    }).catch(() => {
                         setProjectModalState(2);
-                        setSavingLoading(false);
                     });
                 }
             } else {
@@ -3098,7 +2320,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                 modalHandleShow("add_to_project_modal");
             }
         }
-    }, [isLoggedIn, saveProjectCount]);
+    }, [isLoggedIn]);
     
     useEffect(() => {
         if (Object.keys(model).length !== 0) {
@@ -3121,34 +2343,18 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
             });
             setModelAccessories(tempObj);
             setDefaultFabricPhoto(model["DefaultFabricPhotoUrl"]);
-            setCart("PhotoUrl", model["DefaultFabricPhotoUrl"]);
+            setCart("PhotoUrl",model["DefaultFabricPhotoUrl"]);
             setDefaultModelName(model["ModelENName"]);
             setDefaultModelNameFa(model["ModelName"]);
         }
     }, [model]);
     
     useEffect(() => {
-        if (deleteUploadImageIndex !== -1) {
-            if (deleteUploadImageUrl !== "") {
-                deleteUploadedImg(uploadedImagesList, uploadedImagesNamesList, deleteUploadImageUrl, deleteUploadImageIndex);
-            }
-        }
-    }, [deleteUploadImageUrl]);
-    
-    useEffect(() => {
-        if (deleteUploadPdfIndex !== -1) {
-            if (deleteUploadPdfUrl !== "") {
-                deleteUploadedPdf(uploadedPDFNameList, deleteUploadPdfUrl, deleteUploadPdfIndex);
-            }
-        }
-    }, [deleteUploadPdfUrl]);
-    
-    useEffect(() => {
         if (modelID !== '' && catID !== '') {
             // if(firstRender) {
             getCats();
             getModel();
-            // getFabrics();
+            getFabrics();
             // setFirstRender(false);
             // }
         }
@@ -3158,26 +2364,8 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
     useEffect(() => {
         if (Object.keys(fabrics).length) {
             renderFabrics();
-        } else {
-            setFabricsList([]);
         }
     }, [fabrics, location.pathname]);
-    
-    useEffect(() => {
-        if (filterChanged["filter"] !== 0) {
-            filterSelected(filterChanged["filter"], filterChanged["filter_id"], filterChanged["isDelete"]);
-            
-            setFilterChanged({
-                filter: 0,
-                filter_id: undefined,
-                isDelete: false
-            });
-        }
-    }, [filterChanged]);
-    
-    useEffect(() => {
-        getFabricsWithFilter();
-    }, [filterColors, filterPatterns, filterTypes, filterPrices, searchText]);
     
     useEffect(() => {
         // setModels([]);
@@ -3185,153 +2373,23 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
         // setFabricsList([]);
         if (pageLanguage !== '') {
             setSelectedMotorChannels([motorChannels[pageLanguage].find(opt => opt.value === '0')]);
+            
         }
-        GetSewingFilters(1, `${modelID}`).then((temp) => {
-            setSewingColors(temp[location.pathname.split('').slice(1, 3).join('')].map((obj, index) => (
-                <Dropdown.Item as={Button} key={index}>
-                    <label className="dropdown_label">
-                        <input type="checkbox" filter-id={obj.value}
-                               ref={ref => (filterCheckboxes.current["colors"] = [...filterCheckboxes.current["colors"], ref])}
-                               onChange={(e) => {
-                                   setFilterChanged({
-                                       filter: 1,
-                                       filter_id: e.target.getAttribute("filter-id"),
-                                       isDelete: e.target.checked
-                                   });
-                               }} id={"dropdown_color" + obj.value + index}/>
-                        <label htmlFor={"dropdown_color" + obj.value + index} className="checkbox_label">
-                            <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')} alt=""/>
-                        </label>
-                        {obj.label}
-                    </label>
-                </Dropdown.Item>
-            )));
-        });
-        GetSewingFilters(2, `${modelID}`).then((temp) => {
-            setSewingPatterns(temp[location.pathname.split('').slice(1, 3).join('')].map((obj, index) => (
-                <Dropdown.Item as={Button} key={index}>
-                    <label className="dropdown_label">
-                        <input type="checkbox" filter-id={obj.value}
-                               ref={ref => (filterCheckboxes.current["patterns"] = [...filterCheckboxes.current["patterns"], ref])}
-                               onChange={(e) => {
-                                   setFilterChanged({
-                                       filter: 2,
-                                       filter_id: e.target.getAttribute("filter-id"),
-                                       isDelete: e.target.checked
-                                   });
-                               }} id={"dropdown_pattern" + obj.value + index}/>
-                        <label htmlFor={"dropdown_pattern" + obj.value + index} className="checkbox_label">
-                            <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')} alt=""/>
-                        </label>
-                        {obj.label}
-                    </label>
-                </Dropdown.Item>
-            )));
-        });
-        GetSewingFilters(3, `${modelID}`).then((temp) => {
-            setSewingTypes(temp[location.pathname.split('').slice(1, 3).join('')].map((obj, index) => (
-                <Dropdown.Item as={Button} key={index}>
-                    <label className="dropdown_label">
-                        <input type="checkbox" filter-id={obj.value}
-                               ref={ref => (filterCheckboxes.current["types"] = [...filterCheckboxes.current["types"], ref])}
-                               onChange={(e) => {
-                                   setFilterChanged({
-                                       filter: 3,
-                                       filter_id: e.target.getAttribute("filter-id"),
-                                       isDelete: e.target.checked
-                                   });
-                               }} id={"dropdown_type" + obj.value + index}/>
-                        <label htmlFor={"dropdown_type" + obj.value + index} className="checkbox_label">
-                            <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')} alt=""/>
-                        </label>
-                        {obj.label}
-                    </label>
-                </Dropdown.Item>
-            )));
-        });
-        GetSewingFilters(4, `${modelID}`).then((temp) => {
-            setSewingPrices(temp[location.pathname.split('').slice(1, 3).join('')].map((obj, index) => (
-                <Dropdown.Item as={Button} key={index}>
-                    <label className="dropdown_label">
-                        <input type="checkbox" filter-id={obj.value}
-                               ref={ref => (filterCheckboxes.current["prices"] = [...filterCheckboxes.current["prices"], ref])}
-                               onChange={(e) => {
-                                   setFilterChanged({
-                                       filter: 4,
-                                       filter_id: e.target.getAttribute("filter-id"),
-                                       isDelete: e.target.checked
-                                   });
-                               }} id={"dropdown_price" + obj.value + index}/>
-                        <label htmlFor={"dropdown_price" + obj.value + index} className="checkbox_label">
-                            <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')} alt=""/>
-                        </label>
-                        {obj.label}
-                    </label>
-                </Dropdown.Item>
-            )));
-        });
     }, [pageLanguage, location.pathname]);
     
     useEffect(() => {
-        if (Object.keys(cartValues).length !== 0) {
-            cartValues["SewingModelId"] = `${modelID}`;
-            sessionStorage.setItem("cartValues", JSON.stringify(cartValues));
-            if (editIndex) {
-                sessionStorage.setItem("editIndex", JSON.stringify(editIndex));
-            }
-            if (projectId) {
-                sessionStorage.setItem("projectId", JSON.stringify(projectId));
-            }
-        }
-    }, [cartValues]);
-    
-    useEffect(() => {
-        if (sessionStorage.getItem("cartValues") !== null && editIndex === undefined && projectId === undefined) {
-            let tempCartValues = {};
-            let tempEditIndex;
-            let tempProjectId;
-            if (sessionStorage.getItem("cartValues") !== null) {
-                tempCartValues = JSON.parse(sessionStorage.getItem("cartValues"));
-                if (Object.keys(tempCartValues).length !== 0) {
-                    if (tempCartValues["SewingModelId"] && tempCartValues["SewingModelId"] === `${modelID}`) {
-                        setStepSelectedLabel({});
-                        setProjectDetails(tempCartValues, undefined, true);
-                    }
-                }
-            }
-            if (sessionStorage.getItem("editIndex") !== null) {
-                tempEditIndex = JSON.parse(sessionStorage.getItem("editIndex") && sessionStorage.getItem("editIndex").toUpperCase() !== "UNDEFINED");
-                setEditIndex(tempEditIndex);
-            }
-            if (sessionStorage.getItem("projectId") !== null && sessionStorage.getItem("projectId").toUpperCase() !== "UNDEFINED") {
-                tempProjectId = JSON.parse(sessionStorage.getItem("projectId"));
-                setProjectId(tempProjectId);
-            }
-            sessionStorage.clear();
-        }
-    }, []);
-    
-    
-    useEffect(() => {
-        if (editIndex && editIndex !== "") {
-            if (isLoggedIn) {
-                getProjectDetail(editIndex);
-            } else {
-                if (localStorage.getItem("cart") !== null) {
-                    if (JSON.parse(localStorage.getItem("cart"))["drapery"] !== undefined) {
-                        setProjectDetails(JSON.parse(localStorage.getItem("cart"))["drapery"][editIndex], editIndex);
-                    } else {
-                        navigate("/" + pageLanguage + "/Curtain/" + catID + "/" + modelID);
-                    }
+        if (editIndex !== undefined) {
+            if (localStorage.getItem("cart") !== null) {
+                if (JSON.parse(localStorage.getItem("cart"))["drapery"] !== undefined) {
+                    setProjectDetails(JSON.parse(localStorage.getItem("cart"))["drapery"][editIndex], editIndex);
                 } else {
                     navigate("/" + pageLanguage + "/Curtain/" + catID + "/" + modelID);
                 }
+            } else {
+                navigate("/" + pageLanguage + "/Curtain/" + catID + "/" + modelID);
             }
-        } else if (projectId && projectId !== "") {
+        } else if (projectId && projectId !== '') {
             getProjectDetail();
-        } else if (Object.keys(cartValues).length !== 0) {
-            setStepSelectedLabel({});
-            setProjectDetails(cartValues, undefined, true)
         }
     }, [location.pathname]);
     
@@ -3376,14 +2434,13 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                 <div className="search_box">
                                                     <input type="text" placeholder={t("Search for product Name/Code")}
                                                            className="form-control search_input"
-                                                           name="search_input" value={searchText}
+                                                           name="search_input" defaultValue=""
                                                            ref={search_input}
                                                            onChange={(e) => {
                                                                if (e.target.value !== "")
                                                                    setSearchShow(true);
                                                                else
                                                                    setSearchShow(false);
-                                                               setSearchText(e.target.value);
                                                            }}/>
                                                     {searchShow &&
                                                     <div className="clear-icon-container" onClick={() => {
@@ -3408,12 +2465,20 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu className="filter_color_items">
                                                             <div className="filter_items_container">
-                                                                {sewingColors}
+                                                                {colors[location.pathname.split('').slice(1, 3).join('')].map((obj, index) => (
+                                                                    <Dropdown.Item as={Button} key={index}>
+                                                                        <label className="dropdown_label">
+                                                                            <input type="checkbox" value={obj.value}
+                                                                                   ref={ref => (filterCheckboxes.current["colors"] = [...filterCheckboxes.current["colors"], ref])}/>
+                                                                            {obj.label}
+                                                                        </label>
+                                                                    </Dropdown.Item>
+                                                                ))}
                                                             </div>
                                                             <div className="filter_inside_button_section">
                                                                 <div className="clear_inside_filter" text="colors"
                                                                      onClick={(e) => clearFilters(e)}>{t("filter_Clear Filters")}</div>
-                                                                <Dropdown.Toggle as="div" className="done_inside_filter">{t("filter_Done")}</Dropdown.Toggle>
+                                                                <div className="done_inside_filter">{t("filter_Done")}</div>
                                                             </div>
                                                         </Dropdown.Menu>
                                                     </Dropdown>
@@ -3426,12 +2491,20 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
                                                             <div className="filter_items_container">
-                                                                {sewingPatterns}
+                                                                {patterns[location.pathname.split('').slice(1, 3).join('')].map((obj, index) => (
+                                                                    <Dropdown.Item as={Button} key={index}>
+                                                                        <label className="dropdown_label">
+                                                                            <input type="checkbox" value={obj.value}
+                                                                                   ref={ref => (filterCheckboxes.current["patterns"] = [...filterCheckboxes.current["patterns"], ref])}/>
+                                                                            {obj.label}
+                                                                        </label>
+                                                                    </Dropdown.Item>
+                                                                ))}
                                                             </div>
                                                             <div className="filter_inside_button_section">
                                                                 <div className="clear_inside_filter" text="patterns"
                                                                      onClick={(e) => clearFilters(e)}>{t("filter_Clear Filters")}</div>
-                                                                <Dropdown.Toggle as="div" className="done_inside_filter">{t("filter_Done")}</Dropdown.Toggle>
+                                                                <div className="done_inside_filter">{t("filter_Done")}</div>
                                                             </div>
                                                         </Dropdown.Menu>
                                                     </Dropdown>
@@ -3444,11 +2517,19 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
                                                             <div className="filter_items_container">
-                                                                {sewingTypes}
+                                                                {types[location.pathname.split('').slice(1, 3).join('')].map((obj, index) => (
+                                                                    <Dropdown.Item as={Button} key={index}>
+                                                                        <label className="dropdown_label">
+                                                                            <input type="checkbox" value={obj.value}
+                                                                                   ref={ref => (filterCheckboxes.current["types"] = [...filterCheckboxes.current["types"], ref])}/>
+                                                                            {obj.label}
+                                                                        </label>
+                                                                    </Dropdown.Item>
+                                                                ))}
                                                             </div>
                                                             <div className="filter_inside_button_section">
                                                                 <div className="clear_inside_filter" text="types" onClick={(e) => clearFilters(e)}>{t("filter_Clear Filters")}</div>
-                                                                <Dropdown.Toggle as="div" className="done_inside_filter">{t("filter_Done")}</Dropdown.Toggle>
+                                                                <div className="done_inside_filter">{t("filter_Done")}</div>
                                                             </div>
                                                         </Dropdown.Menu>
                                                     </Dropdown>
@@ -3461,24 +2542,28 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
                                                             <div className="filter_items_container">
-                                                                <div className="price_filter_description">Pricing tiers determine the upholstery cost of our furniture prices. All
-                                                                    swatch samples ship free no matter the tier.
-                                                                </div>
-                                                                {sewingPrices}
+                                                                <div className="price_filter_description">Pricing tiers determine the upholstery cost of our furniture prices. All swatch samples ship free no matter the tier.</div>
+                                                                {prices[location.pathname.split('').slice(1, 3).join('')].map((obj, index) => (
+                                                                    <Dropdown.Item as={Button} key={index}>
+                                                                        <label className="dropdown_label">
+                                                                            <input type="checkbox" value={obj.value}
+                                                                                   ref={ref => (filterCheckboxes.current["prices"] = [...filterCheckboxes.current["prices"], ref])}/>
+                                                                            {obj.label}
+                                                                        </label>
+                                                                    </Dropdown.Item>
+                                                                ))}
                                                             </div>
                                                             <div className="filter_inside_button_section">
                                                                 <div className="clear_inside_filter" text="prices"
                                                                      onClick={(e) => clearFilters(e)}>{t("filter_Clear Filters")}</div>
-                                                                <Dropdown.Toggle as="div" className="done_inside_filter">{t("filter_Done")}</Dropdown.Toggle>
+                                                                <div className="done_inside_filter">{t("filter_Done")}</div>
                                                             </div>
                                                         </Dropdown.Menu>
                                                     </Dropdown>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="fabrics_list_container">
-                                            {fabricsList}
-                                        </div>
+                                        {fabricsList}
                                         <Modal dialogClassName="zoomModal" show={show} onHide={() => handleClose()}>
                                             <Modal.Header closeButton>
                                                 {zoomModalHeader}
@@ -3504,20 +2589,17 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                 <Card.Body>
                                     <div className="card_body card_body_radio">
                                         <div className="box50 radio_style">
-                                            <img src={require('../Images/drapery/zebra/mount_inside.svg').default} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/roller/mount_inside.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("mount_Inside")} value="1" name="step2" ref-num="2" id="21" checked={step2 === "Inside"}
                                                    onChange={e => {
                                                        selectChanged(e, "3AOut,3BOut,3COut,3DOut");
                                                        setStep2("Inside");
-                                                       setStep21("");
-                                                       setMeasurementsNextStep("4");
                                                        if (stepSelectedValue["3"] === "2") {
-                                                           setDeps("21", "2,3AOut,3BOut1,3BOut2,3COut,3DOut");
+                                                           setDeps("3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3", "2,3AOut,3BOut1,3BOut2,3COut,3DOut");
                                                            deleteSpecialSelects(2);
                                                            setCart("Mount", "Inside");
-                                                           setStep3("");
                                                        } else {
-                                                           setDeps("21", "2");
+                                                           setDeps("", "2");
                                                            setCart("Mount", "Inside");
                                                        }
                                                 
@@ -3525,70 +2607,23 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                             <label htmlFor="21">{t("mount_Inside")}</label>
                                         </div>
                                         <div className="box50 radio_style">
-                                            <img src={require('../Images/drapery/zebra/mount_outside.svg').default} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/roller/mount_outside.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("mount_Outside")} value="2" name="step2" ref-num="2" id="22" checked={step2 === "Outside"}
                                                    onChange={e => {
                                                        selectChanged(e, "3AIn,3BIn");
                                                        setStep2("Outside");
-                                                       setStep21("");
                                                        if (stepSelectedValue["3"] === "2") {
-                                                           setDeps("3AOut,3BOut1,3BOut2,3COut,3DOut", "2,21,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3");
+                                                           setDeps("3AOut,3BOut1,3BOut2,3COut,3DOut", "2,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3");
                                                            deleteSpecialSelects(1);
                                                            setCart("Mount", "Outside", "Width1,Width2,Width3,Height1,Height2,Height3");
                                                        } else {
-                                                           setDeps("", "2,21");
+                                                           setDeps("", "2");
                                                            setCart("Mount", "Outside", "Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
                                                        }
                                                    }} ref={ref => (inputs.current["22"] = ref)}/>
                                             <label htmlFor="22">{t("mount_Outside")}</label>
                                         </div>
-                                        {stepSelectedValue["2"] === "1" &&
-                                        <div className="secondary_options same_row_selection">
-                                            <div className="card-body-display-flex">
-                                                <div className="checkbox_style checkbox_style_step2">
-                                                    <input type="checkbox" value="1" name="step21" ref-num="21" checked={step21 === "true"} onChange={(e) => {
-                                                        if (e.target.checked) {
-                                                            selectChanged(e);
-                                                            setStep21("true");
-                                                            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                            let refIndex = inputs.current["21"].getAttribute('ref-num');
-                                                            tempLabels[refIndex] = inputs.current["21"].getAttribute('text');
-                                                            setStepSelectedLabel(tempLabels);
-                                                            if (stepSelectedValue["3"] === "2") {
-                                                                setDeps("3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3", "21");
-                                                            }
-                                                            else{
-                                                                setDeps("", "21");
-                                                            }
-                                                        } else {
-                                                            setStep21("");
-                                                            // modalHandleShow("noPower");
-                                                            
-                                                            if (stepSelectedValue["3"] === "2") {
-                                                                setStep3("");
-                                                                setDeps("21,3", "3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3");
-                                                            }
-                                                            else{
-                                                                setDeps("21", "3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3");
-                                                            }
-                                                        }
-                                                    }} id="211" ref={ref => (inputs.current["211"] = ref)}/>
-                                                    <label htmlFor="211" className="checkbox_label">
-                                                        <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
-                                                             alt=""/>
-                                                    </label>
-                                                    <span className="checkbox_text">
-                                                        {t("inside_checkbox_title")}
-                                                    </span>
-                                                </div>
-                                            
-                                            </div>
-                                        </div>
-                                        }
-                                        <NextStep eventKey="3" onClick={() => {
-                                            if (stepSelectedValue["2"] === "1" && step21 !== "true")
-                                                modalHandleShow("noInsideUnderstand");
-                                        }}>{t("NEXT STEP")}</NextStep>
+                                        <NextStep eventKey="3">{t("NEXT STEP")}</NextStep>
                                     </div>
                                     <div className="accordion_help">
                                         <div className="help_container">
@@ -3647,23 +2682,14 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                            selectUncheck(e);
                                                            modalHandleShow("noMount");
                                                            setDeps("3", "31,32");
-                                                           setCart("calcMeasurements", true, "Width,height,calcMeasurements");
+                                                           setCart("calcMeasurements", true, "Width,height");
                                                        } else if (stepSelectedValue["2"] === "1") {
-                                                           if (stepSelectedValue["2"] === "1" && step21 !== "true") {
-                                                               modalHandleShow("noInsideUnderstand");
-                                                               setStep3("");
-                                                               selectUncheck(e);
-                                                               setDeps("3", "31,32");
-                                                               setCart("calcMeasurements", true, "Width,height,calcMeasurements");
-                                                           }
-                                                           else {
-                                                               setStep3("true");
-                                                               deleteSpecialSelects(3);
-                                                               selectChanged(e);
-                                                               setMeasurementsNextStep("3A");
-                                                               setDeps("3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3", "3,3AOut,3BOut1,3BOut2,3COut,3DOut,31,32");
-                                                               setCart("calcMeasurements", true, "Width,Height,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
-                                                           }
+                                                           setStep3("true");
+                                                           deleteSpecialSelects(3);
+                                                           selectChanged(e);
+                                                           setMeasurementsNextStep("3A");
+                                                           setDeps("3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3", "3,3AOut,3BOut1,3BOut2,3COut,3DOut,31,32");
+                                                           setCart("calcMeasurements", true, "Width,Height,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
                                                        } else {
                                                            setStep3("true");
                                                            deleteSpecialSelects(3);
@@ -3692,11 +2718,11 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                         values={selectCustomValues.width}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
                                                             }, 100);
                                                         }}
                                                         dropdownRenderer={
@@ -3716,7 +2742,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                             setDeps("", "31");
                                                             setCart("Width", selected[0].value);
                                                         }}
-                                                        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
+                                                        options={SelectOptionRange(30, 300, 0.5, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -3733,11 +2759,11 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                         values={selectCustomValues.length}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
                                                             }, 100);
                                                         }}
                                                         dropdownRenderer={
@@ -3757,7 +2783,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                             setDeps("", "32");
                                                             setCart("Height", selected[0].value);
                                                         }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                        options={SelectOptionRange(30, 400, 0.5, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -3807,7 +2833,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                         </Card>
                         
                         {/* step 3A inside */}
-                        {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "1" && step21 === "true" &&
+                        {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "1" &&
                         <Card>
                             <Card.Header>
                                 <ContextAwareToggle eventKey="3A" stepNum={t("3A")} stepTitle={t("zebra_step3AInside")} stepRef="3AIn" type="2" required={requiredStep["3AIn"]}
@@ -3819,7 +2845,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                         <div className="box100">
                                             <p className="step_selection_title">{t("step3A_title")}</p>
                                             <img
-                                                src={pageLanguage === 'fa' ? require('../Images/drapery/zebra/width_inside_3_fa.svg').default : require('../Images/drapery/zebra/width_inside_3.svg').default}
+                                                src={pageLanguage === 'fa' ? require('../Images/drapery/roller/width_inside_3_fa.svg').default : require('../Images/drapery/roller/width_inside_3.svg').default}
                                                 className="img-fluid" alt=""/>
                                         </div>
                                         <div className="box100 Three_selection_container">
@@ -3835,11 +2861,11 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                         dropdownGap={0}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
                                                             }, 100);
                                                         }}
                                                         values={selectCustomValues.width1}
@@ -3862,7 +2888,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                                 setCart("Width1", selected[0].value);
                                                             }
                                                         }}
-                                                        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
+                                                        options={SelectOptionRange(30, 300, 0.5, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -3878,11 +2904,11 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                         dropdownGap={0}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
                                                             }, 100);
                                                         }}
                                                         values={selectCustomValues.width2}
@@ -3905,7 +2931,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                                 setCart("Width2", selected[0].value);
                                                             }
                                                         }}
-                                                        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
+                                                        options={SelectOptionRange(30, 300, 0.5, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -3921,11 +2947,11 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                         dropdownGap={0}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
                                                             }, 100);
                                                         }}
                                                         values={selectCustomValues.width3}
@@ -3948,7 +2974,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                                 setCart("Width3", selected[0].value);
                                                             }
                                                         }}
-                                                        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
+                                                        options={SelectOptionRange(30, 300, 0.5, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -3973,7 +2999,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                         }
                         
                         {/* step 3B inside */}
-                        {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "1" && step21 === "true" &&
+                        {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "1" &&
                         <Card>
                             <Card.Header>
                                 <ContextAwareToggle eventKey="3B" stepNum={t("3B")} stepTitle={t("zebra_step3BInside")} stepRef="3BIn" type="2" required={requiredStep["3BIn"]}
@@ -3985,7 +3011,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                         <div className="box100">
                                             <p className="step_selection_title">{t("step3B_title")}</p>
                                             <img
-                                                src={pageLanguage === 'fa' ? require('../Images/drapery/zebra/height_inside_3_fa.svg').default : require('../Images/drapery/zebra/height_inside_3.svg').default}
+                                                src={pageLanguage === 'fa' ? require('../Images/drapery/roller/height_inside_3_fa.svg').default : require('../Images/drapery/roller/height_inside_3.svg').default}
                                                 className="img-fluid" alt=""/>
                                         </div>
                                         <div className="box100 Three_selection_container">
@@ -4001,11 +3027,11 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                         dropdownGap={0}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
                                                             }, 100);
                                                         }}
                                                         values={selectCustomValues.height1}
@@ -4019,7 +3045,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                         //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                         // }
                                                         onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
+                                                            if (selected.length) {
                                                                 optionSelectChanged_three(selected[0], "3BIn", 0, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
                                                                 let temp = selectCustomValues;
                                                                 temp.height1 = selected;
@@ -4028,7 +3054,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                                 setCart("Height1", selected[0].value);
                                                             }
                                                         }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                        options={SelectOptionRange(30, 400, 0.5, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -4044,11 +3070,11 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                         dropdownGap={0}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
                                                             }, 100);
                                                         }}
                                                         values={selectCustomValues.height2}
@@ -4062,7 +3088,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                         //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                         // }
                                                         onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
+                                                            if (selected.length) {
                                                                 optionSelectChanged_three(selected[0], "3BIn", 1, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
                                                                 let temp = selectCustomValues;
                                                                 temp.height2 = selected;
@@ -4071,7 +3097,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                                 setCart("Height2", selected[0].value);
                                                             }
                                                         }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                        options={SelectOptionRange(30, 400, 0.5, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -4087,11 +3113,11 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                         dropdownGap={0}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
                                                             }, 100);
                                                         }}
                                                         values={selectCustomValues.height3}
@@ -4114,7 +3140,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                                 setCart("Height3", selected[0].value);
                                                             }
                                                         }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                        options={SelectOptionRange(30, 400, 0.5, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -4151,7 +3177,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                     <div className="card_body">
                                         <div className="box100">
                                             <p className="step_selection_title">{t("step3A_out_title")}</p>
-                                            <img src={require('../Images/drapery/zebra/FrameSize.svg').default} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/roller/FrameSize.svg').default} className="img-fluid" alt=""/>
                                         </div>
                                         <div className="box100 Three_selection_container">
                                             <div className="box100">
@@ -4166,11 +3192,11 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                         dropdownGap={0}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
                                                             }, 100);
                                                         }}
                                                         values={selectCustomValues.width3A}
@@ -4193,7 +3219,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                                 setCart("Width3A", selected[0].value);
                                                             }
                                                         }}
-                                                        options={SelectOptionRange(30, 290, 1, "cm", "", pageLanguage)}
+                                                        options={SelectOptionRange(30, 290, 0.5, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -4218,7 +3244,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                     <div className="card_body">
                                         <div className="box100">
                                             <p className="step_selection_title">{t("step3B_out_title")}</p>
-                                            <img src={require('../Images/drapery/zebra/wall_cover.svg').default} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/roller/wall_cover.svg').default} className="img-fluid" alt=""/>
                                         </div>
                                         <div className="box100 Three_selection_container dir_ltr">
                                             <div className="box50">
@@ -4233,11 +3259,11 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                         dropdownGap={0}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
                                                             }, 100);
                                                         }}
                                                         values={selectCustomValues.left}
@@ -4276,11 +3302,11 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                         dropdownGap={0}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
                                                             }, 100);
                                                         }}
                                                         values={selectCustomValues.right}
@@ -4340,7 +3366,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                     <div className="card_body">
                                         <div className="box100">
                                             <p className="step_selection_title">{t("step3C_out_title")}</p>
-                                            <img src={require('../Images/drapery/zebra/frame_height.svg').default} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/roller/frame_height.svg').default} className="img-fluid" alt=""/>
                                         </div>
                                         <div className="box100 Three_selection_container">
                                             <div className="box100">
@@ -4355,11 +3381,11 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                         dropdownGap={0}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
                                                             }, 100);
                                                         }}
                                                         values={selectCustomValues.height3C}
@@ -4382,7 +3408,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                                 setCart("Height3C", selected[0].value);
                                                             }
                                                         }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                        options={SelectOptionRange(30, 400, 0.5, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -4407,7 +3433,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                     <div className="card_body">
                                         <div className="box100">
                                             <p className="step_selection_title">{t("step3D_out_title")}</p>
-                                            <img src={require('../Images/drapery/zebra/shade_mount.svg').default} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/roller/shade_mount.svg').default} className="img-fluid" alt=""/>
                                         </div>
                                         <div className="box100 Three_selection_container">
                                             <div className="box100">
@@ -4422,11 +3448,11 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                         dropdownGap={0}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
                                                             }, 100);
                                                         }}
                                                         values={selectCustomValues.shadeMount}
@@ -4488,7 +3514,6 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                    onChange={e => {
                                                        selectChanged(e);
                                                        setStep4("Continuous Loop");
-                                                       setStep41("false");
                                                        setControlTypeNextStep("4A");
                                                        setDeps("4A,4B", "4,41,411");
                                                        setCart("ControlType", "Continuous Loop", "hasPower,MotorPosition,RemoteName,MotorChannels");
@@ -4512,57 +3537,29 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                         </div>
                                         {stepSelectedValue["4"] === "2" &&
                                         <div className="secondary_options same_row_selection">
-                                            {/*<hr/>*/}
-                                            {/*<p className="no_power_title">{t("Motor_title")}</p>*/}
+                                            <hr/>
+                                            <p className="no_power_title">{t("Motor_title")}</p>
                                             <div className="card-body-display-flex">
-                                                {/*<div className="box50 radio_style">*/}
-                                                {/*    <input className="radio" type="radio" text={t("Yes")} value="1" name="step41" ref-num="41" id="411" checked={step41 === "true"}*/}
-                                                {/*           onChange={e => {*/}
-                                                {/*               selectChanged(e);*/}
-                                                {/*               setStep41("true");*/}
-                                                {/*               setDeps("411", "41");*/}
-                                                {/*               setCart("hasPower", true, "", "MotorChannels", [selectedMotorChannels.map(obj => obj.value)]);*/}
-                                                {/*           }} ref={ref => (inputs.current["411"] = ref)}/>*/}
-                                                {/*    <label htmlFor="411">{t("Yes")}</label>*/}
-                                                {/*</div>*/}
-                                                {/*<div className="box50 radio_style">*/}
-                                                {/*    <input className="radio" type="radio" text={t("No")} value="2" name="step41" ref-num="41" id="412"*/}
-                                                {/*           onClick={e => {*/}
-                                                {/*               selectUncheck(e);*/}
-                                                {/*               setStep41("");*/}
-                                                {/*               modalHandleShow("noPower");*/}
-                                                {/*               setDeps("41", "411");*/}
-                                                {/*           }} ref={ref => (inputs.current["412"] = ref)}/>*/}
-                                                {/*    <label htmlFor="412">{t("No")}</label>*/}
-                                                {/*</div>*/}
-                                                <div className="width_max checkbox_style">
-                                                    <input type="checkbox" value="1" name="step41" ref-num="41" checked={step41 === "true"} onChange={(e) => {
-                                                        if (e.target.checked) {
-                                                            selectChanged(e);
-                                                            setStep41("true");
-                                                            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                            let refIndex = inputs.current["42"].getAttribute('ref-num');
-                                                            tempLabels[refIndex] = inputs.current["42"].getAttribute('text');
-                                                            setStepSelectedLabel(tempLabels);
-                                                            setSelectedMotorPosition([]);
-                                                            setDeps("411", "41");
-                                                            setCart("hasPower", true, "", "MotorChannels", [selectedMotorChannels.map(obj => obj.value)]);
-                                                        } else {
-                                                            selectUncheck(e);
-                                                            setStep41("");
-                                                            // modalHandleShow("noPower");
-                                                            setDeps("41", "411");
-                                                        }
-                                                    }} id="411" ref={ref => (inputs.current["411"] = ref)}/>
-                                                    <label htmlFor="411" className="checkbox_label">
-                                                        <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
-                                                             alt=""/>
-                                                    </label>
-                                                    <span className="checkbox_text">
-                                                        {t("Motor_title")}
-                                                    </span>
+                                                <div className="box50 radio_style">
+                                                    <input className="radio" type="radio" text={t("Yes")} value="1" name="step41" ref-num="41" id="411" checked={step41 === "true"}
+                                                           onChange={e => {
+                                                               selectChanged(e);
+                                                               setStep41("true");
+                                                               setDeps("411", "41");
+                                                               setCart("hasPower", true, "", "MotorChannels", [selectedMotorChannels.map(obj => obj.value)]);
+                                                           }} ref={ref => (inputs.current["411"] = ref)}/>
+                                                    <label htmlFor="411">{t("Yes")}</label>
                                                 </div>
-                                            
+                                                <div className="box50 radio_style">
+                                                    <input className="radio" type="radio" text={t("No")} value="2" name="step41" ref-num="41" id="412"
+                                                           onClick={e => {
+                                                               selectUncheck(e);
+                                                               setStep41("");
+                                                               modalHandleShow("noPower");
+                                                               setDeps("41", "411");
+                                                           }} ref={ref => (inputs.current["412"] = ref)}/>
+                                                    <label htmlFor="412">{t("No")}</label>
+                                                </div>
                                             </div>
                                         </div>
                                         }
@@ -4585,11 +3582,11 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                         values={selectedMotorPosition}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
                                                             }, 100);
                                                         }}
                                                         dropdownRenderer={
@@ -4642,11 +3639,11 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                         values={selectedMotorChannels}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
                                                             }, 100);
                                                         }}
                                                         dropdownRenderer={
@@ -4687,7 +3684,6 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                 <p className="help_column_header">{t("step4_help_4")}</p>
                                                 <ul className="help_column_list">
                                                     <li>{t("step4_help_5")}</li>
-                                                    <li>{t("step4_help_5.5")}</li>
                                                     <li>{t("step4_help_6")}</li>
                                                 </ul>
                                             </div>
@@ -4707,9 +3703,9 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                             </Card.Header>
                             <Accordion.Collapse eventKey="4A">
                                 <Card.Body>
-                                    <div className="card_body card_body_radio special_farsi_card_body">
+                                    <div className="card_body card_body_radio">
                                         <div className="box50 radio_style">
-                                            <img src={require('../Images/drapery/zebra/position_left.svg').default} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/roller/position_left.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("Left")} value="1" name="step4A" ref-num="4A" id="4A1" checked={step4A === "Left"}
                                                    onChange={e => {
                                                        selectChanged(e);
@@ -4720,7 +3716,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                             <label htmlFor="4A1">{t("Left")}</label>
                                         </div>
                                         <div className="box50 radio_style">
-                                            <img src={require('../Images/drapery/zebra/position_right.svg').default} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/roller/position_right.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("Right")} value="2" name="step4A"
                                                    ref-num="4A" id="4A2" checked={step4A === "Right"}
                                                    onChange={e => {
@@ -4804,7 +3800,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                             </Accordion.Collapse>
                         </Card>
                         }
-    
+                        
                         {/* step 5 */}
                         <Card>
                             <Card.Header>
@@ -4977,7 +3973,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                 </Card.Body>
                             </Accordion.Collapse>
                         </Card>
-    
+                        
                         {/* step 5A */}
                         {stepSelectedValue["5"] === "1" &&
                         <Card>
@@ -5102,7 +4098,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                             </Accordion.Collapse>
                         </Card>
                         }
-    
+                        
                         {/* step 5B */}
                         {stepSelectedValue["5"] === "1" &&
                         <Card>
@@ -5143,7 +4139,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                             </Accordion.Collapse>
                         </Card>
                         }
-    
+                        
                         {/* step 5C */}
                         {stepSelectedValue["5"] === "1" &&
                         <Card>
@@ -5242,7 +4238,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                             </Accordion.Collapse>
                         </Card>
                         }
-    
+                        
                         {/* step 6 */}
                         <Card>
                             <Card.Header>
@@ -5328,7 +4324,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                 </Card.Body>
                             </Accordion.Collapse>
                         </Card>
-    
+                        
                         {/* step 6A */}
                         {stepSelectedValue["6"] === "1" &&
                         <Card>
@@ -5441,7 +4437,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                             </Accordion.Collapse>
                         </Card>
                         }
-    
+                        
                         {/* step 7 */}
                         <Card>
                             <Card.Header>
@@ -5606,25 +4602,6 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                 {/*</Modal.Footer>*/}
             </Modal>
             
-            <Modal dialogClassName={`noInsideUnderstand_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
-                   show={modals["noInsideUnderstand"] === undefined ? false : modals["noInsideUnderstand"]}
-                   onHide={() => modalHandleClose(" noInsideUnderstand")}>
-                <Modal.Header closeButton>
-                    {/*<Modal.Title>Modal heading</Modal.Title>*/}
-                </Modal.Header>
-                <Modal.Body>
-                    <p>{t("modal_select_mount")}</p>
-                    
-                    {/*<br/>*/}
-                    {/*<div className=" text_center">*/}
-                    {/*    <button className=" btn btn-new-dark" onClick={() => modalHandleClose(" noMount")}>{t("CONTINUE")}</button>*/}
-                    {/*</div>*/}
-                </Modal.Body>
-                {/*<Modal.Footer>*/}
-                {/*    */}
-                {/*</Modal.Footer>*/}
-            </Modal>
-            
             <Modal dialogClassName={`noMount_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["noMount"] === undefined ? false : modals["noMount"]}
                    onHide={() => modalHandleClose(" noMount")}>
@@ -5667,7 +4644,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
             
             <Modal backdrop="static" keyboard={false} dialogClassName={`measurementsHelp_modal largeSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["measurementsHelp"] === undefined ? false : modals["measurementsHelp"]}
-                   onHide={() => modalHandleClose("measurementsHelp")} scrollable={true}>
+                   onHide={() => modalHandleClose("measurementsHelp")}>
                 <Modal.Header closeButton>
                     {/*<Modal.Title>Modal heading</Modal.Title>*/}
                 </Modal.Header>
@@ -5676,7 +4653,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                         <p className="measurementsHelp_modal_title">{t("HOW TO MEASURE FOR ZEBRA SHADES")}</p>
                         <p className="measurementsHelp_modal_img_title">{t("Inside Mount")}</p>
                         <object className="measurementsHelp_modal_img" type="image/svg+xml"
-                                data={pageLanguage === 'fa' ? require('../Images/drapery/zebra/step3_help_inside_fa.svg').default : require('../Images/drapery/zebra/step3_help_inside.svg').default}/>
+                                data={pageLanguage === 'fa' ? require('../Images/drapery/roller/step3_help_inside_fa.svg').default : require('../Images/drapery/roller/step3_help_inside.svg').default}/>
                     </div>
                     <div className="accordion_help measurementsHelp_modal_help_section">
                         <div className="help_container">
@@ -5685,7 +4662,6 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                 <ul className="help_column_list">
                                     <li>{t("modal_help_1")}</li>
                                     <li>{t("modal_help_2")}</li>
-                                    <li>{t("modal_help_2.5")}</li>
                                     <li>{t("modal_help_3")}</li>
                                 </ul>
                             </div>
@@ -5725,7 +4701,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                     <div className="measurementsHelp_modal_img_section">
                         <p className="measurementsHelp_modal_img_title">{t("Outside Mount")}</p>
                         <object className="measurementsHelp_modal_img" type="image/svg+xml"
-                                data={pageLanguage === 'fa' ? require('../Images/drapery/zebra/step3_help_outside_fa.svg').default : require('../Images/drapery/zebra/step3_help_outside.svg').default}/>
+                                data={pageLanguage === 'fa' ? require('../Images/drapery/roller/step3_help_outside_fa.svg').default : require('../Images/drapery/roller/step3_help_outside.svg').default}/>
                     </div>
                     <div className="accordion_help measurementsHelp_modal_help_section">
                         <div className="help_container">
@@ -5762,12 +4738,89 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                 </Modal.Body>
             </Modal>
             
+            <Modal backdrop="static" keyboard={false} dialogClassName={`measurementsHelp_modal largeSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                   show={modals["headrailHelp"] === undefined ? false : modals["headrailHelp"]}
+                   onHide={() => modalHandleClose("headrailHelp")}>
+                <Modal.Header closeButton>
+                    {/*<Modal.Title>Modal heading</Modal.Title>*/}
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="largeSizeModal_modal_body_container">
+                        <div className="accordion_help help_largeSizeModal_modal">
+                            <p className="help_column_header">{t("headrailHelp1")}</p>
+                            <div className="largeSizeModal_img_plus_help">
+                                <img src={require('../Images/drapery/roller/roller_help_NoValance.jpg')} className="img-fluid" alt=""/>
+                                <div className="help_container">
+                                    <div className="help_column help_left_column">
+                                        <ul className="help_column_list">
+                                            <li>{t("headrailHelp2")}</li>
+                                            <li>{t("headrailHelp3")}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="accordion_help help_largeSizeModal_modal">
+                            <p className="help_column_header">{t("headrailHelp4")}</p>
+                            <div className="largeSizeModal_img_plus_help">
+                                <img src={require('../Images/drapery/roller/roller_help_MetalValance.jpg')} className="img-fluid" alt=""/>
+                                <div className="help_container">
+                                    <div className="help_column help_left_column">
+                                        <ul className="help_column_list">
+                                            <li>{t("headrailHelp5")}</li>
+                                            <li>{t("headrailHelp6")}</li>
+                                            <li>{t("headrailHelp7")}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="largeSizeModal_modal_body_container">
+                        <div className="accordion_help help_largeSizeModal_modal">
+                            <p className="help_column_header">{t("headrailHelp8")}</p>
+                            <div className="largeSizeModal_img_plus_help">
+                                <img src={require('../Images/drapery/roller/roller_help_MetalValance.jpg')} className="img-fluid" alt=""/>
+                                <div className="help_container">
+                                    <div className="help_column help_left_column">
+                                        <ul className="help_column_list">
+                                            <li>{t("headrailHelp9")}</li>
+                                            <li>{t("headrailHelp10")}</li>
+                                            <li>{t("headrailHelp11")}</li>
+                                            <li>{t("headrailHelp12")}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="accordion_help help_largeSizeModal_modal">
+                            <p className="help_column_header">{t("headrailHelp13")}</p>
+                            <div className="largeSizeModal_img_plus_help">
+                                <img src={require('../Images/drapery/roller/roller_help_UphosteredValance.jpg')} className="img-fluid" alt=""/>
+                                <div className="help_container">
+                                    <div className="help_column help_left_column">
+                                        <ul className="help_column_list">
+                                            <li>{t("headrailHelp14")}</li>
+                                            <li>{t("headrailHelp15")}</li>
+                                            <li>{t("headrailHelp16")}</li>
+                                            <li>{t("headrailHelp17")}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br/>
+                    <div className="text_center">
+                        <button className="btn btn-new-dark" onClick={() => modalHandleClose("headrailHelp")}>{t("CONTINUE")}</button>
+                    </div>
+                </Modal.Body>
+            </Modal>
+            
             <Modal dialogClassName={`upload_modal uploadImg_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["uploadImg"] === undefined ? false : modals["uploadImg"]}
                    onHide={() => {
-                       setSelectedFile(undefined);
-                       setSelectedFileName("");
-                       setEditedFileName("");
                        modalHandleClose(" uploadImg");
                        setDetailsShow(false)
                    }}>
@@ -5775,83 +4828,37 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                     {/*<Modal.Title>Modal heading</Modal.Title>*/}
                 </Modal.Header>
                 <Modal.Body>
-                    <div onDragOver={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                    }}
-                         onDrop={(e) => {
-                             e.preventDefault();
-                             e.stopPropagation();
-                        
-                             const {files} = e.dataTransfer;
-                        
-                             if (files && files.length && (files[0].type === "image/jpg" || files[0].type === "image/jpeg" || files[0].type === "image/png")) {
-                                 uploadImg(files[0]);
-                             } else {
-                                 setSelectedFile(undefined);
-                                 setSelectedFileName("");
-                             }
-                         }}>
-                        <h2>Upload Your Image</h2>
-                        <p className="file_size_description">Your image size must be smaller than 5MB. Acceptable formats:<br/> .gif, .jpg, or .png file.</p>
-                        <div className="controls">
-                            <div className="modal_upload_section">
-                                <div className="modal_upload_item">
-                                    <label htmlFor="image-upload-btn" className="btn btn-new-gray file-upload-btn">
-                                        Choose File
-                                        <input type="file" className="custom-file file-upload" id="image-upload-btn" name="file" accept="image/png,image/jpeg,image/jpg"
-                                               onChange={(e) => {
-                                                   if (e.target.files && e.target.files.length) {
-                                                       uploadImg(e.target.files[0]);
-                                                   } else {
-                                                       setSelectedFile(undefined);
-                                                       setSelectedFileName("");
-                                                   }
-                                               }}
-                                               onDragOver={(e) => {
-                                                   e.preventDefault();
-                                                   e.stopPropagation();
-                                               }}
-                                               onDrop={(e) => {
-                                                   e.preventDefault();
-                                                   e.stopPropagation();
-                                            
-                                                   const {files} = e.dataTransfer;
-                                            
-                                                   if (files && files.length && (files[0].type === "image/jpg" || files[0].type === "image/jpeg" || files[0].type === "image/png")) {
-                                                       uploadImg(files[0]);
-                                                   } else {
-                                                       setSelectedFile(undefined);
-                                                       setSelectedFileName("");
-                                                   }
-                                               }}
-                                        />
-                                    </label>
-                                    <div className="file-name file-upload-btn">{selectedFileName === "" ? "No File Chosen" : selectedFileName}</div>
-                                </div>
-                                <div className="modal_upload_item">
-                                    <input className="file_name_text" type="text" value={editedFileName} onChange={(e) => setEditedFileName(e.target.value)}
-                                           placeholder="Image Name"/>
-                                </div>
+                    <h2>Upload Your Image</h2>
+                    <p className="file_size_description">Your image size must be smaller than 5MB. Acceptable formats:<br/> .gif, .jpg, or .png file.</p>
+                    <div className="controls">
+                        <div className="modal_upload_section">
+                            <div className="modal_upload_item">
+                                <label htmlFor="image-upload-btn" className="btn btn-new-gray file-upload-btn">
+                                    Choose File
+                                    <input type="file" className="custom-file file-upload" name="file" id="image-upload-btn" accept="image/png,image/jpeg,image/jpg"/>
+                                </label>
+                                <div className="file-name file-upload-btn">No File Chosen</div>
                             </div>
-                        </div>
-                        <div className="controls">
-                            <div className="modal_button_section">
-                                <button className="btn btn-new-gray" onClick={() => {
-                                    setSelectedFile(undefined);
-                                    setSelectedFileName("");
-                                    setEditedFileName("");
-                                    modalHandleClose("uploadImg");
-                                    setDetailsShow(false)
-                                }}>Cancel
-                                </button>
-                                <div className="btn btn-new-dark image_submit file-upload-btn btn-disabled" onClick={() => {
-                                    submitUploadedFile(2);
-                                }} disabled={selectedFileName === "" || isUploading}>{isUploading ? t("UPLOADING...") : t("Upload Image")}
-                                </div>
+                            <div className="modal_upload_item">
+                                <input className="file_name_text" type="text" name="file_title" placeholder="Image Name"/>
                             </div>
                         </div>
                     </div>
+                    <div className="controls">
+                        <div className="modal_button_section">
+                            <button className="btn btn-new-gray" onClick={() => {
+                                modalHandleClose(" uploadImg");
+                                setDetailsShow(false)
+                            }}>Cancel
+                            </button>
+                            <div className="btn btn-new-dark image_submit file-upload-btn btn-disabled" onClick={() => {
+                                modalHandleClose(" uploadImg");
+                                setDetailsShow(false)
+                            }}>Upload Image
+                            </div>
+                        </div>
+                    </div>
+                
                 </Modal.Body>
                 {/*<Modal.Footer>*/}
                 {/*    */}
@@ -5868,82 +4875,37 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                     {/*<Modal.Title>Modal heading</Modal.Title>*/}
                 </Modal.Header>
                 <Modal.Body>
-                    <div onDragOver={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                    }}
-                         onDrop={(e) => {
-                             e.preventDefault();
-                             e.stopPropagation();
-                        
-                             const {files} = e.dataTransfer;
-                        
-                             if (files && files.length && files[0].type === "application/pdf") {
-                                 uploadImg(files[0]);
-                             } else {
-                                 setSelectedFile(undefined);
-                                 setSelectedFileName("");
-                             }
-                         }}>
-                        <h2>Upload Your PDF</h2>
-                        <p className="file_size_description">Your pdf size must be smaller than 5MB.</p>
-                        <div className="controls">
-                            <div className="modal_upload_section">
-                                <div className="modal_upload_item">
-                                    <label htmlFor="file-upload-btn" className="btn btn-new-gray file-upload-btn">
-                                        Choose File
-                                        <input type="file" className="custom-file file-upload" name="file" id="file-upload-btn" accept="application/pdf"
-                                               onChange={(e) => {
-                                                   if (e.target.files && e.target.files.length) {
-                                                       uploadImg(e.target.files[0]);
-                                                   } else {
-                                                       setSelectedFile(undefined);
-                                                       setSelectedFileName("");
-                                                   }
-                                               }}
-                                               onDragOver={(e) => {
-                                                   e.preventDefault();
-                                                   e.stopPropagation();
-                                               }}
-                                               onDrop={(e) => {
-                                                   e.preventDefault();
-                                                   e.stopPropagation();
-                                            
-                                                   const {files} = e.dataTransfer;
-                                            
-                                                   if (files && files.length && files[0].type === "application/pdf") {
-                                                       uploadImg(files[0]);
-                                                   } else {
-                                                       setSelectedFile(undefined);
-                                                       setSelectedFileName("");
-                                                   }
-                                               }}/>
-                                    </label>
-                                    <div className="file-name file-upload-btn">{selectedFileName === "" ? "No File Chosen" : selectedFileName}</div>
-                                </div>
-                                <div className="modal_upload_item">
-                                    <input className="file_name_text" type="text" value={editedFileName} onChange={(e) => setEditedFileName(e.target.value)}
-                                           placeholder="PDF Name"/>
-                                </div>
+                    <h2>Upload Your PDF</h2>
+                    <p className="file_size_description">Your pdf size must be smaller than 5MB.</p>
+                    <div className="controls">
+                        <div className="modal_upload_section">
+                            <div className="modal_upload_item">
+                                <label htmlFor="file-upload-btn" className="btn btn-new-gray file-upload-btn">
+                                    Choose File
+                                    <input type="file" className="custom-file file-upload" name="file" id="file-upload-btn" accept="image/png,image/jpeg,image/jpg"/>
+                                </label>
+                                <div className="file-name file-upload-btn">No File Chosen</div>
                             </div>
-                        </div>
-                        <div className="controls">
-                            <div className="modal_button_section">
-                                <button className="btn btn-new-gray" onClick={() => {
-                                    setSelectedFile(undefined);
-                                    setSelectedFileName("");
-                                    setEditedFileName("");
-                                    modalHandleClose("uploadPdf");
-                                    setDetailsShow(false)
-                                }}>Cancel
-                                </button>
-                                <div className="btn btn-new-dark image_submit file-upload-btn btn-disabled" onClick={() => {
-                                    submitUploadedFile(1);
-                                }} disabled={selectedFileName === "" || isUploading}>{isUploading ? t("UPLOADING...") : t("Upload PDF")}
-                                </div>
+                            <div className="modal_upload_item">
+                                <input className="file_name_text" type="text" name="file_title" placeholder="PDF Name"/>
                             </div>
                         </div>
                     </div>
+                    <div className="controls">
+                        <div className="modal_button_section">
+                            <button className="btn btn-new-gray" onClick={() => {
+                                modalHandleClose(" uploadPdf");
+                                setDetailsShow(false)
+                            }}>Cancel
+                            </button>
+                            <div className="btn btn-new-dark image_submit file-upload-btn btn-disabled" onClick={() => {
+                                modalHandleClose(" uploadPdf");
+                                setDetailsShow(false)
+                            }}>Upload PDF
+                            </div>
+                        </div>
+                    </div>
+                
                 </Modal.Body>
                 {/*<Modal.Footer>*/}
                 {/*    */}
@@ -5953,11 +4915,11 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
             <Modal backdrop="static" keyboard={false} dialogClassName={`warning_modal bigSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["widthDifferent"] === undefined ? false : modals["widthDifferent"]}
                    onHide={() => {
-                       modalHandleClose("widthDifferent");
+                       modalHandleClose(" widthDifferent");
                    }}>
                 <Modal.Header>
-                    {/*<div className="required"/>*/}
-                    <p>{t("WIDTH DISCREPANCIES")}</p>
+                    <div className="required"/>
+                    <p>Confirm Width Discrepancies</p>
                 </Modal.Header>
                 <Modal.Body>
                     <p>We noticed that there’s quite a difference in some of your measurements, and this could affect the fit of your custom shades.</p>
@@ -5983,7 +4945,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                             setStepSelectedLabel(tempLabels);
                         }}>CHANGE MEASUREMENTS
                         </button>
-                        <button className="btn white_btn" onClick={() => {
+                        <button className="btn btn-danger" onClick={() => {
                             modalHandleClose("widthDifferent");
                             setAccordionActiveKey("3B");
                         }}>I AGREE, CONTINUE ANYWAY
@@ -6028,8 +4990,8 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                        modalHandleClose(" heightDifferent");
                    }}>
                 <Modal.Header>
-                    {/*<div className="required"/>*/}
-                    <p>{t("HEIGHT DISCREPANCIES")}</p>
+                    <div className="required"/>
+                    <p>Confirm Height Discrepancies</p>
                 </Modal.Header>
                 <Modal.Body>
                     <p>We noticed that there’s quite a difference in some of your measurements, and this could affect the fit of your custom shades.</p>
@@ -6055,7 +5017,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                             setStepSelectedLabel(tempLabels);
                         }}>CHANGE MEASUREMENTS
                         </button>
-                        <button className="btn white_btn" onClick={() => {
+                        <button className="btn btn-danger" onClick={() => {
                             modalHandleClose("heightDifferent");
                             setAccordionActiveKey("4");
                         }}>I AGREE, CONTINUE ANYWAY
@@ -6100,45 +5062,24 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                     }
                     
                     {!cartStateAgree &&
-                    <h1 className="cart_agree_title1">{t("REVIEW ORDER")}</h1>
+                    <h1 className="cart_agree_title1">{t("SPECIAL ORDER")}</h1>
                     }
                     {!cartStateAgree &&
                     <h2 className="cart_agree_title2">{t("TERMS OF SALE")}</h2>
                     }
                     {!cartStateAgree &&
+                    <span className="cart_agree_desc">{t("cart_agree_desc")}<p
+                        className="return_policy">{t("Return Policy")}</p>.</span>
+                    }
+                    {!cartStateAgree &&
                     <div>{cartAgree}</div>
                     }
-                    {!cartStateAgree &&
-                    <span className="cart_agree_desc">
-                        <div className="checkbox_style">
-                            <input type="checkbox" checked={cartAgreeDescription} onChange={(e) => {
-                                setCartAgreeDescription(e.target.checked);
-                            }} id="cartAgreeDescription"/>
-                            <label htmlFor="cartAgreeDescription" className="checkbox_label">
-                                <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
-                                     alt=""/>
-                            </label>
-                            <span className="checkbox_text">
-                                {t("cart_agree_desc")}
-                                <p className="return_policy">{t("Return Policy")}</p>.
-                            </span>
-                        </div>
-                    </span>
-                    }
-                    {!cartStateAgree &&
-                    <div className="go_to_checkout">
-                        <button className="basket_checkout" onClick={() => {
-                            setAddingLoading(true);
-                            addToCart_agreed();
-                        }} disabled={addingLoading || !cartAgreeDescription}>{addingLoading ? t("ADDING...") : t("AGREE & ADD TO BAG")}
-                        </button>
-                    </div>
-                    }
+                
                 </Modal.Body>
                 <Modal.Footer>
                     {cartStateAgree &&
                     <div className="go_to_checkout">
-                        <div className="checkout_button_section small_checkout_button_section">
+                        <div className="checkout_button_section">
                             <span className="checkout_payment_price_detail payment_price_detail">
                                 <h3>{t("SUBTOTAL")}</h3>
                                 <h4>{GetPrice(totalCartPrice, pageLanguage, t("TOMANS"))}</h4>
@@ -6147,6 +5088,14 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                 setCartStateAgree(false);
                             }}>{t("CHECKOUT")}</Link>
                         </div>
+                    </div>
+                    }
+                    {!cartStateAgree &&
+                    <div className="go_to_checkout">
+                        <button className="basket_checkout" onClick={() => {
+                            addToCart_agreed();
+                        }}>{t("AGREE & ADD TO BAG")}
+                        </button>
                     </div>
                     }
                 </Modal.Footer>
@@ -6179,11 +5128,11 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                         values={selectedRoomLabel}
                                         // onDropdownOpen={() => {
                                         //     let temp1 = window.scrollY;
-                                        //     window.scrollTo(window.scrollX, window.scrollY + 1);
+                                        //     window.scrollTo(window.scrollX, window.scrollY + 0.5);
                                         //     setTimeout(() => {
                                         //         let temp2 = window.scrollY;
                                         //         if (temp2 === temp1)
-                                        //             window.scrollTo(window.scrollX, window.scrollY - 1);
+                                        //             window.scrollTo(window.scrollX, window.scrollY - 0.5);
                                         //     }, 100);
                                         // }}
                                         dropdownRenderer={
@@ -6225,45 +5174,32 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                         <button className="save_item_btn btn-new-dark"
                                 onClick={() => {
                                     if (roomLabelText !== "" && selectedRoomLabel.length) {
-                                        setSavingLoading(true);
                                         if (projectId && projectId !== "") {
-                                            SaveUserProject(depSet, cartValues, [uploadedImagesFile, uploadedImagesURL, uploadedPDFFile, uploadedPDFURL], `${modelID}`, price, defaultModelName, defaultModelNameFa, projectData).then((temp) => {
-                                                if (temp === 401) {
-                                                    setSaveProjectCount(saveProjectCount + 1);
-                                                } else if (temp) {
+                                            SaveUserProject(depSet, cartValues, `${modelID}`, price, defaultModelName, defaultModelNameFa, projectData).then((temp) => {
+                                                if (temp) {
                                                     modalHandleShow("add_to_project_modal");
                                                     setProjectModalState(1);
-                                                    setSavingLoading(false);
                                                 } else {
                                                     console.log("project not saved!");
-                                                    setSavingLoading(false);
                                                 }
                                             }).catch(() => {
-                                                // console.log("hi4");
                                                 setProjectModalState(2);
-                                                setSavingLoading(false);
                                             });
                                         } else {
-                                            SaveUserProject(depSet, cartValues, [uploadedImagesFile, uploadedImagesURL, uploadedPDFFile, uploadedPDFURL], `${modelID}`, price, defaultModelName, defaultModelNameFa).then((temp) => {
-                                                if (temp === 401) {
-                                                    setSaveProjectCount(saveProjectCount + 1);
-                                                } else if (temp) {
+                                            SaveUserProject(depSet, cartValues, `${modelID}`, price, defaultModelName, defaultModelNameFa).then((temp) => {
+                                                if (temp) {
                                                     setProjectModalState(1);
-                                                    setSavingLoading(false);
                                                 } else {
                                                     console.log("project not saved!");
-                                                    setSavingLoading(false);
                                                 }
-                                            }).catch((err) => {
-                                                // console.log("hi3",);
+                                            }).catch(() => {
                                                 setProjectModalState(2);
-                                                setSavingLoading(false);
                                             });
                                         }
                                     } else {
                                         setProjectModalState(0);
                                     }
-                                }} disabled={savingLoading}>{savingLoading ? t("SAVING...") : t("SAVE ITEM")}
+                                }}>{t("SAVE ITEM")}
                         </button>
                         }
                     </div>
@@ -6282,6 +5218,8 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                     {projectModalState === 2 &&
                     <ModalLogin/>
                     }
+                
+                
                 </Modal.Body>
             </Modal>
             
@@ -6322,50 +5260,36 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                     <div className="left_footer">
                         <button className="save_to_acc" onClick={() => {
                             if (roomLabelText !== "" && selectedRoomLabel.length) {
-                                setSavingLoading(true);
                                 if (projectId && projectId !== "") {
-                                    SaveUserProject(depSet, cartValues, [uploadedImagesFile, uploadedImagesURL, uploadedPDFFile, uploadedPDFURL], `${modelID}`, price, defaultModelName, defaultModelNameFa, projectData).then((temp) => {
-                                        if (temp === 401) {
-                                            setSaveProjectCount(saveProjectCount + 1);
-                                        } else if (temp) {
+                                    SaveUserProject(depSet, cartValues, `${modelID}`, price, defaultModelName, defaultModelNameFa, projectData).then((temp) => {
+                                        if (temp) {
                                             modalHandleShow("add_to_project_modal");
                                             setProjectModalState(1);
-                                            setSavingLoading(false);
                                         } else {
                                             console.log("project not saved!");
-                                            setSavingLoading(false);
                                         }
                                     }).catch(() => {
-                                        // console.log("hi2");
                                         setProjectModalState(2);
-                                        modalHandleShow("add_to_project_modal");
-                                        setSavingLoading(false);
+                                        modalHandleShow("add_to_project_modal")
                                     });
                                 } else {
-                                    SaveUserProject(depSet, cartValues, [uploadedImagesFile, uploadedImagesURL, uploadedPDFFile, uploadedPDFURL], `${modelID}`, price, defaultModelName, defaultModelNameFa).then((temp) => {
-                                        if (temp === 401) {
-                                            console.log("hi1");
-                                            setSaveProjectCount(saveProjectCount + 1);
-                                        } else if (temp) {
+                                    SaveUserProject(depSet, cartValues, `${modelID}`, price, defaultModelName, defaultModelNameFa).then((temp) => {
+                                        if (temp) {
                                             modalHandleShow("add_to_project_modal");
                                             setProjectModalState(1);
-                                            setSavingLoading(false);
                                         } else {
                                             console.log("project not saved!");
-                                            setSavingLoading(false);
                                         }
                                     }).catch(() => {
-                                        // console.log("hi1");
                                         setProjectModalState(2);
-                                        modalHandleShow("add_to_project_modal");
-                                        setSavingLoading(false);
+                                        modalHandleShow("add_to_project_modal")
                                     });
                                 }
                             } else {
                                 setProjectModalState(0);
                                 modalHandleShow("add_to_project_modal");
                             }
-                        }} disabled={savingLoading}>{savingLoading ? t("SAVING...") : t("footer_Save To")}<br/>{savingLoading ? "" : t("footer_My Account")}</button>
+                        }}>{t("footer_Save To")}<br/>{t("footer_My Account")}</button>
                     </div>
                     <div className="hidden_inner_footer">&nbsp;</div>
                     <div className="footer_price_section">
@@ -6373,11 +5297,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                         <div className="price">{GetPrice(price, pageLanguage, t("TOMANS"))}</div>
                     </div>
                     <div className="right_footer">
-                        <input type="submit" onClick={() => {
-                            setAddingLoading(true);
-                            addToCart();
-                        }} className="btn add_to_cart" disabled={addingLoading} value={addingLoading ? t("ADDING...") : t("footer_Add" +
-                            " To Cart")} readOnly/>
+                        <input type="submit" onClick={() => addToCart()} className="btn add_to_cart" value={t("footer_Add To Cart")} readOnly/>
                     </div>
                 </div>
             </div>
@@ -6385,4 +5305,4 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
     );
 }
 
-export default Roller;
+export default Roller_Old;
