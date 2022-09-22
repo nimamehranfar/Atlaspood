@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
-import {Link, useLocation, useNavigate} from "react-router-dom";
+import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 import Breadcrumb from "react-bootstrap/Breadcrumb";
 import {func} from "prop-types";
 import axios from "axios";
@@ -41,6 +41,7 @@ const baseURLDeleteDiscount = "https://api.atlaspood.ir/Cart/DeleteDiscountCode"
 function Checkout() {
     const {t, i18n} = useTranslation();
     const location = useLocation();
+    const {swatchOnly} = useParams();
     const [pageLanguage, setPageLanguage] = React.useState(location.pathname.split('').slice(1, 3).join(''));
     const {isLoggedIn, isRegistered, user, showLogin} = useSelector((state) => state.auth);
     let navigate = useNavigate();
@@ -552,11 +553,30 @@ function Checkout() {
     useEffect(() => {
         if (Object.keys(cart).length !== 0) {
             if (isLoggedIn) {
+                if (swatchOnly === undefined) {
+                let draperies = cart["CartDetails"].filter((object1) => {
+                    return object1["TypeId"] === 6403;
+                });
+    
+                let swatches = cart["CartDetails"].filter((object1) => {
+                    return object1["TypeId"] === 6402;
+                });
                 setTotalPrice(cart["TotalAmount"]);
-                setDrapery(cart["CartDetails"]);
+                setDrapery(draperies);
+                setDraperyCount(draperies.length);
+                setSwatches(swatches);
+                setSwatchesCount(swatches.length);
                 setDiscounts(cart["DiscountCodes"]);
-                setDraperyCount(cart["CartDetails"].length);
-                // console.log(cart["CartDetails"].length);
+                } else if (swatchOnly && swatchOnly === "Swatches") {
+                    let swatches = cart["CartDetails"].filter((object1) => {
+                        return object1["TypeId"] === 6402;
+                    });
+                    setSwatches(swatches);
+                    setSwatchesCount(swatches.length);
+                    setDiscounts(cart["DiscountCodes"]);
+                } else {
+                    navigate("/" + pageLanguage);
+                }
             } else {
                 if (cart["drapery"] === undefined || cart["drapery"] === []) {
                     setDrapery([]);
@@ -906,13 +926,55 @@ function Checkout() {
     }, [drapery]);
     
     useEffect(() => {
+        if (isLoggedIn) {
+            let temp = [];
+            let tempTotal = 0;
+            let promise2 = new Promise((resolve, reject) => {
+                for (let i = 0; i < swatches.length; i++) {
+                    let obj = swatches[i];
+                    let CartDetailId = obj["CartDetailId"];
+                    let ProductName = obj["ProductName"];
+                    let ProductEnName = obj["ProductEnName"];
+                    let photoUrl = obj["PhotoUrl"];
+                    let price = obj["TotalAmount"];
+                    let count = obj["Count"];
+                    tempTotal += price;
+    
+                    temp[i] =
+                        <li className="checkout_item_container" key={i}>
+                            <div className="checkout_item_image_container">
+                                <img src={`https://api.atlaspood.ir/${photoUrl}`} alt="" className="checkout_item_img"/>
+                                <p className="checkout_item_image_qty">{pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${count}`) : count}</p>
+                            </div>
+                            <div className="checkout_item_desc_container">
+                                <div className="checkout_item">
+                                    <h1 className="checkout_item_name">{pageLanguage === 'fa' ? ProductName  :ProductEnName}</h1>
+                                    <span className="checkout_item_price">{GetPrice(price * count, pageLanguage, t("TOMANS"))}</span>
+                                </div>
+                            </div>
+                        </li>;
+                    if (i === swatches.length - 1) {
+                        resolve();
+                    }
+                }
+            });
+            promise2.then(() => {
+                setSwatchesList(temp);
+                if (swatchOnly && swatchOnly === "Swatches") {
+                    setTotalPrice(tempTotal);
+                }
+            });
+        }
+    }, [swatches]);
+    
+    useEffect(() => {
         if (discounts.length > 0) {
             let tempDiscounts = JSON.parse(JSON.stringify(discounts));
             let tempArr = [];
             let promise1 = new Promise((resolve, reject) => {
                 tempDiscounts.forEach((tempObj, index) => {
                     tempArr[index] =
-                        <span className="discount_applied">
+                        <span className="discount_applied" key={index}>
                             <img src={require('../Images/public/discount.svg').default} className="img-fluid discount_applied_img" alt=""/>
                             <p className="discount_applied_text">{tempObj["Code"]}</p>
                             <button className="btn-close discount_applied_remove" onClick={() => removeDiscount(tempObj["Code"])}/>
@@ -1443,6 +1505,7 @@ function Checkout() {
                     <div className="checkout_right_container">
                         <ul className="checkout_right_cart_items">
                             {draperyList}
+                            {swatchesList}
                         </ul>
                         <div className="checkout_right_discount">
                             <div className="checkout_right_discount_container">

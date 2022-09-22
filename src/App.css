@@ -1945,7 +1945,7 @@ span.model_info_price_off {
 
 .card_body {
     min-height: 4rem;
-    max-height: 36rem;
+    max-height: 37rem;
     padding: 1.9rem 0.125rem 0;
     overflow-x: hidden;
     overflow-y: auto;
@@ -2247,16 +2247,34 @@ input[name="fabric"]:checked + .frame_img img, .img-fluid_checked {
     margin: 0.625rem 2.3125rem 1rem;
 }
 
-.zoomModal .modal-header {
+.modal .zoomModal .modal-header {
     padding: 0;
     margin: 1rem 2.3125rem 0;
+    height: max-content;
 }
 
-.zoomModal span {
-    color: #323232;
+.zoomModal h1 {
+    color: #49443e;
     text-transform: uppercase;
     font-size: 0.75rem;
-    margin-bottom: 1rem;
+    line-height: normal;
+}
+
+.zoomModal .zoom_modal_header_Contents {
+    font-size: 0.875rem;
+    text-transform: unset;
+}
+
+.zoomModal .zoom_modal_header_Contents_item {
+    color: #49443e;
+    /*text-transform: uppercase;*/
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+.zoomModal  .zoom_modal_header_design{
+    margin-bottom: 0.25rem;
+    font-size: 0.9375rem;
 }
 
 .zoomImg .imageContainer div {
@@ -2720,6 +2738,7 @@ input[name="fabric"]:checked + .frame_img img, .img-fluid_checked {
 .popover_thumbnail_img {
     width: 2.8125rem;
     height: 2.8125rem;
+    pointer-events: unset;
 }
 
 .popover_footer div:hover {
@@ -2958,6 +2977,7 @@ body .react-dropdown-select-dropdown {
 
 .modal-header .btn-close:focus, .modal-body .btn-close:focus, .btn-close:focus {
     box-shadow: unset;
+    opacity: unset;
 }
 
 .btn-close:hover {
@@ -3017,7 +3037,7 @@ body .react-dropdown-select-dropdown {
 }
 
 .modal-body p {
-    font-weight: 300;
+    /*font-weight: 300;*/
     font-size: 0.75rem;
     color: #49443e;
     display: block;
@@ -3488,18 +3508,20 @@ body .react-dropdown-select-dropdown {
 }
 
 .addToCartErr_list li {
-    font-weight: 300;
-    font-size: 1.25rem;
+    font-weight: 400;
+    font-size: 1.125rem;
     box-sizing: border-box;
     color: #49443e;
     line-height: 2em;
     text-align: center;
 }
 
-.addToCartErr p {
+.addToCartErr span {
     font-size: 1rem;
-    color: #666666;
-    line-height: 1.375rem;
+    color: #49443e;
+    /*line-height: 1.375rem;*/
+    display: block;
+    margin: 0.5rem 0;
 }
 
 .stepRequired {
@@ -4887,6 +4909,7 @@ body .add_to_project_modal .react-dropdown-select-dropdown {
 
 .is_loading {
     position: relative;
+    pointer-events: none;
 }
 
 @keyframes rotate {
@@ -4927,7 +4950,7 @@ body .add_to_project_modal .react-dropdown-select-dropdown {
     z-index: 4;
 }
 
-.drapery_basket_item.is_loading {
+li.is_loading {
     opacity: .5;
     visibility: visible;
 }
@@ -6651,10 +6674,11 @@ body .add_to_project_modal .react-dropdown-select-dropdown {
     font-weight: 400;
     text-align: start;
     width: calc(100% - 1rem);
+    white-space: pre-line;
 }
 
 .checkbox_style_step2{
-    width: 86%;
+    width: max-content;
 }
 
 .cart_agree_desc .checkbox_text{
@@ -6675,4 +6699,138 @@ body .add_to_project_modal .react-dropdown-select-dropdown {
 .checkout_item_discount{
     margin-block-end: 0;
     font-size: 0.875rem;
+}
+
+.swatches_basket_items{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 1%;
+    margin: 0.9rem 0;
+    width: 80%;
+}
+
+.swatches_basket_item{
+    width: 9.1%;
+    margin-bottom: 1rem;
+}
+
+.swatches_item_image_container{
+    width: 100%;
+    height: 5.875rem;
+}
+
+.swatches_item_image_container .img-fluid{
+    height: 100%;
+}
+
+.swatches_item_title_container{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: nowrap;
+    gap: 5%;
+}
+
+.swatches_item_title_name{
+    text-align: initial;
+}
+
+.swatches_item_title_price{
+    text-align: initial;
+}
+
+.swatches_item_remove{
+    width: max-content;
+    text-align: end;
+}
+
+.swatches_item_remove .btn-close{
+    padding: 0;
+    width: 0.6rem;
+    height: 0.6rem;
+}
+
+.zoom_modal_header_Contents_container{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.3rem;
+}
+
+.zoomModal .zoom_modal_header_Price{
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+    text-transform: unset;
+}
+
+.basket_header_swatches_only{
+    width: 21.5%;
+}
+
+.arrow_container{
+    display: flex;
+    gap: 4%;
+    align-items: center;
+    cursor: pointer;
+}
+
+.arrow_container .arrow_body .head, .arrow_container .arrow_body .head:after {
+    height: 0.1rem;
+    background: #000;
+    width: 0.5rem;
+    position: absolute;
+    right: -0.125rem;
+    top: 0.15625rem;
+    transform: rotate(-40deg);
+    padding: 0;
+}
+
+.arrow_container .arrow_body .head:after {
+    content: "";
+    border-color: #000;
+    right: -0.1875rem;
+    top: -0.21875rem;
+    transform: rotate(80deg);
+}
+
+.arrow_container .arrow_body{
+    width: 4rem;
+    margin-top: 0;
+    height: 0.1rem;
+    background: #000;
+    position: relative;
+    top: 1px;
+    padding: 0;
+    transition: all 0.3s;
+}
+
+.arrow_container:hover .arrow_body{
+    /*width: 31%;*/
+    flex-grow: 1;
+}
+
+.basket_container .basket_header_swatches_only .swatches_only{
+    width: max-content;
+    padding: 0;
+    text-transform: uppercase;
+}
+
+.swatches_basket_item>div{
+    margin-bottom: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.swatch_list_container{
+    display: flex;
+}
+
+.swatch_price_section{
+    padding: 0.9rem 0;
+    text-align: end;
+    font-size: 0.875rem;
+    width: 19%;
 }

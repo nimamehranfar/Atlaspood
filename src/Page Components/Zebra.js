@@ -56,8 +56,7 @@ const baseURLUploadPdf = "https://api.atlaspood.ir/SewingOrderAttachment/PdfUplo
 const baseURLDeleteFile = "https://api.atlaspood.ir/SewingOrderAttachment/Delete";
 const baseURLEditProject = "https://api.atlaspood.ir/SewingPreorder/Edit";
 const baseURLDeleteBasketProject = "https://api.atlaspood.ir/Cart/DeleteItem";
-
-const baseURLFilterColor = "https://api.atlaspood.ir/Color/GetBaseColors";
+const baseURLAddSwatch = "https://api.atlaspood.ir/Cart/Add";
 const baseURLFilterPattern = "https://api.atlaspood.ir/Sewing/GetModelPatternType";
 const baseURLFilterType = "https://api.atlaspood.ir/Sewing/GetModelDesignType";
 const baseURLFilterPrice = "https://api.atlaspood.ir/BaseType/GetPriceLevel";
@@ -66,7 +65,7 @@ const baseURLFilterPrice = "https://api.atlaspood.ir/BaseType/GetPriceLevel";
 function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     const {t} = useTranslation();
     const location = useLocation();
-    let pageLanguage = location.pathname.split('').slice(1, 3).join('');
+    const [pageLanguage, setPageLanguage] = React.useState(location.pathname.split('').slice(1, 3).join(''));
     const [firstRender, setFirstRender] = useState(true);
     const [catID, setCatID] = useState(CatID);
     const [modelID, setModelID] = useState(ModelID);
@@ -79,7 +78,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     const [projectData, setProjectData] = useState({});
     const [model, setModel] = useState({});
     const [modelAccessories, setModelAccessories] = useState({});
-    const [fabrics, setFabrics] = useState([]);
+    const [fabrics, setFabrics] = useState({});
     const [fabricsList, setFabricsList] = useState([]);
     const [defaultFabricPhoto, setDefaultFabricPhoto] = useState(null);
     const [defaultModelName, setDefaultModelName] = useState("");
@@ -97,11 +96,15 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     const [zoomModalHeader, setZoomModalHeader] = useState([]);
     const [zoomModalBody, setZoomModalBody] = useState([]);
     const [swatchId, setSwatchId] = useState(0);
+    const [swatchDetailId, setSwatchDetailId] = useState(0);
+    const [swatchPhotoPath, setSwatchPhotoPath] = useState("");
     const [hasSwatchId, setHasSwatchId] = useState(false);
     const [addCartErr, setAddCartErr] = useState([]);
     const [cartItems, setCartItems] = useState([]);
     const [cartAgree, setCartAgree] = useState([]);
     // const [pageLanguage, setPageLanguage] = useState("");
+    const [cartChanged, setCartChanged] = useState(0);
+    const [bag, setBag] = useState(0);
     const [accordionActiveKey, setAccordionActiveKey] = useState("");
     const [roomLabelText, setRoomLabelText] = useState("");
     const [fabricSelected, setFabricSelected] = useState({
@@ -247,6 +250,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     const [addingLoading, setAddingLoading] = useState(false);
     const [savingLoading, setSavingLoading] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
+    const [swatchLogin, setSwatchLogin] = useState(false);
     
     function convertToPersian(string_farsi) {
         if (string_farsi !== null && string_farsi !== undefined && string_farsi !== "") {
@@ -382,15 +386,19 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
         });
     };
     
-    function renderFabrics() {
+    function renderFabrics(bag) {
         const fabricList = [];
         let count = 0;
-        let cartObj={};
-        let temp=[];
+        let cartObj = {};
+        let temp = [];
         let pageLanguage1 = location.pathname.split('').slice(1, 3).join('');
-        if (localStorage.getItem("cart") !== null) {
-            cartObj = JSON.parse(localStorage.getItem("cart"));
-            temp = cartObj["swatches"];
+        if (Object.keys(bag).length > 0) {
+            if (isLoggedIn) {
+            
+            } else {
+                cartObj = JSON.parse(localStorage.getItem("cart"));
+                temp = cartObj["swatches"];
+            }
         }
         
         Object.keys(fabrics).forEach((key, index) => {
@@ -412,18 +420,37 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                 let DesignCode = fabrics[key][j].DesignCode;
                 let DesignRaportLength = fabrics[key][j].DesignRaportLength;
                 let DesignRaportWidth = fabrics[key][j].DesignRaportWidth;
+                let PolyesterPercent = fabrics[key][j].PolyesterPercent;
+                let ViscosePercent = fabrics[key][j].ViscosePercent;
+                let NylonPercent = fabrics[key][j].NylonPercent;
                 let ColorName = convertToPersian(fabrics[key][j].ColorName);
                 let ColorEnName = fabrics[key][j].ColorEnName;
-                let SwatchId = fabrics[key][j].SwatchId?fabrics[key][j].SwatchId:1;
-                let HasSwatchId=false;
-                if(temp.length>0) {
-                    let index = temp.findIndex(object => {
-                        return object["SwatchId"] === SwatchId;
-                    });
-                    if(index!==-1) {
-                        HasSwatchId=true;
+                let SwatchId = fabrics[key][j].SwatchId ? fabrics[key][j].SwatchId : -1;
+                let HasSwatchId = false;
+                let swatchDetailId = undefined;
+                let index = -1;
+                if (isLoggedIn) {
+                    if (bag["CartDetails"]) {
+                        let index = bag["CartDetails"].findIndex(object => {
+                            return object["ProductId"] === SwatchId;
+                        });
+                        // console.log(index);
+                        if (index !== -1) {
+                            HasSwatchId = true;
+                            swatchDetailId = bag["CartDetails"][index]["CartDetailId"];
+                        }
+                    }
+                } else {
+                    if (temp.length > 0) {
+                        index = temp.findIndex(object => {
+                            return object["SwatchId"] === SwatchId;
+                        });
+                        if (index !== -1) {
+                            HasSwatchId = true;
+                        }
                     }
                 }
+                // console.log(HasSwatchId);
                 // console.log(step1 === `${FabricId}`, step1, `${FabricId}`, FabricId);
                 
                 fabric.push(
@@ -458,12 +485,16 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                         <div className={`fabric_name_container ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
                             <h1>{pageLanguage1 === 'en' ? ColorEnName : ColorName}</h1>
                             <span onClick={() => {
-                                handleShow(PhotoPath, DesignName, DesignEnName, ColorName, ColorEnName,SwatchId);
+                                handleShow(fabrics[key][j], swatchDetailId);
                                 setHasSwatchId(HasSwatchId);
                             }}><i className="fa fa-search" aria-hidden="true"/></span>
                         </div>
-                        <button className={`swatchButton ${HasSwatchId? "activeSwatch":""} ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} current-state={HasSwatchId? "1":"0"}
-                                onClick={e => fabricSwatch(e, SwatchId)}>{HasSwatchId? t("SWATCH IN CART"):t("ORDER SWATCH")}</button>
+                        <button className={`swatchButton ${HasSwatchId ? "activeSwatch" : ""} ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}
+                                current-state={HasSwatchId ? "1" : "0"}
+                                onClick={(e) => {
+                                    fabricSwatch(e, SwatchId, swatchDetailId, PhotoPath);
+                                }} disabled={SwatchId === -1}>{HasSwatchId ? t("SWATCH IN CART") : t("ORDER" +
+                            " SWATCH")}</button>
                     </div>
                 );
                 
@@ -488,7 +519,25 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
         setShow(false);
     }
     
-    function handleShow(PhotoPath, DesignName, DesignEnName, ColorName, ColorEnName,SwatchId) {
+    function handleShow(fabricObj, SwatchDetailId) {
+        let DesignName = convertToPersian(fabricObj["DesignName"]);
+        let DesignEnName = fabricObj["DesignEnName"];
+        let FabricId = fabricObj["FabricId"];
+        let PhotoPath = "";
+        fabricObj["FabricPhotos"].forEach(obj => {
+            if (obj["PhotoTypeId"] === 4702)
+                PhotoPath = obj["PhotoUrl"];
+        });
+        
+        let PriceLevelEnTitle = fabricObj["PriceLevelEnTitle"];
+        let PriceLevelTitle = fabricObj["PriceLevelTitle"];
+        let PolyesterPercent = fabricObj["PolyesterPercent"] || 0;
+        let ViscosePercent = fabricObj["ViscosePercent"] || 0;
+        let NylonPercent = fabricObj["NylonPercent"] || 0;
+        let ColorName = convertToPersian(fabricObj["ColorName"]);
+        let ColorEnName = fabricObj["ColorEnName"];
+        let SwatchId = fabricObj["SwatchId"] ? fabricObj["SwatchId"] : -1;
+        
         const tempDiv = [];
         const tempDiv1 = [];
         tempDiv.push(
@@ -497,7 +546,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                     <ReactImageMagnify
                         imageProps={{
                             alt: '',
-                            isFluidWidth: true,
+                            // isFluidWidth: true,
                             src: `https://api.atlaspood.ir/${PhotoPath}`
                         }}
                         magnifiedImageProps={{
@@ -512,12 +561,23 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
             </div>
         );
         tempDiv1.push(
-            <span key={1} className="s">{pageLanguage === 'en' ? DesignEnName : DesignName} / {pageLanguage === 'en' ? ColorEnName : ColorName}</span>
+            <div key={1} className="zoom_modal_header_container">
+                <h1 className="zoom_modal_header_design">{pageLanguage === 'en' ? DesignEnName : DesignName} / {pageLanguage === 'en' ? ColorEnName : ColorName}</h1>
+                <h1 className="zoom_modal_header_Price">{t("PRICE GROUP: ")}{pageLanguage === 'en' ? PriceLevelEnTitle : PriceLevelTitle}</h1>
+                <div className="zoom_modal_header_Contents_container">
+                    <h1 className="zoom_modal_header_Contents">{t("Contents")}</h1>
+                    {PolyesterPercent>0 && <p className="zoom_modal_header_Contents_item">{PolyesterPercent + "%"} {t("Polyester")}</p>}
+                    {ViscosePercent>0 && <p className="zoom_modal_header_Contents_item">{ViscosePercent + "%"} {t("Viscose")}</p>}
+                    {NylonPercent>0 && <p className="zoom_modal_header_Contents_item">{NylonPercent + "%"} {t("Nylon")}</p>}
+                </div>
+            </div>
         );
         
         setZoomModalBody(tempDiv);
         setZoomModalHeader(tempDiv1);
         setSwatchId(SwatchId);
+        setSwatchDetailId(SwatchDetailId);
+        setSwatchPhotoPath(PhotoPath);
         setShow(true);
     }
     
@@ -618,6 +678,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                 obj.checked = false;
         });
         search_input.current.value = "";
+        setSearchText("");
         setSearchShow(false);
         
         setFilterColors([]);
@@ -1591,168 +1652,31 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
             let cartCount = 0;
             if (isLoggedIn) {
                 cartCount += cartObjects["CartDetails"].length;
-                let draperiesTotalPrice = cartObjects["TotalAmount"];
+                let totalPrice = cartObjects["TotalAmount"];
                 
-                let promise2 = new Promise((resolve, reject) => {
-                    for (let i = 0; i < cartObjects["CartDetails"].length; i++) {
-                        let obj = cartObjects["CartDetails"][i]["SewingPreorder"]["PreorderText"];
-                        
-                        let roomName = (obj["WindowName"] === undefined || obj["WindowName"] === "") ? "" : " / " + obj["WindowName"];
-                        temp1[i] =
-                            <li className="custom_cart_item" key={"drapery" + i} ref={ref => (draperyRef.current[cartObjects["CartDetails"][i]["CartDetailId"]] = ref)}>
-                                <div className="custom_cart_item_image_container">
-                                    <img src={`https://api.atlaspood.ir/${obj["PhotoUrl"]}`} alt="" className="custom_cart_item_img img-fluid"/>
-                                </div>
-                                <div className="custom_cart_item_desc">
-                                    <div className="custom_cart_item_desc_container">
-                                        <h1 className="custom_cart_item_desc_name">{pageLanguage === 'fa' ? obj["ModelNameFa"] + " سفارشی " : "Custom " + obj["ModelNameEn"]}</h1>
-                                        <button type="button" className="btn-close" aria-label="Close"
-                                                onClick={() => setBasketNumber(cartObjects, cartObjects["CartDetails"][i]["CartDetailId"], 0, 0)}/>
-                                    </div>
-                                    <div className="custom_cart_item_desc_container">
-                                        <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["FabricDesignFa"] + " / " + obj["FabricColorFa"] : obj["FabricDesignEn"] + " / " + obj["FabricColorEn"]}</h2>
-                                    </div>
-                                    <div className="custom_cart_item_desc_container">
-                                        <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["RoomNameFa"] + roomName : obj["RoomNameEn"] + roomName}</h2>
-                                    </div>
-                                    <div className="custom_cart_item_desc_container">
-                                        <div className="custom_cart_item_desc_qty">
-                                            <button type="text" className="basket_qty_minus"
-                                                    onClick={() => setBasketNumber(cartObjects, cartObjects["CartDetails"][i]["CartDetailId"], 0, 0, -1)}>–
-                                            </button>
-                                            <input type="text" className="basket_qty_num"
-                                                   value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${cartObjects["CartDetails"][i]["SewingPreorder"]["Count"]}`) : cartObjects["CartDetails"][i]["SewingPreorder"]["Count"]}
-                                                   onChange={(e) => setBasketNumber(cartObjects, cartObjects["CartDetails"][i]["CartDetailId"], NumberToPersianWord.convertPeToEn(`${e.target.value}`))}/>
-                                            <button type="text" className="basket_qty_plus"
-                                                    onClick={() => setBasketNumber(cartObjects, cartObjects["CartDetails"][i]["CartDetailId"], 0, 0, 1)}>+
-                                            </button>
-                                        </div>
-                                        <p className="custom_cart_item_end_price">{GetPrice(obj["price"], pageLanguage, t("TOMANS"))}</p>
-                                    </div>
-                                </div>
-                            </li>;
-                        if (i === cartObjects["CartDetails"].length - 1) {
-                            resolve();
-                        }
-                    }
+                let draperies = cartObjects["CartDetails"].filter((object1) => {
+                    return object1["SewingPreorderId"] !== null;
                 });
-                promise2.then(() => {
-                    setCartItems(temp1);
-                    setCartCount(cartCount);
-                    localStorage.removeItem("cart");
-                    setTotalCartPrice(draperiesTotalPrice);
+                
+                let swatches = cartObjects["CartDetails"].filter((object1) => {
+                    return object1["ProductId"] !== null;
                 });
-                if (cartObjects["CartDetails"].length === 0) {
-                    modalHandleClose("cart_modal");
-                    setCartStateAgree(false);
-                }
-            } else {
-                if (cartObjects["drapery"].length) {
-                    cartCount += cartObjects["drapery"].length;
-                    let draperiesTotalPrice = 0;
-                    let promiseArr = [];
-                    
-                    cartObjects["drapery"].forEach((obj, index) => {
-                        promiseArr[index] = new Promise((resolve, reject) => {
-                            let tempPostObj = {};
-                            // tempPostObj["ApiKey"] = window.$apikey;
-                            if (obj["PreorderText"] === undefined) {
-                                localStorage.removeItem("cart");
-                            } else {
-                                let userProjects = JSON.parse(JSON.stringify(UserProjects))[obj["PreorderText"]["SewingModelId"]]["data"];
-                                // let temp = obj["PreorderText"];
-                                GetUserProjectData(obj).then((temp) => {
-                                    tempPostObj["WindowCount"] = 1;
-                                    tempPostObj["SewingModelId"] = `${modelID}`;
-                                    Object.keys(temp).forEach(key => {
-                                        if (temp[key] !== null || temp[key] !== "") {
-                                            let tempObj = userProjects.find(obj => obj["cart"] === key);
-                                            // console.log(key,tempObj);
-                                            if (tempObj["apiLabel"] !== "") {
-                                                if (tempObj["apiValue"] === null) {
-                                                    tempPostObj[tempObj["apiLabel"]] = temp[key];
-                                                } else {
-                                                    tempPostObj[tempObj["apiLabel"]] = tempObj["apiValue"][temp[key]];
-                                                }
-                                            }
-                                        }
-                                    });
-                                    
-                                    tempPostObj["SewingOrderDetails"] = [];
-                                    tempPostObj["SewingOrderDetails"][0] = {};
-                                    tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
-                                    tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
-                                    tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
-                                    tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
-                                    tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
-                                    Object.keys(temp).forEach(key => {
-                                        if (temp[key] !== null || temp[key] !== "") {
-                                            let tempObj = userProjects.find(obj => obj["cart"] === key);
-                                            if (tempObj["apiLabel2"] !== undefined) {
-                                                if (tempObj["apiValue2"] === null) {
-                                                    tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
-                                                } else {
-                                                    tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
-                                                }
-                                            }
-                                        }
-                                    });
-                                    tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
-                                    Object.keys(temp).forEach(key => {
-                                        if (temp[key] !== null || temp[key] !== "") {
-                                            let tempObj = userProjects.find(obj => obj["cart"] === key);
-                                            if (tempObj["apiAcc"] !== undefined) {
-                                                if (tempObj["apiAcc"] === true) {
-                                                    tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
-                                                } else {
-                                                
-                                                }
-                                            }
-                                        }
-                                    });
-                                    tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
-                                        return el != null;
-                                    });
-                                    
-                                    // delete tempPostObj["SewingOrderDetails"][0]["SewingModelId"];
-                                    // delete tempPostObj["SewingModelId"];
-                                    tempPostObj["SewingModelId"] = tempPostObj["SewingOrderDetails"][0]["SewingModelId"];
-                                    
-                                    if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
-                                        axios.post(baseURLPrice, tempPostObj).then((response) => {
-                                            resolve(response);
-                                        }).catch(err => {
-                                            resolve(false);
-                                            // console.log("hi2");
-                                        });
-                                    } else {
-                                        // console.log("hi3");
-                                        resolve(false);
-                                    }
-                                }).catch(err => {
-                                    // console.log("hi3");
-                                    resolve(false);
-                                });
-                            }
-                        });
-                    });
-                    Promise.all(promiseArr).then(function (values) {
-                        // console.log(values);
-                        cartObjects["drapery"].forEach((obj1, index) => {
-                            let obj = obj1["PreorderText"];
-                            obj["price"] = values[index].data["price"] / obj1["Count"];
-                            obj1["price"] = values[index].data["price"] / obj1["Count"];
-                            draperiesTotalPrice += values[index].data["price"];
+                
+                let promise1 = new Promise((resolve, reject) => {
+                    if (draperies.length) {
+                        for (let i = 0; i < draperies.length; i++) {
+                            let obj = draperies[i]["SewingPreorder"]["PreorderText"];
                             let roomName = (obj["WindowName"] === undefined || obj["WindowName"] === "") ? "" : " / " + obj["WindowName"];
-                            temp1[index] =
-                                <li className="custom_cart_item" key={"drapery" + index} ref={ref => (draperyRef.current[index] = ref)}>
+                            temp1[i] =
+                                <li className="custom_cart_item" key={"drapery" + i} ref={ref => (draperyRef.current[draperies[i]["CartDetailId"]] = ref)}>
                                     <div className="custom_cart_item_image_container">
                                         <img src={`https://api.atlaspood.ir/${obj["PhotoUrl"]}`} alt="" className="custom_cart_item_img img-fluid"/>
                                     </div>
                                     <div className="custom_cart_item_desc">
                                         <div className="custom_cart_item_desc_container">
                                             <h1 className="custom_cart_item_desc_name">{pageLanguage === 'fa' ? obj["ModelNameFa"] + " سفارشی " : "Custom " + obj["ModelNameEn"]}</h1>
-                                            <button type="button" className="btn-close" aria-label="Close" onClick={() => setBasketNumber(undefined, index, 0, 0)}/>
+                                            <button type="button" className="btn-close" aria-label="Close"
+                                                    onClick={() => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], 0, 0)}/>
                                         </div>
                                         <div className="custom_cart_item_desc_container">
                                             <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["FabricDesignFa"] + " / " + obj["FabricColorFa"] : obj["FabricDesignEn"] + " / " + obj["FabricColorEn"]}</h2>
@@ -1762,26 +1686,231 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                         </div>
                                         <div className="custom_cart_item_desc_container">
                                             <div className="custom_cart_item_desc_qty">
-                                                <button type="text" className="basket_qty_minus" onClick={() => setBasketNumber(undefined, index, 0, 0, -1)}>–</button>
+                                                <button type="text" className="basket_qty_minus"
+                                                        onClick={() => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], 0, 0, -1)}>–
+                                                </button>
                                                 <input type="text" className="basket_qty_num"
-                                                       value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${obj1["Count"]}`) : obj1["Count"]}
-                                                       onChange={(e) => setBasketNumber(undefined, index, NumberToPersianWord.convertPeToEn(`${e.target.value}`), 0)}/>
-                                                <button type="text" className="basket_qty_plus" onClick={() => setBasketNumber(undefined, index, 0, 0, 1)}>+</button>
+                                                       value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${draperies[i]["SewingPreorder"]["Count"]}`) : draperies[i]["SewingPreorder"]["Count"]}
+                                                       onChange={(e) => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], NumberToPersianWord.convertPeToEn(`${e.target.value}`))}/>
+                                                <button type="text" className="basket_qty_plus"
+                                                        onClick={() => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], 0, 0, 1)}>+
+                                                </button>
                                             </div>
-                                            <p className="custom_cart_item_end_price">{GetPrice(obj1["price"] * obj1["Count"], pageLanguage, t("TOMANS"))}</p>
+                                            <p className="custom_cart_item_end_price">{GetPrice(obj["price"], pageLanguage, t("TOMANS"))}</p>
                                         </div>
                                     </div>
                                 </li>;
-                        });
-                        setCartItems(temp1);
-                        setCartCount(cartCount);
-                        localStorage.setItem('cart', JSON.stringify(cartObjects));
-                        setTotalCartPrice(draperiesTotalPrice);
+                            if (i === draperies.length - 1) {
+                                resolve();
+                            }
+                        }
+                    } else {
+                        resolve();
+                    }
+                });
+                
+                let promise2 = new Promise((resolve, reject) => {
+                    if (swatches.length) {
+                        for (let i = 0; i < swatches.length; i++) {
+                            let obj = swatches[i];
+                            temp1[i + draperies.length] =
+                                <li className="custom_cart_item" key={"swatches" + i} ref={ref => (draperyRef.current[swatches[i]["CartDetailId"]] = ref)}>
+                                    <div className="custom_cart_item_image_container">
+                                        <img src={`https://api.atlaspood.ir/${obj["PhotoUrl"]}`} alt="" className="custom_cart_item_img img-fluid"/>
+                                    </div>
+                                    <div className="custom_cart_item_desc">
+                                        <div className="custom_cart_item_desc_container">
+                                            <h1 className="custom_cart_item_desc_name">{pageLanguage === 'fa' ? obj["ProductName"] : obj["ProductEnName"]}</h1>
+                                            <button type="button" className="btn-close" aria-label="Close"
+                                                    onClick={() => setBasketNumber(cartObjects, swatches[i]["CartDetailId"], 0, 0)}/>
+                                        </div>
+                                        <div className="custom_cart_item_desc_container">
+                                            <h2 className="custom_cart_item_desc_detail"/>
+                                        </div>
+                                        <div className="custom_cart_item_desc_container">
+                                            <h2 className="custom_cart_item_desc_detail"/>
+                                        </div>
+                                        <div className="custom_cart_item_desc_container">
+                                            <div className="custom_cart_item_desc_qty">
+                                                <button type="text" className="basket_qty_minus"
+                                                        onClick={() => setBasketNumber(cartObjects, swatches[i]["CartDetailId"], 0, 0, -1)}>–
+                                                </button>
+                                                <input type="text" className="basket_qty_num"
+                                                       value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${swatches[i]["Count"]}`) : swatches[i]["Count"]}
+                                                       onChange={(e) => setBasketNumber(cartObjects, swatches[i]["CartDetailId"], NumberToPersianWord.convertPeToEn(`${e.target.value}`))}/>
+                                                <button type="text" className="basket_qty_plus"
+                                                        onClick={() => setBasketNumber(cartObjects, swatches[i]["CartDetailId"], 0, 0, 1)}>+
+                                                </button>
+                                            </div>
+                                            <p className="custom_cart_item_end_price">{GetPrice(obj["UnitPrice"], pageLanguage, t("TOMANS"))}</p>
+                                        </div>
+                                    </div>
+                                </li>;
+                            if (i === swatches.length - 1) {
+                                resolve();
+                            }
+                        }
+                    } else {
+                        resolve();
+                    }
+                });
+                Promise.all([promise1, promise2]).then(() => {
+                    setCartItems(temp1);
+                    setCartCount(cartCount);
+                    localStorage.removeItem("cart");
+                    setTotalCartPrice(totalPrice);
+                });
+                if (cartObjects["CartDetails"].length === 0) {
+                    modalHandleClose("cart_modal");
+                    setCartStateAgree(false);
+                }
+            } else {
+                let promiseArr = [];
+                let totalPrice = 0;
+                let draperiesTotalPrice = 0;
+                let swatchesTotalPrice = 0;
+                if (cartObjects["drapery"].length) {
+                    promiseArr[0] = new Promise((resolve, reject) => {
+                        cartCount += cartObjects["drapery"].length;
+                        let promiseArr2 = [];
                         
-                    }).catch(err => {
-                        console.log(err);
+                        cartObjects["drapery"].forEach((obj, index) => {
+                            promiseArr2[index] = new Promise((resolve, reject) => {
+                                let tempPostObj = {};
+                                // tempPostObj["ApiKey"] = window.$apikey;
+                                if (obj["PreorderText"] === undefined) {
+                                    localStorage.removeItem("cart");
+                                } else {
+                                    let userProjects = JSON.parse(JSON.stringify(UserProjects))[obj["PreorderText"]["SewingModelId"]]["data"];
+                                    // let temp = obj["PreorderText"];
+                                    GetUserProjectData(obj).then((temp) => {
+                                        tempPostObj["WindowCount"] = 1;
+                                        tempPostObj["SewingModelId"] = `${modelID}`;
+                                        Object.keys(temp).forEach(key => {
+                                            if (temp[key] !== null || temp[key] !== "") {
+                                                let tempObj = userProjects.find(obj => obj["cart"] === key);
+                                                // console.log(key,tempObj);
+                                                if (tempObj["apiLabel"] !== "") {
+                                                    if (tempObj["apiValue"] === null) {
+                                                        tempPostObj[tempObj["apiLabel"]] = temp[key];
+                                                    } else {
+                                                        tempPostObj[tempObj["apiLabel"]] = tempObj["apiValue"][temp[key]];
+                                                    }
+                                                }
+                                            }
+                                        });
+                                        
+                                        tempPostObj["SewingOrderDetails"] = [];
+                                        tempPostObj["SewingOrderDetails"][0] = {};
+                                        tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
+                                        tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
+                                        tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
+                                        tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
+                                        tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
+                                        Object.keys(temp).forEach(key => {
+                                            if (temp[key] !== null || temp[key] !== "") {
+                                                let tempObj = userProjects.find(obj => obj["cart"] === key);
+                                                if (tempObj["apiLabel2"] !== undefined) {
+                                                    if (tempObj["apiValue2"] === null) {
+                                                        tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
+                                                    } else {
+                                                        tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                                                    }
+                                                }
+                                            }
+                                        });
+                                        tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
+                                        Object.keys(temp).forEach(key => {
+                                            if (temp[key] !== null || temp[key] !== "") {
+                                                let tempObj = userProjects.find(obj => obj["cart"] === key);
+                                                if (tempObj["apiAcc"] !== undefined) {
+                                                    if (tempObj["apiAcc"] === true) {
+                                                        tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
+                                                    } else {
+                                                    
+                                                    }
+                                                }
+                                            }
+                                        });
+                                        tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
+                                            return el != null;
+                                        });
+                                        
+                                        // delete tempPostObj["SewingOrderDetails"][0]["SewingModelId"];
+                                        // delete tempPostObj["SewingModelId"];
+                                        tempPostObj["SewingModelId"] = tempPostObj["SewingOrderDetails"][0]["SewingModelId"];
+                                        
+                                        if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
+                                            axios.post(baseURLPrice, tempPostObj).then((response) => {
+                                                resolve(response);
+                                            }).catch(err => {
+                                                resolve(false);
+                                                // console.log("hi2");
+                                            });
+                                        } else {
+                                            // console.log("hi3");
+                                            resolve(false);
+                                        }
+                                    }).catch(err => {
+                                        // console.log("hi3");
+                                        resolve(false);
+                                    });
+                                }
+                            });
+                        });
+                        Promise.all(promiseArr2).then(function (values) {
+                            // console.log(values);
+                            cartObjects["drapery"].forEach((obj1, index) => {
+                                let obj = obj1["PreorderText"];
+                                obj["price"] = values[index].data["price"] / obj1["Count"];
+                                obj1["price"] = values[index].data["price"] / obj1["Count"];
+                                draperiesTotalPrice += values[index].data["price"];
+                                let roomName = (obj["WindowName"] === undefined || obj["WindowName"] === "") ? "" : " / " + obj["WindowName"];
+                                temp1[index] =
+                                    <li className="custom_cart_item" key={"drapery" + index} ref={ref => (draperyRef.current[index] = ref)}>
+                                        <div className="custom_cart_item_image_container">
+                                            <img src={`https://api.atlaspood.ir/${obj["PhotoUrl"]}`} alt="" className="custom_cart_item_img img-fluid"/>
+                                        </div>
+                                        <div className="custom_cart_item_desc">
+                                            <div className="custom_cart_item_desc_container">
+                                                <h1 className="custom_cart_item_desc_name">{pageLanguage === 'fa' ? obj["ModelNameFa"] + " سفارشی " : "Custom " + obj["ModelNameEn"]}</h1>
+                                                <button type="button" className="btn-close" aria-label="Close" onClick={() => setBasketNumber(undefined, index, 0, 0)}/>
+                                            </div>
+                                            <div className="custom_cart_item_desc_container">
+                                                <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["FabricDesignFa"] + " / " + obj["FabricColorFa"] : obj["FabricDesignEn"] + " / " + obj["FabricColorEn"]}</h2>
+                                            </div>
+                                            <div className="custom_cart_item_desc_container">
+                                                <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["RoomNameFa"] + roomName : obj["RoomNameEn"] + roomName}</h2>
+                                            </div>
+                                            <div className="custom_cart_item_desc_container">
+                                                <div className="custom_cart_item_desc_qty">
+                                                    <button type="text" className="basket_qty_minus" onClick={() => setBasketNumber(undefined, index, 0, 0, -1)}>–</button>
+                                                    <input type="text" className="basket_qty_num"
+                                                           value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${obj1["Count"]}`) : obj1["Count"]}
+                                                           onChange={(e) => setBasketNumber(undefined, index, NumberToPersianWord.convertPeToEn(`${e.target.value}`), 0)}/>
+                                                    <button type="text" className="basket_qty_plus" onClick={() => setBasketNumber(undefined, index, 0, 0, 1)}>+</button>
+                                                </div>
+                                                <p className="custom_cart_item_end_price">{GetPrice(obj1["price"] * obj1["Count"], pageLanguage, t("TOMANS"))}</p>
+                                            </div>
+                                        </div>
+                                    </li>;
+                                if (index === cartObjects["drapery"].length - 1) {
+                                    resolve();
+                                }
+                            });
+                        }).catch(err => {
+                            console.log(err);
+                            resolve();
+                        });
                     });
                 }
+                Promise.all(promiseArr).then(() => {
+                    setCartItems(temp1);
+                    setCartCount(cartCount);
+                    localStorage.setItem('cart', JSON.stringify(cartObjects));
+                    setTotalCartPrice(draperiesTotalPrice + swatchesTotalPrice);
+                });
+                
                 if (cartObjects["drapery"].length + cartObjects["product"].length + cartObjects["swatches"].length === 0) {
                     setCartCount(0);
                     modalHandleClose("cart_modal");
@@ -1803,41 +1932,105 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
         // console.log(hasTrim)
     }
     
-    function fabricSwatch(e, SwatchId) {
+    function fabricSwatch(e, SwatchId, SwatchDetailId, PhotoPath) {
         let currentState = e.target.getAttribute('current-state');
-        let cartObj={};
-        let temp=[];
-        if (localStorage.getItem("cart") !== null) {
-            cartObj = JSON.parse(localStorage.getItem("cart"));
-            temp = cartObj["swatches"];
-        } else {
-            cartObj["drapery"]=[];
-            cartObj["product"]=[];
-            cartObj["swatches"]=[];
-        }
-        if (currentState === "0") {
-            temp.push({"SwatchId":SwatchId,"Count":1});
-        } else {
-            if(temp.length>0) {
-                let index = temp.findIndex(object => {
-                    return object["SwatchId"] === SwatchId;
+        let cartObj = {};
+        let temp = [];
+        if (isLoggedIn) {
+            if (currentState === "0") {
+                axios.post(baseURLAddSwatch, {}, {
+                    headers: authHeader(),
+                    params: {
+                        productId: SwatchId,
+                        count: 1
+                    }
+                }).then((response) => {
+                    setBag(response.data);
+                    renderFabrics(response.data);
+                    if (show) {
+                        if (response.data["CartDetails"]) {
+                            let index = response.data["CartDetails"].findIndex(object => {
+                                return object["ProductId"] === SwatchId;
+                            });
+                            if (index !== -1) {
+                                setSwatchDetailId(response.data["CartDetails"][index]["CartDetailId"]);
+                            }
+                        }
+                    }
+                }).catch(err => {
+                    if (err.response.status === 401) {
+                        refreshToken().then((response2) => {
+                            if (response2 !== false) {
+                                fabricSwatch(e, SwatchId, SwatchDetailId);
+                            } else {
+                                fabricSwatch(e, SwatchId, SwatchDetailId);
+                            }
+                        });
+                    } else {
+                    }
                 });
-                if(index!==-1) {
-                    temp.splice(index, 1);
+            } else {
+                if (SwatchDetailId) {
+                    axios.delete(baseURLDeleteBasketProject, {
+                        params: {
+                            detailId: SwatchDetailId
+                        },
+                        headers: authHeader()
+                    }).then((response) => {
+                        setCartChanged(cartChanged + 1);
+                    }).catch(err => {
+                        if (err.response.status === 401) {
+                            refreshToken().then((response2) => {
+                                if (response2 !== false) {
+                                    fabricSwatch(e, SwatchId, SwatchDetailId);
+                                } else {
+                                    fabricSwatch(e, SwatchId, SwatchDetailId);
+                                }
+                            });
+                        } else {
+                        }
+                    });
                 }
             }
-        }
-        cartObj["swatches"]=temp;
-        localStorage.setItem('cart', JSON.stringify(cartObj));
-        renderFabrics();
-        if(show){
-            if(currentState === "0"){
-                setHasSwatchId(true);
+            if (show) {
+                if (currentState === "0") {
+                    setHasSwatchId(true);
+                } else {
+                    setHasSwatchId(false);
+                }
             }
-            else{
-                setHasSwatchId(false);
-            }
+            
+        } else {
+            setSwatchLogin(true);
+            modalHandleShow("side_login_modal");
+            // dispatch({
+            //     type: ShowLoginModal,
+            // })
+            // if (localStorage.getItem("cart") !== null) {
+            //     cartObj = JSON.parse(localStorage.getItem("cart"));
+            //     temp = cartObj["swatches"];
+            // } else {
+            //     cartObj["drapery"] = [];
+            //     cartObj["product"] = [];
+            //     cartObj["swatches"] = [];
+            // }
+            // if (currentState === "0") {
+            //     temp.push({"SwatchId": SwatchId, "Count": 1,"PhotoPath":PhotoPath});
+            // } else {
+            //     if (temp.length > 0) {
+            //         let index = temp.findIndex(object => {
+            //             return object["SwatchId"] === SwatchId;
+            //         });
+            //         if (index !== -1) {
+            //             temp.splice(index, 1);
+            //         }
+            //     }
+            // }
+            // cartObj["swatches"] = temp;
+            // localStorage.setItem('cart', JSON.stringify(cartObj));
+            // setCartChanged(cartChanged + 1);
         }
+        
     }
     
     function getWindowSize(totalWidth, totalHeight) {
@@ -2299,8 +2492,8 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                             if (temp["Mount"]) {
                                 if (temp["Mount"] === "Inside") {
                                     // console.log(temp);
-                                    let tempWidth=changeLang? temp["Width1"] :temp["Width"];
-                                    let tempHeight=changeLang? temp["Height1"] :temp["Height"];
+                                    let tempWidth = changeLang ? temp["Width1"] : temp["Width"];
+                                    let tempHeight = changeLang ? temp["Height1"] : temp["Height"];
                                     
                                     selectValues["width1"] = tempWidth ? [{value: tempWidth}] : [];
                                     selectValues["width2"] = temp["Width2"] ? [{value: temp["Width2"]}] : [];
@@ -2322,8 +2515,8 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                     setStepSelectedLabel(tempLabels);
                                     setStepSelectedValue(tempValue);
                                 } else {
-                                    let tempWidth=changeLang? temp["Width3A"] :temp["Width"];
-                                    let tempHeight=changeLang? temp["Height3C"] :temp["Height"];
+                                    let tempWidth = changeLang ? temp["Width3A"] : temp["Width"];
+                                    let tempHeight = changeLang ? temp["Height3C"] : temp["Height"];
                                     
                                     // console.log(temp,tempWidth,tempHeight);
                                     
@@ -2685,7 +2878,12 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
             {value: '7', label: '7'},
             {value: '8', label: '8'},
             {value: '9', label: '9'},
-            {value: '10', label: '10'}
+            {value: '10', label: '10'},
+            {value: '11', label: '11'},
+            {value: '12', label: '12'},
+            {value: '13', label: '13'},
+            {value: '14', label: '14'},
+            {value: '15', label: '15'}
         ],
         "fa": [
             {value: '0', label: '۰ (همه محصولات)'},
@@ -2875,7 +3073,15 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     }, [fabricSelected]);
     
     useEffect(() => {
-        renderFabrics();
+        getCart().then((temp) => {
+            if (Object.keys(fabrics).length) {
+                setTimeout(() => {
+                    renderFabrics(temp);
+                }, 100);
+            } else {
+                setFabricsList([]);
+            }
+        });
     }, [step1]);
     // useEffect(() => {
     //     if (firstRender === false) {
@@ -2966,7 +3172,11 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     
     useEffect(() => {
         // console.log("hi2");
-        if ((projectModalState === 2 && isLoggedIn) || (saveProjectCount !== 0 && isLoggedIn)) {
+        if (swatchLogin) {
+            setSwatchLogin(false);
+            modalHandleClose("side_login_modal");
+        }
+        else if ((projectModalState === 2 && isLoggedIn) || (saveProjectCount !== 0 && isLoggedIn)) {
             if (roomLabelText !== "" && selectedRoomLabel.length) {
                 if (projectId && projectId !== "") {
                     SaveUserProject(depSet, cartValues, [uploadedImagesFile, uploadedImagesURL, uploadedPDFFile, uploadedPDFURL], `${modelID}`, price, defaultModelName, defaultModelNameFa, projectData).then((temp) => {
@@ -3062,14 +3272,62 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
         }
     }, [modelID, catID]);
     
+    async function setLang() {
+        const tempLang = location.pathname.split('');
+        setPageLanguage(tempLang.slice(1, 3).join(''));
+    }
+    
+    async function getCart() {
+        return await new Promise((resolve, reject) => {
+            if (isLoggedIn) {
+                axios.get(baseURLGetCart, {
+                    headers: authHeader()
+                }).then((response) => {
+                    setBag(response.data);
+                    resolve(response.data);
+                }).catch(err => {
+                    if (err.response.status === 401) {
+                        refreshToken().then((response2) => {
+                            if (response2 !== false) {
+                                setCartChanged(cartChanged + 1);
+                                reject();
+                            } else {
+                                setCartChanged(cartChanged + 1);
+                                reject();
+                            }
+                        });
+                    } else {
+                        setCartChanged(cartChanged + 1);
+                        reject();
+                    }
+                });
+            } else {
+                if (localStorage.getItem("cart") !== null) {
+                    setBag(JSON.parse(localStorage.getItem("cart")));
+                    resolve(JSON.parse(localStorage.getItem("cart")));
+                } else {
+                    setBag({});
+                    resolve({});
+                }
+            }
+        });
+    }
     
     useEffect(() => {
-        if (Object.keys(fabrics).length) {
-            renderFabrics();
-        } else {
-            setFabricsList([]);
-        }
-    }, [fabrics, location.pathname]);
+        setLang().then(() => {
+            if (pageLanguage !== '') {
+                if (Object.keys(fabrics).length) {
+                    getCart().then((temp) => {
+                        setTimeout(() => {
+                            renderFabrics(temp);
+                        }, 100);
+                    });
+                } else {
+                    setFabricsList([]);
+                }
+            }
+        });
+    }, [fabrics, cartChanged, isLoggedIn, location.pathname]);
     
     useEffect(() => {
         if (filterChanged["filter"] !== 0) {
@@ -3219,7 +3477,6 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
         }
     }, []);
     
-    
     useEffect(() => {
         if (editIndex && editIndex !== "") {
             if (isLoggedIn) {
@@ -3296,6 +3553,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                     {searchShow &&
                                                     <div className="clear-icon-container" onClick={() => {
                                                         search_input.current.value = "";
+                                                        setSearchText("");
                                                         setSearchShow(false)
                                                     }}>
                                                         <i className="fa fa-times-circle clear-icon"/>
@@ -3369,8 +3627,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
                                                             <div className="filter_items_container">
-                                                                <div className="price_filter_description">Pricing tiers determine the upholstery cost of our furniture prices. All
-                                                                    swatch samples ship free no matter the tier.
+                                                                <div className="price_filter_description">{t("filter_price_title")}
                                                                 </div>
                                                                 {sewingPrices}
                                                             </div>
@@ -3393,8 +3650,12 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                             </Modal.Header>
                                             <Modal.Body>{zoomModalBody}</Modal.Body>
                                             <Modal.Footer>
-                                                <button className={`swatchButton ${hasSwatchId? "activeSwatch":""} ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} current-state={hasSwatchId? "1":"0"}
-                                                        onClick={e => fabricSwatch(e, swatchId)}>{hasSwatchId? t("SWATCH IN CART"):t("ORDER SWATCH")}</button>
+                                                <button className={`swatchButton ${hasSwatchId ? "activeSwatch" : ""} ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                                                        current-state={hasSwatchId ? "1" : "0"}
+                                                        onClick={(e) => {
+                                                            fabricSwatch(e, swatchId, swatchDetailId, swatchPhotoPath);
+                                                        }}
+                                                        disabled={swatchId === -1}>{hasSwatchId ? t("SWATCH IN CART") : t("ORDER SWATCH")}</button>
                                             </Modal.Footer>
                                         </Modal>
                                         <NextStep eventKey="2">{t("NEXT STEP")}</NextStep>
@@ -3465,8 +3726,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                             setStepSelectedLabel(tempLabels);
                                                             if (stepSelectedValue["3"] === "2") {
                                                                 setDeps("3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3", "21");
-                                                            }
-                                                            else{
+                                                            } else {
                                                                 setDeps("", "21");
                                                             }
                                                         } else {
@@ -3476,8 +3736,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                             if (stepSelectedValue["3"] === "2") {
                                                                 setStep3("");
                                                                 setDeps("21,3", "3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3");
-                                                            }
-                                                            else{
+                                                            } else {
                                                                 setDeps("21", "3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3");
                                                             }
                                                         }
@@ -3505,7 +3764,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                 <p className="help_column_header">{t("step2_help_1")}</p>
                                                 <ul className="help_column_list">
                                                     <li>{t("step2_help_2")}</li>
-                                                    <li>{t("step2_help_3")}</li>
+                                                    {/*<li>{t("step2_help_3")}</li>*/}
                                                     <li>{t("step2_help_4")}</li>
                                                     <li>{t("step2_help_5")}</li>
                                                 </ul>
@@ -3564,8 +3823,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                                selectUncheck(e);
                                                                setDeps("3", "31,32");
                                                                setCart("calcMeasurements", true, "Width,height,calcMeasurements");
-                                                           }
-                                                           else {
+                                                           } else {
                                                                setStep3("true");
                                                                deleteSpecialSelects(3);
                                                                selectChanged(e);
@@ -4358,7 +4616,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                                 setCart("ShadeMount", selected[0].value);
                                                             }
                                                         }}
-                                                        options={SelectOptionRange(0, 100, 1, "cm", "", pageLanguage)}
+                                                        options={SelectOptionRange(10, 100, 1, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -4595,8 +4853,43 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                             <div className="help_column help_right_column">
                                                 <p className="help_column_header">{t("step4_help_4")}</p>
                                                 <ul className="help_column_list">
-                                                    <li>{t("step4_help_5")}</li>
-                                                    <li>{t("step4_help_5.5")}</li>
+                                                    {/*<li>{t("step4_help_5")}</li>*/}
+                                                    <li className="no_listStyle">
+                                                        <span className="popover_indicator">
+                                                            {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
+                                                                                  children={<object className="popover_camera" type="image/svg+xml"
+                                                                                                    data={require('../Images/public/camera.svg').default}/>}
+                                                                                  component={
+                                                                                      <div className="clearfix">
+                                                                                          <div className="popover_image clearfix">
+                                                                                              <img
+                                                                                                  src={popoverImages["step41"] === undefined ? require('../Images/drapery/zebra/motorized_control_type1.png.jpg') : popoverImages["step41"]}
+                                                                                                  className="img-fluid" alt=""/>
+                                                                                          </div>
+                                                                                          <div className="popover_footer">
+                                                                                              <span className="popover_footer_title">{t("step4_popover_1")}</span>
+                                                                                              <span className="popover_thumbnails">
+                                                                                                  <div>
+                                                                                                      <img src={require('../Images/drapery/zebra/motorized_control_type1.png.jpg')}
+                                                                                                           text="step41"
+                                                                                                           onMouseEnter={(e) => popoverThumbnailHover(e)}
+                                                                                                           className="popover_thumbnail_img img-fluid"
+                                                                                                           alt=""/>
+                                                                                                  </div>
+                                                                                                  {/*<div>*/}
+                                                                                                  {/*    <img src={require('../Images/drapery/zebra/motorized_control_type2.png')}*/}
+                                                                                                  {/*         text="step41"*/}
+                                                                                                  {/*         onMouseEnter={(e) => popoverThumbnailHover(e)}*/}
+                                                                                                  {/*         className="popover_thumbnail_img img-fluid"*/}
+                                                                                                  {/*         alt=""/>*/}
+                                                                                                  {/*</div>*/}
+                                                                                              </span>
+                                                                                          </div>
+                                                                                      </div>
+                                                                                  }/>
+                                                            }
+                                                        </span>{t("step4_help_5")}</li>
+                                                    {/*<li>{t("step4_help_5.5")}</li>*/}
                                                     <li>{t("step4_help_6")}</li>
                                                 </ul>
                                             </div>
@@ -5323,13 +5616,13 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                  setSelectedFileName("");
                              }
                          }}>
-                        <h2>Upload Your Image</h2>
-                        <p className="file_size_description">Your image size must be smaller than 5MB. Acceptable formats:<br/> .gif, .jpg, or .png file.</p>
+                        <h2>{t("upload_img1")}</h2>
+                        <p className="file_size_description">{t("upload_img2")}</p>
                         <div className="controls">
                             <div className="modal_upload_section">
                                 <div className="modal_upload_item">
                                     <label htmlFor="image-upload-btn" className="btn btn-new-gray file-upload-btn">
-                                        Choose File
+                                        {t("upload_img3")}
                                         <input type="file" className="custom-file file-upload" id="image-upload-btn" name="file" accept="image/png,image/jpeg,image/jpg"
                                                onChange={(e) => {
                                                    if (e.target.files && e.target.files.length) {
@@ -5358,11 +5651,11 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                }}
                                         />
                                     </label>
-                                    <div className="file-name file-upload-btn">{selectedFileName === "" ? "No File Chosen" : selectedFileName}</div>
+                                    <div className="file-name file-upload-btn">{selectedFileName === "" ? t("upload_img5") : selectedFileName}</div>
                                 </div>
                                 <div className="modal_upload_item">
                                     <input className="file_name_text" type="text" value={editedFileName} onChange={(e) => setEditedFileName(e.target.value)}
-                                           placeholder="Image Name"/>
+                                           placeholder={t("upload_img4")}/>
                                 </div>
                             </div>
                         </div>
@@ -5374,7 +5667,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                     setEditedFileName("");
                                     modalHandleClose("uploadImg");
                                     setDetailsShow(false)
-                                }}>Cancel
+                                }}>{t("Cancel")}
                                 </button>
                                 <div className="btn btn-new-dark image_submit file-upload-btn btn-disabled" onClick={() => {
                                     submitUploadedFile(2);
@@ -5416,13 +5709,13 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                  setSelectedFileName("");
                              }
                          }}>
-                        <h2>Upload Your PDF</h2>
-                        <p className="file_size_description">Your pdf size must be smaller than 5MB.</p>
+                        <h2>{t("upload_pdf1")}</h2>
+                        <p className="file_size_description">{t("upload_pdf2")}</p>
                         <div className="controls">
                             <div className="modal_upload_section">
                                 <div className="modal_upload_item">
                                     <label htmlFor="file-upload-btn" className="btn btn-new-gray file-upload-btn">
-                                        Choose File
+                                        {t("upload_pdf3")}
                                         <input type="file" className="custom-file file-upload" name="file" id="file-upload-btn" accept="application/pdf"
                                                onChange={(e) => {
                                                    if (e.target.files && e.target.files.length) {
@@ -5450,11 +5743,11 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                    }
                                                }}/>
                                     </label>
-                                    <div className="file-name file-upload-btn">{selectedFileName === "" ? "No File Chosen" : selectedFileName}</div>
+                                    <div className="file-name file-upload-btn">{selectedFileName === "" ? t("upload_pdf5") : selectedFileName}</div>
                                 </div>
                                 <div className="modal_upload_item">
                                     <input className="file_name_text" type="text" value={editedFileName} onChange={(e) => setEditedFileName(e.target.value)}
-                                           placeholder="PDF Name"/>
+                                           placeholder={t("upload_pdf4")}/>
                                 </div>
                             </div>
                         </div>
@@ -5466,7 +5759,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                     setEditedFileName("");
                                     modalHandleClose("uploadPdf");
                                     setDetailsShow(false)
-                                }}>Cancel
+                                }}>{t("Cancel")}
                                 </button>
                                 <div className="btn btn-new-dark image_submit file-upload-btn btn-disabled" onClick={() => {
                                     submitUploadedFile(1);
@@ -5491,10 +5784,9 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                     <p>{t("WIDTH DISCREPANCIES")}</p>
                 </Modal.Header>
                 <Modal.Body>
-                    <p>We noticed that there’s quite a difference in some of your measurements, and this could affect the fit of your custom shades.</p>
+                    <p>{t("WIDTH DISCREPANCIES_1")}</p>
                     <br/>
-                    <p>Before you continue, please make sure you read &amp; understand our return policy, and if you need help, please feel free to contact us! Our designers
-                        can help you work out any discrepancies to make sure you love your new custom drapery.</p>
+                    <p>{t("WIDTH DISCREPANCIES_2")}</p>
                     <br/>
                     
                     <div className="buttons_section">
@@ -5517,7 +5809,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                         <button className="btn white_btn" onClick={() => {
                             modalHandleClose("widthDifferent");
                             setAccordionActiveKey("3B");
-                        }}>I AGREE, CONTINUE ANYWAY
+                        }}>{t("I AGREE, CONTINUE ANYWAY")}
                         </button>
                     </div>
                 
@@ -5538,9 +5830,10 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                     <ul className="addToCartErr_list">
                         {addCartErr}
                     </ul>
-                    <p>{t("addToCartErr1")}</p>
-                    <p>{t("addToCartErr2")}</p>
-                    <p>{t("addToCartErr3")}</p>
+                    <br/>
+                    <span>{t("addToCartErr1")}</span>
+                    {/*<span>{t("addToCartErr2")}</span>*/}
+                    <span>{t("addToCartErr3")}</span>
                     
                     <br/>
                     <div className="text_center">
@@ -5563,10 +5856,9 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                     <p>{t("HEIGHT DISCREPANCIES")}</p>
                 </Modal.Header>
                 <Modal.Body>
-                    <p>We noticed that there’s quite a difference in some of your measurements, and this could affect the fit of your custom shades.</p>
+                    <p>{t("HEIGHT DISCREPANCIES_1")}</p>
                     <br/>
-                    <p>Before you continue, please make sure you read &amp; understand our return policy, and if you need help, please feel free to contact us! Our designers
-                        can help you work out any discrepancies to make sure you love your new custom drapery.</p>
+                    <p>{t("HEIGHT DISCREPANCIES_2")}</p>
                     <br/>
                     
                     <div className="buttons_section">
@@ -5589,7 +5881,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                         <button className="btn white_btn" onClick={() => {
                             modalHandleClose("heightDifferent");
                             setAccordionActiveKey("4");
-                        }}>I AGREE, CONTINUE ANYWAY
+                        }}>{t("I AGREE, CONTINUE ANYWAY")}
                         </button>
                     </div>
                 
@@ -5813,6 +6105,21 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                     {projectModalState === 2 &&
                     <ModalLogin/>
                     }
+                </Modal.Body>
+            </Modal>
+            
+            <Modal backdrop="static" keyboard={false}
+                   className={`cart_modal_container cart_agree_container add_to_project_modal side_login_modal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                   dialogClassName={`cart_modal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                   show={modals["side_login_modal"] === undefined ? false : modals["side_login_modal"]}
+                   onHide={() => {
+                       modalHandleClose("side_login_modal");
+                       setSwatchLogin(false);
+                   }} id="side_login_modal">
+                <Modal.Header closeButton>
+                </Modal.Header>
+                <Modal.Body>
+                    <ModalLogin/>
                 </Modal.Body>
             </Modal>
             

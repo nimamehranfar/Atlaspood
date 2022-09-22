@@ -410,8 +410,8 @@ function ModalLogin() {
                 }
                 {!registerPage &&
                 <div className="no_acc_modal_login">
-                    <h1>DON'T HAVE AN ACCOUNT?</h1>
-                    <h6 className="text_underline_light" onClick={() => setRegisterPage(true)}>Register for your account today</h6>
+                    <h1>{t("DON'T HAVE AN ACCOUNT?")}</h1>
+                    <h6 className="text_underline_light" onClick={() => setRegisterPage(true)}>{t("Register for your account today")}</h6>
                 </div>
                 }
                 {registerPage &&

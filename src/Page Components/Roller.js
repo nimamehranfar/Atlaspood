@@ -66,7 +66,7 @@ const baseURLFilterPrice = "https://api.atlaspood.ir/BaseType/GetPriceLevel";
 function Roller({CatID, ModelID, ProjectId, EditIndex}) {
     const {t} = useTranslation();
     const location = useLocation();
-    let pageLanguage = location.pathname.split('').slice(1, 3).join('');
+    const [pageLanguage, setPageLanguage] = React.useState(location.pathname.split('').slice(1, 3).join(''));
     const [firstRender, setFirstRender] = useState(true);
     const [catID, setCatID] = useState(CatID);
     const [modelID, setModelID] = useState(ModelID);
@@ -604,6 +604,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                 obj.checked = false;
         });
         search_input.current.value = "";
+        setSearchText("");
         setSearchShow(false);
         
         setFilterColors([]);
@@ -3154,13 +3155,23 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
         }
     }, [modelID, catID]);
     
+    async function setLang() {
+        const tempLang = location.pathname.split('');
+        setPageLanguage(tempLang.slice(1, 3).join(''));
+    }
     
     useEffect(() => {
-        if (Object.keys(fabrics).length) {
-            renderFabrics();
-        } else {
-            setFabricsList([]);
-        }
+        setLang().then(() => {
+            if (pageLanguage !== '') {
+                if (Object.keys(fabrics).length) {
+                    setTimeout(() => {
+                        renderFabrics();
+                    }, 100);
+                } else {
+                    setFabricsList([]);
+                }
+            }
+        });
     }, [fabrics, location.pathname]);
     
     useEffect(() => {
@@ -3388,6 +3399,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                     {searchShow &&
                                                     <div className="clear-icon-container" onClick={() => {
                                                         search_input.current.value = "";
+                                                        setSearchText("");
                                                         setSearchShow(false)
                                                     }}>
                                                         <i className="fa fa-times-circle clear-icon"/>
@@ -3461,8 +3473,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
                                                             <div className="filter_items_container">
-                                                                <div className="price_filter_description">Pricing tiers determine the upholstery cost of our furniture prices. All
-                                                                    swatch samples ship free no matter the tier.
+                                                                <div className="price_filter_description">{t("filter_price_title")}
                                                                 </div>
                                                                 {sewingPrices}
                                                             </div>
@@ -4687,7 +4698,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                 <p className="help_column_header">{t("step4_help_4")}</p>
                                                 <ul className="help_column_list">
                                                     <li>{t("step4_help_5")}</li>
-                                                    <li>{t("step4_help_5.5")}</li>
+                                                    {/*<li>{t("step4_help_5.5")}</li>*/}
                                                     <li>{t("step4_help_6")}</li>
                                                 </ul>
                                             </div>
@@ -5761,7 +5772,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                     </div>
                 </Modal.Body>
             </Modal>
-            
+    
             <Modal dialogClassName={`upload_modal uploadImg_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["uploadImg"] === undefined ? false : modals["uploadImg"]}
                    onHide={() => {
@@ -5782,9 +5793,9 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                          onDrop={(e) => {
                              e.preventDefault();
                              e.stopPropagation();
-                        
+                
                              const {files} = e.dataTransfer;
-                        
+                
                              if (files && files.length && (files[0].type === "image/jpg" || files[0].type === "image/jpeg" || files[0].type === "image/png")) {
                                  uploadImg(files[0]);
                              } else {
@@ -5792,13 +5803,13 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                  setSelectedFileName("");
                              }
                          }}>
-                        <h2>Upload Your Image</h2>
-                        <p className="file_size_description">Your image size must be smaller than 5MB. Acceptable formats:<br/> .gif, .jpg, or .png file.</p>
+                        <h2>{t("upload_img1")}</h2>
+                        <p className="file_size_description">{t("upload_img2")}</p>
                         <div className="controls">
                             <div className="modal_upload_section">
                                 <div className="modal_upload_item">
                                     <label htmlFor="image-upload-btn" className="btn btn-new-gray file-upload-btn">
-                                        Choose File
+                                        {t("upload_img3")}
                                         <input type="file" className="custom-file file-upload" id="image-upload-btn" name="file" accept="image/png,image/jpeg,image/jpg"
                                                onChange={(e) => {
                                                    if (e.target.files && e.target.files.length) {
@@ -5815,9 +5826,9 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                onDrop={(e) => {
                                                    e.preventDefault();
                                                    e.stopPropagation();
-                                            
+                                    
                                                    const {files} = e.dataTransfer;
-                                            
+                                    
                                                    if (files && files.length && (files[0].type === "image/jpg" || files[0].type === "image/jpeg" || files[0].type === "image/png")) {
                                                        uploadImg(files[0]);
                                                    } else {
@@ -5827,11 +5838,11 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                }}
                                         />
                                     </label>
-                                    <div className="file-name file-upload-btn">{selectedFileName === "" ? "No File Chosen" : selectedFileName}</div>
+                                    <div className="file-name file-upload-btn">{selectedFileName === "" ? t("upload_img5") : selectedFileName}</div>
                                 </div>
                                 <div className="modal_upload_item">
                                     <input className="file_name_text" type="text" value={editedFileName} onChange={(e) => setEditedFileName(e.target.value)}
-                                           placeholder="Image Name"/>
+                                           placeholder={t("upload_img4")}/>
                                 </div>
                             </div>
                         </div>
@@ -5843,7 +5854,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                     setEditedFileName("");
                                     modalHandleClose("uploadImg");
                                     setDetailsShow(false)
-                                }}>Cancel
+                                }}>{t("Cancel")}
                                 </button>
                                 <div className="btn btn-new-dark image_submit file-upload-btn btn-disabled" onClick={() => {
                                     submitUploadedFile(2);
@@ -5857,7 +5868,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                 {/*    */}
                 {/*</Modal.Footer>*/}
             </Modal>
-            
+    
             <Modal dialogClassName={`upload_modal uploadPdf_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["uploadPdf"] === undefined ? false : modals["uploadPdf"]}
                    onHide={() => {
@@ -5875,9 +5886,9 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                          onDrop={(e) => {
                              e.preventDefault();
                              e.stopPropagation();
-                        
+                
                              const {files} = e.dataTransfer;
-                        
+                
                              if (files && files.length && files[0].type === "application/pdf") {
                                  uploadImg(files[0]);
                              } else {
@@ -5885,13 +5896,13 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                  setSelectedFileName("");
                              }
                          }}>
-                        <h2>Upload Your PDF</h2>
-                        <p className="file_size_description">Your pdf size must be smaller than 5MB.</p>
+                        <h2>{t("upload_pdf1")}</h2>
+                        <p className="file_size_description">{t("upload_pdf2")}</p>
                         <div className="controls">
                             <div className="modal_upload_section">
                                 <div className="modal_upload_item">
                                     <label htmlFor="file-upload-btn" className="btn btn-new-gray file-upload-btn">
-                                        Choose File
+                                        {t("upload_pdf3")}
                                         <input type="file" className="custom-file file-upload" name="file" id="file-upload-btn" accept="application/pdf"
                                                onChange={(e) => {
                                                    if (e.target.files && e.target.files.length) {
@@ -5908,9 +5919,9 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                onDrop={(e) => {
                                                    e.preventDefault();
                                                    e.stopPropagation();
-                                            
+                                    
                                                    const {files} = e.dataTransfer;
-                                            
+                                    
                                                    if (files && files.length && files[0].type === "application/pdf") {
                                                        uploadImg(files[0]);
                                                    } else {
@@ -5919,11 +5930,11 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                    }
                                                }}/>
                                     </label>
-                                    <div className="file-name file-upload-btn">{selectedFileName === "" ? "No File Chosen" : selectedFileName}</div>
+                                    <div className="file-name file-upload-btn">{selectedFileName === "" ? t("upload_pdf5") : selectedFileName}</div>
                                 </div>
                                 <div className="modal_upload_item">
                                     <input className="file_name_text" type="text" value={editedFileName} onChange={(e) => setEditedFileName(e.target.value)}
-                                           placeholder="PDF Name"/>
+                                           placeholder={t("upload_pdf4")}/>
                                 </div>
                             </div>
                         </div>
@@ -5935,7 +5946,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                     setEditedFileName("");
                                     modalHandleClose("uploadPdf");
                                     setDetailsShow(false)
-                                }}>Cancel
+                                }}>{t("Cancel")}
                                 </button>
                                 <div className="btn btn-new-dark image_submit file-upload-btn btn-disabled" onClick={() => {
                                     submitUploadedFile(1);
@@ -6007,9 +6018,9 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                     <ul className="addToCartErr_list">
                         {addCartErr}
                     </ul>
-                    <p>{t("addToCartErr1")}</p>
-                    <p>{t("addToCartErr2")}</p>
-                    <p>{t("addToCartErr3")}</p>
+                    <span>{t("addToCartErr1")}</span>
+                    <span>{t("addToCartErr2")}</span>
+                    <span>{t("addToCartErr3")}</span>
                     
                     <br/>
                     <div className="text_center">

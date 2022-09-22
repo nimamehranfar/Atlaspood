@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import {useTranslation} from "react-i18next";
-import {Link, useLocation, useNavigate} from "react-router-dom";
+import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 import Breadcrumb from "react-bootstrap/Breadcrumb";
 import {func} from "prop-types";
 import axios from "axios";
@@ -32,6 +32,7 @@ const baseURLDeleteFile = "https://api.atlaspood.ir/SewingOrderAttachment/Delete
 function Basket() {
     const {t} = useTranslation();
     const location = useLocation();
+    const {swatchOnly} = useParams();
     const [pageLanguage, setPageLanguage] = React.useState(location.pathname.split('').slice(1, 3).join(''));
     const {isLoggedIn, isRegistered, user, showLogin} = useSelector((state) => state.auth);
     const dispatch = useDispatch();
@@ -46,6 +47,7 @@ function Basket() {
     const [productCount, setProductCount] = useState(0);
     const [swatches, setSwatches] = useState([]);
     const [swatchesList, setSwatchesList] = useState([]);
+    const [swatchesTotalPrice, setSwatchesTotalPrice] = useState(0);
     const [swatchesCount, setSwatchesCount] = useState(0);
     const [cartChanged, setCartChanged] = useState(0);
     const draperyRef = useRef([]);
@@ -214,7 +216,7 @@ function Basket() {
     }
     
     function deleteBasketProject(refIndex) {
-        draperyRef.current[refIndex].className = "drapery_basket_item is_loading";
+        draperyRef.current[refIndex].classList.add("is_loading");
         axios.delete(baseURLDeleteBasketProject, {
             params: {
                 detailId: refIndex
@@ -222,7 +224,7 @@ function Basket() {
             headers: authHeader()
         }).then((response) => {
             if (draperyRef.current[refIndex]) {
-                draperyRef.current[refIndex].className = "drapery_basket_item";
+                draperyRef.current[refIndex].classList.remove("is_loading");
             }
             setCartChanged(cartChanged + 1);
         }).catch(err => {
@@ -236,19 +238,19 @@ function Basket() {
                 });
             } else {
                 if (draperyRef.current[refIndex]) {
-                    draperyRef.current[refIndex].className = "drapery_basket_item";
+                    draperyRef.current[refIndex].classList.remove("is_loading");
                 }
             }
         });
     }
     
     function saveForLaterBasketProject(refIndex) {
-        draperyRef.current[refIndex].className = "drapery_basket_item is_loading";
+        draperyRef.current[refIndex].classList.add("is_loading");
         axios.post(baseURLSaveForLaterBasketProject + "/" + refIndex, {}, {
             headers: authHeader()
         }).then((response) => {
             if (draperyRef.current[refIndex]) {
-                draperyRef.current[refIndex].className = "drapery_basket_item";
+                draperyRef.current[refIndex].classList.remove("is_loading");
             }
             setCartChanged(cartChanged + 1);
         }).catch(err => {
@@ -262,7 +264,7 @@ function Basket() {
                 });
             } else {
                 if (draperyRef.current[refIndex]) {
-                    draperyRef.current[refIndex].className = "drapery_basket_item";
+                    draperyRef.current[refIndex].classList.remove("is_loading");
                 }
             }
         });
@@ -471,10 +473,28 @@ function Basket() {
     useEffect(() => {
         if (Object.keys(cart).length !== 0) {
             if (isLoggedIn) {
-                setTotalPrice(cart["TotalAmount"]);
-                setDrapery(cart["CartDetails"]);
-                setDraperyCount(cart["CartDetails"].length);
-                // console.log(cart["CartDetails"].length);
+                if (swatchOnly === undefined) {
+                    let draperies = cart["CartDetails"].filter((object1) => {
+                        return object1["TypeId"] === 6403;
+                    });
+                    
+                    let swatches = cart["CartDetails"].filter((object1) => {
+                        return object1["TypeId"] === 6402;
+                    });
+                    setTotalPrice(cart["TotalAmount"]);
+                    setDrapery(draperies);
+                    setDraperyCount(draperies.length);
+                    setSwatches(swatches);
+                    setSwatchesCount(swatches.length);
+                } else if (swatchOnly && swatchOnly === "Swatches") {
+                    let swatches = cart["CartDetails"].filter((object1) => {
+                        return object1["TypeId"] === 6402;
+                    });
+                    setSwatches(swatches);
+                    setSwatchesCount(swatches.length);
+                } else {
+                    navigate("/" + pageLanguage);
+                }
             } else {
                 if (cart["drapery"] === undefined || cart["drapery"] === []) {
                     setDrapery([]);
@@ -788,7 +808,7 @@ function Basket() {
                                         }
                                     }
                                 });
-            
+                                
                                 tempPostObj["SewingOrderDetails"] = [];
                                 tempPostObj["SewingOrderDetails"][0] = {};
                                 tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
@@ -816,7 +836,7 @@ function Basket() {
                                             if (tempObj["apiAcc"] === true) {
                                                 tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
                                             } else {
-                            
+                                            
                                             }
                                         }
                                     }
@@ -824,11 +844,11 @@ function Basket() {
                                 tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
                                     return el != null;
                                 });
-            
+                                
                                 // delete tempPostObj["SewingOrderDetails"][0]["SewingModelId"];
                                 // delete tempPostObj["SewingModelId"];
                                 tempPostObj["SewingModelId"] = tempPostObj["SewingOrderDetails"][0]["SewingModelId"];
-            
+                                
                                 if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
                                     axios.post(baseURLPrice, tempPostObj).then((response) => {
                                         resolve(response);
@@ -897,7 +917,7 @@ function Basket() {
                                                         {/*                             <GetMeasurementArray modelId={`${SewingModelId}`} cartValues={temp}/>*/}
                                                         {/*                         </div>*/}
                                                         {/*                     }/>*/}
-                                                        <Dropdown autoClose="outside" title=""  align={pageLanguage === "fa" ? "end" : "start"}>
+                                                        <Dropdown autoClose="outside" title="" align={pageLanguage === "fa" ? "end" : "start"}>
                                                             <Dropdown.Toggle className="basket_item_title_dropdown_btn">
                                                                 <h4 className="basket_item_details">{t("View Details")}</h4>
                                                                 <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default}
@@ -955,59 +975,60 @@ function Basket() {
                                 
                                 temp[index] =
                                     <li className="drapery_basket_item" key={index} ref={ref => (draperyRef.current[index] = ref)}>
-                        <span className="basket_item_title">
-                            <div className="basket_item_image_container">
-                                <img src={`https://api.atlaspood.ir/${photoUrl}`} alt="" className="basket_item_img"/>
-                            </div>
-                            <div className="basket_item_title_container">
-                                <div className="basket_item_title_name">{pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</div>
-                                {/*<div className="basket_item_title_desc">*/}
-                                {/*    <h3>Fabric Material & Color&nbsp;&nbsp;&nbsp;&nbsp;</h3>*/}
-                                {/*    <h4>{pageLanguage === 'fa' ? fabricDesignFa + " / " + fabricColorFa : fabricDesign + " / " + fabricColor}</h4>*/}
-                                {/*</div>*/}
-                                {desc}
-                                <div className="basket_item_title_desc">
-                                    <h3>{pageLanguage === 'fa' ? "نام اتاق" : "Room Label"}&nbsp;</h3>
-                                    <h4>{pageLanguage === 'fa' ? roomNameFa + (WindowName === "" ? "" : " / " + WindowName) : roomName + (WindowName === "" ? "" : " / " + WindowName)}</h4>
-                                </div>
-                                <div className="basket_item_desc_button">
-                                    <Link className="btn basket_desc_button"
-                                          to={"/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[obj["SewingModelId"]]["route"] + "/Bag-Projects/" + index}>{t("EDIT")}</Link>
-                                    <button className="basket_desc_button" onClick={() => copyItem(index)}>{t("COPY")}</button>
-                                </div>
-                                <div className="basket_item_delivery_section">
-                                    <div className="basket_item_delivery_avail">
-                                        <h1 className="basket_item_delivery_title">{t("AVAILABILITY")}</h1>
-                                        <h2 className="basket_item_delivery_desc">{t("AVAILABILITY_desc")}</h2>
-                                    </div>
-                                    <div className="basket_item_delivery_return">
-                                        <h1 className="basket_item_delivery_title">{t("RETURNS")}</h1>
-                                        <h2 className="basket_item_delivery_desc">{t("RETURNS_desc")}<p>{t("Return Policy")}</p></h2>
-                                    </div>
-                                </div>
-                            </div>
-                        </span>
+                                        <span className="basket_item_title">
+                                            <div className="basket_item_image_container">
+                                                <img src={`https://api.atlaspood.ir/${photoUrl}`} alt="" className="basket_item_img"/>
+                                            </div>
+                                            <div className="basket_item_title_container">
+                                                <div
+                                                    className="basket_item_title_name">{pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</div>
+                                                {/*<div className="basket_item_title_desc">*/}
+                                                {/*    <h3>Fabric Material & Color&nbsp;&nbsp;&nbsp;&nbsp;</h3>*/}
+                                                {/*    <h4>{pageLanguage === 'fa' ? fabricDesignFa + " / " + fabricColorFa : fabricDesign + " / " + fabricColor}</h4>*/}
+                                                {/*</div>*/}
+                                                {desc}
+                                                <div className="basket_item_title_desc">
+                                                    <h3>{pageLanguage === 'fa' ? "نام اتاق" : "Room Label"}&nbsp;</h3>
+                                                    <h4>{pageLanguage === 'fa' ? roomNameFa + (WindowName === "" ? "" : " / " + WindowName) : roomName + (WindowName === "" ? "" : " / " + WindowName)}</h4>
+                                                </div>
+                                                <div className="basket_item_desc_button">
+                                                    <Link className="btn basket_desc_button"
+                                                          to={"/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[obj["SewingModelId"]]["route"] + "/Bag-Projects/" + index}>{t("EDIT")}</Link>
+                                                    <button className="basket_desc_button" onClick={() => copyItem(index)}>{t("COPY")}</button>
+                                                </div>
+                                                <div className="basket_item_delivery_section">
+                                                    <div className="basket_item_delivery_avail">
+                                                        <h1 className="basket_item_delivery_title">{t("AVAILABILITY")}</h1>
+                                                        <h2 className="basket_item_delivery_desc">{t("AVAILABILITY_desc")}</h2>
+                                                    </div>
+                                                    <div className="basket_item_delivery_return">
+                                                        <h1 className="basket_item_delivery_title">{t("RETURNS")}</h1>
+                                                        <h2 className="basket_item_delivery_desc">{t("RETURNS_desc")}<p>{t("Return Policy")}</p></h2>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </span>
                                         <span
                                             className="basket_item_price">{GetPrice((obj1["price"]), pageLanguage, t("TOMANS"))}</span>
                                         <span className="basket_item_qty">
-                        <div className="basket_item_qty_numbers">
-                            <button type="text" className="basket_qty_minus" onClick={() => setBasketNumber(index, 0, 0, -1)}><img
-                                src={require('../Images/public/minus.svg').default} alt="" className="qty_math_icon"/></button>
-                            <input type="text" className="basket_qty_num"
-                                   value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${obj1["Count"]}`) : obj1["Count"]}
-                                   onChange={(e) => setBasketNumber(index, NumberToPersianWord.convertPeToEn(`${e.target.value}`), 0)} readOnly/>
-                            <button type="text" className="basket_qty_plus" onClick={() => setBasketNumber(index, 0, 0, 1)}><img src={require('../Images/public/plus.svg').default}
-                                                                                                                                 alt="" className="qty_math_icon"/></button>
-                        </div>
-                        <div className="basket_item_qty_button">
-                            <button className="basket_button basket_button_remove" onClick={() => setBasketNumber(index, 0, 0)}>{t("X REMOVE")}</button>
-                        </div>
-                        <div className="basket_item_qty_button">
-                            <button className="basket_button basket_button_edit"><p>+</p>&nbsp;<h4>{t("WISHLIST")}</h4></button>
-                        </div>
-                            </span>
-                                        <span
-                                            className="basket_item_total">{GetPrice(obj1["price"] * obj1["Count"], pageLanguage, t("TOMANS"))}</span>
+                                            <div className="basket_item_qty_numbers">
+                                                <button type="text" className="basket_qty_minus" onClick={() => setBasketNumber(index, 0, 0, -1)}><img
+                                                    src={require('../Images/public/minus.svg').default} alt="" className="qty_math_icon"/></button>
+                                                <input type="text" className="basket_qty_num"
+                                                       value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${obj1["Count"]}`) : obj1["Count"]}
+                                                       onChange={(e) => setBasketNumber(index, NumberToPersianWord.convertPeToEn(`${e.target.value}`), 0)} readOnly/>
+                                                <button type="text" className="basket_qty_plus" onClick={() => setBasketNumber(index, 0, 0, 1)}><img
+                                                    src={require('../Images/public/plus.svg').default}
+                                                    alt="" className="qty_math_icon"/></button>
+                                            </div>
+                                            <div className="basket_item_qty_button">
+                                                <button className="basket_button basket_button_remove" onClick={() => setBasketNumber(index, 0, 0)}>{t("X REMOVE")}</button>
+                                            </div>
+                                            <div className="basket_item_qty_button">
+                                                <button className="basket_button basket_button_edit"><p>+</p>&nbsp;<h4>{t("WISHLIST")}</h4></button>
+                                            </div>
+                                        </span>
+                                        <span className="basket_item_total">{GetPrice(obj1["price"] * obj1["Count"], pageLanguage, t("TOMANS"))}</span>
                                     </li>;
                                 
                                 if (index === tempDrapery.length - 1) {
@@ -1035,6 +1056,54 @@ function Basket() {
             }
         }
     }, [drapery]);
+    
+    useEffect(() => {
+        if (isLoggedIn) {
+            let temp = [];
+            let tempTotal = 0;
+            let promise2 = new Promise((resolve, reject) => {
+                for (let i = 0; i < swatches.length; i++) {
+                    let obj = swatches[i];
+                    let CartDetailId = obj["CartDetailId"];
+                    let ProductEnName = obj["ProductEnName"];
+                    let ProductName = obj["ProductName"];
+                    let ProductDesignEnName = obj["ProductDesignEnName"];
+                    let ProductDesignName = obj["ProductDesignName"];
+                    let ProductColorEnName = obj["ProductColorEnName"];
+                    let ProductColorName = obj["ProductColorName"];
+                    let photoUrl = obj["PhotoUrl"];
+                    let price = obj["TotalAmount"];
+                    tempTotal += price;
+                    temp[i] =
+                        <li className="swatches_basket_item" key={i} ref={ref => (draperyRef.current[CartDetailId] = ref)}>
+                            <div className="swatches_item_image_container">
+                                <img src={`https://api.atlaspood.ir/${photoUrl}`} alt="" className="swatches_item_img img-fluid"/>
+                            </div>
+                            <div className="swatches_item_title_container">
+                                <div className="swatches_item_title_name">{pageLanguage === 'fa' ? ProductDesignName : ProductDesignEnName}</div>
+                                <div className="swatches_item_remove">
+                                    <button type="button" className="btn-close" onClick={() => setBasketNumber(CartDetailId, 0, 0)}/>
+                                </div>
+                            </div>
+                            <div className="swatches_item_title_name">{pageLanguage === 'fa' ? ProductColorName : ProductColorEnName}</div>
+                            <div className="swatches_item_title_price">{price === 0 ? t("Free") : GetPrice(price, pageLanguage, t("TOMANS"))}</div>
+                            
+                        
+                        </li>;
+                    if (i === swatches.length - 1) {
+                        resolve();
+                    }
+                }
+            });
+            promise2.then(() => {
+                setSwatchesTotalPrice(tempTotal);
+                setSwatchesList(temp);
+                if (swatchOnly && swatchOnly === "Swatches") {
+                    setTotalPrice(tempTotal);
+                }
+            });
+        }
+    }, [swatches]);
     
     useEffect(() => {
         const tempLang = location.pathname.split('');
@@ -1080,16 +1149,26 @@ function Basket() {
                             
                             </ul>
                         </div>}
-                        {swatchesCount > 0 && <div className="samples_basket">
-                            <div className="samples_basket_header basket_header">
-                                <span className="basket_header_title">SAMPLES</span>
-                                <span className="basket_header_price">PRICE</span>
-                                <span className="basket_header_qty">QTY</span>
-                                <span className="basket_header_total">TOTAL PRICE</span>
+                        {swatchesCount > 0 && <div className="swatches_basket">
+                            <div className="swatches_basket_header basket_header">
+                                <span className="basket_header_title">SWATCHES</span>
+                                <span className="basket_header_price"/>
+                                <span className="basket_header_qty"/>
+                                <span className="basket_header_swatches_only">
+                                    <div className="arrow_container" onClick={()=>navigate("/"+ pageLanguage+"/Checkout/Swatches")}>
+                                        <span className="swatches_only">Order Swatches Only</span>
+                                        <span className="arrow_body"><span className="head"/></span>
+                                    </div>
+                                </span>
                             </div>
-                            <ul className="samples_basket_items">
-                            
-                            </ul>
+                            <div className="swatch_list_container">
+                                <ul className="swatches_basket_items">
+                                    {swatchesList}
+                                </ul>
+                                <div className="swatch_price_section">
+                                    <span className="total_swatch_price">{swatchesTotalPrice > 0 ? GetPrice(swatchesTotalPrice, pageLanguage, t("TOMANS")) : t("Free")}</span>
+                                </div>
+                            </div>
                         </div>}
                     </div>
                     {/*<div className="payment_section">*/}

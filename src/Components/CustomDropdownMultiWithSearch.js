@@ -1,8 +1,10 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
+import NumberToPersianWord from "number_to_persian_word";
 
 function CustomDropdownMultiWithSearch({props, state, methods}) {
     const regexp = new RegExp(state.search, "i");
+    const regexp2 = new RegExp(NumberToPersianWord.convertEnToPe(`${state.search.toLocaleString()}`), "i");
     const {t} = useTranslation();
     
     return (
@@ -18,7 +20,9 @@ function CustomDropdownMultiWithSearch({props, state, methods}) {
             <div>
                 {props.options
                     .filter(item =>
-                        regexp.test(item[props.searchBy] || item[props.labelField])
+                        regexp.test(item[props.searchBy] || item[props.labelField] || NumberToPersianWord.convertEnToPe(`${item[props.searchBy].toLocaleString()}`) || NumberToPersianWord.convertEnToPe(`${item[props.labelField].toLocaleString()}`)) ||
+                        regexp2.test(item[props.searchBy] || item[props.labelField] || NumberToPersianWord.convertEnToPe(`${item[props.searchBy].toLocaleString()}`) || NumberToPersianWord.convertEnToPe(`${item[props.labelField].toLocaleString()}`))
+
                     )
                     .map(option => {
                         let exist="false";

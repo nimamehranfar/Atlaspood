@@ -115,6 +115,7 @@ function App({t}) {
                             <Route path="Curtain/:catID" element={<Curtain/>}/>
                             <Route path="Product/:catID" element={<Product/>}/>
                             <Route path="Basket" element={<Basket/>}/>
+                            <Route path="Basket/:swatchOnly" element={<Basket/>}/>
                             <Route path="User" element={isRegistered ? <Navigate replace to="/en/Account"/> : (isLoggedIn ? <Navigate to="/en/Account/OrderHistory"/> : <RegisterLogin/>)}/>
                             <Route path="User/NewUser" element={<Navigate replace to="/en/User"/>}/>
                             <Route path="User/Reset/:emailId/:resetId" element={<Reset/>}/>
@@ -131,6 +132,7 @@ function App({t}) {
                             <Route path="Curtain/:catID" element={<Curtain/>}/>
                             <Route path="Product/:catID" element={<Product/>}/>
                             <Route path="Basket" element={<Basket/>}/>
+                            <Route path="Basket/:swatchOnly" element={<Basket/>}/>
                             <Route path="User" element={isLoggedIn ? <Navigate replace to="/fa/Account"/> : <RegisterLogin/>}/>
                             <Route path="User/NewUser" element={<Navigate replace to="/fa/User"/>}/>
                             <Route path="User/Reset/:emailId/:resetId" element={<Reset/>}/>
@@ -148,12 +150,14 @@ function App({t}) {
                             <Route path="Curtain/:catID/:modelID/Saved-Projects/:projectId" element={<CustomCurtain/>}/>
                             <Route path="Curtain/:catID/:modelID/Bag-Projects/:editIndex" element={<CustomCurtain/>}/>
                             <Route path="Checkout" element={<Checkout/>}/>
+                            <Route path="Checkout/:swatchOnly" element={<Checkout/>}/>
                         </Route>
                         <Route path="/fa" element={<HeaderWithOutlet/>}>
                             <Route path="Curtain/:catID/:modelID" element={<CustomCurtain/>}/>
                             <Route path="Curtain/:catID/:modelID/Saved-Projects/:projectId" element={<CustomCurtain/>}/>
                             <Route path="Curtain/:catID/:modelID/Bag-Projects/:editIndex" element={<CustomCurtain/>}/>
                             <Route path="Checkout" element={<Checkout/>}/>
+                            <Route path="Checkout/:swatchOnly" element={<Checkout/>}/>
                         </Route>
                 
                         <Route path="/en" element={<NoHeaderNoFooter/>}>

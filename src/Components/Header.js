@@ -929,9 +929,9 @@ function Header() {
                                     <div className="card_menu_title">
                                         <span>Shopping Bag</span>
                                     </div>
-                                    <Link className="card_button" to="/">Swatches (<span id="swatch">0</span>)</Link>
+                                    <Link className="card_button" to={"/"+ pageLanguage+"/Basket/Swatches"}>Swatches (<span id="swatch">0</span>)</Link>
                                     <Link className="card_button" to="/">Product (<span id="procount">0</span>)</Link>
-                                    <Link className="card_button" to="/">Go To Bag</Link>
+                                    <Link className="card_button"  to={"/" + pageLanguage + "/Basket"}>Go To Bag</Link>
                                 </div>
                             </li>
                         </ul>
