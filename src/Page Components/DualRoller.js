@@ -56,13 +56,14 @@ const baseURLUploadPdf = "https://api.atlaspood.ir/SewingOrderAttachment/PdfUplo
 const baseURLDeleteFile = "https://api.atlaspood.ir/SewingOrderAttachment/Delete";
 const baseURLEditProject = "https://api.atlaspood.ir/SewingPreorder/Edit";
 const baseURLDeleteBasketProject = "https://api.atlaspood.ir/Cart/DeleteItem";
+
 const baseURLAddSwatch = "https://api.atlaspood.ir/Cart/Add";
 const baseURLFilterPattern = "https://api.atlaspood.ir/Sewing/GetModelPatternType";
 const baseURLFilterType = "https://api.atlaspood.ir/Sewing/GetModelDesignType";
 const baseURLFilterPrice = "https://api.atlaspood.ir/BaseType/GetPriceLevel";
 
 
-function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
+function DualRoller({CatID, ModelID, ProjectId, EditIndex}) {
     const {t} = useTranslation();
     const location = useLocation();
     const [pageLanguage, setPageLanguage] = React.useState(location.pathname.split('').slice(1, 3).join(''));
@@ -79,7 +80,9 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     const [model, setModel] = useState({});
     const [modelAccessories, setModelAccessories] = useState({});
     const [fabrics, setFabrics] = useState({});
+    const [fabrics2, setFabrics2] = useState({});
     const [fabricsList, setFabricsList] = useState([]);
+    const [fabricsList2, setFabricsList2] = useState([]);
     const [defaultFabricPhoto, setDefaultFabricPhoto] = useState(null);
     const [defaultModelName, setDefaultModelName] = useState("");
     const [defaultModelNameFa, setDefaultModelNameFa] = useState("");
@@ -92,6 +95,8 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     const [searchShow, setSearchShow] = useState(false);
     const [measurementsNextStep, setMeasurementsNextStep] = useState("4");
     const [controlTypeNextStep, setControlTypeNextStep] = useState("5");
+    const [headrailsNextStep, setHeadrailsNextStep] = useState("6");
+    const [hemStyleNextStep, setHemStyleNextStep] = useState("7");
     const [projectModalState, setProjectModalState] = useState(0);
     const [zoomModalHeader, setZoomModalHeader] = useState([]);
     const [zoomModalBody, setZoomModalBody] = useState([]);
@@ -108,6 +113,15 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     const [accordionActiveKey, setAccordionActiveKey] = useState("");
     const [roomLabelText, setRoomLabelText] = useState("");
     const [fabricSelected, setFabricSelected] = useState({
+        selectedFabricId: 0,
+        selectedTextEn: "",
+        selectedTextFa: "",
+        selectedColorEn: "",
+        selectedColorFa: "",
+        selectedHasTrim: false,
+        selectedPhoto: ""
+    });
+    const [fabricSelected2, setFabricSelected2] = useState({
         selectedFabricId: 0,
         selectedTextEn: "",
         selectedTextFa: "",
@@ -158,6 +172,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     });
     const [requiredStep, setRequiredStep] = useState({
         "1": false,
+        "15": false,
         "2": false,
         "3": false,
         "3AIn": false,
@@ -183,7 +198,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     });
     const [saveProjectCount, setSaveProjectCount] = useState(0);
     
-    const [depSet, setDepSet] = useState(new Set(['1', '2', '3', '4', '5', '61', '62']));
+    const [depSet, setDepSet] = useState(new Set(['1', '15', '2', '3', '4', '5', '6', '71', '72']));
     
     const inputs = useRef({});
     const selectedTitle = useRef({});
@@ -210,6 +225,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     const [filterPrices, setFilterPrices] = useState([]);
     
     const [step1, setStep1] = useState("");
+    const [step15, setStep15] = useState("");
     const [step2, setStep2] = useState("");
     const [step21, setStep21] = useState("");
     const [step3, setStep3] = useState("");
@@ -218,10 +234,20 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     const [step4A, setStep4A] = useState("");
     const [step4B, setStep4B] = useState("");
     const [step5, setStep5] = useState("");
+    const [step5A, setStep5A] = useState("");
+    const [step5B, setStep5B] = useState("");
+    const [step5C, setStep5C] = useState("");
+    const [step6, setStep6] = useState("");
+    const [step6A, setStep6A] = useState("");
     const [remoteName, setRemoteName] = useState("");
     const [selectedValanceColor1, setSelectedValanceColor1] = useState([]);
     const [selectedValanceColor2, setSelectedValanceColor2] = useState([]);
+    const [selectedPosition1, setSelectedPosition1] = useState([]);
+    const [selectedPosition2, setSelectedPosition2] = useState([]);
     const [selectedRoomLabel, setSelectedRoomLabel] = useState([]);
+    
+    const [selectedFrontPosition, setSelectedFrontPosition] = useState("");
+    const [selectedBackPosition, setSelectedBackPosition] = useState("");
     
     const [savedProjectRoomLabel, setSavedProjectRoomLabel] = useState("");
     const [savedProjectRoomText, setSavedProjectRoomText] = useState("");
@@ -278,6 +304,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
             });
             
             setFabrics(tempFabrics);
+            setFabrics2(tempFabrics);
         }).catch(err => {
             console.log(err);
         });
@@ -355,6 +382,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                 });
                 
                 setFabrics(tempFabrics);
+                setFabrics2(tempFabrics);
             }).catch(err => {
                 console.log(err);
             });
@@ -515,6 +543,136 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
         // console.log(fabricList)
     }
     
+    function renderFabrics2(bag) {
+        const fabricList = [];
+        let count = 0;
+        let cartObj = {};
+        let temp = [];
+        let pageLanguage1 = location.pathname.split('').slice(1, 3).join('');
+        if (Object.keys(bag).length > 0) {
+            if (isLoggedIn) {
+            
+            } else {
+                cartObj = JSON.parse(localStorage.getItem("cart"));
+                temp = cartObj["swatches"];
+            }
+        }
+        
+        Object.keys(fabrics2).forEach((key, index) => {
+            let fabrics = fabrics2;
+            let DesignName = convertToPersian(fabrics[key][0].DesignName);
+            let DesignEnName = fabrics[key][0].DesignEnName;
+            
+            const fabric = [];
+            for (let j = 0; j < fabrics[key].length; j++) {
+                let FabricId = fabrics[key][j].FabricId;
+                // console.log(fabrics,key);
+                let PhotoPath = "";
+                fabrics[key][j].FabricPhotos.forEach(obj => {
+                    if (obj.PhotoTypeId === 4702)
+                        PhotoPath = obj.PhotoUrl;
+                });
+                
+                let FabricOnModelPhotoUrl = fabrics[key][j].FabricOnModelPhotoUrl;
+                let HasTrim = fabrics[key][j].HasTrim;
+                let DesignCode = fabrics[key][j].DesignCode;
+                let DesignRaportLength = fabrics[key][j].DesignRaportLength;
+                let DesignRaportWidth = fabrics[key][j].DesignRaportWidth;
+                let PolyesterPercent = fabrics[key][j].PolyesterPercent;
+                let ViscosePercent = fabrics[key][j].ViscosePercent;
+                let NylonPercent = fabrics[key][j].NylonPercent;
+                let ColorName = convertToPersian(fabrics[key][j].ColorName);
+                let ColorEnName = fabrics[key][j].ColorEnName;
+                let SwatchId = fabrics[key][j].SwatchId ? fabrics[key][j].SwatchId : -1;
+                let HasSwatchId = false;
+                let swatchDetailId = undefined;
+                let index = -1;
+                if (isLoggedIn) {
+                    if (bag["CartDetails"]) {
+                        let index = bag["CartDetails"].findIndex(object => {
+                            return object["ProductId"] === SwatchId;
+                        });
+                        // console.log(index);
+                        if (index !== -1) {
+                            HasSwatchId = true;
+                            swatchDetailId = bag["CartDetails"][index]["CartDetailId"];
+                        }
+                    }
+                } else {
+                    if (temp.length > 0) {
+                        index = temp.findIndex(object => {
+                            return object["SwatchId"] === SwatchId;
+                        });
+                        if (index !== -1) {
+                            HasSwatchId = true;
+                        }
+                    }
+                }
+                // console.log(HasSwatchId);
+                // console.log(step15 === `${FabricId}`, step15, `${FabricId}`, FabricId);
+                
+                fabric.push(
+                    <div className={`radio_group ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key + j}>
+                        <label data-tip={`${pageLanguage1 === 'en' ? DesignEnName : DesignName}: ${pageLanguage1 === 'en' ? ColorEnName : ColorName}`}
+                               data-for={"fabric" + key + j} className={`radio_container ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}
+                               data-img={`https://www.doopsalta.com/upload/${PhotoPath}`}>
+                            {/*<ReactTooltip id={"fabric" + key + j} place="top" type="light" effect="float"/>*/}
+                            <input className="radio" type="radio" ref-num="15" default-fabric-photo={FabricOnModelPhotoUrl}
+                                   onChange={e => {
+                                       // console.log("hi1");
+                                       let temp = JSON.parse(JSON.stringify(fabricSelected2));
+                                       temp.selectedFabricId = FabricId;
+                                       temp.selectedTextEn = DesignEnName;
+                                       temp.selectedTextFa = DesignName;
+                                       temp.selectedColorEn = ColorEnName;
+                                       temp.selectedColorFa = ColorName;
+                                       temp.selectedHasTrim = HasTrim;
+                                       temp.selectedPhoto = FabricOnModelPhotoUrl;
+                                       setFabricSelected2(temp);
+                                       // fabricClicked(e, HasTrim);
+                                       // selectChanged(e);
+                                       // setCart("FabricId", FabricId);
+                                       // setDeps("", "15");
+                                   }} name="fabric2"
+                                   model-id={modelID} value={FabricId} text-en={DesignEnName} text-fa={DesignName} checked={`${FabricId}` === step15}
+                                   ref={ref => (inputs.current[`15${FabricId}`] = ref)}/>
+                            <div className="frame_img">
+                                <img className={`img-fluid ${`${FabricId}` === step15?"img-fluid_checked":""}`} src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
+                            </div>
+                        </label>
+                        <div className={`fabric_name_container ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
+                            <h1>{pageLanguage1 === 'en' ? ColorEnName : ColorName}</h1>
+                            <span onClick={() => {
+                                handleShow(fabrics[key][j], swatchDetailId);
+                                setHasSwatchId(HasSwatchId);
+                            }}><i className="fa fa-search" aria-hidden="true"/></span>
+                        </div>
+                        <button className={`swatchButton ${HasSwatchId ? "activeSwatch" : ""} ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}
+                                current-state={HasSwatchId ? "1" : "0"}
+                                onClick={(e) => {
+                                    fabricSwatch(e, SwatchId, swatchDetailId, PhotoPath);
+                                }} disabled={SwatchId === -1}>{HasSwatchId ? t("SWATCH IN CART") : t("ORDER" +
+                            " SWATCH")}</button>
+                    </div>
+                );
+                
+            }
+            
+            fabricList.push(
+                <div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key}>
+                    <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
+                        <hr/>
+                        <span>{t("DESIGN NAME")}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</span>
+                    </div>
+                    {fabric}
+                </div>
+            );
+            
+        });
+        setFabricsList2(fabricList);
+        // console.log(fabricList)
+    }
+    
     function handleClose() {
         setShow(false);
     }
@@ -530,7 +688,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
             if (obj["PhotoTypeId"] === 4702)
                 PhotoPath = obj["PhotoUrl"];
         });
-        // console.log(fabricObj);
+        console.log(fabricObj);
         let PriceLevelEnTitle = fabricObj["PriceLevelEnTitle"];
         let PriceLevelTitle = fabricObj["PriceLevelTitle"];
         let PolyesterPercent = fabricObj["PolyesterPercent"] || 0;
@@ -1053,7 +1211,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
             if (temp[key] !== null || temp[key] !== "") {
                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                 if (tempObj === undefined) {
-                    console.log(key);
+                    // console.log(key);
                     // window.location.reload();
                 } else {
                     if (tempObj["apiLabel"] !== "") {
@@ -1451,7 +1609,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
             Object.keys(temp).forEach(key => {
                 if (temp[key] !== null || temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
-                    // console.log(key,tempObj);
+                    // console.log(key, tempObj);
                     if (tempObj["apiLabel"] !== "") {
                         if (tempObj["apiValue"] === null) {
                             tempPostObj[tempObj["apiLabel"]] = temp[key];
@@ -2405,7 +2563,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
         if (data && Object.keys(data).length !== 0) {
             setProjectData(data);
         }
-    
+        
         let pageLanguage = location.pathname.split('').slice(1, 3).join('');
         let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
         let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
@@ -2423,8 +2581,9 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
             setCartValues(temp);
             
             let tempFabric = {};
+            let tempFabric2 = {};
             let promise2 = new Promise((resolve, reject) => {
-                if (temp["FabricId"]) {
+                if (temp["FabricId"] || temp["FabricId2"]) {
                     axios.get(baseURLFabrics, {
                         params: {
                             modelId: modelID
@@ -2433,6 +2592,9 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                         response.data.forEach(obj => {
                             if (obj["FabricId"] === temp["FabricId"]) {
                                 tempFabric = obj;
+                            }
+                            if (obj["FabricId"] === temp["FabricId2"]) {
+                                tempFabric2 = obj;
                             }
                         });
                         resolve();
@@ -2445,20 +2607,37 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                 }
             });
             promise2.then(() => {
-                if (tempFabric !== {}) {
-                    let temp1 = JSON.parse(JSON.stringify(fabricSelected));
-                    temp1.selectedFabricId = tempFabric.FabricId;
-                    temp1.selectedTextEn = tempFabric.DesignEnName;
-                    temp1.selectedTextFa = tempFabric.DesignName;
-                    temp1.selectedColorEn = tempFabric.ColorEnName;
-                    temp1.selectedColorFa = tempFabric.ColorName;
-                    temp1.selectedHasTrim = tempFabric.HasTrim;
-                    temp1.selectedPhoto = tempFabric.FabricOnModelPhotoUrl;
-                    setFabricSelected(temp1);
-                    // fabricClicked(tempFabric["FabricOnModelPhotoUrl"], tempFabric["HasTrim"]);
-                    tempLabels["1"] = location.pathname.split('').slice(1, 3).join('') === "fa" ? tempFabric["DesignName"] + "/" + tempFabric["ColorName"] : tempFabric["DesignEnName"] + "/" + tempFabric["ColorEnName"];
-                    tempValue["1"] = temp["FabricId"];
-                    depSetTempArr = new Set([...setGetDeps("", "1", depSetTempArr)]);
+                if (Object.keys(tempFabric).length > 0 || Object.keys(tempFabric2).length > 0) {
+                    if (Object.keys(tempFabric).length > 0) {
+                        let temp1 = JSON.parse(JSON.stringify(fabricSelected));
+                        temp1.selectedFabricId = tempFabric.FabricId;
+                        temp1.selectedTextEn = tempFabric.DesignEnName;
+                        temp1.selectedTextFa = tempFabric.DesignName;
+                        temp1.selectedColorEn = tempFabric.ColorEnName;
+                        temp1.selectedColorFa = tempFabric.ColorName;
+                        temp1.selectedHasTrim = tempFabric.HasTrim;
+                        temp1.selectedPhoto = tempFabric.FabricOnModelPhotoUrl;
+                        setFabricSelected(temp1);
+                        // fabricClicked(tempFabric["FabricOnModelPhotoUrl"], tempFabric["HasTrim"]);
+                        tempLabels["1"] = location.pathname.split('').slice(1, 3).join('') === "fa" ? tempFabric["DesignName"] + "/" + tempFabric["ColorName"] : tempFabric["DesignEnName"] + "/" + tempFabric["ColorEnName"];
+                        tempValue["1"] = temp["FabricId"];
+                        depSetTempArr = new Set([...setGetDeps("", "1", depSetTempArr)]);
+                    }
+                    if (Object.keys(tempFabric2).length > 0) {
+                        let temp1 = JSON.parse(JSON.stringify(fabricSelected2));
+                        temp1.selectedFabricId = tempFabric2.FabricId;
+                        temp1.selectedTextEn = tempFabric2.DesignEnName;
+                        temp1.selectedTextFa = tempFabric2.DesignName;
+                        temp1.selectedColorEn = tempFabric2.ColorEnName;
+                        temp1.selectedColorFa = tempFabric2.ColorName;
+                        temp1.selectedHasTrim = tempFabric2.HasTrim;
+                        temp1.selectedPhoto = tempFabric2.FabricOnModelPhotoUrl;
+                        setFabricSelected2(temp1);
+                        // fabricClicked(tempFabric["FabricOnModelPhotoUrl"], tempFabric["HasTrim"]);
+                        tempLabels["15"] = location.pathname.split('').slice(1, 3).join('') === "fa" ? tempFabric2["DesignName"] + "/" + tempFabric2["ColorName"] : tempFabric2["DesignEnName"] + "/" + tempFabric2["ColorEnName"];
+                        tempValue["15"] = temp["FabricId2"];
+                        depSetTempArr = new Set([...setGetDeps("", "15", depSetTempArr)]);
+                    }
                     // console.log(depSetTempArr);
                     // setStep1(temp["FabricId"]);
                     setStepSelectedLabel(tempLabels);
@@ -2575,27 +2754,41 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                             tempLabels[refIndex] = inputs.current["41"].getAttribute('text');
                             tempValue[refIndex] = inputs.current["41"].value;
                             
-                            depSetTempArr = new Set([...setGetDeps((temp["ControlPosition"] ? "" : "4A,") + (temp["ChainLength"] ? "" : "4B,"), "4", depSetTempArr)]);
+                            depSetTempArr = new Set([...setGetDeps((temp["controlPositionFront"] ? "" : "4A1,") + (temp["controlPositionBack"] ? "" : "4A2,") + (temp["ChainLength"] ? "" : "4B,"), "4", depSetTempArr)]);
                             setStepSelectedLabel(tempLabels);
                             setStepSelectedValue(tempValue);
                             
-                            if (temp["ControlPosition"]) {
-                                setStep4A(temp["ControlPosition"].toString());
-                                if (temp["ControlPosition"] === "Left") {
-                                    let refIndex = inputs.current["4A1"].getAttribute('ref-num');
-                                    tempLabels[refIndex] = inputs.current["4A1"].getAttribute('text');
-                                    tempValue[refIndex] = inputs.current["4A1"].value;
-                                    setStepSelectedLabel(tempLabels);
-                                    setStepSelectedValue(tempValue);
-                                } else {
-                                    
-                                    let refIndex = inputs.current["4A2"].getAttribute('ref-num');
-                                    tempLabels[refIndex] = inputs.current["4A2"].getAttribute('text');
-                                    tempValue[refIndex] = inputs.current["4A2"].value;
-                                    setStepSelectedLabel(tempLabels);
-                                    setStepSelectedValue(tempValue);
-                                }
+                            let selectedFrontPosition;
+                            let selectedBackPosition;
+                            
+                            if (temp["controlPositionFront"]) {
+                                selectedFrontPosition = optionsPosition[pageLanguage].find(opt => opt.value === temp["controlPositionFront"]).label;
+                                setSelectedPosition1(temp["controlPositionFront"] ? [{
+                                    value: temp["controlPositionFront"],
+                                    label: selectedFrontPosition
+                                }] : []);
                             }
+                            if (temp["controlPositionBack"]) {
+                                selectedBackPosition = optionsPosition[pageLanguage].find(opt => opt.value === temp["controlPositionBack"]).label;
+                                setSelectedPosition1(temp["controlPositionBack"] ? [{
+                                    value: temp["controlPositionBack"],
+                                    label: selectedBackPosition
+                                }] : []);
+                            }
+                            if (selectedFrontPosition !== "" && selectedBackPosition !== "") {
+                                tempLabels["4A"] = pageLanguage === "fa" ? `پرده رو: ${t(selectedFrontPosition)}\u00A0\u00A0\u00A0 پرده پشت: ${t(selectedBackPosition)}` : `Front Shade: ${t(selectedFrontPosition)}\u00A0\u00A0\u00A0Back Shade: ${t(selectedBackPosition)}`;
+                                
+                            } else if (selectedFrontPosition !== "") {
+                                tempLabels["4A"] = pageLanguage === "fa" ? `پرده رو: ${t(selectedFrontPosition)}\u00A0\u00A0\u00A0` : `Front Shade: ${t(selectedFrontPosition)}\u00A0\u00A0\u00A0`;
+                                
+                            } else if (selectedBackPosition !== "") {
+                                tempLabels["4A"] = pageLanguage === "fa" ? `\u00A0\u00A0\u00A0 پرده پشت: ${t(selectedBackPosition)}` : `\u00A0\u00A0\u00A0Back Shade: ${t(selectedBackPosition)}`;
+                                
+                            } else {
+                                tempLabels["4A"] = "";
+                            }
+                            setStepSelectedLabel(tempLabels);
+                            
                             
                             if (temp["ChainLength"]) {
                                 setStep4B(temp["ChainLength"].toString());
@@ -2625,7 +2818,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                             tempLabels[refIndex] = inputs.current["42"].getAttribute('text');
                             tempValue[refIndex] = inputs.current["42"].value;
                             
-                            depSetTempArr = new Set([...setGetDeps((temp["hasPower"] ? ((temp["MotorType"] ? "" : "411,")+(temp["MotorPosition"] ? "" : "412,")) : "41,"), "4", depSetTempArr)]);
+                            depSetTempArr = new Set([...setGetDeps((temp["hasPower"] ? (temp["MotorPosition"] ? "" : "411,") : "41,"), "4", depSetTempArr)]);
                             setStepSelectedLabel(tempLabels);
                             setStepSelectedValue(tempValue);
                             if (temp["hasPower"] !== undefined) {
@@ -2635,11 +2828,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                 tempValue[refIndex] = inputs.current["411"].value;
                                 setStepSelectedLabel(tempLabels);
                                 setStepSelectedValue(tempValue);
-    
-                                setSelectedMotorType(temp["MotorType"] ? [{
-                                    value: temp["MotorType"],
-                                    label: MotorType[pageLanguage].find(opt => opt.value === temp["MotorType"]).label
-                                }] : []);
+                                
                                 setSelectedMotorPosition(temp["MotorPosition"] ? [{
                                     value: temp["MotorPosition"],
                                     label: MotorPosition[pageLanguage].find(opt => opt.value === temp["MotorPosition"]).label
@@ -2653,37 +2842,167 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                         }
                     }
                     
-                    if (temp["MetalValanceStyle"]) {
-                        setStep5(temp["MetalValanceStyle"]);
+                    if (temp["Headrail"]) {
+                        setStep5(temp["Headrail"]);
                         
-                        if (temp["MetalValanceStyle"] === "MetalValance") {
-                            let refIndex = inputs.current["51"].getAttribute('ref-num');
-                            tempLabels[refIndex] = inputs.current["51"].getAttribute('text') + (temp["MetalValanceColor"] ? "/" + optionsMetalValance[pageLanguage].find(opt => opt.value === temp["MetalValanceColor"]).label : "");
-                            tempValue[refIndex] = inputs.current["51"].value;
+                        if (temp["Headrail"] === "MetalValance") {
+                            let refIndex = inputs.current["53"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["53"].getAttribute('text') + (temp["MetalValanceColor"] ? "/" + temp["MetalValanceColor"] : "");
+                            tempValue[refIndex] = inputs.current["53"].value;
                             setStepSelectedLabel(tempLabels);
                             setStepSelectedValue(tempValue);
                             setSelectedValanceColor1(temp["MetalValanceColor"] ? [{
                                 value: temp["MetalValanceColor"],
                                 label: optionsMetalValance[pageLanguage].find(opt => opt.value === temp["MetalValanceColor"]).label
                             }] : []);
-                            depSetTempArr = new Set([...setGetDeps((temp["MetalValanceColor"] ? "" : "51,"), "5", depSetTempArr)]);
-                        } else {
-                            let refIndex = inputs.current["52"].getAttribute('ref-num');
-                            tempLabels[refIndex] = inputs.current["52"].getAttribute('text') + (temp["MetalValanceColor"] ? "/" + optionsMetalValance[pageLanguage].find(opt => opt.value === temp["MetalValanceColor"]).label : "");
-                            tempValue[refIndex] = inputs.current["52"].value;
+                            depSetTempArr = new Set([...setGetDeps((temp["MetalValanceColor"] ? "" : "53,"), "5", depSetTempArr)]);
+                        } else if (temp["Headrail"] === "MetalValanceFabricInsert") {
+                            let refIndex = inputs.current["54"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["54"].getAttribute('text') + (temp["MetalValanceColor"] ? "/" + temp["MetalValanceColor"] : "");
+                            tempValue[refIndex] = inputs.current["54"].value;
                             setStepSelectedLabel(tempLabels);
                             setStepSelectedValue(tempValue);
                             setSelectedValanceColor2(temp["MetalValanceColor"] ? [{
                                 value: temp["MetalValanceColor"],
                                 label: optionsMetalValance[pageLanguage].find(opt => opt.value === temp["MetalValanceColor"]).label
                             }] : []);
-                            depSetTempArr = new Set([...setGetDeps((temp["MetalValanceColor"] ? "" : "52,"), "5", depSetTempArr)]);
+                            depSetTempArr = new Set([...setGetDeps((temp["MetalValanceColor"] ? "" : "54,"), "5", depSetTempArr)]);
+                        } else if (temp["Headrail"] === "Upholstered") {
+                            let refIndex = inputs.current["52"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["52"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["52"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            depSetTempArr = new Set([...setGetDeps("", "5", depSetTempArr)]);
+                        } else {
+                            let refIndex = inputs.current["51"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["51"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["51"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            depSetTempArr = new Set([...setGetDeps((temp["RollType"] ? "" : "5A,") + (temp["BracketType"] ? "" : "5B,") + (temp["BracketColor"] ? "" : "5C,"), "5", depSetTempArr)]);
+                            
+                            if (temp["RollType"]) {
+                                setStep5A(temp["RollType"]);
+                                if (temp["RollType"] === "Regular") {
+                                    let refIndex = inputs.current["5A1"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["5A1"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["5A1"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                    depSetTempArr = new Set([...setGetDeps("", "5A", depSetTempArr)]);
+                                } else {
+                                    let refIndex = inputs.current["5A2"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["5A2"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["5A2"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                    depSetTempArr = new Set([...setGetDeps("", "5A", depSetTempArr)]);
+                                }
+                            }
+                            if (temp["BracketType"]) {
+                                setStep5B(temp["BracketType"]);
+                                if (temp["BracketType"] === "Round Edge") {
+                                    let refIndex = inputs.current["5B1"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["5B1"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["5B1"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                    depSetTempArr = new Set([...setGetDeps("", "5B", depSetTempArr)]);
+                                } else {
+                                    let refIndex = inputs.current["5B2"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["5B2"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["5B2"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                    depSetTempArr = new Set([...setGetDeps("", "5B", depSetTempArr)]);
+                                }
+                            }
+                            if (temp["BracketColor"]) {
+                                setStep5C(temp["BracketColor"]);
+                                if (temp["BracketColor"] === "Satin Brass") {
+                                    let refIndex = inputs.current["5C1"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["5C1"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["5C1"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                    depSetTempArr = new Set([...setGetDeps("", "5C", depSetTempArr)]);
+                                } else if (temp["BracketColor"] === "Satin Nickel") {
+                                    let refIndex = inputs.current["5C2"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["5C2"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["5C2"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                    depSetTempArr = new Set([...setGetDeps("", "5C", depSetTempArr)]);
+                                } else {
+                                    let refIndex = inputs.current["5C3"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["5C3"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["5C3"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                    depSetTempArr = new Set([...setGetDeps("", "5C", depSetTempArr)]);
+                                }
+                            }
                         }
                     }
+                    
+                    if (temp["HemStyle"]) {
+                        setStep6(temp["HemStyle"]);
+                        
+                        if (temp["HemStyle"] === "Scallop") {
+                            let refIndex = inputs.current["62"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["62"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["62"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
+                        } else if (temp["HemStyle"] === "Wave") {
+                            let refIndex = inputs.current["63"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["63"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["63"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
+                        } else if (temp["HemStyle"] === "Colonial") {
+                            let refIndex = inputs.current["64"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["64"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["64"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
+                        } else {
+                            let refIndex = inputs.current["61"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["61"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["61"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            depSetTempArr = new Set([...setGetDeps((temp["RollType"] ? "" : "6A,"), "6", depSetTempArr)]);
+                            
+                            if (temp["BottomBarStyle"]) {
+                                setStep6A(temp["BottomBarStyle"]);
+                                if (temp["BottomBarStyle"] === "Sewn-In") {
+                                    let refIndex = inputs.current["6A1"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["6A1"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["6A1"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                    depSetTempArr = new Set([...setGetDeps("", "6A", depSetTempArr)]);
+                                } else {
+                                    let refIndex = inputs.current["6A2"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["6A2"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["6A2"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                    depSetTempArr = new Set([...setGetDeps("", "6A", depSetTempArr)]);
+                                }
+                            }
+                        }
+                    }
+                    
                     if (temp["RoomNameEn"]) {
                         setSavedProjectRoomLabel(temp["RoomNameEn"]);
                         
-                        depSetTempArr = new Set([...setGetDeps("", "61", depSetTempArr)]);
+                        depSetTempArr = new Set([...setGetDeps("", "71", depSetTempArr)]);
                         setSelectedRoomLabel(temp["RoomNameEn"] ? [{
                             value: temp["RoomNameEn"],
                             label: rooms[pageLanguage].find(opt => opt.value === temp["RoomNameEn"]).label
@@ -2692,15 +3011,15 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                         tempSelect.value = temp["RoomNameEn"];
                         setRoomLabelSelect(tempSelect);
                         if (temp["WindowName"] === undefined || (temp["WindowName"] && temp["WindowName"] === "")) {
-                            tempLabels["6"] = tempSelect.label;
+                            tempLabels["7"] = tempSelect.label;
                         } else if (temp["WindowName"]) {
-                            tempLabels["6"] = tempSelect.label + " - " + temp["WindowName"];
+                            tempLabels["7"] = tempSelect.label + " - " + temp["WindowName"];
                         }
                         setStepSelectedLabel(tempLabels);
                     }
                     if (temp["WindowName"] && temp["WindowName"] !== "") {
                         setSavedProjectRoomText(temp["WindowName"]);
-                        depSetTempArr = new Set([...setGetDeps("", "62", depSetTempArr)]);
+                        depSetTempArr = new Set([...setGetDeps("", "72", depSetTempArr)]);
                         setRoomLabelText(temp["WindowName"]);
                     }
                     
@@ -2760,6 +3079,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                             setUploadedPDFNameList(tempArrayNames);
                         });
                     }
+                    
                     
                     setTimeout(() => {
                         setDepSet(depSetTempArr);
@@ -2823,6 +3143,18 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
         }
     }
     
+    const optionsPosition = {
+        "en": [
+            {value: 'Left', label: 'Left'},
+            {value: 'Right', label: 'Right'}
+        ],
+        "fa": [
+            {value: 'Left', label: 'چپ'},
+            {value: 'Right', label: 'راست'}
+        ],
+        
+    };
+    
     const optionsMetalValance = {
         "en": [
             {value: 'White', label: 'White'},
@@ -2847,18 +3179,6 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
             {value: 'White', label: 'سفید'},
             {value: 'Silver', label: 'نقره ای'},
             {value: 'Black', label: 'مشکی'}
-        ],
-        
-    };
-    
-    const MotorType = {
-        "en": [
-            {value: 'Standard', label: 'Standard'},
-            {value: 'Smart', label: 'Smart'}
-        ],
-        "fa": [
-            {value: 'Standard', label: 'استاندارد'},
-            {value: 'Smart', label: 'هوشمند'}
         ],
         
     };
@@ -2945,7 +3265,6 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     };
     const [selectedMotorChannels, setSelectedMotorChannels] = useState([motorChannels[pageLanguage].find(opt => opt.value === '0')]);
     const [selectedMotorPosition, setSelectedMotorPosition] = useState([]);
-    const [selectedMotorType, setSelectedMotorType] = useState([]);
     
     const colors = {
         "en": [
@@ -3117,6 +3436,23 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     }, [fabricSelected]);
     
     useEffect(() => {
+        if (fabricSelected2.selectedFabricId && fabricSelected2.selectedFabricId !== 0) {
+            fabricClicked(fabricSelected2.selectedPhoto, fabricSelected2.selectedHasTrim);
+            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+            tempLabels["15"] = location.pathname.split('').slice(1, 3).join('') === "fa" ? fabricSelected2.selectedTextFa + "/" + fabricSelected2.selectedColorFa : fabricSelected2.selectedTextEn + "/" + fabricSelected2.selectedColorEn;
+            let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
+            tempValue["15"] = fabricSelected2.selectedFabricId;
+            setStepSelectedLabel(tempLabels);
+            setStepSelectedValue(tempValue);
+            // setCart("FabricId", fabricSelected2.selectedFabricId);
+            setCart("FabricId2", `${fabricSelected2.selectedFabricId}`, "", "FabricDesignFa2,FabricDesignEn2,FabricColorEn2,FabricColorFa2,PhotoUrl2", [fabricSelected2.selectedTextFa, fabricSelected2.selectedTextEn, fabricSelected2.selectedColorEn, fabricSelected2.selectedColorFa, fabricSelected2.selectedPhoto]);
+            // setCart("PhotoUrl", fabricSelected2.selectedPhoto);
+            setDeps("", "15");
+            setStep15(fabricSelected2.selectedFabricId.toString());
+        }
+    }, [fabricSelected2]);
+    
+    useEffect(() => {
         getCart().then((temp) => {
             if (Object.keys(fabrics).length) {
                 setTimeout(() => {
@@ -3127,6 +3463,38 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
             }
         });
     }, [step1]);
+    
+    useEffect(() => {
+        getCart().then((temp) => {
+            if (Object.keys(fabrics).length) {
+                setTimeout(() => {
+                    renderFabrics2(temp);
+                }, 100);
+            } else {
+                setFabricsList([]);
+            }
+        });
+    }, [step15]);
+    
+    useEffect(() => {
+        
+        let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+        
+        if (selectedFrontPosition !== "" && selectedBackPosition !== "") {
+            tempLabels["4A"] = pageLanguage === "fa" ? `پرده رو: ${t(selectedFrontPosition)}\u00A0\u00A0\u00A0 پرده پشت: ${t(selectedBackPosition)}` : `Front Shade: ${t(selectedFrontPosition)}\u00A0\u00A0\u00A0Back Shade: ${t(selectedBackPosition)}`;
+            
+        } else if (selectedFrontPosition !== "") {
+            tempLabels["4A"] = pageLanguage === "fa" ? `پرده رو: ${t(selectedFrontPosition)}` : `Front Shade: ${t(selectedFrontPosition)}`;
+            
+        } else if (selectedBackPosition !== "") {
+            tempLabels["4A"] = pageLanguage === "fa" ? `\u00A0\u00A0\u00A0 پرده پشت: ${t(selectedBackPosition)}` : `\u00A0\u00A0\u00A0Back Shade: ${t(selectedBackPosition)}`;
+            
+        } else {
+            tempLabels["4A"] = "";
+        }
+        setStepSelectedLabel(tempLabels);
+    }, [selectedFrontPosition, selectedBackPosition]);
+    
     // useEffect(() => {
     //     if (firstRender === false) {
     //         const tempLang = location.pathname.split('');
@@ -3297,7 +3665,6 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     }, [deleteUploadPdfUrl]);
     
     useEffect(() => {
-        // console.log(Object.keys(model).length !== 0 , cartValues["WidthCart"] !== undefined);
         if (Object.keys(model).length !== 0 && cartValues["WidthCart"] !== undefined) {
             let tempObj = {};
             model["Accessories"].forEach(obj => {
@@ -3308,6 +3675,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                 });
                 tempObj[obj["SewingAccessoryId"]] = tempObj2;
             });
+            // console.log(tempObj);
             setModelAccessories(tempObj);
         }
         else{
@@ -3374,6 +3742,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                     getCart().then((temp) => {
                         setTimeout(() => {
                             renderFabrics(temp);
+                            renderFabrics2(temp);
                         }, 100);
                     });
                 } else {
@@ -3381,7 +3750,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                 }
             }
         });
-    }, [fabrics, cartChanged, isLoggedIn, location.pathname]);
+    }, [fabrics, fabrics2, cartChanged, isLoggedIn, location.pathname]);
     
     useEffect(() => {
         if (filterChanged["filter"] !== 0) {
@@ -3532,6 +3901,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
         }
     }, []);
     
+    
     useEffect(() => {
         if (editIndex && editIndex !== "") {
             if (isLoggedIn) {
@@ -3586,7 +3956,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                         {/* step 1 */}
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="1" stepNum={t("1")} stepTitle={t("zebra_step1")} stepRef="1" type="1" required={requiredStep["1"]}
+                                <ContextAwareToggle eventKey="1" stepNum={t("1")} stepTitle={t("dualRoller_step1")} stepRef="1" type="1" required={requiredStep["1"]}
                                                     stepSelected={stepSelectedLabel["1"] === undefined ? "" : stepSelectedLabel["1"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="1">
@@ -3714,7 +4084,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                         disabled={swatchId === -1}>{hasSwatchId ? t("SWATCH IN CART") : t("ORDER SWATCH")}</button>
                                             </Modal.Footer>
                                         </Modal>
-                                        <NextStep eventKey="2">{t("NEXT STEP")}</NextStep>
+                                        <NextStep eventKey="15">{t("NEXT STEP")}</NextStep>
                                     </div>
                                 </Card.Body>
                             </Accordion.Collapse>
@@ -3723,7 +4093,144 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                         {/* step 2 */}
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="2" stepNum={t("2")} stepTitle={t("zebra_step2")} stepRef="2" type="1" required={requiredStep["2"]}
+                                <ContextAwareToggle eventKey="15" stepNum={t("2")} stepTitle={t("dualRoller_step2")} stepRef="15" type="1" required={requiredStep["15"]}
+                                                    stepSelected={stepSelectedLabel["15"] === undefined ? "" : stepSelectedLabel["15"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="15">
+                                <Card.Body>
+                                    <div className="card_body card-body-fabric">
+                                        <div className="search_filter_container">
+                                            <div className="search_container">
+                                                <div className="search_box">
+                                                    <input type="text" placeholder={t("Search for product Name/Code")}
+                                                           className="form-control search_input"
+                                                           name="search_input" value={searchText}
+                                                           ref={search_input}
+                                                           onChange={(e) => {
+                                                               if (e.target.value !== "")
+                                                                   setSearchShow(true);
+                                                               else
+                                                                   setSearchShow(false);
+                                                               setSearchText(e.target.value);
+                                                           }}/>
+                                                    {searchShow &&
+                                                    <div className="clear-icon-container" onClick={() => {
+                                                        search_input.current.value = "";
+                                                        setSearchText("");
+                                                        setSearchShow(false)
+                                                    }}>
+                                                        <i className="fa fa-times-circle clear-icon"/>
+                                                    </div>
+                                                    }
+                                                    <div className="search-icon-container">
+                                                        <i className="fa fa-search search-icon"/>
+                                                    </div>
+                                                </div>
+                                                <button className="reset_filters" onClick={() => clearAllFilters()}>{t("Reset Filters")}</button>
+                                            </div>
+                                            <div className="filters_container">
+                                                <div className="filter_container">
+                                                    <Dropdown autoClose="outside" title="">
+                                                        <Dropdown.Toggle className="dropdown_btn">
+                                                            <p>{t("filter_Color")}</p>
+                                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
+                                                        </Dropdown.Toggle>
+                                                        <Dropdown.Menu className="filter_color_items">
+                                                            <div className="filter_items_container">
+                                                                {sewingColors}
+                                                            </div>
+                                                            <div className="filter_inside_button_section">
+                                                                <div className="clear_inside_filter" text="colors"
+                                                                     onClick={(e) => clearFilters(e)}>{t("filter_Clear Filters")}</div>
+                                                                <Dropdown.Toggle as="div" className="done_inside_filter">{t("filter_Done")}</Dropdown.Toggle>
+                                                            </div>
+                                                        </Dropdown.Menu>
+                                                    </Dropdown>
+                                                </div>
+                                                <div className="filter_container">
+                                                    <Dropdown autoClose="outside" title="">
+                                                        <Dropdown.Toggle className="dropdown_btn">
+                                                            <p>{t("filter_Pattern")}</p>
+                                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
+                                                        </Dropdown.Toggle>
+                                                        <Dropdown.Menu>
+                                                            <div className="filter_items_container">
+                                                                {sewingPatterns}
+                                                            </div>
+                                                            <div className="filter_inside_button_section">
+                                                                <div className="clear_inside_filter" text="patterns"
+                                                                     onClick={(e) => clearFilters(e)}>{t("filter_Clear Filters")}</div>
+                                                                <Dropdown.Toggle as="div" className="done_inside_filter">{t("filter_Done")}</Dropdown.Toggle>
+                                                            </div>
+                                                        </Dropdown.Menu>
+                                                    </Dropdown>
+                                                </div>
+                                                <div className="filter_container">
+                                                    <Dropdown autoClose="outside" title="">
+                                                        <Dropdown.Toggle className="dropdown_btn">
+                                                            <p>{t("filter_Type")}</p>
+                                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
+                                                        </Dropdown.Toggle>
+                                                        <Dropdown.Menu>
+                                                            <div className="filter_items_container">
+                                                                {sewingTypes}
+                                                            </div>
+                                                            <div className="filter_inside_button_section">
+                                                                <div className="clear_inside_filter" text="types" onClick={(e) => clearFilters(e)}>{t("filter_Clear Filters")}</div>
+                                                                <Dropdown.Toggle as="div" className="done_inside_filter">{t("filter_Done")}</Dropdown.Toggle>
+                                                            </div>
+                                                        </Dropdown.Menu>
+                                                    </Dropdown>
+                                                </div>
+                                                <div className="filter_container">
+                                                    <Dropdown autoClose="outside" title="">
+                                                        <Dropdown.Toggle className="dropdown_btn">
+                                                            <p>{t("filter_Price")}</p>
+                                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
+                                                        </Dropdown.Toggle>
+                                                        <Dropdown.Menu>
+                                                            <div className="filter_items_container">
+                                                                <div className="price_filter_description">{t("filter_price_title")}
+                                                                </div>
+                                                                {sewingPrices}
+                                                            </div>
+                                                            <div className="filter_inside_button_section">
+                                                                <div className="clear_inside_filter" text="prices"
+                                                                     onClick={(e) => clearFilters(e)}>{t("filter_Clear Filters")}</div>
+                                                                <Dropdown.Toggle as="div" className="done_inside_filter">{t("filter_Done")}</Dropdown.Toggle>
+                                                            </div>
+                                                        </Dropdown.Menu>
+                                                    </Dropdown>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="fabrics_list_container">
+                                            {fabricsList2}
+                                        </div>
+                                        <Modal dialogClassName="zoomModal" show={show} onHide={() => handleClose()}>
+                                            <Modal.Header closeButton>
+                                                {zoomModalHeader}
+                                            </Modal.Header>
+                                            <Modal.Body>{zoomModalBody}</Modal.Body>
+                                            <Modal.Footer>
+                                                <button className={`swatchButton ${hasSwatchId ? "activeSwatch" : ""} ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                                                        current-state={hasSwatchId ? "1" : "0"}
+                                                        onClick={(e) => {
+                                                            fabricSwatch(e, swatchId, swatchDetailId, swatchPhotoPath);
+                                                        }}
+                                                        disabled={swatchId === -1}>{hasSwatchId ? t("SWATCH IN CART") : t("ORDER SWATCH")}</button>
+                                            </Modal.Footer>
+                                        </Modal>
+                                        <NextStep eventKey="2">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
+                        {/* step 3 */}
+                        <Card>
+                            <Card.Header>
+                                <ContextAwareToggle eventKey="2" stepNum={t("3")} stepTitle={t("zebra_step2")} stepRef="2" type="1" required={requiredStep["2"]}
                                                     stepSelected={stepSelectedLabel["2"] === undefined ? "" : stepSelectedLabel["2"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="2">
@@ -3839,10 +4346,10 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                             </Accordion.Collapse>
                         </Card>
                         
-                        {/* step 3 */}
+                        {/* step 4 */}
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="3" stepNum={t("3")} stepTitle={t("zebra_step3")} stepRef="3" type="2" required={requiredStep["3"]}
+                                <ContextAwareToggle eventKey="3" stepNum={t("4")} stepTitle={t("zebra_step3")} stepRef="3" type="2" required={requiredStep["3"]}
                                                     stepSelected={windowSizeBool ? windowSize : (stepSelectedLabel["3"] === undefined ? "" : stepSelectedLabel["3"])}
                                                     cartCustomText={t("zebra_step3_custom_cart_text")}/>
                             </Card.Header>
@@ -4029,11 +4536,11 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                             </Accordion.Collapse>
                         </Card>
                         
-                        {/* step 3A inside */}
+                        {/* step 4A inside */}
                         {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "1" && step21 === "true" &&
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="3A" stepNum={t("3A")} stepTitle={t("zebra_step3AInside")} stepRef="3AIn" type="2" required={requiredStep["3AIn"]}
+                                <ContextAwareToggle eventKey="3A" stepNum={t("4A")} stepTitle={t("zebra_step3AInside")} stepRef="3AIn" type="2" required={requiredStep["3AIn"]}
                                                     stepSelected={stepSelectedLabel["3AIn"] === undefined ? "" : stepSelectedLabel["3AIn"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="3A">
@@ -4195,11 +4702,11 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                         </Card>
                         }
                         
-                        {/* step 3B inside */}
+                        {/* step 4B inside */}
                         {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "1" && step21 === "true" &&
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="3B" stepNum={t("3B")} stepTitle={t("zebra_step3BInside")} stepRef="3BIn" type="2" required={requiredStep["3BIn"]}
+                                <ContextAwareToggle eventKey="3B" stepNum={t("4B")} stepTitle={t("zebra_step3BInside")} stepRef="3BIn" type="2" required={requiredStep["3BIn"]}
                                                     stepSelected={stepSelectedLabel["3BIn"] === undefined ? "" : stepSelectedLabel["3BIn"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="3B">
@@ -4362,11 +4869,11 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                         </Card>
                         }
                         
-                        {/* step 3A outside */}
+                        {/* step 4A outside */}
                         {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "2" &&
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="3A" stepNum={t("3A")} stepTitle={t("zebra_step3AOutside")} stepRef="3AOut" type="2" required={requiredStep["3AOut"]}
+                                <ContextAwareToggle eventKey="3A" stepNum={t("4A")} stepTitle={t("zebra_step3AOutside")} stepRef="3AOut" type="2" required={requiredStep["3AOut"]}
                                                     stepSelected={stepSelectedLabel["3AOut"] === undefined ? "" : stepSelectedLabel["3AOut"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="3A">
@@ -4429,11 +4936,11 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                         </Card>
                         }
                         
-                        {/* step 3B outside */}
+                        {/* step 4B outside */}
                         {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "2" &&
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="3B" stepNum={t("3B")} stepTitle={t("zebra_step3BOutside")} stepRef="3BOut" type="2" required={requiredStep["3BOut"]}
+                                <ContextAwareToggle eventKey="3B" stepNum={t("4B")} stepTitle={t("zebra_step3BOutside")} stepRef="3BOut" type="2" required={requiredStep["3BOut"]}
                                                     stepSelected={stepSelectedLabel["3BOut"] === undefined ? "" : stepSelectedLabel["3BOut"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="3B">
@@ -4551,11 +5058,11 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                         </Card>
                         }
                         
-                        {/* step 3C outside */}
+                        {/* step 4C outside */}
                         {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "2" &&
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="3C" stepNum={t("3C")} stepTitle={t("zebra_step3COutside")} stepRef="3COut" type="2" required={requiredStep["3COut"]}
+                                <ContextAwareToggle eventKey="3C" stepNum={t("4C")} stepTitle={t("zebra_step3COutside")} stepRef="3COut" type="2" required={requiredStep["3COut"]}
                                                     stepSelected={stepSelectedLabel["3COut"] === undefined ? "" : stepSelectedLabel["3COut"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="3C">
@@ -4618,11 +5125,11 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                         </Card>
                         }
                         
-                        {/* step 3D outside */}
+                        {/* step 4D outside */}
                         {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "2" &&
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="3D" stepNum={t("3D")} stepTitle={t("zebra_step3DOutside")} stepRef="3DOut" type="2" required={requiredStep["3DOut"]}
+                                <ContextAwareToggle eventKey="3D" stepNum={t("4D")} stepTitle={t("zebra_step3DOutside")} stepRef="3DOut" type="2" required={requiredStep["3DOut"]}
                                                     stepSelected={stepSelectedLabel["3DOut"] === undefined ? "" : stepSelectedLabel["3DOut"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="3D">
@@ -4696,10 +5203,10 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                         </Card>
                         }
                         
-                        {/* step 4 */}
+                        {/* step 5 */}
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="4" stepNum={t("4")} stepTitle={t("zebra_step4")} stepRef="4" type="1" required={requiredStep["4"]}
+                                <ContextAwareToggle eventKey="4" stepNum={t("5")} stepTitle={t("zebra_step4")} stepRef="4" type="1" required={requiredStep["4"]}
                                                     stepSelected={stepSelectedLabel["4"] === undefined ? "" : stepSelectedLabel["4"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="4">
@@ -4713,7 +5220,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                        setStep4("Continuous Loop");
                                                        setStep41("false");
                                                        setControlTypeNextStep("4A");
-                                                       setDeps("4A,4B", "4,41,411,412");
+                                                       setDeps("4A1,4A2,4B", "4,41,411");
                                                        setCart("ControlType", "Continuous Loop", "hasPower,MotorPosition,RemoteName,MotorChannels");
                                                    }} ref={ref => (inputs.current["41"] = ref)}/>
                                             <label htmlFor="41">{t("Continuous")}<br/><p>{t("Loop")}</p></label>
@@ -4725,11 +5232,15 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                        selectChanged(e, "41", "4A,4B");
                                                        setStep4("Motorized");
                                                        setControlTypeNextStep("5");
-                                                       setDeps("41", "4,4A,4B");
-                                                       setCart("ControlType", "Motorized", "ControlPosition,ChainLength");
+                                                       setSelectedPosition1([]);
+                                                       setSelectedPosition2([]);
+                                                       setSelectedFrontPosition("");
+                                                       setSelectedBackPosition("");
+                                                       setDeps("41", "4,4A1,4A2,4B");
+                                                       setCart("ControlType", "Motorized", "ControlPositionFront,ControlPositionBack,ChainLength");
                                                    }} ref={ref => (inputs.current["42"] = ref)}/>
                                             <label htmlFor="42">{t("Motorized")}<br/><p
-                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Starts at "): t("Surcharge Applies")}{(modelAccessories["1"] ? (modelAccessories["1"]["1"] ? GetPrice(modelAccessories["1"]["1"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["1"] ? (modelAccessories["1"]["1"] ? GetPrice(modelAccessories["1"]["1"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
                                             </label>
                                         
                                         </div>
@@ -4768,7 +5279,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                             tempLabels[refIndex] = inputs.current["42"].getAttribute('text');
                                                             setStepSelectedLabel(tempLabels);
                                                             setSelectedMotorPosition([]);
-                                                            setDeps("411,412", "41");
+                                                            setDeps("411", "41");
                                                             setCart("hasPower", true, "", "MotorChannels", [selectedMotorChannels.map(obj => obj.value)]);
                                                         } else {
                                                             selectUncheck(e);
@@ -4790,51 +5301,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                         </div>
                                         }
                                         {stepSelectedValue["41"] === "1" && stepSelectedValue["4"] === "2" &&
-                                        <div className="motorized_options same_row_selection">
-                                            <div className="motorized_option_left">
-                                                <p>{t("Motor Type")}</p>
-                                                &nbsp;
-                                                <span onClick={() => modalHandleShow("learnMore")}>{t("(Learn More)")}</span>
-                                            </div>
-                                            <div className="motorized_option_right">
-                                                <div className="select_container">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        values={selectedMotorType}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0]) {
-                                                                setDeps("", "411");
-                                                                setCart("MotorType", selected[0].value);
-                                                                setSelectedMotorType(selected);
-                                                            }
-                                                        }}
-                                                        options={MotorType[pageLanguage]}
-                                                    />
-                                                </div>
-                                            </div>
+                                        <div className="motorized_options">
                                             <div className="motorized_option_left">
                                                 <p>{t("Motor Position")}</p>
                                                 &nbsp;
@@ -4869,9 +5336,9 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                         //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                         // }
                                                         onChange={(selected) => {
+                                                            setDeps("", "411");
+                                                            setCart("MotorPosition", selected[0].value);
                                                             if (selected[0]) {
-                                                                setDeps("", "412");
-                                                                setCart("MotorPosition", selected[0].value);
                                                                 setSelectedMotorPosition(selected);
                                                             }
                                                         }}
@@ -5000,38 +5467,105 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                             </Accordion.Collapse>
                         </Card>
                         
-                        {/* step 4A */}
+                        {/* step 5A */}
                         {stepSelectedValue["4"] === "1" &&
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="4A" stepNum={t("4A")} stepTitle={t("zebra_step4A")} stepRef="4A" type="1" required={requiredStep["4A"]}
+                                <ContextAwareToggle eventKey="4A" stepNum={t("5A")} stepTitle={t("zebra_step4A")} stepRef="4A" type="1" required={requiredStep["4A"]}
                                                     stepSelected={stepSelectedLabel["4A"] === undefined ? "" : stepSelectedLabel["4A"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="4A">
                                 <Card.Body>
-                                    <div className="card_body card_body_radio special_farsi_card_body">
+                                    <div className="card_body card_body_radio same_row_selection">
                                         <div className="box50 radio_style">
-                                            <img src={require('../Images/drapery/zebra/position_left.svg').default} className="img-fluid" alt=""/>
-                                            <input className="radio" type="radio" text={t("Left")} value="1" name="step4A" ref-num="4A" id="4A1" checked={step4A === "Left"}
-                                                   onChange={e => {
-                                                       selectChanged(e);
-                                                       setStep4A("Left");
-                                                       setDeps("", "4A");
-                                                       setCart("ControlPosition", "Left");
-                                                   }} ref={ref => (inputs.current["4A1"] = ref)}/>
-                                            <label htmlFor="4A1">{t("Left")}</label>
+                                            <div className="same_row_selection_title">
+                                                Front Shade Chain Position
+                                            </div>
                                         </div>
                                         <div className="box50 radio_style">
-                                            <img src={require('../Images/drapery/zebra/position_right.svg').default} className="img-fluid" alt=""/>
-                                            <input className="radio" type="radio" text={t("Right")} value="2" name="step4A"
-                                                   ref-num="4A" id="4A2" checked={step4A === "Right"}
-                                                   onChange={e => {
-                                                       selectChanged(e);
-                                                       setStep4A("Right");
-                                                       setDeps("", "4A");
-                                                       setCart("ControlPosition", "Right");
-                                                   }} ref={ref => (inputs.current["4A2"] = ref)}/>
-                                            <label htmlFor="4A2">{t("Right")}</label>
+                                            <div className="select_container">
+                                                <Select
+                                                    className="select"
+                                                    placeholder={t("Please Select")}
+                                                    portal={document.body}
+                                                    dropdownPosition="bottom"
+                                                    dropdownHandle={false}
+                                                    dropdownGap={0}
+                                                    values={selectedPosition1}
+                                                    onDropdownOpen={() => {
+                                                        let temp1 = window.scrollY;
+                                                        window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                        setTimeout(() => {
+                                                            let temp2 = window.scrollY;
+                                                            if (temp2 === temp1)
+                                                                window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                        }, 100);
+                                                    }}
+                                                    dropdownRenderer={
+                                                        ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
+                                                    }
+                                                    contentRenderer={
+                                                        ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                    }
+                                                    onChange={(selected) => {
+                                                        if (selected.length) {
+                                                            setDeps("", "4A1");
+                                                            setCart("controlPositionFront", selected[0].value);
+                                                            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                            tempLabels["4A"] = selected[0].label;
+                                                            setStepSelectedLabel(tempLabels);
+                                                            setSelectedPosition1(selected);
+                                                            setSelectedFrontPosition(selected[0].value);
+                                                        }
+                                                    }}
+                                                    options={optionsPosition[pageLanguage]}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="box50 radio_style">
+                                            <div className="same_row_selection_title">
+                                                Back Shade Chain Position
+                                            </div>
+                                        </div>
+                                        <div className="box50 radio_style">
+                                            <div className="select_container">
+                                                <Select
+                                                    className="select"
+                                                    placeholder={t("Please Select")}
+                                                    portal={document.body}
+                                                    dropdownPosition="bottom"
+                                                    dropdownHandle={false}
+                                                    dropdownGap={0}
+                                                    values={selectedPosition2}
+                                                    onDropdownOpen={() => {
+                                                        let temp1 = window.scrollY;
+                                                        window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                        setTimeout(() => {
+                                                            let temp2 = window.scrollY;
+                                                            if (temp2 === temp1)
+                                                                window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                        }, 100);
+                                                    }}
+                                                    dropdownRenderer={
+                                                        ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
+                                                    }
+                                                    contentRenderer={
+                                                        ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                    }
+                                                    onChange={(selected) => {
+                                                        if (selected.length) {
+                                                            setDeps("", "4A2");
+                                                            setCart("controlPositionBack", selected[0].value);
+                                                            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                            tempLabels["4A"] = selected[0].label;
+                                                            setStepSelectedLabel(tempLabels);
+                                                            setSelectedPosition2(selected);
+                                                            setSelectedBackPosition(selected[0].value);
+                                                        }
+                                                    }}
+                                                    options={optionsPosition[pageLanguage]}
+                                                />
+                                            </div>
                                         </div>
                                         <NextStep eventKey="4B">{t("NEXT STEP")}</NextStep>
                                     </div>
@@ -5053,11 +5587,11 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                         </Card>
                         }
                         
-                        {/* step 4B */}
+                        {/* step 5B */}
                         {stepSelectedValue["4"] === "1" &&
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="4B" stepNum={t("4B")} stepTitle={t("zebra_step4B")} stepRef="4B" type="1" required={requiredStep["4B"]}
+                                <ContextAwareToggle eventKey="4B" stepNum={t("5B")} stepTitle={t("zebra_step4B")} stepRef="4B" type="1" required={requiredStep["4B"]}
                                                     stepSelected={stepSelectedLabel["4B"] === undefined ? "" : stepSelectedLabel["4B"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="4B">
@@ -5101,49 +5635,127 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                         </div>
                                         <NextStep eventKey="5">{t("NEXT STEP")}</NextStep>
                                     </div>
+                                    
+                                    <div className="accordion_help">
+                                        <div className="help_container help_container_third">
+                                            <div className="help_column help_left_column text_center">
+                                                <ul className="help_column_list">
+                                                    <li className="no_listStyle">
+                                                        <span className="popover_indicator">
+                                                            {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
+                                                                                  children={<object className="popover_camera" type="image/svg+xml"
+                                                                                                    data={require('../Images/public/camera.svg').default}/>}
+                                                                                  component={
+                                                                                      <div id="popover_content_step5Bhelp1" className="clearfix">
+                                                                                          <div className="popover_image clearfix">
+                                                                                              <img
+                                                                                                  src={popoverImages["step4B"] === undefined ? require('../Images/drapery/dualRoller/BracketColorRound1.jpg') : popoverImages["step4B"]}
+                                                                                                  className="img-fluid" alt=""/>
+                                                                                          </div>
+                                                                                          <div className="popover_footer">
+                                                                                              <span className="popover_footer_title">{t("dualRoller_step5B_popover_1")}</span>
+                                                                                              <span className="popover_thumbnails">
+                                                                                                  <div>
+                                                                                                      <img src={require('../Images/drapery/dualRoller/BracketColorRound1.jpg').default}
+                                                                                                           text="step5B"
+                                                                                                           onMouseEnter={(e) => popoverThumbnailHover(e)}
+                                                                                                           className="popover_thumbnail_img img-fluid"
+                                                                                                           alt=""/>
+                                                                                                  </div>
+                                                                                                  <div>
+                                                                                                      <img src={require('../Images/drapery/dualRoller/BracketColorSquare1.jpg').default}
+                                                                                                           text="step4B"
+                                                                                                           onMouseEnter={(e) => popoverThumbnailHover(e)}
+                                                                                                           className="popover_thumbnail_img img-fluid"
+                                                                                                           alt=""/>
+                                                                                                  </div>
+                                                                                              </span>
+                                                                                          </div>
+                                                                                      </div>
+                                                                                  }/>
+                                                            }
+                                                        </span>{t("dualRoller_step5B_help_1")}</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
                                 
                                 </Card.Body>
                             </Accordion.Collapse>
                         </Card>
                         }
                         
-                        {/* step 5 */}
+                        {/* step 6 */}
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="5" stepNum={t("5")} stepTitle={t("zebra_step5")} stepRef="5" type="1" required={requiredStep["5"]}
+                                <ContextAwareToggle eventKey="5" stepNum={t("6")} stepTitle={t("roller_step5")} stepRef="5" type="1" required={requiredStep["5"]}
                                                     stepSelected={stepSelectedLabel["5"] === undefined ? "" : stepSelectedLabel["5"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="5">
                                 <Card.Body>
-                                    <div className="card_body card_body_radio">
+                                    <div className="card_body card_body_radio card_body_4">
                                         <div className="box50 radio_style">
-                                            <img src={require('../Images/drapery/zebra/metal_valance.svg').default} className="img-fluid mb-3" alt=""/>
-                                            <input className="radio" type="radio" text={t("style_Metal Valance")} value="1" name="step5" ref-num="5" id="51"
+                                            <img src={require('../Images/drapery/roller/roll_regular.svg').default} className="img-fluid half_margin" alt=""/>
+                                            <input className="radio" type="radio" text={t("roller_headrail1")} value="1" name="step5" ref-num="5" id="51"
+                                                   checked={step5 === "Exposed"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep5("Exposed");
+                                                       setDeps("", "5,53,54");
+                                                       setCart("Headrail", "Exposed");
+                                                       setHeadrailsNextStep("5A");
+                                                   }} ref={ref => (inputs.current["51"] = ref)}/>
+                                            <label htmlFor="51">{t("roller_headrail1")}</label>
+                                        </div>
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/roller/roll_upholstered_valance.svg').default} className="img-fluid half_margin" alt=""/>
+                                            <input className="radio" type="radio" text={t("roller_headrail2")} value="2" name="step5" ref-num="5" id="52"
+                                                   checked={step5 === "Upholstered"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep5("Upholstered");
+                                                       setDeps("", "5,53,54");
+                                                       setCart("Headrail", "Upholstered");
+                                                       setHeadrailsNextStep("6");
+                                                   }} ref={ref => (inputs.current["52"] = ref)}/>
+                                            <label htmlFor="52">{t("roller_headrail2")}<br/><p
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["5"] ? (modelAccessories["5"]["8"] ? GetPrice(modelAccessories["5"]["8"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
+                                            </label>
+                                        </div>
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/roller/roll_metal_valance.svg').default} className="img-fluid half_margin" alt=""/>
+                                            <input className="radio" type="radio" text={t("roller_headrail3")} value="3" name="step5" ref-num="5" id="53"
                                                    checked={step5 === "MetalValance"}
                                                    onChange={e => {
                                                        selectChanged(e);
                                                        setStep5("MetalValance");
-                                                       setDeps("51", "5,52");
-                                                       setCart("MetalValanceStyle", "MetalValance");
-                                                   }} ref={ref => (inputs.current["51"] = ref)}/>
-                                            <label htmlFor="51">{t("style_Metal Valance")}</label>
+                                                       setDeps("53", "5,54");
+                                                       setCart("Headrail", "MetalValance");
+                                                       setHeadrailsNextStep("6");
+                                                   }} ref={ref => (inputs.current["53"] = ref)}/>
+                                            <label htmlFor="53">{t("roller_headrail3")}<br/><p
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["5"] ? (modelAccessories["5"]["10"] ? GetPrice(modelAccessories["5"]["10"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
+                                            </label>
                                         </div>
                                         <div className="box50 radio_style">
-                                            <img src={require('../Images/drapery/zebra/metal_valance_fabric_insert.svg').default} className="img-fluid mb-3" alt=""/>
-                                            <input className="radio" type="radio" text={t("style_Metal Valance") + " " + t("style_Fabric Insert")} value="2" name="step5"
-                                                   ref-num="5" id="52" checked={step5 === "MetalValanceFabricInsert"}
+                                            <img src={require('../Images/drapery/roller/roll_fabric_insert.svg').default} className="img-fluid half_margin" alt=""/>
+                                            <input className="radio" type="radio" text={t("roller_headrail4")} value="4" name="step5" ref-num="5" id="54"
+                                                   checked={step5 === "MetalValanceFabricInsert"}
                                                    onChange={e => {
                                                        selectChanged(e);
                                                        setStep5("MetalValanceFabricInsert");
-                                                       setDeps("52", "5,51");
-                                                       setCart("MetalValanceStyle", "MetalValanceFabricInsert");
-                                                   }} ref={ref => (inputs.current["52"] = ref)}/>
-                                            <label htmlFor="52">{t("style_Metal Valance")}<br/>{t("style_Fabric Insert")}</label>
+                                                       setDeps("54", "5,53");
+                                                       setCart("Headrail", "MetalValanceFabricInsert");
+                                                       setHeadrailsNextStep("6");
+                                                   }} ref={ref => (inputs.current["54"] = ref)}/>
+                                            <label htmlFor="54">{t("roller_headrail4")}<br/><p
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["5"] ? (modelAccessories["5"]["12"] ? GetPrice(modelAccessories["5"]["12"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
+                                            </label>
                                         </div>
-                                        {(stepSelectedValue["5"] === "1" || stepSelectedValue["5"] === "2") &&
+                                        {(stepSelectedValue["5"] === "3" || stepSelectedValue["5"] === "4") &&
                                         <div className="selection_section">
                                             <div className="select_container">
-                                                {stepSelectedValue["5"] === "1" &&
+                                                {stepSelectedValue["5"] === "3" &&
                                                 <Select
                                                     className="select"
                                                     placeholder={t("Please Select")}
@@ -5172,10 +5784,10 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                     // }
                                                     onChange={(selected) => {
                                                         if (selected.length) {
-                                                            setDeps("", "51");
+                                                            setDeps("", "53");
                                                             setCart("MetalValanceColor", selected[0].value);
                                                             let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                            tempLabels["5"] = t("style_Metal Valance") + "/" + selected[0].label;
+                                                            tempLabels["5"] = t("roller_headrail3") + "/" + selected[0].label;
                                                             setStepSelectedLabel(tempLabels);
                                                         }
                                                     }}
@@ -5184,7 +5796,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                 }
                                             </div>
                                             <div className="select_container">
-                                                {stepSelectedValue["5"] === "2" &&
+                                                {stepSelectedValue["5"] === "4" &&
                                                 <Select
                                                     className="select"
                                                     placeholder={t("Please Select")}
@@ -5213,10 +5825,10 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                     // }
                                                     onChange={(selected) => {
                                                         if (selected.length) {
-                                                            setDeps("", "52");
+                                                            setDeps("", "54");
                                                             setCart("MetalValanceColor", selected[0].value);
                                                             let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                            tempLabels["5"] = t("style_Metal Valance") + " " + t("style_Fabric Insert") + "/" + selected[0].label;
+                                                            tempLabels["5"] = t("roller_headrail4") + "/" + selected[0].label;
                                                             setStepSelectedLabel(tempLabels);
                                                         }
                                                     }}
@@ -5226,14 +5838,65 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                             </div>
                                         </div>
                                         }
-                                        <NextStep eventKey="6">{t("NEXT STEP")}</NextStep>
+                                        <NextStep eventKey={headrailsNextStep}>{t("NEXT STEP")}</NextStep>
                                     </div>
                                     <div className="accordion_help">
                                         <div className="help_container">
                                             <div className="help_column help_left_column">
-                                                <p className="help_column_header">{t("step5_help_1")}</p>
+                                                <p className="help_column_header"/>
                                                 <ul className="help_column_list">
-                                                    <li className="no_listStyle">&nbsp;</li>
+                                                    <li className="no_listStyle single_line_height">
+                                                        <div className="measurementsHelp_link text-center" onClick={e => modalHandleShow("headrailHelp")}>
+                                                            {t("headrailHelp")}
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
+                        {/* step 6A */}
+                        {stepSelectedValue["5"] === "1" &&
+                        <Card>
+                            <Card.Header>
+                                <ContextAwareToggle eventKey="5A" stepNum={t("6A")} stepTitle={t("roller_step5A")} stepRef="5A" type="1" required={requiredStep["5A"]}
+                                                    stepSelected={stepSelectedLabel["5A"] === undefined ? "" : stepSelectedLabel["5A"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="5A">
+                                <Card.Body>
+                                    <div className="card_body card_body_radio">
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/roller/roll_regular.svg').default} className="img-fluid half_margin" alt=""/>
+                                            <input className="radio" type="radio" text={t("RollType1")} value="1" name="step5A" ref-num="5A" id="5A1" checked={step5A === "Regular"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep5A("Regular");
+                                                       setDeps("", "5A");
+                                                       setCart("RollType", "Regular");
+                                                   }} ref={ref => (inputs.current["5A1"] = ref)}/>
+                                            <label htmlFor="5A1">{t("RollType1")}</label>
+                                        </div>
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/roller/roll_reverse.svg').default} className="img-fluid half_margin" alt=""/>
+                                            <input className="radio" type="radio" text={t("RollType2")} value="2" name="step5A" ref-num="5A" id="5A2" checked={step5A === "Reverse"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep5A("Reverse");
+                                                       setDeps("", "5A");
+                                                       setCart("RollType", "Reverse");
+                                                   }} ref={ref => (inputs.current["5A2"] = ref)}/>
+                                            <label htmlFor="5A2">{t("RollType2")}</label>
+                                        </div>
+                                        <NextStep eventKey="5B">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                    <div className="accordion_help">
+                                        <div className="help_container">
+                                            <div className="help_column help_left_column help_left_column_mount_type">
+                                                <p className="help_column_header">{t("RollType_help_1")}</p>
+                                                <ul className="help_column_list">
                                                     <li className="no_listStyle">
                                                         <span className="popover_indicator">
                                                             {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
@@ -5243,21 +5906,21 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                                                       <div className="clearfix">
                                                                                           <div className="popover_image clearfix">
                                                                                               <img
-                                                                                                  src={popoverImages["step51"] === undefined ? require('../Images/drapery/zebra/DoubleRoller_Valance_Colors.jpg') : popoverImages["step51"]}
+                                                                                                  src={popoverImages["step51"] === undefined ? require('../Images/drapery/roller/RegularRoll1a.jpg') : popoverImages["step51"]}
                                                                                                   className="img-fluid" alt=""/>
                                                                                           </div>
                                                                                           <div className="popover_footer">
-                                                                                              <span className="popover_footer_title">{t("step5_popover_1")}</span>
+                                                                                              <span className="popover_footer_title">{t("RollType_help_7")}</span>
                                                                                               <span className="popover_thumbnails">
                                                                                                   <div>
-                                                                                                      <img src={require('../Images/drapery/zebra/DoubleRoller_Valance_Colors.jpg').default}
+                                                                                                      <img src={require('../Images/drapery/roller/RegularRoll1a.jpg').default}
                                                                                                            text="step51"
                                                                                                            onMouseEnter={(e) => popoverThumbnailHover(e)}
                                                                                                            className="popover_thumbnail_img img-fluid"
                                                                                                            alt=""/>
                                                                                                   </div>
                                                                                                   <div>
-                                                                                                      <img src={require('../Images/drapery/zebra/roller_bottombar_designer.jpg').default}
+                                                                                                      <img src={require('../Images/drapery/roller/RegularRoll2.jpg').default}
                                                                                                            text="step51"
                                                                                                            onMouseEnter={(e) => popoverThumbnailHover(e)}
                                                                                                            className="popover_thumbnail_img img-fluid"
@@ -5268,12 +5931,12 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                                                       </div>
                                                                                   }/>
                                                             }
-                                                        </span>{t("step5_help_2")}</li>
-                                                    <li>{t("step5_help_3")}</li>
+                                                        </span>{t("RollType_help_2")}</li>
+                                                    <li>{t("RollType_help_3")}</li>
                                                 </ul>
                                             </div>
-                                            <div className="help_column help_right_column">
-                                                <p className="help_column_header">{t("step5_help_4")}</p>
+                                            <div className="help_column help_right_column help_right_column_mount_type">
+                                                <p className="help_column_header">{t("RollType_help_4")}</p>
                                                 <ul className="help_column_list">
                                                     <li className="no_listStyle">
                                                         <span className="popover_indicator">
@@ -5281,18 +5944,25 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                                                   children={<object className="popover_camera" type="image/svg+xml"
                                                                                                     data={require('../Images/public/camera.svg').default}/>}
                                                                                   component={
-                                                                                      <div id="popover_content_step5help2" className="clearfix">
+                                                                                      <div className="clearfix">
                                                                                           <div className="popover_image clearfix">
                                                                                               <img
-                                                                                                  src={popoverImages["step52"] === undefined ? require('../Images/drapery/zebra/DoubleRoller_Valance_Colors.jpg') : popoverImages["step52"]}
+                                                                                                  src={popoverImages["step51"] === undefined ? require('../Images/drapery/roller/ReverseRoll1a.jpg') : popoverImages["step51"]}
                                                                                                   className="img-fluid" alt=""/>
                                                                                           </div>
                                                                                           <div className="popover_footer">
-                                                                                              <span className="popover_footer_title">{t("step5_popover_2")}</span>
+                                                                                              <span className="popover_footer_title">{t("RollType_help_8")}</span>
                                                                                               <span className="popover_thumbnails">
                                                                                                   <div>
-                                                                                                      <img src={require('../Images/drapery/zebra/DoubleRoller_Valance_Colors.jpg').default}
-                                                                                                           text="step52"
+                                                                                                      <img src={require('../Images/drapery/roller/ReverseRoll1a.jpg').default}
+                                                                                                           text="step51"
+                                                                                                           onMouseEnter={(e) => popoverThumbnailHover(e)}
+                                                                                                           className="popover_thumbnail_img img-fluid"
+                                                                                                           alt=""/>
+                                                                                                  </div>
+                                                                                                  <div>
+                                                                                                      <img src={require('../Images/drapery/roller/ReverseRoll2.jpg')}
+                                                                                                           text="step51"
                                                                                                            onMouseEnter={(e) => popoverThumbnailHover(e)}
                                                                                                            className="popover_thumbnail_img img-fluid"
                                                                                                            alt=""/>
@@ -5302,33 +5972,172 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                                                       </div>
                                                                                   }/>
                                                             }
-                                                        </span>{t("step5_help_5")}</li>
-                                                    <li>{t("step5_help_6")}</li>
-                                                    <li>{t("step5_help_7")}</li>
+                                                        </span>{t("RollType_help_5")}</li>
+                                                    <li>{t("RollType_help_6")}</li>
                                                 </ul>
                                             </div>
                                         </div>
-                                        <div className="help_container help_container_third">
-                                            <div className="help_column help_left_column text_center">
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        }
+                        
+                        {/* step 6B */}
+                        {stepSelectedValue["5"] === "1" &&
+                        <Card>
+                            <Card.Header>
+                                <ContextAwareToggle eventKey="5B" stepNum={t("6B")} stepTitle={t("roller_step5B")} stepRef="5B" type="1" required={requiredStep["5B"]}
+                                                    stepSelected={stepSelectedLabel["5B"] === undefined ? "" : stepSelectedLabel["5B"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="5B">
+                                <Card.Body>
+                                    <div className="card_body card_body_radio">
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/roller/bracket_type_round.png')} className="img-fluid half_margin" alt=""/>
+                                            <input className="radio" type="radio" text={t("BracketType1")} value="1" name="step5B" ref-num="5B" id="5B1"
+                                                   checked={step5B === "Round Edge"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep5B("Round Edge");
+                                                       setDeps("", "5B");
+                                                       setCart("BracketType", "Round Edge");
+                                                   }} ref={ref => (inputs.current["5B1"] = ref)}/>
+                                            <label htmlFor="5B1">{t("BracketType1")}</label>
+                                        </div>
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/roller/bracket_type_square.png')} className="img-fluid half_margin" alt=""/>
+                                            <input className="radio" type="radio" text={t("BracketType2")} value="2" name="step5B" ref-num="5B" id="5B2"
+                                                   checked={step5B === "Square Edge"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep5B("Square Edge");
+                                                       setDeps("", "5B");
+                                                       setCart("BracketType", "Square Edge");
+                                                   }} ref={ref => (inputs.current["5B2"] = ref)}/>
+                                            <label htmlFor="5B2">{t("BracketType2")}</label>
+                                        </div>
+                                        <NextStep eventKey="5C">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        }
+                        
+                        {/* step 6C */}
+                        {stepSelectedValue["5"] === "1" &&
+                        <Card>
+                            <Card.Header>
+                                <ContextAwareToggle eventKey="5C" stepNum={t("5C")} stepTitle={t("roller_step5C")} stepRef="5C" type="1" required={requiredStep["5C"]}
+                                                    stepSelected={stepSelectedLabel["5C"] === undefined ? "" : stepSelectedLabel["5C"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="5C">
+                                <Card.Body>
+                                    <div className="card_body card_body_radio bracket_color">
+                                        <div className="box33">
+                                            {/*<img src={require('../Images/drapery/roller/SatinBrass.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                                            <input className="radio" type="radio" text={t("BracketColor1")} value="1" name="step5C" ref-num="5C" id="5C1"
+                                                   checked={step5C === "Satin Brass"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep5C("Satin Brass");
+                                                       setDeps("", "5C");
+                                                       setCart("BracketColor", "Satin Brass");
+                                                   }} ref={ref => (inputs.current["5C1"] = ref)}/>
+                                            <label htmlFor="5C1">{t("BracketColor1")}</label> */}
+                                            
+                                            <div className="radio_group">
+                                                <label className="radio_container">
+                                                    <input className="radio" type="radio" text={t("BracketColor1")} value="1" name="step5C" ref-num="5C" id="5C1"
+                                                           checked={step5C === "Satin Brass"}
+                                                           onChange={e => {
+                                                               selectChanged(e);
+                                                               setStep5C("Satin Brass");
+                                                               setDeps("", "5C");
+                                                               setCart("BracketColor", "Satin Brass");
+                                                           }} ref={ref => (inputs.current["5C1"] = ref)}/>
+                                                    <div className="frame_img">
+                                                        <img src={require('../Images/drapery/roller/SatinBrass.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                                                    </div>
+                                                </label>
+                                                <div className="radio_group_name_container">
+                                                    <h1>{t("BracketColor1")}</h1>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="box33">
+                                            <div className="radio_group">
+                                                <label className="radio_container">
+                                                    <input className="radio" type="radio" text={t("BracketColor2")} value="2" name="step5C" ref-num="5C" id="5C2"
+                                                           checked={step5C === "Satin Nickel"}
+                                                           onChange={e => {
+                                                               selectChanged(e);
+                                                               setStep5C("Satin Nickel");
+                                                               setDeps("", "5C");
+                                                               setCart("BracketColor", "Satin Nickel");
+                                                           }} ref={ref => (inputs.current["5C2"] = ref)}/>
+                                                    <div className="frame_img">
+                                                        <img src={require('../Images/drapery/roller/SatinNickel.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                                                    </div>
+                                                </label>
+                                                <div className="radio_group_name_container">
+                                                    <h1>{t("BracketColor2")}</h1>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="box33">
+                                            <div className="radio_group">
+                                                <label className="radio_container">
+                                                    <input className="radio" type="radio" text={t("BracketColor3")} value="3" name="step5C" ref-num="5C" id="5C3"
+                                                           checked={step5C === "Gun Metal"}
+                                                           onChange={e => {
+                                                               selectChanged(e);
+                                                               setStep5C("Gun Metal");
+                                                               setDeps("", "5C");
+                                                               setCart("BracketColor", "Gun Metal");
+                                                           }} ref={ref => (inputs.current["5C2"] = ref)}/>
+                                                    <div className="frame_img">
+                                                        <img src={require('../Images/drapery/roller/GunMetal.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                                                    </div>
+                                                </label>
+                                                <div className="radio_group_name_container">
+                                                    <h1>{t("BracketColor2")}</h1>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <NextStep eventKey="6">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                    <div className="accordion_help">
+                                        <div className="help_container">
+                                            <div className="help_column help_left_column">
+                                                <p className="help_column_header"/>
                                                 <ul className="help_column_list">
-                                                    <li className="no_listStyle">
+                                                    <li className="no_listStyle text-center">
+                                                        
                                                         <span className="popover_indicator">
                                                             {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
                                                                                   children={<object className="popover_camera" type="image/svg+xml"
                                                                                                     data={require('../Images/public/camera.svg').default}/>}
                                                                                   component={
-                                                                                      <div id="popover_content_step5help2" className="clearfix">
+                                                                                      <div className="clearfix">
                                                                                           <div className="popover_image clearfix">
                                                                                               <img
-                                                                                                  src={popoverImages["step53"] === undefined ? require('../Images/drapery/zebra/roller_bottombar_designer.jpg') : popoverImages["step53"]}
+                                                                                                  src={popoverImages["step51"] === undefined ? require('../Images/drapery/roller/bracket_type_round.png') : popoverImages["step51"]}
                                                                                                   className="img-fluid" alt=""/>
                                                                                           </div>
                                                                                           <div className="popover_footer">
-                                                                                              <span className="popover_footer_title">{t("step5_popover_3")}</span>
+                                                                                              <span className="popover_footer_title">{t("BottomBarStyle_help_5")}</span>
                                                                                               <span className="popover_thumbnails">
                                                                                                   <div>
-                                                                                                      <img src={require('../Images/drapery/zebra/roller_bottombar_designer.jpg').default}
-                                                                                                           text="step53"
+                                                                                                      <img src={require('../Images/drapery/roller/bracket_type_round.png')}
+                                                                                                           text="step51"
+                                                                                                           onMouseEnter={(e) => popoverThumbnailHover(e)}
+                                                                                                           className="popover_thumbnail_img img-fluid"
+                                                                                                           alt=""/>
+                                                                                                  </div>
+                                                                                                  <div>
+                                                                                                      <img src={require('../Images/drapery/roller/bracket_type_square.png')}
+                                                                                                           text="step51"
                                                                                                            onMouseEnter={(e) => popoverThumbnailHover(e)}
                                                                                                            className="popover_thumbnail_img img-fluid"
                                                                                                            alt=""/>
@@ -5338,7 +6147,95 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                                                       </div>
                                                                                   }/>
                                                             }
-                                                        </span>{t("step5_help_8")}</li>
+                                                        </span>{t("bracketColor_help")}
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        }
+                        
+                        {/* step 7 */}
+                        <Card>
+                            <Card.Header>
+                                <ContextAwareToggle eventKey="6" stepNum={t("7")} stepTitle={t("roller_step6")} stepRef="6" type="1" required={requiredStep["6"]}
+                                                    stepSelected={stepSelectedLabel["6"] === undefined ? "" : stepSelectedLabel["6"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="6">
+                                <Card.Body>
+                                    <div className="card_body card_body_radio card_body_4">
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/dualRoller/Standard_dual.svg').default} className="img-fluid" alt=""/>
+                                            <input className="radio" type="radio" text={t("roller_HemStyle1")} value="1" name="step6" ref-num="6" id="61"
+                                                   checked={step6 === "Standard"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep6("Standard");
+                                                       setDeps("", "6");
+                                                       setCart("HemStyle", "Standard");
+                                                       setHemStyleNextStep("6A");
+                                                   }} ref={ref => (inputs.current["61"] = ref)}/>
+                                            <label htmlFor="61">{t("roller_HemStyle1")}</label>
+                                        </div>
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/dualRoller/Scallop_dual.svg').default} className="img-fluid" alt=""/>
+                                            <input className="radio" type="radio" text={t("roller_HemStyle2")} value="2" name="step6" ref-num="6" id="62"
+                                                   checked={step6 === "Scallop"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep6("Scallop");
+                                                       setDeps("", "6");
+                                                       setCart("HemStyle", "Scallop");
+                                                       setHemStyleNextStep("7");
+                                                   }} ref={ref => (inputs.current["62"] = ref)}/>
+                                            <label htmlFor="62">{t("roller_HemStyle2")}<br/><p
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["4"] ? (modelAccessories["4"]["6"] ? GetPrice(modelAccessories["4"]["6"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
+                                            </label>
+                                        </div>
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/dualRoller/Wave_dual.svg').default} className="img-fluid" alt=""/>
+                                            <input className="radio" type="radio" text={t("roller_HemStyle3")} value="3" name="step6" ref-num="6" id="63" checked={step6 === "Wave"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep6("Wave");
+                                                       setDeps("", "6");
+                                                       setCart("HemStyle", "Wave");
+                                                       setHemStyleNextStep("7");
+                                                   }} ref={ref => (inputs.current["63"] = ref)}/>
+                                            <label htmlFor="63">{t("roller_HemStyle3")}<br/><p
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["4"] ? (modelAccessories["4"]["7"] ? GetPrice(modelAccessories["4"]["7"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
+                                            </label>
+                                        </div>
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/dualRoller/Colonial_dual.svg').default} className="img-fluid" alt=""/>
+                                            <input className="radio" type="radio" text={t("roller_HemStyle4")} value="4" name="step6" ref-num="6" id="64"
+                                                   checked={step6 === "Colonial"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep6("Colonial");
+                                                       setDeps("", "6");
+                                                       setCart("HemStyle", "Colonial");
+                                                       setHemStyleNextStep("7");
+                                                   }} ref={ref => (inputs.current["64"] = ref)}/>
+                                            <label htmlFor="64">{t("roller_HemStyle4")}<br/><p
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["4"] ? (modelAccessories["4"]["9"] ? GetPrice(modelAccessories["4"]["9"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
+                                            </label>
+                                        </div>
+                                        <NextStep eventKey={hemStyleNextStep}>{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                    <div className="accordion_help">
+                                        <div className="help_container">
+                                            <div className="help_column help_left_column">
+                                                <p className="help_column_header"/>
+                                                <ul className="help_column_list">
+                                                    <li className="no_listStyle single_line_height">
+                                                        <div className="measurementsHelp_link text-center" onClick={e => modalHandleShow("headrailHelp")}>
+                                                            {t("headrailHelp")}
+                                                        </div>
+                                                    </li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -5347,13 +6244,126 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                             </Accordion.Collapse>
                         </Card>
                         
-                        {/* step 6 */}
+                        {/* step 7A */}
+                        {stepSelectedValue["6"] === "1" &&
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="6" stepNum={t("6")} stepTitle={t("zebra_step6")} stepRef="6" type="2" required={requiredStep["6"]}
-                                                    stepSelected={stepSelectedLabel["6"] === undefined ? "" : stepSelectedLabel["6"]}/>
+                                <ContextAwareToggle eventKey="6A" stepNum={t("7A")} stepTitle={t("roller_step6A")} stepRef="6A" type="1" required={requiredStep["6A"]}
+                                                    stepSelected={stepSelectedLabel["6A"] === undefined ? "" : stepSelectedLabel["6A"]}/>
                             </Card.Header>
-                            <Accordion.Collapse eventKey="6">
+                            <Accordion.Collapse eventKey="6A">
+                                <Card.Body>
+                                    <div className="card_body card_body_radio">
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/roller/bottom_bar_sewn_in.png')} className="img-fluid half_margin special_margin" alt=""/>
+                                            <input className="radio" type="radio" text={t("BottomBarStyle1")} value="1" name="step6A" ref-num="6A" id="6A1"
+                                                   checked={step6A === "Sewn-In"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep6A("Sewn-In");
+                                                       setDeps("", "6A");
+                                                       setCart("BottomBarStyle", "Sewn-In");
+                                                   }} ref={ref => (inputs.current["6A1"] = ref)}/>
+                                            <label htmlFor="6A1">{t("BottomBarStyle1")}</label>
+                                        </div>
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/roller/bottom_bar_exposed_designer.png')} className="img-fluid half_margin special_margin" alt=""/>
+                                            <input className="radio" type="radio" text={t("BottomBarStyle2")} value="2" name="step6A" ref-num="6A" id="6A2"
+                                                   checked={step6A === "Exposed - Designer"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep6A("Exposed - Designer");
+                                                       setDeps("", "6A");
+                                                       setCart("BottomBarStyle", "Exposed - Designer");
+                                                   }} ref={ref => (inputs.current["6A2"] = ref)}/>
+                                            <label htmlFor="6A2">{t("BottomBarStyle2")}<br/><p
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["6"] ? (modelAccessories["6"]["13"] ? GetPrice(modelAccessories["6"]["13"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
+                                            </label>
+                                        </div>
+                                        <NextStep eventKey="7">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                    <div className="accordion_help">
+                                        <div className="help_container">
+                                            <div className="help_column help_left_column help_left_column_mount_type">
+                                                <p className="help_column_header">{t("BottomBarStyle_help_1")}</p>
+                                                <ul className="help_column_list">
+                                                    <li className="no_listStyle">
+                                                        <span className="popover_indicator">
+                                                            {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
+                                                                                  children={<object className="popover_camera" type="image/svg+xml"
+                                                                                                    data={require('../Images/public/camera.svg').default}/>}
+                                                                                  component={
+                                                                                      <div className="clearfix">
+                                                                                          <div className="popover_image clearfix">
+                                                                                              <img
+                                                                                                  src={popoverImages["step51"] === undefined ? require('../Images/drapery/roller/SewnIn.jpg') : popoverImages["step51"]}
+                                                                                                  className="img-fluid" alt=""/>
+                                                                                          </div>
+                                                                                          <div className="popover_footer">
+                                                                                              <span className="popover_footer_title">{t("BottomBarStyle_help_5")}</span>
+                                                                                              <span className="popover_thumbnails">
+                                                                                                  <div>
+                                                                                                      <img src={require('../Images/drapery/roller/SewnIn.jpg')}
+                                                                                                           text="step51"
+                                                                                                           onMouseEnter={(e) => popoverThumbnailHover(e)}
+                                                                                                           className="popover_thumbnail_img img-fluid"
+                                                                                                           alt=""/>
+                                                                                                  </div>
+                                                                                              </span>
+                                                                                          </div>
+                                                                                      </div>
+                                                                                  }/>
+                                                            }
+                                                        </span>{t("BottomBarStyle_help_2")}</li>
+                                                </ul>
+                                            </div>
+                                            <div className="help_column help_right_column help_right_column_mount_type">
+                                                <p className="help_column_header">{t("BottomBarStyle_help_3")}</p>
+                                                <ul className="help_column_list">
+                                                    <li className="no_listStyle">
+                                                        <span className="popover_indicator">
+                                                            {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
+                                                                                  children={<object className="popover_camera" type="image/svg+xml"
+                                                                                                    data={require('../Images/public/camera.svg').default}/>}
+                                                                                  component={
+                                                                                      <div className="clearfix">
+                                                                                          <div className="popover_image clearfix">
+                                                                                              <img
+                                                                                                  src={popoverImages["step51"] === undefined ? require('../Images/drapery/roller/designer.jpg') : popoverImages["step51"]}
+                                                                                                  className="img-fluid" alt=""/>
+                                                                                          </div>
+                                                                                          <div className="popover_footer">
+                                                                                              <span className="popover_footer_title">{t("BottomBarStyle_help_6")}</span>
+                                                                                              <span className="popover_thumbnails">
+                                                                                                  <div>
+                                                                                                      <img src={require('../Images/drapery/roller/designer.jpg')}
+                                                                                                           text="step51"
+                                                                                                           onMouseEnter={(e) => popoverThumbnailHover(e)}
+                                                                                                           className="popover_thumbnail_img img-fluid"
+                                                                                                           alt=""/>
+                                                                                                  </div>
+                                                                                              </span>
+                                                                                          </div>
+                                                                                      </div>
+                                                                                  }/>
+                                                            }
+                                                        </span>{t("BottomBarStyle_help_4")}</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        }
+                        
+                        {/* step 8 */}
+                        <Card>
+                            <Card.Header>
+                                <ContextAwareToggle eventKey="7" stepNum={t("8")} stepTitle={t("zebra_step6")} stepRef="7" type="2" required={requiredStep["7"]}
+                                                    stepSelected={stepSelectedLabel["7"] === undefined ? "" : stepSelectedLabel["7"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="7">
                                 <Card.Body>
                                     <div className="card_body card_body_radio">
                                         <div className="box100 upload_section">
@@ -5372,8 +6382,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                         </span>
                                                     </div>
                                                     <div className="uploaded_images_section">
-                                                        <ul className="upload_results">
-                                                            {uploadedImagesList}
+                                                        <ul className="upload_results clearfix">
                                                         </ul>
                                                     </div>
                                                 </div>
@@ -5390,28 +6399,12 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                             </div>
                                             <div className="project-details">
                                                 <div className="btn-upload img_upload_btn">
-                                                    <button type="button" className="btn" onClick={e => {
-                                                        if (isLoggedIn) {
-                                                            modalHandleShow("uploadImg");
-                                                        } else {
-                                                            dispatch({
-                                                                type: ShowLogin2Modal,
-                                                            })
-                                                        }
-                                                    }}>
+                                                    <button type="button" className="btn" onClick={e => modalHandleShow("uploadImg")}>
                                                         {t("Upload Image")}
                                                     </button>
                                                 </div>
                                                 <div className="btn-upload">
-                                                    <button type="button" className="btn" onClick={e => {
-                                                        if (isLoggedIn) {
-                                                            modalHandleShow("uploadPdf");
-                                                        } else {
-                                                            dispatch({
-                                                                type: ShowLogin2Modal,
-                                                            })
-                                                        }
-                                                    }}>
+                                                    <button type="button" className="btn" onClick={e => modalHandleShow("uploadPdf")}>
                                                         {t("Upload PDF")}
                                                     </button>
                                                 </div>
@@ -5420,11 +6413,9 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                         <div className="box100 uploaded_name_section">
                                             <div className="mid_upload">
                                                 <ul className="upload_names_images">
-                                                    {uploadedImagesNamesList}
                                                 </ul>
                                                 <br/>
                                                 <ul className="upload_names_pdfs">
-                                                    {uploadedPDFNameList}
                                                 </ul>
                                             </div>
                                         </div>
@@ -5459,8 +6450,8 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                         //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                         // }
                                                         onChange={(selected) => {
-                                                            setDeps("", "61");
-                                                            roomLabelChanged(selected[0], "6", false);
+                                                            setDeps("", "71");
+                                                            roomLabelChanged(selected[0], "7", false);
                                                             setSelectedRoomLabel(selected);
                                                             // setCart("RoomNameEn", selected[0].value);
                                                             setCart("RoomNameFa", rooms["fa"].find(opt => opt.value === selected[0].value).label, "", "RoomNameEn", [selected[0].value]);
@@ -5475,10 +6466,10 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                        value={roomLabelText}
                                                        onChange={(e) => {
                                                            if (e.target.value === "")
-                                                               setDeps("62", "");
+                                                               setDeps("72", "");
                                                            else
-                                                               setDeps("", "62");
-                                                           roomLabelChanged(e.target.value, "6", true);
+                                                               setDeps("", "72");
+                                                           roomLabelChanged(e.target.value, "7", true);
                                                            setRoomLabelText(e.target.value);
                                                            setCart("WindowName", e.target.value);
                                                        }}/>
@@ -6323,4 +7314,4 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     );
 }
 
-export default Zebra;
+export default DualRoller;

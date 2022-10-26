@@ -496,7 +496,7 @@ function Basket() {
                     navigate("/" + pageLanguage);
                 }
             } else {
-                if (cart["drapery"] === undefined || cart["drapery"] === []) {
+                if (cart["drapery"] === undefined || cart["drapery"].length===0) {
                     setDrapery([]);
                     setDraperyCount(0);
                 } else {
@@ -1052,7 +1052,9 @@ function Basket() {
                 }).catch(err => {
                     console.log(err);
                 });
-                
+            }
+            else{
+                setTotalPrice(0);
             }
         }
     }, [drapery]);
@@ -1151,12 +1153,12 @@ function Basket() {
                         </div>}
                         {swatchesCount > 0 && <div className="swatches_basket">
                             <div className="swatches_basket_header basket_header">
-                                <span className="basket_header_title">SWATCHES</span>
+                                <span className="basket_header_title">{t("SWATCHES")}</span>
                                 <span className="basket_header_price"/>
                                 <span className="basket_header_qty"/>
                                 <span className="basket_header_swatches_only">
                                     <div className="arrow_container" onClick={()=>navigate("/"+ pageLanguage+"/Checkout/Swatches")}>
-                                        <span className="swatches_only">Order Swatches Only</span>
+                                        <span className="swatches_only">{t("Order Swatches Only")}</span>
                                         <span className="arrow_body"><span className="head"/></span>
                                     </div>
                                 </span>

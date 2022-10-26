@@ -306,7 +306,7 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                                    model-id={modelID} value={FabricId} text-en={DesignEnName} text-fa={DesignName} checked={`${FabricId}` === step1}
                                    ref={ref => (inputs.current[`1${FabricId}`] = ref)}/>
                             <div className="frame_img">
-                                <img className="img-fluid" src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
+                                <img className={`img-fluid ${`${FabricId}` === step1?"img-fluid_checked":""}`} src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
                             </div>
                         </label>
                         <div className={`fabric_name_container ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
@@ -3531,7 +3531,7 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                                                        setCart("ControlType", "Motorized", "ControlPosition,ChainLength");
                                                    }} ref={ref => (inputs.current["42"] = ref)}/>
                                             <label htmlFor="42">{t("Motorized")}<br/><p
-                                                className="surcharge_price">{t("Add ")}{Object.keys(modelAccessories).length !== 0 ? (modelAccessories["1"] ? (modelAccessories["1"]["61500508"] ? GetPrice(modelAccessories["1"]["61500508"]["price"], pageLanguage, t("TOMANS")) : null) : null) : null}</p>
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["1"] ? (modelAccessories["1"]["61500508"] ? GetPrice(modelAccessories["1"]["61500508"]["price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
                                             </label>
                                         
                                         </div>
@@ -3777,7 +3777,7 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                                                        setCart("ChainLength", "300");
                                                    }} ref={ref => (inputs.current["4B2"] = ref)}/>
                                             <label htmlFor="4B2">{t("300cm")}<br/><p
-                                                className="surcharge_price">{t("Add ")}{Object.keys(modelAccessories).length !== 0 ? (modelAccessories["3"] ? (modelAccessories["3"]["90908901"] ? GetPrice(modelAccessories["3"]["90908901"]["price"], pageLanguage, t("TOMANS")) : null) : null) : null}</p>
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["3"] ? (modelAccessories["3"]["90908901"] ? GetPrice(modelAccessories["3"]["90908901"]["price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
                                             </label>
                                         </div>
                                         <div className="box33 radio_style">
@@ -3790,7 +3790,7 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                                                        setCart("ChainLength", "500");
                                                    }} ref={ref => (inputs.current["4B3"] = ref)}/>
                                             <label htmlFor="4B3">{t("500cm")}<br/><p
-                                                className="surcharge_price">{t("Add ")}{Object.keys(modelAccessories).length !== 0 ? (modelAccessories["3"] ? (modelAccessories["3"]["90908902"] ? GetPrice(modelAccessories["3"]["90908902"]["price"], pageLanguage, t("TOMANS")) : null) : null) : null}</p>
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["3"] ? (modelAccessories["3"]["90908902"] ? GetPrice(modelAccessories["3"]["90908902"]["price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
                                             </label>
                                         </div>
                                         <NextStep eventKey="5">{t("NEXT STEP")}</NextStep>
@@ -3835,7 +3835,7 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                                                        setHeadrailsNextStep("6");
                                                    }} ref={ref => (inputs.current["52"] = ref)}/>
                                             <label htmlFor="52">{t("roller_headrail2")}<br/><p
-                                                className="surcharge_price">{t("Add ")}{Object.keys(modelAccessories).length !== 0 ? (modelAccessories["1"] ? (modelAccessories["1"]["61500508"] ? GetPrice(modelAccessories["1"]["61500508"]["price"], pageLanguage, t("TOMANS")) : null) : null) : null}</p>
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["1"] ? (modelAccessories["1"]["61500508"] ? GetPrice(modelAccessories["1"]["61500508"]["price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
                                             </label>
                                         </div>
                                         <div className="box50 radio_style">
@@ -3850,7 +3850,7 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                                                        setHeadrailsNextStep("6");
                                                    }} ref={ref => (inputs.current["53"] = ref)}/>
                                             <label htmlFor="53">{t("roller_headrail3")}<br/><p
-                                                className="surcharge_price">{t("Add ")}{Object.keys(modelAccessories).length !== 0 ? (modelAccessories["1"] ? (modelAccessories["1"]["61500508"] ? GetPrice(modelAccessories["1"]["61500508"]["price"], pageLanguage, t("TOMANS")) : null) : null) : null}</p>
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["1"] ? (modelAccessories["1"]["61500508"] ? GetPrice(modelAccessories["1"]["61500508"]["price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
                                             </label>
                                         </div>
                                         <div className="box50 radio_style">
@@ -3865,7 +3865,7 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                                                        setHeadrailsNextStep("6");
                                                    }} ref={ref => (inputs.current["54"] = ref)}/>
                                             <label htmlFor="54">{t("roller_headrail4")}<br/><p
-                                                className="surcharge_price">{t("Add ")}{Object.keys(modelAccessories).length !== 0 ? (modelAccessories["1"] ? (modelAccessories["1"]["61500508"] ? GetPrice(modelAccessories["1"]["61500508"]["price"], pageLanguage, t("TOMANS")) : null) : null) : null}</p>
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["1"] ? (modelAccessories["1"]["61500508"] ? GetPrice(modelAccessories["1"]["61500508"]["price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
                                             </label>
                                         </div>
                                         {(stepSelectedValue["5"] === "3" || stepSelectedValue["5"] === "4") &&
@@ -4029,14 +4029,14 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                                                                                               <span className="popover_footer_title">{t("RollType_help_7")}</span>
                                                                                               <span className="popover_thumbnails">
                                                                                                   <div>
-                                                                                                      <img src={require('../Images/drapery/roller/RegularRoll1a.jpg')}
+                                                                                                      <img src={require('../Images/drapery/roller/RegularRoll1a.jpg').default}
                                                                                                            text="step51"
                                                                                                            onMouseEnter={(e) => popoverThumbnailHover(e)}
                                                                                                            className="popover_thumbnail_img img-fluid"
                                                                                                            alt=""/>
                                                                                                   </div>
                                                                                                   <div>
-                                                                                                      <img src={require('../Images/drapery/roller/RegularRoll2.jpg')}
+                                                                                                      <img src={require('../Images/drapery/roller/RegularRoll2.jpg').default}
                                                                                                            text="step51"
                                                                                                            onMouseEnter={(e) => popoverThumbnailHover(e)}
                                                                                                            className="popover_thumbnail_img img-fluid"
@@ -4273,7 +4273,7 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                                                        setHemStyleNextStep("7");
                                                    }} ref={ref => (inputs.current["62"] = ref)}/>
                                             <label htmlFor="62">{t("roller_HemStyle2")}<br/><p
-                                                className="surcharge_price">{t("Add ")}{Object.keys(modelAccessories).length !== 0 ? (modelAccessories["1"] ? (modelAccessories["1"]["61500508"] ? GetPrice(modelAccessories["1"]["61500508"]["price"], pageLanguage, t("TOMANS")) : null) : null) : null}</p>
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["1"] ? (modelAccessories["1"]["61500508"] ? GetPrice(modelAccessories["1"]["61500508"]["price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
                                             </label>
                                         </div>
                                         <div className="box50 radio_style">
@@ -4287,7 +4287,7 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                                                        setHemStyleNextStep("7");
                                                    }} ref={ref => (inputs.current["63"] = ref)}/>
                                             <label htmlFor="63">{t("roller_HemStyle3")}<br/><p
-                                                className="surcharge_price">{t("Add ")}{Object.keys(modelAccessories).length !== 0 ? (modelAccessories["1"] ? (modelAccessories["1"]["61500508"] ? GetPrice(modelAccessories["1"]["61500508"]["price"], pageLanguage, t("TOMANS")) : null) : null) : null}</p>
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["1"] ? (modelAccessories["1"]["61500508"] ? GetPrice(modelAccessories["1"]["61500508"]["price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
                                             </label>
                                         </div>
                                         <div className="box50 radio_style">
@@ -4302,7 +4302,7 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                                                        setHemStyleNextStep("7");
                                                    }} ref={ref => (inputs.current["64"] = ref)}/>
                                             <label htmlFor="64">{t("roller_HemStyle4")}<br/><p
-                                                className="surcharge_price">{t("Add ")}{Object.keys(modelAccessories).length !== 0 ? (modelAccessories["1"] ? (modelAccessories["1"]["61500508"] ? GetPrice(modelAccessories["1"]["61500508"]["price"], pageLanguage, t("TOMANS")) : null) : null) : null}</p>
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["1"] ? (modelAccessories["1"]["61500508"] ? GetPrice(modelAccessories["1"]["61500508"]["price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
                                             </label>
                                         </div>
                                         <NextStep eventKey={hemStyleNextStep}>{t("NEXT STEP")}</NextStep>
@@ -4358,7 +4358,7 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                                                        setCart("BottomBarStyle", "Exposed - Designer");
                                                    }} ref={ref => (inputs.current["6A2"] = ref)}/>
                                             <label htmlFor="6A2">{t("BottomBarStyle2")}<br/><p
-                                                className="surcharge_price">{t("Add ")}{Object.keys(modelAccessories).length !== 0 ? (modelAccessories["1"] ? (modelAccessories["1"]["61500508"] ? GetPrice(modelAccessories["1"]["61500508"]["price"], pageLanguage, t("TOMANS")) : null) : null) : null}</p>
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["1"] ? (modelAccessories["1"]["61500508"] ? GetPrice(modelAccessories["1"]["61500508"]["price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
                                             </label>
                                         </div>
                                         <NextStep eventKey="7">{t("NEXT STEP")}</NextStep>

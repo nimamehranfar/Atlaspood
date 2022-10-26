@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="137" height="155.679" viewBox="0 0 137 155.679">
+  <defs>
+    <style>
+      .cls-1, .cls-3, .cls-5, .cls-6 {
+        fill: none;
+      }
+
+      .cls-2 {
+        fill: #fff;
+        stroke: #454545;
+        stroke-width: 1.1px;
+      }
+
+      .cls-3, .cls-5, .cls-6 {
+        stroke: #606060;
+      }
+
+      .cls-3 {
+        stroke-width: 2px;
+      }
+
+      .cls-4, .cls-7 {
+        fill: #606060;
+      }
+
+      .cls-5 {
+        stroke-width: 0.8px;
+      }
+
+      .cls-6 {
+        stroke-width: 1.4px;
+      }
+
+      .cls-8, .cls-9 {
+        stroke: none;
+      }
+
+      .cls-9 {
+        fill: #606060;
+      }
+    </style>
+  </defs>
+  <g id="Group_25" data-name="Group 25" transform="translate(-68.774 3.602)">
+    <rect id="Rectangle_41" data-name="Rectangle 41" class="cls-1" width="122" height="151" transform="translate(76.514 -3.602)"/>
+    <g id="Rectangle_4" data-name="Rectangle 4" class="cls-2" transform="translate(89.241 20.514)">
+      <rect class="cls-8" width="95.067" height="131.563"/>
+      <rect class="cls-1" x="0.55" y="0.55" width="93.967" height="130.463"/>
+    </g>
+    <g id="Rectangle_5" data-name="Rectangle 5" class="cls-2" transform="translate(97.532 28.805)">
+      <rect class="cls-8" width="78.485" height="114.982"/>
+      <rect class="cls-1" x="0.55" y="0.55" width="77.385" height="113.882"/>
+    </g>
+    <line id="Line_44" data-name="Line 44" class="cls-3" x2="124.739" transform="translate(75.274 0.296)"/>
+
+    <g id="Group_29" data-name="Group 29" transform="translate(135.907 -2.602)">
+      <line id="Line_5" data-name="Line 5" class="cls-5" y1="22.385" transform="translate(47.99 2.52)"/>
+      <line id="Line_6" data-name="Line 6" class="cls-5" y1="22.385" transform="translate(62.867 2.52)"/>
+      <line id="Line_7" data-name="Line 7" class="cls-6" x2="11.382" transform="translate(49.742 18.698)"/>
+      <g id="Polygon_1" data-name="Polygon 1" class="cls-7" transform="translate(62.374 16.698) rotate(90)">
+        <path class="cls-8" d="M 3.252593278884888 2.599999904632568 L 0.747406542301178 2.599999904632568 L 1.99999988079071 0.7211099863052368 L 3.252593278884888 2.599999904632568 Z"/>
+        <path class="cls-9" d="M 1.99999988079071 1.442219972610474 L 1.494813203811646 2.200000047683716 L 2.505186557769775 2.200000047683716 L 1.99999988079071 1.442219972610474 M 1.99999988079071 0 L 4 3 L -2.384185791015625e-07 3 L 1.99999988079071 0 Z"/>
+      </g>
+      <g id="Polygon_2" data-name="Polygon 2" class="cls-7" transform="translate(48.49 20.698) rotate(-90)">
+        <path class="cls-8" d="M 3.252593278884888 2.599999904632568 L 0.747406542301178 2.599999904632568 L 1.99999988079071 0.7211099863052368 L 3.252593278884888 2.599999904632568 Z"/>
+        <path class="cls-9" d="M 1.99999988079071 1.442219972610474 L 1.494813203811646 2.200000047683716 L 2.505186557769775 2.200000047683716 L 1.99999988079071 1.442219972610474 M 1.99999988079071 0 L 4 3 L -2.384185791015625e-07 3 L 1.99999988079071 0 Z"/>
+      </g>
+    </g>
+    <g id="Group_30" data-name="Group 30" transform="translate(27.784 -2.602)">
+      <line id="Line_5-2" data-name="Line 5" class="cls-5" y1="22.385" transform="translate(47.99 2.52)"/>
+      <line id="Line_6-2" data-name="Line 6" class="cls-5" y1="22.385" transform="translate(61.866 2.52)"/>
+      <line id="Line_7-2" data-name="Line 7" class="cls-6" x2="10.381" transform="translate(49.742 18.698)"/>
+      <g id="Polygon_1-2" data-name="Polygon 1" class="cls-7" transform="translate(61.373 16.698) rotate(90)">
+        <path class="cls-8" d="M 3.252593278884888 2.599999904632568 L 0.747406542301178 2.599999904632568 L 1.99999988079071 0.7211099863052368 L 3.252593278884888 2.599999904632568 Z"/>
+        <path class="cls-9" d="M 1.99999988079071 1.442219972610474 L 1.494813203811646 2.200000047683716 L 2.505186557769775 2.200000047683716 L 1.99999988079071 1.442219972610474 M 1.99999988079071 0 L 4 3 L -2.384185791015625e-07 3 L 1.99999988079071 0 Z"/>
+      </g>
+      <g id="Polygon_2-2" data-name="Polygon 2" class="cls-7" transform="translate(48.49 20.698) rotate(-90)">
+        <path class="cls-8" d="M 3.252593278884888 2.599999904632568 L 0.747406542301178 2.599999904632568 L 1.99999988079071 0.7211099863052368 L 3.252593278884888 2.599999904632568 Z"/>
+        <path class="cls-9" d="M 1.99999988079071 1.442219972610474 L 1.494813203811646 2.200000047683716 L 2.505186557769775 2.200000047683716 L 1.99999988079071 1.442219972610474 M 1.99999988079071 0 L 4 3 L -2.384185791015625e-07 3 L 1.99999988079071 0 Z"/>
+      </g>
+    </g>
+  </g>
+</svg>

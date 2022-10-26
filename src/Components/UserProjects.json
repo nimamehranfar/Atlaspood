@@ -342,8 +342,9 @@
         "apiAcc": true,
         "apiAccValue": {
           "Motorized": {
+            "SewingAccessoryId": 1,
             "SewingModelAccessoryId": 1,
-            "ProductId": "61500508",
+            "SewingAccessoryValue": "61500508",
             "Qty": 1
           },
           "ContinuousLoop": null
@@ -373,6 +374,19 @@
         "titlePostfix": "",
         "order": 6,
         "apiLabel": "MotorPosition",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "MotorType",
+        "title": "Motor Type",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 6,
+        "apiLabel": "MotorType",
         "apiValue": null,
         "lang": [
           "en",
@@ -430,13 +444,15 @@
         "apiAccValue": {
           "150": null,
           "300": {
+            "SewingAccessoryId": 2,
             "SewingModelAccessoryId": 3,
-            "ProductId": "90908901",
+            "SewingAccessoryValue": "90908901",
             "Qty": 1
           },
           "500": {
+            "SewingAccessoryId": 2,
             "SewingModelAccessoryId": 3,
-            "ProductId": "90908902",
+            "SewingAccessoryValue": "90908902",
             "Qty": 1
           }
         },
@@ -653,6 +669,18 @@
         "apiValue": null,
         "apiLabel2": "FabricId",
         "apiValue2": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },{
+        "cart": "SewingModelId",
+        "title": "SewingModelId",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "SewingModelId",
+        "apiValue": null,
         "lang": [
           "en",
           "fa"
@@ -964,10 +992,7 @@
       {
         "cart": "ControlType",
         "title": "Control Type",
-        "titleValue": {
-          "ContinuousLoop": "Continuous Loop",
-          "Motorized": "Motorized"
-        },
+        "titleValue": null,
         "titlePostfix": "",
         "order": 5,
         "apiLabel": "ControlType",
@@ -975,8 +1000,9 @@
         "apiAcc": true,
         "apiAccValue": {
           "Motorized": {
+            "SewingAccessoryId": 1,
             "SewingModelAccessoryId": 1,
-            "ProductId": "61500508",
+            "SewingAccessoryValue": "61500508",
             "Qty": 1
           },
           "ContinuousLoop": null
@@ -1006,6 +1032,19 @@
         "titlePostfix": "",
         "order": 6,
         "apiLabel": "MotorPosition",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "MotorType",
+        "title": "Motor Type",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 6,
+        "apiLabel": "MotorType",
         "apiValue": null,
         "lang": [
           "en",
@@ -1063,13 +1102,15 @@
         "apiAccValue": {
           "150": null,
           "300": {
+            "SewingAccessoryId": 2,
             "SewingModelAccessoryId": 3,
-            "ProductId": "90908901",
+            "SewingAccessoryValue": "90908901",
             "Qty": 1
           },
           "500": {
+            "SewingAccessoryId": 2,
             "SewingModelAccessoryId": 3,
-            "ProductId": "90908902",
+            "SewingAccessoryValue": "90908902",
             "Qty": 1
           }
         },
@@ -1086,6 +1127,28 @@
         "order": 9,
         "apiLabel": "Headrail",
         "apiValue": null,
+        "apiAcc": true,
+        "apiAccValue": {
+          "Exposed": null,
+          "Upholstered": {
+            "SewingAccessoryId": 5,
+            "SewingModelAccessoryId": 7,
+            "SewingAccessoryValue": "900004",
+            "Qty": 1
+          },
+          "MetalValance": {
+            "SewingAccessoryId": 5,
+            "SewingModelAccessoryId": 7,
+            "SewingAccessoryValue": "900005",
+            "Qty": 1
+          },
+          "MetalValanceFabricInsert": {
+            "SewingAccessoryId": 5,
+            "SewingModelAccessoryId": 7,
+            "SewingAccessoryValue": "900006",
+            "Qty": 1
+          }
+        },
         "lang": [
           "en",
           "fa"
@@ -1151,6 +1214,28 @@
         "order": 14,
         "apiLabel": "HemStyle",
         "apiValue": null,
+        "apiAcc": true,
+        "apiAccValue": {
+          "Standard": null,
+          "Scallop": {
+            "SewingAccessoryId": 4,
+            "SewingModelAccessoryId": 6,
+            "SewingAccessoryValue": "900001",
+            "Qty": 1
+          },
+          "Wave": {
+            "SewingAccessoryId": 4,
+            "SewingModelAccessoryId": 6,
+            "SewingAccessoryValue": "900002",
+            "Qty": 1
+          },
+          "Colonial": {
+            "SewingAccessoryId": 4,
+            "SewingModelAccessoryId": 6,
+            "SewingAccessoryValue": "900003",
+            "Qty": 1
+          }
+        },
         "lang": [
           "en",
           "fa"
@@ -1164,6 +1249,1749 @@
         "order": 15,
         "apiLabel": "BottomBarStyle",
         "apiValue": null,
+        "apiAcc": true,
+        "apiAccValue": {
+          "Sewn-In": null,
+          "Exposed - Designer": {
+            "SewingAccessoryId": 6,
+            "SewingModelAccessoryId": 12,
+            "SewingAccessoryValue": "900007",
+            "Qty": 1
+          }
+        },
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "RoomNameFa",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 16,
+        "apiLabel": "RoomNameFa",
+        "apiValue": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "RoomNameEn",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 16,
+        "apiLabel": "RoomNameEn",
+        "apiValue": null,
+        "lang": [
+          "en"
+        ]
+      },
+      {
+        "cart": "WindowName",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "WindowName",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "ModelNameEn",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "ModelNameEn",
+        "apiValue": null,
+        "lang": [
+          "en"
+        ]
+      },
+      {
+        "cart": "ModelNameFa",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "ModelNameFa",
+        "apiValue": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "ModelId",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "ModelId",
+        "apiValue": null,
+        "apiLabel2": "ModelId",
+        "apiValue2": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "uploadedImagesURL",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "uploadedImagesURL",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "uploadedImagesFile",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "uploadedImagesFile",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "uploadedPDFURL",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "uploadedPDFURL",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "uploadedPDFFile",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "uploadedPDFFile",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "qty",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "WindowCount",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "price",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      }
+    ],
+    "route": "/Curtain/Roller-Shades/0324"
+  },
+  "0325": {
+    "data": [
+      {
+        "cart": "FabricId",
+        "title": "FabricId",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "FabricId",
+        "apiValue": null,
+        "apiLabel2": "FabricId",
+        "apiValue2": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "FabricId2",
+        "title": "FabricId2",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "FabricId2",
+        "apiValue": null,
+        "apiLabel2": "FabricId2",
+        "apiValue2": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },{
+        "cart": "SewingModelId",
+        "title": "SewingModelId",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "SewingModelId",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "PhotoUrl",
+        "title": "PhotoUrl",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "PhotoUrl",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "PhotoUrl2",
+        "title": "PhotoUrl",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "PhotoUrl2",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "calcMeasurements",
+        "title": "calcMeasurements",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "CalcWindowSize",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "FabricDesignFa",
+        "title": "Fabric",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 0,
+        "apiLabel": "FabricDesignFa",
+        "apiValue": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "FabricDesignEn",
+        "title": "Fabric",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 0,
+        "apiLabel": "FabricDesignEn",
+        "apiValue": null,
+        "lang": [
+          "en"
+        ]
+      },
+      {
+        "cart": "FabricColorEn",
+        "title": "Color",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 1,
+        "apiLabel": "FabricColorEn",
+        "apiValue": null,
+        "lang": [
+          "en"
+        ]
+      },
+      {
+        "cart": "FabricColorFa",
+        "title": "Color",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 1,
+        "apiLabel": "FabricColorFa",
+        "apiValue": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "FabricDesignFa2",
+        "title": "Fabric",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 0,
+        "apiLabel": "FabricDesignFa2",
+        "apiValue": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "FabricDesignEn2",
+        "title": "Fabric",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 0,
+        "apiLabel": "FabricDesignEn2",
+        "apiValue": null,
+        "lang": [
+          "en"
+        ]
+      },
+      {
+        "cart": "FabricColorEn2",
+        "title": "Color",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 1,
+        "apiLabel": "FabricColorEn2",
+        "apiValue": null,
+        "lang": [
+          "en"
+        ]
+      },
+      {
+        "cart": "FabricColorFa2",
+        "title": "Color",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 1,
+        "apiLabel": "FabricColorFa2",
+        "apiValue": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "Mount",
+        "title": "Mount Type",
+        "titleValue": {
+          "null": "Inside",
+          "true": "Outside"
+        },
+        "titlePostfix": "",
+        "order": 2,
+        "apiLabel": "isWalled",
+        "apiValue": {
+          "Inside": null,
+          "Outside": true
+        },
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Width",
+        "title": "Width",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": 3,
+        "apiLabel": "Width1",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Height",
+        "title": "Height",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": 4,
+        "apiLabel": "Height1",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "WidthCart",
+        "title": "Width",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": 3,
+        "apiLabel": "WidthCart",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "HeightCart",
+        "title": "Height",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": 4,
+        "apiLabel": "HeightCart",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Width1",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Width1",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Width2",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Width2",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Width3",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Width3",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Height1",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Height1",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Height2",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Height2",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Height3",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Height3",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Width3A",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Width1",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Height3C",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Height1",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "ExtensionLeft",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "LeftWidthExt",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "ExtensionRight",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "RightWidthExt",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "ShadeMount",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "HeightOfRodMount",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "ControlType",
+        "title": "Control Type",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 5,
+        "apiLabel": "ControlType",
+        "apiValue": null,
+        "apiAcc": true,
+        "apiAccValue": {
+          "Motorized": {
+            "SewingAccessoryId": 1,
+            "SewingModelAccessoryId": 1,
+            "SewingAccessoryValue": "61500508",
+            "Qty": 1
+          },
+          "ContinuousLoop": null
+        },
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "hasPower",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "hasPower",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "MotorPosition",
+        "title": "Motor Position",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 6,
+        "apiLabel": "MotorPosition",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "MotorType",
+        "title": "Motor Type",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 6,
+        "apiLabel": "MotorType",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "RemoteName",
+        "title": "Remote Name",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 7,
+        "apiLabel": "RemoteName",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "MotorChannels",
+        "title": "Motor Channels",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 8,
+        "apiLabel": "MotorChannels",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "controlPositionFront",
+        "title": "Control Position Front",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 6,
+        "apiLabel": "controlPositionFront",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "controlPositionBack",
+        "title": "Control Position Back",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 6,
+        "apiLabel": "controlPositionBack",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "ChainLength",
+        "title": "Chain Length",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": 7,
+        "apiLabel": "ChainLength",
+        "apiValue": null,
+        "apiAcc": true,
+        "apiAccValue": {
+          "150": null,
+          "300": {
+            "SewingAccessoryId": 2,
+            "SewingModelAccessoryId": 3,
+            "SewingAccessoryValue": "90908901",
+            "Qty": 1
+          },
+          "500": {
+            "SewingAccessoryId": 2,
+            "SewingModelAccessoryId": 3,
+            "SewingAccessoryValue": "90908902",
+            "Qty": 1
+          }
+        },
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Headrail",
+        "title": "Headrail",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 9,
+        "apiLabel": "Headrail",
+        "apiValue": null,
+        "apiAcc": true,
+        "apiAccValue": {
+          "Exposed": null,
+          "Upholstered": {
+            "SewingAccessoryId": 5,
+            "SewingModelAccessoryId": 7,
+            "SewingAccessoryValue": "900004",
+            "Qty": 1
+          },
+          "MetalValance": {
+            "SewingAccessoryId": 5,
+            "SewingModelAccessoryId": 7,
+            "SewingAccessoryValue": "900005",
+            "Qty": 1
+          },
+          "MetalValanceFabricInsert": {
+            "SewingAccessoryId": 5,
+            "SewingModelAccessoryId": 7,
+            "SewingAccessoryValue": "900006",
+            "Qty": 1
+          }
+        },
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "RollType",
+        "title": "Roll Type",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 10,
+        "apiLabel": "RollType",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "BracketType",
+        "title": "Bracket Type",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 11,
+        "apiLabel": "BracketType",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "BracketColor",
+        "title": "Bracket Color",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 12,
+        "apiLabel": "BracketColor",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "MetalValanceColor",
+        "title": "Metal Valance Color",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 10,
+        "apiLabel": "",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "HemStyle",
+        "title": "Hem Style",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 14,
+        "apiLabel": "HemStyle",
+        "apiValue": null,
+        "apiAcc": true,
+        "apiAccValue": {
+          "Standard": null,
+          "Scallop": {
+            "SewingAccessoryId": 4,
+            "SewingModelAccessoryId": 6,
+            "SewingAccessoryValue": "900001",
+            "Qty": 1
+          },
+          "Wave": {
+            "SewingAccessoryId": 4,
+            "SewingModelAccessoryId": 6,
+            "SewingAccessoryValue": "900002",
+            "Qty": 1
+          },
+          "Colonial": {
+            "SewingAccessoryId": 4,
+            "SewingModelAccessoryId": 6,
+            "SewingAccessoryValue": "900003",
+            "Qty": 1
+          }
+        },
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "BottomBarStyle",
+        "title": "Bottom Bar Style",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 15,
+        "apiLabel": "BottomBarStyle",
+        "apiValue": null,
+        "apiAcc": true,
+        "apiAccValue": {
+          "Sewn-In": null,
+          "Exposed - Designer": {
+            "SewingAccessoryId": 6,
+            "SewingModelAccessoryId": 12,
+            "SewingAccessoryValue": "900007",
+            "Qty": 1
+          }
+        },
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "RoomNameFa",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 16,
+        "apiLabel": "RoomNameFa",
+        "apiValue": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "RoomNameEn",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 16,
+        "apiLabel": "RoomNameEn",
+        "apiValue": null,
+        "lang": [
+          "en"
+        ]
+      },
+      {
+        "cart": "WindowName",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "WindowName",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "ModelNameEn",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "ModelNameEn",
+        "apiValue": null,
+        "lang": [
+          "en"
+        ]
+      },
+      {
+        "cart": "ModelNameFa",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "ModelNameFa",
+        "apiValue": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "ModelId",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "ModelId",
+        "apiValue": null,
+        "apiLabel2": "ModelId",
+        "apiValue2": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "uploadedImagesURL",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "uploadedImagesURL",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "uploadedImagesFile",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "uploadedImagesFile",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "uploadedPDFURL",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "uploadedPDFURL",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "uploadedPDFFile",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "uploadedPDFFile",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "qty",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "WindowCount",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "price",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      }
+    ],
+    "route": "/Curtain/Dual-Roller-Shades/0325"
+  },
+  "0326": {
+    "data": [
+      {
+        "cart": "FabricId",
+        "title": "FabricId",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "FabricId",
+        "apiValue": null,
+        "apiLabel2": "FabricId",
+        "apiValue2": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "FabricId2",
+        "title": "FabricId2",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "FabricId2",
+        "apiValue": null,
+        "apiLabel2": "FabricId2",
+        "apiValue2": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },{
+        "cart": "SewingModelId",
+        "title": "SewingModelId",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "SewingModelId",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "PhotoUrl",
+        "title": "PhotoUrl",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "PhotoUrl",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "PhotoUrl2",
+        "title": "PhotoUrl",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "PhotoUrl2",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "calcMeasurements",
+        "title": "calcMeasurements",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "CalcWindowSize",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "FabricDesignFa",
+        "title": "Fabric",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 0,
+        "apiLabel": "FabricDesignFa",
+        "apiValue": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "FabricDesignEn",
+        "title": "Fabric",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 0,
+        "apiLabel": "FabricDesignEn",
+        "apiValue": null,
+        "lang": [
+          "en"
+        ]
+      },
+      {
+        "cart": "FabricColorEn",
+        "title": "Color",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 1,
+        "apiLabel": "FabricColorEn",
+        "apiValue": null,
+        "lang": [
+          "en"
+        ]
+      },
+      {
+        "cart": "FabricColorFa",
+        "title": "Color",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 1,
+        "apiLabel": "FabricColorFa",
+        "apiValue": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "FabricDesignFa2",
+        "title": "Fabric",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 0,
+        "apiLabel": "FabricDesignFa2",
+        "apiValue": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "FabricDesignEn2",
+        "title": "Fabric",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 0,
+        "apiLabel": "FabricDesignEn2",
+        "apiValue": null,
+        "lang": [
+          "en"
+        ]
+      },
+      {
+        "cart": "FabricColorEn2",
+        "title": "Color",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 1,
+        "apiLabel": "FabricColorEn2",
+        "apiValue": null,
+        "lang": [
+          "en"
+        ]
+      },
+      {
+        "cart": "FabricColorFa2",
+        "title": "Color",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 1,
+        "apiLabel": "FabricColorFa2",
+        "apiValue": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "Mount",
+        "title": "Mount Type",
+        "titleValue": {
+          "null": "Inside",
+          "true": "Outside"
+        },
+        "titlePostfix": "",
+        "order": 2,
+        "apiLabel": "isWalled",
+        "apiValue": {
+          "Inside": null,
+          "Outside": true
+        },
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "MountOutsideType",
+        "title": "Mount Outside Type",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": 3,
+        "apiLabel": "MountOutsideType",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Width",
+        "title": "Width",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": 3,
+        "apiLabel": "Width1",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Height",
+        "title": "Height",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": 4,
+        "apiLabel": "Height1",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "WidthCart",
+        "title": "Width",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": 3,
+        "apiLabel": "WidthCart",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "HeightCart",
+        "title": "Height",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": 4,
+        "apiLabel": "HeightCart",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Width1",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Width1",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Width2",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Width2",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Width3",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Width3",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Height1",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Height1",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Height2",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Height2",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Height3",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Height3",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Width3A",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Width1",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Height3C",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Height1",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "ExtensionLeft",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "LeftWidthExt",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "ExtensionRight",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "RightWidthExt",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "ShadeMount",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "HeightOfRodMount",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "ControlType",
+        "title": "Control Type",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 5,
+        "apiLabel": "ControlType",
+        "apiValue": null,
+        "apiAcc": true,
+        "apiAccValue": {
+          "Motorized": {
+            "SewingAccessoryId": 1,
+            "SewingModelAccessoryId": 1,
+            "SewingAccessoryValue": "61500508",
+            "Qty": 1
+          },
+          "ContinuousLoop": null
+        },
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "hasPower",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "hasPower",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "MotorPosition",
+        "title": "Motor Position",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 6,
+        "apiLabel": "MotorPosition",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "MotorType",
+        "title": "Motor Type",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 6,
+        "apiLabel": "MotorType",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "RemoteName",
+        "title": "Remote Name",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 7,
+        "apiLabel": "RemoteName",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "MotorChannels",
+        "title": "Motor Channels",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 8,
+        "apiLabel": "MotorChannels",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "ControlPosition",
+        "title": "Control Position",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 6,
+        "apiLabel": "ControlPosition",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "ChainLength",
+        "title": "Chain Length",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": 7,
+        "apiLabel": "ChainLength",
+        "apiValue": null,
+        "apiAcc": true,
+        "apiAccValue": {
+          "150": null,
+          "300": {
+            "SewingAccessoryId": 2,
+            "SewingModelAccessoryId": 3,
+            "SewingAccessoryValue": "90908901",
+            "Qty": 1
+          },
+          "500": {
+            "SewingAccessoryId": 2,
+            "SewingModelAccessoryId": 3,
+            "SewingAccessoryValue": "90908902",
+            "Qty": 1
+          }
+        },
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Headrail",
+        "title": "Headrail",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 9,
+        "apiLabel": "Headrail",
+        "apiValue": null,
+        "apiAcc": true,
+        "apiAccValue": {
+          "Exposed": null,
+          "Upholstered": {
+            "SewingAccessoryId": 5,
+            "SewingModelAccessoryId": 7,
+            "SewingAccessoryValue": "900004",
+            "Qty": 1
+          },
+          "MetalValance": {
+            "SewingAccessoryId": 5,
+            "SewingModelAccessoryId": 7,
+            "SewingAccessoryValue": "900005",
+            "Qty": 1
+          },
+          "MetalValanceFabricInsert": {
+            "SewingAccessoryId": 5,
+            "SewingModelAccessoryId": 7,
+            "SewingAccessoryValue": "900006",
+            "Qty": 1
+          }
+        },
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "RollType",
+        "title": "Roll Type",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 10,
+        "apiLabel": "RollType",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "BracketType",
+        "title": "Bracket Type",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 11,
+        "apiLabel": "BracketType",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "BracketColor",
+        "title": "Bracket Color",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 12,
+        "apiLabel": "BracketColor",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "MetalValanceColor",
+        "title": "Metal Valance Color",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 10,
+        "apiLabel": "",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "HemStyle",
+        "title": "Hem Style",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 14,
+        "apiLabel": "HemStyle",
+        "apiValue": null,
+        "apiAcc": true,
+        "apiAccValue": {
+          "Standard": null,
+          "Scallop": {
+            "SewingAccessoryId": 4,
+            "SewingModelAccessoryId": 6,
+            "SewingAccessoryValue": "900001",
+            "Qty": 1
+          },
+          "Wave": {
+            "SewingAccessoryId": 4,
+            "SewingModelAccessoryId": 6,
+            "SewingAccessoryValue": "900002",
+            "Qty": 1
+          },
+          "Colonial": {
+            "SewingAccessoryId": 4,
+            "SewingModelAccessoryId": 6,
+            "SewingAccessoryValue": "900003",
+            "Qty": 1
+          }
+        },
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "BottomBarStyle",
+        "title": "Bottom Bar Style",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 15,
+        "apiLabel": "BottomBarStyle",
+        "apiValue": null,
+        "apiAcc": true,
+        "apiAccValue": {
+          "Sewn-In": null,
+          "Exposed - Designer": {
+            "SewingAccessoryId": 6,
+            "SewingModelAccessoryId": 12,
+            "SewingAccessoryValue": "900007",
+            "Qty": 1
+          }
+        },
         "lang": [
           "en",
           "fa"

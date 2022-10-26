@@ -887,7 +887,7 @@ function Header() {
                     <div className="mid_header_left">
                         <div className="search-box">
                             <button className="btn-search">
-                                <img src={require('../Images/public/main_search_icon.svg')}
+                                <img src={require('../Images/public/main_search_icon.svg').default}
                                      className="img-fluid" alt=""/>
                                 <input type="text" className={`input-search ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} placeholder={t("Search_placeholder")}
                                        autoComplete="new-search"/>

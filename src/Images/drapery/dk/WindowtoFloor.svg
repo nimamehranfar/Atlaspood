@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="242" height="181.747" viewBox="0 0 242 181.747">
+  <defs>
+    <style>
+	
+	@font-face {
+    font-family: "proximanova-nova";
+
+    src: url('http://www.doopsalta.com/asset/fonts/proxima-nova-three.woff2') format('woff2'),
+        url('http://www.doopsalta.com/asset/fonts/proxima-nova-three.woff') format('woff'),
+        url('http://www.doopsalta.com/asset/fonts/proxima-nova-three.otf') format('opentype');
+    font-style: normal;
+	}
+	
+      .cls-1, .cls-3, .cls-5, .cls-6, .cls-7 {
+        fill: none;
+      }
+
+      .cls-2 {
+        fill: #707070;
+        stroke: rgba(0,0,0,0.5);
+        font-size: 11px;
+        font-family:'proximanova-nova',sans-serif;
+        font-weight: 200;
+      }
+
+      .cls-3 {
+        stroke: #707070;
+        stroke-width: 1.5px;
+      }
+
+      .cls-4 {
+        fill: #fff;
+        stroke: #454545;
+        stroke-width: 1.1px;
+      }
+
+      .cls-5, .cls-6, .cls-7 {
+        stroke: #606060;
+      }
+
+      .cls-6 {
+        stroke-width: 0.8px;
+      }
+
+      .cls-7 {
+        stroke-width: 1.2px;
+      }
+
+      .cls-8 {
+        fill: #606060;
+      }
+
+      .cls-10, .cls-9 {
+        stroke: none;
+      }
+
+      .cls-10 {
+        fill: #606060;
+      }
+    </style>
+  </defs>
+  <g id="Group_27" data-name="Group 27" transform="translate(-723.625 -300.651)">
+    <rect id="Rectangle_51" data-name="Rectangle 51" class="cls-1" width="189" height="180" transform="translate(723.625 301.398)"/>
+    <text id="FLOOR" class="cls-2" transform="translate(926.625 477.398)"><tspan x="0" y="0">FLOOR</tspan></text>
+    <line id="Line_4" data-name="Line 4" class="cls-3" x2="155" transform="translate(767.454 473.898)"/>
+    <g id="Rectangle_4" data-name="Rectangle 4" class="cls-4" transform="translate(797.42 300.651)">
+      <rect class="cls-9" width="95.067" height="131.563"/>
+      <rect class="cls-1" x="0.55" y="0.55" width="93.967" height="130.463"/>
+    </g>
+    <g id="Rectangle_5" data-name="Rectangle 5" class="cls-4" transform="translate(805.711 308.942)">
+      <rect class="cls-9" width="78.485" height="114.982"/>
+      <rect class="cls-1" x="0.55" y="0.55" width="77.385" height="113.882"/>
+    </g>
+    <g id="Group_31" data-name="Group 31" transform="translate(801.42 253.164) rotate(90)">
+      <line id="Line_5" data-name="Line 5" class="cls-5" y1="18.591" transform="translate(47.99 3)"/>
+      <line id="Line_6" data-name="Line 6" class="cls-6" y1="18.591" transform="translate(220.734 3)"/>
+      <line id="Line_7" data-name="Line 7" class="cls-7" x2="167.476" transform="translate(50.581 17.31)"/>
+      <g id="Polygon_1" data-name="Polygon 1" class="cls-8" transform="translate(219.92 14.338) rotate(90)">
+        <path class="cls-9" d="M 5.587347507476807 6.740784168243408 L 0.6095922589302063 6.740784168243408 L 3.098469972610474 1.004879474639893 L 5.587347507476807 6.740784168243408 Z"/>
+        <path class="cls-10" d="M 3.098469972610474 2.009778022766113 L 1.219194412231445 6.340784072875977 L 4.977745532989502 6.340784072875977 L 3.098469972610474 2.009778022766113 M 3.098469972610474 3.814697265625e-06 L 6.196939945220947 7.14078426361084 L 0 7.14078426361084 L 3.098469972610474 3.814697265625e-06 Z"/>
+      </g>
+      <g id="Polygon_2" data-name="Polygon 2" class="cls-8" transform="translate(48.84 20.535) rotate(-90)">
+        <path class="cls-9" d="M 5.587347507476807 6.740784168243408 L 0.6095922589302063 6.740784168243408 L 3.098469972610474 1.004879474639893 L 5.587347507476807 6.740784168243408 Z"/>
+        <path class="cls-10" d="M 3.098469972610474 2.009778022766113 L 1.219194412231445 6.340784072875977 L 4.977745532989502 6.340784072875977 L 3.098469972610474 2.009778022766113 M 3.098469972610474 3.814697265625e-06 L 6.196939945220947 7.14078426361084 L 0 7.14078426361084 L 3.098469972610474 3.814697265625e-06 Z"/>
+      </g>
+    </g>
+  </g>
+</svg>

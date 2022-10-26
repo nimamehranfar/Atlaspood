@@ -22,7 +22,6 @@ import CustomControlMulti from "../Components/CustomControlMulti";
 import CustomDropdown from "../Components/CustomDropdown";
 import CustomDropdownMulti from "../Components/CustomDropdownMulti";
 import SelectOptionRange from "../Components/SelectOptionRange";
-
 import {ReactComponent as Camera} from '../Images/public/camera.svg';
 import CustomDropdownWithSearch from "../Components/CustomDropdownWithSearch";
 import CustomControlNum from "../Components/CustomControlNum";
@@ -57,7 +56,7 @@ const baseURLDeleteFile = "https://api.atlaspood.ir/SewingOrderAttachment/Delete
 const baseURLEditProject = "https://api.atlaspood.ir/SewingPreorder/Edit";
 const baseURLDeleteBasketProject = "https://api.atlaspood.ir/Cart/DeleteItem";
 
-const baseURLFilterColor = "https://api.atlaspood.ir/Color/GetBaseColors";
+const baseURLAddSwatch = "https://api.atlaspood.ir/Cart/Add";
 const baseURLFilterPattern = "https://api.atlaspood.ir/Sewing/GetModelPatternType";
 const baseURLFilterType = "https://api.atlaspood.ir/Sewing/GetModelDesignType";
 const baseURLFilterPrice = "https://api.atlaspood.ir/BaseType/GetPriceLevel";
@@ -79,7 +78,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
     const [projectData, setProjectData] = useState({});
     const [model, setModel] = useState({});
     const [modelAccessories, setModelAccessories] = useState({});
-    const [fabrics, setFabrics] = useState([]);
+    const [fabrics, setFabrics] = useState({});
     const [fabricsList, setFabricsList] = useState([]);
     const [defaultFabricPhoto, setDefaultFabricPhoto] = useState(null);
     const [defaultModelName, setDefaultModelName] = useState("");
@@ -98,10 +97,16 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
     const [projectModalState, setProjectModalState] = useState(0);
     const [zoomModalHeader, setZoomModalHeader] = useState([]);
     const [zoomModalBody, setZoomModalBody] = useState([]);
+    const [swatchId, setSwatchId] = useState(0);
+    const [swatchDetailId, setSwatchDetailId] = useState(0);
+    const [swatchPhotoPath, setSwatchPhotoPath] = useState("");
+    const [hasSwatchId, setHasSwatchId] = useState(false);
     const [addCartErr, setAddCartErr] = useState([]);
     const [cartItems, setCartItems] = useState([]);
     const [cartAgree, setCartAgree] = useState([]);
     // const [pageLanguage, setPageLanguage] = useState("");
+    const [cartChanged, setCartChanged] = useState(0);
+    const [bag, setBag] = useState(0);
     const [accordionActiveKey, setAccordionActiveKey] = useState("");
     const [roomLabelText, setRoomLabelText] = useState("");
     const [fabricSelected, setFabricSelected] = useState({
@@ -167,7 +172,12 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
         "4A": false,
         "4B": false,
         "5": false,
-        "6": false
+        "5A": false,
+        "5B": false,
+        "5C": false,
+        "6": false,
+        "6A": false,
+        "7": false
     });
     const [cartValues, setCartValues] = useState({});
     const [cartStateAgree, setCartStateAgree] = useState(false);
@@ -252,6 +262,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
     const [addingLoading, setAddingLoading] = useState(false);
     const [savingLoading, setSavingLoading] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
+    const [swatchLogin, setSwatchLogin] = useState(false);
     
     function convertToPersian(string_farsi) {
         if (string_farsi !== null && string_farsi !== undefined && string_farsi !== "") {
@@ -387,10 +398,20 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
         });
     };
     
-    function renderFabrics() {
+    function renderFabrics(bag) {
         const fabricList = [];
         let count = 0;
+        let cartObj = {};
+        let temp = [];
         let pageLanguage1 = location.pathname.split('').slice(1, 3).join('');
+        if (Object.keys(bag).length > 0) {
+            if (isLoggedIn) {
+            
+            } else {
+                cartObj = JSON.parse(localStorage.getItem("cart"));
+                temp = cartObj["swatches"];
+            }
+        }
         
         Object.keys(fabrics).forEach((key, index) => {
             let DesignName = convertToPersian(fabrics[key][0].DesignName);
@@ -399,7 +420,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
             const fabric = [];
             for (let j = 0; j < fabrics[key].length; j++) {
                 let FabricId = fabrics[key][j].FabricId;
-                
+                // console.log(fabrics,key);
                 let PhotoPath = "";
                 fabrics[key][j].FabricPhotos.forEach(obj => {
                     if (obj.PhotoTypeId === 4702)
@@ -411,9 +432,37 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                 let DesignCode = fabrics[key][j].DesignCode;
                 let DesignRaportLength = fabrics[key][j].DesignRaportLength;
                 let DesignRaportWidth = fabrics[key][j].DesignRaportWidth;
+                let PolyesterPercent = fabrics[key][j].PolyesterPercent;
+                let ViscosePercent = fabrics[key][j].ViscosePercent;
+                let NylonPercent = fabrics[key][j].NylonPercent;
                 let ColorName = convertToPersian(fabrics[key][j].ColorName);
                 let ColorEnName = fabrics[key][j].ColorEnName;
-                
+                let SwatchId = fabrics[key][j].SwatchId ? fabrics[key][j].SwatchId : -1;
+                let HasSwatchId = false;
+                let swatchDetailId = undefined;
+                let index = -1;
+                if (isLoggedIn) {
+                    if (bag["CartDetails"]) {
+                        let index = bag["CartDetails"].findIndex(object => {
+                            return object["ProductId"] === SwatchId;
+                        });
+                        // console.log(index);
+                        if (index !== -1) {
+                            HasSwatchId = true;
+                            swatchDetailId = bag["CartDetails"][index]["CartDetailId"];
+                        }
+                    }
+                } else {
+                    if (temp.length > 0) {
+                        index = temp.findIndex(object => {
+                            return object["SwatchId"] === SwatchId;
+                        });
+                        if (index !== -1) {
+                            HasSwatchId = true;
+                        }
+                    }
+                }
+                // console.log(HasSwatchId);
                 // console.log(step1 === `${FabricId}`, step1, `${FabricId}`, FabricId);
                 
                 fabric.push(
@@ -442,15 +491,22 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                    model-id={modelID} value={FabricId} text-en={DesignEnName} text-fa={DesignName} checked={`${FabricId}` === step1}
                                    ref={ref => (inputs.current[`1${FabricId}`] = ref)}/>
                             <div className="frame_img">
-                                <img className="img-fluid" src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
+                                <img className={`img-fluid ${`${FabricId}` === step1?"img-fluid_checked":""}`} src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
                             </div>
                         </label>
                         <div className={`fabric_name_container ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
                             <h1>{pageLanguage1 === 'en' ? ColorEnName : ColorName}</h1>
-                            <span onClick={() => handleShow(PhotoPath, DesignName, DesignEnName, ColorName, ColorEnName)}><i className="fa fa-search" aria-hidden="true"/></span>
+                            <span onClick={() => {
+                                handleShow(fabrics[key][j], swatchDetailId);
+                                setHasSwatchId(HasSwatchId);
+                            }}><i className="fa fa-search" aria-hidden="true"/></span>
                         </div>
-                        <button className={`swatchButton ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} current-state="0"
-                                onClick={e => fabricSwatch(e, FabricId)}>{t("ORDER SWATCH")}</button>
+                        <button className={`swatchButton ${HasSwatchId ? "activeSwatch" : ""} ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}
+                                current-state={HasSwatchId ? "1" : "0"}
+                                onClick={(e) => {
+                                    fabricSwatch(e, SwatchId, swatchDetailId, PhotoPath);
+                                }} disabled={SwatchId === -1}>{HasSwatchId ? t("SWATCH IN CART") : t("ORDER" +
+                            " SWATCH")}</button>
                     </div>
                 );
                 
@@ -475,7 +531,29 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
         setShow(false);
     }
     
-    function handleShow(PhotoPath, DesignName, DesignEnName, ColorName, ColorEnName) {
+    function handleShow(fabricObj, SwatchDetailId) {
+        let pageLanguage = location.pathname.split('').slice(1, 3).join('');
+        
+        let DesignName = convertToPersian(fabricObj["DesignName"]);
+        let DesignEnName = fabricObj["DesignEnName"];
+        let FabricId = fabricObj["FabricId"];
+        let PhotoPath = "";
+        fabricObj["FabricPhotos"].forEach(obj => {
+            if (obj["PhotoTypeId"] === 4702)
+                PhotoPath = obj["PhotoUrl"];
+        });
+        console.log(fabricObj);
+        let PriceLevelEnTitle = fabricObj["PriceLevelEnTitle"];
+        let PriceLevelTitle = fabricObj["PriceLevelTitle"];
+        let PolyesterPercent = fabricObj["PolyesterPercent"] || 0;
+        let ViscosePercent = fabricObj["ViscosePercent"] || 0;
+        let NylonPercent = fabricObj["NylonPercent"] || 0;
+        let ConttonPercent = fabricObj["ConttonPercent"] || 0;
+        let LinenPercent = fabricObj["LinenPercent"] || 0;
+        let ColorName = convertToPersian(fabricObj["ColorName"]);
+        let ColorEnName = fabricObj["ColorEnName"];
+        let SwatchId = fabricObj["SwatchId"] ? fabricObj["SwatchId"] : -1;
+        
         const tempDiv = [];
         const tempDiv1 = [];
         tempDiv.push(
@@ -484,7 +562,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                     <ReactImageMagnify
                         imageProps={{
                             alt: '',
-                            isFluidWidth: true,
+                            // isFluidWidth: true,
                             src: `https://api.atlaspood.ir/${PhotoPath}`
                         }}
                         magnifiedImageProps={{
@@ -499,11 +577,25 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
             </div>
         );
         tempDiv1.push(
-            <span key={1} className="s">{pageLanguage === 'en' ? DesignEnName : DesignName} / {pageLanguage === 'en' ? ColorEnName : ColorName}</span>
+            <div key={1} className="zoom_modal_header_container">
+                <h1 className="zoom_modal_header_design">{pageLanguage === 'en' ? DesignEnName : DesignName} / {pageLanguage === 'en' ? ColorEnName : ColorName}</h1>
+                <h1 className="zoom_modal_header_Price">{t("PRICE GROUP: ")}{pageLanguage === 'en' ? PriceLevelEnTitle : PriceLevelTitle}</h1>
+                <div className="zoom_modal_header_Contents_container">
+                    <h1 className="zoom_modal_header_Contents">{t("Contents")}</h1>
+                    {PolyesterPercent > 0 && <p className="zoom_modal_header_Contents_item">{PolyesterPercent + "%"} {t("Polyester")}</p>}
+                    {ViscosePercent > 0 && <p className="zoom_modal_header_Contents_item">{ViscosePercent + "%"} {t("Viscose")}</p>}
+                    {NylonPercent > 0 && <p className="zoom_modal_header_Contents_item">{NylonPercent + "%"} {t("Nylon")}</p>}
+                    {ConttonPercent > 0 && <p className="zoom_modal_header_Contents_item">{ConttonPercent + "%"} {t("Contton")}</p>}
+                    {LinenPercent > 0 && <p className="zoom_modal_header_Contents_item">{LinenPercent + "%"} {t("Linen")}</p>}
+                </div>
+            </div>
         );
         
         setZoomModalBody(tempDiv);
         setZoomModalHeader(tempDiv1);
+        setSwatchId(SwatchId);
+        setSwatchDetailId(SwatchDetailId);
+        setSwatchPhotoPath(PhotoPath);
         setShow(true);
     }
     
@@ -558,6 +650,17 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                     <div className="steps_header_title" type-of-step={type} cart-custom-text={cartCustomText === undefined ? stepTitle : cartCustomText}
                          ref={ref => (steps.current[stepRef] = ref)}>{stepTitle}</div>
                 </div>
+                {/*<div className="steps_header_selected_container">*/}
+                {/*    <PopoverStickOnHover classNames="step_label_popover"*/}
+                {/*                         placement="bottom"*/}
+                {/*                         children={<div className="steps_header_selected"*/}
+                {/*                                        ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? stepSelected : null}</div>}*/}
+                {/*                         component={*/}
+                {/*                             <div className="step_label_popover_container">*/}
+                {/*                                 <div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? stepSelected : null}</div>*/}
+                {/*                             </div>*/}
+                {/*                         }/>*/}
+                {/*</div>*/}
                 <div className="steps_header_selected_container">
                     <div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? stepSelected : null}</div>
                 </div>
@@ -962,7 +1065,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
             if (temp[key] !== null || temp[key] !== "") {
                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                 if (tempObj === undefined) {
-                    console.log(key);
+                    // console.log(key);
                     // window.location.reload();
                 } else {
                     if (tempObj["apiLabel"] !== "") {
@@ -1338,14 +1441,14 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
             setAddCartErr(tempErr);
             modalHandleShow("addToCartErr");
         } else if (cartValues["HeightCart"] === undefined || cartValues["WidthCart"] === undefined) {
-            // console.log(cartValues);
+            // console.log(cartValues,"1");
             if (measureWindowSize()) {
                 addToCart();
             } else {
                 setAddingLoading(false);
             }
         } else {
-            // console.log(cartValues,"hi");
+            // console.log(cartValues,"2");
             let userProjects = JSON.parse(JSON.stringify(UserProjects))[`${modelID}`]["data"];
             let tempArr = [];
             let temp1 = [];
@@ -1578,168 +1681,31 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
             let cartCount = 0;
             if (isLoggedIn) {
                 cartCount += cartObjects["CartDetails"].length;
-                let draperiesTotalPrice = cartObjects["TotalAmount"];
+                let totalPrice = cartObjects["TotalAmount"];
                 
-                let promise2 = new Promise((resolve, reject) => {
-                    for (let i = 0; i < cartObjects["CartDetails"].length; i++) {
-                        let obj = cartObjects["CartDetails"][i]["SewingPreorder"]["PreorderText"];
-                        
-                        let roomName = (obj["WindowName"] === undefined || obj["WindowName"] === "") ? "" : " / " + obj["WindowName"];
-                        temp1[i] =
-                            <li className="custom_cart_item" key={"drapery" + i} ref={ref => (draperyRef.current[cartObjects["CartDetails"][i]["CartDetailId"]] = ref)}>
-                                <div className="custom_cart_item_image_container">
-                                    <img src={`https://api.atlaspood.ir/${obj["PhotoUrl"]}`} alt="" className="custom_cart_item_img img-fluid"/>
-                                </div>
-                                <div className="custom_cart_item_desc">
-                                    <div className="custom_cart_item_desc_container">
-                                        <h1 className="custom_cart_item_desc_name">{pageLanguage === 'fa' ? obj["ModelNameFa"] + " سفارشی " : "Custom " + obj["ModelNameEn"]}</h1>
-                                        <button type="button" className="btn-close" aria-label="Close"
-                                                onClick={() => setBasketNumber(cartObjects, cartObjects["CartDetails"][i]["CartDetailId"], 0, 0)}/>
-                                    </div>
-                                    <div className="custom_cart_item_desc_container">
-                                        <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["FabricDesignFa"] + " / " + obj["FabricColorFa"] : obj["FabricDesignEn"] + " / " + obj["FabricColorEn"]}</h2>
-                                    </div>
-                                    <div className="custom_cart_item_desc_container">
-                                        <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["RoomNameFa"] + roomName : obj["RoomNameEn"] + roomName}</h2>
-                                    </div>
-                                    <div className="custom_cart_item_desc_container">
-                                        <div className="custom_cart_item_desc_qty">
-                                            <button type="text" className="basket_qty_minus"
-                                                    onClick={() => setBasketNumber(cartObjects, cartObjects["CartDetails"][i]["CartDetailId"], 0, 0, -1)}>–
-                                            </button>
-                                            <input type="text" className="basket_qty_num"
-                                                   value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${cartObjects["CartDetails"][i]["SewingPreorder"]["Count"]}`) : cartObjects["CartDetails"][i]["SewingPreorder"]["Count"]}
-                                                   onChange={(e) => setBasketNumber(cartObjects, cartObjects["CartDetails"][i]["CartDetailId"], NumberToPersianWord.convertPeToEn(`${e.target.value}`))}/>
-                                            <button type="text" className="basket_qty_plus"
-                                                    onClick={() => setBasketNumber(cartObjects, cartObjects["CartDetails"][i]["CartDetailId"], 0, 0, 1)}>+
-                                            </button>
-                                        </div>
-                                        <p className="custom_cart_item_end_price">{GetPrice(obj["price"], pageLanguage, t("TOMANS"))}</p>
-                                    </div>
-                                </div>
-                            </li>;
-                        if (i === cartObjects["CartDetails"].length - 1) {
-                            resolve();
-                        }
-                    }
+                let draperies = cartObjects["CartDetails"].filter((object1) => {
+                    return object1["SewingPreorderId"] !== null;
                 });
-                promise2.then(() => {
-                    setCartItems(temp1);
-                    setCartCount(cartCount);
-                    localStorage.removeItem("cart");
-                    setTotalCartPrice(draperiesTotalPrice);
+                
+                let swatches = cartObjects["CartDetails"].filter((object1) => {
+                    return object1["ProductId"] !== null;
                 });
-                if (cartObjects["CartDetails"].length === 0) {
-                    modalHandleClose("cart_modal");
-                    setCartStateAgree(false);
-                }
-            } else {
-                if (cartObjects["drapery"].length) {
-                    cartCount += cartObjects["drapery"].length;
-                    let draperiesTotalPrice = 0;
-                    let promiseArr = [];
-                    
-                    cartObjects["drapery"].forEach((obj, index) => {
-                        promiseArr[index] = new Promise((resolve, reject) => {
-                            let tempPostObj = {};
-                            // tempPostObj["ApiKey"] = window.$apikey;
-                            if (obj["PreorderText"] === undefined) {
-                                localStorage.removeItem("cart");
-                            } else {
-                                let userProjects = JSON.parse(JSON.stringify(UserProjects))[obj["PreorderText"]["SewingModelId"]]["data"];
-                                // let temp = obj["PreorderText"];
-                                GetUserProjectData(obj).then((temp) => {
-                                    tempPostObj["WindowCount"] = 1;
-                                    tempPostObj["SewingModelId"] = `${modelID}`;
-                                    Object.keys(temp).forEach(key => {
-                                        if (temp[key] !== null || temp[key] !== "") {
-                                            let tempObj = userProjects.find(obj => obj["cart"] === key);
-                                            // console.log(key,tempObj);
-                                            if (tempObj["apiLabel"] !== "") {
-                                                if (tempObj["apiValue"] === null) {
-                                                    tempPostObj[tempObj["apiLabel"]] = temp[key];
-                                                } else {
-                                                    tempPostObj[tempObj["apiLabel"]] = tempObj["apiValue"][temp[key]];
-                                                }
-                                            }
-                                        }
-                                    });
-                                    
-                                    tempPostObj["SewingOrderDetails"] = [];
-                                    tempPostObj["SewingOrderDetails"][0] = {};
-                                    tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
-                                    tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
-                                    tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
-                                    tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
-                                    tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
-                                    Object.keys(temp).forEach(key => {
-                                        if (temp[key] !== null || temp[key] !== "") {
-                                            let tempObj = userProjects.find(obj => obj["cart"] === key);
-                                            if (tempObj["apiLabel2"] !== undefined) {
-                                                if (tempObj["apiValue2"] === null) {
-                                                    tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
-                                                } else {
-                                                    tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
-                                                }
-                                            }
-                                        }
-                                    });
-                                    tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
-                                    Object.keys(temp).forEach(key => {
-                                        if (temp[key] !== null || temp[key] !== "") {
-                                            let tempObj = userProjects.find(obj => obj["cart"] === key);
-                                            if (tempObj["apiAcc"] !== undefined) {
-                                                if (tempObj["apiAcc"] === true) {
-                                                    tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
-                                                } else {
-                                                
-                                                }
-                                            }
-                                        }
-                                    });
-                                    tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
-                                        return el != null;
-                                    });
-                                    
-                                    // delete tempPostObj["SewingOrderDetails"][0]["SewingModelId"];
-                                    // delete tempPostObj["SewingModelId"];
-                                    tempPostObj["SewingModelId"] = tempPostObj["SewingOrderDetails"][0]["SewingModelId"];
-                                    
-                                    if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
-                                        axios.post(baseURLPrice, tempPostObj).then((response) => {
-                                            resolve(response);
-                                        }).catch(err => {
-                                            resolve(false);
-                                            // console.log("hi2");
-                                        });
-                                    } else {
-                                        // console.log("hi3");
-                                        resolve(false);
-                                    }
-                                }).catch(err => {
-                                    // console.log("hi3");
-                                    resolve(false);
-                                });
-                            }
-                        });
-                    });
-                    Promise.all(promiseArr).then(function (values) {
-                        // console.log(values);
-                        cartObjects["drapery"].forEach((obj1, index) => {
-                            let obj = obj1["PreorderText"];
-                            obj["price"] = values[index].data["price"] / obj1["Count"];
-                            obj1["price"] = values[index].data["price"] / obj1["Count"];
-                            draperiesTotalPrice += values[index].data["price"];
+                
+                let promise1 = new Promise((resolve, reject) => {
+                    if (draperies.length) {
+                        for (let i = 0; i < draperies.length; i++) {
+                            let obj = draperies[i]["SewingPreorder"]["PreorderText"];
                             let roomName = (obj["WindowName"] === undefined || obj["WindowName"] === "") ? "" : " / " + obj["WindowName"];
-                            temp1[index] =
-                                <li className="custom_cart_item" key={"drapery" + index} ref={ref => (draperyRef.current[index] = ref)}>
+                            temp1[i] =
+                                <li className="custom_cart_item" key={"drapery" + i} ref={ref => (draperyRef.current[draperies[i]["CartDetailId"]] = ref)}>
                                     <div className="custom_cart_item_image_container">
                                         <img src={`https://api.atlaspood.ir/${obj["PhotoUrl"]}`} alt="" className="custom_cart_item_img img-fluid"/>
                                     </div>
                                     <div className="custom_cart_item_desc">
                                         <div className="custom_cart_item_desc_container">
                                             <h1 className="custom_cart_item_desc_name">{pageLanguage === 'fa' ? obj["ModelNameFa"] + " سفارشی " : "Custom " + obj["ModelNameEn"]}</h1>
-                                            <button type="button" className="btn-close" aria-label="Close" onClick={() => setBasketNumber(undefined, index, 0, 0)}/>
+                                            <button type="button" className="btn-close" aria-label="Close"
+                                                    onClick={() => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], 0, 0)}/>
                                         </div>
                                         <div className="custom_cart_item_desc_container">
                                             <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["FabricDesignFa"] + " / " + obj["FabricColorFa"] : obj["FabricDesignEn"] + " / " + obj["FabricColorEn"]}</h2>
@@ -1749,26 +1715,231 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                         </div>
                                         <div className="custom_cart_item_desc_container">
                                             <div className="custom_cart_item_desc_qty">
-                                                <button type="text" className="basket_qty_minus" onClick={() => setBasketNumber(undefined, index, 0, 0, -1)}>–</button>
+                                                <button type="text" className="basket_qty_minus"
+                                                        onClick={() => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], 0, 0, -1)}>–
+                                                </button>
                                                 <input type="text" className="basket_qty_num"
-                                                       value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${obj1["Count"]}`) : obj1["Count"]}
-                                                       onChange={(e) => setBasketNumber(undefined, index, NumberToPersianWord.convertPeToEn(`${e.target.value}`), 0)}/>
-                                                <button type="text" className="basket_qty_plus" onClick={() => setBasketNumber(undefined, index, 0, 0, 1)}>+</button>
+                                                       value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${draperies[i]["SewingPreorder"]["Count"]}`) : draperies[i]["SewingPreorder"]["Count"]}
+                                                       onChange={(e) => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], NumberToPersianWord.convertPeToEn(`${e.target.value}`))}/>
+                                                <button type="text" className="basket_qty_plus"
+                                                        onClick={() => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], 0, 0, 1)}>+
+                                                </button>
                                             </div>
-                                            <p className="custom_cart_item_end_price">{GetPrice(obj1["price"] * obj1["Count"], pageLanguage, t("TOMANS"))}</p>
+                                            <p className="custom_cart_item_end_price">{GetPrice(obj["price"], pageLanguage, t("TOMANS"))}</p>
                                         </div>
                                     </div>
                                 </li>;
-                        });
-                        setCartItems(temp1);
-                        setCartCount(cartCount);
-                        localStorage.setItem('cart', JSON.stringify(cartObjects));
-                        setTotalCartPrice(draperiesTotalPrice);
+                            if (i === draperies.length - 1) {
+                                resolve();
+                            }
+                        }
+                    } else {
+                        resolve();
+                    }
+                });
+                
+                let promise2 = new Promise((resolve, reject) => {
+                    if (swatches.length) {
+                        for (let i = 0; i < swatches.length; i++) {
+                            let obj = swatches[i];
+                            temp1[i + draperies.length] =
+                                <li className="custom_cart_item" key={"swatches" + i} ref={ref => (draperyRef.current[swatches[i]["CartDetailId"]] = ref)}>
+                                    <div className="custom_cart_item_image_container">
+                                        <img src={`https://api.atlaspood.ir/${obj["PhotoUrl"]}`} alt="" className="custom_cart_item_img img-fluid"/>
+                                    </div>
+                                    <div className="custom_cart_item_desc">
+                                        <div className="custom_cart_item_desc_container">
+                                            <h1 className="custom_cart_item_desc_name">{pageLanguage === 'fa' ? obj["ProductName"] : obj["ProductEnName"]}</h1>
+                                            <button type="button" className="btn-close" aria-label="Close"
+                                                    onClick={() => setBasketNumber(cartObjects, swatches[i]["CartDetailId"], 0, 0)}/>
+                                        </div>
+                                        <div className="custom_cart_item_desc_container">
+                                            <h2 className="custom_cart_item_desc_detail"/>
+                                        </div>
+                                        <div className="custom_cart_item_desc_container">
+                                            <h2 className="custom_cart_item_desc_detail"/>
+                                        </div>
+                                        <div className="custom_cart_item_desc_container">
+                                            <div className="custom_cart_item_desc_qty">
+                                                <button type="text" className="basket_qty_minus"
+                                                        onClick={() => setBasketNumber(cartObjects, swatches[i]["CartDetailId"], 0, 0, -1)}>–
+                                                </button>
+                                                <input type="text" className="basket_qty_num"
+                                                       value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${swatches[i]["Count"]}`) : swatches[i]["Count"]}
+                                                       onChange={(e) => setBasketNumber(cartObjects, swatches[i]["CartDetailId"], NumberToPersianWord.convertPeToEn(`${e.target.value}`))}/>
+                                                <button type="text" className="basket_qty_plus"
+                                                        onClick={() => setBasketNumber(cartObjects, swatches[i]["CartDetailId"], 0, 0, 1)}>+
+                                                </button>
+                                            </div>
+                                            <p className="custom_cart_item_end_price">{GetPrice(obj["UnitPrice"], pageLanguage, t("TOMANS"))}</p>
+                                        </div>
+                                    </div>
+                                </li>;
+                            if (i === swatches.length - 1) {
+                                resolve();
+                            }
+                        }
+                    } else {
+                        resolve();
+                    }
+                });
+                Promise.all([promise1, promise2]).then(() => {
+                    setCartItems(temp1);
+                    setCartCount(cartCount);
+                    localStorage.removeItem("cart");
+                    setTotalCartPrice(totalPrice);
+                });
+                if (cartObjects["CartDetails"].length === 0) {
+                    modalHandleClose("cart_modal");
+                    setCartStateAgree(false);
+                }
+            } else {
+                let promiseArr = [];
+                let totalPrice = 0;
+                let draperiesTotalPrice = 0;
+                let swatchesTotalPrice = 0;
+                if (cartObjects["drapery"].length) {
+                    promiseArr[0] = new Promise((resolve, reject) => {
+                        cartCount += cartObjects["drapery"].length;
+                        let promiseArr2 = [];
                         
-                    }).catch(err => {
-                        console.log(err);
+                        cartObjects["drapery"].forEach((obj, index) => {
+                            promiseArr2[index] = new Promise((resolve, reject) => {
+                                let tempPostObj = {};
+                                // tempPostObj["ApiKey"] = window.$apikey;
+                                if (obj["PreorderText"] === undefined) {
+                                    localStorage.removeItem("cart");
+                                } else {
+                                    let userProjects = JSON.parse(JSON.stringify(UserProjects))[obj["PreorderText"]["SewingModelId"]]["data"];
+                                    // let temp = obj["PreorderText"];
+                                    GetUserProjectData(obj).then((temp) => {
+                                        tempPostObj["WindowCount"] = 1;
+                                        tempPostObj["SewingModelId"] = `${modelID}`;
+                                        Object.keys(temp).forEach(key => {
+                                            if (temp[key] !== null || temp[key] !== "") {
+                                                let tempObj = userProjects.find(obj => obj["cart"] === key);
+                                                // console.log(key,tempObj);
+                                                if (tempObj["apiLabel"] !== "") {
+                                                    if (tempObj["apiValue"] === null) {
+                                                        tempPostObj[tempObj["apiLabel"]] = temp[key];
+                                                    } else {
+                                                        tempPostObj[tempObj["apiLabel"]] = tempObj["apiValue"][temp[key]];
+                                                    }
+                                                }
+                                            }
+                                        });
+                                        
+                                        tempPostObj["SewingOrderDetails"] = [];
+                                        tempPostObj["SewingOrderDetails"][0] = {};
+                                        tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
+                                        tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
+                                        tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
+                                        tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
+                                        tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
+                                        Object.keys(temp).forEach(key => {
+                                            if (temp[key] !== null || temp[key] !== "") {
+                                                let tempObj = userProjects.find(obj => obj["cart"] === key);
+                                                if (tempObj["apiLabel2"] !== undefined) {
+                                                    if (tempObj["apiValue2"] === null) {
+                                                        tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
+                                                    } else {
+                                                        tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                                                    }
+                                                }
+                                            }
+                                        });
+                                        tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
+                                        Object.keys(temp).forEach(key => {
+                                            if (temp[key] !== null || temp[key] !== "") {
+                                                let tempObj = userProjects.find(obj => obj["cart"] === key);
+                                                if (tempObj["apiAcc"] !== undefined) {
+                                                    if (tempObj["apiAcc"] === true) {
+                                                        tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
+                                                    } else {
+                                                    
+                                                    }
+                                                }
+                                            }
+                                        });
+                                        tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
+                                            return el != null;
+                                        });
+                                        
+                                        // delete tempPostObj["SewingOrderDetails"][0]["SewingModelId"];
+                                        // delete tempPostObj["SewingModelId"];
+                                        tempPostObj["SewingModelId"] = tempPostObj["SewingOrderDetails"][0]["SewingModelId"];
+                                        
+                                        if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
+                                            axios.post(baseURLPrice, tempPostObj).then((response) => {
+                                                resolve(response);
+                                            }).catch(err => {
+                                                resolve(false);
+                                                // console.log("hi2");
+                                            });
+                                        } else {
+                                            // console.log("hi3");
+                                            resolve(false);
+                                        }
+                                    }).catch(err => {
+                                        // console.log("hi3");
+                                        resolve(false);
+                                    });
+                                }
+                            });
+                        });
+                        Promise.all(promiseArr2).then(function (values) {
+                            // console.log(values);
+                            cartObjects["drapery"].forEach((obj1, index) => {
+                                let obj = obj1["PreorderText"];
+                                obj["price"] = values[index].data["price"] / obj1["Count"];
+                                obj1["price"] = values[index].data["price"] / obj1["Count"];
+                                draperiesTotalPrice += values[index].data["price"];
+                                let roomName = (obj["WindowName"] === undefined || obj["WindowName"] === "") ? "" : " / " + obj["WindowName"];
+                                temp1[index] =
+                                    <li className="custom_cart_item" key={"drapery" + index} ref={ref => (draperyRef.current[index] = ref)}>
+                                        <div className="custom_cart_item_image_container">
+                                            <img src={`https://api.atlaspood.ir/${obj["PhotoUrl"]}`} alt="" className="custom_cart_item_img img-fluid"/>
+                                        </div>
+                                        <div className="custom_cart_item_desc">
+                                            <div className="custom_cart_item_desc_container">
+                                                <h1 className="custom_cart_item_desc_name">{pageLanguage === 'fa' ? obj["ModelNameFa"] + " سفارشی " : "Custom " + obj["ModelNameEn"]}</h1>
+                                                <button type="button" className="btn-close" aria-label="Close" onClick={() => setBasketNumber(undefined, index, 0, 0)}/>
+                                            </div>
+                                            <div className="custom_cart_item_desc_container">
+                                                <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["FabricDesignFa"] + " / " + obj["FabricColorFa"] : obj["FabricDesignEn"] + " / " + obj["FabricColorEn"]}</h2>
+                                            </div>
+                                            <div className="custom_cart_item_desc_container">
+                                                <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["RoomNameFa"] + roomName : obj["RoomNameEn"] + roomName}</h2>
+                                            </div>
+                                            <div className="custom_cart_item_desc_container">
+                                                <div className="custom_cart_item_desc_qty">
+                                                    <button type="text" className="basket_qty_minus" onClick={() => setBasketNumber(undefined, index, 0, 0, -1)}>–</button>
+                                                    <input type="text" className="basket_qty_num"
+                                                           value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${obj1["Count"]}`) : obj1["Count"]}
+                                                           onChange={(e) => setBasketNumber(undefined, index, NumberToPersianWord.convertPeToEn(`${e.target.value}`), 0)}/>
+                                                    <button type="text" className="basket_qty_plus" onClick={() => setBasketNumber(undefined, index, 0, 0, 1)}>+</button>
+                                                </div>
+                                                <p className="custom_cart_item_end_price">{GetPrice(obj1["price"] * obj1["Count"], pageLanguage, t("TOMANS"))}</p>
+                                            </div>
+                                        </div>
+                                    </li>;
+                                if (index === cartObjects["drapery"].length - 1) {
+                                    resolve();
+                                }
+                            });
+                        }).catch(err => {
+                            console.log(err);
+                            resolve();
+                        });
                     });
                 }
+                Promise.all(promiseArr).then(() => {
+                    setCartItems(temp1);
+                    setCartCount(cartCount);
+                    localStorage.setItem('cart', JSON.stringify(cartObjects));
+                    setTotalCartPrice(draperiesTotalPrice + swatchesTotalPrice);
+                });
+                
                 if (cartObjects["drapery"].length + cartObjects["product"].length + cartObjects["swatches"].length === 0) {
                     setCartCount(0);
                     modalHandleClose("cart_modal");
@@ -1790,17 +1961,105 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
         // console.log(hasTrim)
     }
     
-    function fabricSwatch(e, fabricId) {
+    function fabricSwatch(e, SwatchId, SwatchDetailId, PhotoPath) {
         let currentState = e.target.getAttribute('current-state');
-        if (currentState === "0") {
-            e.target.innerHTML = t("SWATCH IN CART");
-            e.target.setAttribute('current-state', "1");
-            e.target.className = "swatchButton activeSwatch";
+        let cartObj = {};
+        let temp = [];
+        if (isLoggedIn) {
+            if (currentState === "0") {
+                axios.post(baseURLAddSwatch, {}, {
+                    headers: authHeader(),
+                    params: {
+                        productId: SwatchId,
+                        count: 1
+                    }
+                }).then((response) => {
+                    setBag(response.data);
+                    renderFabrics(response.data);
+                    if (show) {
+                        if (response.data["CartDetails"]) {
+                            let index = response.data["CartDetails"].findIndex(object => {
+                                return object["ProductId"] === SwatchId;
+                            });
+                            if (index !== -1) {
+                                setSwatchDetailId(response.data["CartDetails"][index]["CartDetailId"]);
+                            }
+                        }
+                    }
+                }).catch(err => {
+                    if (err.response.status === 401) {
+                        refreshToken().then((response2) => {
+                            if (response2 !== false) {
+                                fabricSwatch(e, SwatchId, SwatchDetailId);
+                            } else {
+                                fabricSwatch(e, SwatchId, SwatchDetailId);
+                            }
+                        });
+                    } else {
+                    }
+                });
+            } else {
+                if (SwatchDetailId) {
+                    axios.delete(baseURLDeleteBasketProject, {
+                        params: {
+                            detailId: SwatchDetailId
+                        },
+                        headers: authHeader()
+                    }).then((response) => {
+                        setCartChanged(cartChanged + 1);
+                    }).catch(err => {
+                        if (err.response.status === 401) {
+                            refreshToken().then((response2) => {
+                                if (response2 !== false) {
+                                    fabricSwatch(e, SwatchId, SwatchDetailId);
+                                } else {
+                                    fabricSwatch(e, SwatchId, SwatchDetailId);
+                                }
+                            });
+                        } else {
+                        }
+                    });
+                }
+            }
+            if (show) {
+                if (currentState === "0") {
+                    setHasSwatchId(true);
+                } else {
+                    setHasSwatchId(false);
+                }
+            }
+            
         } else {
-            e.target.innerHTML = t("ORDER SWATCH");
-            e.target.setAttribute('current-state', "0");
-            e.target.className = "swatchButton";
+            setSwatchLogin(true);
+            modalHandleShow("side_login_modal");
+            // dispatch({
+            //     type: ShowLoginModal,
+            // })
+            // if (localStorage.getItem("cart") !== null) {
+            //     cartObj = JSON.parse(localStorage.getItem("cart"));
+            //     temp = cartObj["swatches"];
+            // } else {
+            //     cartObj["drapery"] = [];
+            //     cartObj["product"] = [];
+            //     cartObj["swatches"] = [];
+            // }
+            // if (currentState === "0") {
+            //     temp.push({"SwatchId": SwatchId, "Count": 1,"PhotoPath":PhotoPath});
+            // } else {
+            //     if (temp.length > 0) {
+            //         let index = temp.findIndex(object => {
+            //             return object["SwatchId"] === SwatchId;
+            //         });
+            //         if (index !== -1) {
+            //             temp.splice(index, 1);
+            //         }
+            //     }
+            // }
+            // cartObj["swatches"] = temp;
+            // localStorage.setItem('cart', JSON.stringify(cartObj));
+            // setCartChanged(cartChanged + 1);
         }
+        
     }
     
     function getWindowSize(totalWidth, totalHeight) {
@@ -2159,6 +2418,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
             setProjectData(data);
         }
         
+        let pageLanguage = location.pathname.split('').slice(1, 3).join('');
         let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
         let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
         let selectValues = JSON.parse(JSON.stringify(selectCustomValues));
@@ -2262,8 +2522,8 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                             if (temp["Mount"]) {
                                 if (temp["Mount"] === "Inside") {
                                     // console.log(temp);
-                                    let tempWidth=changeLang? temp["Width1"] :temp["Width"];
-                                    let tempHeight=changeLang? temp["Height1"] :temp["Height"];
+                                    let tempWidth = changeLang ? temp["Width1"] : temp["Width"];
+                                    let tempHeight = changeLang ? temp["Height1"] : temp["Height"];
                                     
                                     selectValues["width1"] = tempWidth ? [{value: tempWidth}] : [];
                                     selectValues["width2"] = temp["Width2"] ? [{value: temp["Width2"]}] : [];
@@ -2285,8 +2545,8 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                     setStepSelectedLabel(tempLabels);
                                     setStepSelectedValue(tempValue);
                                 } else {
-                                    let tempWidth=changeLang? temp["Width3A"] :temp["Width"];
-                                    let tempHeight=changeLang? temp["Height3C"] :temp["Height"];
+                                    let tempWidth = changeLang ? temp["Width3A"] : temp["Width"];
+                                    let tempHeight = changeLang ? temp["Height3C"] : temp["Height"];
                                     
                                     // console.log(temp,tempWidth,tempHeight);
                                     
@@ -2400,168 +2660,168 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                             }
                         }
                     }
-    
-                if (temp["Headrail"]) {
-                    setStep5(temp["Headrail"]);
-        
-                    if (temp["Headrail"] === "MetalValance") {
-                        let refIndex = inputs.current["53"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["53"].getAttribute('text') + (temp["MetalValanceColor"] ? "/" + temp["MetalValanceColor"] : "");
-                        tempValue[refIndex] = inputs.current["53"].value;
-                        setStepSelectedLabel(tempLabels);
-                        setStepSelectedValue(tempValue);
-                        setSelectedValanceColor1(temp["MetalValanceColor"] ? [{
-                            value: temp["MetalValanceColor"],
-                            label: optionsMetalValance[pageLanguage].find(opt => opt.value === temp["MetalValanceColor"]).label
-                        }] : []);
-                        depSetTempArr = new Set([...setGetDeps((temp["MetalValanceColor"] ? "" : "53,"), "5", depSetTempArr)]);
-                    } else if (temp["Headrail"] === "MetalValanceFabricInsert") {
-                        let refIndex = inputs.current["54"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["54"].getAttribute('text') + (temp["MetalValanceColor"] ? "/" + temp["MetalValanceColor"] : "");
-                        tempValue[refIndex] = inputs.current["54"].value;
-                        setStepSelectedLabel(tempLabels);
-                        setStepSelectedValue(tempValue);
-                        setSelectedValanceColor2(temp["MetalValanceColor"] ? [{
-                            value: temp["MetalValanceColor"],
-                            label: optionsMetalValance[pageLanguage].find(opt => opt.value === temp["MetalValanceColor"]).label
-                        }] : []);
-                        depSetTempArr = new Set([...setGetDeps((temp["MetalValanceColor"] ? "" : "54,"), "5", depSetTempArr)]);
-                    } else if (temp["Headrail"] === "Upholstered") {
-                        let refIndex = inputs.current["52"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["52"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["52"].value;
-                        setStepSelectedLabel(tempLabels);
-                        setStepSelectedValue(tempValue);
-                        depSetTempArr = new Set([...setGetDeps("", "5", depSetTempArr)]);
-                    } else {
-                        let refIndex = inputs.current["51"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["51"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["51"].value;
-                        setStepSelectedLabel(tempLabels);
-                        setStepSelectedValue(tempValue);
-                        depSetTempArr = new Set([...setGetDeps((temp["RollType"] ? "" : "5A,") + (temp["BracketType"] ? "" : "5B,") + (temp["BracketColor"] ? "" : "5C,"), "5", depSetTempArr)]);
-            
-                        if (temp["RollType"]) {
-                            setStep5A(temp["RollType"]);
-                            if (temp["RollType"] === "Regular") {
-                                let refIndex = inputs.current["5A1"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["5A1"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["5A1"].value;
-                                setStepSelectedLabel(tempLabels);
-                                setStepSelectedValue(tempValue);
-                                depSetTempArr = new Set([...setGetDeps("", "5A", depSetTempArr)]);
-                            } else {
-                                let refIndex = inputs.current["5A2"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["5A2"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["5A2"].value;
-                                setStepSelectedLabel(tempLabels);
-                                setStepSelectedValue(tempValue);
-                                depSetTempArr = new Set([...setGetDeps("", "5A", depSetTempArr)]);
+                    
+                    if (temp["Headrail"]) {
+                        setStep5(temp["Headrail"]);
+                        
+                        if (temp["Headrail"] === "MetalValance") {
+                            let refIndex = inputs.current["53"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["53"].getAttribute('text') + (temp["MetalValanceColor"] ? "/" + temp["MetalValanceColor"] : "");
+                            tempValue[refIndex] = inputs.current["53"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            setSelectedValanceColor1(temp["MetalValanceColor"] ? [{
+                                value: temp["MetalValanceColor"],
+                                label: optionsMetalValance[pageLanguage].find(opt => opt.value === temp["MetalValanceColor"]).label
+                            }] : []);
+                            depSetTempArr = new Set([...setGetDeps((temp["MetalValanceColor"] ? "" : "53,"), "5", depSetTempArr)]);
+                        } else if (temp["Headrail"] === "MetalValanceFabricInsert") {
+                            let refIndex = inputs.current["54"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["54"].getAttribute('text') + (temp["MetalValanceColor"] ? "/" + temp["MetalValanceColor"] : "");
+                            tempValue[refIndex] = inputs.current["54"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            setSelectedValanceColor2(temp["MetalValanceColor"] ? [{
+                                value: temp["MetalValanceColor"],
+                                label: optionsMetalValance[pageLanguage].find(opt => opt.value === temp["MetalValanceColor"]).label
+                            }] : []);
+                            depSetTempArr = new Set([...setGetDeps((temp["MetalValanceColor"] ? "" : "54,"), "5", depSetTempArr)]);
+                        } else if (temp["Headrail"] === "Upholstered") {
+                            let refIndex = inputs.current["52"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["52"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["52"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            depSetTempArr = new Set([...setGetDeps("", "5", depSetTempArr)]);
+                        } else {
+                            let refIndex = inputs.current["51"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["51"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["51"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            depSetTempArr = new Set([...setGetDeps((temp["RollType"] ? "" : "5A,") + (temp["BracketType"] ? "" : "5B,") + (temp["BracketColor"] ? "" : "5C,"), "5", depSetTempArr)]);
+                            
+                            if (temp["RollType"]) {
+                                setStep5A(temp["RollType"]);
+                                if (temp["RollType"] === "Regular") {
+                                    let refIndex = inputs.current["5A1"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["5A1"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["5A1"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                    depSetTempArr = new Set([...setGetDeps("", "5A", depSetTempArr)]);
+                                } else {
+                                    let refIndex = inputs.current["5A2"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["5A2"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["5A2"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                    depSetTempArr = new Set([...setGetDeps("", "5A", depSetTempArr)]);
+                                }
                             }
-                        }
-                        if (temp["BracketType"]) {
-                            setStep5B(temp["BracketType"]);
-                            if (temp["BracketType"] === "Round Edge") {
-                                let refIndex = inputs.current["5B1"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["5B1"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["5B1"].value;
-                                setStepSelectedLabel(tempLabels);
-                                setStepSelectedValue(tempValue);
-                                depSetTempArr = new Set([...setGetDeps("", "5B", depSetTempArr)]);
-                            } else {
-                                let refIndex = inputs.current["5B2"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["5B2"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["5B2"].value;
-                                setStepSelectedLabel(tempLabels);
-                                setStepSelectedValue(tempValue);
-                                depSetTempArr = new Set([...setGetDeps("", "5B", depSetTempArr)]);
+                            if (temp["BracketType"]) {
+                                setStep5B(temp["BracketType"]);
+                                if (temp["BracketType"] === "Round Edge") {
+                                    let refIndex = inputs.current["5B1"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["5B1"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["5B1"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                    depSetTempArr = new Set([...setGetDeps("", "5B", depSetTempArr)]);
+                                } else {
+                                    let refIndex = inputs.current["5B2"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["5B2"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["5B2"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                    depSetTempArr = new Set([...setGetDeps("", "5B", depSetTempArr)]);
+                                }
                             }
-                        }
-                        if (temp["BracketColor"]) {
-                            setStep5C(temp["BracketColor"]);
-                            if (temp["BracketColor"] === "Satin Brass") {
-                                let refIndex = inputs.current["5C1"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["5C1"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["5C1"].value;
-                                setStepSelectedLabel(tempLabels);
-                                setStepSelectedValue(tempValue);
-                                depSetTempArr = new Set([...setGetDeps("", "5C", depSetTempArr)]);
-                            } else if (temp["BracketColor"] === "Satin Nickel") {
-                                let refIndex = inputs.current["5C2"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["5C2"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["5C2"].value;
-                                setStepSelectedLabel(tempLabels);
-                                setStepSelectedValue(tempValue);
-                                depSetTempArr = new Set([...setGetDeps("", "5C", depSetTempArr)]);
-                            } else {
-                                let refIndex = inputs.current["5C3"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["5C3"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["5C3"].value;
-                                setStepSelectedLabel(tempLabels);
-                                setStepSelectedValue(tempValue);
-                                depSetTempArr = new Set([...setGetDeps("", "5C", depSetTempArr)]);
-                            }
-                        }
-                    }
-                }
-    
-                if (temp["HemStyle"]) {
-                    setStep6(temp["HemStyle"]);
-        
-                    if (temp["HemStyle"] === "Scallop") {
-                        let refIndex = inputs.current["62"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["62"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["62"].value;
-                        setStepSelectedLabel(tempLabels);
-                        setStepSelectedValue(tempValue);
-                        depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
-                    } else if (temp["HemStyle"] === "Wave") {
-                        let refIndex = inputs.current["63"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["63"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["63"].value;
-                        setStepSelectedLabel(tempLabels);
-                        setStepSelectedValue(tempValue);
-                        depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
-                    } else if (temp["HemStyle"] === "Colonial") {
-                        let refIndex = inputs.current["64"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["64"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["64"].value;
-                        setStepSelectedLabel(tempLabels);
-                        setStepSelectedValue(tempValue);
-                        depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
-                    } else {
-                        let refIndex = inputs.current["61"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["61"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["61"].value;
-                        setStepSelectedLabel(tempLabels);
-                        setStepSelectedValue(tempValue);
-                        depSetTempArr = new Set([...setGetDeps((temp["RollType"] ? "" : "6A,"), "6", depSetTempArr)]);
-            
-                        if (temp["BottomBarStyle"]) {
-                            setStep6A(temp["BottomBarStyle"]);
-                            if (temp["BottomBarStyle"] === "Sewn-In") {
-                                let refIndex = inputs.current["6A1"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["6A1"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["6A1"].value;
-                                setStepSelectedLabel(tempLabels);
-                                setStepSelectedValue(tempValue);
-                                depSetTempArr = new Set([...setGetDeps("", "6A", depSetTempArr)]);
-                            } else {
-                                let refIndex = inputs.current["6A2"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["6A2"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["6A2"].value;
-                                setStepSelectedLabel(tempLabels);
-                                setStepSelectedValue(tempValue);
-                                depSetTempArr = new Set([...setGetDeps("", "6A", depSetTempArr)]);
+                            if (temp["BracketColor"]) {
+                                setStep5C(temp["BracketColor"]);
+                                if (temp["BracketColor"] === "Satin Brass") {
+                                    let refIndex = inputs.current["5C1"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["5C1"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["5C1"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                    depSetTempArr = new Set([...setGetDeps("", "5C", depSetTempArr)]);
+                                } else if (temp["BracketColor"] === "Satin Nickel") {
+                                    let refIndex = inputs.current["5C2"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["5C2"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["5C2"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                    depSetTempArr = new Set([...setGetDeps("", "5C", depSetTempArr)]);
+                                } else {
+                                    let refIndex = inputs.current["5C3"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["5C3"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["5C3"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                    depSetTempArr = new Set([...setGetDeps("", "5C", depSetTempArr)]);
+                                }
                             }
                         }
                     }
-                }
-    
-                if (temp["RoomNameEn"]) {
+                    
+                    if (temp["HemStyle"]) {
+                        setStep6(temp["HemStyle"]);
+                        
+                        if (temp["HemStyle"] === "Scallop") {
+                            let refIndex = inputs.current["62"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["62"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["62"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
+                        } else if (temp["HemStyle"] === "Wave") {
+                            let refIndex = inputs.current["63"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["63"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["63"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
+                        } else if (temp["HemStyle"] === "Colonial") {
+                            let refIndex = inputs.current["64"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["64"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["64"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
+                        } else {
+                            let refIndex = inputs.current["61"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["61"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["61"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            depSetTempArr = new Set([...setGetDeps((temp["RollType"] ? "" : "6A,"), "6", depSetTempArr)]);
+                            
+                            if (temp["BottomBarStyle"]) {
+                                setStep6A(temp["BottomBarStyle"]);
+                                if (temp["BottomBarStyle"] === "Sewn-In") {
+                                    let refIndex = inputs.current["6A1"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["6A1"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["6A1"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                    depSetTempArr = new Set([...setGetDeps("", "6A", depSetTempArr)]);
+                                } else {
+                                    let refIndex = inputs.current["6A2"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["6A2"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["6A2"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                    depSetTempArr = new Set([...setGetDeps("", "6A", depSetTempArr)]);
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (temp["RoomNameEn"]) {
                         setSavedProjectRoomLabel(temp["RoomNameEn"]);
                         
-                        depSetTempArr = new Set([...setGetDeps("", "61", depSetTempArr)]);
+                        depSetTempArr = new Set([...setGetDeps("", "71", depSetTempArr)]);
                         setSelectedRoomLabel(temp["RoomNameEn"] ? [{
                             value: temp["RoomNameEn"],
                             label: rooms[pageLanguage].find(opt => opt.value === temp["RoomNameEn"]).label
@@ -2570,15 +2830,15 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                         tempSelect.value = temp["RoomNameEn"];
                         setRoomLabelSelect(tempSelect);
                         if (temp["WindowName"] === undefined || (temp["WindowName"] && temp["WindowName"] === "")) {
-                            tempLabels["6"] = tempSelect.label;
+                            tempLabels["7"] = tempSelect.label;
                         } else if (temp["WindowName"]) {
-                            tempLabels["6"] = tempSelect.label + " - " + temp["WindowName"];
+                            tempLabels["7"] = tempSelect.label + " - " + temp["WindowName"];
                         }
                         setStepSelectedLabel(tempLabels);
                     }
                     if (temp["WindowName"] && temp["WindowName"] !== "") {
                         setSavedProjectRoomText(temp["WindowName"]);
-                        depSetTempArr = new Set([...setGetDeps("", "62", depSetTempArr)]);
+                        depSetTempArr = new Set([...setGetDeps("", "72", depSetTempArr)]);
                         setRoomLabelText(temp["WindowName"]);
                     }
                     
@@ -2639,9 +2899,13 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                         });
                     }
                     
-                    setDepSet(depSetTempArr);
-                    setStepSelectedLabel(tempLabels);
-                    setStepSelectedValue(tempValue);
+                    setTimeout(() => {
+                        setDepSet(depSetTempArr);
+                        setSelectCustomValues(selectValues);
+                        setStepSelectedLabel(tempLabels);
+                        setStepSelectedValue(tempValue);
+                        // setLabelLock(true);
+                    }, 300);
                     
                 }
             );
@@ -2778,7 +3042,12 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
             {value: '7', label: '7'},
             {value: '8', label: '8'},
             {value: '9', label: '9'},
-            {value: '10', label: '10'}
+            {value: '10', label: '10'},
+            {value: '11', label: '11'},
+            {value: '12', label: '12'},
+            {value: '13', label: '13'},
+            {value: '14', label: '14'},
+            {value: '15', label: '15'}
         ],
         "fa": [
             {value: '0', label: '۰ (همه محصولات)'},
@@ -2791,7 +3060,12 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
             {value: '7', label: '۷'},
             {value: '8', label: '۸'},
             {value: '9', label: '۹'},
-            {value: '10', label: '۱۰'}
+            {value: '10', label: '۱۰'},
+            {value: '11', label: '۱۱'},
+            {value: '12', label: '۱۲'},
+            {value: '13', label: '۱۳'},
+            {value: '14', label: '۱۴'},
+            {value: '15', label: '۱۵'}
         ],
         
     };
@@ -2968,7 +3242,15 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
     }, [fabricSelected]);
     
     useEffect(() => {
-        renderFabrics();
+        getCart().then((temp) => {
+            if (Object.keys(fabrics).length) {
+                setTimeout(() => {
+                    renderFabrics(temp);
+                }, 100);
+            } else {
+                setFabricsList([]);
+            }
+        });
     }, [step1]);
     // useEffect(() => {
     //     if (firstRender === false) {
@@ -3059,7 +3341,10 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
     
     useEffect(() => {
         // console.log("hi2");
-        if ((projectModalState === 2 && isLoggedIn) || (saveProjectCount !== 0 && isLoggedIn)) {
+        if (swatchLogin) {
+            setSwatchLogin(false);
+            modalHandleClose("side_login_modal");
+        } else if ((projectModalState === 2 && isLoggedIn) || (saveProjectCount !== 0 && isLoggedIn)) {
             if (roomLabelText !== "" && selectedRoomLabel.length) {
                 if (projectId && projectId !== "") {
                     SaveUserProject(depSet, cartValues, [uploadedImagesFile, uploadedImagesURL, uploadedPDFFile, uploadedPDFURL], `${modelID}`, price, defaultModelName, defaultModelNameFa, projectData).then((temp) => {
@@ -3111,16 +3396,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
             //         setDefaultModelNameFa(obj.ModelName);
             //     }
             // });
-            let tempObj = {};
-            model["Accessories"].forEach(obj => {
-                let tempObj2 = {};
-                obj["SourceValue"].split(',').forEach(el => {
-                    tempObj2[el] = {};
-                    tempObj2[el]["price"] = obj["Products"][el];
-                });
-                tempObj[obj["SewingModelAccessoryId"]] = tempObj2;
-            });
-            setModelAccessories(tempObj);
+            
             setDefaultFabricPhoto(model["DefaultFabricPhotoUrl"]);
             setCart("PhotoUrl", model["DefaultFabricPhotoUrl"]);
             setDefaultModelName(model["ModelENName"]);
@@ -3145,6 +3421,25 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
     }, [deleteUploadPdfUrl]);
     
     useEffect(() => {
+        if (Object.keys(model).length !== 0 && cartValues["WidthCart"] !== undefined) {
+            let tempObj = {};
+            model["Accessories"].forEach(obj => {
+                let tempObj2 = {};
+                obj["SewingAccessoryDetails"].forEach(el => {
+                    tempObj2[el["SewingAccessoryDetailId"]] = JSON.parse(JSON.stringify(el));
+                    tempObj2[el["SewingAccessoryDetailId"]]["Price"]=el["Price"]*cartValues["WidthCart"]/100;
+                });
+                tempObj[obj["SewingAccessoryId"]] = tempObj2;
+            });
+            console.log(tempObj);
+            setModelAccessories(tempObj);
+        }
+        else{
+            setModelAccessories({});
+        }
+    }, [JSON.stringify(cartValues)]);
+    
+    useEffect(() => {
         if (modelID !== '' && catID !== '') {
             // if(firstRender) {
             getCats();
@@ -3160,19 +3455,57 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
         setPageLanguage(tempLang.slice(1, 3).join(''));
     }
     
+    async function getCart() {
+        return await new Promise((resolve, reject) => {
+            if (isLoggedIn) {
+                axios.get(baseURLGetCart, {
+                    headers: authHeader()
+                }).then((response) => {
+                    setBag(response.data);
+                    resolve(response.data);
+                }).catch(err => {
+                    if (err.response.status === 401) {
+                        refreshToken().then((response2) => {
+                            if (response2 !== false) {
+                                setCartChanged(cartChanged + 1);
+                                reject();
+                            } else {
+                                setCartChanged(cartChanged + 1);
+                                reject();
+                            }
+                        });
+                    } else {
+                        setCartChanged(cartChanged + 1);
+                        reject();
+                    }
+                });
+            } else {
+                if (localStorage.getItem("cart") !== null) {
+                    setBag(JSON.parse(localStorage.getItem("cart")));
+                    resolve(JSON.parse(localStorage.getItem("cart")));
+                } else {
+                    setBag({});
+                    resolve({});
+                }
+            }
+        });
+    }
+    
     useEffect(() => {
         setLang().then(() => {
             if (pageLanguage !== '') {
                 if (Object.keys(fabrics).length) {
-                    setTimeout(() => {
-                        renderFabrics();
-                    }, 100);
+                    getCart().then((temp) => {
+                        setTimeout(() => {
+                            renderFabrics(temp);
+                        }, 100);
+                    });
                 } else {
                     setFabricsList([]);
                 }
             }
         });
-    }, [fabrics, location.pathname]);
+    }, [fabrics, cartChanged, isLoggedIn, location.pathname]);
     
     useEffect(() => {
         if (filterChanged["filter"] !== 0) {
@@ -3306,6 +3639,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                 if (Object.keys(tempCartValues).length !== 0) {
                     if (tempCartValues["SewingModelId"] && tempCartValues["SewingModelId"] === `${modelID}`) {
                         setStepSelectedLabel({});
+                        setWindowSize("");
                         setProjectDetails(tempCartValues, undefined, true);
                     }
                 }
@@ -3342,6 +3676,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
             getProjectDetail();
         } else if (Object.keys(cartValues).length !== 0) {
             setStepSelectedLabel({});
+            setWindowSize("");
             setProjectDetails(cartValues, undefined, true)
         }
     }, [location.pathname]);
@@ -3496,7 +3831,12 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                             </Modal.Header>
                                             <Modal.Body>{zoomModalBody}</Modal.Body>
                                             <Modal.Footer>
-                                                <button className="swatchButton" current-state="0" onClick={e => fabricSwatch(e)}>{t("ORDER SWATCH")}</button>
+                                                <button className={`swatchButton ${hasSwatchId ? "activeSwatch" : ""} ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                                                        current-state={hasSwatchId ? "1" : "0"}
+                                                        onClick={(e) => {
+                                                            fabricSwatch(e, swatchId, swatchDetailId, swatchPhotoPath);
+                                                        }}
+                                                        disabled={swatchId === -1}>{hasSwatchId ? t("SWATCH IN CART") : t("ORDER SWATCH")}</button>
                                             </Modal.Footer>
                                         </Modal>
                                         <NextStep eventKey="2">{t("NEXT STEP")}</NextStep>
@@ -3554,7 +3894,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                             <label htmlFor="22">{t("mount_Outside")}</label>
                                         </div>
                                         {stepSelectedValue["2"] === "1" &&
-                                        <div className="secondary_options same_row_selection">
+                                        <div className="secondary_options">
                                             <div className="card-body-display-flex">
                                                 <div className="checkbox_style checkbox_style_step2">
                                                     <input type="checkbox" value="1" name="step21" ref-num="21" checked={step21 === "true"} onChange={(e) => {
@@ -3567,8 +3907,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                             setStepSelectedLabel(tempLabels);
                                                             if (stepSelectedValue["3"] === "2") {
                                                                 setDeps("3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3", "21");
-                                                            }
-                                                            else{
+                                                            } else {
                                                                 setDeps("", "21");
                                                             }
                                                         } else {
@@ -3578,8 +3917,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                             if (stepSelectedValue["3"] === "2") {
                                                                 setStep3("");
                                                                 setDeps("21,3", "3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3");
-                                                            }
-                                                            else{
+                                                            } else {
                                                                 setDeps("21", "3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3");
                                                             }
                                                         }
@@ -3596,7 +3934,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                             </div>
                                         </div>
                                         }
-                                        <NextStep eventKey="3" onClick={() => {
+                                        <NextStep eventKey={stepSelectedValue["2"] === "1" && step21 !== "true" ? "2" : "3"} onClick={() => {
                                             if (stepSelectedValue["2"] === "1" && step21 !== "true")
                                                 modalHandleShow("noInsideUnderstand");
                                         }}>{t("NEXT STEP")}</NextStep>
@@ -3607,7 +3945,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                 <p className="help_column_header">{t("step2_help_1")}</p>
                                                 <ul className="help_column_list">
                                                     <li>{t("step2_help_2")}</li>
-                                                    <li>{t("step2_help_3")}</li>
+                                                    {/*<li>{t("step2_help_3")}</li>*/}
                                                     <li>{t("step2_help_4")}</li>
                                                     <li>{t("step2_help_5")}</li>
                                                 </ul>
@@ -3666,8 +4004,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                                selectUncheck(e);
                                                                setDeps("3", "31,32");
                                                                setCart("calcMeasurements", true, "Width,height,calcMeasurements");
-                                                           }
-                                                           else {
+                                                           } else {
                                                                setStep3("true");
                                                                deleteSpecialSelects(3);
                                                                selectChanged(e);
@@ -4460,7 +4797,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                                 setCart("ShadeMount", selected[0].value);
                                                             }
                                                         }}
-                                                        options={SelectOptionRange(0, 100, 1, "cm", "", pageLanguage)}
+                                                        options={SelectOptionRange(10, 100, 1, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -4517,12 +4854,12 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                        setCart("ControlType", "Motorized", "ControlPosition,ChainLength");
                                                    }} ref={ref => (inputs.current["42"] = ref)}/>
                                             <label htmlFor="42">{t("Motorized")}<br/><p
-                                                className="surcharge_price">{t("Add ")}{Object.keys(modelAccessories).length !== 0 ? (modelAccessories["1"] ? (modelAccessories["1"]["61500508"] ? GetPrice(modelAccessories["1"]["61500508"]["price"], pageLanguage, t("TOMANS")) : null) : null) : null}</p>
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["1"] ? (modelAccessories["1"]["1"] ? GetPrice(modelAccessories["1"]["1"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
                                             </label>
                                         
                                         </div>
                                         {stepSelectedValue["4"] === "2" &&
-                                        <div className="secondary_options same_row_selection">
+                                        <div className="secondary_options">
                                             {/*<hr/>*/}
                                             {/*<p className="no_power_title">{t("Motor_title")}</p>*/}
                                             <div className="card-body-display-flex">
@@ -4578,7 +4915,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                         </div>
                                         }
                                         {stepSelectedValue["41"] === "1" && stepSelectedValue["4"] === "2" &&
-                                        <div className="motorized_options same_row_selection">
+                                        <div className="motorized_options">
                                             <div className="motorized_option_left">
                                                 <p>{t("Motor Position")}</p>
                                                 &nbsp;
@@ -4697,7 +5034,42 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                             <div className="help_column help_right_column">
                                                 <p className="help_column_header">{t("step4_help_4")}</p>
                                                 <ul className="help_column_list">
-                                                    <li>{t("step4_help_5")}</li>
+                                                    {/*<li>{t("step4_help_5")}</li>*/}
+                                                    <li className="no_listStyle">
+                                                        <span className="popover_indicator">
+                                                            {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
+                                                                                  children={<object className="popover_camera" type="image/svg+xml"
+                                                                                                    data={require('../Images/public/camera.svg').default}/>}
+                                                                                  component={
+                                                                                      <div className="clearfix">
+                                                                                          <div className="popover_image clearfix">
+                                                                                              <img
+                                                                                                  src={popoverImages["step41"] === undefined ? require('../Images/drapery/zebra/motorized_control_type1.png.jpg') : popoverImages["step41"]}
+                                                                                                  className="img-fluid" alt=""/>
+                                                                                          </div>
+                                                                                          <div className="popover_footer">
+                                                                                              <span className="popover_footer_title">{t("step4_popover_1")}</span>
+                                                                                              <span className="popover_thumbnails">
+                                                                                                  <div>
+                                                                                                      <img src={require('../Images/drapery/zebra/motorized_control_type1.png.jpg').default}
+                                                                                                           text="step41"
+                                                                                                           onMouseEnter={(e) => popoverThumbnailHover(e)}
+                                                                                                           className="popover_thumbnail_img img-fluid"
+                                                                                                           alt=""/>
+                                                                                                  </div>
+                                                                                                  {/*<div>*/}
+                                                                                                  {/*    <img src={require('../Images/drapery/zebra/motorized_control_type2.png').default}*/}
+                                                                                                  {/*         text="step41"*/}
+                                                                                                  {/*         onMouseEnter={(e) => popoverThumbnailHover(e)}*/}
+                                                                                                  {/*         className="popover_thumbnail_img img-fluid"*/}
+                                                                                                  {/*         alt=""/>*/}
+                                                                                                  {/*</div>*/}
+                                                                                              </span>
+                                                                                          </div>
+                                                                                      </div>
+                                                                                  }/>
+                                                            }
+                                                        </span>{t("step4_help_5")}</li>
                                                     {/*<li>{t("step4_help_5.5")}</li>*/}
                                                     <li>{t("step4_help_6")}</li>
                                                 </ul>
@@ -4720,7 +5092,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                 <Card.Body>
                                     <div className="card_body card_body_radio special_farsi_card_body">
                                         <div className="box50 radio_style">
-                                            <img src={require('../Images/drapery/zebra/position_left.svg').default} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/roller/windowLeft.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("Left")} value="1" name="step4A" ref-num="4A" id="4A1" checked={step4A === "Left"}
                                                    onChange={e => {
                                                        selectChanged(e);
@@ -4731,7 +5103,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                             <label htmlFor="4A1">{t("Left")}</label>
                                         </div>
                                         <div className="box50 radio_style">
-                                            <img src={require('../Images/drapery/zebra/position_right.svg').default} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/roller/windowRight.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("Right")} value="2" name="step4A"
                                                    ref-num="4A" id="4A2" checked={step4A === "Right"}
                                                    onChange={e => {
@@ -4792,7 +5164,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                        setCart("ChainLength", "300");
                                                    }} ref={ref => (inputs.current["4B2"] = ref)}/>
                                             <label htmlFor="4B2">{t("300cm")}<br/><p
-                                                className="surcharge_price">{t("Add ")}{Object.keys(modelAccessories).length !== 0 ? (modelAccessories["3"] ? (modelAccessories["3"]["90908901"] ? GetPrice(modelAccessories["3"]["90908901"]["price"], pageLanguage, t("TOMANS")) : null) : null) : null}</p>
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["2"] ? (modelAccessories["2"]["2"] ? GetPrice(modelAccessories["2"]["2"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
                                             </label>
                                         </div>
                                         <div className="box33 radio_style">
@@ -4805,7 +5177,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                        setCart("ChainLength", "500");
                                                    }} ref={ref => (inputs.current["4B3"] = ref)}/>
                                             <label htmlFor="4B3">{t("500cm")}<br/><p
-                                                className="surcharge_price">{t("Add ")}{Object.keys(modelAccessories).length !== 0 ? (modelAccessories["3"] ? (modelAccessories["3"]["90908902"] ? GetPrice(modelAccessories["3"]["90908902"]["price"], pageLanguage, t("TOMANS")) : null) : null) : null}</p>
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["2"] ? (modelAccessories["2"]["3"] ? GetPrice(modelAccessories["2"]["3"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
                                             </label>
                                         </div>
                                         <NextStep eventKey="5">{t("NEXT STEP")}</NextStep>
@@ -4815,7 +5187,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                             </Accordion.Collapse>
                         </Card>
                         }
-    
+                        
                         {/* step 5 */}
                         <Card>
                             <Card.Header>
@@ -4850,7 +5222,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                        setHeadrailsNextStep("6");
                                                    }} ref={ref => (inputs.current["52"] = ref)}/>
                                             <label htmlFor="52">{t("roller_headrail2")}<br/><p
-                                                className="surcharge_price">{t("Add ")}{Object.keys(modelAccessories).length !== 0 ? (modelAccessories["1"] ? (modelAccessories["1"]["61500508"] ? GetPrice(modelAccessories["1"]["61500508"]["price"], pageLanguage, t("TOMANS")) : null) : null) : null}</p>
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["5"] ? (modelAccessories["5"]["8"] ? GetPrice(modelAccessories["5"]["8"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
                                             </label>
                                         </div>
                                         <div className="box50 radio_style">
@@ -4865,7 +5237,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                        setHeadrailsNextStep("6");
                                                    }} ref={ref => (inputs.current["53"] = ref)}/>
                                             <label htmlFor="53">{t("roller_headrail3")}<br/><p
-                                                className="surcharge_price">{t("Add ")}{Object.keys(modelAccessories).length !== 0 ? (modelAccessories["1"] ? (modelAccessories["1"]["61500508"] ? GetPrice(modelAccessories["1"]["61500508"]["price"], pageLanguage, t("TOMANS")) : null) : null) : null}</p>
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["5"] ? (modelAccessories["5"]["10"] ? GetPrice(modelAccessories["5"]["10"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
                                             </label>
                                         </div>
                                         <div className="box50 radio_style">
@@ -4880,7 +5252,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                        setHeadrailsNextStep("6");
                                                    }} ref={ref => (inputs.current["54"] = ref)}/>
                                             <label htmlFor="54">{t("roller_headrail4")}<br/><p
-                                                className="surcharge_price">{t("Add ")}{Object.keys(modelAccessories).length !== 0 ? (modelAccessories["1"] ? (modelAccessories["1"]["61500508"] ? GetPrice(modelAccessories["1"]["61500508"]["price"], pageLanguage, t("TOMANS")) : null) : null) : null}</p>
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["5"] ? (modelAccessories["5"]["12"] ? GetPrice(modelAccessories["5"]["12"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
                                             </label>
                                         </div>
                                         {(stepSelectedValue["5"] === "3" || stepSelectedValue["5"] === "4") &&
@@ -4897,11 +5269,11 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                     values={selectedValanceColor1}
                                                     onDropdownOpen={() => {
                                                         let temp1 = window.scrollY;
-                                                        window.scrollTo(window.scrollX, window.scrollY + 0.5);
+                                                        window.scrollTo(window.scrollX, window.scrollY + 1);
                                                         setTimeout(() => {
                                                             let temp2 = window.scrollY;
                                                             if (temp2 === temp1)
-                                                                window.scrollTo(window.scrollX, window.scrollY - 0.5);
+                                                                window.scrollTo(window.scrollX, window.scrollY - 1);
                                                         }, 100);
                                                     }}
                                                     dropdownRenderer={
@@ -4938,11 +5310,11 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                     values={selectedValanceColor2}
                                                     onDropdownOpen={() => {
                                                         let temp1 = window.scrollY;
-                                                        window.scrollTo(window.scrollX, window.scrollY + 0.5);
+                                                        window.scrollTo(window.scrollX, window.scrollY + 1);
                                                         setTimeout(() => {
                                                             let temp2 = window.scrollY;
                                                             if (temp2 === temp1)
-                                                                window.scrollTo(window.scrollX, window.scrollY - 0.5);
+                                                                window.scrollTo(window.scrollX, window.scrollY - 1);
                                                         }, 100);
                                                     }}
                                                     dropdownRenderer={
@@ -4988,7 +5360,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                 </Card.Body>
                             </Accordion.Collapse>
                         </Card>
-    
+                        
                         {/* step 5A */}
                         {stepSelectedValue["5"] === "1" &&
                         <Card>
@@ -5044,14 +5416,14 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                                                               <span className="popover_footer_title">{t("RollType_help_7")}</span>
                                                                                               <span className="popover_thumbnails">
                                                                                                   <div>
-                                                                                                      <img src={require('../Images/drapery/roller/RegularRoll1a.jpg')}
+                                                                                                      <img src={require('../Images/drapery/roller/RegularRoll1a.jpg').default}
                                                                                                            text="step51"
                                                                                                            onMouseEnter={(e) => popoverThumbnailHover(e)}
                                                                                                            className="popover_thumbnail_img img-fluid"
                                                                                                            alt=""/>
                                                                                                   </div>
                                                                                                   <div>
-                                                                                                      <img src={require('../Images/drapery/roller/RegularRoll2.jpg')}
+                                                                                                      <img src={require('../Images/drapery/roller/RegularRoll2.jpg').default}
                                                                                                            text="step51"
                                                                                                            onMouseEnter={(e) => popoverThumbnailHover(e)}
                                                                                                            className="popover_thumbnail_img img-fluid"
@@ -5085,14 +5457,14 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                                                               <span className="popover_footer_title">{t("RollType_help_8")}</span>
                                                                                               <span className="popover_thumbnails">
                                                                                                   <div>
-                                                                                                      <img src={require('../Images/drapery/roller/ReverseRoll1a.jpg')}
+                                                                                                      <img src={require('../Images/drapery/roller/ReverseRoll1a.jpg').default}
                                                                                                            text="step51"
                                                                                                            onMouseEnter={(e) => popoverThumbnailHover(e)}
                                                                                                            className="popover_thumbnail_img img-fluid"
                                                                                                            alt=""/>
                                                                                                   </div>
                                                                                                   <div>
-                                                                                                      <img src={require('../Images/drapery/roller/ReverseRoll2.jpg')}
+                                                                                                      <img src={require('../Images/drapery/roller/ReverseRoll2.jpg').default}
                                                                                                            text="step51"
                                                                                                            onMouseEnter={(e) => popoverThumbnailHover(e)}
                                                                                                            className="popover_thumbnail_img img-fluid"
@@ -5113,7 +5485,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                             </Accordion.Collapse>
                         </Card>
                         }
-    
+                        
                         {/* step 5B */}
                         {stepSelectedValue["5"] === "1" &&
                         <Card>
@@ -5125,7 +5497,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                 <Card.Body>
                                     <div className="card_body card_body_radio">
                                         <div className="box50 radio_style">
-                                            <img src={require('../Images/drapery/roller/bracket_type_round.png')} className="img-fluid half_margin" alt=""/>
+                                            <img src={require('../Images/drapery/roller/bracket_type_round.png').default} className="img-fluid half_margin" alt=""/>
                                             <input className="radio" type="radio" text={t("BracketType1")} value="1" name="step5B" ref-num="5B" id="5B1"
                                                    checked={step5B === "Round Edge"}
                                                    onChange={e => {
@@ -5137,7 +5509,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                             <label htmlFor="5B1">{t("BracketType1")}</label>
                                         </div>
                                         <div className="box50 radio_style">
-                                            <img src={require('../Images/drapery/roller/bracket_type_square.png')} className="img-fluid half_margin" alt=""/>
+                                            <img src={require('../Images/drapery/roller/bracket_type_square.png').default} className="img-fluid half_margin" alt=""/>
                                             <input className="radio" type="radio" text={t("BracketType2")} value="2" name="step5B" ref-num="5B" id="5B2"
                                                    checked={step5B === "Square Edge"}
                                                    onChange={e => {
@@ -5154,7 +5526,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                             </Accordion.Collapse>
                         </Card>
                         }
-    
+                        
                         {/* step 5C */}
                         {stepSelectedValue["5"] === "1" &&
                         <Card>
@@ -5165,8 +5537,8 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                             <Accordion.Collapse eventKey="5C">
                                 <Card.Body>
                                     <div className="card_body card_body_radio bracket_color">
-                                        <div className="box33 radio_style">
-                                            <img src={require('../Images/drapery/roller/SatinBrass.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                                        <div className="box33">
+                                            {/*<img src={require('../Images/drapery/roller/SatinBrass.jpg').default} className="img-fluid bracket_color_img" alt=""/>
                                             <input className="radio" type="radio" text={t("BracketColor1")} value="1" name="step5C" ref-num="5C" id="5C1"
                                                    checked={step5C === "Satin Brass"}
                                                    onChange={e => {
@@ -5175,31 +5547,66 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                        setDeps("", "5C");
                                                        setCart("BracketColor", "Satin Brass");
                                                    }} ref={ref => (inputs.current["5C1"] = ref)}/>
-                                            <label htmlFor="5C1">{t("BracketColor1")}</label>
+                                            <label htmlFor="5C1">{t("BracketColor1")}</label> */}
+                                            
+                                            <div className="radio_group">
+                                                <label className="radio_container">
+                                                    <input className="radio" type="radio" text={t("BracketColor1")} value="1" name="step5C" ref-num="5C" id="5C1"
+                                                           checked={step5C === "Satin Brass"}
+                                                           onChange={e => {
+                                                               selectChanged(e);
+                                                               setStep5C("Satin Brass");
+                                                               setDeps("", "5C");
+                                                               setCart("BracketColor", "Satin Brass");
+                                                           }} ref={ref => (inputs.current["5C1"] = ref)}/>
+                                                    <div className="frame_img">
+                                                        <img src={require('../Images/drapery/roller/SatinBrass.jpg').default} className="img-fluid bracket_color_img" alt=""/>
+                                                    </div>
+                                                </label>
+                                                <div className="radio_group_name_container">
+                                                    <h1>{t("BracketColor1")}</h1>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="box33 radio_style">
-                                            <img src={require('../Images/drapery/roller/SatinNickel.jpg')} className="img-fluid bracket_color_img" alt=""/>
-                                            <input className="radio" type="radio" text={t("BracketColor2")} value="2" name="step5C" ref-num="5C" id="5C2"
-                                                   checked={step5C === "Satin Nickel"}
-                                                   onChange={e => {
-                                                       selectChanged(e);
-                                                       setStep5C("Satin Nickel");
-                                                       setDeps("", "5C");
-                                                       setCart("BracketColor", "Satin Nickel");
-                                                   }} ref={ref => (inputs.current["5C2"] = ref)}/>
-                                            <label htmlFor="5C2">{t("BracketColor2")}</label>
+                                        <div className="box33">
+                                            <div className="radio_group">
+                                                <label className="radio_container">
+                                                    <input className="radio" type="radio" text={t("BracketColor2")} value="2" name="step5C" ref-num="5C" id="5C2"
+                                                           checked={step5C === "Satin Nickel"}
+                                                           onChange={e => {
+                                                               selectChanged(e);
+                                                               setStep5C("Satin Nickel");
+                                                               setDeps("", "5C");
+                                                               setCart("BracketColor", "Satin Nickel");
+                                                           }} ref={ref => (inputs.current["5C2"] = ref)}/>
+                                                    <div className="frame_img">
+                                                        <img src={require('../Images/drapery/roller/SatinNickel.jpg').default} className="img-fluid bracket_color_img" alt=""/>
+                                                    </div>
+                                                </label>
+                                                <div className="radio_group_name_container">
+                                                    <h1>{t("BracketColor2")}</h1>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="box33 radio_style">
-                                            <img src={require('../Images/drapery/roller/GunMetal.jpg')} className="img-fluid bracket_color_img" alt=""/>
-                                            <input className="radio" type="radio" text={t("BracketColor3")} value="3" name="step5C" ref-num="5C" id="5C3"
-                                                   checked={step5C === "Gun Metal"}
-                                                   onChange={e => {
-                                                       selectChanged(e);
-                                                       setStep5C("Gun Metal");
-                                                       setDeps("", "5C");
-                                                       setCart("BracketColor", "Gun Metal");
-                                                   }} ref={ref => (inputs.current["5C2"] = ref)}/>
-                                            <label htmlFor="5C3">{t("BracketColor3")}</label>
+                                        <div className="box33">
+                                            <div className="radio_group">
+                                                <label className="radio_container">
+                                                    <input className="radio" type="radio" text={t("BracketColor3")} value="3" name="step5C" ref-num="5C" id="5C3"
+                                                           checked={step5C === "Gun Metal"}
+                                                           onChange={e => {
+                                                               selectChanged(e);
+                                                               setStep5C("Gun Metal");
+                                                               setDeps("", "5C");
+                                                               setCart("BracketColor", "Gun Metal");
+                                                           }} ref={ref => (inputs.current["5C2"] = ref)}/>
+                                                    <div className="frame_img">
+                                                        <img src={require('../Images/drapery/roller/GunMetal.jpg').default} className="img-fluid bracket_color_img" alt=""/>
+                                                    </div>
+                                                </label>
+                                                <div className="radio_group_name_container">
+                                                    <h1>{t("BracketColor2")}</h1>
+                                                </div>
+                                            </div>
                                         </div>
                                         <NextStep eventKey="6">{t("NEXT STEP")}</NextStep>
                                     </div>
@@ -5225,14 +5632,14 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                                                               <span className="popover_footer_title">{t("BottomBarStyle_help_5")}</span>
                                                                                               <span className="popover_thumbnails">
                                                                                                   <div>
-                                                                                                      <img src={require('../Images/drapery/roller/bracket_type_round.png')}
+                                                                                                      <img src={require('../Images/drapery/roller/bracket_type_round.png').default}
                                                                                                            text="step51"
                                                                                                            onMouseEnter={(e) => popoverThumbnailHover(e)}
                                                                                                            className="popover_thumbnail_img img-fluid"
                                                                                                            alt=""/>
                                                                                                   </div>
                                                                                                   <div>
-                                                                                                      <img src={require('../Images/drapery/roller/bracket_type_square.png')}
+                                                                                                      <img src={require('../Images/drapery/roller/bracket_type_square.png').default}
                                                                                                            text="step51"
                                                                                                            onMouseEnter={(e) => popoverThumbnailHover(e)}
                                                                                                            className="popover_thumbnail_img img-fluid"
@@ -5253,7 +5660,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                             </Accordion.Collapse>
                         </Card>
                         }
-    
+                        
                         {/* step 6 */}
                         <Card>
                             <Card.Header>
@@ -5288,7 +5695,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                        setHemStyleNextStep("7");
                                                    }} ref={ref => (inputs.current["62"] = ref)}/>
                                             <label htmlFor="62">{t("roller_HemStyle2")}<br/><p
-                                                className="surcharge_price">{t("Add ")}{Object.keys(modelAccessories).length !== 0 ? (modelAccessories["1"] ? (modelAccessories["1"]["61500508"] ? GetPrice(modelAccessories["1"]["61500508"]["price"], pageLanguage, t("TOMANS")) : null) : null) : null}</p>
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["4"] ? (modelAccessories["4"]["6"] ? GetPrice(modelAccessories["4"]["6"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
                                             </label>
                                         </div>
                                         <div className="box50 radio_style">
@@ -5302,7 +5709,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                        setHemStyleNextStep("7");
                                                    }} ref={ref => (inputs.current["63"] = ref)}/>
                                             <label htmlFor="63">{t("roller_HemStyle3")}<br/><p
-                                                className="surcharge_price">{t("Add ")}{Object.keys(modelAccessories).length !== 0 ? (modelAccessories["1"] ? (modelAccessories["1"]["61500508"] ? GetPrice(modelAccessories["1"]["61500508"]["price"], pageLanguage, t("TOMANS")) : null) : null) : null}</p>
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["4"] ? (modelAccessories["4"]["7"] ? GetPrice(modelAccessories["4"]["7"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
                                             </label>
                                         </div>
                                         <div className="box50 radio_style">
@@ -5317,7 +5724,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                        setHemStyleNextStep("7");
                                                    }} ref={ref => (inputs.current["64"] = ref)}/>
                                             <label htmlFor="64">{t("roller_HemStyle4")}<br/><p
-                                                className="surcharge_price">{t("Add ")}{Object.keys(modelAccessories).length !== 0 ? (modelAccessories["1"] ? (modelAccessories["1"]["61500508"] ? GetPrice(modelAccessories["1"]["61500508"]["price"], pageLanguage, t("TOMANS")) : null) : null) : null}</p>
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["4"] ? (modelAccessories["4"]["9"] ? GetPrice(modelAccessories["4"]["9"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
                                             </label>
                                         </div>
                                         <NextStep eventKey={hemStyleNextStep}>{t("NEXT STEP")}</NextStep>
@@ -5339,7 +5746,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                 </Card.Body>
                             </Accordion.Collapse>
                         </Card>
-    
+                        
                         {/* step 6A */}
                         {stepSelectedValue["6"] === "1" &&
                         <Card>
@@ -5351,7 +5758,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                 <Card.Body>
                                     <div className="card_body card_body_radio">
                                         <div className="box50 radio_style">
-                                            <img src={require('../Images/drapery/roller/bottom_bar_sewn_in.png')} className="img-fluid half_margin special_margin" alt=""/>
+                                            <img src={require('../Images/drapery/roller/bottom_bar_sewn_in.png').default} className="img-fluid half_margin special_margin" alt=""/>
                                             <input className="radio" type="radio" text={t("BottomBarStyle1")} value="1" name="step6A" ref-num="6A" id="6A1"
                                                    checked={step6A === "Sewn-In"}
                                                    onChange={e => {
@@ -5363,7 +5770,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                             <label htmlFor="6A1">{t("BottomBarStyle1")}</label>
                                         </div>
                                         <div className="box50 radio_style">
-                                            <img src={require('../Images/drapery/roller/bottom_bar_exposed_designer.png')} className="img-fluid half_margin special_margin" alt=""/>
+                                            <img src={require('../Images/drapery/roller/bottom_bar_exposed_designer.png').default} className="img-fluid half_margin special_margin" alt=""/>
                                             <input className="radio" type="radio" text={t("BottomBarStyle2")} value="2" name="step6A" ref-num="6A" id="6A2"
                                                    checked={step6A === "Exposed - Designer"}
                                                    onChange={e => {
@@ -5373,7 +5780,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                        setCart("BottomBarStyle", "Exposed - Designer");
                                                    }} ref={ref => (inputs.current["6A2"] = ref)}/>
                                             <label htmlFor="6A2">{t("BottomBarStyle2")}<br/><p
-                                                className="surcharge_price">{t("Add ")}{Object.keys(modelAccessories).length !== 0 ? (modelAccessories["1"] ? (modelAccessories["1"]["61500508"] ? GetPrice(modelAccessories["1"]["61500508"]["price"], pageLanguage, t("TOMANS")) : null) : null) : null}</p>
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["6"] ? (modelAccessories["6"]["13"] ? GetPrice(modelAccessories["6"]["13"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
                                             </label>
                                         </div>
                                         <NextStep eventKey="7">{t("NEXT STEP")}</NextStep>
@@ -5399,7 +5806,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                                                               <span className="popover_footer_title">{t("BottomBarStyle_help_5")}</span>
                                                                                               <span className="popover_thumbnails">
                                                                                                   <div>
-                                                                                                      <img src={require('../Images/drapery/roller/SewnIn.jpg')}
+                                                                                                      <img src={require('../Images/drapery/roller/SewnIn.jpg').default}
                                                                                                            text="step51"
                                                                                                            onMouseEnter={(e) => popoverThumbnailHover(e)}
                                                                                                            className="popover_thumbnail_img img-fluid"
@@ -5432,7 +5839,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                                                               <span className="popover_footer_title">{t("BottomBarStyle_help_6")}</span>
                                                                                               <span className="popover_thumbnails">
                                                                                                   <div>
-                                                                                                      <img src={require('../Images/drapery/roller/designer.jpg')}
+                                                                                                      <img src={require('../Images/drapery/roller/designer.jpg').default}
                                                                                                            text="step51"
                                                                                                            onMouseEnter={(e) => popoverThumbnailHover(e)}
                                                                                                            className="popover_thumbnail_img img-fluid"
@@ -5452,7 +5859,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                             </Accordion.Collapse>
                         </Card>
                         }
-    
+                        
                         {/* step 7 */}
                         <Card>
                             <Card.Header>
@@ -5529,11 +5936,11 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                         values={selectedRoomLabel}
                                                         onDropdownOpen={() => {
                                                             let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 0.5);
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
                                                             setTimeout(() => {
                                                                 let temp2 = window.scrollY;
                                                                 if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 0.5);
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
                                                             }, 100);
                                                         }}
                                                         dropdownRenderer={
@@ -5772,7 +6179,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                     </div>
                 </Modal.Body>
             </Modal>
-    
+            
             <Modal dialogClassName={`upload_modal uploadImg_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["uploadImg"] === undefined ? false : modals["uploadImg"]}
                    onHide={() => {
@@ -5793,9 +6200,9 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                          onDrop={(e) => {
                              e.preventDefault();
                              e.stopPropagation();
-                
+                        
                              const {files} = e.dataTransfer;
-                
+                        
                              if (files && files.length && (files[0].type === "image/jpg" || files[0].type === "image/jpeg" || files[0].type === "image/png")) {
                                  uploadImg(files[0]);
                              } else {
@@ -5826,9 +6233,9 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                onDrop={(e) => {
                                                    e.preventDefault();
                                                    e.stopPropagation();
-                                    
+                                            
                                                    const {files} = e.dataTransfer;
-                                    
+                                            
                                                    if (files && files.length && (files[0].type === "image/jpg" || files[0].type === "image/jpeg" || files[0].type === "image/png")) {
                                                        uploadImg(files[0]);
                                                    } else {
@@ -5868,7 +6275,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                 {/*    */}
                 {/*</Modal.Footer>*/}
             </Modal>
-    
+            
             <Modal dialogClassName={`upload_modal uploadPdf_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["uploadPdf"] === undefined ? false : modals["uploadPdf"]}
                    onHide={() => {
@@ -5886,9 +6293,9 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                          onDrop={(e) => {
                              e.preventDefault();
                              e.stopPropagation();
-                
+                        
                              const {files} = e.dataTransfer;
-                
+                        
                              if (files && files.length && files[0].type === "application/pdf") {
                                  uploadImg(files[0]);
                              } else {
@@ -5919,9 +6326,9 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                onDrop={(e) => {
                                                    e.preventDefault();
                                                    e.stopPropagation();
-                                    
+                                            
                                                    const {files} = e.dataTransfer;
-                                    
+                                            
                                                    if (files && files.length && files[0].type === "application/pdf") {
                                                        uploadImg(files[0]);
                                                    } else {
@@ -5971,10 +6378,9 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                     <p>{t("WIDTH DISCREPANCIES")}</p>
                 </Modal.Header>
                 <Modal.Body>
-                    <p>We noticed that there’s quite a difference in some of your measurements, and this could affect the fit of your custom shades.</p>
+                    <p>{t("WIDTH DISCREPANCIES_1")}</p>
                     <br/>
-                    <p>Before you continue, please make sure you read &amp; understand our return policy, and if you need help, please feel free to contact us! Our designers
-                        can help you work out any discrepancies to make sure you love your new custom drapery.</p>
+                    <p>{t("WIDTH DISCREPANCIES_2")}</p>
                     <br/>
                     
                     <div className="buttons_section">
@@ -5997,7 +6403,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                         <button className="btn white_btn" onClick={() => {
                             modalHandleClose("widthDifferent");
                             setAccordionActiveKey("3B");
-                        }}>I AGREE, CONTINUE ANYWAY
+                        }}>{t("I AGREE, CONTINUE ANYWAY")}
                         </button>
                     </div>
                 
@@ -6018,8 +6424,9 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                     <ul className="addToCartErr_list">
                         {addCartErr}
                     </ul>
+                    <br/>
                     <span>{t("addToCartErr1")}</span>
-                    <span>{t("addToCartErr2")}</span>
+                    {/*<span>{t("addToCartErr2")}</span>*/}
                     <span>{t("addToCartErr3")}</span>
                     
                     <br/>
@@ -6043,10 +6450,9 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                     <p>{t("HEIGHT DISCREPANCIES")}</p>
                 </Modal.Header>
                 <Modal.Body>
-                    <p>We noticed that there’s quite a difference in some of your measurements, and this could affect the fit of your custom shades.</p>
+                    <p>{t("HEIGHT DISCREPANCIES_1")}</p>
                     <br/>
-                    <p>Before you continue, please make sure you read &amp; understand our return policy, and if you need help, please feel free to contact us! Our designers
-                        can help you work out any discrepancies to make sure you love your new custom drapery.</p>
+                    <p>{t("HEIGHT DISCREPANCIES_2")}</p>
                     <br/>
                     
                     <div className="buttons_section">
@@ -6069,7 +6475,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                         <button className="btn white_btn" onClick={() => {
                             modalHandleClose("heightDifferent");
                             setAccordionActiveKey("4");
-                        }}>I AGREE, CONTINUE ANYWAY
+                        }}>{t("I AGREE, CONTINUE ANYWAY")}
                         </button>
                     </div>
                 
@@ -6293,6 +6699,21 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                     {projectModalState === 2 &&
                     <ModalLogin/>
                     }
+                </Modal.Body>
+            </Modal>
+            
+            <Modal backdrop="static" keyboard={false}
+                   className={`cart_modal_container cart_agree_container add_to_project_modal side_login_modal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                   dialogClassName={`cart_modal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                   show={modals["side_login_modal"] === undefined ? false : modals["side_login_modal"]}
+                   onHide={() => {
+                       modalHandleClose("side_login_modal");
+                       setSwatchLogin(false);
+                   }} id="side_login_modal">
+                <Modal.Header closeButton>
+                </Modal.Header>
+                <Modal.Body>
+                    <ModalLogin/>
                 </Modal.Body>
             </Modal>
             

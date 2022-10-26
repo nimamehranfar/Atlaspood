@@ -17,6 +17,7 @@ import GetPrice from "../Components/GetPrice";
 import Tooltip from "bootstrap/js/src/tooltip";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import PopoverStickOnHover from "../Components/PopoverStickOnHover";
+import PopoverStickOnClick from "../Components/PopoverStickOnClick";
 import {useDispatch, useSelector} from "react-redux";
 import jwt from "jwt-decode";
 import store from "../store";
@@ -157,6 +158,10 @@ function Checkout() {
     const [selectedCity, setSelectedCity] = useState([]);
     const [tempCity, setTempCity] = useState([]);
     const [tempCityId, setTempCityId] = useState(undefined);
+	
+	const popperConfig = {
+		strategy: "fixed"
+	};
     
     function checkPasswordStrength(user_password) {
         let temp = JSON.parse(JSON.stringify(passwordValidation));
@@ -297,7 +302,7 @@ function Checkout() {
     }
     
     function removeDiscount(discountText) {
-        axios.delete(baseURLAddDiscount, {
+        axios.delete(baseURLDeleteDiscount, {
             params: {
                 code: discountText
             },
@@ -693,25 +698,30 @@ function Checkout() {
                                                 <span className="checkout_item_price">{GetPrice(obj["price"] - drapery[i]["Discount"], pageLanguage, t("TOMANS"))}</span>}
                                             </div>
                                         </div>
-                                        {/*<PopoverStickOnHover classNames="checkout_view_detail_popover"*/}
-                                        {/*                     placement="bottom"*/}
-                                        {/*                     children={<h2 className="checkout_item_details">{t("View Details")}</h2>}*/}
-                                        {/*                     component={*/}
-                                        {/*                         <div className="basket_item_title_container">*/}
-                                        {/*                             {desc}*/}
-                                        {/*                         </div>*/}
-                                        {/*                     }/>*/}
-                                        <Dropdown autoClose="outside" title="" align={{sm: pageLanguage === "fa" ? "end" : "start"}}>
-                                            <Dropdown.Toggle className="basket_item_title_dropdown_btn">
-                                                <h2 className="checkout_item_details">{t("View Details")}</h2>
-                                                <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
-                                            </Dropdown.Toggle>
-                                            <Dropdown.Menu className="basket_view_detail_popover">
-                                                <div className="basket_item_title_container">
-                                                    {desc}
-                                                </div>
-                                            </Dropdown.Menu>
-                                        </Dropdown>
+                                        {!hasDiscount &&
+                                            <h4 className="checkout_item_room_name">{pageLanguage === 'fa' ? roomNameFa + " / "+ WindowName : roomName + " / "+ WindowName}</h4>
+                                        }
+                                        <PopoverStickOnClick classNames="checkout_view_detail_popover"
+                                                             placement="bottom"
+                                                             children={<h2 className="checkout_item_details">{t("View Details")}</h2>}
+                                                             component={
+                                                                 <div className="basket_item_title_container">
+                                                                     {desc}
+                                                                 </div>
+                                                             }/>
+										{/*<div className="checkout_item_dropdown">
+											<Dropdown autoClose="outside" title="" align={{sm: pageLanguage === "fa" ? "end" : "start"}}>
+												<Dropdown.Toggle className="basket_item_title_dropdown_btn" style={{ position: "static" }}>
+													<h2 className="checkout_item_details">{t("View Details")}</h2>
+													<img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
+												</Dropdown.Toggle>
+												<Dropdown.Menu container={'body'} popperConfig={{ strategy: "fixed" }} positionFixed={true} className="basket_view_detail_popover">
+													<div className="basket_item_title_container">
+														{desc}
+													</div>
+												</Dropdown.Menu>
+											</Dropdown>
+										</div>*/}
                                         {hasDiscount &&
                                         <span className="checkout_item_discount">{t('Discount')} (-{GetPrice(drapery[i]["Discount"], pageLanguage, t("TOMANS"))})</span>}
                                     </div>
@@ -894,17 +904,20 @@ function Checkout() {
                                     {/*                              {desc}*/}
                                     {/*                          </div>*/}
                                     {/*                      }/>*/}
-                                    <Dropdown autoClose="outside" title="" align={{sm: pageLanguage === "fa" ? "end" : "start"}}>
-                                        <Dropdown.Toggle className="basket_item_title_dropdown_btn">
-                                            <h2 className="checkout_item_details">{t("View Details")}</h2>
-                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
-                                        </Dropdown.Toggle>
-                                        <Dropdown.Menu className="basket_view_detail_popover">
-                                            <div className="basket_item_title_container">
-                                                {desc}
-                                            </div>
-                                        </Dropdown.Menu>
-                                    </Dropdown>
+									
+                                    <div className="checkout_item_dropdown">
+										<Dropdown autoClose="outside" title="" align={{sm: pageLanguage === "fa" ? "end" : "start"}}>
+											<Dropdown.Toggle className="basket_item_title_dropdown_btn">
+												<h2 className="checkout_item_details">{t("View Details")}</h2>
+												<img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
+											</Dropdown.Toggle>
+											<Dropdown.Menu popperConfig={popperConfig} positionFixed={true} className="basket_view_detail_popover">
+												<div className="basket_item_title_container">
+													{desc}
+												</div>
+											</Dropdown.Menu>
+										</Dropdown>
+									</div>
                                 </div>
                             </li>;
                     });
@@ -922,6 +935,9 @@ function Checkout() {
                 });
                 
             }
+            else{
+                setTotalPrice(0);
+            }
         }
     }, [drapery]);
     
@@ -935,6 +951,10 @@ function Checkout() {
                     let CartDetailId = obj["CartDetailId"];
                     let ProductName = obj["ProductName"];
                     let ProductEnName = obj["ProductEnName"];
+                    let ProductDesignEnName = obj["ProductDesignEnName"];
+                    let ProductDesignName = obj["ProductDesignName"];
+                    let ProductColorEnName = obj["ProductColorEnName"];
+                    let ProductColorName = obj["ProductColorName"];
                     let photoUrl = obj["PhotoUrl"];
                     let price = obj["TotalAmount"];
                     let count = obj["Count"];
@@ -948,9 +968,11 @@ function Checkout() {
                             </div>
                             <div className="checkout_item_desc_container">
                                 <div className="checkout_item">
-                                    <h1 className="checkout_item_name">{pageLanguage === 'fa' ? ProductName  :ProductEnName}</h1>
-                                    <span className="checkout_item_price">{GetPrice(price * count, pageLanguage, t("TOMANS"))}</span>
+                                    <h1 className="checkout_item_name">{t('Fabric Swatch')}</h1>
+                                    <span className="checkout_item_price">{price === 0 ? t("Free") :GetPrice(price * count, pageLanguage, t("TOMANS"))}</span>
                                 </div>
+                                <h2 className="checkout_item_details checkout_item_details_design">{pageLanguage === 'fa' ? ProductDesignName : ProductDesignEnName}</h2>
+								<span className="checkout_item_discount  checkout_item_details_color">{pageLanguage === 'fa' ? ProductColorName : ProductColorEnName}</span>
                             </div>
                         </li>;
                     if (i === swatches.length - 1) {
@@ -989,6 +1011,9 @@ function Checkout() {
             promise1.then(() => {
                 setDiscountList(tempArr);
             });
+        }
+        else{
+            setDiscountList([]);
         }
     }, [discounts]);
     
@@ -1445,6 +1470,7 @@ function Checkout() {
                         
                         </div>
                         <div className="checkout_left_payment">
+						{(totalPrice + shippingPrice) > 0 &&
                             <div className="checkout_left_info_flex checkout_left_info_flex_title">
                                 <div className="checkout_left_info_flex_left">
                                     <h1 className="checkout_left_info_title">{t("PLEASE SELECT A PAYMENT METHOD")}</h1>
@@ -1452,6 +1478,9 @@ function Checkout() {
                                 <div className="checkout_left_info_flex_right">
                                 </div>
                             </div>
+						}
+						
+						{(totalPrice + shippingPrice) > 0 &&
                             <div className="checkout_left_info_flex checkout_left_info_flex_title">
                                 <div className="checkout_left_info_flex_all">
                                     <ul className="box-list gateway-list">
@@ -1462,7 +1491,7 @@ function Checkout() {
                                                    }
                                                    }/>
                                             <label htmlFor="bank1">
-                                                <img src={require('../Images/public/bank-saman.png')} className="img-fluid" alt=""/>
+                                                <img src={require('../Images/public/bank-saman.png').default} className="img-fluid" alt=""/>
                                             </label>
                                         
                                         </li>
@@ -1473,7 +1502,7 @@ function Checkout() {
                                                    }
                                                    }/>
                                             <label htmlFor="bank2">
-                                                <img src={require('../Images/public/bank-mellat.png')} className="img-fluid" alt=""/>
+                                                <img src={require('../Images/public/bank-mellat.png').default} className="img-fluid" alt=""/>
                                             </label>
                                         </li>
                                         <li className={bank === 3 ? "selected" : ""}>
@@ -1483,15 +1512,21 @@ function Checkout() {
                                                    }
                                                    }/>
                                             <label htmlFor="bank3">
-                                                <img src={require('../Images/public/bank-parsian.png')} className="img-fluid" alt=""/>
+                                                <img src={require('../Images/public/bank-parsian.png').default} className="img-fluid" alt=""/>
                                             </label>
                                         </li>
                                     </ul>
                                 </div>
                             </div>
+						}
                             <div className="checkout_left_info_flex checkout_left_info_flex_title">
                                 <div className="checkout_left_info_flex_left">
+						{(totalPrice + shippingPrice) > 0 &&
                                     <button className="checkout_payment_button" onClick={() => validateInputs()}>{t("Continue to Payment")}</button>
+						}
+						{(totalPrice + shippingPrice) === 0 &&
+						            <button className="checkout_payment_button" onClick={() => validateInputs()}>{t("Submit Order")}</button>
+						}
                                 </div>
                                 <div className="checkout_left_info_flex_right">
                                     <Link to={"/" + pageLanguage + "/Basket"} className="checkout_payment_button_return"><span>{t("Return to Bag")}</span><i
@@ -1524,7 +1559,7 @@ function Checkout() {
                         <div className="checkout_right_price_detail">
                             <span className="checkout_right_price_sub payment_price_detail">
                                 <h3>{t("SUBTOTAL")}</h3>
-                                <h4>{GetPrice(totalPrice, pageLanguage, t("TOMANS"))}</h4>
+                                <h4>{totalPrice > 0 ? GetPrice(totalPrice, pageLanguage, t("TOMANS")) : t("FREE")}</h4>
                             </span>
                             <span className="checkout_right_price_sub payment_price_detail">
                                 <h3>{t("SHIPPING")}</h3>
@@ -1534,7 +1569,7 @@ function Checkout() {
                         <div className="checkout_right_price_detail">
                             <span className="checkout_right_price_total payment_price_detail">
                                 <h3>{t("TOTAL")}</h3>
-                                <h4>{GetPrice((totalPrice + shippingPrice), pageLanguage, t("TOMANS"))}</h4>
+                                <h4>{(totalPrice + shippingPrice) === 0 ? t("Free") :GetPrice((totalPrice + shippingPrice), pageLanguage, t("TOMANS"))}</h4>
                             </span>
                         </div>
                     </div>

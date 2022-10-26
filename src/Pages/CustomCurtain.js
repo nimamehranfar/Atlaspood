@@ -3,6 +3,8 @@ import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import Zebra from "../Page Components/Zebra";
 import Roller from "../Page Components/Roller";
+import DualRoller from "../Page Components/DualRoller";
+import DK from "../Page Components/DK";
 import {useSelector} from "react-redux";
 
 
@@ -37,6 +39,12 @@ function CustomCurtain() {
         }
         else if(modelID === "0324") {
             setPageModel(<Roller CatID={catID} ModelID={modelID} ProjectId={projectId} EditIndex={editIndex}/>)
+        }
+        else if(modelID === "0325") {
+            setPageModel(<DualRoller CatID={catID} ModelID={modelID} ProjectId={projectId} EditIndex={editIndex}/>)
+        }
+        else if(modelID === "0326") {
+            setPageModel(<DK CatID={catID} ModelID={modelID} ProjectId={projectId} EditIndex={editIndex}/>)
         }
         
     };
