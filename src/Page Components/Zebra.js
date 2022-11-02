@@ -3626,7 +3626,8 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                     <Dropdown autoClose="outside" title="">
                                                         <Dropdown.Toggle className="dropdown_btn">
                                                             <p>{t("filter_Color")}</p>
-                                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
+                                                            {/*<img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>*/}
+                                                            <div className="select_control_handle_close img-fluid"/>
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu className="filter_color_items">
                                                             <div className="filter_items_container">
@@ -3644,7 +3645,8 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                     <Dropdown autoClose="outside" title="">
                                                         <Dropdown.Toggle className="dropdown_btn">
                                                             <p>{t("filter_Pattern")}</p>
-                                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
+                                                            {/*<img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>*/}
+                                                            <div className="select_control_handle_close img-fluid"/>
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
                                                             <div className="filter_items_container">
@@ -3662,7 +3664,8 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                     <Dropdown autoClose="outside" title="">
                                                         <Dropdown.Toggle className="dropdown_btn">
                                                             <p>{t("filter_Type")}</p>
-                                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
+                                                            {/*<img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>*/}
+                                                            <div className="select_control_handle_close img-fluid"/>
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
                                                             <div className="filter_items_container">
@@ -3679,12 +3682,12 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                     <Dropdown autoClose="outside" title="">
                                                         <Dropdown.Toggle className="dropdown_btn">
                                                             <p>{t("filter_Price")}</p>
-                                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
+                                                            {/*<img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>*/}
+                                                            <div className="select_control_handle_close img-fluid"/>
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
                                                             <div className="filter_items_container">
-                                                                <div className="price_filter_description">{t("filter_price_title")}
-                                                                </div>
+                                                                {/*<div className="price_filter_description">{t("filter_price_title")}</div>*/}
                                                                 {sewingPrices}
                                                             </div>
                                                             <div className="filter_inside_button_section">
@@ -4970,14 +4973,14 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                                                               <span className="popover_footer_title">{t("step4_popover_1")}</span>
                                                                                               <span className="popover_thumbnails">
                                                                                                   <div>
-                                                                                                      <img src={require('../Images/drapery/zebra/motorized_control_type1.png.jpg').default}
+                                                                                                      <img src={require('../Images/drapery/zebra/motorized_control_type1.png.jpg')}
                                                                                                            text="step41"
                                                                                                            onMouseEnter={(e) => popoverThumbnailHover(e)}
                                                                                                            className="popover_thumbnail_img img-fluid"
                                                                                                            alt=""/>
                                                                                                   </div>
                                                                                                   {/*<div>*/}
-                                                                                                  {/*    <img src={require('../Images/drapery/zebra/motorized_control_type2.png').default}*/}
+                                                                                                  {/*    <img src={require('../Images/drapery/zebra/motorized_control_type2.png')}*/}
                                                                                                   {/*         text="step41"*/}
                                                                                                   {/*         onMouseEnter={(e) => popoverThumbnailHover(e)}*/}
                                                                                                   {/*         className="popover_thumbnail_img img-fluid"*/}
@@ -5250,14 +5253,14 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                                                               <span className="popover_footer_title">{t("step5_popover_1")}</span>
                                                                                               <span className="popover_thumbnails">
                                                                                                   <div>
-                                                                                                      <img src={require('../Images/drapery/zebra/DoubleRoller_Valance_Colors.jpg').default}
+                                                                                                      <img src={require('../Images/drapery/zebra/DoubleRoller_Valance_Colors.jpg')}
                                                                                                            text="step51"
                                                                                                            onMouseEnter={(e) => popoverThumbnailHover(e)}
                                                                                                            className="popover_thumbnail_img img-fluid"
                                                                                                            alt=""/>
                                                                                                   </div>
                                                                                                   <div>
-                                                                                                      <img src={require('../Images/drapery/zebra/roller_bottombar_designer.jpg').default}
+                                                                                                      <img src={require('../Images/drapery/zebra/roller_bottombar_designer.jpg')}
                                                                                                            text="step51"
                                                                                                            onMouseEnter={(e) => popoverThumbnailHover(e)}
                                                                                                            className="popover_thumbnail_img img-fluid"
@@ -5291,7 +5294,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                                                               <span className="popover_footer_title">{t("step5_popover_2")}</span>
                                                                                               <span className="popover_thumbnails">
                                                                                                   <div>
-                                                                                                      <img src={require('../Images/drapery/zebra/DoubleRoller_Valance_Colors.jpg').default}
+                                                                                                      <img src={require('../Images/drapery/zebra/DoubleRoller_Valance_Colors.jpg')}
                                                                                                            text="step52"
                                                                                                            onMouseEnter={(e) => popoverThumbnailHover(e)}
                                                                                                            className="popover_thumbnail_img img-fluid"
@@ -5327,7 +5330,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                                                               <span className="popover_footer_title">{t("step5_popover_3")}</span>
                                                                                               <span className="popover_thumbnails">
                                                                                                   <div>
-                                                                                                      <img src={require('../Images/drapery/zebra/roller_bottombar_designer.jpg').default}
+                                                                                                      <img src={require('../Images/drapery/zebra/roller_bottombar_designer.jpg')}
                                                                                                            text="step53"
                                                                                                            onMouseEnter={(e) => popoverThumbnailHover(e)}
                                                                                                            className="popover_thumbnail_img img-fluid"

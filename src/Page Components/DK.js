@@ -85,9 +85,11 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
     const [fabricColorHtmlCode, setFabricColorHtmlCode] = useState("#000");
     const [dkCurtainList, setDkCurtainList] = useState([]);
     const [dkCurtainPreviewList, setDkCurtainPreviewList] = useState([]);
-    const [showMorePreview, setShowMorePreview] = useState(false);
+    const [showMoreFabric, setShowMoreFabric] = useState("");
     const [dkCurtainArr, setDkCurtainArr] = useState([]);
-    const [currentDkCurtainIndex, setCurrentDkCurtainIndex] = useState(-1);
+    const [dkCurtainArrComplete, setDkCurtainArrComplete] = useState(false);
+    const [dkCurtainArrCount, setDkCurtainArrCount] = useState(0);
+    const [sodFabrics, setSodFabrics] = useState([]);
     const [symmetric, setSymmetric] = useState(true);
     const [defaultFabricPhoto, setDefaultFabricPhoto] = useState(null);
     const [defaultModelName, setDefaultModelName] = useState("");
@@ -362,13 +364,14 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                     return qs.stringify(params, {arrayFormat: 'repeat'})
                 }
             }).then((response) => {
-                let tempFabrics = [];
+                let tempFabrics = {};
                 response.data.forEach(obj => {
+                    obj["ShowMore"] = false;
                     if (tempFabrics[obj["DesignEnName"]] === "" || tempFabrics[obj["DesignEnName"]] === undefined || tempFabrics[obj["DesignEnName"]] === null || tempFabrics[obj["DesignEnName"]] === [])
                         tempFabrics[obj["DesignEnName"]] = [];
                     tempFabrics[obj["DesignEnName"]].push(obj);
                 });
-                
+                setShowMoreFabric("");
                 setFabrics(tempFabrics);
                 // console.log(tempFabrics);
             }).catch(err => {
@@ -423,100 +426,109 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
             
             const fabric = [];
             for (let j = 0; j < fabrics[key].length; j++) {
-                let FabricId = fabrics[key][j].FabricId;
-                // console.log(fabrics,key);
-                let PhotoPath = "";
-                // console.log(fabrics[key][j].FabricPhotos);
-                fabrics[key][j].FabricPhotos.forEach(obj => {
-                    if (obj.PhotoTypeId === 4702)
-                        PhotoPath = obj.PhotoUrl;
-                });
-                
-                let FabricOnModelPhotoUrl = fabrics[key][j].FabricOnModelPhotoUrl;
-                let HasTrim = fabrics[key][j].HasTrim;
-                let DesignCode = fabrics[key][j].DesignCode;
-                let DesignRaportLength = fabrics[key][j].DesignRaportLength;
-                let DesignRaportWidth = fabrics[key][j].DesignRaportWidth;
-                let PolyesterPercent = fabrics[key][j].PolyesterPercent;
-                let ViscosePercent = fabrics[key][j].ViscosePercent;
-                let NylonPercent = fabrics[key][j].NylonPercent;
-                let ColorName = convertToPersian(fabrics[key][j].ColorName);
-                let ColorEnName = fabrics[key][j].ColorEnName;
-                let ColorHtmlCode = fabrics[key][j].ColorHtmlCode ? fabrics[key][j].ColorHtmlCode : "#000";
-                let SwatchId = fabrics[key][j].SwatchId ? fabrics[key][j].SwatchId : -1;
-                let HasSwatchId = false;
-                let swatchDetailId = undefined;
-                let index = -1;
-                if (isLoggedIn) {
-                    if (bag["CartDetails"]) {
-                        let index = bag["CartDetails"].findIndex(object => {
-                            return object["ProductId"] === SwatchId;
-                        });
-                        // console.log(index);
-                        if (index !== -1) {
-                            HasSwatchId = true;
-                            swatchDetailId = bag["CartDetails"][index]["CartDetailId"];
-                        }
-                    }
-                } else {
-                    if (temp.length > 0) {
-                        index = temp.findIndex(object => {
-                            return object["SwatchId"] === SwatchId;
-                        });
-                        if (index !== -1) {
-                            HasSwatchId = true;
-                        }
-                    }
-                }
-                // console.log(HasSwatchId);
-                // console.log(step3 === `${FabricId}`, step3, `${FabricId}`, FabricId);
-                
-                fabric.push(
-                    <div className={`radio_group ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key + j}>
-                        <label data-tip={`${pageLanguage1 === 'en' ? DesignEnName : DesignName}: ${pageLanguage1 === 'en' ? ColorEnName : ColorName}`}
-                               data-for={"fabric" + key + j} className={`radio_container ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}
-                               data-img={`https://www.doopsalta.com/upload/${PhotoPath}`}>
-                            {/*<ReactTooltip id={"fabric" + key + j} place="top" type="light" effect="float"/>*/}
-                            <input className="radio" type="radio" ref-num="3" default-fabric-photo={FabricOnModelPhotoUrl}
-                                   onChange={e => {
-                                       // console.log("hi1");
-                                       let temp = JSON.parse(JSON.stringify(fabricSelected));
-                                       temp.selectedFabricId = FabricId;
-                                       temp.selectedTextEn = DesignEnName;
-                                       temp.selectedTextFa = DesignName;
-                                       temp.selectedColorEn = ColorEnName;
-                                       temp.selectedColorFa = ColorName;
-                                       temp.ColorHtmlCode = ColorHtmlCode;
-                                       temp.selectedHasTrim = HasTrim;
-                                       temp.selectedPhoto = FabricOnModelPhotoUrl;
-                                       setFabricSelected(temp);
-                                       // fabricClicked(e, HasTrim);
-                                       // selectChanged(e);
-                                       // setCart("FabricId", FabricId);
-                                       // setDeps("", "1");
-                                   }} name="fabric"
-                                   model-id={modelID} value={FabricId} text-en={DesignEnName} text-fa={DesignName} checked={`${FabricId}` === step3}
-                                   ref={ref => (inputs.current[`3${FabricId}`] = ref)}/>
-                            <div className="frame_img">
-                                <img className={`img-fluid ${`${FabricId}` === step3 ? "img-fluid_checked" : ""}`} src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
-                            </div>
-                        </label>
-                        <div className={`fabric_name_container ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
-                            <h1>{pageLanguage1 === 'en' ? ColorEnName : ColorName}</h1>
-                            <span onClick={() => {
-                                handleShow(fabrics[key][j], swatchDetailId);
-                                setHasSwatchId(HasSwatchId);
-                            }}><i className="fa fa-search" aria-hidden="true"/></span>
+                if (j === 8 && !fabrics[key][j]["ShowMore"]) {
+                    fabric.push(
+                        <div key={j} className="dk_fabric_show_more_button_container">
+                            <button className="dk_fabric_show_more_button btn" onClick={() => setShowMoreFabric(key)}>SEE MORE COLOR OPTIONS</button>
                         </div>
-                        <button className={`swatchButton ${HasSwatchId ? "activeSwatch" : ""} ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}
-                                current-state={HasSwatchId ? "1" : "0"}
-                                onClick={(e) => {
-                                    fabricSwatch(e, SwatchId, swatchDetailId, PhotoPath);
-                                }} disabled={SwatchId === -1}>{HasSwatchId ? t("SWATCH IN CART") : t("ORDER" +
-                            " SWATCH")}</button>
-                    </div>
-                );
+                    );
+                } else if (j > 8 && !fabrics[key][j]["ShowMore"]) {
                 
+                } else {
+                    let FabricId = fabrics[key][j].FabricId;
+                    // console.log(fabrics,key);
+                    let PhotoPath = "";
+                    // console.log(fabrics[key][j].FabricPhotos);
+                    fabrics[key][j].FabricPhotos.forEach(obj => {
+                        if (obj.PhotoTypeId === 4702)
+                            PhotoPath = obj.PhotoUrl;
+                    });
+                    
+                    let FabricOnModelPhotoUrl = fabrics[key][j].FabricOnModelPhotoUrl;
+                    let HasTrim = fabrics[key][j].HasTrim;
+                    let DesignCode = fabrics[key][j].DesignCode;
+                    let DesignRaportLength = fabrics[key][j].DesignRaportLength;
+                    let DesignRaportWidth = fabrics[key][j].DesignRaportWidth;
+                    let PolyesterPercent = fabrics[key][j].PolyesterPercent;
+                    let ViscosePercent = fabrics[key][j].ViscosePercent;
+                    let NylonPercent = fabrics[key][j].NylonPercent;
+                    let ColorName = convertToPersian(fabrics[key][j].ColorName);
+                    let ColorEnName = fabrics[key][j].ColorEnName;
+                    let ColorHtmlCode = fabrics[key][j].ColorHtmlCode ? fabrics[key][j].ColorHtmlCode : "#000";
+                    let SwatchId = fabrics[key][j].SwatchId ? fabrics[key][j].SwatchId : -1;
+                    let HasSwatchId = false;
+                    let swatchDetailId = undefined;
+                    let index = -1;
+                    if (isLoggedIn) {
+                        if (bag["CartDetails"]) {
+                            let index = bag["CartDetails"].findIndex(object => {
+                                return object["ProductId"] === SwatchId;
+                            });
+                            // console.log(index);
+                            if (index !== -1) {
+                                HasSwatchId = true;
+                                swatchDetailId = bag["CartDetails"][index]["CartDetailId"];
+                            }
+                        }
+                    } else {
+                        if (temp.length > 0) {
+                            index = temp.findIndex(object => {
+                                return object["SwatchId"] === SwatchId;
+                            });
+                            if (index !== -1) {
+                                HasSwatchId = true;
+                            }
+                        }
+                    }
+                    // console.log(HasSwatchId);
+                    // console.log(step3 === `${FabricId}`, step3, `${FabricId}`, FabricId);
+                    
+                    fabric.push(
+                        <div className={`radio_group ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key + j}>
+                            <label data-tip={`${pageLanguage1 === 'en' ? DesignEnName : DesignName}: ${pageLanguage1 === 'en' ? ColorEnName : ColorName}`}
+                                   data-for={"fabric" + key + j} className={`radio_container ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}
+                                   data-img={`https://www.doopsalta.com/upload/${PhotoPath}`}>
+                                {/*<ReactTooltip id={"fabric" + key + j} place="top" type="light" effect="float"/>*/}
+                                <input className="radio" type="radio" ref-num="3" default-fabric-photo={FabricOnModelPhotoUrl}
+                                       onChange={e => {
+                                           // console.log("hi1");
+                                           let temp = JSON.parse(JSON.stringify(fabricSelected));
+                                           temp.selectedFabricId = FabricId;
+                                           temp.selectedTextEn = DesignEnName;
+                                           temp.selectedTextFa = DesignName;
+                                           temp.selectedColorEn = ColorEnName;
+                                           temp.selectedColorFa = ColorName;
+                                           temp.ColorHtmlCode = ColorHtmlCode;
+                                           temp.selectedHasTrim = HasTrim;
+                                           temp.selectedPhoto = FabricOnModelPhotoUrl;
+                                           setFabricSelected(temp);
+                                           // fabricClicked(e, HasTrim);
+                                           // selectChanged(e);
+                                           // setCart("FabricId", FabricId);
+                                           // setDeps("", "1");
+                                       }} name="fabric"
+                                       model-id={modelID} value={FabricId} text-en={DesignEnName} text-fa={DesignName} checked={`${FabricId}` === step3}
+                                       ref={ref => (inputs.current[`3${FabricId}`] = ref)}/>
+                                <div className="frame_img">
+                                    <img className={`img-fluid ${`${FabricId}` === step3 ? "img-fluid_checked" : ""}`} src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
+                                </div>
+                            </label>
+                            <div className={`fabric_name_container ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
+                                <h1>{pageLanguage1 === 'en' ? ColorEnName : ColorName}</h1>
+                                <span onClick={() => {
+                                    handleShow(fabrics[key][j], swatchDetailId);
+                                    setHasSwatchId(HasSwatchId);
+                                }}><i className="fa fa-search" aria-hidden="true"/></span>
+                            </div>
+                            <button className={`swatchButton ${HasSwatchId ? "activeSwatch" : ""} ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}
+                                    current-state={HasSwatchId ? "1" : "0"}
+                                    onClick={(e) => {
+                                        fabricSwatch(e, SwatchId, swatchDetailId, PhotoPath);
+                                    }} disabled={SwatchId === -1}>{HasSwatchId ? t("SWATCH IN CART") : t("ORDER" +
+                                " SWATCH")}</button>
+                        </div>
+                    );
+                }
             }
             
             fabricList.push(
@@ -537,11 +549,32 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
     function renderDkCurtains(curtainWidth) {
         const curtainList = [];
         let count = Math.floor(curtainWidth / 11.5);
+        let DkCurtainArr=JSON.parse(JSON.stringify(dkCurtainArr));
+        if(dkCurtainArrCount!==count){
+            setDkCurtainArr([]);
+            DkCurtainArr=[]
+            setDkCurtainArrCount(count);
+        }
         // console.log(dkCurtainArr);
+        
+        let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+        let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
+        if (DkCurtainArr.filter(el => el).length === count) {
+            tempLabels["3"] = t('Completed')
+            tempValue["3"] = "Completed";
+            setDkCurtainArrComplete(true);
+        } else {
+            tempLabels["3"] = undefined;
+            tempValue["3"] = undefined;
+            setDkCurtainArrComplete(false);
+        }
+        setStepSelectedLabel(tempLabels);
+        setStepSelectedValue(tempValue);
+        
         let promiseArr = [];
         for (let i = 0; i < count; i++) {
             promiseArr[i] = new Promise((resolve, reject) => {
-                let tempColor = dkCurtainArr[i] ? (dkCurtainArr[i]["ColorHtmlCode"] ? dkCurtainArr[i]["ColorHtmlCode"] : "#e2e2e2") : "#e2e2e2";
+                let tempColor = DkCurtainArr[i] ? (DkCurtainArr[i]["ColorHtmlCode"] ? DkCurtainArr[i]["ColorHtmlCode"] : "#e2e2e2") : "#e2e2e2";
                 curtainList.push(
                     <div key={i} className="dk_curtain_inside_part" onClick={() => curtainChanged(i)} style={{backgroundColor: tempColor}}/>
                 );
@@ -1150,9 +1183,11 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
             return el != null;
         });
         
+        tempPostObj["SewingOrderDetails"][0]["SodFabrics"] = JSON.parse(JSON.stringify(sodFabrics));
+        
         let promise2 = new Promise((resolve, reject) => {
             if (stepSelectedValue["2"] !== undefined) {
-                if (tempPostObj["SewingOrderDetails"][0]["FabricId"] === undefined) {
+                if (!dkCurtainArrComplete) {
                     delete tempPostObj["SewingOrderDetails"];
                 }
                 // if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined && stepSelectedValue["2"] !== undefined && stepSelectedValue["3"] !== undefined) {
@@ -2423,6 +2458,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
         if (refIndex !== -1 && cartValues["WidthCart"] !== undefined) {
             let tempArr = JSON.parse(JSON.stringify(dkCurtainArr));
             let count = Math.floor(cartValues["WidthCart"] / 11.5);
+            tempArr=tempArr.slice(0, count);
             let fabricObject = {};
             
             let promiseArr = [];
@@ -2996,12 +3032,12 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
     useEffect(() => {
         if (fabricSelected.selectedFabricId && fabricSelected.selectedFabricId !== 0) {
             fabricClicked(fabricSelected.selectedPhoto, fabricSelected.selectedHasTrim);
-            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-            tempLabels["3"] = location.pathname.split('').slice(1, 3).join('') === "fa" ? fabricSelected.selectedTextFa + "/" + fabricSelected.selectedColorFa : fabricSelected.selectedTextEn + "/" + fabricSelected.selectedColorEn;
-            let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
-            tempValue["3"] = fabricSelected.selectedFabricId;
-            setStepSelectedLabel(tempLabels);
-            setStepSelectedValue(tempValue);
+            // let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+            // tempLabels["3"] = location.pathname.split('').slice(1, 3).join('') === "fa" ? fabricSelected.selectedTextFa + "/" + fabricSelected.selectedColorFa : fabricSelected.selectedTextEn + "/" + fabricSelected.selectedColorEn;
+            // let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
+            // tempValue["3"] = fabricSelected.selectedFabricId;
+            // setStepSelectedLabel(tempLabels);
+            // setStepSelectedValue(tempValue);
             // setCart("FabricId", fabricSelected.selectedFabricId);
             setCart("FabricId", `${fabricSelected.selectedFabricId}`, "", "FabricDesignFa,FabricDesignEn,FabricColorEn,FabricColorFa,PhotoUrl", [fabricSelected.selectedTextFa, fabricSelected.selectedTextEn, fabricSelected.selectedColorEn, fabricSelected.selectedColorFa, fabricSelected.selectedPhoto]);
             // setCart("PhotoUrl", fabricSelected.selectedPhoto);
@@ -3207,7 +3243,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
         } else {
             setModelAccessories({});
             setNoWidth(true);
-            renderDkCurtains(300);
+            renderDkCurtains(184);
         }
     }, [JSON.stringify(cartValues)]);
     
@@ -3240,70 +3276,142 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
             renderDkCurtains(cartValues["WidthCart"]);
             
             let tempArr = [];
-            let tempObj = {};
+            let tempObj = [];
+            let tempObjFabric = [];
             let promiseArr = [];
-            for (let i = 0; i < dkCurtainArr.length; i++) {
+            for (let i = 0; i <= dkCurtainArr.length; i++) {
                 if (dkCurtainArr[i]) {
                     promiseArr[i] = new Promise((resolve, reject) => {
                         let objKey = (pageLanguage === 'en' ? dkCurtainArr[i]["DesignEnName"] : dkCurtainArr[i]["DesignName"]).toString() + "/" + (pageLanguage === 'en' ? dkCurtainArr[i]["ColorEnName"] : dkCurtainArr[i]["ColorName"]).toString();
-                        if (tempObj[objKey]) {
-                            tempObj[objKey] = tempObj[objKey] + 1;
-                        } else {
-                            tempObj[objKey] = 1;
-                        }
+                        tempObj[i] = objKey;
+                        tempObjFabric[i] = dkCurtainArr[i]["FabricId"];
                         resolve();
                     });
-                } else {
-                    // promiseArr[i] = new Promise((resolve, reject) => {
-                    //     tempArr.push(
-                    //         <h2 key={i}
-                    //             className="dk_curtain_preview_detail">{t("Undefined")}</h2>
-                    //     );
-                    //     resolve();
-                    // });
                 }
             }
             
             Promise.all(promiseArr).then(() => {
                 let promiseArr2 = [];
-                Object.keys(tempObj).forEach((key, index) => {
-                    if (index < 8) {
-                        promiseArr2[index] = new Promise((resolve, reject) => {
-                            tempArr.push(
-                                <div key={index}
-                                     className="dk_curtain_preview_detail"><h2>{key}</h2><h3>&nbsp;{"\u00d7 " + tempObj[key]}</h3></div>
-                            );
+                let lastString = tempObj[0];
+                let lastFabric = tempObjFabric[0];
+                let tempObjCount = {};
+                let count = 0;
+                let lastRef = 0;
+                
+                const doPush = (refIndex) => {
+                    tempObjCount[refIndex] = {
+                        "count": count,
+                        "string": lastString,
+                        "fabricId": lastFabric
+                    };
+                };
+                for (let i = 0; i < tempObj.length; i++) {
+                    let string = tempObj[i];
+                    promiseArr2[i] = new Promise((resolve, reject) => {
+                        if (string !== lastString) {
+                            doPush(lastRef);
+                            lastString = string;
+                            lastFabric = tempObjFabric[i];
+                            count = 1;
+                            lastRef = i;
                             resolve();
-                        });
-                    } else {
-                        if (showMorePreview) {
-                            promiseArr2[index] = new Promise((resolve, reject) => {
+                        } else {
+                            count++;
+                            resolve();
+                        }
+                    });
+                }
+                
+                Promise.all(promiseArr2).then(() => {
+                    doPush(lastRef);
+                    
+                    let promiseArr3 = [];
+                    Object.keys(tempObjCount).forEach((key, index) => {
+                        // if (index < 8) {
+                        promiseArr3[index] = new Promise((resolve, reject) => {
+                            if (tempObjCount[key]["string"]) {
                                 tempArr.push(
                                     <div key={index}
-                                         className="dk_curtain_preview_detail"><h2>{key}</h2><h3>&nbsp;{"\u00d7 " + tempObj[key]}</h3></div>
-                                );
-                                resolve();
-                            });
-                        } else if (index === 8) {
-                            promiseArr2[index] = new Promise((resolve, reject) => {
-                                tempArr.push(
-                                    <div key={index} className="dk_curtain_preview_detail_more_button_container">
-                                        <button className="dk_curtain_preview_detail_more_button btn" onClick={()=>setShowMorePreview(true)}>See More Color Options</button>
+                                         className="dk_curtain_preview_detail"><h2>{tempObjCount[key]["string"]}</h2><h3>&nbsp;{"\u00d7 " + tempObjCount[key]["count"]}</h3>
                                     </div>
                                 );
                                 resolve();
+                            } else {
+                                resolve();
+                            }
+                        });
+                        // } else {
+                        //     if (showMorePreview) {
+                        //         promiseArr2[index] = new Promise((resolve, reject) => {
+                        //             tempArr.push(
+                        //                 <div key={index}
+                        //                      className="dk_curtain_preview_detail"><h2>{key}</h2><h3>&nbsp;{"/ " + tempObj[key]}</h3></div>
+                        //             );
+                        //             resolve();
+                        //         });
+                        //     } else if (index === 8) {
+                        //         promiseArr2[index] = new Promise((resolve, reject) => {
+                        //             tempArr.push(
+                        //                 <div key={index} className="dk_curtain_preview_detail_more_button_container">
+                        //                     <button className="dk_curtain_preview_detail_more_button btn" onClick={() => setShowMorePreview(true)}>See More Color Options</button>
+                        //                 </div>
+                        //             );
+                        //             resolve();
+                        //         });
+                        //     }
+                        // }
+                    });
+                    Promise.all(promiseArr3).then(() => {
+                        setDkCurtainPreviewList(tempArr);
+                        
+                        let tempSodFabrics = [];
+                        let promiseArr4 = [];
+                        Object.keys(tempObjCount).forEach((key, index) => {
+                            promiseArr4[index] = new Promise((resolve, reject) => {
+                                if (tempObjCount[key]["fabricId"]) {
+                                    tempSodFabrics.push(
+                                        {
+                                            "FabricId": tempObjCount[key]["fabricId"].toString(),
+                                            "Qty": tempObjCount[key]["count"].toString(),
+                                            "FabricOrder": (+key + +1).toString()
+                                        });
+                                }
+                                resolve();
                             });
-                        }
-                    }
+                        });
+                        
+                        Promise.all(promiseArr4).then(() => {
+                            setSodFabrics(tempSodFabrics);
+                            // console.log(tempSodFabrics);
+                        });
+                    });
+                    // console.log(curtainList)
                 });
-                
-                Promise.all(promiseArr).then(() => {
-                    setDkCurtainPreviewList(tempArr);
-                });
-                // console.log(curtainList)
             });
         }
-    }, [JSON.stringify(dkCurtainArr), symmetric, showMorePreview]);
+    }, [JSON.stringify(dkCurtainArr), symmetric]);
+    
+    useEffect(() => {
+        if (showMoreFabric !== "") {
+            let tempFabrics = JSON.parse(JSON.stringify(fabrics));
+            
+            let promiseArr = [];
+            if (fabrics[showMoreFabric]) {
+                tempFabrics[showMoreFabric].forEach((el, index) => {
+                    promiseArr[index] = new Promise((resolve, reject) => {
+                        el["ShowMore"] = true;
+                        // console.log(fabrics[showMoreFabric],el,index);
+                        resolve();
+                    });
+                })
+            }
+            
+            Promise.all(promiseArr).then(() => {
+                setFabrics(tempFabrics);
+                // console.log(tempFabrics);
+            });
+        }
+    }, [showMoreFabric]);
     
     useEffect(() => {
         if (modelID !== '' && catID !== '') {
@@ -3594,11 +3702,11 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                        if (stepSelectedValue["2"] === "2") {
                                                            setDeps("21", "2,3AOut,3BOut1,3BOut2,3COut,3DOut");
                                                            deleteSpecialSelects(2);
-                                                           setCart("Mount", "Inside");
+                                                           setCart("Mount", "Inside", "Mount2");
                                                            setStep2("");
                                                        } else {
                                                            setDeps("21", "2");
-                                                           setCart("Mount", "Inside");
+                                                           setCart("Mount", "Inside", "Mount2");
                                                        }
                                                 
                                                    }} ref={ref => (inputs.current["11"] = ref)}/>
@@ -3614,10 +3722,10 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                        if (stepSelectedValue["2"] === "2") {
                                                            setDeps("3AOut,3BOut1,3BOut2,3COut,3DOut", "2,21,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3");
                                                            deleteSpecialSelects(1);
-                                                           setCart("Mount", "Outside", "Width1,Width2,Width3,Height1,Height2,Height3");
+                                                           setCart("", "", "Mount,Mount2,Width1,Width2,Width3,Height1,Height2,Height3");
                                                        } else {
                                                            setDeps("", "2,21");
-                                                           setCart("Mount", "Outside", "Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
+                                                           setCart("", "", "Mount,Mount2,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
                                                        }
                                                        setSelectedMountOutsideType([]);
                                                    }} ref={ref => (inputs.current["12"] = ref)}/>
@@ -3625,18 +3733,18 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                         </div>
                                         <div className="box33 radio_style">
                                             <img src={require('../Images/drapery/zebra/mount_outside.svg').default} className="img-fluid" alt=""/>
-                                            <input className="radio" type="radio" text={t("mount_Arc")} value="3" name="step1" ref-num="1" id="13" checked={step1 === "Arc"}
+                                            <input className="radio" type="radio" text={t("mount_Arc")} value="3" name="step1" ref-num="1" id="13" checked={step1 === "HiddenMouldingMount"}
                                                    onChange={e => {
                                                        selectChanged(e, "3AIn,3BIn");
-                                                       setStep1("Arc");
+                                                       setStep1("HiddenMouldingMount");
                                                        setStep11("");
                                                        if (stepSelectedValue["2"] === "2") {
                                                            setDeps("3AOut,3BOut1,3BOut2,3COut,3DOut", "2,21,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3");
                                                            deleteSpecialSelects(1);
-                                                           setCart("Mount", "Outside", "Width1,Width2,Width3,Height1,Height2,Height3");
+                                                           setCart("Mount2", "HiddenMouldingMount", "Mount,Width1,Width2,Width3,Height1,Height2,Height3");
                                                        } else {
                                                            setDeps("", "2,21");
-                                                           setCart("Mount", "Arc", "Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
+                                                           setCart("Mount2", "HiddenMouldingMount", "Mount,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
                                                        }
                                                    }} ref={ref => (inputs.current["13"] = ref)}/>
                                             <label htmlFor="13">{t("mount_Arc")}</label>
@@ -3714,7 +3822,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                             if (selected.length) {
                                                                 setSelectedMountOutsideType(selected);
                                                                 setDeps("", "11");
-                                                                setCart("MountOutsideType", selected[0].value);
+                                                                setCart("Mount2", selected[0].value);
                                                                 let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
                                                                 tempLabels["1"] = t("mount_Outside") + "/" + selected[0].label;
                                                                 setStepSelectedLabel(tempLabels);
@@ -3773,23 +3881,43 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                     modalHandleShow("noInsideUnderstand");
                                             }}>{t("NEXT STEP")}</NextStep>
                                     </div>
+                                    {/*<div className="accordion_help accordion_help_three">*/}
+                                    {/*    <div className="help_container">*/}
+                                    {/*        <div className="help_column help_left_column help_left_column_mount_type">*/}
+                                    {/*            <p className="help_column_header">{t("step2_help_1")}</p>*/}
+                                    {/*            <ul className="help_column_list">*/}
+                                    {/*                <li>{t("step2_help_2")}</li>*/}
+                                    {/*                /!*<li>{t("step2_help_3")}</li>*!/*/}
+                                    {/*                <li>{t("step2_help_4")}</li>*/}
+                                    {/*                <li>{t("step2_help_5")}</li>*/}
+                                    {/*            </ul>*/}
+                                    {/*        </div>*/}
+                                    {/*        <div className="help_column help_right_column help_right_column_mount_type">*/}
+                                    {/*            <p className="help_column_header">{t("step2_help_6")}</p>*/}
+                                    {/*            <ul className="help_column_list">*/}
+                                    {/*                <li>{t("step2_help_7")}</li>*/}
+                                    {/*                <li>{t("step2_help_8")}</li>*/}
+                                    {/*                <li>{t("step2_help_9")}</li>*/}
+                                    {/*            </ul>*/}
+                                    {/*        </div>*/}
+                                    {/*        <div className="help_column help_left_column help_right_column_mount_type">*/}
+                                    {/*            <p className="help_column_header">{t("dk_step2_help_10")}</p>*/}
+                                    {/*            <ul className="help_column_list">*/}
+                                    {/*                <li>{t("dk_step2_help_11")}</li>*/}
+                                    {/*                <li>{t("dk_step2_help_12")}</li>*/}
+                                    {/*                <li>{t("dk_step2_help_13")}</li>*/}
+                                    {/*            </ul>*/}
+                                    {/*        </div>*/}
+                                    {/*    </div>*/}
+                                    {/*</div>*/}
                                     <div className="accordion_help">
                                         <div className="help_container">
-                                            <div className="help_column help_left_column help_left_column_mount_type">
-                                                <p className="help_column_header">{t("step2_help_1")}</p>
+                                            <div className="help_column help_left_column">
+                                                <p className="help_column_header"></p>
                                                 <ul className="help_column_list">
-                                                    <li>{t("step2_help_2")}</li>
-                                                    {/*<li>{t("step2_help_3")}</li>*/}
-                                                    <li>{t("step2_help_4")}</li>
-                                                    <li>{t("step2_help_5")}</li>
-                                                </ul>
-                                            </div>
-                                            <div className="help_column help_right_column help_right_column_mount_type">
-                                                <p className="help_column_header">{t("step2_help_6")}</p>
-                                                <ul className="help_column_list">
-                                                    <li>{t("step2_help_7")}</li>
-                                                    <li>{t("step2_help_8")}</li>
-                                                    <li>{t("step2_help_9")}</li>
+                                                    <li className="no_listStyle"><b>{t("dk_step2_help_1")}</b>{t("dk_step2_help_2")}</li>
+                                                    <li className="no_listStyle"><b>{t("dk_step2_help_3")}</b>{t("dk_step2_help_4")}</li>
+                                                    <li className="no_listStyle"><b>{t("dk_step2_help_5")}</b>{t("dk_step2_help_6")}</li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -4121,7 +4249,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                         window.scrollTo(window.scrollX, window.scrollY - 1);
                                                                 }, 100);
                                                             }}
-                                                            values={selectCustomValues.width3A}
+                                                            values={selectCustomValues.Width2B}
                                                             dropdownRenderer={
                                                                 ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                             }
@@ -4136,10 +4264,10 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged("2B", selected[0], "cm", "س\u200Cم", pageLanguage);
                                                                     let temp = selectCustomValues;
-                                                                    temp.width3A = selected;
+                                                                    temp.Width2B = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2B");
-                                                                    setCart("Width3A", selected[0].value);
+                                                                    setCart("Width2B", selected[0].value);
                                                                 }
                                                             }}
                                                             options={SelectOptionRange(30, 360, 1, "cm", "", pageLanguage)}
@@ -4165,7 +4293,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                     <Card.Body>
                                         <div className="card_body">
                                             <div className="box100">
-                                                <p className="step_selection_title">{t("step3B_out_title")}</p>
+                                                <p className="step_selection_title">{t("dk_step2c_out_title")}</p>
                                                 <img src={require('../Images/drapery/zebra/wall_cover.svg').default} className="img-fluid" alt=""/>
                                             </div>
                                             <div className="box100 Three_selection_container dir_ltr">
@@ -4279,7 +4407,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                         }
                         
                         {/* step 2CCeiling and wall*/}
-                        {stepSelectedValue["2"] === "2" && stepSelectedValue["2A"] && ((stepSelectedValue["1"] === "3" && step11 === "true") || (stepSelectedValue["1"] === "2" && selectedMountOutsideType.length)) &&
+                        {stepSelectedValue["2"] === "2" && stepSelectedValue["2A"] && ((stepSelectedValue["1"] === "2" && selectedMountOutsideType.length)) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2C" stepNum={t("2C")} stepTitle={t("dk_step2CCeiling")} stepRef="2CCeiling" type="2"
@@ -4290,7 +4418,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                     <Card.Body>
                                         <div className="card_body">
                                             <div className="box100">
-                                                <p className="step_selection_title">{t("step3B_out_title")}</p>
+                                                <p className="step_selection_title">{t("dk_step2c_out_title")}</p>
                                                 <img src={require('../Images/drapery/dk/fullRod_track.svg').default} className="img-fluid" alt=""/>
                                             </div>
                                             <div className="box100 Three_selection_container dir_ltr">
@@ -4334,7 +4462,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                     setCart("StackWidthLeft", selected[0].value);
                                                                 }
                                                             }}
-                                                            options={SelectOptionRange(1, 10, 1, "cm", "", pageLanguage)}
+                                                            options={SelectOptionRange(1, 50, 1, "cm", "", pageLanguage)}
                                                         />
                                                     </div>
                                                 </div>
@@ -4439,7 +4567,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                         window.scrollTo(window.scrollX, window.scrollY - 1);
                                                                 }, 100);
                                                             }}
-                                                            values={selectCustomValues.ceilingToWindow1}
+                                                            values={selectCustomValues.CeilingToWindow1}
                                                             dropdownRenderer={
                                                                 ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                             }
@@ -4454,10 +4582,10 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_three(selected[0], "2D", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
                                                                     let temp = selectCustomValues;
-                                                                    temp.ceilingToWindow1 = selected;
+                                                                    temp.CeilingToWindow1 = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2D1");
-                                                                    setCart("ceilingToWindow1", selected[0].value);
+                                                                    setCart("CeilingToWindow1", selected[0].value);
                                                                 }
                                                             }}
                                                             options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
@@ -4483,7 +4611,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                         window.scrollTo(window.scrollX, window.scrollY - 1);
                                                                 }, 100);
                                                             }}
-                                                            values={selectCustomValues.ceilingToWindow2}
+                                                            values={selectCustomValues.CeilingToWindow2}
                                                             dropdownRenderer={
                                                                 ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                             }
@@ -4498,10 +4626,10 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_three(selected[0], "2D", 1, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
                                                                     let temp = selectCustomValues;
-                                                                    temp.ceilingToWindow2 = selected;
+                                                                    temp.CeilingToWindow2 = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2D2");
-                                                                    setCart("ceilingToWindow2", selected[0].value);
+                                                                    setCart("CeilingToWindow2", selected[0].value);
                                                                 }
                                                             }}
                                                             options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
@@ -4527,7 +4655,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                         window.scrollTo(window.scrollX, window.scrollY - 1);
                                                                 }, 100);
                                                             }}
-                                                            values={selectCustomValues.ceilingToWindow3}
+                                                            values={selectCustomValues.CeilingToWindow3}
                                                             dropdownRenderer={
                                                                 ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                             }
@@ -4542,10 +4670,10 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_three(selected[0], "2D", 2, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
                                                                     let temp = selectCustomValues;
-                                                                    temp.ceilingToWindow3 = selected;
+                                                                    temp.CeilingToWindow3 = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2D3");
-                                                                    setCart("ceilingToWindow3", selected[0].value);
+                                                                    setCart("CeilingToWindow3", selected[0].value);
                                                                 }
                                                             }}
                                                             options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
@@ -4606,7 +4734,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                         window.scrollTo(window.scrollX, window.scrollY - 1);
                                                                 }, 100);
                                                             }}
-                                                            values={selectCustomValues.ceilingToFloor}
+                                                            values={selectCustomValues.CeilingToFloor}
                                                             dropdownRenderer={
                                                                 ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                             }
@@ -4621,13 +4749,13 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged("3E", selected[0], "cm", "س\u200Cم", pageLanguage);
                                                                     let temp = selectCustomValues;
-                                                                    temp.ceilingToFloor = selected;
+                                                                    temp.CeilingToFloor = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "3E");
-                                                                    setCart("ceilingToFloor", selected[0].value);
+                                                                    setCart("CeilingToFloor", selected[0].value);
                                                                 }
                                                             }}
-                                                            options={SelectOptionRange(30, 360, 1, "cm", "", pageLanguage)}
+                                                            options={SelectOptionRange(100, 500, 1, "cm", "", pageLanguage)}
                                                         />
                                                     </div>
                                                 </div>
@@ -4675,7 +4803,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                         window.scrollTo(window.scrollX, window.scrollY - 1);
                                                                 }, 100);
                                                             }}
-                                                            values={selectCustomValues.ceilingToFloor1}
+                                                            values={selectCustomValues.CeilingToFloor1}
                                                             dropdownRenderer={
                                                                 ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                             }
@@ -4690,13 +4818,13 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_three(selected[0], "2DFloor", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
                                                                     let temp = selectCustomValues;
-                                                                    temp.ceilingToFloor1 = selected;
+                                                                    temp.CeilingToFloor1 = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2DFloor1");
-                                                                    setCart("ceilingToFloor1", selected[0].value);
+                                                                    setCart("CeilingToFloor1", selected[0].value);
                                                                 }
                                                             }}
-                                                            options={SelectOptionRange(30, 600, 1, "cm", "", pageLanguage)}
+                                                            options={SelectOptionRange(100, 500, 1, "cm", "", pageLanguage)}
                                                         />
                                                     </div>
                                                 </div>
@@ -4719,7 +4847,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                         window.scrollTo(window.scrollX, window.scrollY - 1);
                                                                 }, 100);
                                                             }}
-                                                            values={selectCustomValues.ceilingToFloor2}
+                                                            values={selectCustomValues.CeilingToFloor2}
                                                             dropdownRenderer={
                                                                 ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                             }
@@ -4734,13 +4862,13 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_three(selected[0], "2DFloor", 1, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
                                                                     let temp = selectCustomValues;
-                                                                    temp.ceilingToFloor2 = selected;
+                                                                    temp.CeilingToFloor2 = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2DFloor2");
-                                                                    setCart("ceilingToFloor2", selected[0].value);
+                                                                    setCart("CeilingToFloor2", selected[0].value);
                                                                 }
                                                             }}
-                                                            options={SelectOptionRange(30, 600, 1, "cm", "", pageLanguage)}
+                                                            options={SelectOptionRange(100, 500, 1, "cm", "", pageLanguage)}
                                                         />
                                                     </div>
                                                 </div>
@@ -4763,7 +4891,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                         window.scrollTo(window.scrollX, window.scrollY - 1);
                                                                 }, 100);
                                                             }}
-                                                            values={selectCustomValues.ceilingToFloor3}
+                                                            values={selectCustomValues.CeilingToFloor3}
                                                             dropdownRenderer={
                                                                 ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                             }
@@ -4778,13 +4906,13 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_three(selected[0], "2DFloor", 2, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
                                                                     let temp = selectCustomValues;
-                                                                    temp.ceilingToFloor3 = selected;
+                                                                    temp.CeilingToFloor3 = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2DFloor3");
-                                                                    setCart("ceilingToFloor3", selected[0].value);
+                                                                    setCart("CeilingToFloor3", selected[0].value);
                                                                 }
                                                             }}
-                                                            options={SelectOptionRange(30, 600, 1, "cm", "", pageLanguage)}
+                                                            options={SelectOptionRange(100, 500, 1, "cm", "", pageLanguage)}
                                                         />
                                                     </div>
                                                 </div>
@@ -4844,7 +4972,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                         window.scrollTo(window.scrollX, window.scrollY - 1);
                                                                 }, 100);
                                                             }}
-                                                            values={selectCustomValues.ceilingToFloor}
+                                                            values={selectCustomValues.WindowToFloor}
                                                             dropdownRenderer={
                                                                 ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                             }
@@ -4859,13 +4987,13 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged("2DWall", selected[0], "cm", "س\u200Cم", pageLanguage);
                                                                     let temp = selectCustomValues;
-                                                                    temp.ceilingToFloor = selected;
+                                                                    temp.WindowToFloor = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2DWall");
-                                                                    setCart("ceilingToFloor", selected[0].value);
+                                                                    setCart("WindowToFloor", selected[0].value);
                                                                 }
                                                             }}
-                                                            options={SelectOptionRange(30, 360, 1, "cm", "", pageLanguage)}
+                                                            options={SelectOptionRange(100, 350, 1, "cm", "", pageLanguage)}
                                                         />
                                                     </div>
                                                 </div>
@@ -4911,7 +5039,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                         window.scrollTo(window.scrollX, window.scrollY - 1);
                                                                 }, 100);
                                                             }}
-                                                            values={selectCustomValues.ceilingToFloor}
+                                                            values={selectCustomValues.Height2E}
                                                             dropdownRenderer={
                                                                 ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                             }
@@ -4926,13 +5054,13 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged("2EWall", selected[0], "cm", "س\u200Cم", pageLanguage);
                                                                     let temp = selectCustomValues;
-                                                                    temp.ceilingToFloor = selected;
+                                                                    temp.Height2E = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2EWall");
-                                                                    setCart("ceilingToFloor", selected[0].value);
+                                                                    setCart("Height2E", selected[0].value);
                                                                 }
                                                             }}
-                                                            options={SelectOptionRange(30, 360, 1, "cm", "", pageLanguage)}
+                                                            options={SelectOptionRange(30, 500, 1, "cm", "", pageLanguage)}
                                                         />
                                                     </div>
                                                 </div>
@@ -4980,7 +5108,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                         window.scrollTo(window.scrollX, window.scrollY - 1);
                                                                 }, 100);
                                                             }}
-                                                            values={selectCustomValues.ceilingToFloor}
+                                                            values={selectCustomValues.ShadeMount}
                                                             dropdownRenderer={
                                                                 ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                             }
@@ -4995,13 +5123,13 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged("2FWall", selected[0], "cm", "س\u200Cم", pageLanguage);
                                                                     let temp = selectCustomValues;
-                                                                    temp.ceilingToFloor = selected;
+                                                                    temp.ShadeMount = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2FWall");
-                                                                    setCart("ceilingToFloor", selected[0].value);
+                                                                    setCart("ShadeMount", selected[0].value);
                                                                 }
                                                             }}
-                                                            options={SelectOptionRange(30, 360, 1, "cm", "", pageLanguage)}
+                                                            options={SelectOptionRange(10, 50, 1, "cm", "", pageLanguage)}
                                                         />
                                                     </div>
                                                 </div>
@@ -5058,7 +5186,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                         window.scrollTo(window.scrollX, window.scrollY - 1);
                                                                 }, 100);
                                                             }}
-                                                            values={selectCustomValues.ceilingToFloor}
+                                                            values={selectCustomValues.CeilingToFloor}
                                                             dropdownRenderer={
                                                                 ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                             }
@@ -5073,13 +5201,13 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged("2GWall", selected[0], "cm", "س\u200Cم", pageLanguage);
                                                                     let temp = selectCustomValues;
-                                                                    temp.ceilingToFloor = selected;
+                                                                    temp.CeilingToFloor = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2GWall");
-                                                                    setCart("ceilingToFloor", selected[0].value);
+                                                                    setCart("CeilingToFloor", selected[0].value);
                                                                 }
                                                             }}
-                                                            options={SelectOptionRange(30, 360, 1, "cm", "", pageLanguage)}
+                                                            options={SelectOptionRange(100, 500, 1, "cm", "", pageLanguage)}
                                                         />
                                                     </div>
                                                 </div>
@@ -5128,7 +5256,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                         window.scrollTo(window.scrollX, window.scrollY - 1);
                                                                 }, 100);
                                                             }}
-                                                            values={selectCustomValues.ceilingToFloor}
+                                                            values={selectCustomValues.ShadeMount}
                                                             dropdownRenderer={
                                                                 ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                             }
@@ -5143,13 +5271,13 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged("2EWallFloor", selected[0], "cm", "س\u200Cم", pageLanguage);
                                                                     let temp = selectCustomValues;
-                                                                    temp.ceilingToFloor = selected;
+                                                                    temp.ShadeMount = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2EWallFloor");
-                                                                    setCart("ceilingToFloor", selected[0].value);
+                                                                    setCart("ShadeMount", selected[0].value);
                                                                 }
                                                             }}
-                                                            options={SelectOptionRange(30, 360, 1, "cm", "", pageLanguage)}
+                                                            options={SelectOptionRange(10, 50, 1, "cm", "", pageLanguage)}
                                                         />
                                                     </div>
                                                 </div>
@@ -5207,7 +5335,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                         window.scrollTo(window.scrollX, window.scrollY - 1);
                                                                 }, 100);
                                                             }}
-                                                            values={selectCustomValues.ceilingToFloor}
+                                                            values={selectCustomValues.CeilingToFloor}
                                                             dropdownRenderer={
                                                                 ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                             }
@@ -5222,13 +5350,13 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged("2FWallFloor", selected[0], "cm", "س\u200Cم", pageLanguage);
                                                                     let temp = selectCustomValues;
-                                                                    temp.ceilingToFloor = selected;
+                                                                    temp.CeilingToFloor = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2FWallFloor");
-                                                                    setCart("ceilingToFloor", selected[0].value);
+                                                                    setCart("CeilingToFloor", selected[0].value);
                                                                 }
                                                             }}
-                                                            options={SelectOptionRange(30, 360, 1, "cm", "", pageLanguage)}
+                                                            options={SelectOptionRange(100, 500, 1, "cm", "", pageLanguage)}
                                                         />
                                                     </div>
                                                 </div>
@@ -5616,12 +5744,12 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                 </div>
                                             </div>
                                             {dkCurtainArr.length > 0 &&
-                                                <div className={`dk_curtain_preview_container ${showMorePreview?"dk_curtain_preview_container_extended":""}`}>
+                                                <div className={`dk_curtain_preview_container`}>
                                                     <Dropdown autoClose="outside" title="" align={pageLanguage === "fa" ? "end" : "start"}>
                                                         <Dropdown.Toggle className="basket_item_title_dropdown_btn">
-                                                            <h4 className="dk_curtain_preview_item_details" onClick={()=>setShowMorePreview(false)}>{t("Selection Fabric Preview")}</h4>
+                                                            <h4 className="dk_curtain_preview_item_details">{t("Selection Fabric Preview")}</h4>
                                                             <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default}
-                                                                 alt="" onClick={()=>setShowMorePreview(false)}/>
+                                                                 alt=""/>
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu className="basket_item_title_dropdown dk_curtain_preview_dropdown">
                                                             <div className="dk_curtain_preview_detail_container">
@@ -5675,7 +5803,8 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                     <Dropdown autoClose="outside" title="">
                                                         <Dropdown.Toggle className="dropdown_btn">
                                                             <p>{t("filter_Color")}</p>
-                                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
+                                                            {/*<img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>*/}
+                                                            <div className="select_control_handle_close img-fluid"/>
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu className="filter_color_items">
                                                             <div className="filter_items_container">
@@ -5693,7 +5822,8 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                     <Dropdown autoClose="outside" title="">
                                                         <Dropdown.Toggle className="dropdown_btn">
                                                             <p>{t("filter_Pattern")}</p>
-                                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
+                                                            {/*<img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>*/}
+                                                            <div className="select_control_handle_close img-fluid"/>
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
                                                             <div className="filter_items_container">
@@ -5711,7 +5841,8 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                     <Dropdown autoClose="outside" title="">
                                                         <Dropdown.Toggle className="dropdown_btn">
                                                             <p>{t("filter_Type")}</p>
-                                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
+                                                            {/*<img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>*/}
+                                                            <div className="select_control_handle_close img-fluid"/>
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
                                                             <div className="filter_items_container">
@@ -5728,12 +5859,12 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                     <Dropdown autoClose="outside" title="">
                                                         <Dropdown.Toggle className="dropdown_btn">
                                                             <p>{t("filter_Price")}</p>
-                                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
+                                                            {/*<img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>*/}
+                                                            <div className="select_control_handle_close img-fluid"/>
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
                                                             <div className="filter_items_container">
-                                                                <div className="price_filter_description">{t("filter_price_title")}
-                                                                </div>
+                                                                {/*<div className="price_filter_description">{t("filter_price_title")}</div>*/}
                                                                 {sewingPrices}
                                                             </div>
                                                             <div className="filter_inside_button_section">

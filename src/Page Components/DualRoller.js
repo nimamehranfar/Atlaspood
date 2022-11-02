@@ -3996,7 +3996,8 @@ function DualRoller({CatID, ModelID, ProjectId, EditIndex}) {
                                                     <Dropdown autoClose="outside" title="">
                                                         <Dropdown.Toggle className="dropdown_btn">
                                                             <p>{t("filter_Color")}</p>
-                                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
+                                                            {/*<img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>*/}
+                                                            <div className="select_control_handle_close img-fluid"/>
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu className="filter_color_items">
                                                             <div className="filter_items_container">
@@ -4014,7 +4015,8 @@ function DualRoller({CatID, ModelID, ProjectId, EditIndex}) {
                                                     <Dropdown autoClose="outside" title="">
                                                         <Dropdown.Toggle className="dropdown_btn">
                                                             <p>{t("filter_Pattern")}</p>
-                                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
+                                                            {/*<img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>*/}
+                                                            <div className="select_control_handle_close img-fluid"/>
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
                                                             <div className="filter_items_container">
@@ -4032,7 +4034,8 @@ function DualRoller({CatID, ModelID, ProjectId, EditIndex}) {
                                                     <Dropdown autoClose="outside" title="">
                                                         <Dropdown.Toggle className="dropdown_btn">
                                                             <p>{t("filter_Type")}</p>
-                                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
+                                                            {/*<img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>*/}
+                                                            <div className="select_control_handle_close img-fluid"/>
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
                                                             <div className="filter_items_container">
@@ -4049,12 +4052,12 @@ function DualRoller({CatID, ModelID, ProjectId, EditIndex}) {
                                                     <Dropdown autoClose="outside" title="">
                                                         <Dropdown.Toggle className="dropdown_btn">
                                                             <p>{t("filter_Price")}</p>
-                                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
+                                                            {/*<img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>*/}
+                                                            <div className="select_control_handle_close img-fluid"/>
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
                                                             <div className="filter_items_container">
-                                                                <div className="price_filter_description">{t("filter_price_title")}
-                                                                </div>
+                                                                {/*<div className="price_filter_description">{t("filter_price_title")}</div>*/}
                                                                 {sewingPrices}
                                                             </div>
                                                             <div className="filter_inside_button_section">
@@ -4133,7 +4136,8 @@ function DualRoller({CatID, ModelID, ProjectId, EditIndex}) {
                                                     <Dropdown autoClose="outside" title="">
                                                         <Dropdown.Toggle className="dropdown_btn">
                                                             <p>{t("filter_Color")}</p>
-                                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
+                                                            {/*<img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>*/}
+                                                            <div className="select_control_handle_close img-fluid"/>
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu className="filter_color_items">
                                                             <div className="filter_items_container">
@@ -4151,7 +4155,8 @@ function DualRoller({CatID, ModelID, ProjectId, EditIndex}) {
                                                     <Dropdown autoClose="outside" title="">
                                                         <Dropdown.Toggle className="dropdown_btn">
                                                             <p>{t("filter_Pattern")}</p>
-                                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
+                                                            {/*<img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>*/}
+                                                            <div className="select_control_handle_close img-fluid"/>
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
                                                             <div className="filter_items_container">
@@ -4169,7 +4174,8 @@ function DualRoller({CatID, ModelID, ProjectId, EditIndex}) {
                                                     <Dropdown autoClose="outside" title="">
                                                         <Dropdown.Toggle className="dropdown_btn">
                                                             <p>{t("filter_Type")}</p>
-                                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
+                                                            {/*<img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>*/}
+                                                            <div className="select_control_handle_close img-fluid"/>
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
                                                             <div className="filter_items_container">
@@ -4186,7 +4192,8 @@ function DualRoller({CatID, ModelID, ProjectId, EditIndex}) {
                                                     <Dropdown autoClose="outside" title="">
                                                         <Dropdown.Toggle className="dropdown_btn">
                                                             <p>{t("filter_Price")}</p>
-                                                            <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
+                                                            {/*<img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>*/}
+                                                            <div className="select_control_handle_close img-fluid"/>
                                                         </Dropdown.Toggle>
                                                         <Dropdown.Menu>
                                                             <div className="filter_items_container">
@@ -5437,14 +5444,14 @@ function DualRoller({CatID, ModelID, ProjectId, EditIndex}) {
                                                                                               <span className="popover_footer_title">{t("step4_popover_1")}</span>
                                                                                               <span className="popover_thumbnails">
                                                                                                   <div>
-                                                                                                      <img src={require('../Images/drapery/zebra/motorized_control_type1.png.jpg').default}
+                                                                                                      <img src={require('../Images/drapery/zebra/motorized_control_type1.png.jpg')}
                                                                                                            text="step41"
                                                                                                            onMouseEnter={(e) => popoverThumbnailHover(e)}
                                                                                                            className="popover_thumbnail_img img-fluid"
                                                                                                            alt=""/>
                                                                                                   </div>
                                                                                                   {/*<div>*/}
-                                                                                                  {/*    <img src={require('../Images/drapery/zebra/motorized_control_type2.png').default}*/}
+                                                                                                  {/*    <img src={require('../Images/drapery/zebra/motorized_control_type2.png')}*/}
                                                                                                   {/*         text="step41"*/}
                                                                                                   {/*         onMouseEnter={(e) => popoverThumbnailHover(e)}*/}
                                                                                                   {/*         className="popover_thumbnail_img img-fluid"*/}
@@ -5656,14 +5663,14 @@ function DualRoller({CatID, ModelID, ProjectId, EditIndex}) {
                                                                                               <span className="popover_footer_title">{t("dualRoller_step5B_popover_1")}</span>
                                                                                               <span className="popover_thumbnails">
                                                                                                   <div>
-                                                                                                      <img src={require('../Images/drapery/dualRoller/BracketColorRound1.jpg').default}
+                                                                                                      <img src={require('../Images/drapery/dualRoller/BracketColorRound1.jpg')}
                                                                                                            text="step5B"
                                                                                                            onMouseEnter={(e) => popoverThumbnailHover(e)}
                                                                                                            className="popover_thumbnail_img img-fluid"
                                                                                                            alt=""/>
                                                                                                   </div>
                                                                                                   <div>
-                                                                                                      <img src={require('../Images/drapery/dualRoller/BracketColorSquare1.jpg').default}
+                                                                                                      <img src={require('../Images/drapery/dualRoller/BracketColorSquare1.jpg')}
                                                                                                            text="step4B"
                                                                                                            onMouseEnter={(e) => popoverThumbnailHover(e)}
                                                                                                            className="popover_thumbnail_img img-fluid"
@@ -5913,14 +5920,14 @@ function DualRoller({CatID, ModelID, ProjectId, EditIndex}) {
                                                                                               <span className="popover_footer_title">{t("RollType_help_7")}</span>
                                                                                               <span className="popover_thumbnails">
                                                                                                   <div>
-                                                                                                      <img src={require('../Images/drapery/roller/RegularRoll1a.jpg').default}
+                                                                                                      <img src={require('../Images/drapery/roller/RegularRoll1a.jpg')}
                                                                                                            text="step51"
                                                                                                            onMouseEnter={(e) => popoverThumbnailHover(e)}
                                                                                                            className="popover_thumbnail_img img-fluid"
                                                                                                            alt=""/>
                                                                                                   </div>
                                                                                                   <div>
-                                                                                                      <img src={require('../Images/drapery/roller/RegularRoll2.jpg').default}
+                                                                                                      <img src={require('../Images/drapery/roller/RegularRoll2.jpg')}
                                                                                                            text="step51"
                                                                                                            onMouseEnter={(e) => popoverThumbnailHover(e)}
                                                                                                            className="popover_thumbnail_img img-fluid"
@@ -5954,7 +5961,7 @@ function DualRoller({CatID, ModelID, ProjectId, EditIndex}) {
                                                                                               <span className="popover_footer_title">{t("RollType_help_8")}</span>
                                                                                               <span className="popover_thumbnails">
                                                                                                   <div>
-                                                                                                      <img src={require('../Images/drapery/roller/ReverseRoll1a.jpg').default}
+                                                                                                      <img src={require('../Images/drapery/roller/ReverseRoll1a.jpg')}
                                                                                                            text="step51"
                                                                                                            onMouseEnter={(e) => popoverThumbnailHover(e)}
                                                                                                            className="popover_thumbnail_img img-fluid"
@@ -6122,21 +6129,21 @@ function DualRoller({CatID, ModelID, ProjectId, EditIndex}) {
                                                                                       <div className="clearfix">
                                                                                           <div className="popover_image clearfix">
                                                                                               <img
-                                                                                                  src={popoverImages["step51"] === undefined ? require('../Images/drapery/roller/bracket_type_round.png') : popoverImages["step51"]}
+                                                                                                  src={popoverImages["step51"] === undefined ? require('../Images/drapery/roller/BracketColorRound1.jpg') : popoverImages["step51"]}
                                                                                                   className="img-fluid" alt=""/>
                                                                                           </div>
                                                                                           <div className="popover_footer">
                                                                                               <span className="popover_footer_title">{t("BottomBarStyle_help_5")}</span>
                                                                                               <span className="popover_thumbnails">
                                                                                                   <div>
-                                                                                                      <img src={require('../Images/drapery/roller/bracket_type_round.png')}
+                                                                                                      <img src={require('../Images/drapery/roller/BracketColorRound1.jpg')}
                                                                                                            text="step51"
                                                                                                            onMouseEnter={(e) => popoverThumbnailHover(e)}
                                                                                                            className="popover_thumbnail_img img-fluid"
                                                                                                            alt=""/>
                                                                                                   </div>
                                                                                                   <div>
-                                                                                                      <img src={require('../Images/drapery/roller/bracket_type_square.png')}
+                                                                                                      <img src={require('../Images/drapery/roller/BracketColorSquare1.jpg')}
                                                                                                            text="step51"
                                                                                                            onMouseEnter={(e) => popoverThumbnailHover(e)}
                                                                                                            className="popover_thumbnail_img img-fluid"
@@ -6676,7 +6683,87 @@ function DualRoller({CatID, ModelID, ProjectId, EditIndex}) {
                     </div>
                 </Modal.Body>
             </Modal>
+    
+            <Modal backdrop="static" keyboard={false} dialogClassName={`measurementsHelp_modal largeSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                   show={modals["headrailHelp"] === undefined ? false : modals["headrailHelp"]}
+                   onHide={() => modalHandleClose("headrailHelp")}>
+                <Modal.Header closeButton>
+                    {/*<Modal.Title>Modal heading</Modal.Title>*/}
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="largeSizeModal_modal_body_container">
+                        <div className="accordion_help help_largeSizeModal_modal">
+                            <p className="help_column_header">{t("headrailHelp1")}</p>
+                            <div className="largeSizeModal_img_plus_help">
+                                <img src={require('../Images/drapery/roller/roller_help_NoValance.jpg')} className="img-fluid" alt=""/>
+                                <div className="help_container">
+                                    <div className="help_column help_left_column">
+                                        <ul className="help_column_list">
+                                            <li>{t("headrailHelp2")}</li>
+                                            <li>{t("headrailHelp3")}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="accordion_help help_largeSizeModal_modal">
+                            <p className="help_column_header">{t("headrailHelp4")}</p>
+                            <div className="largeSizeModal_img_plus_help">
+                                <img src={require('../Images/drapery/roller/roller_help_MetalValance.jpg')} className="img-fluid" alt=""/>
+                                <div className="help_container">
+                                    <div className="help_column help_left_column">
+                                        <ul className="help_column_list">
+                                            <li>{t("headrailHelp5")}</li>
+                                            <li>{t("headrailHelp6")}</li>
+                                            <li>{t("headrailHelp7")}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
             
+                    <div className="largeSizeModal_modal_body_container">
+                        <div className="accordion_help help_largeSizeModal_modal">
+                            <p className="help_column_header">{t("headrailHelp8")}</p>
+                            <div className="largeSizeModal_img_plus_help">
+                                <img src={require('../Images/drapery/roller/roller_help_MetalValance.jpg')} className="img-fluid" alt=""/>
+                                <div className="help_container">
+                                    <div className="help_column help_left_column">
+                                        <ul className="help_column_list">
+                                            <li>{t("headrailHelp9")}</li>
+                                            <li>{t("headrailHelp10")}</li>
+                                            <li>{t("headrailHelp11")}</li>
+                                            <li>{t("headrailHelp12")}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="accordion_help help_largeSizeModal_modal">
+                            <p className="help_column_header">{t("headrailHelp13")}</p>
+                            <div className="largeSizeModal_img_plus_help">
+                                <img src={require('../Images/drapery/roller/roller_help_UphosteredValance.jpg')} className="img-fluid" alt=""/>
+                                <div className="help_container">
+                                    <div className="help_column help_left_column">
+                                        <ul className="help_column_list">
+                                            <li>{t("headrailHelp14")}</li>
+                                            <li>{t("headrailHelp15")}</li>
+                                            <li>{t("headrailHelp16")}</li>
+                                            <li>{t("headrailHelp17")}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br/>
+                    <div className="text_center">
+                        <button className="btn btn-new-dark" onClick={() => modalHandleClose("headrailHelp")}>{t("CONTINUE")}</button>
+                    </div>
+                </Modal.Body>
+            </Modal>
+    
             <Modal dialogClassName={`upload_modal uploadImg_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["uploadImg"] === undefined ? false : modals["uploadImg"]}
                    onHide={() => {

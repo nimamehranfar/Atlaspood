@@ -145,6 +145,7 @@ function Curtain() {
                         {/*    /!*</div>*!/*/}
                         {/*</div>*/}
                         {/*<Link to={"/" + pageLanguage + "/Curtain/" + catID + "/" + SewingModelId} className={`btn_normal`}>{t("Start Customizing")}</Link>*/}
+
                         <div className="model_item_info_container">
                             <Link to={"/" + pageLanguage + "/Curtain/" + catID + "/" + SewingModelId}
                                   className="model_item_info_title">{pageLanguage === 'en' ? ModelENName : ModelName}</Link>

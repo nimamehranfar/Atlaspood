@@ -1491,7 +1491,7 @@ function Checkout() {
                                                    }
                                                    }/>
                                             <label htmlFor="bank1">
-                                                <img src={require('../Images/public/bank-saman.png').default} className="img-fluid" alt=""/>
+                                                <img src={require('../Images/public/bank-saman.png')} className="img-fluid" alt=""/>
                                             </label>
                                         
                                         </li>
@@ -1502,7 +1502,7 @@ function Checkout() {
                                                    }
                                                    }/>
                                             <label htmlFor="bank2">
-                                                <img src={require('../Images/public/bank-mellat.png').default} className="img-fluid" alt=""/>
+                                                <img src={require('../Images/public/bank-mellat.png')} className="img-fluid" alt=""/>
                                             </label>
                                         </li>
                                         <li className={bank === 3 ? "selected" : ""}>
@@ -1512,7 +1512,7 @@ function Checkout() {
                                                    }
                                                    }/>
                                             <label htmlFor="bank3">
-                                                <img src={require('../Images/public/bank-parsian.png').default} className="img-fluid" alt=""/>
+                                                <img src={require('../Images/public/bank-parsian.png')} className="img-fluid" alt=""/>
                                             </label>
                                         </li>
                                     </ul>

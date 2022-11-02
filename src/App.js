@@ -33,7 +33,7 @@ function App({t}) {
     const dispatch = useDispatch();
     const [user1, setuser] = useState({
         pass: "",
-        success: false
+        success: true
     });
     const inputsHandler = (e) => {
         setuser({[e.target.name]: e.target.value})

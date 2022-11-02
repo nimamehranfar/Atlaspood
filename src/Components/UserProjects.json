@@ -104,7 +104,7 @@
       },
       {
         "cart": "Mount",
-        "title": "Mount Type",
+        "title": "Mount Position",
         "titleValue": {
           "null": "Inside",
           "true": "Outside"
@@ -762,7 +762,7 @@
       },
       {
         "cart": "Mount",
-        "title": "Mount Type",
+        "title": "Mount Position",
         "titleValue": {
           "null": "Inside",
           "true": "Outside"
@@ -1615,7 +1615,7 @@
       },
       {
         "cart": "Mount",
-        "title": "Mount Type",
+        "title": "Mount Position",
         "titleValue": {
           "null": "Inside",
           "true": "Outside"
@@ -2318,20 +2318,6 @@
         ]
       },
       {
-        "cart": "FabricId2",
-        "title": "FabricId2",
-        "titleValue": null,
-        "titlePostfix": "",
-        "order": -1,
-        "apiLabel": "FabricId2",
-        "apiValue": null,
-        "apiLabel2": "FabricId2",
-        "apiValue2": null,
-        "lang": [
-          "en",
-          "fa"
-        ]
-      },{
         "cart": "SewingModelId",
         "title": "SewingModelId",
         "titleValue": null,
@@ -2432,66 +2418,20 @@
         ]
       },
       {
-        "cart": "FabricDesignFa2",
-        "title": "Fabric",
-        "titleValue": null,
-        "titlePostfix": "",
-        "order": 0,
-        "apiLabel": "FabricDesignFa2",
-        "apiValue": null,
-        "lang": [
-          "fa"
-        ]
-      },
-      {
-        "cart": "FabricDesignEn2",
-        "title": "Fabric",
-        "titleValue": null,
-        "titlePostfix": "",
-        "order": 0,
-        "apiLabel": "FabricDesignEn2",
-        "apiValue": null,
-        "lang": [
-          "en"
-        ]
-      },
-      {
-        "cart": "FabricColorEn2",
-        "title": "Color",
-        "titleValue": null,
-        "titlePostfix": "",
-        "order": 1,
-        "apiLabel": "FabricColorEn2",
-        "apiValue": null,
-        "lang": [
-          "en"
-        ]
-      },
-      {
-        "cart": "FabricColorFa2",
-        "title": "Color",
-        "titleValue": null,
-        "titlePostfix": "",
-        "order": 1,
-        "apiLabel": "FabricColorFa2",
-        "apiValue": null,
-        "lang": [
-          "fa"
-        ]
-      },
-      {
         "cart": "Mount",
-        "title": "Mount Type",
+        "title": "Mount Position",
         "titleValue": {
           "null": "Inside",
-          "true": "Outside"
+          "true": "Wall",
+          "false": "Ceilling"
         },
         "titlePostfix": "",
         "order": 2,
         "apiLabel": "isWalled",
         "apiValue": {
           "Inside": null,
-          "Outside": true
+          "Wall": true,
+          "Ceilling": false
         },
         "lang": [
           "en",
@@ -2499,14 +2439,17 @@
         ]
       },
       {
-        "cart": "MountOutsideType",
-        "title": "Mount Outside Type",
-        "titleValue": null,
-        "titlePostfix": "cm",
-        "order": 3,
-        "apiLabel": "MountOutsideType",
-        "apiValue": null,
-        "measurements": true,
+        "cart": "Mount2",
+        "title": "Mount Position",
+        "titleValue": {
+          "true": "HiddenMouldingMount"
+        },
+        "titlePostfix": "",
+        "order": 2,
+        "apiLabel": "isArc",
+        "apiValue": {
+          "HiddenMouldingMount": true
+        },
         "lang": [
           "en",
           "fa"
@@ -2653,7 +2596,29 @@
         ]
       },
       {
-        "cart": "Width3A",
+        "cart": "FinishedLengthType",
+        "title": "Finished Length Type",
+        "titleValue": {
+          "5403": "Sill",
+          "5401": "Apron",
+          "5402": "Floor"
+        },
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "FinishedLengthType",
+        "apiValue": {
+          "Sill": 5403,
+          "Apron": 5401,
+          "Floor": 5402
+        },
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Width2B",
         "title": "",
         "titleValue": null,
         "titlePostfix": "cm",
@@ -2667,7 +2632,7 @@
         ]
       },
       {
-        "cart": "Height3C",
+        "cart": "Height2E",
         "title": "",
         "titleValue": null,
         "titlePostfix": "cm",
@@ -2701,6 +2666,118 @@
         "titlePostfix": "cm",
         "order": -1,
         "apiLabel": "RightWidthExt",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "CeilingToWindow1",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "CeilingToWindow1",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "CeilingToWindow2",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "CeilingToWindow2",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "CeilingToWindow3",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "CeilingToWindow3",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "CeilingToFloor",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "HeightOfCeilingToFloor",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "CeilingToFloor1",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "CeilingToFloor1",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "CeilingToFloor2",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "CeilingToFloor2",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "CeilingToFloor3",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "CeilingToFloor3",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "WindowToFloor",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "HeightOfWindowToFloor",
         "apiValue": null,
         "measurements": true,
         "lang": [
