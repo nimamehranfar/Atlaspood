@@ -20,6 +20,7 @@ import Select from "react-dropdown-select";
 import CustomDropdownWithSearch from "../Components/CustomDropdownWithSearch";
 import CustomControl from "../Components/CustomControl";
 import CustomControlFiles from "../Components/CustomControlFiles";
+import convertToPersian from "../Components/ConvertToPersian";
 
 const baseURLGetProjects = "https://api.atlaspood.ir/SewingPreorder/GetAll";
 const baseURLEditProject = "https://api.atlaspood.ir/SewingPreorder/Edit";
@@ -564,7 +565,7 @@ function Projects() {
                         });
                         tempArr.push(
                             <div key={defaultModelName}>
-                                <h2 className="cart_agree_title2">{pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</h2>
+                                <h2 className="cart_agree_title2">{pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</h2>
                                 <ul className="cart_agree_items_container">
                                     {temp1}
                                     <li className="cart_agree_item">

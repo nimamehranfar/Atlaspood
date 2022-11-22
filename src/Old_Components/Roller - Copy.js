@@ -583,15 +583,16 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
     }
     
     function selectChanged(e, nums) {
-        // console.log(e.target.value);
-        let refIndex = e.target.getAttribute('ref-num');
-        // selectedTitle.current[refIndex].innerHTML = e.target.getAttribute('text');
-        let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-        tempLabels[refIndex] = e.target.getAttribute('text');
-        
         let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
-        tempValue[refIndex] = e.target.value;
-        
+        let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+        if(e) {
+            // console.log(e.target.value);
+            let refIndex = e.target.getAttribute('ref-num');
+            // selectedTitle.current[refIndex].innerHTML = e.target.getAttribute('text');
+            tempLabels[refIndex] = e.target.getAttribute('text');
+    
+            tempValue[refIndex] = e.target.value;
+        }
         if (nums !== undefined) {
             let tempArr = nums.split(',');
             tempArr.forEach(num => {
@@ -1080,7 +1081,7 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                         });
                         tempArr.push(
                             <div key={defaultModelName}>
-                                <h2 className="cart_agree_title2">{pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</h2>
+                                <h2 className="cart_agree_title2">{pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</h2>
                                 <ul className="cart_agree_items_container">
                                     {temp1}
                                     <li className="cart_agree_item">
@@ -2410,7 +2411,7 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
             
             
             <div className="models_title_div">
-                <h1>{defaultModelName === undefined || defaultModelName === "" ? " " : pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</h1>
+                <h1>{defaultModelName === undefined || defaultModelName === "" ? " " : pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</h1>
             </div>
             <div className="model_customize_container">
                 <div className="model_customize_image">
@@ -2593,7 +2594,7 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                                 <Card.Body>
                                     <div className="card_body card_body_radio">
                                         <div className="box50 radio_style">
-                                            <img src={require('../Images/drapery/roller/mount_inside.svg').default} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/roller/window-Inside.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("mount_Inside")} value="1" name="step2" ref-num="2" id="21" checked={step2 === "Inside"}
                                                    onChange={e => {
                                                        selectChanged(e, "3AOut,3BOut,3COut,3DOut");
@@ -2611,7 +2612,7 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                                             <label htmlFor="21">{t("mount_Inside")}</label>
                                         </div>
                                         <div className="box50 radio_style">
-                                            <img src={require('../Images/drapery/roller/mount_outside.svg').default} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/roller/window-Outside.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("mount_Outside")} value="2" name="step2" ref-num="2" id="22" checked={step2 === "Outside"}
                                                    onChange={e => {
                                                        selectChanged(e, "3AIn,3BIn");

@@ -13,8 +13,8 @@ import Select from "react-dropdown-select";
 import ReactImageMagnify from '@blacklab/react-image-magnify';
 import * as qs from 'qs'
 
-import {ReactComponent as MountInside} from '../Images/drapery/zebra/mount_inside.svg';
-import {ReactComponent as MountOutside} from '../Images/drapery/zebra/mount_outside.svg';
+import {ReactComponent as MountInside} from '../Images/drapery/zebra/window-Inside.svg';
+import {ReactComponent as MountOutside} from '../Images/drapery/zebra/window-Outside.svg';
 import Form from "react-bootstrap/Form";
 import PopoverStickOnHover from "../Components/PopoverStickOnHover";
 import CustomControl from "../Components/CustomControl";
@@ -41,6 +41,8 @@ import ModalLogin from "../Components/ModalLogin";
 import AddProjectToCart from "../Components/AddProjectToCart";
 import GetMeasurementArray from "../Components/GetMeasurementArray";
 import GetSewingFilters from "../Components/GetSewingFilters";
+import TruncateMarkup from "react-truncate-markup";
+import convertToPersian from "../Components/ConvertToPersian";
 
 
 const baseURLCats = "https://api.atlaspood.ir/WebsitePage/GetDetailByName";
@@ -87,6 +89,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
     const [dkCurtainPreviewList, setDkCurtainPreviewList] = useState([]);
     const [showMoreFabric, setShowMoreFabric] = useState("");
     const [dkCurtainArr, setDkCurtainArr] = useState([]);
+    const [curtainChangeId, setCurtainChangeId] = useState(-1);
     const [dkCurtainArrComplete, setDkCurtainArrComplete] = useState(false);
     const [dkCurtainArrCount, setDkCurtainArrCount] = useState(0);
     const [sodFabrics, setSodFabrics] = useState([]);
@@ -203,7 +206,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
     });
     const [saveProjectCount, setSaveProjectCount] = useState(0);
     
-    const [depSet, setDepSet] = useState(new Set(['1', '2', '3', '4', '5', '6', '71', '72']));
+    const [depSet, setDepSet] = useState(new Set(['1', '2', '3', '4', '5', '61', '62']));
     
     const inputs = useRef({});
     const selectedTitle = useRef({});
@@ -268,18 +271,6 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
     const [savingLoading, setSavingLoading] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [swatchLogin, setSwatchLogin] = useState(false);
-    
-    function convertToPersian(string_farsi) {
-        if (string_farsi !== null && string_farsi !== undefined && string_farsi !== "") {
-            let tempString = string_farsi.replace("ي", "ی");
-            tempString = tempString.replace("ي", "ی");
-            tempString = tempString.replace("ي", "ی");
-            tempString = tempString.replace("ي", "ی");
-            tempString = tempString.replace('ك', 'ک');
-            return tempString;
-        } else
-            return string_farsi;
-    }
     
     const getFabrics = () => {
         axios.get(baseURLFabrics, {
@@ -560,13 +551,15 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
         let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
         let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
         if (DkCurtainArr.filter(el => el).length === count) {
-            tempLabels["3"] = t('Completed')
+            tempLabels["3"] = t('Completed');
             tempValue["3"] = "Completed";
             setDkCurtainArrComplete(true);
+            setDeps("", "3");
         } else {
             tempLabels["3"] = undefined;
             tempValue["3"] = undefined;
             setDkCurtainArrComplete(false);
+            setDeps("3", "");
         }
         setStepSelectedLabel(tempLabels);
         setStepSelectedValue(tempValue);
@@ -576,7 +569,10 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
             promiseArr[i] = new Promise((resolve, reject) => {
                 let tempColor = DkCurtainArr[i] ? (DkCurtainArr[i]["ColorHtmlCode"] ? DkCurtainArr[i]["ColorHtmlCode"] : "#e2e2e2") : "#e2e2e2";
                 curtainList.push(
-                    <div key={i} className="dk_curtain_inside_part" onClick={() => curtainChanged(i)} style={{backgroundColor: tempColor}}/>
+                    <div key={i} className="dk_curtain_inside_part" onClick={() => {
+                        // curtainChanged(i);
+                        setCurtainChangeId(i);
+                    }} style={{backgroundColor: tempColor}}/>
                 );
                 resolve();
             });
@@ -723,7 +719,13 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                 {/*                         }/>*/}
                 {/*</div>*/}
                 <div className="steps_header_selected_container">
-                    <div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? stepSelected : null}</div>
+                    {/*<div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? stepSelected : null}</div>*/}
+    
+                    {showLabels &&
+                        <TruncateMarkup lines={1} tokenize="words">
+                            <div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{stepSelected}</div>
+                        </TruncateMarkup>
+                    }
                 </div>
                 {required && stepSelected === "" &&
                     <div className="stepRequired"/>
@@ -900,15 +902,16 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
     }
     
     function selectChanged(e, nums) {
-        // console.log(e.target.value);
-        let refIndex = e.target.getAttribute('ref-num');
-        // selectedTitle.current[refIndex].innerHTML = e.target.getAttribute('text');
-        let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-        tempLabels[refIndex] = e.target.getAttribute('text');
-        
         let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
-        tempValue[refIndex] = e.target.value;
-        
+        let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+        if(e) {
+            // console.log(e.target.value);
+            let refIndex = e.target.getAttribute('ref-num');
+            // selectedTitle.current[refIndex].innerHTML = e.target.getAttribute('text');
+            tempLabels[refIndex] = e.target.getAttribute('text');
+    
+            tempValue[refIndex] = e.target.value;
+        }
         if (nums !== undefined) {
             let tempArr = nums.split(',');
             tempArr.forEach(num => {
@@ -1135,6 +1138,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                             tempPostObj[tempObj["apiLabel"]] = temp[key];
                         } else {
                             tempPostObj[tempObj["apiLabel"]] = tempObj["apiValue"][temp[key]];
+                            // console.log(key,tempObj["apiLabel"],tempPostObj);
                         }
                     }
                 }
@@ -1191,7 +1195,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                     delete tempPostObj["SewingOrderDetails"];
                 }
                 // if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined && stepSelectedValue["2"] !== undefined && stepSelectedValue["3"] !== undefined) {
-                // console.log(JSON.stringify(tempPostObj));
+                // console.log(tempPostObj);
                 axios.post(baseURLPrice, tempPostObj)
                     .then((response) => {
                         setPrice(response.data["price"]);
@@ -1199,27 +1203,28 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                         // console.log("1");
                         
                         // setCart("HeightCart", totalHeight, "", "WidthCart", [totalWidth]);
-                        if (stepSelectedValue["1"] === "1" && stepSelectedValue["2"] === "2") {
-                            if (temp["Width1"] !== undefined && temp["Width2"] !== undefined && temp["Width3"] !== undefined && temp["Height1"] !== undefined && temp["Height2"] !== undefined && temp["Height3"] !== undefined) {
-                                // console.log("2");
-                                getWindowSize(response.data["Width"], response.data["Height"]);
-                                temp["WidthCart"] = response.data["Width"];
-                                temp["HeightCart"] = response.data["Height"];
-                                
-                            }
-                        } else if (stepSelectedValue["1"] === "2" && stepSelectedValue["2"] === "2") {
-                            if (temp["Width3A"] !== undefined && temp["Height3C"] !== undefined && temp["ExtensionRight"] !== undefined && temp["ExtensionLeft"] !== undefined && temp["ShadeMount"] !== undefined) {
-                                getWindowSize(response.data["Width"], response.data["Height"]);
-                                temp["WidthCart"] = response.data["Width"];
-                                temp["HeightCart"] = response.data["Height"];
-                                // console.log("3");
-                            }
-                        } else {
-                            getWindowSize(response.data["Width"], response.data["Height"]);
-                            temp["WidthCart"] = response.data["Width"];
-                            temp["HeightCart"] = response.data["Height"];
-                            // console.log("4");
-                        }
+    
+                        getWindowSize(response.data["Width"], response.data["Height"]);
+                        temp["WidthCart"] = response.data["Width"];
+                        temp["HeightCart"] = response.data["Height"];
+                        // if (stepSelectedValue["1"] === "1" && stepSelectedValue["2"] === "2") {
+                        //     if (temp["Width1"] !== undefined && temp["Width2"] !== undefined && temp["Width3"] !== undefined && temp["Height1"] !== undefined && temp["Height2"] !== undefined && temp["Height3"] !== undefined) {
+                        //         // console.log("2");
+                        //         getWindowSize(response.data["Width"], response.data["Height"]);
+                        //         temp["WidthCart"] = response.data["Width"];
+                        //         temp["HeightCart"] = response.data["Height"];
+                        //
+                        //     }
+                        // } else if (stepSelectedValue["1"] === "2" && stepSelectedValue["2"] === "2") {
+                        //     if (temp["Width3A"] !== undefined && temp["Height3C"] !== undefined && temp["ExtensionRight"] !== undefined && temp["ExtensionLeft"] !== undefined && temp["ShadeMount"] !== undefined) {
+                        //         getWindowSize(response.data["Width"], response.data["Height"]);
+                        //         temp["WidthCart"] = response.data["Width"];
+                        //         temp["HeightCart"] = response.data["Height"];
+                        //         // console.log("3");
+                        //     }
+                        // } else {
+                        //     // console.log("4");
+                        // }
                         resolve();
                     }).catch(err => {
                     setPrice(0);
@@ -1240,7 +1245,6 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
     }
     
     function measureWindowSize() {
-        
         let promise2 = new Promise((resolve, reject) => {
             let temp = JSON.parse(JSON.stringify(cartValues));
             let tempPostObj = {};
@@ -1253,7 +1257,8 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                 if (temp[key] !== null || temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
                     if (tempObj === undefined) {
-                        window.location.reload();
+                        // window.location.reload();
+                        console.log(key);
                     } else {
                         if (tempObj["apiLabel"] !== "") {
                             if (tempObj["apiValue"] === null) {
@@ -1302,9 +1307,11 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
             tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
                 return el != null;
             });
-            
-            if (stepSelectedValue["3"] !== undefined) {
-                if (tempPostObj["SewingOrderDetails"][0]["FabricId"] === undefined) {
+    
+            tempPostObj["SewingOrderDetails"][0]["SodFabrics"] = JSON.parse(JSON.stringify(sodFabrics));
+    
+            if (stepSelectedValue["2"] !== undefined) {
+                if (!dkCurtainArrComplete) {
                     delete tempPostObj["SewingOrderDetails"];
                 }
                 // if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined && stepSelectedValue["2"] !== undefined && stepSelectedValue["3"] !== undefined) {
@@ -1381,17 +1388,9 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
             temp.length = [];
             setSelectCustomValues(temp);
         } else {
-            temp.width1 = [];
-            temp.width2 = [];
-            temp.width3 = [];
-            temp.height1 = [];
-            temp.height2 = [];
-            temp.height3 = [];
-            temp.width3A = [];
-            temp.height3C = [];
-            temp.left = [];
-            temp.right = [];
-            temp.shadeMount = [];
+            Object.keys(temp).forEach((key, index) => {
+                temp[key]=[];
+            });
             setSelectCustomValues(temp);
             
             temp2.labels["3AIn"] = [];
@@ -1625,7 +1624,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                         
                         tempArr.push(
                             <div key={defaultModelName}>
-                                <h2 className="cart_agree_title">{pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</h2>
+                                <h2 className="cart_agree_title">{pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</h2>
                                 <ul className="cart_agree_items_container">
                                     <GetMeasurementArray modelId={`${modelID}`} cartValues={cartValues}/>
                                     {temp1}
@@ -2127,6 +2126,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
     }
     
     function getWindowSize(totalWidth, totalHeight) {
+        let pageLanguage = location.pathname.split('').slice(1, 3).join('');
         let tempWindowSize = pageLanguage === "fa" ? `عرض: ${NumberToPersianWord.convertEnToPe(totalWidth.toString())}س\u200Cم\u00A0\u00A0\u00A0ارتفاع: ${NumberToPersianWord.convertEnToPe(totalHeight.toString())}س\u200Cم` : `Width: ${totalWidth}cm\u00A0\u00A0\u00A0Height: ${totalHeight}cm`;
         setWindowSize(tempWindowSize);
         setWindowSizeBool(true);
@@ -2472,6 +2472,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
             });
             
             Promise.all(promiseArr).then(() => {
+                console.log(step3,fabricObject);
                 if (symmetric) {
                     tempArr[refIndex] = fabricObject;
                     tempArr[count - refIndex - 1] = fabricObject;
@@ -2530,6 +2531,8 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                 setCartProjectIndex(editIndex);
             }
             setCartValues(temp);
+            setDkCurtainArr([]);
+            // setDkCurtainPreviewList([]);
             
             let tempFabric = {};
             let promise2 = new Promise((resolve, reject) => {
@@ -2554,7 +2557,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                 }
             });
             promise2.then(() => {
-                if (tempFabric !== {}) {
+                if (Object.keys(tempFabric).length > 0) {
                     let temp1 = JSON.parse(JSON.stringify(fabricSelected));
                     temp1.selectedFabricId = tempFabric.FabricId;
                     temp1.selectedTextEn = tempFabric.DesignEnName;
@@ -2565,9 +2568,20 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                     temp1.selectedPhoto = tempFabric.FabricOnModelPhotoUrl;
                     setFabricSelected(temp1);
                     // fabricClicked(tempFabric["FabricOnModelPhotoUrl"], tempFabric["HasTrim"]);
-                    tempLabels["3"] = location.pathname.split('').slice(1, 3).join('') === "fa" ? tempFabric["DesignName"] + "/" + tempFabric["ColorName"] : tempFabric["DesignEnName"] + "/" + tempFabric["ColorEnName"];
-                    tempValue["3"] = temp["FabricId"];
-                    depSetTempArr = new Set([...setGetDeps("", "3", depSetTempArr)]);
+                    
+                    if (temp["WidthCart"] && temp["CurtainArr"].filter(el => el).length === Math.floor(temp["WidthCart"] / 11.5)) {
+                        tempLabels["3"] = t('Completed');
+                        tempValue["3"] = "Completed";
+                        setDkCurtainArrComplete(true);
+                        depSetTempArr = new Set([...setGetDeps("", "3", depSetTempArr)]);
+                        setDkCurtainArr(temp["CurtainArr"]);
+                    } else {
+                        tempLabels["3"] = undefined;
+                        tempValue["3"] = undefined;
+                        setDkCurtainArrComplete(false);
+                        depSetTempArr = new Set([...setGetDeps("3", "", depSetTempArr)]);
+                        setDkCurtainArr(temp["CurtainArr"]);
+                    }
                     // console.log(depSetTempArr);
                     // setStep1(temp["FabricId"]);
                     setStepSelectedLabel(tempLabels);
@@ -2588,7 +2602,13 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                             let refIndex = inputs.current["12"].getAttribute('ref-num');
                             tempLabels[refIndex] = inputs.current["12"].getAttribute('text');
                             tempValue[refIndex] = inputs.current["12"].value;
-                            depSetTempArr = new Set([...setGetDeps("", "1", depSetTempArr)]);
+                            if(temp["IsWalled"]) {
+                                setSelectedMountOutsideType([{
+                                    value: temp["IsWalled"],
+                                    label: optionsOutside[pageLanguage].find(opt => opt.value === temp["IsWalled"]).label
+                                }]);
+                            }
+                            depSetTempArr = new Set([...setGetDeps((temp["IsWalled"] ? "" : "11,"), "1", depSetTempArr)]);
                         } else {
                             setStep11("true");
                             let refIndex = inputs.current["13"].getAttribute('ref-num');
@@ -2603,12 +2623,449 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                     if (temp["calcMeasurements"] !== undefined) {
                         // console.log(temp["calcMeasurements"].toString());
                         setStep2(temp["calcMeasurements"].toString());
-                        
+    
+                        if (!temp["calcMeasurements"]) {
+                            let refIndex = inputs.current["21"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["21"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["21"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+        
+                            selectValues["width"] = temp["Width"] ? [{value: temp["Width"]}] : [];
+                            selectValues["length"] = temp["Height"] ? [{value: temp["Height"]}] : [];
+                            depSetTempArr = new Set([...setGetDeps((temp["Width"] ? "" : "21,") + (temp["Height"] ? "" : "22,"), "2", depSetTempArr)]);
+                            setSelectCustomValues(selectValues);
+                        } else {
+                            let refIndex = inputs.current["22"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["22"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["22"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            if (temp["Mount"]) {
+                                if (temp["Mount"] === "Inside") {
+                                    // console.log(temp);
+                                    let tempWidth = changeLang ? temp["Width1"] : temp["Width"];
+                                    let tempHeight = changeLang ? temp["Height1"] : temp["Height"];
+            
+                                    selectValues["width1"] = tempWidth ? [{value: tempWidth}] : [];
+                                    selectValues["width2"] = temp["Width2"] ? [{value: temp["Width2"]}] : [];
+                                    selectValues["width3"] = temp["Width3"] ? [{value: temp["Width3"]}] : [];
+                                    selectValues["height1"] = tempHeight ? [{value: tempHeight}] : [];
+                                    selectValues["height2"] = temp["Height2"] ? [{value: temp["Height2"]}] : [];
+                                    selectValues["height3"] = temp["Height3"] ? [{value: temp["Height3"]}] : [];
+                                    if (tempWidth && temp["Width2"] && temp["Width3"]) {
+                                        let tempMin = Math.min(tempWidth, temp["Width2"], temp["Width3"]);
+                                        tempLabels["2AIn"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
+                                    }
+                                    if (tempHeight && temp["Height2"] && temp["Height3"]) {
+                                        let tempMax = Math.max(tempHeight, temp["Height2"], temp["Height3"]);
+                                        tempLabels["2BIn"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + postfixFa : tempMax + postfixEn;
+                                    }
+            
+                                    depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2AIn1,") + (temp["Width2"] ? "" : "2AIn2,") + (temp["Width3"] ? "" : "2AIn3,") + (tempHeight ? "" : "2BIn1,") + (temp["Height2"] ? "" : "2BIn2,") + (temp["Height3"] ? "" : "2BIn3,"), "2", depSetTempArr)]);
+                                    setSelectCustomValues(selectValues);
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                } else if (temp["Mount"] === "HiddenMoulding") {
+                                    if(temp["FinishedLengthType"]){
+                                        setStep2A(temp["FinishedLengthType"]);
+                                        
+                                        if(temp["FinishedLengthType"]==="Sill"){
+                                            let refIndex = inputs.current["2A1"].getAttribute('ref-num');
+                                            tempLabels[refIndex] = inputs.current["2A1"].getAttribute('text');
+                                            tempValue[refIndex] = inputs.current["2A1"].value;
+                                            setStepSelectedLabel(tempLabels);
+                                            setStepSelectedValue(tempValue);
+    
+                                            let tempWidth = changeLang ? temp["Width2B"] : temp["Width"];
+                                            // let tempHeight = changeLang ? temp["Height2E"] : temp["Height"];
+                                            // console.log(temp,tempWidth,tempHeight);
+    
+                                            selectValues["Width2B"] = tempWidth ? [{value: tempWidth}] : [];
+                                            if (tempWidth) {
+                                                tempLabels["2B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                            }
+                                            selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
+                                            selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                            if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
+                                                tempLabels["2C"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
+                                            }
+                                            selectValues["CeilingToWindow1"] = temp["CeilingToWindow1"] ? [{value: temp["CeilingToWindow1"]}] : [];
+                                            selectValues["CeilingToWindow2"] = temp["CeilingToWindow2"] ? [{value: temp["CeilingToWindow2"]}] : [];
+                                            selectValues["CeilingToWindow3"] = temp["CeilingToWindow3"] ? [{value: temp["CeilingToWindow3"]}] : [];
+                                            if (temp["CeilingToWindow1"] && temp["CeilingToWindow2"] && temp["CeilingToWindow3"]) {
+                                                let tempMin = Math.min(temp["CeilingToWindow1"], temp["CeilingToWindow2"], temp["CeilingToWindow3"]);
+                                                tempLabels["2D"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
+                                            }
+                                            selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
+                                            if (temp["CeilingToFloor"]) {
+                                                tempLabels["2E"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
+                                            }
+    
+                                            depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (temp["CeilingToFloor"] ? "" : "2E,") + (temp["ExtensionLeft"] !== undefined ? "" : "2C1,") + (temp["ExtensionRight"] !== undefined ? "" : "2C2,") + (temp["CeilingToWindow1"] !== undefined ? "" : "2D1,")+ (temp["CeilingToWindow2"] !== undefined ? "" : "2D2,")+ (temp["CeilingToWindow3"] !== undefined ? "" : "2D3,"), "2,2A", depSetTempArr)]);
+                                            setSelectCustomValues(selectValues);
+                                            setStepSelectedLabel(tempLabels);
+                                            setStepSelectedValue(tempValue);
+                                        }
+                                        else if(temp["FinishedLengthType"]==="Apron"){
+                                            let refIndex = inputs.current["2A2"].getAttribute('ref-num');
+                                            tempLabels[refIndex] = inputs.current["2A2"].getAttribute('text');
+                                            tempValue[refIndex] = inputs.current["2A2"].value;
+                                            setStepSelectedLabel(tempLabels);
+                                            setStepSelectedValue(tempValue);
+    
+                                            let tempWidth = changeLang ? temp["Width2B"] : temp["Width"];
+                                            // let tempHeight = changeLang ? temp["Height2E"] : temp["Height"];
+                                            // console.log(temp,tempWidth,tempHeight);
+    
+                                            selectValues["Width2B"] = tempWidth ? [{value: tempWidth}] : [];
+                                            if (tempWidth) {
+                                                tempLabels["2B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                            }
+                                            selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
+                                            selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                            if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
+                                                tempLabels["2C"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
+                                            }
+                                            selectValues["CeilingToWindow1"] = temp["CeilingToWindow1"] ? [{value: temp["CeilingToWindow1"]}] : [];
+                                            selectValues["CeilingToWindow2"] = temp["CeilingToWindow2"] ? [{value: temp["CeilingToWindow2"]}] : [];
+                                            selectValues["CeilingToWindow3"] = temp["CeilingToWindow3"] ? [{value: temp["CeilingToWindow3"]}] : [];
+                                            if (temp["CeilingToWindow1"] && temp["CeilingToWindow2"] && temp["CeilingToWindow3"]) {
+                                                let tempMin = Math.min(temp["CeilingToWindow1"], temp["CeilingToWindow2"], temp["CeilingToWindow3"]);
+                                                tempLabels["2D"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
+                                            }
+                                            selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
+                                            if (temp["CeilingToFloor"]) {
+                                                tempLabels["2E"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
+                                            }
+    
+                                            depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (temp["CeilingToFloor"] ? "" : "2E,") + (temp["ExtensionLeft"] !== undefined ? "" : "2C1,") + (temp["ExtensionRight"] !== undefined ? "" : "2C2,") + (temp["CeilingToWindow1"] !== undefined ? "" : "2D1,")+ (temp["CeilingToWindow2"] !== undefined ? "" : "2D2,")+ (temp["CeilingToWindow3"] !== undefined ? "" : "2D3,"), "2,2A", depSetTempArr)]);
+                                            setSelectCustomValues(selectValues);
+                                            setStepSelectedLabel(tempLabels);
+                                            setStepSelectedValue(tempValue);
+                                        }
+                                        else{
+                                            let refIndex = inputs.current["2A3"].getAttribute('ref-num');
+                                            tempLabels[refIndex] = inputs.current["2A3"].getAttribute('text');
+                                            tempValue[refIndex] = inputs.current["2A3"].value;
+                                            setStepSelectedLabel(tempLabels);
+                                            setStepSelectedValue(tempValue);
+    
+                                            let tempWidth = changeLang ? temp["Width2B"] : temp["Width"];
+                                            // let tempHeight = changeLang ? temp["Height2E"] : temp["Height"];
+                                            // console.log(temp,tempWidth,tempHeight);
+    
+                                            selectValues["Width2B"] = tempWidth ? [{value: tempWidth}] : [];
+                                            if (tempWidth) {
+                                                tempLabels["2B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                            }
+                                            selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
+                                            selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                            if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
+                                                tempLabels["2C"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
+                                            }
+                                            selectValues["CeilingToFloor1"] = temp["CeilingToFloor1"] ? [{value: temp["CeilingToFloor1"]}] : [];
+                                            selectValues["CeilingToFloor2"] = temp["CeilingToFloor2"] ? [{value: temp["CeilingToFloor2"]}] : [];
+                                            selectValues["CeilingToFloor3"] = temp["CeilingToFloor3"] ? [{value: temp["CeilingToFloor3"]}] : [];
+                                            if (temp["CeilingToFloor1"] && temp["CeilingToFloor2"] && temp["CeilingToFloor3"]) {
+                                                let tempMin = Math.min(temp["CeilingToFloor1"], temp["CeilingToFloor2"], temp["CeilingToFloor3"]);
+                                                tempLabels["2DFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
+                                            }
+    
+                                            depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (temp["ExtensionLeft"] !== undefined ? "" : "2C1,") + (temp["ExtensionRight"] !== undefined ? "" : "2C2,") + (temp["CeilingToFloor1"] !== undefined ? "" : "2DFloor1,")+ (temp["CeilingToFloor2"] !== undefined ? "" : "2DFloor2,")+ (temp["CeilingToFloor3"] !== undefined ? "" : "2DFloor3,"), "2,2A", depSetTempArr)]);
+                                            setSelectCustomValues(selectValues);
+                                            setStepSelectedLabel(tempLabels);
+                                            setStepSelectedValue(tempValue);
+                                        }
+                                    }
+                                } else{
+                                    if(temp["IsWalled"]) {
+                                        // console.log([{value: temp["IsWalled"]}]);
+                                        if(temp["IsWalled"]==="Ceiling") {
+                                            if (temp["FinishedLengthType"]) {
+                                                setStep2A(temp["FinishedLengthType"]);
+        
+                                                if (temp["FinishedLengthType"] === "Sill") {
+                                                    let refIndex = inputs.current["2A1"].getAttribute('ref-num');
+                                                    tempLabels[refIndex] = inputs.current["2A1"].getAttribute('text');
+                                                    tempValue[refIndex] = inputs.current["2A1"].value;
+                                                    setStepSelectedLabel(tempLabels);
+                                                    setStepSelectedValue(tempValue);
+            
+                                                    let tempWidth = changeLang ? temp["Width2B"] : temp["Width"];
+                                                    // let tempHeight = changeLang ? temp["Height2E"] : temp["Height"];
+                                                    // console.log(temp,tempWidth,tempHeight);
+            
+                                                    selectValues["Width2B"] = tempWidth ? [{value: tempWidth}] : [];
+                                                    if (tempWidth) {
+                                                        tempLabels["2B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                    }
+                                                    selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
+                                                    selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                                    if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
+                                                        tempLabels["2CCeiling"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
+                                                    }
+                                                    selectValues["CeilingToWindow1"] = temp["CeilingToWindow1"] ? [{value: temp["CeilingToWindow1"]}] : [];
+                                                    selectValues["CeilingToWindow2"] = temp["CeilingToWindow2"] ? [{value: temp["CeilingToWindow2"]}] : [];
+                                                    selectValues["CeilingToWindow3"] = temp["CeilingToWindow3"] ? [{value: temp["CeilingToWindow3"]}] : [];
+                                                    if (temp["CeilingToWindow1"] && temp["CeilingToWindow2"] && temp["CeilingToWindow3"]) {
+                                                        let tempMin = Math.min(temp["CeilingToWindow1"], temp["CeilingToWindow2"], temp["CeilingToWindow3"]);
+                                                        tempLabels["2D"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
+                                                    }
+                                                    selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
+                                                    if (temp["CeilingToFloor"]) {
+                                                        tempLabels["2E"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
+                                                    }
+            
+                                                    depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (temp["CeilingToFloor"] ? "" : "2E,") + (temp["ExtensionLeft"] !== undefined ? "" : "2CCeiling1,") + (temp["ExtensionRight"] !== undefined ? "" : "2CCeiling2,") + (temp["CeilingToWindow1"] !== undefined ? "" : "2D1,") + (temp["CeilingToWindow2"] !== undefined ? "" : "2D2,") + (temp["CeilingToWindow3"] !== undefined ? "" : "2D3,"), "2,2A", depSetTempArr)]);
+                                                    setSelectCustomValues(selectValues);
+                                                    setStepSelectedLabel(tempLabels);
+                                                    setStepSelectedValue(tempValue);
+                                                } else if (temp["FinishedLengthType"] === "Apron") {
+                                                    let refIndex = inputs.current["2A2"].getAttribute('ref-num');
+                                                    tempLabels[refIndex] = inputs.current["2A2"].getAttribute('text');
+                                                    tempValue[refIndex] = inputs.current["2A2"].value;
+                                                    setStepSelectedLabel(tempLabels);
+                                                    setStepSelectedValue(tempValue);
+            
+                                                    let tempWidth = changeLang ? temp["Width2B"] : temp["Width"];
+                                                    // let tempHeight = changeLang ? temp["Height2E"] : temp["Height"];
+                                                    // console.log(temp,tempWidth,tempHeight);
+            
+                                                    selectValues["Width2B"] = tempWidth ? [{value: tempWidth}] : [];
+                                                    if (tempWidth) {
+                                                        tempLabels["2B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                    }
+                                                    selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
+                                                    selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                                    if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
+                                                        tempLabels["2CCeiling"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
+                                                    }
+                                                    selectValues["CeilingToWindow1"] = temp["CeilingToWindow1"] ? [{value: temp["CeilingToWindow1"]}] : [];
+                                                    selectValues["CeilingToWindow2"] = temp["CeilingToWindow2"] ? [{value: temp["CeilingToWindow2"]}] : [];
+                                                    selectValues["CeilingToWindow3"] = temp["CeilingToWindow3"] ? [{value: temp["CeilingToWindow3"]}] : [];
+                                                    if (temp["CeilingToWindow1"] && temp["CeilingToWindow2"] && temp["CeilingToWindow3"]) {
+                                                        let tempMin = Math.min(temp["CeilingToWindow1"], temp["CeilingToWindow2"], temp["CeilingToWindow3"]);
+                                                        tempLabels["2D"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
+                                                    }
+                                                    selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
+                                                    if (temp["CeilingToFloor"]) {
+                                                        tempLabels["2E"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
+                                                    }
+            
+                                                    depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (temp["CeilingToFloor"] ? "" : "2E,") + (temp["ExtensionLeft"] !== undefined ? "" : "2CCeiling1,") + (temp["ExtensionRight"] !== undefined ? "" : "2CCeiling2,") + (temp["CeilingToWindow1"] !== undefined ? "" : "2D1,") + (temp["CeilingToWindow2"] !== undefined ? "" : "2D2,") + (temp["CeilingToWindow3"] !== undefined ? "" : "2D3,"), "2,2A", depSetTempArr)]);
+                                                    setSelectCustomValues(selectValues);
+                                                    setStepSelectedLabel(tempLabels);
+                                                    setStepSelectedValue(tempValue);
+                                                } else {
+                                                    let refIndex = inputs.current["2A3"].getAttribute('ref-num');
+                                                    tempLabels[refIndex] = inputs.current["2A3"].getAttribute('text');
+                                                    tempValue[refIndex] = inputs.current["2A3"].value;
+                                                    setStepSelectedLabel(tempLabels);
+                                                    setStepSelectedValue(tempValue);
+            
+                                                    let tempWidth = changeLang ? temp["Width2B"] : temp["Width"];
+                                                    // let tempHeight = changeLang ? temp["Height2E"] : temp["Height"];
+                                                    // console.log(temp,tempWidth,tempHeight);
+            
+                                                    selectValues["Width2B"] = tempWidth ? [{value: tempWidth}] : [];
+                                                    if (tempWidth) {
+                                                        tempLabels["2B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                    }
+                                                    selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
+                                                    selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                                    if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
+                                                        tempLabels["2CCeiling"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
+                                                    }
+                                                    selectValues["CeilingToFloor1"] = temp["CeilingToFloor1"] ? [{value: temp["CeilingToFloor1"]}] : [];
+                                                    selectValues["CeilingToFloor2"] = temp["CeilingToFloor2"] ? [{value: temp["CeilingToFloor2"]}] : [];
+                                                    selectValues["CeilingToFloor3"] = temp["CeilingToFloor3"] ? [{value: temp["CeilingToFloor3"]}] : [];
+                                                    if (temp["CeilingToFloor1"] && temp["CeilingToFloor2"] && temp["CeilingToFloor3"]) {
+                                                        let tempMin = Math.min(temp["CeilingToFloor1"], temp["CeilingToFloor2"], temp["CeilingToFloor3"]);
+                                                        tempLabels["2DFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
+                                                    }
+            
+                                                    depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (temp["ExtensionLeft"] !== undefined ? "" : "2CCeiling1,") + (temp["ExtensionRight"] !== undefined ? "" : "2CCeiling2,") + (temp["CeilingToFloor1"] !== undefined ? "" : "2DFloor1,") + (temp["CeilingToFloor2"] !== undefined ? "" : "2DFloor2,") + (temp["CeilingToFloor3"] !== undefined ? "" : "2DFloor3,"), "2,2A", depSetTempArr)]);
+                                                    setSelectCustomValues(selectValues);
+                                                    setStepSelectedLabel(tempLabels);
+                                                    setStepSelectedValue(tempValue);
+                                                }
+                                            }
+                                        }
+                                        else{
+                                            if (temp["FinishedLengthType"]) {
+                                                setStep2A(temp["FinishedLengthType"]);
+        
+                                                if (temp["FinishedLengthType"] === "Sill") {
+                                                    let refIndex = inputs.current["2A1"].getAttribute('ref-num');
+                                                    tempLabels[refIndex] = inputs.current["2A1"].getAttribute('text');
+                                                    tempValue[refIndex] = inputs.current["2A1"].value;
+                                                    setStepSelectedLabel(tempLabels);
+                                                    setStepSelectedValue(tempValue);
+            
+                                                    let tempWidth = changeLang ? temp["Width2B"] : temp["Width"];
+                                                    let tempHeight = changeLang ? temp["Height2E"] : temp["Height"];
+                                                    // console.log(temp,tempWidth,tempHeight);
+            
+                                                    selectValues["Width2B"] = tempWidth ? [{value: tempWidth}] : [];
+                                                    if (tempWidth) {
+                                                        tempLabels["2B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                    }
+                                                    selectValues["Height2E"] = tempHeight ? [{value: tempHeight}] : [];
+                                                    if (tempHeight) {
+                                                        tempLabels["2EWall"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
+                                                    }
+                                                    selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
+                                                    selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                                    if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
+                                                        tempLabels["2CCeiling"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
+                                                    }
+                                                    selectValues["WindowToFloor"] = temp["WindowToFloor"] ? [{value: temp["WindowToFloor"]}] : [];
+                                                    if (temp["WindowToFloor"]) {
+                                                        tempLabels["2DWall"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["WindowToFloor"]}`) + postfixFa : temp["WindowToFloor"] + postfixEn;
+                                                    }
+                                                    selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
+                                                    if (temp["ShadeMount"] !== undefined) {
+                                                        tempLabels["2FWall"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["ShadeMount"]}`) + postfixFa : temp["ShadeMount"] + postfixEn;
+                                                    }
+                                                    selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
+                                                    if (temp["CeilingToFloor"]) {
+                                                        tempLabels["2GWall"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
+                                                    }
+            
+                                                    depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (tempHeight ? "" : "2EWall,") + (temp["ExtensionLeft"] !== undefined ? "" : "2CCeiling1,") + (temp["ExtensionRight"] !== undefined ? "" : "2CCeiling2,") + (temp["WindowToFloor"] !== undefined ? "" : "2DWall,") + (temp["ShadeMount"] !== undefined ? "" : "2FWall,") + (temp["CeilingToFloor"] !== undefined ? "" : "2GWall,"), "2,2A", depSetTempArr)]);
+                                                    setSelectCustomValues(selectValues);
+                                                    setStepSelectedLabel(tempLabels);
+                                                    setStepSelectedValue(tempValue);
+                                                } else if (temp["FinishedLengthType"] === "Apron") {
+                                                    let refIndex = inputs.current["2A2"].getAttribute('ref-num');
+                                                    tempLabels[refIndex] = inputs.current["2A2"].getAttribute('text');
+                                                    tempValue[refIndex] = inputs.current["2A2"].value;
+                                                    setStepSelectedLabel(tempLabels);
+                                                    setStepSelectedValue(tempValue);
+    
+                                                    let tempWidth = changeLang ? temp["Width2B"] : temp["Width"];
+                                                    let tempHeight = changeLang ? temp["Height2E"] : temp["Height"];
+                                                    // console.log(temp,tempWidth,tempHeight);
+    
+                                                    selectValues["Width2B"] = tempWidth ? [{value: tempWidth}] : [];
+                                                    if (tempWidth) {
+                                                        tempLabels["2B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                    }
+                                                    selectValues["Height2E"] = tempHeight ? [{value: tempHeight}] : [];
+                                                    if (tempHeight) {
+                                                        tempLabels["2EWall"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
+                                                    }
+                                                    selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
+                                                    selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                                    if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
+                                                        tempLabels["2CCeiling"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
+                                                    }
+                                                    selectValues["WindowToFloor"] = temp["WindowToFloor"] ? [{value: temp["WindowToFloor"]}] : [];
+                                                    if (temp["WindowToFloor"]) {
+                                                        tempLabels["2DWall"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["WindowToFloor"]}`) + postfixFa : temp["WindowToFloor"] + postfixEn;
+                                                    }
+                                                    selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
+                                                    if (temp["ShadeMount"] !== undefined) {
+                                                        tempLabels["2FWall"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["ShadeMount"]}`) + postfixFa : temp["ShadeMount"] + postfixEn;
+                                                    }
+                                                    selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
+                                                    if (temp["CeilingToFloor"]) {
+                                                        tempLabels["2GWall"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
+                                                    }
+    
+                                                    depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (tempHeight ? "" : "2EWall,") + (temp["ExtensionLeft"] !== undefined ? "" : "2CCeiling1,") + (temp["ExtensionRight"] !== undefined ? "" : "2CCeiling2,") + (temp["WindowToFloor"] !== undefined ? "" : "2DWall,") + (temp["ShadeMount"] !== undefined ? "" : "2FWall,") + (temp["CeilingToFloor"] !== undefined ? "" : "2GWall,"), "2,2A", depSetTempArr)]);
+                                                    setSelectCustomValues(selectValues);
+                                                    setStepSelectedLabel(tempLabels);
+                                                    setStepSelectedValue(tempValue);
+                                                } else {
+                                                    let refIndex = inputs.current["2A3"].getAttribute('ref-num');
+                                                    tempLabels[refIndex] = inputs.current["2A3"].getAttribute('text');
+                                                    tempValue[refIndex] = inputs.current["2A3"].value;
+                                                    setStepSelectedLabel(tempLabels);
+                                                    setStepSelectedValue(tempValue);
+    
+                                                    let tempWidth = changeLang ? temp["Width2B"] : temp["Width"];
+                                                    // let tempHeight = changeLang ? temp["Height2E"] : temp["Height"];
+                                                    // console.log(temp,tempWidth,tempHeight);
+    
+                                                    selectValues["Width2B"] = tempWidth ? [{value: tempWidth}] : [];
+                                                    if (tempWidth) {
+                                                        tempLabels["2B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                    }
+                                                    selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
+                                                    selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                                    if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
+                                                        tempLabels["2CCeiling"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
+                                                    }
+                                                    selectValues["WindowToFloor"] = temp["WindowToFloor"] ? [{value: temp["WindowToFloor"]}] : [];
+                                                    if (temp["WindowToFloor"]) {
+                                                        tempLabels["2DWall"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["WindowToFloor"]}`) + postfixFa : temp["WindowToFloor"] + postfixEn;
+                                                    }
+                                                    selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
+                                                    if (temp["ShadeMount"] !== undefined) {
+                                                        tempLabels["2EWallFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["ShadeMount"]}`) + postfixFa : temp["ShadeMount"] + postfixEn;
+                                                    }
+                                                    selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
+                                                    if (temp["CeilingToFloor"]) {
+                                                        tempLabels["2FWallFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
+                                                    }
+    
+                                                    depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (temp["ExtensionLeft"] !== undefined ? "" : "2CCeiling1,") + (temp["ExtensionRight"] !== undefined ? "" : "2CCeiling2,") + (temp["WindowToFloor"] !== undefined ? "" : "2DWall,") + (temp["ShadeMount"] !== undefined ? "" : "2EWallFloor,") + (temp["CeilingToFloor"] !== undefined ? "" : "2FWallFloor,"), "2,2A", depSetTempArr)]);
+                                                    setSelectCustomValues(selectValues);
+                                                    setStepSelectedLabel(tempLabels);
+                                                    setStepSelectedValue(tempValue);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                     if (temp["WidthCart"] && temp["HeightCart"]) {
                         getWindowSize(temp["WidthCart"], temp["HeightCart"]);
                     }
                     
+                    if (temp["StackPosition"]) {
+                        setStep4(temp["StackPosition"]);
+                        if (temp["StackPosition"] === "Left") {
+                            let refIndex = inputs.current["41"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["41"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["41"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "4", depSetTempArr)]);
+                        } else if (temp["StackPosition"] === "Right") {
+                            let refIndex = inputs.current["42"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["42"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["42"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "4", depSetTempArr)]);
+                        } else {
+                            let refIndex = inputs.current["43"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["43"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["43"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "4", depSetTempArr)]);
+                        }
+                        setStepSelectedLabel(tempLabels);
+                        setStepSelectedValue(tempValue);
+                    }
+                    
+                    if (temp["ControlPosition"]) {
+                        setStep5(temp["ControlPosition"]);
+                        if (temp["ControlPosition"] === "Left") {
+                            let refIndex = inputs.current["51"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["51"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["51"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "5", depSetTempArr)]);
+                        } else {
+                            let refIndex = inputs.current["52"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["52"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["52"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "5", depSetTempArr)]);
+                        }
+                        setStepSelectedLabel(tempLabels);
+                        setStepSelectedValue(tempValue);
+                    }
+    
                     if (temp["RoomNameEn"]) {
                         setSavedProjectRoomLabel(temp["RoomNameEn"]);
                         
@@ -3038,10 +3495,9 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
             // tempValue["3"] = fabricSelected.selectedFabricId;
             // setStepSelectedLabel(tempLabels);
             // setStepSelectedValue(tempValue);
-            // setCart("FabricId", fabricSelected.selectedFabricId);
-            setCart("FabricId", `${fabricSelected.selectedFabricId}`, "", "FabricDesignFa,FabricDesignEn,FabricColorEn,FabricColorFa,PhotoUrl", [fabricSelected.selectedTextFa, fabricSelected.selectedTextEn, fabricSelected.selectedColorEn, fabricSelected.selectedColorFa, fabricSelected.selectedPhoto]);
+            setCart("FabricId", fabricSelected.selectedFabricId);
+            // setCart("FabricId", `${fabricSelected.selectedFabricId}`, "", "FabricDesignFa,FabricDesignEn,FabricColorEn,FabricColorFa,PhotoUrl", [fabricSelected.selectedTextFa, fabricSelected.selectedTextEn, fabricSelected.selectedColorEn, fabricSelected.selectedColorFa, fabricSelected.selectedPhoto]);
             // setCart("PhotoUrl", fabricSelected.selectedPhoto);
-            setDeps("", "3");
             setStep3(fabricSelected.selectedFabricId.toString());
             setFabricColorHtmlCode(fabricSelected.ColorHtmlCode);
         }
@@ -3274,122 +3730,181 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
     useEffect(() => {
         if (cartValues["WidthCart"] !== undefined) {
             renderDkCurtains(cartValues["WidthCart"]);
-            
+    
+            let pageLanguage = location.pathname.split('').slice(1, 3).join('');
             let tempArr = [];
             let tempObj = [];
             let tempObjFabric = [];
             let promiseArr = [];
-            for (let i = 0; i <= dkCurtainArr.length; i++) {
-                if (dkCurtainArr[i]) {
-                    promiseArr[i] = new Promise((resolve, reject) => {
-                        let objKey = (pageLanguage === 'en' ? dkCurtainArr[i]["DesignEnName"] : dkCurtainArr[i]["DesignName"]).toString() + "/" + (pageLanguage === 'en' ? dkCurtainArr[i]["ColorEnName"] : dkCurtainArr[i]["ColorName"]).toString();
-                        tempObj[i] = objKey;
-                        tempObjFabric[i] = dkCurtainArr[i]["FabricId"];
-                        resolve();
-                    });
+            if(dkCurtainArr.length) {
+                for (let i = 0; i <= dkCurtainArr.length; i++) {
+                    if (dkCurtainArr[i] && Object.keys(dkCurtainArr[i]).length > 0) {
+                        promiseArr[i] = new Promise((resolve, reject) => {
+                            // console.log(dkCurtainArr[i]);
+                            let objKey = (pageLanguage === 'en' ? dkCurtainArr[i]["DesignEnName"] : dkCurtainArr[i]["DesignName"]).toString() + "/" + (pageLanguage === 'en' ? dkCurtainArr[i]["ColorEnName"] : dkCurtainArr[i]["ColorName"]).toString();
+                            tempObj[i] = objKey;
+                            tempObjFabric[i] = dkCurtainArr[i]["FabricId"];
+                            // console.log(location.pathname,pageLanguage,objKey);
+                            resolve();
+                        });
+                    }
                 }
-            }
-            
-            Promise.all(promiseArr).then(() => {
-                let promiseArr2 = [];
-                let lastString = tempObj[0];
-                let lastFabric = tempObjFabric[0];
-                let tempObjCount = {};
-                let count = 0;
-                let lastRef = 0;
-                
-                const doPush = (refIndex) => {
-                    tempObjCount[refIndex] = {
-                        "count": count,
-                        "string": lastString,
-                        "fabricId": lastFabric
+    
+                Promise.all(promiseArr).then(() => {
+                    let promiseArr2 = [];
+                    let lastString = tempObj[0];
+                    let lastFabric = tempObjFabric[0];
+                    let tempObjCount = {};
+                    let count = 0;
+                    let lastRef = 0;
+        
+                    const doPush = (refIndex) => {
+                        tempObjCount[refIndex] = {
+                            "count": count,
+                            "string": lastString,
+                            "fabricId": lastFabric
+                        };
                     };
-                };
-                for (let i = 0; i < tempObj.length; i++) {
-                    let string = tempObj[i];
-                    promiseArr2[i] = new Promise((resolve, reject) => {
-                        if (string !== lastString) {
-                            doPush(lastRef);
-                            lastString = string;
-                            lastFabric = tempObjFabric[i];
-                            count = 1;
-                            lastRef = i;
-                            resolve();
-                        } else {
-                            count++;
-                            resolve();
-                        }
-                    });
-                }
-                
-                Promise.all(promiseArr2).then(() => {
-                    doPush(lastRef);
-                    
-                    let promiseArr3 = [];
-                    Object.keys(tempObjCount).forEach((key, index) => {
-                        // if (index < 8) {
-                        promiseArr3[index] = new Promise((resolve, reject) => {
-                            if (tempObjCount[key]["string"]) {
-                                tempArr.push(
-                                    <div key={index}
-                                         className="dk_curtain_preview_detail"><h2>{tempObjCount[key]["string"]}</h2><h3>&nbsp;{"\u00d7 " + tempObjCount[key]["count"]}</h3>
-                                    </div>
-                                );
+                    for (let i = 0; i < tempObj.length; i++) {
+                        let string = tempObj[i];
+                        promiseArr2[i] = new Promise((resolve, reject) => {
+                            if (string !== lastString) {
+                                doPush(lastRef);
+                                lastString = string;
+                                lastFabric = tempObjFabric[i];
+                                count = 1;
+                                lastRef = i;
                                 resolve();
                             } else {
+                                count++;
                                 resolve();
                             }
                         });
-                        // } else {
-                        //     if (showMorePreview) {
-                        //         promiseArr2[index] = new Promise((resolve, reject) => {
-                        //             tempArr.push(
-                        //                 <div key={index}
-                        //                      className="dk_curtain_preview_detail"><h2>{key}</h2><h3>&nbsp;{"/ " + tempObj[key]}</h3></div>
-                        //             );
-                        //             resolve();
-                        //         });
-                        //     } else if (index === 8) {
-                        //         promiseArr2[index] = new Promise((resolve, reject) => {
-                        //             tempArr.push(
-                        //                 <div key={index} className="dk_curtain_preview_detail_more_button_container">
-                        //                     <button className="dk_curtain_preview_detail_more_button btn" onClick={() => setShowMorePreview(true)}>See More Color Options</button>
-                        //                 </div>
-                        //             );
-                        //             resolve();
-                        //         });
-                        //     }
-                        // }
-                    });
-                    Promise.all(promiseArr3).then(() => {
-                        setDkCurtainPreviewList(tempArr);
-                        
-                        let tempSodFabrics = [];
-                        let promiseArr4 = [];
+                    }
+        
+                    Promise.all(promiseArr2).then(() => {
+                        doPush(lastRef);
+            
+                        let promiseArr3 = [];
                         Object.keys(tempObjCount).forEach((key, index) => {
-                            promiseArr4[index] = new Promise((resolve, reject) => {
-                                if (tempObjCount[key]["fabricId"]) {
-                                    tempSodFabrics.push(
-                                        {
-                                            "FabricId": tempObjCount[key]["fabricId"].toString(),
-                                            "Qty": tempObjCount[key]["count"].toString(),
-                                            "FabricOrder": (+key + +1).toString()
-                                        });
+                            // if (index < 8) {
+                            promiseArr3[index] = new Promise((resolve, reject) => {
+                                if (tempObjCount[key]["string"]) {
+                                    tempArr.push(
+                                        <div key={index}
+                                             className="dk_curtain_preview_detail"><h2>{tempObjCount[key]["string"]}</h2><h3>&nbsp;{"\u00d7 " + tempObjCount[key]["count"]}</h3>
+                                        </div>
+                                    );
+                                    resolve();
+                                } else {
+                                    resolve();
                                 }
-                                resolve();
+                            });
+                            // } else {
+                            //     if (showMorePreview) {
+                            //         promiseArr2[index] = new Promise((resolve, reject) => {
+                            //             tempArr.push(
+                            //                 <div key={index}
+                            //                      className="dk_curtain_preview_detail"><h2>{key}</h2><h3>&nbsp;{"/ " + tempObj[key]}</h3></div>
+                            //             );
+                            //             resolve();
+                            //         });
+                            //     } else if (index === 8) {
+                            //         promiseArr2[index] = new Promise((resolve, reject) => {
+                            //             tempArr.push(
+                            //                 <div key={index} className="dk_curtain_preview_detail_more_button_container">
+                            //                     <button className="dk_curtain_preview_detail_more_button btn" onClick={() => setShowMorePreview(true)}>See More Color Options</button>
+                            //                 </div>
+                            //             );
+                            //             resolve();
+                            //         });
+                            //     }
+                            // }
+                        });
+                        Promise.all(promiseArr3).then(() => {
+                            setDkCurtainPreviewList(tempArr);
+                
+                            let tempSodFabrics = [];
+                            let promiseArr4 = [];
+                            Object.keys(tempObjCount).forEach((key, index) => {
+                                promiseArr4[index] = new Promise((resolve, reject) => {
+                                    if (tempObjCount[key]["fabricId"]) {
+                                        tempSodFabrics.push(
+                                            {
+                                                "FabricId": tempObjCount[key]["fabricId"].toString(),
+                                                "Qty": tempObjCount[key]["count"].toString(),
+                                                "FabricOrder": (+key + +1).toString()
+                                            });
+                                    }
+                                    resolve();
+                                });
+                            });
+                
+                            Promise.all(promiseArr4).then(() => {
+                                setSodFabrics(tempSodFabrics);
+                                // console.log(tempSodFabrics);
                             });
                         });
-                        
-                        Promise.all(promiseArr4).then(() => {
-                            setSodFabrics(tempSodFabrics);
-                            // console.log(tempSodFabrics);
-                        });
+                        // console.log(curtainList)
                     });
-                    // console.log(curtainList)
                 });
-            });
+            }
+            else{
+                setDkCurtainPreviewList([]);
+                setSodFabrics([]);
+            }
         }
+        setCart("CurtainArr",dkCurtainArr);
     }, [JSON.stringify(dkCurtainArr), symmetric]);
+    
+    useEffect(() => {
+        if (curtainChangeId !== -1) {
+            if (cartValues["WidthCart"] !== undefined) {
+                let tempArr = JSON.parse(JSON.stringify(dkCurtainArr));
+                let count = Math.floor(cartValues["WidthCart"] / 11.5);
+                tempArr = tempArr.slice(0, count);
+                let fabricObject = {};
+        
+                let promiseArr = [];
+                Object.keys(fabrics).forEach((key, index) => {
+                    promiseArr[index] = new Promise((resolve, reject) => {
+                        fabricObject = fabrics[key].filter(obj => {
+                            return obj["FabricId"] === step3
+                        })[0] || fabricObject;
+                        resolve();
+                    });
+                });
+        
+                Promise.all(promiseArr).then(() => {
+                    // console.log(step3, fabricObject);
+                    if (symmetric) {
+                        tempArr[curtainChangeId] = fabricObject;
+                        tempArr[count - curtainChangeId - 1] = fabricObject;
+                    } else {
+                        tempArr[curtainChangeId] = fabricObject;
+                    }
+                    setDkCurtainArr(tempArr);
+                    setCurtainChangeId(-1);
+                });
+            } else {
+                modalHandleShow("noMeasurements");
+                setCurtainChangeId(-1);
+            }
+        }
+    }, [curtainChangeId]);
+    
+    useEffect(() => {
+        if(sodFabrics.length) {
+            let count = Math.floor(cartValues["WidthCart"] / 11.5);
+            let DkCurtainArr = JSON.parse(JSON.stringify(dkCurtainArr));
+            if (DkCurtainArr.filter(el => el).length === count) {
+                measureWindowSize();
+            }
+        }
+        else{
+            measureWindowSize();
+        }
+    }, [JSON.stringify(sodFabrics)]);
     
     useEffect(() => {
         if (showMoreFabric !== "") {
@@ -3672,7 +4187,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
             
             
             <div className="models_title_div">
-                <h1>{defaultModelName === undefined || defaultModelName === "" ? " " : pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</h1>
+                <h1>{defaultModelName === undefined || defaultModelName === "" ? " " : pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</h1>
             </div>
             <div className="model_customize_container">
                 <div className="model_customize_image">
@@ -3692,59 +4207,65 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                 <Card.Body>
                                     <div className="card_body card_body_radio">
                                         <div className="box33 radio_style">
-                                            <img src={require('../Images/drapery/zebra/mount_inside.svg').default} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/zebra/window-Inside.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("mount_Inside")} value="1" name="step1" ref-num="1" id="11" checked={step1 === "Inside"}
                                                    onChange={e => {
-                                                       selectChanged(e, "");
                                                        setStep1("Inside");
                                                        setStep11("");
                                                        setMeasurementsNextStep("3");
                                                        if (stepSelectedValue["2"] === "2") {
-                                                           setDeps("21", "2,3AOut,3BOut1,3BOut2,3COut,3DOut");
-                                                           deleteSpecialSelects(2);
-                                                           setCart("Mount", "Inside", "Mount2");
+                                                           setDeps("11,2", "1,2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWall,2EWall,2FWall,2GWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
+                                                           deleteSpecialSelects();
+                                                           setCart("Mount", "Inside", "IsWalled,calcMeasurements,Width1,Width2,Width3,Height1,Height2,Height3,FinishedLengthType,Width2B,Height2E,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
                                                            setStep2("");
+                                                           selectChanged(e, "2,2AIn,2BIn,2A,2B,2E,2DWall,2EWall,2FWall,2GWall,2EWallFloor,2FWallFloor,2C,2CCeiling,2D,2DFloor");
                                                        } else {
-                                                           setDeps("21", "2");
-                                                           setCart("Mount", "Inside", "Mount2");
+                                                           setDeps("11", "1");
+                                                           setCart("Mount", "Inside", "IsWalled");
+                                                           selectChanged(e, "");
                                                        }
                                                 
                                                    }} ref={ref => (inputs.current["11"] = ref)}/>
                                             <label htmlFor="11">{t("mount_Inside")}</label>
                                         </div>
                                         <div className="box33 radio_style">
-                                            <img src={require('../Images/drapery/zebra/mount_outside.svg').default} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/zebra/window-Outside.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("mount_Outside")} value="2" name="step1" ref-num="1" id="12" checked={step1 === "Outside"}
                                                    onChange={e => {
-                                                       selectChanged(e, "");
                                                        setStep1("Outside");
                                                        setStep11("");
                                                        if (stepSelectedValue["2"] === "2") {
-                                                           setDeps("3AOut,3BOut1,3BOut2,3COut,3DOut", "2,21,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3");
-                                                           deleteSpecialSelects(1);
-                                                           setCart("", "", "Mount,Mount2,Width1,Width2,Width3,Height1,Height2,Height3");
+                                                           setDeps("2", "1,11,2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWall,2EWall,2FWall,2GWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
+                                                           deleteSpecialSelects();
+                                                           setCart("Mount", "Outside", "IsWalled,calcMeasurements,Width1,Width2,Width3,Height1,Height2,Height3,FinishedLengthType,Width2B,Height2E,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
+                                                           setStep2("");
+                                                           selectChanged(e, "2,2AIn,2BIn,2A,2B,2E,2DWall,2EWall,2FWall,2GWall,2EWallFloor,2FWallFloor,2C,2CCeiling,2D,2DFloor");
                                                        } else {
-                                                           setDeps("", "2,21");
-                                                           setCart("", "", "Mount,Mount2,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
+                                                           setDeps("", "1,11");
+                                                           setCart("Mount", "Outside", "IsWalled,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
+                                                           selectChanged(e, "");
                                                        }
                                                        setSelectedMountOutsideType([]);
                                                    }} ref={ref => (inputs.current["12"] = ref)}/>
                                             <label htmlFor="12">{t("mount_Outside")}</label>
                                         </div>
                                         <div className="box33 radio_style">
-                                            <img src={require('../Images/drapery/zebra/mount_outside.svg').default} className="img-fluid" alt=""/>
-                                            <input className="radio" type="radio" text={t("mount_Arc")} value="3" name="step1" ref-num="1" id="13" checked={step1 === "HiddenMouldingMount"}
+                                            <img src={require('../Images/drapery/zebra/window-Arc.svg').default} className="img-fluid" alt=""/>
+                                            <input className="radio" type="radio" text={t("mount_Arc")} value="3" name="step1" ref-num="1" id="13" checked={step1 === "HiddenMoulding"}
                                                    onChange={e => {
-                                                       selectChanged(e, "3AIn,3BIn");
-                                                       setStep1("HiddenMouldingMount");
+                                                       setStep1("HiddenMoulding");
                                                        setStep11("");
+                                                       setMeasurementsNextStep("3");
                                                        if (stepSelectedValue["2"] === "2") {
-                                                           setDeps("3AOut,3BOut1,3BOut2,3COut,3DOut", "2,21,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3");
-                                                           deleteSpecialSelects(1);
-                                                           setCart("Mount2", "HiddenMouldingMount", "Mount,Width1,Width2,Width3,Height1,Height2,Height3");
+                                                           setDeps("11,2", "1,2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWall,2EWall,2FWall,2GWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
+                                                           deleteSpecialSelects();
+                                                           setCart("Mount", "HiddenMoulding", "IsWalled,calcMeasurements,Width1,Width2,Width3,Height1,Height2,Height3,FinishedLengthType,Width2B,Height2E,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
+                                                           setStep2("");
+                                                           selectChanged(e, "2,2AIn,2BIn,2A,2B,2E,2DWall,2EWall,2FWall,2GWall,2EWallFloor,2FWallFloor,2C,2CCeiling,2D,2DFloor");
                                                        } else {
-                                                           setDeps("", "2,21");
-                                                           setCart("Mount2", "HiddenMouldingMount", "Mount,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
+                                                           setDeps("11", "1");
+                                                           setCart("Mount", "HiddenMoulding", "IsWalled,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
+                                                           selectChanged(e, "2AIn,2BIn");
                                                        }
                                                    }} ref={ref => (inputs.current["13"] = ref)}/>
                                             <label htmlFor="13">{t("mount_Arc")}</label>
@@ -3762,18 +4283,18 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                 let refIndex = inputs.current["11"].getAttribute('ref-num');
                                                                 tempLabels[refIndex] = inputs.current["11"].getAttribute('text');
                                                                 setStepSelectedLabel(tempLabels);
-                                                                if (stepSelectedValue["2"] === "2") {
-                                                                    setDeps("3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3", "21");
-                                                                } else {
-                                                                    setDeps("", "21");
-                                                                }
+                                                                setDeps("", "11");
                                                             } else {
                                                                 setStep11("");
+                                                                // modalHandleShow("noPower");
                                                                 if (stepSelectedValue["2"] === "2") {
+                                                                    setDeps("11,2", "2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWall,2EWall,2FWall,2GWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
+                                                                    deleteSpecialSelects();
+                                                                    setCart("", "","calcMeasurements,Width1,Width2,Width3,Height1,Height2,Height3,FinishedLengthType,Width2B,Height2E,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
                                                                     setStep2("");
-                                                                    setDeps("21,3", "3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3");
+                                                                    selectChanged(undefined, "2,2AIn,2BIn,2A,2B,2E,2DWall,2EWall,2FWall,2GWall,2EWallFloor,2FWallFloor,2C,2CCeiling,2D,2DFloor");
                                                                 } else {
-                                                                    setDeps("21", "3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3");
+                                                                    setDeps("11", "");
                                                                 }
                                                             }
                                                         }} id="111" ref={ref => (inputs.current["111"] = ref)}/>
@@ -3821,11 +4342,22 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                         onChange={(selected) => {
                                                             if (selected.length) {
                                                                 setSelectedMountOutsideType(selected);
-                                                                setDeps("", "11");
-                                                                setCart("Mount2", selected[0].value);
+                                                                // setDeps("", "11");
+                                                                setCart("IsWalled", selected[0].value);
                                                                 let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
                                                                 tempLabels["1"] = t("mount_Outside") + "/" + selected[0].label;
                                                                 setStepSelectedLabel(tempLabels);
+                                                                if (stepSelectedValue["2"] === "2") {
+                                                                    setDeps("2", "1,11,2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWall,2EWall,2FWall,2GWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
+                                                                    deleteSpecialSelects();
+                                                                    setCart("Mount", "Outside", "IsWalled,calcMeasurements,Width1,Width2,Width3,Height1,Height2,Height3,FinishedLengthType,Width2B,Height2E,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
+                                                                    setStep2("");
+                                                                    selectChanged(undefined, "2,2AIn,2BIn,2A,2B,2E,2DWall,2EWall,2FWall,2GWall,2EWallFloor,2FWallFloor,2C,2CCeiling,2D,2DFloor");
+                                                                } else {
+                                                                    setDeps("", "1,11");
+                                                                    setCart("Mount", "Outside", "IsWalled,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
+                                                                    selectChanged(undefined, "");
+                                                                }
                                                             }
                                                         }}
                                                         options={optionsOutside[pageLanguage]}
@@ -3845,20 +4377,19 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                 let refIndex = inputs.current["13"].getAttribute('ref-num');
                                                                 tempLabels[refIndex] = inputs.current["13"].getAttribute('text');
                                                                 setStepSelectedLabel(tempLabels);
-                                                                if (stepSelectedValue["2"] === "2") {
-                                                                    setDeps("3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3", "21");
-                                                                } else {
-                                                                    setDeps("", "21");
-                                                                }
+                                                                setDeps("", "11");
                                                             } else {
                                                                 setStep11("");
                                                                 // modalHandleShow("noPower");
                                                                 
                                                                 if (stepSelectedValue["2"] === "2") {
+                                                                    setDeps("11,2", "2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWall,2EWall,2FWall,2GWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
+                                                                    deleteSpecialSelects();
+                                                                    setCart("", "","calcMeasurements,Width1,Width2,Width3,Height1,Height2,Height3,FinishedLengthType,Width2B,Height2E,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
                                                                     setStep2("");
-                                                                    setDeps("21,3", "3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3");
+                                                                    selectChanged(undefined, "2,2AIn,2BIn,2A,2B,2E,2DWall,2EWall,2FWall,2GWall,2EWallFloor,2FWallFloor,2C,2CCeiling,2D,2DFloor");
                                                                 } else {
-                                                                    setDeps("21", "3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3");
+                                                                    setDeps("11", "");
                                                                 }
                                                             }
                                                         }} id="111" ref={ref => (inputs.current["111"] = ref)}/>
@@ -3943,9 +4474,9 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                        setStep2("false");
                                                        selectChanged(e, "");
                                                        setMeasurementsNextStep("3");
-                                                       setDeps("21,22", "2");
+                                                       setDeps("21,22", "2,2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWall,2EWall,2FWall,2GWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
                                                        deleteSpecialSelects();
-                                                       setCart("calcMeasurements", false, "WidthCart,HeightCart,Width1,Width2,Width3,Height1,Height2,Height3,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
+                                                       setCart("calcMeasurements", false, "WidthCart,HeightCart,Width1,Width2,Width3,Height1,Height2,Height3,FinishedLengthType,Width2B,Height2E,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
                                                    }} ref={ref => (inputs.current["21"] = ref)}/>
                                             <label htmlFor="21">{t("I have my own measurements.")}</label>
                                         </div>
@@ -3953,6 +4484,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                             <input className="radio" type="radio" text={t("Calculate my measurements")} value="2" name="step2" checked={step2 === "true"}
                                                    ref-num="2" id="22" ref={ref => (inputs.current["22"] = ref)}
                                                    onChange={e => {
+                                                       setStep2A("");
                                                        if (stepSelectedValue["1"] === undefined) {
                                                            setStep2("");
                                                            selectUncheck(e);
@@ -3968,11 +4500,11 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                setCart("calcMeasurements", true, "Width,height,calcMeasurements");
                                                            } else {
                                                                setStep2("true");
-                                                               deleteSpecialSelects(2);
+                                                               deleteSpecialSelects();
                                                                selectChanged(e);
                                                                setMeasurementsNextStep("2A");
-                                                               setDeps("");
-                                                               setCart("calcMeasurements", true, "Width,Height,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
+                                                               setDeps("2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3","2,21,22");
+                                                               setCart("calcMeasurements", true, "Width,Height,FinishedLengthType,Width2B,Height2E,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
                                                            }
                                                        } else if (stepSelectedValue["1"] === "3") {
                                                            if (step11 !== "true") {
@@ -3983,11 +4515,11 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                setCart("calcMeasurements", true, "Width,height,calcMeasurements");
                                                            } else {
                                                                setStep2("true");
-                                                               deleteSpecialSelects(2);
+                                                               deleteSpecialSelects();
                                                                selectChanged(e);
                                                                setMeasurementsNextStep("2A");
-                                                               setDeps("");
-                                                               setCart("calcMeasurements", true, "Width,Height,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
+                                                               setDeps("2A","2,21,22");
+                                                               setCart("calcMeasurements", true, "Width,Height,FinishedLengthType");
                                                            }
                                                        } else {
                                                            if (!selectedMountOutsideType.length) {
@@ -3998,11 +4530,11 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                setCart("calcMeasurements", true, "Width,height,calcMeasurements");
                                                            } else {
                                                                setStep2("true");
-                                                               deleteSpecialSelects(2);
+                                                               deleteSpecialSelects();
                                                                selectChanged(e);
                                                                setMeasurementsNextStep("2A");
-                                                               setDeps("");
-                                                               setCart("calcMeasurements", true, "Width,Height,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
+                                                               setDeps("2A","2,21,22");
+                                                               setCart("calcMeasurements", true, "Width,Height,FinishedLengthType");
                                                            }
                                                        }
                                                    }}/>
@@ -4129,9 +4661,12 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                     <p className="help_column_header"/>
                                                     <ul className="help_column_list">
                                                         <li className="no_listStyle single_line_height">
-                                                            <b>{t("Note:&nbsp;")}</b>
-                                                            {t("step3_help_3")}
+                                                            {t("step3_help_2.5")}
                                                         </li>
+                                                        {/*<li className="no_listStyle single_line_height">*/}
+                                                        {/*    <b>{t("Note:&nbsp;")}</b>*/}
+                                                        {/*    {t("step3_help_3")}*/}
+                                                        {/*</li>*/}
                                                     </ul>
                                                 </div>
                                             </div>
@@ -4142,7 +4677,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                         </Card>
                         
                         {/* step 2A */}
-                        {stepSelectedValue["2"] === "2" && ((stepSelectedValue["1"] === "3" && step11 === "true") || (stepSelectedValue["1"] === "2" && selectedMountOutsideType.length)) &&
+                        {stepSelectedValue["2"] === "2" && !!((stepSelectedValue["1"] === "3" && step11 === "true") || (stepSelectedValue["1"] === "2" && selectedMountOutsideType.length)) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2A" stepNum={t("2A")} stepTitle={t("dk_step2A")} stepRef="2A" type="1" required={requiredStep["2A"]}
@@ -4160,10 +4695,25 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                 <img src={require('../Images/drapery/dualRoller/Sill_track.svg').default} className="img-fluid height_auto" alt=""/>
                                                 <input className="radio" type="radio" text={t("Sill")} value="1" name="step2A" ref-num="2A" id="2A1" checked={step2A === "Sill"}
                                                        onChange={e => {
-                                                           selectChanged(e, "");
                                                            setStep2A("Sill");
-                                                           setDeps("21", "2,3AOut,3BOut1,3BOut2,3COut,3DOut");
-                                                           setCart("FinishedLengthType", "Sill");
+                                                           deleteSpecialSelects();
+                                                           if (stepSelectedValue["1"] === "3") {
+                                                               setCart("FinishedLengthType", "Sill","Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2E,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
+                                                               setDeps("2B,2C1,2C2,2D1,2D2,2D3,2E", "2A,2DFloor1,2DFloor2,2DFloor3");
+                                                               selectChanged(e, "2B,2C,2D,2E");
+                                                           }
+                                                           else{
+                                                               if(selectedMountOutsideType[0].value === "Ceiling"){
+                                                                   setCart("FinishedLengthType", "Sill","Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2E,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
+                                                                   setDeps("2B,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2E", "2A,2DFloor1,2DFloor2,2DFloor3");
+                                                                   selectChanged(e, "2B,2CCeiling,2D,2E");
+                                                               }else{
+                                                                   setCart("FinishedLengthType", "Sill","Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2E,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
+                                                                   setDeps("2B,2CCeiling1,2CCeiling2,2DWall,2EWall,2FWall,2GWall", "2A,2EWallFloor,2FWallFloor");
+                                                                   selectChanged(e, "2B,2CCeiling,2DWall,2EWall,2FWall,2GWall");
+                                                               }
+                                                               
+                                                           }
                                                     
                                                        }} ref={ref => (inputs.current["2A1"] = ref)}/>
                                                 <label htmlFor="2A1">{t("Sill")}</label>
@@ -4172,9 +4722,25 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                 <img src={require('../Images/drapery/dualRoller/small_track.svg').default} className="img-fluid height_auto" alt=""/>
                                                 <input className="radio" type="radio" text={t("Apron")} value="2" name="step2A" ref-num="2A" id="2A2" checked={step2A === "Apron"}
                                                        onChange={e => {
-                                                           selectChanged(e, "");
                                                            setStep2A("Apron");
-                                                           setCart("FinishedLengthType", "Apron");
+                                                           deleteSpecialSelects();
+                                                           if (stepSelectedValue["1"] === "3") {
+                                                               setCart("FinishedLengthType", "Apron","Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2E,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
+                                                               setDeps("2B,2C1,2C2,2D1,2D2,2D3,2E", "2A,2DFloor1,2DFloor2,2DFloor3");
+                                                               selectChanged(e, "2B,2C,2D,2E");
+                                                           }
+                                                           else{
+                                                               if(selectedMountOutsideType[0].value === "Ceiling"){
+                                                                   setCart("FinishedLengthType", "Apron","Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2E,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
+                                                                   setDeps("2B,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2E", "2A,2DFloor1,2DFloor2,2DFloor3");
+                                                                   selectChanged(e, "2B,2CCeiling,2D,2E");
+                                                               }else{
+                                                                   setCart("FinishedLengthType", "Apron","Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2E,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
+                                                                   setDeps("2B,2CCeiling1,2CCeiling2,2DWall,2EWall,2FWall,2GWall", "2A,2EWallFloor,2FWallFloor");
+                                                                   selectChanged(e, "2B,2CCeiling,2DWall,2EWall,2FWall,2GWall");
+                                                               }
+        
+                                                           }
                                                        }} ref={ref => (inputs.current["2A2"] = ref)}/>
                                                 <label htmlFor="2A2">{t("Apron")}</label>
                                             </div>
@@ -4182,9 +4748,25 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                 <img src={require('../Images/drapery/dualRoller/medium_track.svg').default} className="img-fluid height_auto" alt=""/>
                                                 <input className="radio" type="radio" text={t("Floor")} value="3" name="step2A" ref-num="2A" id="2A3" checked={step2A === "Floor"}
                                                        onChange={e => {
-                                                           selectChanged(e, "");
                                                            setStep2A("Floor");
-                                                           setCart("FinishedLengthType", "Floor");
+                                                           deleteSpecialSelects();
+                                                           if (stepSelectedValue["1"] === "3") {
+                                                               setCart("FinishedLengthType", "Floor","Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2E,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
+                                                               setDeps("2B,2C1,2C2,2DFloor1,2DFloor2,2DFloor3", "2A,2D1,2D2,2D3,2E");
+                                                               selectChanged(e, "2B,2C,2DFloor");
+                                                           }
+                                                           else{
+                                                               if(selectedMountOutsideType[0].value === "Ceiling"){
+                                                                   setCart("FinishedLengthType", "Floor","Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2E,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
+                                                                   setDeps("2B,2CCeiling1,2CCeiling2,2DFloor1,2DFloor2,2DFloor3", "2A,2D1,2D2,2D3,2E");
+                                                                   selectChanged(e, "2B,2CCeiling,2DFloor");
+                                                               }else{
+                                                                   setCart("FinishedLengthType", "Floor","Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2E,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
+                                                                   setDeps("2B,2CCeiling1,2CCeiling2,2DWall,2EWallFloor,2FWallFloor", "2A,2EWall,2FWall,2GWall");
+                                                                   selectChanged(e, "2B,2CCeiling,2DWall,2EWallFloor,2FWallFloor");
+                                                               }
+        
+                                                           }
                                                        }} ref={ref => (inputs.current["2A3"] = ref)}/>
                                                 <label htmlFor="2A3">{t("Floor")}</label>
                                             </div>
@@ -4216,7 +4798,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                         
                         
                         {/* step 2B*/}
-                        {stepSelectedValue["2"] === "2" && stepSelectedValue["2A"] && ((stepSelectedValue["1"] === "3" && step11 === "true") || (stepSelectedValue["1"] === "2" && selectedMountOutsideType.length)) &&
+                        {stepSelectedValue["2"] === "2" && stepSelectedValue["2A"] && !!((stepSelectedValue["1"] === "3" && step11 === "true") || (stepSelectedValue["1"] === "2" && selectedMountOutsideType.length)) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2B" stepNum={t("2B")} stepTitle={t("dk_step2B")} stepRef="2B" type="2" required={requiredStep["2B"]}
@@ -4286,7 +4868,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                         {stepSelectedValue["2"] === "2" && stepSelectedValue["2A"] && ((stepSelectedValue["1"] === "3" && step11 === "true")) &&
                             <Card>
                                 <Card.Header>
-                                    <ContextAwareToggle eventKey="2C" stepNum={t("2C")} stepTitle={t("zebra_step3BOutside")} stepRef="2C" type="2" required={requiredStep["2C"]}
+                                    <ContextAwareToggle eventKey="2C" stepNum={t("2C")} stepTitle={t("dk_step2CCeiling")} stepRef="2C" type="2" required={requiredStep["2C"]}
                                                         stepSelected={stepSelectedLabel["2C"] === undefined ? "" : stepSelectedLabel["2C"]}/>
                                 </Card.Header>
                                 <Accordion.Collapse eventKey="2C">
@@ -4294,7 +4876,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                         <div className="card_body">
                                             <div className="box100">
                                                 <p className="step_selection_title">{t("dk_step2c_out_title")}</p>
-                                                <img src={require('../Images/drapery/zebra/wall_cover.svg').default} className="img-fluid" alt=""/>
+                                                <img src={require('../Images/drapery/dk/fullRod_track.svg').default} className="img-fluid" alt=""/>
                                             </div>
                                             <div className="box100 Three_selection_container dir_ltr">
                                                 <div className="box50">
@@ -4377,7 +4959,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                     let temp = selectCustomValues;
                                                                     temp.right = selected;
                                                                     setSelectCustomValues(temp);
-                                                                    setDeps("", "2C");
+                                                                    setDeps("", "2C2");
                                                                     setCart("ExtensionRight", selected[0].value);
                                                                 }
                                                             }}
@@ -4407,7 +4989,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                         }
                         
                         {/* step 2CCeiling and wall*/}
-                        {stepSelectedValue["2"] === "2" && stepSelectedValue["2A"] && ((stepSelectedValue["1"] === "2" && selectedMountOutsideType.length)) &&
+                        {stepSelectedValue["2"] === "2" && stepSelectedValue["2A"] && !!((stepSelectedValue["1"] === "2" && selectedMountOutsideType.length)) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2C" stepNum={t("2C")} stepTitle={t("dk_step2CCeiling")} stepRef="2CCeiling" type="2"
@@ -4459,7 +5041,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                     temp.left = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2CCeiling1");
-                                                                    setCart("StackWidthLeft", selected[0].value);
+                                                                    setCart("ExtensionLeft", selected[0].value);
                                                                 }
                                                             }}
                                                             options={SelectOptionRange(1, 50, 1, "cm", "", pageLanguage)}
@@ -4503,7 +5085,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                                     temp.right = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2CCeiling2");
-                                                                    setCart("StackWidthRight", selected[0].value);
+                                                                    setCart("ExtensionRight", selected[0].value);
                                                                 }
                                                             }}
                                                             options={SelectOptionRange(1, 10, 1, "cm", "", pageLanguage)}
@@ -4520,7 +5102,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                 <div className="help_column help_left_column">
                                                     <p className="help_column_header"/>
                                                     <ul className="help_column_list">
-                                                        <li className="no_listStyle single_line_height">{t("step3B_out_help_1")}
+                                                        <li className="no_listStyle single_line_height">{t("dk_step3C_out_help_1")}
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -4532,7 +5114,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                         }
                         
                         {/* step 2D */}
-                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && ((stepSelectedValue["1"] === "3" && step11 === "true") || (stepSelectedValue["1"] === "2" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Ceiling")) &&
+                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && !!((stepSelectedValue["1"] === "3" && step11 === "true") || (stepSelectedValue["1"] === "2" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Ceiling")) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2D" stepNum={t("2D")} stepTitle={t("dk_step2D")} stepRef="2D" type="2" required={requiredStep["2D"]}
@@ -4542,7 +5124,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                     <Card.Body>
                                         <div className="card_body">
                                             <div className="box100">
-                                                <p className="step_selection_title">{t("dk_step2D_title")}</p>
+                                                <p className="step_selection_title">{t("arc_step2D_title")}</p>
                                                 <img
                                                     src={pageLanguage === 'fa' ? require('../Images/drapery/dk/ceiling_to_window_3.svg').default : require('../Images/drapery/dk/ceiling_to_window_3.svg').default}
                                                     className="img-fluid" alt=""/>
@@ -4689,7 +5271,41 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                 <div className="help_column help_left_column">
                                                     <p className="help_column_header"/>
                                                     <ul className="help_column_list">
-                                                        <li className="no_listStyle single_line_height">{t("dk_step2D_help_1")}
+                                                        <li className="no_listStyle single_line_height">
+                                                        <span className="popover_indicator">
+                                                            {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
+                                                                                  children={<object className="popover_camera" type="image/svg+xml"
+                                                                                                    data={require('../Images/public/camera.svg').default}/>}
+                                                                                  component={
+                                                                                      <div className="clearfix">
+                                                                                          <div className="popover_image clearfix">
+                                                                                              <img
+                                                                                                  src={popoverImages["step2d"] === undefined ? require('../Images/drapery/dk/mouldinghelpphoto1.jpg') : popoverImages["step2d"]}
+                                                                                                  className="img-fluid" alt=""/>
+                                                                                          </div>
+                                                                                          <div className="popover_footer">
+                                                                                              <span className="popover_footer_title">{t("dk_step_help_camera_title")}</span>
+                                                                                              <span className="popover_thumbnails">
+                                                                                                  <div>
+                                                                                                      <img src={require('../Images/drapery/dk/mouldinghelpphoto1.jpg')}
+                                                                                                           text="step2d"
+                                                                                                           onMouseEnter={(e) => popoverThumbnailHover(e)}
+                                                                                                           className="popover_thumbnail_img img-fluid"
+                                                                                                           alt=""/>
+                                                                                                  </div>
+                                                                                                  <div>
+                                                                                                      <img src={require('../Images/drapery/dk/mouldinghelpphoto2.jpg')}
+                                                                                                           text="step2d"
+                                                                                                           onMouseEnter={(e) => popoverThumbnailHover(e)}
+                                                                                                           className="popover_thumbnail_img img-fluid"
+                                                                                                           alt=""/>
+                                                                                                  </div>
+                                                                                              </span>
+                                                                                          </div>
+                                                                                      </div>
+                                                                                  }/>
+                                                            }
+                                                        </span>{t("dk_step2D_help_1")}
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -4701,7 +5317,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                         }
                         
                         {/* step 2E*/}
-                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && ((stepSelectedValue["1"] === "3" && step11 === "true") || (stepSelectedValue["1"] === "2" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Ceiling")) &&
+                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && !!((stepSelectedValue["1"] === "3" && step11 === "true") || (stepSelectedValue["1"] === "2" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Ceiling")) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2E" stepNum={t("2E")} stepTitle={t("dk_step2E")} stepRef="2E" type="2" required={requiredStep["2E"]}
@@ -4711,7 +5327,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                     <Card.Body>
                                         <div className="card_body">
                                             <div className="box100">
-                                                <p className="step_selection_title">{t("dk_step2E_title")}</p>
+                                                <p className="step_selection_title">{t("arc_step2E_title")}</p>
                                                 <img src={require('../Images/drapery/dk/CeilingToFloor_noRod.svg').default} className="img-fluid" alt=""/>
                                             </div>
                                             <div className="box100 Three_selection_container">
@@ -4747,11 +5363,11 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                             // }
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
-                                                                    optionSelectChanged("3E", selected[0], "cm", "س\u200Cم", pageLanguage);
+                                                                    optionSelectChanged("2E", selected[0], "cm", "س\u200Cم", pageLanguage);
                                                                     let temp = selectCustomValues;
                                                                     temp.CeilingToFloor = selected;
                                                                     setSelectCustomValues(temp);
-                                                                    setDeps("", "3E");
+                                                                    setDeps("", "2E");
                                                                     setCart("CeilingToFloor", selected[0].value);
                                                                 }
                                                             }}
@@ -4768,7 +5384,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                         }
                         
                         {/* step 2DFloor */}
-                        {stepSelectedValue["2"] === "2" && stepSelectedValue["2A"] === "3" && ((stepSelectedValue["1"] === "3" && step11 === "true") || (stepSelectedValue["1"] === "2" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Ceiling")) &&
+                        {stepSelectedValue["2"] === "2" && stepSelectedValue["2A"] === "3" && !!((stepSelectedValue["1"] === "3" && step11 === "true") || (stepSelectedValue["1"] === "2" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Ceiling")) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2D" stepNum={t("2D")} stepTitle={t("dk_step2E")} stepRef="2DFloor" type="2" required={requiredStep["2DFloor"]}
@@ -4778,7 +5394,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                     <Card.Body>
                                         <div className="card_body">
                                             <div className="box100">
-                                                <p className="step_selection_title">{t("dk_step2E_title")}</p>
+                                                <p className="step_selection_title">{t("arc_step2E_title")}</p>
                                                 <img
                                                     src={pageLanguage === 'fa' ? require('../Images/drapery/dk/ceiling_to_floor_3.svg').default : require('../Images/drapery/dk/ceiling_to_floor_3.svg').default}
                                                     className="img-fluid" alt=""/>
@@ -4937,7 +5553,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                         }
                         
                         {/* step 2DWall */}
-                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2" || stepSelectedValue["2A"] === "3") && ((stepSelectedValue["1"] === "2" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
+                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2" || stepSelectedValue["2A"] === "3") && !!((stepSelectedValue["1"] === "2" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2D" stepNum={t("2D")} stepTitle={t("dk_step2DWall")} stepRef="2DWall" type="2" required={requiredStep["2DWall"]}
@@ -5006,7 +5622,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                         }
                         
                         {/* step 2EWall*/}
-                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && ((stepSelectedValue["1"] === "2" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
+                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && !!((stepSelectedValue["1"] === "2" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2E" stepNum={t("2E")} stepTitle={t("dk_step2EWall")} stepRef="2EWall" type="2" required={requiredStep["2EWall"]}
@@ -5073,7 +5689,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                         }
                         
                         {/* step 2FWall */}
-                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && ((stepSelectedValue["1"] === "2" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
+                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && !!((stepSelectedValue["1"] === "2" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2F" stepNum={t("2F")} stepTitle={t("dk_step2FWall")} stepRef="2FWall" type="2" required={requiredStep["2FWall"]}
@@ -5153,7 +5769,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                         }
                         
                         {/* step 2GWall*/}
-                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && ((stepSelectedValue["1"] === "2" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
+                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && !!((stepSelectedValue["1"] === "2" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2G" stepNum={t("2G")} stepTitle={t("dk_step2GWall")} stepRef="2GWall" type="2" required={requiredStep["2GWall"]}
@@ -5220,7 +5836,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                         }
                         
                         {/* step 2EWallFloor */}
-                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "3") && ((stepSelectedValue["1"] === "2" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
+                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "3") && !!((stepSelectedValue["1"] === "2" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2E" stepNum={t("2E")} stepTitle={t("dk_step2FWall")} stepRef="2EWallFloor" type="2"
@@ -5301,7 +5917,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                         }
                         
                         {/* step 2FWallFloor*/}
-                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "3") && ((stepSelectedValue["1"] === "2" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
+                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "3") && !!((stepSelectedValue["1"] === "2" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2F" stepNum={t("2F")} stepTitle={t("dk_step2GWall")} stepRef="2FWallFloor" type="2"
@@ -5729,14 +6345,14 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                 <div className="dk_curtain_symmetric_buttons">
                                                     <button className={`dk_curtain_symmetric_button_left btn ${symmetric ? "dk_curtain_symmetric_button_on" : ""}`}
                                                             onClick={() => setSymmetric(true)}>
-                                                        SYMMETRIC COLORING
+                                                        {t("SYMMETRIC COLORING")}
                                                     </button>
                                                     <button className={`dk_curtain_symmetric_button_right btn ${!symmetric ? "dk_curtain_symmetric_button_on" : ""}`}
                                                             onClick={() => setSymmetric(false)}>
-                                                        INDIVIDUAL COLORING
+                                                        {t("INDIVIDUAL COLORING")}
                                                     </button>
                                                 </div>
-                                                <button className="dk_curtain_clear btn" onClick={() => setDkCurtainArr([])}>CLEAR</button>
+                                                <button className="dk_curtain_clear btn" onClick={() => setDkCurtainArr([])}>{t("CLEAR")}</button>
                                             </div>
                                             <div className="dk_curtain">
                                                 <div className="dk_curtain_inside">
@@ -5761,8 +6377,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                             }
                                             <div className="dk_curtain_text_container">
                                                 <h1 className="dk_curtain_text">
-                                                    To create the color combination you want, you can customize by first clicking on the fabric color you want to use and then
-                                                    clicking on the slides above.
+                                                    {t("dk_curtain_preview_help")}
                                                 </h1>
                                             </div>
                                         </div>
@@ -5910,7 +6525,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                 <Card.Body>
                                     <div className="card_body card_body_radio">
                                         <div className="box33 radio_style">
-                                            <img src={require('../Images/drapery/zebra/mount_inside.svg').default} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/zebra/window-Inside.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("Left")} value="1" name="step4" ref-num="4" id="41" checked={step4 === "Left"}
                                                    onChange={e => {
                                                        selectChanged(e, "");
@@ -5921,7 +6536,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                             <label htmlFor="41">{t("Left")}</label>
                                         </div>
                                         <div className="box33 radio_style">
-                                            <img src={require('../Images/drapery/zebra/mount_inside.svg').default} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/zebra/window-Inside.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("Right")} value="2" name="step4" ref-num="4" id="42" checked={step4 === "Right"}
                                                    onChange={e => {
                                                        selectChanged(e, "");
@@ -5932,7 +6547,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                             <label htmlFor="42">{t("Right")}</label>
                                         </div>
                                         <div className="box33 radio_style">
-                                            <img src={require('../Images/drapery/zebra/mount_inside.svg').default} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/zebra/window-Inside.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("Center Split")} value="3" name="step4" ref-num="4" id="43"
                                                    checked={step4 === "CenterSplit"}
                                                    onChange={e => {
@@ -5972,7 +6587,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                 <Card.Body>
                                     <div className="card_body card_body_radio">
                                         <div className="box50 radio_style">
-                                            <img src={require('../Images/drapery/zebra/mount_inside.svg').default} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/zebra/window-Inside.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("Left")} value="1" name="step5" ref-num="5" id="51" checked={step5 === "Left"}
                                                    onChange={e => {
                                                        selectChanged(e, "");
@@ -5983,7 +6598,7 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                             <label htmlFor="51">{t("Left")}</label>
                                         </div>
                                         <div className="box50 radio_style">
-                                            <img src={require('../Images/drapery/zebra/mount_inside.svg').default} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/zebra/window-Inside.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("Right")} value="5" name="step5" ref-num="5" id="52" checked={step5 === "Right"}
                                                    onChange={e => {
                                                        selectChanged(e, "");
@@ -6014,10 +6629,10 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                         {/* step 6 */}
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="7" stepNum={t("6")} stepTitle={t("zebra_step6")} stepRef="7" type="2" required={requiredStep["7"]}
-                                                    stepSelected={stepSelectedLabel["7"] === undefined ? "" : stepSelectedLabel["7"]}/>
+                                <ContextAwareToggle eventKey="6" stepNum={t("6")} stepTitle={t("zebra_step6")} stepRef="6" type="2" required={requiredStep["6"]}
+                                                    stepSelected={stepSelectedLabel["6"] === undefined ? "" : stepSelectedLabel["6"]}/>
                             </Card.Header>
-                            <Accordion.Collapse eventKey="7">
+                            <Accordion.Collapse eventKey="6">
                                 <Card.Body>
                                     <div className="card_body card_body_radio">
                                         <div className="box100 upload_section">
@@ -6104,8 +6719,8 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                         //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                         // }
                                                         onChange={(selected) => {
-                                                            setDeps("", "71");
-                                                            roomLabelChanged(selected[0], "7", false);
+                                                            setDeps("", "61");
+                                                            roomLabelChanged(selected[0], "6", false);
                                                             setSelectedRoomLabel(selected);
                                                             // setCart("RoomNameEn", selected[0].value);
                                                             setCart("RoomNameFa", rooms["fa"].find(opt => opt.value === selected[0].value).label, "", "RoomNameEn", [selected[0].value]);
@@ -6120,10 +6735,10 @@ function DK({CatID, ModelID, ProjectId, EditIndex}) {
                                                        value={roomLabelText}
                                                        onChange={(e) => {
                                                            if (e.target.value === "")
-                                                               setDeps("72", "");
+                                                               setDeps("62", "");
                                                            else
-                                                               setDeps("", "72");
-                                                           roomLabelChanged(e.target.value, "7", true);
+                                                               setDeps("", "62");
+                                                           roomLabelChanged(e.target.value, "6", true);
                                                            setRoomLabelText(e.target.value);
                                                            setCart("WindowName", e.target.value);
                                                        }}/>

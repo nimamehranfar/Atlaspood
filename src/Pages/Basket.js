@@ -19,6 +19,7 @@ import PopoverStickOnHover from "../Components/PopoverStickOnHover";
 import GetMeasurementArray from "../Components/GetMeasurementArray";
 import GetUserProjectData from "../Components/GetUserProjectData";
 import Dropdown from "react-bootstrap/Dropdown";
+import convertToPersian from "../Components/ConvertToPersian";
 
 const baseURLPrice = "https://api.atlaspood.ir/Sewing/GetSewingOrderPrice";
 const baseURLGetCart = "https://api.atlaspood.ir/cart/GetAll";
@@ -674,7 +675,7 @@ function Basket() {
                                             <img src={`https://api.atlaspood.ir/${photoUrl}`} alt="" className="basket_item_img"/>
                                         </div>
                                         <div className="basket_item_title_container">
-                                            <div className="basket_item_title_name">{pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</div>
+                                            <div className="basket_item_title_name">{pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</div>
                                             {/*<div className="basket_item_title_desc">*/}
                                             {/*    <h3>Fabric Material & Color&nbsp;&nbsp;&nbsp;&nbsp;</h3>*/}
                                             {/*    <h4>{pageLanguage === 'fa' ? fabricDesignFa + " / " + fabricColorFa : fabricDesign + " / " + fabricColor}</h4>*/}
@@ -981,7 +982,7 @@ function Basket() {
                                             </div>
                                             <div className="basket_item_title_container">
                                                 <div
-                                                    className="basket_item_title_name">{pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</div>
+                                                    className="basket_item_title_name">{pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</div>
                                                 {/*<div className="basket_item_title_desc">*/}
                                                 {/*    <h3>Fabric Material & Color&nbsp;&nbsp;&nbsp;&nbsp;</h3>*/}
                                                 {/*    <h4>{pageLanguage === 'fa' ? fabricDesignFa + " / " + fabricColorFa : fabricDesign + " / " + fabricColor}</h4>*/}

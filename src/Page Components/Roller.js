@@ -13,8 +13,8 @@ import Select from "react-dropdown-select";
 import ReactImageMagnify from '@blacklab/react-image-magnify';
 import * as qs from 'qs'
 
-import {ReactComponent as MountInside} from '../Images/drapery/zebra/mount_inside.svg';
-import {ReactComponent as MountOutside} from '../Images/drapery/zebra/mount_outside.svg';
+import {ReactComponent as MountInside} from '../Images/drapery/zebra/window-Inside.svg';
+import {ReactComponent as MountOutside} from '../Images/drapery/zebra/window-Outside.svg';
 import Form from "react-bootstrap/Form";
 import PopoverStickOnHover from "../Components/PopoverStickOnHover";
 import CustomControl from "../Components/CustomControl";
@@ -40,6 +40,7 @@ import ModalLogin from "../Components/ModalLogin";
 import AddProjectToCart from "../Components/AddProjectToCart";
 import GetMeasurementArray from "../Components/GetMeasurementArray";
 import GetSewingFilters from "../Components/GetSewingFilters";
+import TruncateMarkup from "react-truncate-markup";
 
 
 const baseURLCats = "https://api.atlaspood.ir/WebsitePage/GetDetailByName";
@@ -228,6 +229,9 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
     const [step5A, setStep5A] = useState("");
     const [step5B, setStep5B] = useState("");
     const [step5C, setStep5C] = useState("");
+    const [step5Arc, setStep5Arc] = useState("");
+    const [step5AArc, setStep5AArc] = useState("");
+    const [step5BArc, setStep5BArc] = useState("");
     const [step6, setStep6] = useState("");
     const [step6A, setStep6A] = useState("");
     const [remoteName, setRemoteName] = useState("");
@@ -662,7 +666,13 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                 {/*                         }/>*/}
                 {/*</div>*/}
                 <div className="steps_header_selected_container">
-                    <div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? stepSelected : null}</div>
+                    {/*<div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? stepSelected : null}</div>*/}
+    
+                    {showLabels &&
+                        <TruncateMarkup lines={1} tokenize="words">
+                            <div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{stepSelected}</div>
+                        </TruncateMarkup>
+                    }
                 </div>
                 {required && stepSelected === "" &&
                 <div className="stepRequired"/>
@@ -838,15 +848,16 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
     }
     
     function selectChanged(e, nums) {
-        // console.log(e.target.value);
-        let refIndex = e.target.getAttribute('ref-num');
-        // selectedTitle.current[refIndex].innerHTML = e.target.getAttribute('text');
-        let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-        tempLabels[refIndex] = e.target.getAttribute('text');
-        
         let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
-        tempValue[refIndex] = e.target.value;
-        
+        let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+        if(e) {
+            // console.log(e.target.value);
+            let refIndex = e.target.getAttribute('ref-num');
+            // selectedTitle.current[refIndex].innerHTML = e.target.getAttribute('text');
+            tempLabels[refIndex] = e.target.getAttribute('text');
+    
+            tempValue[refIndex] = e.target.value;
+        }
         if (nums !== undefined) {
             let tempArr = nums.split(',');
             tempArr.forEach(num => {
@@ -1561,7 +1572,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                         
                         tempArr.push(
                             <div key={defaultModelName}>
-                                <h2 className="cart_agree_title">{pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</h2>
+                                <h2 className="cart_agree_title">{pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</h2>
                                 <ul className="cart_agree_items_container">
                                     <GetMeasurementArray modelId={`${modelID}`} cartValues={cartValues}/>
                                     {temp1}
@@ -2063,6 +2074,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
     }
     
     function getWindowSize(totalWidth, totalHeight) {
+        let pageLanguage = location.pathname.split('').slice(1, 3).join('');
         let tempWindowSize = pageLanguage === "fa" ? `عرض: ${NumberToPersianWord.convertEnToPe(totalWidth.toString())}س\u200Cم\u00A0\u00A0\u00A0ارتفاع: ${NumberToPersianWord.convertEnToPe(totalHeight.toString())}س\u200Cم` : `Width: ${totalWidth}cm\u00A0\u00A0\u00A0Height: ${totalHeight}cm`;
         setWindowSize(tempWindowSize);
         setWindowSizeBool(true);
@@ -2487,12 +2499,17 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                             tempLabels[refIndex] = inputs.current["21"].getAttribute('text');
                             tempValue[refIndex] = inputs.current["21"].value;
                             depSetTempArr = new Set([...setGetDeps("", "2", depSetTempArr)]);
-                        } else {
-                            
+                        } else if (temp["Mount"] === "Outside") {
                             let refIndex = inputs.current["22"].getAttribute('ref-num');
                             tempLabels[refIndex] = inputs.current["22"].getAttribute('text');
                             tempValue[refIndex] = inputs.current["22"].value;
-                            depSetTempArr = new Set([...setGetDeps("", "2", depSetTempArr)]);
+                            depSetTempArr = new Set([...setGetDeps("", "1", depSetTempArr)]);
+                        } else {
+                            setStep21("true");
+                            let refIndex = inputs.current["23"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["23"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["23"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "1", depSetTempArr)]);
                         }
                         setStepSelectedLabel(tempLabels);
                         setStepSelectedValue(tempValue);
@@ -3698,7 +3715,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
             
             
             <div className="models_title_div">
-                <h1>{defaultModelName === undefined || defaultModelName === "" ? " " : pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</h1>
+                <h1>{defaultModelName === undefined || defaultModelName === "" ? " " : pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</h1>
             </div>
             <div className="model_customize_container">
                 <div className="model_customize_image">
@@ -3857,108 +3874,185 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                             <Accordion.Collapse eventKey="2">
                                 <Card.Body>
                                     <div className="card_body card_body_radio">
-                                        <div className="box50 radio_style">
+                                        <div className="box33 radio_style">
                                             <img src={require('../Images/drapery/zebra/mount_inside.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("mount_Inside")} value="1" name="step2" ref-num="2" id="21" checked={step2 === "Inside"}
                                                    onChange={e => {
-                                                       selectChanged(e, "3AOut,3BOut,3COut,3DOut");
                                                        setStep2("Inside");
                                                        setStep21("");
                                                        setMeasurementsNextStep("4");
+                                                       setStep5Arc("");
                                                        if (stepSelectedValue["3"] === "2") {
-                                                           setDeps("21", "2,3AOut,3BOut1,3BOut2,3COut,3DOut");
-                                                           deleteSpecialSelects(2);
-                                                           setCart("Mount", "Inside");
+                                                           setDeps("21,5", "2,3AOut,3BOut1,3BOut2,3COut,3DOut,3CArc1,3CArc2,3CArc3,5Arc,5Arc,5BArc");
+                                                           deleteSpecialSelects();
+                                                           setCart("Mount", "Inside","calcMeasurements,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
                                                            setStep3("");
+                                                           selectChanged(e, "3,3AOut,3BOut,3COut,3DOut,3CArc,5Arc,5Arc,5BArc");
                                                        } else {
-                                                           setDeps("21", "2");
+                                                           setDeps("21,5", "2,5Arc,5Arc,5BArc");
                                                            setCart("Mount", "Inside");
+                                                           selectChanged(e, "3AOut,3BOut,3COut,3DOut,3CArc,5Arc,5Arc,5BArc");
                                                        }
-                                                
+                                                       
                                                    }} ref={ref => (inputs.current["21"] = ref)}/>
                                             <label htmlFor="21">{t("mount_Inside")}</label>
                                         </div>
-                                        <div className="box50 radio_style">
+                                        <div className="box33 radio_style">
                                             <img src={require('../Images/drapery/zebra/mount_outside.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("mount_Outside")} value="2" name="step2" ref-num="2" id="22" checked={step2 === "Outside"}
                                                    onChange={e => {
-                                                       selectChanged(e, "3AIn,3BIn");
                                                        setStep2("Outside");
                                                        setStep21("");
+                                                       setStep5Arc("");
                                                        if (stepSelectedValue["3"] === "2") {
-                                                           setDeps("3AOut,3BOut1,3BOut2,3COut,3DOut", "2,21,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3");
-                                                           deleteSpecialSelects(1);
-                                                           setCart("Mount", "Outside", "Width1,Width2,Width3,Height1,Height2,Height3");
+                                                           setDeps("3AOut,3BOut1,3BOut2,3COut,3DOut,5", "2,21,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3,3CArc1,3CArc2,3CArc3,5Arc,5Arc,5BArc");
+                                                           deleteSpecialSelects();
+                                                           setCart("Mount", "Outside", "calcMeasurements,Width1,Width2,Width3,Height1,Height2,Height3,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                           setStep3("");
+                                                           selectChanged(e, "3,3AIn,3BIn,3AOut,3BOut,3CArc,5Arc,5Arc,5BArc");
                                                        } else {
-                                                           setDeps("", "2,21");
-                                                           setCart("Mount", "Outside", "Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
+                                                           setDeps("5", "2,21,5Arc,5Arc,5BArc");
+                                                           setCart("Mount", "Outside");
+                                                           selectChanged(e, "3AIn,3BIn,3AOut,3BOut,3CArc,5Arc,5Arc,5BArc");
                                                        }
                                                    }} ref={ref => (inputs.current["22"] = ref)}/>
                                             <label htmlFor="22">{t("mount_Outside")}</label>
                                         </div>
+                                        <div className="box33 radio_style">
+                                            <img src={require('../Images/drapery/zebra/window-Arc.svg').default} className="img-fluid" alt=""/>
+                                            <input className="radio" type="radio" text={t("mount_Arc")} value="3" name="step1" ref-num="2" id="23" checked={step2 === "HiddenMoulding"}
+                                                   onChange={e => {
+                                                       setStep2("HiddenMoulding");
+                                                       setStep21("");
+                                                       setStep5("");
+                                                       setMeasurementsNextStep("4");
+                                                       if (stepSelectedValue["3"] === "2") {
+                                                           setDeps("21,5Arc,5Arc,5BArc", "2,2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWall,2EWall,2FWall,2GWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3,5,53,54,5A,5B,5C");
+                                                           deleteSpecialSelects();
+                                                           setCart("Mount", "HiddenMoulding", "calcMeasurements,Width1,Width2,Width3,Height1,Height2,Height3,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
+                                                           setStep3("");
+                                                           selectChanged(e, "3,3AIn,3BIn,3AOut,3BOut,3COut,3DOut,5,5A,5B,5C");
+                                                       } else {
+                                                           setDeps("21,5Arc,5Arc,5BArc", "2,5,53,54,5A,5B,5C");
+                                                           setCart("Mount", "HiddenMoulding");
+                                                           selectChanged(e, "3AIn,3BIn,3AOut,3BOut,3COut,3DOut,5,5A,5B,5C");
+                                                       }
+                                                   }} ref={ref => (inputs.current["23"] = ref)}/>
+                                            <label htmlFor="23">{t("mount_Arc")}</label>
+                                        </div>
                                         {stepSelectedValue["2"] === "1" &&
-                                        <div className="secondary_options">
-                                            <div className="card-body-display-flex">
-                                                <div className="checkbox_style checkbox_style_step2">
-                                                    <input type="checkbox" value="1" name="step21" ref-num="21" checked={step21 === "true"} onChange={(e) => {
-                                                        if (e.target.checked) {
-                                                            selectChanged(e);
-                                                            setStep21("true");
-                                                            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                            let refIndex = inputs.current["21"].getAttribute('ref-num');
-                                                            tempLabels[refIndex] = inputs.current["21"].getAttribute('text');
-                                                            setStepSelectedLabel(tempLabels);
-                                                            if (stepSelectedValue["3"] === "2") {
-                                                                setDeps("3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3", "21");
-                                                            } else {
+                                            <div className="secondary_options">
+                                                <div className="card-body-display-flex">
+                                                    <div className="checkbox_style checkbox_style_step2">
+                                                        <input type="checkbox" value="1" name="step21" ref-num="21" checked={step21 === "true"} onChange={(e) => {
+                                                            if (e.target.checked) {
+                                                                selectChanged(e);
+                                                                setStep21("true");
+                                                                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                                let refIndex = inputs.current["21"].getAttribute('ref-num');
+                                                                tempLabels[refIndex] = inputs.current["21"].getAttribute('text');
+                                                                setStepSelectedLabel(tempLabels);
                                                                 setDeps("", "21");
-                                                            }
-                                                        } else {
-                                                            setStep21("");
-                                                            // modalHandleShow("noPower");
-                                                            
-                                                            if (stepSelectedValue["3"] === "2") {
-                                                                setStep3("");
-                                                                setDeps("21,3", "3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3");
                                                             } else {
-                                                                setDeps("21", "3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3");
+                                                                setStep21("");
+                                                                // modalHandleShow("noPower");
+                                                                if (stepSelectedValue["3"] === "2") {
+                                                                    setDeps("21,3", "3AOut,3BOut1,3BOut2,3COut,3DOut,3CArc1,3CArc2,3CArc3");
+                                                                    deleteSpecialSelects();
+                                                                    setCart("", "","calcMeasurements,Width3A,Height3C,Width1,Width2,Width3,Height1,Height2,Height3,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                                    setStep3("");
+                                                                    selectChanged(undefined, "3,3AOut,3BOut,3COut,3DOut,3CArc");
+                                                                } else {
+                                                                    setDeps("21", "");
+                                                                }
                                                             }
-                                                        }
-                                                    }} id="211" ref={ref => (inputs.current["211"] = ref)}/>
-                                                    <label htmlFor="211" className="checkbox_label">
-                                                        <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
-                                                             alt=""/>
-                                                    </label>
-                                                    <span className="checkbox_text">
+                                                        }} id="211" ref={ref => (inputs.current["211"] = ref)}/>
+                                                        <label htmlFor="211" className="checkbox_label">
+                                                            <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
+                                                                 alt=""/>
+                                                        </label>
+                                                        <span className="checkbox_text">
                                                         {t("inside_checkbox_title")}
                                                     </span>
+                                                    </div>
+                    
                                                 </div>
-                                            
                                             </div>
-                                        </div>
                                         }
-                                        <NextStep eventKey={stepSelectedValue["2"] === "1" && step21 !== "true" ? "2" : "3"} onClick={() => {
-                                            if (stepSelectedValue["2"] === "1" && step21 !== "true")
+                                        {stepSelectedValue["2"] === "3" &&
+                                            <div className="secondary_options">
+                                                <div className="card-body-display-flex">
+                                                    <div className="checkbox_style checkbox_style_step2">
+                                                        <input type="checkbox" value="1" name="step21" ref-num="21" checked={step21 === "true"} onChange={(e) => {
+                                                            if (e.target.checked) {
+                                                                selectChanged(e);
+                                                                setStep21("true");
+                                                                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                                let refIndex = inputs.current["23"].getAttribute('ref-num');
+                                                                tempLabels[refIndex] = inputs.current["23"].getAttribute('text');
+                                                                setStepSelectedLabel(tempLabels);
+                                                                setDeps("", "21");
+                                                            } else {
+                                                                setStep21("");
+                                                                // modalHandleShow("noPower");
+                                    
+                                                                if (stepSelectedValue["3"] === "2") {
+                                                                    setDeps("21,3", "2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWall,2EWall,2FWall,2GWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
+                                                                    deleteSpecialSelects();
+                                                                    setCart("", "", "calcMeasurements,Width1,Width2,Width3,Height1,Height2,Height3,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                                    setStep3("");
+                                                                    selectChanged(undefined, "3,3AIn,3BIn,3AOut,3BOut,3COut,3DOut");
+                                                                } else {
+                                                                    setDeps("21", "");
+                                                                }
+                                                            }
+                                                        }} id="211" ref={ref => (inputs.current["211"] = ref)}/>
+                                                        <label htmlFor="211" className="checkbox_label">
+                                                            <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
+                                                                 alt=""/>
+                                                        </label>
+                                                        <span className="checkbox_text">
+                                                        {t("Arc_checkbox_title")}
+                                                    </span>
+                                                    </div>
+                    
+                                                </div>
+                                            </div>
+                                        }
+                                        <NextStep eventKey={(stepSelectedValue["2"] === "1"||stepSelectedValue["2"] === "3") && step21 !== "true" ? "2" : "3"} onClick={() => {
+                                            if ((stepSelectedValue["2"] === "1"||stepSelectedValue["2"] === "3") && step21 !== "true")
                                                 modalHandleShow("noInsideUnderstand");
                                         }}>{t("NEXT STEP")}</NextStep>
                                     </div>
+                                    {/*<div className="accordion_help">*/}
+                                    {/*    <div className="help_container">*/}
+                                    {/*        <div className="help_column help_left_column help_left_column_mount_type">*/}
+                                    {/*            <p className="help_column_header">{t("step2_help_1")}</p>*/}
+                                    {/*            <ul className="help_column_list">*/}
+                                    {/*                <li>{t("step2_help_2")}</li>*/}
+                                    {/*                /!*<li>{t("step2_help_3")}</li>*!/*/}
+                                    {/*                <li>{t("step2_help_4")}</li>*/}
+                                    {/*                <li>{t("step2_help_5")}</li>*/}
+                                    {/*            </ul>*/}
+                                    {/*        </div>*/}
+                                    {/*        <div className="help_column help_right_column help_right_column_mount_type">*/}
+                                    {/*            <p className="help_column_header">{t("step2_help_6")}</p>*/}
+                                    {/*            <ul className="help_column_list">*/}
+                                    {/*                <li>{t("step2_help_7")}</li>*/}
+                                    {/*                <li>{t("step2_help_8")}</li>*/}
+                                    {/*                <li>{t("step2_help_9")}</li>*/}
+                                    {/*            </ul>*/}
+                                    {/*        </div>*/}
+                                    {/*    </div>*/}
+                                    {/*</div>*/}
                                     <div className="accordion_help">
                                         <div className="help_container">
-                                            <div className="help_column help_left_column help_left_column_mount_type">
-                                                <p className="help_column_header">{t("step2_help_1")}</p>
+                                            <div className="help_column help_left_column">
+                                                <p className="help_column_header"></p>
                                                 <ul className="help_column_list">
-                                                    <li>{t("step2_help_2")}</li>
-                                                    {/*<li>{t("step2_help_3")}</li>*/}
-                                                    <li>{t("step2_help_4")}</li>
-                                                    <li>{t("step2_help_5")}</li>
-                                                </ul>
-                                            </div>
-                                            <div className="help_column help_right_column help_right_column_mount_type">
-                                                <p className="help_column_header">{t("step2_help_6")}</p>
-                                                <ul className="help_column_list">
-                                                    <li>{t("step2_help_7")}</li>
-                                                    <li>{t("step2_help_8")}</li>
-                                                    <li>{t("step2_help_9")}</li>
+                                                    <li className="no_listStyle"><b>{t("dk_step2_help_1")}</b>{t("dk_step2_help_2")}</li>
+                                                    <li className="no_listStyle"><b>{t("dk_step2_help_3")}</b>{t("dk_step2_help_4")}</li>
+                                                    <li className="no_listStyle"><b>{t("dk_step2_help_5")}</b>{t("zebra_step2_help_6")}</li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -3966,7 +4060,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                 </Card.Body>
                             </Accordion.Collapse>
                         </Card>
-                        
+    
                         {/* step 3 */}
                         <Card>
                             <Card.Header>
@@ -3982,11 +4076,11 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                    checked={step3 === "false"}
                                                    onChange={e => {
                                                        setStep3("false");
-                                                       selectChanged(e, "3AIn,3BIn,3AOut,3BOut,3COut,3DOut");
+                                                       selectChanged(e, "3AIn,3BIn,3AOut,3BOut,3COut,3DOut,3CArc");
                                                        setMeasurementsNextStep("4");
-                                                       setDeps("31,32", "3,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3,3AOut,3BOut1,3BOut2,3COut,3DOut");
+                                                       setDeps("31,32", "3,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3,3AOut,3BOut1,3BOut2,3COut,3DOut,3CArc1,3CArc2,3CArc3");
                                                        deleteSpecialSelects();
-                                                       setCart("calcMeasurements", false, "WidthCart,HeightCart,Width1,Width2,Width3,Height1,Height2,Height3,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
+                                                       setCart("calcMeasurements", false, "WidthCart,HeightCart,Width1,Width2,Width3,Height1,Height2,Height3,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
                                                    }} ref={ref => (inputs.current["31"] = ref)}/>
                                             <label htmlFor="31">{t("I have my own measurements.")}</label>
                                         </div>
@@ -4009,821 +4103,1042 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                                setCart("calcMeasurements", true, "Width,height,calcMeasurements");
                                                            } else {
                                                                setStep3("true");
-                                                               deleteSpecialSelects(3);
+                                                               deleteSpecialSelects();
                                                                selectChanged(e);
                                                                setMeasurementsNextStep("3A");
-                                                               setDeps("3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3", "3,3AOut,3BOut1,3BOut2,3COut,3DOut,31,32");
-                                                               setCart("calcMeasurements", true, "Width,Height,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
+                                                               setDeps("3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3", "3,3AOut,3BOut1,3BOut2,3COut,3DOut,31,32,3CArc1,3CArc2,3CArc3");
+                                                               setCart("calcMeasurements", true, "Width,Height,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                           }
+                                                       } else if (stepSelectedValue["2"] === "3") {
+                                                           if (stepSelectedValue["2"] === "3" && step21 !== "true") {
+                                                               modalHandleShow("noInsideUnderstand");
+                                                               setStep3("");
+                                                               selectUncheck(e);
+                                                               setDeps("3", "31,32");
+                                                               setCart("calcMeasurements", true, "Width,height,calcMeasurements");
+                                                           } else {
+                                                               setStep3("true");
+                                                               deleteSpecialSelects();
+                                                               selectChanged(e);
+                                                               setMeasurementsNextStep("3A");
+                                                               setDeps("3AOut,3BOut1,3BOut2,3CArc1,3CArc2,3CArc3", "3,3COut,3DOut,31,32");
+                                                               setCart("calcMeasurements", true, "Width,Height,Width1,Width2,Width3,Height1,Height2,Height3,Height3C,ShadeMount");
                                                            }
                                                        } else {
                                                            setStep3("true");
-                                                           deleteSpecialSelects(3);
+                                                           deleteSpecialSelects();
                                                            selectChanged(e);
                                                            setMeasurementsNextStep("3A");
-                                                           setDeps("3AOut,3BOut1,3BOut2,3COut,3DOut", "3,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3,31,32");
-                                                           setCart("calcMeasurements", true, "Width,Height,Width1,Width2,Width3,Height1,Height2,Height3");
+                                                           setDeps("3AOut,3BOut1,3BOut2,3COut,3DOut", "3,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3,31,32,3CArc1,3CArc2,3CArc3");
+                                                           setCart("calcMeasurements", true, "Width,Height,Width1,Width2,Width3,Height1,Height2,Height3,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
                                                        }
                                                    }}/>
                                             <label htmlFor="32">{t("Calculate my measurements.")}</label>
-                                        
+                    
                                         </div>
-                                        
+                    
                                         {stepSelectedValue["3"] === "1" &&
-                                        <div className="own_measurements_container">
-                                            <div className="own_measurements_width">
-                                                <label className="select_label">{t("Width")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        values={selectCustomValues.width}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            optionSelectChanged_WidthLength(selected[0], "3", true, "cm", "س\u200Cم", pageLanguage);
-                                                            let temp = selectCustomValues;
-                                                            temp.width = selected;
-                                                            setSelectCustomValues(temp);
-                                                            setDeps("", "31");
-                                                            setCart("Width", selected[0].value);
-                                                        }}
-                                                        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
-                                                    />
+                                            <div className="own_measurements_container">
+                                                <div className="own_measurements_width">
+                                                    <label className="select_label">{t("Width")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            values={selectCustomValues.width}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                            }
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                optionSelectChanged_WidthLength(selected[0], "3", true, "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = selectCustomValues;
+                                                                temp.width = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "31");
+                                                                setCart("Width", selected[0].value);
+                                                            }}
+                                                            options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="own_measurements_Length">
+                                                    <label className="select_label">{t("Length_step3")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            values={selectCustomValues.length}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                            }
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                optionSelectChanged_WidthLength(selected[0], "3", false, "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = selectCustomValues;
+                                                                temp.length = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "32");
+                                                                setCart("Height", selected[0].value);
+                                                            }}
+                                                            options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className="own_measurements_Length">
-                                                <label className="select_label">{t("Length_step3")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        values={selectCustomValues.length}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            optionSelectChanged_WidthLength(selected[0], "3", false, "cm", "س\u200Cم", pageLanguage);
-                                                            let temp = selectCustomValues;
-                                                            temp.length = selected;
-                                                            setSelectCustomValues(temp);
-                                                            setDeps("", "32");
-                                                            setCart("Height", selected[0].value);
-                                                        }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
                                         }
-                                        
+                    
                                         <NextStep eventKey={measurementsNextStep}>{t("NEXT STEP")}</NextStep>
                                     </div>
-                                    
+                
                                     {(stepSelectedValue["3"] === "1") &&
-                                    <div className="accordion_help">
-                                        <div className="help_container">
-                                            <div className="help_column help_left_column">
-                                                <p className="help_column_header"/>
-                                                <ul className="help_column_list">
-                                                    <li className="no_listStyle single_line_height">
-                                                        <div className="measurementsHelp_link" onClick={e => modalHandleShow("measurementsHelp")}>
-                                                            {t("step3_help_1")}
-                                                        </div>
-                                                    </li>
-                                                    <li className="no_listStyle single_line_height">
-                                                        <b>{t("Note:&nbsp;")}</b>
-                                                        {t("step3_help_2")}
-                                                    </li>
-                                                </ul>
+                                        <div className="accordion_help">
+                                            <div className="help_container">
+                                                <div className="help_column help_left_column">
+                                                    <p className="help_column_header"/>
+                                                    <ul className="help_column_list">
+                                                        <li className="no_listStyle single_line_height">
+                                                            <div className="measurementsHelp_link" onClick={e => modalHandleShow("measurementsHelp")}>
+                                                                {t("step3_help_1")}
+                                                            </div>
+                                                        </li>
+                                                        <li className="no_listStyle single_line_height">
+                                                            <b>{t("Note:&nbsp;")}</b>
+                                                            {t("step3_help_2")}
+                                                        </li>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
                                     }
                                     {(stepSelectedValue["3"] === "2") &&
-                                    <div className="accordion_help">
-                                        <div className="help_container">
-                                            <div className="help_column help_left_column">
-                                                <p className="help_column_header"/>
-                                                <ul className="help_column_list">
-                                                    <li className="no_listStyle single_line_height">
-                                                        <b>{t("Note:&nbsp;")}</b>
-                                                        {t("step3_help_3")}
-                                                    </li>
-                                                </ul>
+                                        <div className="accordion_help">
+                                            <div className="help_container">
+                                                <div className="help_column help_left_column">
+                                                    <p className="help_column_header"/>
+                                                    <ul className="help_column_list">
+                                                        <li className="no_listStyle single_line_height">
+                                                            <b>{t("Note:&nbsp;")}</b>
+                                                            {t("step3_help_2.5")}
+                                                        </li>
+                                                        <li className="no_listStyle single_line_height">
+                                                            {t("step3_help_3")}
+                                                        </li>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
                                     }
                                 </Card.Body>
                             </Accordion.Collapse>
                         </Card>
-                        
+    
                         {/* step 3A inside */}
                         {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "1" && step21 === "true" &&
-                        <Card>
-                            <Card.Header>
-                                <ContextAwareToggle eventKey="3A" stepNum={t("3A")} stepTitle={t("zebra_step3AInside")} stepRef="3AIn" type="2" required={requiredStep["3AIn"]}
-                                                    stepSelected={stepSelectedLabel["3AIn"] === undefined ? "" : stepSelectedLabel["3AIn"]}/>
-                            </Card.Header>
-                            <Accordion.Collapse eventKey="3A">
-                                <Card.Body>
-                                    <div className="card_body">
-                                        <div className="box100">
-                                            <p className="step_selection_title">{t("step3A_title")}</p>
-                                            <img
-                                                src={pageLanguage === 'fa' ? require('../Images/drapery/zebra/width_inside_3_fa.svg').default : require('../Images/drapery/zebra/width_inside_3.svg').default}
-                                                className="img-fluid" alt=""/>
-                                        </div>
-                                        <div className="box100 Three_selection_container">
-                                            <div className="Three_select_container">
-                                                <label className="select_label">{t("step3AIn_A")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.width1}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_three(selected[0], "3AIn", 0, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.width1 = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3AIn1");
-                                                                setCart("Width1", selected[0].value);
+                            <Card>
+                                <Card.Header>
+                                    <ContextAwareToggle eventKey="3A" stepNum={t("3A")} stepTitle={t("zebra_step3AInside")} stepRef="3AIn" type="2" required={requiredStep["3AIn"]}
+                                                        stepSelected={stepSelectedLabel["3AIn"] === undefined ? "" : stepSelectedLabel["3AIn"]}/>
+                                </Card.Header>
+                                <Accordion.Collapse eventKey="3A">
+                                    <Card.Body>
+                                        <div className="card_body">
+                                            <div className="box100">
+                                                <p className="step_selection_title">{t("step3A_title")}</p>
+                                                <img
+                                                    src={pageLanguage === 'fa' ? require('../Images/drapery/zebra/width_inside_3_fa.svg').default : require('../Images/drapery/zebra/width_inside_3.svg').default}
+                                                    className="img-fluid" alt=""/>
+                                            </div>
+                                            <div className="box100 Three_selection_container">
+                                                <div className="Three_select_container">
+                                                    <label className="select_label">{t("step3AIn_A")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            values={selectCustomValues.width1}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                             }
-                                                        }}
-                                                        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
-                                                    />
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged_three(selected[0], "3AIn", 0, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.width1 = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "3AIn1");
+                                                                    setCart("Width1", selected[0].value);
+                                                                }
+                                                            }}
+                                                            options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="Three_select_container">
+                                                    <label className="select_label">{t("step3AIn_B")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            values={selectCustomValues.width2}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                            }
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged_three(selected[0], "3AIn", 1, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.width2 = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "3AIn2");
+                                                                    setCart("Width2", selected[0].value);
+                                                                }
+                                                            }}
+                                                            options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="Three_select_container">
+                                                    <label className="select_label">{t("step3AIn_C")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            values={selectCustomValues.width3}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                            }
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged_three(selected[0], "3AIn", 2, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.width3 = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "3AIn3");
+                                                                    setCart("Width3", selected[0].value);
+                                                                }
+                                                            }}
+                                                            options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className="Three_select_container">
-                                                <label className="select_label">{t("step3AIn_B")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.width2}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_three(selected[0], "3AIn", 1, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.width2 = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3AIn2");
-                                                                setCart("Width2", selected[0].value);
-                                                            }
-                                                        }}
-                                                        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="Three_select_container">
-                                                <label className="select_label">{t("step3AIn_C")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.width3}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_three(selected[0], "3AIn", 2, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.width3 = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3AIn3");
-                                                                setCart("Width3", selected[0].value);
-                                                            }
-                                                        }}
-                                                        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
-                                                    />
+                                            <NextStep eventKey="3B">{t("NEXT STEP")}</NextStep>
+                                        </div>
+                    
+                                        <div className="accordion_help">
+                                            <div className="help_container">
+                                                <div className="help_column help_left_column">
+                                                    <p className="help_column_header"/>
+                                                    <ul className="help_column_list">
+                                                        <li className="no_listStyle single_line_height">{t("step3A_help_1")}
+                                                        </li>
+                                                    </ul>
                                                 </div>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="3B">{t("NEXT STEP")}</NextStep>
-                                    </div>
-                                    
-                                    <div className="accordion_help">
-                                        <div className="help_container">
-                                            <div className="help_column help_left_column">
-                                                <p className="help_column_header"/>
-                                                <ul className="help_column_list">
-                                                    <li className="no_listStyle single_line_height">{t("step3A_help_1")}
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Card.Body>
-                            </Accordion.Collapse>
-                        </Card>
+                                    </Card.Body>
+                                </Accordion.Collapse>
+                            </Card>
                         }
-                        
+    
                         {/* step 3B inside */}
                         {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "1" && step21 === "true" &&
-                        <Card>
-                            <Card.Header>
-                                <ContextAwareToggle eventKey="3B" stepNum={t("3B")} stepTitle={t("zebra_step3BInside")} stepRef="3BIn" type="2" required={requiredStep["3BIn"]}
-                                                    stepSelected={stepSelectedLabel["3BIn"] === undefined ? "" : stepSelectedLabel["3BIn"]}/>
-                            </Card.Header>
-                            <Accordion.Collapse eventKey="3B">
-                                <Card.Body>
-                                    <div className="card_body">
-                                        <div className="box100">
-                                            <p className="step_selection_title">{t("step3B_title")}</p>
-                                            <img
-                                                src={pageLanguage === 'fa' ? require('../Images/drapery/zebra/height_inside_3_fa.svg').default : require('../Images/drapery/zebra/height_inside_3.svg').default}
-                                                className="img-fluid" alt=""/>
-                                        </div>
-                                        <div className="box100 Three_selection_container">
-                                            <div className="Three_select_container">
-                                                <label className="select_label">{t("step3BIn_A")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.height1}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_three(selected[0], "3BIn", 0, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.height1 = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3BIn1");
-                                                                setCart("Height1", selected[0].value);
-                                                            }
-                                                        }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="Three_select_container">
-                                                <label className="select_label">{t("step3BIn_B")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.height2}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_three(selected[0], "3BIn", 1, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.height2 = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3BIn2");
-                                                                setCart("Height2", selected[0].value);
-                                                            }
-                                                        }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="Three_select_container">
-                                                <label className="select_label">{t("step3BIn_C")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.height3}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_three(selected[0], "3BIn", 2, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.height3 = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3BIn3");
-                                                                setCart("Height3", selected[0].value);
-                                                            }
-                                                        }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <NextStep eventKey="4">{t("NEXT STEP")}</NextStep>
-                                    </div>
-                                    
-                                    <div className="accordion_help">
-                                        <div className="help_container">
-                                            <div className="help_column help_left_column">
-                                                <p className="help_column_header"/>
-                                                <ul className="help_column_list">
-                                                    <li className="no_listStyle single_line_height">{t("step3B_help_1")}
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Card.Body>
-                            </Accordion.Collapse>
-                        </Card>
-                        }
-                        
-                        {/* step 3A outside */}
-                        {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "2" &&
-                        <Card>
-                            <Card.Header>
-                                <ContextAwareToggle eventKey="3A" stepNum={t("3A")} stepTitle={t("zebra_step3AOutside")} stepRef="3AOut" type="2" required={requiredStep["3AOut"]}
-                                                    stepSelected={stepSelectedLabel["3AOut"] === undefined ? "" : stepSelectedLabel["3AOut"]}/>
-                            </Card.Header>
-                            <Accordion.Collapse eventKey="3A">
-                                <Card.Body>
-                                    <div className="card_body">
-                                        <div className="box100">
-                                            <p className="step_selection_title">{t("step3A_out_title")}</p>
-                                            <img src={require('../Images/drapery/zebra/FrameSize.svg').default} className="img-fluid" alt=""/>
-                                        </div>
-                                        <div className="box100 Three_selection_container">
+                            <Card>
+                                <Card.Header>
+                                    <ContextAwareToggle eventKey="3B" stepNum={t("3B")} stepTitle={t("zebra_step3BInside")} stepRef="3BIn" type="2" required={requiredStep["3BIn"]}
+                                                        stepSelected={stepSelectedLabel["3BIn"] === undefined ? "" : stepSelectedLabel["3BIn"]}/>
+                                </Card.Header>
+                                <Accordion.Collapse eventKey="3B">
+                                    <Card.Body>
+                                        <div className="card_body">
                                             <div className="box100">
-                                                <label className="select_label">{t("Width")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.width3A}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged("3AOut", selected[0], "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.width3A = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3AOut");
-                                                                setCart("Width3A", selected[0].value);
+                                                <p className="step_selection_title">{t("step3B_title")}</p>
+                                                <img
+                                                    src={pageLanguage === 'fa' ? require('../Images/drapery/zebra/height_inside_3_fa.svg').default : require('../Images/drapery/zebra/height_inside_3.svg').default}
+                                                    className="img-fluid" alt=""/>
+                                            </div>
+                                            <div className="box100 Three_selection_container">
+                                                <div className="Three_select_container">
+                                                    <label className="select_label">{t("step3BIn_A")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            values={selectCustomValues.height1}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                             }
-                                                        }}
-                                                        options={SelectOptionRange(30, 290, 1, "cm", "", pageLanguage)}
-                                                    />
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged_three(selected[0], "3BIn", 0, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.height1 = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "3BIn1");
+                                                                    setCart("Height1", selected[0].value);
+                                                                }
+                                                            }}
+                                                            options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="Three_select_container">
+                                                    <label className="select_label">{t("step3BIn_B")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            values={selectCustomValues.height2}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                            }
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged_three(selected[0], "3BIn", 1, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.height2 = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "3BIn2");
+                                                                    setCart("Height2", selected[0].value);
+                                                                }
+                                                            }}
+                                                            options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="Three_select_container">
+                                                    <label className="select_label">{t("step3BIn_C")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            values={selectCustomValues.height3}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                            }
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged_three(selected[0], "3BIn", 2, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.height3 = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "3BIn3");
+                                                                    setCart("Height3", selected[0].value);
+                                                                }
+                                                            }}
+                                                            options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                        
+                                            <NextStep eventKey="4">{t("NEXT STEP")}</NextStep>
+                                        </div>
+                    
+                                        <div className="accordion_help">
+                                            <div className="help_container">
+                                                <div className="help_column help_left_column">
+                                                    <p className="help_column_header"/>
+                                                    <ul className="help_column_list">
+                                                        <li className="no_listStyle single_line_height">{t("step3B_help_1")}
+                                                        </li>
+                                                    </ul>
                                                 </div>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="3B">{t("NEXT STEP")}</NextStep>
-                                    </div>
-                                
-                                </Card.Body>
-                            </Accordion.Collapse>
-                        </Card>
+                                    </Card.Body>
+                                </Accordion.Collapse>
+                            </Card>
                         }
-                        
+    
+                        {/* step 3A outside */}
+                        {stepSelectedValue["3"] === "2" && !!(stepSelectedValue["2"] === "2"||stepSelectedValue["2"] === "3") &&
+                            <Card>
+                                <Card.Header>
+                                    <ContextAwareToggle eventKey="3A" stepNum={t("3A")} stepTitle={t("zebra_step3AOutside")} stepRef="3AOut" type="2" required={requiredStep["3AOut"]}
+                                                        stepSelected={stepSelectedLabel["3AOut"] === undefined ? "" : stepSelectedLabel["3AOut"]}/>
+                                </Card.Header>
+                                <Accordion.Collapse eventKey="3A">
+                                    <Card.Body>
+                                        <div className="card_body">
+                                            <div className="box100">
+                                                <p className="step_selection_title">{t("step3A_out_title")}</p>
+                                                <img src={require('../Images/drapery/zebra/FrameSize.svg').default} className="img-fluid" alt=""/>
+                                            </div>
+                                            <div className="box100 Three_selection_container">
+                                                <div className="box100">
+                                                    <label className="select_label">{t("Width")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            values={selectCustomValues.width3A}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                            }
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged("3AOut", selected[0], "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.width3A = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "3AOut");
+                                                                    setCart("Width3A", selected[0].value);
+                                                                }
+                                                            }}
+                                                            options={SelectOptionRange(30, 290, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <NextStep eventKey="3B">{t("NEXT STEP")}</NextStep>
+                                        </div>
+                
+                                    </Card.Body>
+                                </Accordion.Collapse>
+                            </Card>
+                        }
+    
                         {/* step 3B outside */}
-                        {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "2" &&
-                        <Card>
-                            <Card.Header>
-                                <ContextAwareToggle eventKey="3B" stepNum={t("3B")} stepTitle={t("zebra_step3BOutside")} stepRef="3BOut" type="2" required={requiredStep["3BOut"]}
-                                                    stepSelected={stepSelectedLabel["3BOut"] === undefined ? "" : stepSelectedLabel["3BOut"]}/>
-                            </Card.Header>
-                            <Accordion.Collapse eventKey="3B">
-                                <Card.Body>
-                                    <div className="card_body">
-                                        <div className="box100">
-                                            <p className="step_selection_title">{t("step3B_out_title")}</p>
-                                            <img src={require('../Images/drapery/zebra/wall_cover.svg').default} className="img-fluid" alt=""/>
-                                        </div>
-                                        <div className="box100 Three_selection_container dir_ltr">
-                                            <div className="box50">
-                                                <label className="select_label"><p className="farsi_cm">{t("select_cm")}</p>{t("Left")}</label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.left}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_LeftRight(selected[0], "3BOut", true, "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.left = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3BOut1");
-                                                                setCart("ExtensionLeft", selected[0].value);
+                        {stepSelectedValue["3"] === "2" && !!(stepSelectedValue["2"] === "2"||stepSelectedValue["2"] === "3") &&
+                            <Card>
+                                <Card.Header>
+                                    <ContextAwareToggle eventKey="3B" stepNum={t("3B")} stepTitle={t("zebra_step3BOutside")} stepRef="3BOut" type="2" required={requiredStep["3BOut"]}
+                                                        stepSelected={stepSelectedLabel["3BOut"] === undefined ? "" : stepSelectedLabel["3BOut"]}/>
+                                </Card.Header>
+                                <Accordion.Collapse eventKey="3B">
+                                    <Card.Body>
+                                        <div className="card_body">
+                                            <div className="box100">
+                                                <p className="step_selection_title">{t("step3B_out_title")}</p>
+                                                <img src={require('../Images/drapery/zebra/wall_cover.svg').default} className="img-fluid" alt=""/>
+                                            </div>
+                                            <div className="box100 Three_selection_container dir_ltr">
+                                                <div className="box50">
+                                                    <label className="select_label"><p className="farsi_cm">{t("select_cm")}</p>{t("Left")}</label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            values={selectCustomValues.left}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                             }
-                                                        }}
-                                                        options={SelectOptionRange(1, 10, 1, "cm", "", pageLanguage)}
-                                                    />
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged_LeftRight(selected[0], "3BOut", true, "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.left = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "3BOut1");
+                                                                    setCart("ExtensionLeft", selected[0].value);
+                                                                }
+                                                            }}
+                                                            options={SelectOptionRange(1, 10, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="box50">
+                                                    <label className="select_label"><p className="farsi_cm">{t("select_cm")}</p>{t("Right")}</label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            values={selectCustomValues.right}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                            }
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged_LeftRight(selected[0], "3BOut", false, "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.right = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "3BOut2");
+                                                                    setCart("ExtensionRight", selected[0].value);
+                                                                }
+                                                            }}
+                                                            options={SelectOptionRange(1, 10, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className="box50">
-                                                <label className="select_label"><p className="farsi_cm">{t("select_cm")}</p>{t("Right")}</label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.right}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_LeftRight(selected[0], "3BOut", false, "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.right = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3BOut2");
-                                                                setCart("ExtensionRight", selected[0].value);
-                                                            }
-                                                        }}
-                                                        options={SelectOptionRange(1, 10, 1, "cm", "", pageLanguage)}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <NextStep eventKey="3C">{t("NEXT STEP")}</NextStep>
-                                    </div>
-                                    
-                                    <div className="accordion_help">
-                                        <div className="help_container">
-                                            <div className="help_column help_left_column">
-                                                <p className="help_column_header"/>
-                                                <ul className="help_column_list">
-                                                    <li className="no_listStyle single_line_height">{t("step3B_out_help_1")}
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Card.Body>
-                            </Accordion.Collapse>
-                        </Card>
-                        }
                         
+                                            <NextStep eventKey="3C">{t("NEXT STEP")}</NextStep>
+                                        </div>
+                    
+                                        <div className="accordion_help">
+                                            <div className="help_container">
+                                                <div className="help_column help_left_column">
+                                                    <p className="help_column_header"/>
+                                                    <ul className="help_column_list">
+                                                        <li className="no_listStyle single_line_height">{t("step3B_out_help_1")}
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Card.Body>
+                                </Accordion.Collapse>
+                            </Card>
+                        }
+    
                         {/* step 3C outside */}
                         {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "2" &&
-                        <Card>
-                            <Card.Header>
-                                <ContextAwareToggle eventKey="3C" stepNum={t("3C")} stepTitle={t("zebra_step3COutside")} stepRef="3COut" type="2" required={requiredStep["3COut"]}
-                                                    stepSelected={stepSelectedLabel["3COut"] === undefined ? "" : stepSelectedLabel["3COut"]}/>
-                            </Card.Header>
-                            <Accordion.Collapse eventKey="3C">
-                                <Card.Body>
-                                    <div className="card_body">
-                                        <div className="box100">
-                                            <p className="step_selection_title">{t("step3C_out_title")}</p>
-                                            <img src={require('../Images/drapery/zebra/frame_height.svg').default} className="img-fluid" alt=""/>
-                                        </div>
-                                        <div className="box100 Three_selection_container">
+                            <Card>
+                                <Card.Header>
+                                    <ContextAwareToggle eventKey="3C" stepNum={t("3C")} stepTitle={t("zebra_step3COutside")} stepRef="3COut" type="2" required={requiredStep["3COut"]}
+                                                        stepSelected={stepSelectedLabel["3COut"] === undefined ? "" : stepSelectedLabel["3COut"]}/>
+                                </Card.Header>
+                                <Accordion.Collapse eventKey="3C">
+                                    <Card.Body>
+                                        <div className="card_body">
                                             <div className="box100">
-                                                <label className="select_label">{t("Height")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.height3C}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged("3COut", selected[0], "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.height3C = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3COut");
-                                                                setCart("Height3C", selected[0].value);
+                                                <p className="step_selection_title">{t("step3C_out_title")}</p>
+                                                <img src={require('../Images/drapery/zebra/frame_height.svg').default} className="img-fluid" alt=""/>
+                                            </div>
+                                            <div className="box100 Three_selection_container">
+                                                <div className="box100">
+                                                    <label className="select_label">{t("Height")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            values={selectCustomValues.height3C}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                             }
-                                                        }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
-                                                    />
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged("3COut", selected[0], "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.height3C = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "3COut");
+                                                                    setCart("Height3C", selected[0].value);
+                                                                }
+                                                            }}
+                                                            options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <NextStep eventKey="3D">{t("NEXT STEP")}</NextStep>
+                                        </div>
+                
+                                    </Card.Body>
+                                </Accordion.Collapse>
+                            </Card>
+                        }
+    
+                        {/* step 3C Arc */}
+                        {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "3" &&
+                            <Card>
+                                <Card.Header>
+                                    <ContextAwareToggle eventKey="3C" stepNum={t("3C")} stepTitle={t("dk_step2D")} stepRef="3CArc" type="2" required={requiredStep["3CArc"]}
+                                                        stepSelected={stepSelectedLabel["3CArc"] === undefined ? "" : stepSelectedLabel["3CArc"]}/>
+                                </Card.Header>
+                                <Accordion.Collapse eventKey="3C">
+                                    <Card.Body>
+                                        <div className="card_body">
+                                            <div className="box100">
+                                                <p className="step_selection_title">{t("arc_step2D_title")}</p>
+                                                <img
+                                                    src={pageLanguage === 'fa' ? require('../Images/drapery/dk/ceiling_to_window_3.svg').default : require('../Images/drapery/dk/ceiling_to_window_3.svg').default}
+                                                    className="img-fluid" alt=""/>
+                                            </div>
+                                            <div className="box100 Three_selection_container">
+                                                <div className="Three_select_container">
+                                                    <label className="select_label">{t("step3AIn_A")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            values={selectCustomValues.CeilingToWindow1}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                            }
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                               postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged_three(selected[0], "3CArc", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.CeilingToWindow1 = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "3CArc1");
+                                                                    setCart("CeilingToWindow1", selected[0].value);
+                                                                }
+                                                            }}
+                                                            options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="Three_select_container">
+                                                    <label className="select_label">{t("step3AIn_B")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            values={selectCustomValues.CeilingToWindow2}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                            }
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                               postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged_three(selected[0], "3CArc", 1, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.CeilingToWindow2 = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "3CArc2");
+                                                                    setCart("CeilingToWindow2", selected[0].value);
+                                                                }
+                                                            }}
+                                                            options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="Three_select_container">
+                                                    <label className="select_label">{t("step3AIn_C")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            values={selectCustomValues.CeilingToWindow3}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                            }
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                               postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged_three(selected[0], "3CArc", 2, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.CeilingToWindow3 = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "3CArc3");
+                                                                    setCart("CeilingToWindow3", selected[0].value);
+                                                                }
+                                                            }}
+                                                            options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <NextStep eventKey="4">{t("NEXT STEP")}</NextStep>
+                                        </div>
+                    
+                                        <div className="accordion_help">
+                                            <div className="help_container">
+                                                <div className="help_column help_left_column">
+                                                    <p className="help_column_header"/>
+                                                    <ul className="help_column_list">
+                                                        <li className="no_listStyle single_line_height">
+                                                        <span className="popover_indicator">
+                                                            {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
+                                                                                  children={<object className="popover_camera" type="image/svg+xml"
+                                                                                                    data={require('../Images/public/camera.svg').default}/>}
+                                                                                  component={
+                                                                                      <div className="clearfix">
+                                                                                          <div className="popover_image clearfix">
+                                                                                              <img
+                                                                                                  src={popoverImages["step2d"] === undefined ? require('../Images/drapery/dk/mouldinghelpphoto1.jpg') : popoverImages["step2d"]}
+                                                                                                  className="img-fluid" alt=""/>
+                                                                                          </div>
+                                                                                          <div className="popover_footer">
+                                                                                              <span className="popover_footer_title">{t("dk_step_help_camera_title")}</span>
+                                                                                              <span className="popover_thumbnails">
+                                                                                                  <div>
+                                                                                                      <img src={require('../Images/drapery/dk/mouldinghelpphoto1.jpg')}
+                                                                                                           text="step2d"
+                                                                                                           onMouseEnter={(e) => popoverThumbnailHover(e)}
+                                                                                                           className="popover_thumbnail_img img-fluid"
+                                                                                                           alt=""/>
+                                                                                                  </div>
+                                                                                                  <div>
+                                                                                                      <img src={require('../Images/drapery/dk/mouldinghelpphoto2.jpg')}
+                                                                                                           text="step2d"
+                                                                                                           onMouseEnter={(e) => popoverThumbnailHover(e)}
+                                                                                                           className="popover_thumbnail_img img-fluid"
+                                                                                                           alt=""/>
+                                                                                                  </div>
+                                                                                              </span>
+                                                                                          </div>
+                                                                                      </div>
+                                                                                  }/>
+                                                            }
+                                                        </span>{t("dk_step2D_help_1")}
+                                                        </li>
+                                                    </ul>
                                                 </div>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="3D">{t("NEXT STEP")}</NextStep>
-                                    </div>
-                                
-                                </Card.Body>
-                            </Accordion.Collapse>
-                        </Card>
+                                    </Card.Body>
+                                </Accordion.Collapse>
+                            </Card>
                         }
-                        
+    
                         {/* step 3D outside */}
                         {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "2" &&
-                        <Card>
-                            <Card.Header>
-                                <ContextAwareToggle eventKey="3D" stepNum={t("3D")} stepTitle={t("zebra_step3DOutside")} stepRef="3DOut" type="2" required={requiredStep["3DOut"]}
-                                                    stepSelected={stepSelectedLabel["3DOut"] === undefined ? "" : stepSelectedLabel["3DOut"]}/>
-                            </Card.Header>
-                            <Accordion.Collapse eventKey="3D">
-                                <Card.Body>
-                                    <div className="card_body">
-                                        <div className="box100">
-                                            <p className="step_selection_title">{t("step3D_out_title")}</p>
-                                            <img src={require('../Images/drapery/zebra/shade_mount.svg').default} className="img-fluid" alt=""/>
-                                        </div>
-                                        <div className="box100 Three_selection_container">
+                            <Card>
+                                <Card.Header>
+                                    <ContextAwareToggle eventKey="3D" stepNum={t("3D")} stepTitle={t("zebra_step3DOutside")} stepRef="3DOut" type="2" required={requiredStep["3DOut"]}
+                                                        stepSelected={stepSelectedLabel["3DOut"] === undefined ? "" : stepSelectedLabel["3DOut"]}/>
+                                </Card.Header>
+                                <Accordion.Collapse eventKey="3D">
+                                    <Card.Body>
+                                        <div className="card_body">
                                             <div className="box100">
-                                                <label className="select_label"/>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.shadeMount}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged("3DOut", selected[0], "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.shadeMount = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3DOut");
-                                                                setCart("ShadeMount", selected[0].value);
+                                                <p className="step_selection_title">{t("step3D_out_title")}</p>
+                                                <img src={require('../Images/drapery/zebra/shade_mount.svg').default} className="img-fluid" alt=""/>
+                                            </div>
+                                            <div className="box100 Three_selection_container">
+                                                <div className="box100">
+                                                    <label className="select_label"/>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            values={selectCustomValues.shadeMount}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                             }
-                                                        }}
-                                                        options={SelectOptionRange(10, 100, 1, "cm", "", pageLanguage)}
-                                                    />
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged("3DOut", selected[0], "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.shadeMount = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "3DOut");
+                                                                    setCart("ShadeMount", selected[0].value);
+                                                                }
+                                                            }}
+                                                            options={SelectOptionRange(10, 100, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <NextStep eventKey="4">{t("NEXT STEP")}</NextStep>
+                                        </div>
+                    
+                                        <div className="accordion_help">
+                                            <div className="help_container">
+                                                <div className="help_column help_left_column">
+                                                    <p className="help_column_header"/>
+                                                    <ul className="help_column_list">
+                                                        <li className="no_listStyle single_line_height">{t("step3D_out_help_1")}
+                                                        </li>
+                                                    </ul>
                                                 </div>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="4">{t("NEXT STEP")}</NextStep>
-                                    </div>
-                                    
-                                    <div className="accordion_help">
-                                        <div className="help_container">
-                                            <div className="help_column help_left_column">
-                                                <p className="help_column_header"/>
-                                                <ul className="help_column_list">
-                                                    <li className="no_listStyle single_line_height">{t("step3D_out_help_1")}
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Card.Body>
-                            </Accordion.Collapse>
-                        </Card>
+                                    </Card.Body>
+                                </Accordion.Collapse>
+                            </Card>
                         }
-                        
+    
                         {/* step 4 */}
                         <Card>
                             <Card.Header>
@@ -5192,180 +5507,214 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                         }
                         
                         {/* step 5 */}
-                        <Card>
-                            <Card.Header>
-                                <ContextAwareToggle eventKey="5" stepNum={t("5")} stepTitle={t("roller_step5")} stepRef="5" type="1" required={requiredStep["5"]}
-                                                    stepSelected={stepSelectedLabel["5"] === undefined ? "" : stepSelectedLabel["5"]}/>
-                            </Card.Header>
-                            <Accordion.Collapse eventKey="5">
-                                <Card.Body>
-                                    <div className="card_body card_body_radio card_body_4">
-                                        <div className="box50 radio_style">
-                                            <img src={require('../Images/drapery/roller/roll_regular.svg').default} className="img-fluid half_margin" alt=""/>
-                                            <input className="radio" type="radio" text={t("roller_headrail1")} value="1" name="step5" ref-num="5" id="51"
-                                                   checked={step5 === "Exposed"}
-                                                   onChange={e => {
-                                                       selectChanged(e);
-                                                       setStep5("Exposed");
-                                                       setDeps("", "5,53,54");
-                                                       setCart("Headrail", "Exposed");
-                                                       setHeadrailsNextStep("5A");
-                                                   }} ref={ref => (inputs.current["51"] = ref)}/>
-                                            <label htmlFor="51">{t("roller_headrail1")}</label>
-                                        </div>
-                                        <div className="box50 radio_style">
-                                            <img src={require('../Images/drapery/roller/roll_upholstered_valance.svg').default} className="img-fluid half_margin" alt=""/>
-                                            <input className="radio" type="radio" text={t("roller_headrail2")} value="2" name="step5" ref-num="5" id="52"
-                                                   checked={step5 === "Upholstered"}
-                                                   onChange={e => {
-                                                       selectChanged(e);
-                                                       setStep5("Upholstered");
-                                                       setDeps("", "5,53,54");
-                                                       setCart("Headrail", "Upholstered");
-                                                       setHeadrailsNextStep("6");
-                                                   }} ref={ref => (inputs.current["52"] = ref)}/>
-                                            <label htmlFor="52">{t("roller_headrail2")}<br/><p
-                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["5"] ? (modelAccessories["5"]["8"] ? GetPrice(modelAccessories["5"]["8"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
-                                            </label>
-                                        </div>
-                                        <div className="box50 radio_style">
-                                            <img src={require('../Images/drapery/roller/roll_metal_valance.svg').default} className="img-fluid half_margin" alt=""/>
-                                            <input className="radio" type="radio" text={t("roller_headrail3")} value="3" name="step5" ref-num="5" id="53"
-                                                   checked={step5 === "MetalValance"}
-                                                   onChange={e => {
-                                                       selectChanged(e);
-                                                       setStep5("MetalValance");
-                                                       setDeps("53", "5,54");
-                                                       setCart("Headrail", "MetalValance");
-                                                       setHeadrailsNextStep("6");
-                                                   }} ref={ref => (inputs.current["53"] = ref)}/>
-                                            <label htmlFor="53">{t("roller_headrail3")}<br/><p
-                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["5"] ? (modelAccessories["5"]["10"] ? GetPrice(modelAccessories["5"]["10"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
-                                            </label>
-                                        </div>
-                                        <div className="box50 radio_style">
-                                            <img src={require('../Images/drapery/roller/roll_fabric_insert.svg').default} className="img-fluid half_margin" alt=""/>
-                                            <input className="radio" type="radio" text={t("roller_headrail4")} value="4" name="step5" ref-num="5" id="54"
-                                                   checked={step5 === "MetalValanceFabricInsert"}
-                                                   onChange={e => {
-                                                       selectChanged(e);
-                                                       setStep5("MetalValanceFabricInsert");
-                                                       setDeps("54", "5,53");
-                                                       setCart("Headrail", "MetalValanceFabricInsert");
-                                                       setHeadrailsNextStep("6");
-                                                   }} ref={ref => (inputs.current["54"] = ref)}/>
-                                            <label htmlFor="54">{t("roller_headrail4")}<br/><p
-                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["5"] ? (modelAccessories["5"]["12"] ? GetPrice(modelAccessories["5"]["12"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
-                                            </label>
-                                        </div>
-                                        {(stepSelectedValue["5"] === "3" || stepSelectedValue["5"] === "4") &&
-                                        <div className="selection_section">
-                                            <div className="select_container">
-                                                {stepSelectedValue["5"] === "3" &&
-                                                <Select
-                                                    className="select"
-                                                    placeholder={t("Please Select")}
-                                                    portal={document.body}
-                                                    dropdownPosition="bottom"
-                                                    dropdownHandle={false}
-                                                    dropdownGap={0}
-                                                    values={selectedValanceColor1}
-                                                    onDropdownOpen={() => {
-                                                        let temp1 = window.scrollY;
-                                                        window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                        setTimeout(() => {
-                                                            let temp2 = window.scrollY;
-                                                            if (temp2 === temp1)
-                                                                window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                        }, 100);
-                                                    }}
-                                                    dropdownRenderer={
-                                                        ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
-                                                    }
-                                                    contentRenderer={
-                                                        ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
-                                                    }
-                                                    // optionRenderer={
-                                                    //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                    // }
-                                                    onChange={(selected) => {
-                                                        if (selected.length) {
-                                                            setDeps("", "53");
-                                                            setCart("MetalValanceColor", selected[0].value);
-                                                            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                            tempLabels["5"] = t("roller_headrail3") + "/" + selected[0].label;
-                                                            setStepSelectedLabel(tempLabels);
+                        {stepSelectedValue["2"] !== "3" &&
+                            <Card>
+                                <Card.Header>
+                                    <ContextAwareToggle eventKey="5" stepNum={t("5")} stepTitle={t("roller_step5")} stepRef="5" type="1" required={requiredStep["5"]}
+                                                        stepSelected={stepSelectedLabel["5"] === undefined ? "" : stepSelectedLabel["5"]}/>
+                                </Card.Header>
+                                <Accordion.Collapse eventKey="5">
+                                    <Card.Body>
+                                        <div className="card_body card_body_radio card_body_4">
+                                            <div className="box50 radio_style">
+                                                <img src={require('../Images/drapery/roller/roll_regular.svg').default} className="img-fluid half_margin" alt=""/>
+                                                <input className="radio" type="radio" text={t("roller_headrail1")} value="1" name="step5" ref-num="5" id="51"
+                                                       checked={step5 === "Exposed"}
+                                                       onChange={e => {
+                                                           if (stepSelectedValue["2"] === undefined) {
+                                                               setStep5("");
+                                                               selectUncheck(e);
+                                                               modalHandleShow("noMount");
+                                                               setDeps("5", "");
+                                                               setCart("", "", "Headrail");
+                                                           } else {
+                                                               selectChanged(e);
+                                                               setStep5("Exposed");
+                                                               setDeps("", "5,53,54");
+                                                               setCart("Headrail", "Exposed");
+                                                               setHeadrailsNextStep("5A");
+                                                           }
+                                                       }} ref={ref => (inputs.current["51"] = ref)}/>
+                                                <label htmlFor="51">{t("roller_headrail1")}</label>
+                                            </div>
+                                            <div className="box50 radio_style">
+                                                <img src={require('../Images/drapery/roller/roll_upholstered_valance.svg').default} className="img-fluid half_margin" alt=""/>
+                                                <input className="radio" type="radio" text={t("roller_headrail2")} value="2" name="step5" ref-num="5" id="52"
+                                                       checked={step5 === "Upholstered"}
+                                                       onChange={e => {
+                                                           if (stepSelectedValue["2"] === undefined) {
+                                                               setStep5("");
+                                                               selectUncheck(e);
+                                                               modalHandleShow("noMount");
+                                                               setDeps("5", "");
+                                                               setCart("", "", "Headrail");
+                                                           } else {
+                                                               selectChanged(e);
+                                                               setStep5("Upholstered");
+                                                               setDeps("", "5,53,54");
+                                                               setCart("Headrail", "Upholstered");
+                                                               setHeadrailsNextStep("6");
+                                                           }
+                                                       }} ref={ref => (inputs.current["52"] = ref)}/>
+                                                <label htmlFor="52">{t("roller_headrail2")}<br/><p
+                                                    className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add ") : t("Surcharge Applies")}{(modelAccessories["5"] ? (modelAccessories["5"]["8"] ? GetPrice(modelAccessories["5"]["8"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
+                                                </label>
+                                            </div>
+                                            <div className="box50 radio_style">
+                                                <img src={require('../Images/drapery/roller/roll_metal_valance.svg').default} className="img-fluid half_margin" alt=""/>
+                                                <input className="radio" type="radio" text={t("roller_headrail3")} value="3" name="step5" ref-num="5" id="53"
+                                                       checked={step5 === "MetalValance"}
+                                                       onChange={e => {
+                                                           if (stepSelectedValue["2"] === undefined) {
+                                                               setStep5("");
+                                                               selectUncheck(e);
+                                                               modalHandleShow("noMount");
+                                                               setDeps("5", "");
+                                                               setCart("", "", "Headrail");
+                                                           } else {
+                                                               selectChanged(e);
+                                                               setStep5("MetalValance");
+                                                               setDeps("53", "5,54");
+                                                               setCart("Headrail", "MetalValance");
+                                                               setHeadrailsNextStep("6");
+                                                           }
+                                                       }} ref={ref => (inputs.current["53"] = ref)}/>
+                                                <label htmlFor="53">{t("roller_headrail3")}<br/><p
+                                                    className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add ") : t("Surcharge Applies")}{(modelAccessories["5"] ? (modelAccessories["5"]["10"] ? GetPrice(modelAccessories["5"]["10"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
+                                                </label>
+                                            </div>
+                                            <div className="box50 radio_style">
+                                                <img src={require('../Images/drapery/roller/roll_fabric_insert.svg').default} className="img-fluid half_margin" alt=""/>
+                                                <input className="radio" type="radio" text={t("roller_headrail4")} value="4" name="step5" ref-num="5" id="54"
+                                                       checked={step5 === "MetalValanceFabricInsert"}
+                                                       onChange={e => {
+                                                           if (stepSelectedValue["2"] === undefined) {
+                                                               setStep5("");
+                                                               selectUncheck(e);
+                                                               modalHandleShow("noMount");
+                                                               setDeps("5", "");
+                                                               setCart("", "", "Headrail");
+                                                           } else {
+                                                               selectChanged(e);
+                                                               setStep5("MetalValanceFabricInsert");
+                                                               setDeps("54", "5,53");
+                                                               setCart("Headrail", "MetalValanceFabricInsert");
+                                                               setHeadrailsNextStep("6");
+                                                           }
+                                                       }} ref={ref => (inputs.current["54"] = ref)}/>
+                                                <label htmlFor="54">{t("roller_headrail4")}<br/><p
+                                                    className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add ") : t("Surcharge Applies")}{(modelAccessories["5"] ? (modelAccessories["5"]["12"] ? GetPrice(modelAccessories["5"]["12"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
+                                                </label>
+                                            </div>
+                                            {(stepSelectedValue["5"] === "3" || stepSelectedValue["5"] === "4") &&
+                                                <div className="selection_section">
+                                                    <div className="select_container">
+                                                        {stepSelectedValue["5"] === "3" &&
+                                                            <Select
+                                                                className="select"
+                                                                placeholder={t("Please Select")}
+                                                                portal={document.body}
+                                                                dropdownPosition="bottom"
+                                                                dropdownHandle={false}
+                                                                dropdownGap={0}
+                                                                values={selectedValanceColor1}
+                                                                onDropdownOpen={() => {
+                                                                    let temp1 = window.scrollY;
+                                                                    window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                    setTimeout(() => {
+                                                                        let temp2 = window.scrollY;
+                                                                        if (temp2 === temp1)
+                                                                            window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                    }, 100);
+                                                                }}
+                                                                dropdownRenderer={
+                                                                    ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
+                                                                }
+                                                                contentRenderer={
+                                                                    ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                                }
+                                                                // optionRenderer={
+                                                                //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                                // }
+                                                                onChange={(selected) => {
+                                                                    if (selected.length) {
+                                                                        setDeps("", "53");
+                                                                        setCart("MetalValanceColor", selected[0].value);
+                                                                        let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                                        tempLabels["5"] = t("roller_headrail3") + "/" + selected[0].label;
+                                                                        setStepSelectedLabel(tempLabels);
+                                                                    }
+                                                                }}
+                                                                options={optionsMetalValance[pageLanguage]}
+                                                            />
                                                         }
-                                                    }}
-                                                    options={optionsMetalValance[pageLanguage]}
-                                                />
-                                                }
-                                            </div>
-                                            <div className="select_container">
-                                                {stepSelectedValue["5"] === "4" &&
-                                                <Select
-                                                    className="select"
-                                                    placeholder={t("Please Select")}
-                                                    portal={document.body}
-                                                    dropdownPosition="bottom"
-                                                    dropdownHandle={false}
-                                                    dropdownGap={0}
-                                                    values={selectedValanceColor2}
-                                                    onDropdownOpen={() => {
-                                                        let temp1 = window.scrollY;
-                                                        window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                        setTimeout(() => {
-                                                            let temp2 = window.scrollY;
-                                                            if (temp2 === temp1)
-                                                                window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                        }, 100);
-                                                    }}
-                                                    dropdownRenderer={
-                                                        ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
-                                                    }
-                                                    contentRenderer={
-                                                        ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
-                                                    }
-                                                    // optionRenderer={
-                                                    //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                    // }
-                                                    onChange={(selected) => {
-                                                        if (selected.length) {
-                                                            setDeps("", "54");
-                                                            setCart("MetalValanceColor", selected[0].value);
-                                                            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                            tempLabels["5"] = t("roller_headrail4") + "/" + selected[0].label;
-                                                            setStepSelectedLabel(tempLabels);
+                                                    </div>
+                                                    <div className="select_container">
+                                                        {stepSelectedValue["5"] === "4" &&
+                                                            <Select
+                                                                className="select"
+                                                                placeholder={t("Please Select")}
+                                                                portal={document.body}
+                                                                dropdownPosition="bottom"
+                                                                dropdownHandle={false}
+                                                                dropdownGap={0}
+                                                                values={selectedValanceColor2}
+                                                                onDropdownOpen={() => {
+                                                                    let temp1 = window.scrollY;
+                                                                    window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                    setTimeout(() => {
+                                                                        let temp2 = window.scrollY;
+                                                                        if (temp2 === temp1)
+                                                                            window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                    }, 100);
+                                                                }}
+                                                                dropdownRenderer={
+                                                                    ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
+                                                                }
+                                                                contentRenderer={
+                                                                    ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                                }
+                                                                // optionRenderer={
+                                                                //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                                // }
+                                                                onChange={(selected) => {
+                                                                    if (selected.length) {
+                                                                        setDeps("", "54");
+                                                                        setCart("MetalValanceColor", selected[0].value);
+                                                                        let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                                        tempLabels["5"] = t("roller_headrail4") + "/" + selected[0].label;
+                                                                        setStepSelectedLabel(tempLabels);
+                                                                    }
+                                                                }}
+                                                                options={optionsMetalValanceFabricInsert[pageLanguage]}
+                                                            />
                                                         }
-                                                    }}
-                                                    options={optionsMetalValanceFabricInsert[pageLanguage]}
-                                                />
-                                                }
+                                                    </div>
+                                                </div>
+                                            }
+                                            <NextStep eventKey={headrailsNextStep}>{t("NEXT STEP")}</NextStep>
+                                        </div>
+                                        <div className="accordion_help">
+                                            <div className="help_container">
+                                                <div className="help_column help_left_column">
+                                                    <p className="help_column_header"/>
+                                                    <ul className="help_column_list">
+                                                        <li className="no_listStyle single_line_height">
+                                                            <div className="measurementsHelp_link text-center" onClick={e => modalHandleShow("headrailHelp")}>
+                                                                {t("headrailHelp")}
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
-                                        }
-                                        <NextStep eventKey={headrailsNextStep}>{t("NEXT STEP")}</NextStep>
-                                    </div>
-                                    <div className="accordion_help">
-                                        <div className="help_container">
-                                            <div className="help_column help_left_column">
-                                                <p className="help_column_header"/>
-                                                <ul className="help_column_list">
-                                                    <li className="no_listStyle single_line_height">
-                                                        <div className="measurementsHelp_link text-center" onClick={e => modalHandleShow("headrailHelp")}>
-                                                            {t("headrailHelp")}
-                                                        </div>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Card.Body>
-                            </Accordion.Collapse>
-                        </Card>
+                                    </Card.Body>
+                                </Accordion.Collapse>
+                            </Card>
+                        }
                         
                         {/* step 5A */}
-                        {stepSelectedValue["5"] === "1" &&
+                        {stepSelectedValue["5"] === "1" && stepSelectedValue["2"] !== "3" &&
                         <Card>
                             <Card.Header>
                                 <ContextAwareToggle eventKey="5A" stepNum={t("5A")} stepTitle={t("roller_step5A")} stepRef="5A" type="1" required={requiredStep["5A"]}
@@ -5376,12 +5725,12 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                     <div className="card_body card_body_radio">
                                         <div className="box50 radio_style">
                                             <img src={require('../Images/drapery/roller/roll_regular.svg').default} className="img-fluid half_margin" alt=""/>
-                                            <input className="radio" type="radio" text={t("RollType1")} value="1" name="step5A" ref-num="5A" id="5A1" checked={step5A === "Regular"}
+                                            <input className="radio" type="radio" text={t("RollType1")} value="1" name="step5A" ref-num="5A" id="5A1" checked={step5A === "Standard"}
                                                    onChange={e => {
                                                        selectChanged(e);
-                                                       setStep5A("Regular");
+                                                       setStep5A("Standard");
                                                        setDeps("", "5A");
-                                                       setCart("RollType", "Regular");
+                                                       setCart("RollType", "Standard");
                                                    }} ref={ref => (inputs.current["5A1"] = ref)}/>
                                             <label htmlFor="5A1">{t("RollType1")}</label>
                                         </div>
@@ -5490,7 +5839,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                         }
                         
                         {/* step 5B */}
-                        {stepSelectedValue["5"] === "1" &&
+                        {stepSelectedValue["5"] === "1" && stepSelectedValue["2"] !== "3" &&
                         <Card>
                             <Card.Header>
                                 <ContextAwareToggle eventKey="5B" stepNum={t("5B")} stepTitle={t("roller_step5B")} stepRef="5B" type="1" required={requiredStep["5B"]}
@@ -5531,7 +5880,7 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                         }
                         
                         {/* step 5C */}
-                        {stepSelectedValue["5"] === "1" &&
+                        {stepSelectedValue["5"] === "1" && stepSelectedValue["2"] !== "3" &&
                         <Card>
                             <Card.Header>
                                 <ContextAwareToggle eventKey="5C" stepNum={t("5C")} stepTitle={t("roller_step5C")} stepRef="5C" type="1" required={requiredStep["5C"]}
@@ -5602,6 +5951,306 @@ function Roller({CatID, ModelID, ProjectId, EditIndex}) {
                                                                setDeps("", "5C");
                                                                setCart("BracketColor", "Gun Metal");
                                                            }} ref={ref => (inputs.current["5C2"] = ref)}/>
+                                                    <div className="frame_img">
+                                                        <img src={require('../Images/drapery/roller/GunMetal.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                                                    </div>
+                                                </label>
+                                                <div className="radio_group_name_container">
+                                                    <h1>{t("BracketColor2")}</h1>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <NextStep eventKey="6">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                    <div className="accordion_help">
+                                        <div className="help_container">
+                                            <div className="help_column help_left_column">
+                                                <p className="help_column_header"/>
+                                                <ul className="help_column_list">
+                                                    <li className="no_listStyle text-center">
+                                                        
+                                                        <span className="popover_indicator">
+                                                            {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
+                                                                                  children={<object className="popover_camera" type="image/svg+xml"
+                                                                                                    data={require('../Images/public/camera.svg').default}/>}
+                                                                                  component={
+                                                                                      <div className="clearfix">
+                                                                                          <div className="popover_image clearfix">
+                                                                                              <img
+                                                                                                  src={popoverImages["step51"] === undefined ? require('../Images/drapery/roller/BracketColorRound1.jpg') : popoverImages["step51"]}
+                                                                                                  className="img-fluid" alt=""/>
+                                                                                          </div>
+                                                                                          <div className="popover_footer">
+                                                                                              <span className="popover_footer_title">{t("BottomBarStyle_help_5")}</span>
+                                                                                              <span className="popover_thumbnails">
+                                                                                                  <div>
+                                                                                                      <img src={require('../Images/drapery/roller/BracketColorRound1.jpg')}
+                                                                                                           text="step51"
+                                                                                                           onMouseEnter={(e) => popoverThumbnailHover(e)}
+                                                                                                           className="popover_thumbnail_img img-fluid"
+                                                                                                           alt=""/>
+                                                                                                  </div>
+                                                                                                  <div>
+                                                                                                      <img src={require('../Images/drapery/roller/BracketColorSquare1.jpg')}
+                                                                                                           text="step51"
+                                                                                                           onMouseEnter={(e) => popoverThumbnailHover(e)}
+                                                                                                           className="popover_thumbnail_img img-fluid"
+                                                                                                           alt=""/>
+                                                                                                  </div>
+                                                                                              </span>
+                                                                                          </div>
+                                                                                      </div>
+                                                                                  }/>
+                                                            }
+                                                        </span>{t("bracketColor_help")}
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        }
+                        
+                        {/* step 5Arc */}
+                        {stepSelectedValue["2"] === "3" &&
+                        <Card>
+                            <Card.Header>
+                                <ContextAwareToggle eventKey="5" stepNum={t("5")} stepTitle={t("roller_step5A")} stepRef="5Arc" type="1" required={requiredStep["5Arc"]}
+                                                    stepSelected={stepSelectedLabel["5Arc"] === undefined ? "" : stepSelectedLabel["5Arc"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="5">
+                                <Card.Body>
+                                    <div className="card_body card_body_radio">
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/roller/roll_regular.svg').default} className="img-fluid half_margin" alt=""/>
+                                            <input className="radio" type="radio" text={t("RollType1")} value="1" name="step5Arc" ref-num="5Arc" id="5Arc1" checked={step5Arc === "Standard"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep5Arc("Standard");
+                                                       setDeps("", "5Arc");
+                                                       setCart("RollType", "Standard");
+                                                   }} ref={ref => (inputs.current["5Arc1"] = ref)}/>
+                                            <label htmlFor="5Arc1">{t("RollType1")}</label>
+                                        </div>
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/roller/roll_reverse.svg').default} className="img-fluid half_margin" alt=""/>
+                                            <input className="radio" type="radio" text={t("RollType2")} value="2" name="step5Arc" ref-num="5Arc" id="5Arc2" checked={step5Arc === "Reverse"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep5Arc("Reverse");
+                                                       setDeps("", "5Arc");
+                                                       setCart("RollType", "Reverse");
+                                                   }} ref={ref => (inputs.current["5Arc2"] = ref)}/>
+                                            <label htmlFor="5Arc2">{t("RollType2")}</label>
+                                        </div>
+                                        <NextStep eventKey="5A">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                    <div className="accordion_help">
+                                        <div className="help_container">
+                                            <div className="help_column help_left_column help_left_column_mount_type">
+                                                <p className="help_column_header">{t("RollType_help_1")}</p>
+                                                <ul className="help_column_list">
+                                                    <li className="no_listStyle">
+                                                        <span className="popover_indicator">
+                                                            {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
+                                                                                  children={<object className="popover_camera" type="image/svg+xml"
+                                                                                                    data={require('../Images/public/camera.svg').default}/>}
+                                                                                  component={
+                                                                                      <div className="clearfix">
+                                                                                          <div className="popover_image clearfix">
+                                                                                              <img
+                                                                                                  src={popoverImages["step51"] === undefined ? require('../Images/drapery/roller/RegularRoll1a.jpg') : popoverImages["step51"]}
+                                                                                                  className="img-fluid" alt=""/>
+                                                                                          </div>
+                                                                                          <div className="popover_footer">
+                                                                                              <span className="popover_footer_title">{t("RollType_help_7")}</span>
+                                                                                              <span className="popover_thumbnails">
+                                                                                                  <div>
+                                                                                                      <img src={require('../Images/drapery/roller/RegularRoll1a.jpg')}
+                                                                                                           text="step51"
+                                                                                                           onMouseEnter={(e) => popoverThumbnailHover(e)}
+                                                                                                           className="popover_thumbnail_img img-fluid"
+                                                                                                           alt=""/>
+                                                                                                  </div>
+                                                                                                  <div>
+                                                                                                      <img src={require('../Images/drapery/roller/RegularRoll2.jpg')}
+                                                                                                           text="step51"
+                                                                                                           onMouseEnter={(e) => popoverThumbnailHover(e)}
+                                                                                                           className="popover_thumbnail_img img-fluid"
+                                                                                                           alt=""/>
+                                                                                                  </div>
+                                                                                              </span>
+                                                                                          </div>
+                                                                                      </div>
+                                                                                  }/>
+                                                            }
+                                                        </span>{t("RollType_help_2")}</li>
+                                                    <li>{t("RollType_help_3")}</li>
+                                                </ul>
+                                            </div>
+                                            <div className="help_column help_right_column help_right_column_mount_type">
+                                                <p className="help_column_header">{t("RollType_help_4")}</p>
+                                                <ul className="help_column_list">
+                                                    <li className="no_listStyle">
+                                                        <span className="popover_indicator">
+                                                            {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
+                                                                                  children={<object className="popover_camera" type="image/svg+xml"
+                                                                                                    data={require('../Images/public/camera.svg').default}/>}
+                                                                                  component={
+                                                                                      <div className="clearfix">
+                                                                                          <div className="popover_image clearfix">
+                                                                                              <img
+                                                                                                  src={popoverImages["step51"] === undefined ? require('../Images/drapery/roller/ReverseRoll1a.jpg') : popoverImages["step51"]}
+                                                                                                  className="img-fluid" alt=""/>
+                                                                                          </div>
+                                                                                          <div className="popover_footer">
+                                                                                              <span className="popover_footer_title">{t("RollType_help_8")}</span>
+                                                                                              <span className="popover_thumbnails">
+                                                                                                  <div>
+                                                                                                      <img src={require('../Images/drapery/roller/ReverseRoll1a.jpg')}
+                                                                                                           text="step51"
+                                                                                                           onMouseEnter={(e) => popoverThumbnailHover(e)}
+                                                                                                           className="popover_thumbnail_img img-fluid"
+                                                                                                           alt=""/>
+                                                                                                  </div>
+                                                                                                  <div>
+                                                                                                      <img src={require('../Images/drapery/roller/ReverseRoll2.jpg')}
+                                                                                                           text="step51"
+                                                                                                           onMouseEnter={(e) => popoverThumbnailHover(e)}
+                                                                                                           className="popover_thumbnail_img img-fluid"
+                                                                                                           alt=""/>
+                                                                                                  </div>
+                                                                                              </span>
+                                                                                          </div>
+                                                                                      </div>
+                                                                                  }/>
+                                                            }
+                                                        </span>{t("RollType_help_5")}</li>
+                                                    <li>{t("RollType_help_6")}</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        }
+                        
+                        {/* step 5AArc */}
+                        {stepSelectedValue["2"] === "3" &&
+                        <Card>
+                            <Card.Header>
+                                <ContextAwareToggle eventKey="5A" stepNum={t("5A")} stepTitle={t("roller_step5B")} stepRef="5AArc" type="1" required={requiredStep["5AArc"]}
+                                                    stepSelected={stepSelectedLabel["5AArc"] === undefined ? "" : stepSelectedLabel["5AArc"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="5A">
+                                <Card.Body>
+                                    <div className="card_body card_body_radio">
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/roller/bracket_type_round.png')} className="img-fluid half_margin" alt=""/>
+                                            <input className="radio" type="radio" text={t("BracketType1")} value="1" name="step5AArc" ref-num="5AArc" id="5AArc1"
+                                                   checked={step5AArc === "Round Edge"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep5AArc("Round Edge");
+                                                       setDeps("", "5AArc");
+                                                       setCart("BracketType", "Round Edge");
+                                                   }} ref={ref => (inputs.current["5AArc1"] = ref)}/>
+                                            <label htmlFor="5AArc1">{t("BracketType1")}</label>
+                                        </div>
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/roller/bracket_type_square.png')} className="img-fluid half_margin" alt=""/>
+                                            <input className="radio" type="radio" text={t("BracketType2")} value="2" name="step5AArc" ref-num="5AArc" id="5AArc2"
+                                                   checked={step5AArc === "Square Edge"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep5AArc("Square Edge");
+                                                       setDeps("", "5AArc");
+                                                       setCart("BracketType", "Square Edge");
+                                                   }} ref={ref => (inputs.current["5AArc2"] = ref)}/>
+                                            <label htmlFor="5AArc2">{t("BracketType2")}</label>
+                                        </div>
+                                        <NextStep eventKey="5B">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        }
+                        
+                        {/* step 5BArc */}
+                        {stepSelectedValue["2"] === "3" &&
+                        <Card>
+                            <Card.Header>
+                                <ContextAwareToggle eventKey="5B" stepNum={t("5B")} stepTitle={t("roller_step5C")} stepRef="5BArc" type="1" required={requiredStep["5BArc"]}
+                                                    stepSelected={stepSelectedLabel["5BArc"] === undefined ? "" : stepSelectedLabel["5BArc"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="5B">
+                                <Card.Body>
+                                    <div className="card_body card_body_radio bracket_color">
+                                        <div className="box33">
+                                            {/*<img src={require('../Images/drapery/roller/SatinBrass.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                                            <input className="radio" type="radio" text={t("BracketColor1")} value="1" name="step5C" ref-num="5C" id="5C1"
+                                                   checked={step5C === "Satin Brass"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep5C("Satin Brass");
+                                                       setDeps("", "5C");
+                                                       setCart("BracketColor", "Satin Brass");
+                                                   }} ref={ref => (inputs.current["5C1"] = ref)}/>
+                                            <label htmlFor="5C1">{t("BracketColor1")}</label> */}
+                                            
+                                            <div className="radio_group">
+                                                <label className="radio_container">
+                                                    <input className="radio" type="radio" text={t("BracketColor1")} value="1" name="step5BArc" ref-num="5BArc" id="5BArc1"
+                                                           checked={step5BArc === "Satin Brass"}
+                                                           onChange={e => {
+                                                               selectChanged(e);
+                                                               setStep5BArc("Satin Brass");
+                                                               setDeps("", "5BArc");
+                                                               setCart("BracketColor", "Satin Brass");
+                                                           }} ref={ref => (inputs.current["5BArc1"] = ref)}/>
+                                                    <div className="frame_img">
+                                                        <img src={require('../Images/drapery/roller/SatinBrass.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                                                    </div>
+                                                </label>
+                                                <div className="radio_group_name_container">
+                                                    <h1>{t("BracketColor1")}</h1>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="box33">
+                                            <div className="radio_group">
+                                                <label className="radio_container">
+                                                    <input className="radio" type="radio" text={t("BracketColor2")} value="2" name="step5BArc" ref-num="5BArc" id="5BArc2"
+                                                           checked={step5BArc === "Satin Nickel"}
+                                                           onChange={e => {
+                                                               selectChanged(e);
+                                                               setStep5BArc("Satin Nickel");
+                                                               setDeps("", "5BArc");
+                                                               setCart("BracketColor", "Satin Nickel");
+                                                           }} ref={ref => (inputs.current["5BArc2"] = ref)}/>
+                                                    <div className="frame_img">
+                                                        <img src={require('../Images/drapery/roller/SatinNickel.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                                                    </div>
+                                                </label>
+                                                <div className="radio_group_name_container">
+                                                    <h1>{t("BracketColor2")}</h1>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="box33">
+                                            <div className="radio_group">
+                                                <label className="radio_container">
+                                                    <input className="radio" type="radio" text={t("BracketColor3")} value="3" name="step5BArc" ref-num="5BArc" id="5BArc3"
+                                                           checked={step5BArc === "Gun Metal"}
+                                                           onChange={e => {
+                                                               selectChanged(e);
+                                                               setStep5BArc("Gun Metal");
+                                                               setDeps("", "5BArc");
+                                                               setCart("BracketColor", "Gun Metal");
+                                                           }} ref={ref => (inputs.current["5BArc2"] = ref)}/>
                                                     <div className="frame_img">
                                                         <img src={require('../Images/drapery/roller/GunMetal.jpg')} className="img-fluid bracket_color_img" alt=""/>
                                                     </div>

@@ -198,7 +198,7 @@ function Curtain() {
             {/*    </Breadcrumb>*/}
             {/*</div>*/}
             <div className="models_title_div">
-                <h1>{defaultModelName === undefined || defaultModelName === "" ? " " : pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</h1>
+                <h1>{defaultModelName === undefined || defaultModelName === "" ? " " : pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</h1>
                 {/*<h1>{t("model_zebra_temp1")}</h1>*/}
                 <h2>{t("model_zebra_temp2")}</h2>
             </div>

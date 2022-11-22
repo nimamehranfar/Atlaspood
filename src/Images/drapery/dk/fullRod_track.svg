@@ -1,6 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="137" height="155.679" viewBox="0 0 137 155.679">
   <defs>
     <style>
+	@font-face {
+    font-family: "proximanova-nova";
+
+    src: url('https://doopsalta2.com/Fonts/proxima-nova-three.woff2') format('woff2'),
+        url('https://doopsalta2.com/Fonts/proxima-nova-three.woff') format('woff'),
+        url('https://doopsalta2.com/Fonts/proxima-nova-three.otf') format('opentype');
+    font-style: normal;
+	}
+	
       .cls-1, .cls-3, .cls-5, .cls-6 {
         fill: none;
       }

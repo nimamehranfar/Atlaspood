@@ -13,8 +13,8 @@ import Select from "react-dropdown-select";
 import ReactImageMagnify from '@blacklab/react-image-magnify';
 import * as qs from 'qs'
 
-import {ReactComponent as MountInside} from '../Images/drapery/zebra/mount_inside.svg';
-import {ReactComponent as MountOutside} from '../Images/drapery/zebra/mount_outside.svg';
+import {ReactComponent as MountInside} from '../Images/drapery/zebra/window-Inside.svg';
+import {ReactComponent as MountOutside} from '../Images/drapery/zebra/window-Outside.svg';
 import Form from "react-bootstrap/Form";
 import PopoverStickOnHover from "../Components/PopoverStickOnHover";
 import CustomControl from "../Components/CustomControl";
@@ -41,6 +41,7 @@ import ModalLogin from "../Components/ModalLogin";
 import AddProjectToCart from "../Components/AddProjectToCart";
 import GetMeasurementArray from "../Components/GetMeasurementArray";
 import GetSewingFilters from "../Components/GetSewingFilters";
+import TruncateMarkup from "react-truncate-markup";
 
 
 const baseURLCats = "https://api.atlaspood.ir/WebsitePage/GetDetailByName";
@@ -251,6 +252,8 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     const [savingLoading, setSavingLoading] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [swatchLogin, setSwatchLogin] = useState(false);
+    
+    const [helpMeasure, setHelpMeasure] = useState("Inside");
     
     function convertToPersian(string_farsi) {
         if (string_farsi !== null && string_farsi !== undefined && string_farsi !== "") {
@@ -650,7 +653,13 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                 {/*                         }/>*/}
                 {/*</div>*/}
                 <div className="steps_header_selected_container">
-                    <div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? stepSelected : null}</div>
+                    {/*<div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? stepSelected : null}</div>*/}
+    
+                    {showLabels &&
+                        <TruncateMarkup lines={1} tokenize="words">
+                            <div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{stepSelected}</div>
+                        </TruncateMarkup>
+                    }
                 </div>
                 {required && stepSelected === "" &&
                 <div className="stepRequired"/>
@@ -826,15 +835,16 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     }
     
     function selectChanged(e, nums) {
-        // console.log(e.target.value);
-        let refIndex = e.target.getAttribute('ref-num');
-        // selectedTitle.current[refIndex].innerHTML = e.target.getAttribute('text');
-        let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-        tempLabels[refIndex] = e.target.getAttribute('text');
-        
         let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
-        tempValue[refIndex] = e.target.value;
-        
+        let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+        if(e) {
+            // console.log(e.target.value);
+            let refIndex = e.target.getAttribute('ref-num');
+            // selectedTitle.current[refIndex].innerHTML = e.target.getAttribute('text');
+            tempLabels[refIndex] = e.target.getAttribute('text');
+    
+            tempValue[refIndex] = e.target.value;
+        }
         if (nums !== undefined) {
             let tempArr = nums.split(',');
             tempArr.forEach(num => {
@@ -1549,7 +1559,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                         
                         tempArr.push(
                             <div key={defaultModelName}>
-                                <h2 className="cart_agree_title">{pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</h2>
+                                <h2 className="cart_agree_title">{pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</h2>
                                 <ul className="cart_agree_items_container">
                                     <GetMeasurementArray modelId={`${modelID}`} cartValues={cartValues}/>
                                     {temp1}
@@ -2051,6 +2061,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     }
     
     function getWindowSize(totalWidth, totalHeight) {
+        let pageLanguage = location.pathname.split('').slice(1, 3).join('');
         let tempWindowSize = pageLanguage === "fa" ? `عرض: ${NumberToPersianWord.convertEnToPe(totalWidth.toString())}س\u200Cم\u00A0\u00A0\u00A0ارتفاع: ${NumberToPersianWord.convertEnToPe(totalHeight.toString())}س\u200Cم` : `Width: ${totalWidth}cm\u00A0\u00A0\u00A0Height: ${totalHeight}cm`;
         setWindowSize(tempWindowSize);
         setWindowSizeBool(true);
@@ -2475,12 +2486,17 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                             tempLabels[refIndex] = inputs.current["21"].getAttribute('text');
                             tempValue[refIndex] = inputs.current["21"].value;
                             depSetTempArr = new Set([...setGetDeps("", "2", depSetTempArr)]);
-                        } else {
-                            
+                        } else if (temp["Mount"] === "Outside") {
                             let refIndex = inputs.current["22"].getAttribute('ref-num');
                             tempLabels[refIndex] = inputs.current["22"].getAttribute('text');
                             tempValue[refIndex] = inputs.current["22"].value;
-                            depSetTempArr = new Set([...setGetDeps("", "2", depSetTempArr)]);
+                            depSetTempArr = new Set([...setGetDeps("", "1", depSetTempArr)]);
+                        } else {
+                            setStep21("true");
+                            let refIndex = inputs.current["23"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["23"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["23"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "1", depSetTempArr)]);
                         }
                         setStepSelectedLabel(tempLabels);
                         setStepSelectedValue(tempValue);
@@ -3573,7 +3589,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
             
             
             <div className="models_title_div">
-                <h1>{defaultModelName === undefined || defaultModelName === "" ? " " : pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</h1>
+                <h1>{defaultModelName === undefined || defaultModelName === "" ? " " : pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</h1>
             </div>
             <div className="model_customize_container">
                 <div className="model_customize_image">
@@ -3732,44 +3748,68 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                             <Accordion.Collapse eventKey="2">
                                 <Card.Body>
                                     <div className="card_body card_body_radio">
-                                        <div className="box50 radio_style">
+                                        <div className="box33 radio_style">
                                             <img src={require('../Images/drapery/zebra/mount_inside.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("mount_Inside")} value="1" name="step2" ref-num="2" id="21" checked={step2 === "Inside"}
                                                    onChange={e => {
-                                                       selectChanged(e, "3AOut,3BOut,3COut,3DOut");
                                                        setStep2("Inside");
                                                        setStep21("");
                                                        setMeasurementsNextStep("4");
                                                        if (stepSelectedValue["3"] === "2") {
-                                                           setDeps("21", "2,3AOut,3BOut1,3BOut2,3COut,3DOut");
-                                                           deleteSpecialSelects(2);
-                                                           setCart("Mount", "Inside");
+                                                           setDeps("21", "2,3AOut,3BOut1,3BOut2,3COut,3DOut,3CArc1,3CArc2,3CArc3");
+                                                           deleteSpecialSelects();
+                                                           setCart("Mount", "Inside","calcMeasurements,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
                                                            setStep3("");
+                                                           selectChanged(e, "3,3AOut,3BOut,3COut,3DOut,3CArc");
                                                        } else {
                                                            setDeps("21", "2");
                                                            setCart("Mount", "Inside");
+                                                           selectChanged(e, "3AOut,3BOut,3COut,3DOut,3CArc");
                                                        }
                                                 
                                                    }} ref={ref => (inputs.current["21"] = ref)}/>
                                             <label htmlFor="21">{t("mount_Inside")}</label>
                                         </div>
-                                        <div className="box50 radio_style">
+                                        <div className="box33 radio_style">
                                             <img src={require('../Images/drapery/zebra/mount_outside.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("mount_Outside")} value="2" name="step2" ref-num="2" id="22" checked={step2 === "Outside"}
                                                    onChange={e => {
-                                                       selectChanged(e, "3AIn,3BIn");
                                                        setStep2("Outside");
                                                        setStep21("");
                                                        if (stepSelectedValue["3"] === "2") {
-                                                           setDeps("3AOut,3BOut1,3BOut2,3COut,3DOut", "2,21,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3");
-                                                           deleteSpecialSelects(1);
-                                                           setCart("Mount", "Outside", "Width1,Width2,Width3,Height1,Height2,Height3");
+                                                           setDeps("3AOut,3BOut1,3BOut2,3COut,3DOut", "2,21,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3,3CArc1,3CArc2,3CArc3");
+                                                           deleteSpecialSelects();
+                                                           setCart("Mount", "Outside", "calcMeasurements,Width1,Width2,Width3,Height1,Height2,Height3,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                           setStep3("");
+                                                           selectChanged(e, "3,3AIn,3BIn,3AOut,3BOut,3CArc");
                                                        } else {
                                                            setDeps("", "2,21");
-                                                           setCart("Mount", "Outside", "Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
+                                                           setCart("Mount", "Outside");
+                                                           selectChanged(e, "3AIn,3BIn,3AOut,3BOut,3CArc");
                                                        }
                                                    }} ref={ref => (inputs.current["22"] = ref)}/>
                                             <label htmlFor="22">{t("mount_Outside")}</label>
+                                        </div>
+                                        <div className="box33 radio_style">
+                                            <img src={require('../Images/drapery/zebra/window-Arc.svg').default} className="img-fluid" alt=""/>
+                                            <input className="radio" type="radio" text={t("mount_Arc")} value="3" name="step1" ref-num="2" id="23" checked={step2 === "HiddenMoulding"}
+                                                   onChange={e => {
+                                                       setStep2("HiddenMoulding");
+                                                       setStep21("");
+                                                       setMeasurementsNextStep("4");
+                                                       if (stepSelectedValue["3"] === "2") {
+                                                           setDeps("21", "2,2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWall,2EWall,2FWall,2GWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
+                                                           deleteSpecialSelects();
+                                                           setCart("Mount", "HiddenMoulding", "calcMeasurements,Width1,Width2,Width3,Height1,Height2,Height3,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
+                                                           setStep3("");
+                                                           selectChanged(e, "3,3AIn,3BIn,3AOut,3BOut,3COut,3DOut");
+                                                       } else {
+                                                           setDeps("21", "2");
+                                                           setCart("Mount", "HiddenMoulding");
+                                                           selectChanged(e, "3AIn,3BIn,3AOut,3BOut,3COut,3DOut");
+                                                       }
+                                                   }} ref={ref => (inputs.current["23"] = ref)}/>
+                                            <label htmlFor="23">{t("mount_Arc")}</label>
                                         </div>
                                         {stepSelectedValue["2"] === "1" &&
                                         <div className="secondary_options">
@@ -3783,20 +3823,18 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                             let refIndex = inputs.current["21"].getAttribute('ref-num');
                                                             tempLabels[refIndex] = inputs.current["21"].getAttribute('text');
                                                             setStepSelectedLabel(tempLabels);
-                                                            if (stepSelectedValue["3"] === "2") {
-                                                                setDeps("3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3", "21");
-                                                            } else {
-                                                                setDeps("", "21");
-                                                            }
+                                                            setDeps("", "21");
                                                         } else {
                                                             setStep21("");
                                                             // modalHandleShow("noPower");
-                                                            
                                                             if (stepSelectedValue["3"] === "2") {
+                                                                setDeps("21,3", "3AOut,3BOut1,3BOut2,3COut,3DOut,3CArc1,3CArc2,3CArc3");
+                                                                deleteSpecialSelects();
+                                                                setCart("", "","calcMeasurements,Width3A,Height3C,Width1,Width2,Width3,Height1,Height2,Height3,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
                                                                 setStep3("");
-                                                                setDeps("21,3", "3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3");
+                                                                selectChanged(undefined, "3,3AOut,3BOut,3COut,3DOut,3CArc");
                                                             } else {
-                                                                setDeps("21", "3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3");
+                                                                setDeps("21", "");
                                                             }
                                                         }
                                                     }} id="211" ref={ref => (inputs.current["211"] = ref)}/>
@@ -3812,28 +3850,80 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                             </div>
                                         </div>
                                         }
-                                        <NextStep eventKey={stepSelectedValue["2"] === "1" && step21 !== "true" ? "2" : "3"} onClick={() => {
-                                            if (stepSelectedValue["2"] === "1" && step21 !== "true")
+                                        {stepSelectedValue["2"] === "3" &&
+                                        <div className="secondary_options">
+                                            <div className="card-body-display-flex">
+                                                <div className="checkbox_style checkbox_style_step2">
+                                                    <input type="checkbox" value="1" name="step21" ref-num="21" checked={step21 === "true"} onChange={(e) => {
+                                                        if (e.target.checked) {
+                                                            selectChanged(e);
+                                                            setStep21("true");
+                                                            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                            let refIndex = inputs.current["23"].getAttribute('ref-num');
+                                                            tempLabels[refIndex] = inputs.current["23"].getAttribute('text');
+                                                            setStepSelectedLabel(tempLabels);
+                                                            setDeps("", "21");
+                                                        } else {
+                                                            setStep21("");
+                                                            // modalHandleShow("noPower");
+    
+                                                            if (stepSelectedValue["3"] === "2") {
+                                                                setDeps("21,3", "2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWall,2EWall,2FWall,2GWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
+                                                                deleteSpecialSelects();
+                                                                setCart("", "", "calcMeasurements,Width1,Width2,Width3,Height1,Height2,Height3,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                                setStep3("");
+                                                                selectChanged(undefined, "3,3AIn,3BIn,3AOut,3BOut,3COut,3DOut");
+                                                            } else {
+                                                                setDeps("21", "");
+                                                            }
+                                                        }
+                                                    }} id="211" ref={ref => (inputs.current["211"] = ref)}/>
+                                                    <label htmlFor="211" className="checkbox_label">
+                                                        <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
+                                                             alt=""/>
+                                                    </label>
+                                                    <span className="checkbox_text">
+                                                        {t("Arc_checkbox_title")}
+                                                    </span>
+                                                </div>
+                                            
+                                            </div>
+                                        </div>
+                                        }
+                                        <NextStep eventKey={(stepSelectedValue["2"] === "1"||stepSelectedValue["2"] === "3") && step21 !== "true" ? "2" : "3"} onClick={() => {
+                                            if ((stepSelectedValue["2"] === "1"||stepSelectedValue["2"] === "3") && step21 !== "true")
                                                 modalHandleShow("noInsideUnderstand");
                                         }}>{t("NEXT STEP")}</NextStep>
                                     </div>
+                                    {/*<div className="accordion_help">*/}
+                                    {/*    <div className="help_container">*/}
+                                    {/*        <div className="help_column help_left_column help_left_column_mount_type">*/}
+                                    {/*            <p className="help_column_header">{t("step2_help_1")}</p>*/}
+                                    {/*            <ul className="help_column_list">*/}
+                                    {/*                <li>{t("step2_help_2")}</li>*/}
+                                    {/*                /!*<li>{t("step2_help_3")}</li>*!/*/}
+                                    {/*                <li>{t("step2_help_4")}</li>*/}
+                                    {/*                <li>{t("step2_help_5")}</li>*/}
+                                    {/*            </ul>*/}
+                                    {/*        </div>*/}
+                                    {/*        <div className="help_column help_right_column help_right_column_mount_type">*/}
+                                    {/*            <p className="help_column_header">{t("step2_help_6")}</p>*/}
+                                    {/*            <ul className="help_column_list">*/}
+                                    {/*                <li>{t("step2_help_7")}</li>*/}
+                                    {/*                <li>{t("step2_help_8")}</li>*/}
+                                    {/*                <li>{t("step2_help_9")}</li>*/}
+                                    {/*            </ul>*/}
+                                    {/*        </div>*/}
+                                    {/*    </div>*/}
+                                    {/*</div>*/}
                                     <div className="accordion_help">
                                         <div className="help_container">
-                                            <div className="help_column help_left_column help_left_column_mount_type">
-                                                <p className="help_column_header">{t("step2_help_1")}</p>
+                                            <div className="help_column help_left_column">
+                                                <p className="help_column_header"></p>
                                                 <ul className="help_column_list">
-                                                    <li>{t("step2_help_2")}</li>
-                                                    {/*<li>{t("step2_help_3")}</li>*/}
-                                                    <li>{t("step2_help_4")}</li>
-                                                    <li>{t("step2_help_5")}</li>
-                                                </ul>
-                                            </div>
-                                            <div className="help_column help_right_column help_right_column_mount_type">
-                                                <p className="help_column_header">{t("step2_help_6")}</p>
-                                                <ul className="help_column_list">
-                                                    <li>{t("step2_help_7")}</li>
-                                                    <li>{t("step2_help_8")}</li>
-                                                    <li>{t("step2_help_9")}</li>
+                                                    <li className="no_listStyle"><b>{t("dk_step2_help_1")}</b>{t("dk_step2_help_2")}</li>
+                                                    <li className="no_listStyle"><b>{t("dk_step2_help_3")}</b>{t("dk_step2_help_4")}</li>
+                                                    <li className="no_listStyle"><b>{t("dk_step2_help_5")}</b>{t("zebra_step2_help_6")}</li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -3857,11 +3947,11 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                    checked={step3 === "false"}
                                                    onChange={e => {
                                                        setStep3("false");
-                                                       selectChanged(e, "3AIn,3BIn,3AOut,3BOut,3COut,3DOut");
+                                                       selectChanged(e, "3AIn,3BIn,3AOut,3BOut,3COut,3DOut,3CArc");
                                                        setMeasurementsNextStep("4");
-                                                       setDeps("31,32", "3,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3,3AOut,3BOut1,3BOut2,3COut,3DOut");
+                                                       setDeps("31,32", "3,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3,3AOut,3BOut1,3BOut2,3COut,3DOut,3CArc1,3CArc2,3CArc3");
                                                        deleteSpecialSelects();
-                                                       setCart("calcMeasurements", false, "WidthCart,HeightCart,Width1,Width2,Width3,Height1,Height2,Height3,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
+                                                       setCart("calcMeasurements", false, "WidthCart,HeightCart,Width1,Width2,Width3,Height1,Height2,Height3,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
                                                    }} ref={ref => (inputs.current["31"] = ref)}/>
                                             <label htmlFor="31">{t("I have my own measurements.")}</label>
                                         </div>
@@ -3884,19 +3974,34 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                                setCart("calcMeasurements", true, "Width,height,calcMeasurements");
                                                            } else {
                                                                setStep3("true");
-                                                               deleteSpecialSelects(3);
+                                                               deleteSpecialSelects();
                                                                selectChanged(e);
                                                                setMeasurementsNextStep("3A");
-                                                               setDeps("3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3", "3,3AOut,3BOut1,3BOut2,3COut,3DOut,31,32");
-                                                               setCart("calcMeasurements", true, "Width,Height,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
+                                                               setDeps("3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3", "3,3AOut,3BOut1,3BOut2,3COut,3DOut,31,32,3CArc1,3CArc2,3CArc3");
+                                                               setCart("calcMeasurements", true, "Width,Height,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                           }
+                                                       } else if (stepSelectedValue["2"] === "3") {
+                                                           if (stepSelectedValue["2"] === "3" && step21 !== "true") {
+                                                               modalHandleShow("noInsideUnderstand");
+                                                               setStep3("");
+                                                               selectUncheck(e);
+                                                               setDeps("3", "31,32");
+                                                               setCart("calcMeasurements", true, "Width,height,calcMeasurements");
+                                                           } else {
+                                                               setStep3("true");
+                                                               deleteSpecialSelects();
+                                                               selectChanged(e);
+                                                               setMeasurementsNextStep("3A");
+                                                               setDeps("3AOut,3BOut1,3BOut2,3CArc1,3CArc2,3CArc3", "3,3COut,3DOut,31,32");
+                                                               setCart("calcMeasurements", true, "Width,Height,Width1,Width2,Width3,Height1,Height2,Height3,Height3C,ShadeMount");
                                                            }
                                                        } else {
                                                            setStep3("true");
-                                                           deleteSpecialSelects(3);
+                                                           deleteSpecialSelects();
                                                            selectChanged(e);
                                                            setMeasurementsNextStep("3A");
-                                                           setDeps("3AOut,3BOut1,3BOut2,3COut,3DOut", "3,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3,31,32");
-                                                           setCart("calcMeasurements", true, "Width,Height,Width1,Width2,Width3,Height1,Height2,Height3");
+                                                           setDeps("3AOut,3BOut1,3BOut2,3COut,3DOut", "3,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3,31,32,3CArc1,3CArc2,3CArc3");
+                                                           setCart("calcMeasurements", true, "Width,Height,Width1,Width2,Width3,Height1,Height2,Height3,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
                                                        }
                                                    }}/>
                                             <label htmlFor="32">{t("Calculate my measurements.")}</label>
@@ -4021,6 +4126,9 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                 <ul className="help_column_list">
                                                     <li className="no_listStyle single_line_height">
                                                         <b>{t("Note:&nbsp;")}</b>
+                                                        {t("step3_help_2.5")}
+                                                    </li>
+                                                    <li className="no_listStyle single_line_height">
                                                         {t("step3_help_3")}
                                                     </li>
                                                 </ul>
@@ -4366,7 +4474,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                         }
                         
                         {/* step 3A outside */}
-                        {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "2" &&
+                        {stepSelectedValue["3"] === "2" && !!(stepSelectedValue["2"] === "2"||stepSelectedValue["2"] === "3") &&
                         <Card>
                             <Card.Header>
                                 <ContextAwareToggle eventKey="3A" stepNum={t("3A")} stepTitle={t("zebra_step3AOutside")} stepRef="3AOut" type="2" required={requiredStep["3AOut"]}
@@ -4433,7 +4541,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                         }
                         
                         {/* step 3B outside */}
-                        {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "2" &&
+                        {stepSelectedValue["3"] === "2" && !!(stepSelectedValue["2"] === "2"||stepSelectedValue["2"] === "3") &&
                         <Card>
                             <Card.Header>
                                 <ContextAwareToggle eventKey="3B" stepNum={t("3B")} stepTitle={t("zebra_step3BOutside")} stepRef="3BOut" type="2" required={requiredStep["3BOut"]}
@@ -4616,6 +4724,209 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                         <NextStep eventKey="3D">{t("NEXT STEP")}</NextStep>
                                     </div>
                                 
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        }
+                        
+                        {/* step 3C Arc */}
+                        {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "3" &&
+                        <Card>
+                            <Card.Header>
+                                <ContextAwareToggle eventKey="3C" stepNum={t("3C")} stepTitle={t("dk_step2D")} stepRef="3CArc" type="2" required={requiredStep["3CArc"]}
+                                                    stepSelected={stepSelectedLabel["3CArc"] === undefined ? "" : stepSelectedLabel["3CArc"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="3C">
+                                <Card.Body>
+                                    <div className="card_body">
+                                        <div className="box100">
+                                            <p className="step_selection_title">{t("arc_step2D_title")}</p>
+                                            <img
+                                                src={pageLanguage === 'fa' ? require('../Images/drapery/dk/ceiling_to_window_3.svg').default : require('../Images/drapery/dk/ceiling_to_window_3.svg').default}
+                                                className="img-fluid" alt=""/>
+                                        </div>
+                                        <div className="box100 Three_selection_container">
+                                            <div className="Three_select_container">
+                                                <label className="select_label">{t("step3AIn_A")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                <div className="select_container select_container_num">
+                                                    <Select
+                                                        className="select"
+                                                        placeholder={t("Please Select")}
+                                                        portal={document.body}
+                                                        dropdownPosition="bottom"
+                                                        dropdownHandle={false}
+                                                        dropdownGap={0}
+                                                        onDropdownOpen={() => {
+                                                            let temp1 = window.scrollY;
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            setTimeout(() => {
+                                                                let temp2 = window.scrollY;
+                                                                if (temp2 === temp1)
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                            }, 100);
+                                                        }}
+                                                        values={selectCustomValues.CeilingToWindow1}
+                                                        dropdownRenderer={
+                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                        }
+                                                        contentRenderer={
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                           postfixFa=""/>
+                                                        }
+                                                        // optionRenderer={
+                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                        // }
+                                                        onChange={(selected) => {
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged_three(selected[0], "3CArc", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = selectCustomValues;
+                                                                temp.CeilingToWindow1 = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3CArc1");
+                                                                setCart("CeilingToWindow1", selected[0].value);
+                                                            }
+                                                        }}
+                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="Three_select_container">
+                                                <label className="select_label">{t("step3AIn_B")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                <div className="select_container select_container_num">
+                                                    <Select
+                                                        className="select"
+                                                        placeholder={t("Please Select")}
+                                                        portal={document.body}
+                                                        dropdownPosition="bottom"
+                                                        dropdownHandle={false}
+                                                        dropdownGap={0}
+                                                        onDropdownOpen={() => {
+                                                            let temp1 = window.scrollY;
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            setTimeout(() => {
+                                                                let temp2 = window.scrollY;
+                                                                if (temp2 === temp1)
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                            }, 100);
+                                                        }}
+                                                        values={selectCustomValues.CeilingToWindow2}
+                                                        dropdownRenderer={
+                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                        }
+                                                        contentRenderer={
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                           postfixFa=""/>
+                                                        }
+                                                        // optionRenderer={
+                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                        // }
+                                                        onChange={(selected) => {
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged_three(selected[0], "3CArc", 1, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = selectCustomValues;
+                                                                temp.CeilingToWindow2 = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3CArc2");
+                                                                setCart("CeilingToWindow2", selected[0].value);
+                                                            }
+                                                        }}
+                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="Three_select_container">
+                                                <label className="select_label">{t("step3AIn_C")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                <div className="select_container select_container_num">
+                                                    <Select
+                                                        className="select"
+                                                        placeholder={t("Please Select")}
+                                                        portal={document.body}
+                                                        dropdownPosition="bottom"
+                                                        dropdownHandle={false}
+                                                        dropdownGap={0}
+                                                        onDropdownOpen={() => {
+                                                            let temp1 = window.scrollY;
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            setTimeout(() => {
+                                                                let temp2 = window.scrollY;
+                                                                if (temp2 === temp1)
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                            }, 100);
+                                                        }}
+                                                        values={selectCustomValues.CeilingToWindow3}
+                                                        dropdownRenderer={
+                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                        }
+                                                        contentRenderer={
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                           postfixFa=""/>
+                                                        }
+                                                        // optionRenderer={
+                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                        // }
+                                                        onChange={(selected) => {
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged_three(selected[0], "3CArc", 2, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = selectCustomValues;
+                                                                temp.CeilingToWindow3 = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3CArc3");
+                                                                setCart("CeilingToWindow3", selected[0].value);
+                                                            }
+                                                        }}
+                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <NextStep eventKey="4">{t("NEXT STEP")}</NextStep>
+                                    </div>
+    
+                                    <div className="accordion_help">
+                                        <div className="help_container">
+                                            <div className="help_column help_left_column">
+                                                <p className="help_column_header"/>
+                                                <ul className="help_column_list">
+                                                    <li className="no_listStyle single_line_height">
+                                                        <span className="popover_indicator">
+                                                            {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
+                                                                                  children={<object className="popover_camera" type="image/svg+xml"
+                                                                                                    data={require('../Images/public/camera.svg').default}/>}
+                                                                                  component={
+                                                                                      <div className="clearfix">
+                                                                                          <div className="popover_image clearfix">
+                                                                                              <img
+                                                                                                  src={popoverImages["step2d"] === undefined ? require('../Images/drapery/dk/mouldinghelpphoto1.jpg') : popoverImages["step2d"]}
+                                                                                                  className="img-fluid" alt=""/>
+                                                                                          </div>
+                                                                                          <div className="popover_footer">
+                                                                                              <span className="popover_footer_title">{t("dk_step_help_camera_title")}</span>
+                                                                                              <span className="popover_thumbnails">
+                                                                                                  <div>
+                                                                                                      <img src={require('../Images/drapery/dk/mouldinghelpphoto1.jpg')}
+                                                                                                           text="step2d"
+                                                                                                           onMouseEnter={(e) => popoverThumbnailHover(e)}
+                                                                                                           className="popover_thumbnail_img img-fluid"
+                                                                                                           alt=""/>
+                                                                                                  </div>
+                                                                                                  <div>
+                                                                                                      <img src={require('../Images/drapery/dk/mouldinghelpphoto2.jpg')}
+                                                                                                           text="step2d"
+                                                                                                           onMouseEnter={(e) => popoverThumbnailHover(e)}
+                                                                                                           className="popover_thumbnail_img img-fluid"
+                                                                                                           alt=""/>
+                                                                                                  </div>
+                                                                                              </span>
+                                                                                          </div>
+                                                                                      </div>
+                                                                                  }/>
+                                                            }
+                                                        </span>{t("dk_step2D_help_1")}
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </Card.Body>
                             </Accordion.Collapse>
                         </Card>
@@ -5592,16 +5903,25 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                 {/*</Modal.Footer>*/}
             </Modal>
             
-            <Modal backdrop="static" keyboard={false} dialogClassName={`measurementsHelp_modal largeSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+            <Modal backdrop="static" keyboard={false} dialogClassName={`measurementsHelp_modal largeSizeModal scroll_on ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["measurementsHelp"] === undefined ? false : modals["measurementsHelp"]}
                    onHide={() => modalHandleClose("measurementsHelp")} scrollable={true}>
                 <Modal.Header closeButton>
                     {/*<Modal.Title>Modal heading</Modal.Title>*/}
                 </Modal.Header>
                 <Modal.Body>
+                    <p className="measurementsHelp_modal_title">{t("HOW TO MEASURE FOR ZEBRA SHADES")}</p>
+                    <div className="help_options_container">
+                        <ul className="help_options">
+                            <li className={`help_option_item ${helpMeasure==="Inside"?"help_option_item_on":""}`} onClick={()=>setHelpMeasure("Inside")}>{t("bold_Inside_mount")}</li>
+                            <li className="help_option_item_separator"></li>
+                            <li className={`help_option_item ${helpMeasure==="Outside"?"help_option_item_on":""}`} onClick={()=>setHelpMeasure("Outside")}>{t("bold_Outside_mount")}</li>
+                        </ul>
+                    </div>
+                    {helpMeasure==="Inside" &&
+                    <div>
                     <div className="measurementsHelp_modal_img_section">
-                        <p className="measurementsHelp_modal_title">{t("HOW TO MEASURE FOR ZEBRA SHADES")}</p>
-                        <p className="measurementsHelp_modal_img_title">{t("Inside Mount")}</p>
+                        {/*<p className="measurementsHelp_modal_img_title">{t("Inside Mount")}</p>*/}
                         <object className="measurementsHelp_modal_img" type="image/svg+xml"
                                 data={pageLanguage === 'fa' ? require('../Images/drapery/zebra/step3_help_inside_fa.svg').default : require('../Images/drapery/zebra/step3_help_inside.svg').default}/>
                     </div>
@@ -5644,13 +5964,17 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                             </div>
                         </div>
                     </div>
-                    
-                    <br/>
-                    <br/>
-                    <br/>
-                    
+                    </div>
+                    }
+                    {/*<br/>*/}
+                    {/*<br/>*/}
+                    {/*<br/>*/}
+    
+                    {helpMeasure==="Outside" &&
+                        <div>
                     <div className="measurementsHelp_modal_img_section">
-                        <p className="measurementsHelp_modal_img_title">{t("Outside Mount")}</p>
+                        {/*<p className="measurementsHelp_modal_title">{t("HOW TO MEASURE FOR ZEBRA SHADES")}</p>*/}
+                        {/*<p className="measurementsHelp_modal_img_title">{t("Outside Mount")}</p>*/}
                         <object className="measurementsHelp_modal_img" type="image/svg+xml"
                                 data={pageLanguage === 'fa' ? require('../Images/drapery/zebra/step3_help_outside_fa.svg').default : require('../Images/drapery/zebra/step3_help_outside.svg').default}/>
                     </div>
@@ -5682,6 +6006,8 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                             </div>
                         </div>
                     </div>
+                        </div>
+                    }
                     <br/>
                     <div className="text_center">
                         <button className="btn btn-new-dark" onClick={() => modalHandleClose("measurementsHelp")}>{t("CONTINUE")}</button>

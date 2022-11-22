@@ -1,23 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="242" height="181.747" viewBox="0 0 242 181.747">
   <defs>
     <style>
-	
 	@font-face {
     font-family: "proximanova-nova";
 
-    src: url('http://www.doopsalta.com/asset/fonts/proxima-nova-three.woff2') format('woff2'),
-        url('http://www.doopsalta.com/asset/fonts/proxima-nova-three.woff') format('woff'),
-        url('http://www.doopsalta.com/asset/fonts/proxima-nova-three.otf') format('opentype');
+    src: url('https://doopsalta2.com/Fonts/proxima-nova-three.woff2') format('woff2'),
+        url('https://doopsalta2.com/Fonts/proxima-nova-three.woff') format('woff'),
+        url('https://doopsalta2.com/Fonts/proxima-nova-three.otf') format('opentype');
     font-style: normal;
 	}
+	
 	
       .cls-1, .cls-3, .cls-5, .cls-6, .cls-7 {
         fill: none;
       }
 
       .cls-2 {
-        fill: #707070;
-        stroke: rgba(0,0,0,0.5);
+        fill: #606060;
         font-size: 11px;
         font-family:'proximanova-nova',sans-serif;
         font-weight: 200;

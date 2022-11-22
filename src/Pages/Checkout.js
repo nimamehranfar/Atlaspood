@@ -29,6 +29,7 @@ import CustomControlFiles from "../Components/CustomControlFiles";
 import Dropdown from "react-bootstrap/Dropdown";
 import GetMeasurementArray from "../Components/GetMeasurementArray";
 import GetUserProjectData from "../Components/GetUserProjectData";
+import convertToPersian from "../Components/ConvertToPersian";
 
 const baseURLPrice = "https://api.atlaspood.ir/Sewing/GetSewingOrderPrice";
 const baseURLGetAddress = "https://api.atlaspood.ir/user/GetAddress";
@@ -690,7 +691,7 @@ function Checkout() {
                                     </div>
                                     <div className={`checkout_item_desc_container  ${!hasDiscount ? "checkout_item_desc_container_without_discount" : ""}`}>
                                         <div className="checkout_item">
-                                            <h1 className="checkout_item_name">{pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</h1>
+                                            <h1 className="checkout_item_name">{pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</h1>
                                             <div className="checkout_item_price_section">
                                                 <span
                                                     className={`checkout_item_price ${hasDiscount ? "checkout_item_price_with_discount" : ""}`}>{GetPrice(obj["price"], pageLanguage, t("TOMANS"))}</span>
@@ -893,7 +894,7 @@ function Checkout() {
                                 </div>
                                 <div className="checkout_item_desc_container">
                                     <div className="checkout_item">
-                                        <h1 className="checkout_item_name">{pageLanguage === 'fa' ? defaultModelNameFa + " سفارشی " : "Custom " + defaultModelName}</h1>
+                                        <h1 className="checkout_item_name">{pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</h1>
                                         <span className="checkout_item_price">{GetPrice(obj1["price"] * obj1["Count"], pageLanguage, t("TOMANS"))}</span>
                                     </div>
                                     {/*<PopoverStickOnHover classNames="basket_view_detail_popover"*/}
