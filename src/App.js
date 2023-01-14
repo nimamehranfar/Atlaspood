@@ -27,6 +27,8 @@ import Reset from "./Pages/Reset";
 import ConfirmEmail from "./Pages/ConfirmEmail";
 import {refreshToken} from "./Services/auth.service";
 import {CLEAR_REGISTER, LOGIN, LOGOUT, REGISTER} from "./Actions/types";
+import jwt from "jwt-decode";
+import PageItems from "./Components/PageItems";
 
 
 function App({t}) {
@@ -47,6 +49,7 @@ function App({t}) {
     
     const {isLoggedIn, isRegistered, user, showLogin} = useSelector((state) => state.auth);
     const [showPage, setShowPage] = useState(false);
+    const [roles, setRoles] = useState([]);
     
     useEffect(() => {
         if (isLoggedIn) {
@@ -61,6 +64,21 @@ function App({t}) {
             setShowPage(true);
         }
     }, []);
+    
+    useEffect(() => {
+        if (isLoggedIn) {
+            let tempRoles=jwt(user["access_token"])["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+            if(tempRoles && tempRoles.length>0){
+                setRoles(tempRoles);
+            }
+            else{
+                setRoles(["User"]);
+            }
+        }
+        else{
+            setRoles([]);
+        }
+    }, [isLoggedIn]);
     
     useEffect(() => {
         const interval = setInterval(() => {
@@ -146,16 +164,20 @@ function App({t}) {
                         </Route>
                 
                         <Route path="/en" element={<HeaderWithOutlet/>}>
-                            <Route path="Curtain/:catID/:modelID" element={<CustomCurtain/>}/>
+                            {/*<Route path="Curtain/:catID/:modelID" element={<CustomCurtain/>}/>*/}
                             <Route path="Curtain/:catID/:modelID/Saved-Projects/:projectId" element={<CustomCurtain/>}/>
                             <Route path="Curtain/:catID/:modelID/Bag-Projects/:editIndex" element={<CustomCurtain/>}/>
+                            <Route path="Curtain/:catID/:modelID/Page-ID/:websitePageItemId" element={<CustomCurtain/>}/>
+                            <Route path="Curtain/:catID/:modelID/:specialID/Page-ID/:websitePageItemId" element={<CustomCurtain/>}/>
                             <Route path="Checkout" element={<Checkout/>}/>
                             <Route path="Checkout/:swatchOnly" element={<Checkout/>}/>
                         </Route>
                         <Route path="/fa" element={<HeaderWithOutlet/>}>
-                            <Route path="Curtain/:catID/:modelID" element={<CustomCurtain/>}/>
+                            {/*<Route path="Curtain/:catID/:modelID" element={<CustomCurtain/>}/>*/}
                             <Route path="Curtain/:catID/:modelID/Saved-Projects/:projectId" element={<CustomCurtain/>}/>
                             <Route path="Curtain/:catID/:modelID/Bag-Projects/:editIndex" element={<CustomCurtain/>}/>
+                            <Route path="Curtain/:catID/:modelID/Page-ID/:websitePageItemId" element={<CustomCurtain/>}/>
+                            <Route path="Curtain/:catID/:modelID/:specialID/Page-ID/:websitePageItemId" element={<CustomCurtain/>}/>
                             <Route path="Checkout" element={<Checkout/>}/>
                             <Route path="Checkout/:swatchOnly" element={<Checkout/>}/>
                         </Route>
@@ -168,11 +190,12 @@ function App({t}) {
                         </Route>
                 
                 
-                        <Route path="/admin/panel" element={<Panel/>}>
+                        <Route path="/admin/panel" element={roles.includes("WebsiteAdmin") ? <Panel/> : <Navigate replace to="/en"/>}>
                             <Route path="menu" element={<Menu/>}/>
                             <Route path="slideshow" element={<Slideshow/>}/>
                             <Route path="banner" element={<Banner/>}/>
                             <Route path="models" element={<Models/>}/>
+                            <Route path="page-items" element={<PageItems/>}/>
                         </Route>
                         <Route
                             path="*"

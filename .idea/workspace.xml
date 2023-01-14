@@ -2,47 +2,55 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="200ae4a2-413a-4eda-9bd3-7e6393833ac7" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Components/ConvertToPersian.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rollup.config.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/DraggableItem.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/PageItems.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Components/TextTransform.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/dk/dk_Help_wall.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/new_mount_arc.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/new_mount_inside.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/new_mount_outside.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Page Components/DK2.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/public/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/locales/en/translation.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/en/translation.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/locales/fa/translation.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/fa/translation.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/web.config" beforeDir="false" afterPath="$PROJECT_DIR$/public/web.config" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/CustomControl.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/CustomControl.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/CustomControlFiles.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/CustomControlFiles.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/CustomControlMulti.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/CustomControlMulti.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/CustomControlNum.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/CustomControlNum.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/CustomControlStaticPlaceholder.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/CustomControlStaticPlaceholder.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/CustomDropdownMulti.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/CustomDropdownMulti.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/GetMeasurementArray.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/GetMeasurementArray.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/GetSewingFilters.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/GetSewingFilters.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/GetUserProjectData.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/GetUserProjectData.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/Menu.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Menu.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/PopoverStickOnClick.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/PopoverStickOnClick.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/UserProjects.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/UserProjects.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/dk/CeilingToFloor1_track_full.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/dk/CeilingToFloor1_track_full.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/dk/CeilingToFloor_noRod.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/dk/CeilingToFloor_noRod.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/dk/WindowtoFloor.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/dk/WindowtoFloor.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/dk/ceiling_to_floor_3.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/dk/ceiling_to_floor_3.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/dk/ceiling_to_window_3.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/dk/ceiling_to_window_3.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/dk/frame_height.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/dk/frame_height.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/dk/fullRod_track.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/dk/fullRod_track.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/roller/height_inside_3.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/roller/height_inside_3.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/roller/height_inside_3_fa.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/roller/height_inside_3_fa.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/roller/step3_help_inside.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/roller/step3_help_inside.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/roller/step3_help_inside_fa.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/roller/step3_help_inside_fa.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/roller/step3_help_outside.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/roller/step3_help_outside.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/roller/step3_help_outside_fa.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/roller/step3_help_outside_fa.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/roller/width_inside_3.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/roller/width_inside_3.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/roller/width_inside_3_fa.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/roller/width_inside_3_fa.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/zebra/height_inside_3.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/height_inside_3.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/zebra/height_inside_3_fa.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/height_inside_3_fa.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/zebra/step3_help_inside.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/step3_help_inside.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/zebra/step3_help_inside_fa.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/step3_help_inside_fa.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/zebra/step3_help_outside.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/step3_help_outside.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/zebra/step3_help_outside_fa.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/step3_help_outside_fa.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/zebra/width_inside_3.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/width_inside_3.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/zebra/width_inside_3_fa.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/width_inside_3_fa.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Images/drapery/dualRoller/Sill_track.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Images/drapery/dualRoller/medium_track.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Images/drapery/dualRoller/small_track.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Images/drapery/zebra/window-Arc.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/window-Arc.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Images/drapery/zebra/window-Inside.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/window-Inside.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Images/drapery/zebra/window-Outside.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/window-Outside.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Images/public/arrow_up.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/public/arrow_up.svg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Old_Components/Roller - Copy.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Old_Components/Roller - Copy.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Page Components/DK.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Page Components/DK.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Page Components/DualRoller.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Page Components/DualRoller.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Page Components/Roller.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Page Components/Roller.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Page Components/Zebra.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Page Components/Zebra.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Pages/AccountLayout.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/AccountLayout.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Pages/Basket.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/Basket.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Pages/Checkout.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/Checkout.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Pages/Curtain.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/Curtain.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Pages/CustomCurtain.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/CustomCurtain.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Pages/Panel.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/Panel.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Pages/Projects.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/Projects.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
     </list>
@@ -91,6 +99,7 @@
   <component name="PackageJsonUpdateNotifier">
     <dismissed value="$PROJECT_DIR$/package.json" />
   </component>
+  <component name="PhpDebugGeneral" listening_started="true" />
   <component name="ProjectId" id="22YMzyul9kiEhvy2S0Bw44Y3jZ4" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
@@ -101,6 +110,8 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;yarn&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.IDE.editor.colors.Color Scheme Font&quot;,
@@ -109,13 +120,14 @@
   }
 }</component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="F:\doopsalta2\src" />
-      <recent name="F:\doopsalta2\public" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="F:\doopsalta2\public" />
       <recent name="F:\doopsalta2\src\locales\fa" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="F:\doopsalta2" />
+      <recent name="F:\doopsalta2\public" />
+      <recent name="F:\doopsalta2\src" />
     </key>
   </component>
   <component name="RunManager" selected="npm.build">
@@ -450,6 +462,58 @@
       <workItem from="1668964828467" duration="5787000" />
       <workItem from="1669057626471" duration="8225000" />
       <workItem from="1669126916769" duration="4890000" />
+      <workItem from="1669237747309" duration="5202000" />
+      <workItem from="1669489578628" duration="2590000" />
+      <workItem from="1669496476866" duration="95000" />
+      <workItem from="1669496681896" duration="3650000" />
+      <workItem from="1669574365127" duration="8499000" />
+      <workItem from="1669617349600" duration="8161000" />
+      <workItem from="1669717524450" duration="6593000" />
+      <workItem from="1669816966209" duration="7287000" />
+      <workItem from="1669938649506" duration="7857000" />
+      <workItem from="1670044293895" duration="13099000" />
+      <workItem from="1670173847255" duration="5000" />
+      <workItem from="1670176585241" duration="3646000" />
+      <workItem from="1670283386014" duration="3944000" />
+      <workItem from="1670337047396" duration="7312000" />
+      <workItem from="1670439415238" duration="11947000" />
+      <workItem from="1670515651524" duration="3133000" />
+      <workItem from="1670702229867" duration="4266000" />
+      <workItem from="1670727413214" duration="15797000" />
+      <workItem from="1670889048783" duration="15889000" />
+      <workItem from="1671068070294" duration="3769000" />
+      <workItem from="1671072468774" duration="415000" />
+      <workItem from="1671157682220" duration="2963000" />
+      <workItem from="1671255605238" duration="11160000" />
+      <workItem from="1671344583150" duration="629000" />
+      <workItem from="1671390898031" duration="9861000" />
+      <workItem from="1671478164596" duration="7911000" />
+      <workItem from="1671544388753" duration="12498000" />
+      <workItem from="1671637893875" duration="7810000" />
+      <workItem from="1671693111625" duration="7224000" />
+      <workItem from="1671930371121" duration="5382000" />
+      <workItem from="1672063493390" duration="5465000" />
+      <workItem from="1672078994838" duration="1828000" />
+      <workItem from="1672082688219" duration="442000" />
+      <workItem from="1672244283027" duration="6442000" />
+      <workItem from="1672340730335" duration="4563000" />
+      <workItem from="1672499144423" duration="7140000" />
+      <workItem from="1672582336864" duration="9195000" />
+      <workItem from="1672685354182" duration="8353000" />
+      <workItem from="1672760537386" duration="9492000" />
+      <workItem from="1672848400747" duration="5731000" />
+      <workItem from="1672894242481" duration="1849000" />
+      <workItem from="1672897219891" duration="2110000" />
+      <workItem from="1672934992134" duration="6222000" />
+      <workItem from="1673100653727" duration="6435000" />
+      <workItem from="1673193010540" duration="6968000" />
+      <workItem from="1673283972781" duration="13807000" />
+      <workItem from="1673327896541" duration="7000" />
+      <workItem from="1673338715680" duration="7259000" />
+      <workItem from="1673450681372" duration="9450000" />
+      <workItem from="1673550983584" duration="193000" />
+      <workItem from="1673553934311" duration="5148000" />
+      <workItem from="1673715147466" duration="6969000" />
     </task>
     <servers />
   </component>

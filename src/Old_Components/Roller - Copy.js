@@ -42,15 +42,18 @@ const baseURGetProject = "https://api.atlaspood.ir/SewingPreorder/GetById";
 const baseURLGetCart = "https://api.atlaspood.ir/cart/GetAll";
 
 
-function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
+function Roller_Old({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryString, Parameters}) {
     const {t} = useTranslation();
     const location = useLocation();
     let pageLanguage = location.pathname.split('').slice(1, 3).join('');
     const [firstRender, setFirstRender] = useState(true);
     const [catID, setCatID] = useState(CatID);
     const [modelID, setModelID] = useState(ModelID);
+    const [specialId, setSpecialId] = useState(SpecialId);
     const [projectId, setProjectId] = useState(ProjectId);
     const [editIndex, setEditIndex] = useState(EditIndex);
+    const [queryString, setQueryString] = useState(QueryString);
+    const [parameters, setParameters] = useState(Parameters);
     const {isLoggedIn, isRegistered, user, showLogin} = useSelector((state) => state.auth);
     let navigate = useNavigate();
     const dispatch = useDispatch();
@@ -324,7 +327,7 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                 <div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key}>
                     <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
                         <hr/>
-                        <span>{t("DESIGN NAME")}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</span>
+                        <span>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</span>
                     </div>
                     {fabric}
                 </div>
@@ -687,7 +690,7 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
         }
     }
     
-    function setCart(refIndex, cartValue, delRefs, secondRedIndex, secondCartValue) {
+    function setCart(refIndex, cartValue, delRefs, secondRefIndex, secondCartValue) {
         let temp = JSON.parse(JSON.stringify(cartValues));
         temp[refIndex] = cartValue;
         if (delRefs !== undefined) {
@@ -699,8 +702,8 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                 }
             });
         }
-        if (secondRedIndex !== undefined) {
-            let tempArr1 = secondRedIndex.split(',');
+        if (secondRefIndex !== undefined) {
+            let tempArr1 = secondRefIndex.split(',');
             tempArr1.forEach((ref, index) => {
                 if (ref !== undefined) {
                     temp[ref] = secondCartValue[index]
@@ -1283,6 +1286,9 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                     if (cartObjects["CartDetails"].length === 0) {
                         modalHandleClose("cart_modal");
                         setCartStateAgree(false);
+                        if(cartStateAgree){
+                            navigate("/" + pageLanguage);
+                        }
                     }
                 } else {
                     if (cartObjects["drapery"].length) {
@@ -1400,6 +1406,9 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                     if (cartObjects["drapery"].length + cartObjects["product"].length + cartObjects["swatches"].length === 0) {
                         modalHandleClose("cart_modal");
                         setCartStateAgree(false);
+                        if(cartStateAgree){
+                            navigate("/" + pageLanguage);
+                        }
                     }
                 }
             } else {
@@ -2850,7 +2859,7 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                                         <div className="box100">
                                             <p className="step_selection_title">{t("step3A_title")}</p>
                                             <img
-                                                src={pageLanguage === 'fa' ? require('../Images/drapery/roller/width_inside_3_fa.svg').default : require('../Images/drapery/roller/width_inside_3.svg').default}
+                                                src={pageLanguage === 'fa' ? require('../Images/drapery/roller/width_inside_3_fa.svg').default : require('../Images/drapery/roller/new_width_inside_3.svg').default}
                                                 className="img-fluid" alt=""/>
                                         </div>
                                         <div className="box100 Three_selection_container">
@@ -3016,7 +3025,7 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                                         <div className="box100">
                                             <p className="step_selection_title">{t("step3B_title")}</p>
                                             <img
-                                                src={pageLanguage === 'fa' ? require('../Images/drapery/roller/height_inside_3_fa.svg').default : require('../Images/drapery/roller/height_inside_3.svg').default}
+                                                src={pageLanguage === 'fa' ? require('../Images/drapery/roller/height_inside_3_fa.svg').default : require('../Images/drapery/roller/new_height_inside_3.svg').default}
                                                 className="img-fluid" alt=""/>
                                         </div>
                                         <div className="box100 Three_selection_container">
@@ -3182,7 +3191,7 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                                     <div className="card_body">
                                         <div className="box100">
                                             <p className="step_selection_title">{t("step3A_out_title")}</p>
-                                            <img src={require('../Images/drapery/roller/FrameSize.svg').default} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/roller/new_FrameSize.svg').default} className="img-fluid" alt=""/>
                                         </div>
                                         <div className="box100 Three_selection_container">
                                             <div className="box100">
@@ -3249,7 +3258,7 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                                     <div className="card_body">
                                         <div className="box100">
                                             <p className="step_selection_title">{t("step3B_out_title")}</p>
-                                            <img src={require('../Images/drapery/roller/wall_cover.svg').default} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/roller/new_wall_cover.svg').default} className="img-fluid" alt=""/>
                                         </div>
                                         <div className="box100 Three_selection_container dir_ltr">
                                             <div className="box50">
@@ -3371,7 +3380,7 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                                     <div className="card_body">
                                         <div className="box100">
                                             <p className="step_selection_title">{t("step3C_out_title")}</p>
-                                            <img src={require('../Images/drapery/roller/frame_height.svg').default} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/roller/new_frame_height.svg').default} className="img-fluid" alt=""/>
                                         </div>
                                         <div className="box100 Three_selection_container">
                                             <div className="box100">
@@ -3438,7 +3447,7 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                                     <div className="card_body">
                                         <div className="box100">
                                             <p className="step_selection_title">{t("step3D_out_title")}</p>
-                                            <img src={require('../Images/drapery/roller/shade_mount.svg').default} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/roller/new_shade_mount.svg').default} className="img-fluid" alt=""/>
                                         </div>
                                         <div className="box100 Three_selection_container">
                                             <div className="box100">
@@ -4464,7 +4473,8 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                                                         <span className="details-label unselectable">{detailsShow ? t("Hide Details") : t("Add Room Image")}</span>
                                                         <span className="details_indicator">
                                                             {/*<i className="arrow_down"/>*/}
-                                                            <img className="arrow_down img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
+                                                            {detailsShow && <img className="arrow_down img-fluid" src={require('../Images/public/arrow_up.svg').default} alt=""/>}
+                                                            {!detailsShow && <img className="arrow_down img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>}
                                                         </span>
                                                     </div>
                                                     <div className="uploaded_images_section">
@@ -4555,9 +4565,9 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                                                                setDeps("72", "");
                                                            else
                                                                setDeps("", "72");
-                                                           roomLabelChanged(e.target.value, "7", true);
-                                                           setRoomLabelText(e.target.value);
-                                                           setCart("WindowName", e.target.value);
+                                                           roomLabelChanged(Capitalize(e.target.value), "7", true);
+                                                           setRoomLabelText(Capitalize(e.target.value));
+                                                           setCart("WindowName", Capitalize(e.target.value));
                                                        }}/>
                                             </div>
                                         </div>
@@ -5056,6 +5066,9 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                     <button className="custom_cart_close" onClick={() => {
                         modalHandleClose("cart_modal");
                         setCartStateAgree(false);
+                        if(cartStateAgree){
+                            navigate("/" + pageLanguage);
+                        }
                     }}>{t("CONTINUE SHOPPING")}
                     </button>
                 </Modal.Header>
@@ -5169,9 +5182,9 @@ function Roller_Old({CatID, ModelID, ProjectId, EditIndex}) {
                                                setDeps("62", "");
                                            else
                                                setDeps("", "62");
-                                           roomLabelChanged(e.target.value, "6", true);
-                                           setRoomLabelText(e.target.value);
-                                           setCart("WindowName", e.target.value);
+                                           roomLabelChanged(Capitalize(e.target.value), "6", true);
+                                           setRoomLabelText(Capitalize(e.target.value));
+                                           setCart("WindowName", Capitalize(e.target.value));
                                        }}/>
                             </div>
                         </div>

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 import Breadcrumb from "react-bootstrap/Breadcrumb";
@@ -30,6 +30,8 @@ import Dropdown from "react-bootstrap/Dropdown";
 import GetMeasurementArray from "../Components/GetMeasurementArray";
 import GetUserProjectData from "../Components/GetUserProjectData";
 import convertToPersian from "../Components/ConvertToPersian";
+import {Accordion, AccordionContext, useAccordionButton} from "react-bootstrap";
+import {CapitalizeAllWords, Uppercase} from "../Components/TextTransform";
 
 const baseURLPrice = "https://api.atlaspood.ir/Sewing/GetSewingOrderPrice";
 const baseURLGetAddress = "https://api.atlaspood.ir/user/GetAddress";
@@ -516,6 +518,27 @@ function Checkout() {
         }
     }
     
+    function ContextAwareToggleViewDetails({ eventKey, callback, textOnHide, textOnShow}) {
+        const { activeEventKey } = useContext(AccordionContext);
+        
+        const decoratedOnClick = useAccordionButton(
+            eventKey,
+            () => callback && callback(eventKey),
+        );
+        
+        const isCurrentEventKey = activeEventKey === eventKey;
+        
+        return (
+            <button
+                className="basket_item_title_dropdown_btn"
+                aria-expanded={`${isCurrentEventKey}`}
+                type="button"
+                onClick={decoratedOnClick}
+            >
+                <h4 className="dk_curtain_preview_item_details">{isCurrentEventKey ? textOnShow:textOnHide}</h4>
+            </button>
+        );
+    }
     
     useEffect(() => {
         if (userAddress.length) {
@@ -682,6 +705,20 @@ function Checkout() {
                         });
                         
                         promise1.then(() => {
+                            if(obj["SewingModelId"] === "0326"){
+                                desc=[
+                                <div className="basket_item_title_desc" key={"fabric/color"}>
+                                    <h3>{t("Fabric/Color")}&nbsp;</h3>
+                                    <h4>{obj["SodFabrics"].map((item, i) =>
+                                        <div key={i}
+                                             className="dk_curtain_preview_detail">
+                                            <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + " / " + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
+                                            <h5>&nbsp;X</h5><h3>{item["Qty"]}</h3>
+                                        </div>)}
+                                    </h4>
+                                </div>
+                                ,...desc];
+                            }
                             // console.log(desc);
                             temp[i] =
                                 <li className="checkout_item_container" key={i}>
@@ -702,14 +739,15 @@ function Checkout() {
                                         {!hasDiscount &&
                                             <h4 className="checkout_item_room_name">{pageLanguage === 'fa' ? roomNameFa + " / "+ WindowName : roomName + " / "+ WindowName}</h4>
                                         }
-                                        <PopoverStickOnClick classNames="checkout_view_detail_popover"
-                                                             placement="bottom"
-                                                             children={<h2 className="checkout_item_details">{t("View Details")}</h2>}
-                                                             component={
-                                                                 <div className="basket_item_title_container">
-                                                                     {desc}
-                                                                 </div>
-                                                             }/>
+                                        {/*<PopoverStickOnClick classNames="checkout_view_detail_popover"*/}
+                                        {/*                     placement="bottom"*/}
+                                        {/*                     children={<h2 className="checkout_item_details">{t("View Details")}</h2>}*/}
+                                        {/*                     children2={<h2 className="checkout_item_details">{t("Hide Details")}</h2>}*/}
+                                        {/*                     component={*/}
+                                        {/*                         <div className="basket_item_title_container">*/}
+                                        {/*                             {desc}*/}
+                                        {/*                         </div>*/}
+                                        {/*                     }/>*/}
 										{/*<div className="checkout_item_dropdown">
 											<Dropdown autoClose="outside" title="" align={{sm: pageLanguage === "fa" ? "end" : "start"}}>
 												<Dropdown.Toggle className="basket_item_title_dropdown_btn" style={{ position: "static" }}>
@@ -723,6 +761,16 @@ function Checkout() {
 												</Dropdown.Menu>
 											</Dropdown>
 										</div>*/}
+                                        <Accordion>
+                                            <Accordion.Item eventKey="0">
+                                                <ContextAwareToggleViewDetails eventKey="0" textOnHide={t("View Details")} textOnShow={t("Hide Details")} />
+                                                <Accordion.Body className="basket_item_title_dropdown dk_curtain_preview_dropdown">
+                                                    <div className="basket_item_title_container">
+                                                        {desc}
+                                                    </div>
+                                                </Accordion.Body>
+                                            </Accordion.Item>
+                                        </Accordion>
                                         {hasDiscount &&
                                         <span className="checkout_item_discount">{t('Discount')} (-{GetPrice(drapery[i]["Discount"], pageLanguage, t("TOMANS"))})</span>}
                                     </div>

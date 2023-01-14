@@ -65,11 +65,15 @@ async function GetUserProjectData(projectObj, isLoggedIn, editIndex,changeLang) 
                             if (tempObj["titleValue"] === null) {
                                 temp[tempObj["cart"]] = projectObj["PreorderText"][key];
                             } else {
-                                temp[tempObj["cart"]] = projectObj["PreorderText"][key] ? tempObj["titleValue"][projectObj["PreorderText"][key].toString()] : tempObj["titleValue"]["null"];
+                                temp[tempObj["cart"]] = tempObj["titleValue"][projectObj["PreorderText"][key].toString()];
                             }
+                        }
+                        else{
+                            // console.log(key);
                         }
                     }
                     if (index === Object.keys(projectObj["PreorderText"]).length - 1) {
+                        // console.log(temp);
                         resolve(temp);
                     }
                 });

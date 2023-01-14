@@ -15,7 +15,21 @@
           "en",
           "fa"
         ]
-      },{
+      },
+      {
+        "cart": "ZipCode",
+        "title": "ZipCode",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "ZipCode",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
         "cart": "SewingModelId",
         "title": "SewingModelId",
         "titleValue": null,
@@ -320,6 +334,48 @@
         ]
       },
       {
+        "cart": "CeilingToWindow1",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Height1",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "CeilingToWindow2",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Height2",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "CeilingToWindow3",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Height3",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
         "cart": "ShadeMount",
         "title": "",
         "titleValue": null,
@@ -341,16 +397,6 @@
         "order": 5,
         "apiLabel": "ControlType",
         "apiValue": null,
-        "apiAcc": true,
-        "apiAccValue": {
-          "Motorized": {
-            "SewingAccessoryId": 1,
-            "SewingModelAccessoryId": 1,
-            "SewingAccessoryValue": "61500508",
-            "Qty": 1
-          },
-          "ContinuousLoop": null
-        },
         "lang": [
           "en",
           "fa"
@@ -390,6 +436,21 @@
         "order": 6,
         "apiLabel": "MotorType",
         "apiValue": null,
+        "apiAcc": false,
+        "apiAccValue": {
+          "Standard": {
+            "SewingAccessoryId": 17,
+            "SewingModelAccessoryId": 0,
+            "SewingAccessoryValue": "61500508",
+            "Qty": 1
+          },
+          "Smart": {
+            "SewingAccessoryId": 18,
+            "SewingModelAccessoryId": 0,
+            "SewingAccessoryValue": "61500518",
+            "Qty": 1
+          }
+        },
         "lang": [
           "en",
           "fa"
@@ -447,13 +508,13 @@
           "150": null,
           "300": {
             "SewingAccessoryId": 2,
-            "SewingModelAccessoryId": 3,
+            "SewingModelAccessoryId": 0,
             "SewingAccessoryValue": "90908901",
             "Qty": 1
           },
           "500": {
             "SewingAccessoryId": 2,
-            "SewingModelAccessoryId": 3,
+            "SewingModelAccessoryId": 0,
             "SewingAccessoryValue": "90908902",
             "Qty": 1
           }
@@ -675,7 +736,8 @@
           "en",
           "fa"
         ]
-      },{
+      },
+      {
         "cart": "SewingModelId",
         "title": "SewingModelId",
         "titleValue": null,
@@ -1469,7 +1531,8 @@
           "en",
           "fa"
         ]
-      },{
+      },
+      {
         "cart": "SewingModelId",
         "title": "SewingModelId",
         "titleValue": null,
@@ -2322,6 +2385,21 @@
         ]
       },
       {
+        "cart": "SodFabrics",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "SodFabrics",
+        "apiValue": null,
+        "apiLabel2": "SodFabrics",
+        "apiValue2": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
         "cart": "FabricId",
         "title": "FabricId",
         "titleValue": null,
@@ -2330,6 +2408,21 @@
         "apiLabel": "FabricId",
         "apiValue": null,
         "apiLabel2": "FabricId",
+        "apiValue2": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "SpecialId",
+        "title": "SpecialId",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "SpecialId",
+        "apiValue": null,
+        "apiLabel2": "SpecialId",
         "apiValue2": null,
         "lang": [
           "en",
@@ -2620,17 +2713,17 @@
         "cart": "FinishedLengthType",
         "title": "Finished Length Type",
         "titleValue": {
-          "5403": "Sill",
-          "5401": "Apron",
-          "5402": "Floor"
+          "5401": "Sill",
+          "5402": "Apron",
+          "5403": "Floor"
         },
         "titlePostfix": "",
         "order": 4,
         "apiLabel": "FinishedLengthType",
         "apiValue": {
-          "Sill": 5403,
-          "Apron": 5401,
-          "Floor": 5402
+          "Sill": 5401,
+          "Apron": 5402,
+          "Floor": 5403
         },
         "measurements": true,
         "lang": [
@@ -2653,7 +2746,7 @@
         ]
       },
       {
-        "cart": "Height2E",
+        "cart": "Height2D",
         "title": "",
         "titleValue": null,
         "titlePostfix": "cm",
@@ -2798,7 +2891,7 @@
         "titleValue": null,
         "titlePostfix": "cm",
         "order": -1,
-        "apiLabel": "HeightOfWindowToFloor",
+        "apiLabel": "Height1",
         "apiValue": null,
         "measurements": true,
         "lang": [
@@ -3014,7 +3107,7 @@
         ]
       }
     ],
-    "route": "/Curtain/Roller-Shades/0324"
+    "route": "/Curtain/DK/0326"
   },
   "0302": {}
 }

@@ -17,6 +17,7 @@ function AccountLayout() {
     
     
     const [userName, setUserName] = useState("");
+    const [roles, setRoles] = useState([]);
     
     function logoutUser(){
         if (localStorage.getItem("user") !== null) {
@@ -37,6 +38,16 @@ function AccountLayout() {
         {
             let tempObj=JSON.parse(localStorage.getItem("user"));
             setUserName(jwt(tempObj["access_token"])["FirstName"]);
+            let tempRoles=jwt(tempObj["access_token"])["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+            if(tempRoles && tempRoles.length>0){
+                setRoles(tempRoles);
+            }
+            else{
+                setRoles(["User"]);
+            }
+        }
+        else{
+            setRoles([]);
         }
         
     }, [location.pathname]);
@@ -61,6 +72,7 @@ function AccountLayout() {
                         <li className="account_sidebar_list_item"><Link to={"/" + pageLanguage + "/Account"}>{t("ACCOUNT SETTINGS")}</Link></li>
                         <li className="account_sidebar_list_item"><Link to={"/" + pageLanguage + "/Account"}>{t("GIFT CART")}</Link></li>
                         <li className="account_sidebar_list_item"><Link to={"/" + pageLanguage + "/Account"}>{t("MY REWARDS")}</Link></li>
+                        {roles.includes("WebsiteAdmin") &&<li className="account_sidebar_list_item"><Link to={"/admin/panel"}>{t("WEBSITE PANEL")}</Link></li>}
                     </ul>
                     <button className="account_logout" onClick={()=>logoutUser()}>{t("LOG OUT")}</button>
                 </div>

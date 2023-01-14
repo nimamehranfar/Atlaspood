@@ -31,22 +31,28 @@ function Panel() {
                                 {/*<NavDropdown.Divider />*/}
                                 {/*<NavDropdown.Item disabled>Footer</NavDropdown.Item>*/}
                             </NavDropdown>
-                            <NavDropdown title="Curtains" id="navbarScrollingDropdown">
+                            <NavDropdown title="Pages" id="navbarScrollingDropdown">
+                                <NavDropdown.Item as={Link} to="/admin/panel/page-items">Page Items</NavDropdown.Item>
+                                {/*<NavDropdown.Divider />*/}
+                                {/*<NavDropdown.Item disabled>Footer</NavDropdown.Item>*/}
+                            </NavDropdown>
+                            <NavDropdown disabled title="Curtains" id="navbarScrollingDropdown">
                                 <NavDropdown.Item as={Link} to="/admin/panel/models">Models</NavDropdown.Item>
                                 {/*<NavDropdown.Divider />*/}
                                 {/*<NavDropdown.Item disabled>Footer</NavDropdown.Item>*/}
                             </NavDropdown>
                             <Nav.Link disabled>Products</Nav.Link>
                         </Nav>
-                        <Form className="d-flex">
-                            <FormControl
-                                type="search"
-                                placeholder="Search"
-                                className="me-2"
-                                aria-label="Search"
-                            />
-                            <Button variant="outline-success">Search</Button>
-                        </Form>
+                        <Link className="margin_side_1rem" to="/en">Back To Website</Link>
+                        {/*<Form className="d-flex">*/}
+                        {/*    <FormControl*/}
+                        {/*        type="search"*/}
+                        {/*        placeholder="Search"*/}
+                        {/*        className="me-2"*/}
+                        {/*        aria-label="Search"*/}
+                        {/*    />*/}
+                        {/*    <Button variant="outline-success">Search</Button>*/}
+                        {/*</Form>*/}
                     </Navbar.Collapse>
                 </Container>
             </Navbar>

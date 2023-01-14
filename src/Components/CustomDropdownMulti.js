@@ -25,7 +25,7 @@ function CustomDropdownMulti({props, state, methods}) {
                                      option.disabled ? null : () => methods.addItem(option)
                                  }
                             >
-                                <span className="fa">{option[props.labelField]}</span>
+                                <span>{option[props.labelField]}</span>
                             </div>
                         );
                     })}

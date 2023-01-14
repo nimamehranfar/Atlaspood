@@ -1,4 +1,4 @@
-import {Link, useLocation, useParams} from "react-router-dom";
+import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import axios from "axios";
 import {useTranslation} from "react-i18next";
@@ -11,6 +11,7 @@ const baseURLCats = "https://api.atlaspood.ir/WebsitePage/GetDetailByName";
 function Curtain() {
     const {t} = useTranslation();
     const location = useLocation();
+    let navigate = useNavigate();
     const [pageLanguage, setPageLanguage] = React.useState(location.pathname.split('').slice(1, 3).join(''));
     const {catID} = useParams();
     const [models, setModels] = useState([]);
@@ -33,35 +34,58 @@ function Curtain() {
     const getCats = () => {
         axios.get(baseURLCats, {
             params: {
-                pageName: catID,
-                apiKey: window.$apikey
+                pageName: catID
+                // apiKey: window.$apikey
             }
         }).then((response) => {
-            setModels(response.data.SewingModels);
+            if(response.data["WebsitePageItems"].length) {
+                let tempArr=[];
+                let promiseArr=[];
+                if(response.data["PageItems"].split(':')[1]) {
+                    response.data["WebsitePageItems"].forEach((obj,index) => {
+                        promiseArr[index]=new Promise((resolve, reject) => {
+                            let tempSplit1 = response.data["PageItems"].split(obj["WebsitePageItemId"].toString() + ":");
+                            let tempSplit2 = tempSplit1[1] ? parseInt(tempSplit1[1].split(",")[0]) : 0;
+                            tempArr[tempSplit2-1] = obj;
+                            resolve();
+                        });
+                    })
+                    Promise.all(promiseArr).then(() => {
+                        setModels(tempArr);
+                    });
+                }
+                else{
+                    setModels(response.data["WebsitePageItems"]);
+                }
+    
+                setDefaultModelName(response.data["TitleEn"]);
+                setDefaultModelNameFa(response.data["Title"]);
+            }
+            else{
+                setModelList(<p>No Page Item</p>);
+            }
         }).catch(err => {
             console.log(err);
+            navigate("/" + pageLanguage);
         });
     };
     
     function renderModels() {
         const modelLists = [];
         for (let i = 0; i < models.length; i++) {
-            let SewingModelId = models[i].SewingModelId;
-            let ModelName = convertToPersian(models[i].ModelName);
-            let ModelENName = models[i].ModelENName;
-            let DiscountDescription = models[i].DiscountDescription;
-            let DiscountEnDescription = models[i].DiscountEnDescription;
-            let Description = convertToPersian(models[i].Description);
-            let ENDescription = models[i].ENDescription;
-            let StartPrice = models[i].StartPrice;
+            let SewingModelId = models[i].Link;
+            let WebsitePageItemId = models[i].WebsitePageItemId;
+            let ModelName = convertToPersian(models[i].Title);
+            let ModelENName = models[i].EnTitle;
+            let DiscountDescription = models[i].DiscountDesc;
+            let DiscountEnDescription = models[i].DiscountEnDesc;
+            let Description = convertToPersian(models[i].HtmlContent);
+            let ENDescription = models[i].HtmlEnContent;
+            let StartPrice = models[i].Price;
             let DiscountPrice = models[i].DiscountPrice;
-            let PhotoUrl = models[i].PhotoUrl;
-            let DefaultFabricPhotoUrl = models[i].DefaultFabricPhotoUrl;
+            let PhotoUrl = models[i].ImageUrl;
+            let DefaultFabricPhotoUrl = models[i].MainImageUrl;
             let discount = StartPrice !== DiscountPrice;
-    
-    
-            setDefaultModelName(ModelENName);
-            setDefaultModelNameFa(ModelName);
             
             if (Description === null || Description === undefined || Description === "") {
                 Description = ""
@@ -147,7 +171,7 @@ function Curtain() {
                         {/*<Link to={"/" + pageLanguage + "/Curtain/" + catID + "/" + SewingModelId} className={`btn_normal`}>{t("Start Customizing")}</Link>*/}
 
                         <div className="model_item_info_container">
-                            <Link to={"/" + pageLanguage + "/Curtain/" + catID + "/" + SewingModelId}
+                            <Link to={"/" + pageLanguage + "/Curtain/" + catID + "/" + SewingModelId + "/Page-ID/" + WebsitePageItemId}
                                   className="model_item_info_title">{pageLanguage === 'en' ? ModelENName : ModelName}</Link>
                             <h3 className="model_item_info_price_from">{t("prices from")}</h3>
                             <span className={`${discount ? "model_item_info_price model_item_info_price2" : "model_item_info_price"}}`}>{GetPrice(StartPrice, pageLanguage, t("TOMANS"))}</span>
@@ -160,8 +184,10 @@ function Curtain() {
                             <div className={`model_item_info_description_section`}>
                                 {pageLanguage === 'en' ? parse(ENDescription, options) : parse(Description, options)}
                             </div>
-                            <Link to={"/" + pageLanguage + "/Curtain/" + catID + "/" + SewingModelId} className="btn_normal model_item_btn_normal" onClick={()=>sessionStorage.clear()}>{t("Start" +
+                            <Link to={"/" + pageLanguage + "/Curtain/" + catID + "/" + SewingModelId + "/Page-ID/" + WebsitePageItemId} className="btn_normal model_item_btn_normal"
+                                  onClick={() => sessionStorage.clear()}>{t("Start" +
                                 " Customizing")}</Link>
+                            
                         </div>
                     </div>
                 </li>
@@ -198,7 +224,7 @@ function Curtain() {
             {/*    </Breadcrumb>*/}
             {/*</div>*/}
             <div className="models_title_div">
-                <h1>{defaultModelName === undefined || defaultModelName === "" ? " " : pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</h1>
+                <h1>{defaultModelName === undefined || defaultModelName === "" ? "" : pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa): defaultModelName}</h1>
                 {/*<h1>{t("model_zebra_temp1")}</h1>*/}
                 <h2>{t("model_zebra_temp2")}</h2>
             </div>

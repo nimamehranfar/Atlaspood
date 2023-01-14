@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useContext, useEffect, useRef, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {Link, useLocation, useNavigate, useParams} from "react-router-dom";
 import Breadcrumb from "react-bootstrap/Breadcrumb";
@@ -20,6 +20,9 @@ import GetMeasurementArray from "../Components/GetMeasurementArray";
 import GetUserProjectData from "../Components/GetUserProjectData";
 import Dropdown from "react-bootstrap/Dropdown";
 import convertToPersian from "../Components/ConvertToPersian";
+import {Accordion, AccordionContext, useAccordionButton} from "react-bootstrap";
+import PopoverStickOnClick from "../Components/PopoverStickOnClick";
+import {CapitalizeAllWords} from "../Components/TextTransform";
 
 const baseURLPrice = "https://api.atlaspood.ir/Sewing/GetSewingOrderPrice";
 const baseURLGetCart = "https://api.atlaspood.ir/cart/GetAll";
@@ -70,6 +73,28 @@ function Basket() {
         let tempModals = [...modals];
         tempModals[modalName] = true;
         setModals(tempModals);
+    }
+    
+    function ContextAwareToggleViewDetails({ eventKey, callback, textOnHide, textOnShow}) {
+        const { activeEventKey } = useContext(AccordionContext);
+        
+        const decoratedOnClick = useAccordionButton(
+            eventKey,
+            () => callback && callback(eventKey),
+        );
+        
+        const isCurrentEventKey = activeEventKey === eventKey;
+        
+        return (
+            <button
+                className="basket_item_title_dropdown_btn"
+                aria-expanded={`${isCurrentEventKey}`}
+                type="button"
+                onClick={decoratedOnClick}
+            >
+                <h4 className="dk_curtain_preview_item_details">{isCurrentEventKey ? textOnShow:textOnHide}</h4>
+            </button>
+        );
     }
     
     function setBasketNumber(refIndex, numValue, type, minusPlus) {
@@ -546,6 +571,7 @@ function Basket() {
                     let WindowName = obj["WindowName"] === undefined ? "" : obj["WindowName"];
                     let photoUrl = obj["PhotoUrl"];
                     let SewingModelId = obj["SewingModelId"];
+                    let zipcode = obj["ZipCode"];
                     obj["price"] = drapery[i]["UnitPrice"];
                     
                     // let fabricColorFa = "";
@@ -560,6 +586,7 @@ function Basket() {
                     // let photoUrl = "";
                     // let SewingModelId = drapery[i]["SewingPreorder"]["SewingModelId"];
                     obj["price"] = drapery[i]["UnitPrice"];
+                    obj["InstallAmount"] = drapery[i]["InstallAmount"]?obj["InstallAmount"]:0;
                     obj["qty"] = drapery[i]["Count"];
                     
                     let uploadedFiles = drapery[i]["SewingPreorder"]["SewingOrderAttachments"];
@@ -599,26 +626,39 @@ function Basket() {
                                                 desc[tempObj["order"]] =
                                                     <div className="basket_item_title_desc" key={index}>
                                                         <h3>{t("Measurements")}&nbsp;</h3>
-                                                        {/*<PopoverStickOnHover classNames="basket_view_detail_popover"*/}
+                                                        {/*<PopoverStickOnClick classNames="basket_view_detail_popover"*/}
                                                         {/*                     placement="bottom"*/}
-                                                        {/*                     children={<h4 className="basket_item_details">{t("View Details")}</h4>}*/}
+                                                        {/*                     children={<h2 className="checkout_item_details">{t("View Details")}</h2>}*/}
+                                                        {/*                     children2={<h2 className="checkout_item_details">{t("Hide Details")}</h2>}*/}
                                                         {/*                     component={*/}
                                                         {/*                         <div className="basket_item_title_container">*/}
                                                         {/*                             <GetMeasurementArray modelId={`${SewingModelId}`} cartValues={temp}/>*/}
                                                         {/*                         </div>*/}
                                                         {/*                     }/>*/}
-                                                        <Dropdown autoClose="outside" title="" align={pageLanguage === "fa" ? "end" : "start"}>
-                                                            <Dropdown.Toggle className="basket_item_title_dropdown_btn">
-                                                                <h4 className="basket_item_details">{t("View Details")}</h4>
-                                                                <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default}
-                                                                     alt=""/>
-                                                            </Dropdown.Toggle>
-                                                            <Dropdown.Menu className="basket_item_title_dropdown">
-                                                                <div className="basket_item_title_container">
-                                                                    <GetMeasurementArray modelId={`${SewingModelId}`} cartValues={temp}/>
-                                                                </div>
-                                                            </Dropdown.Menu>
-                                                        </Dropdown>
+                                                        {/*<Dropdown autoClose="outside" title="" align={pageLanguage === "fa" ? "end" : "start"}>*/}
+                                                        {/*    <Dropdown.Toggle className="basket_item_title_dropdown_btn">*/}
+                                                        {/*        <h4 className="basket_item_details">{t("View Details")}</h4>*/}
+                                                        {/*        <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default}*/}
+                                                        {/*             alt=""/>*/}
+                                                        {/*    </Dropdown.Toggle>*/}
+                                                        {/*    <Dropdown.Menu className="basket_item_title_dropdown">*/}
+                                                        {/*        <div className="basket_item_title_container">*/}
+                                                        {/*            <GetMeasurementArray modelId={`${SewingModelId}`} cartValues={temp}/>*/}
+                                                        {/*        </div>*/}
+                                                        {/*    </Dropdown.Menu>*/}
+                                                        {/*</Dropdown>*/}
+                                                        <h4 className="basket_measurement_accordion_container">
+                                                            <Accordion>
+                                                                <Accordion.Item eventKey="0">
+                                                                    <ContextAwareToggleViewDetails eventKey="0" textOnHide={t("View Details")} textOnShow={t("Hide Details")} />
+                                                                    <Accordion.Body className="basket_item_title_dropdown dk_curtain_preview_dropdown">
+                                                                        <div className="basket_item_title_container">
+                                                                            <GetMeasurementArray modelId={`${SewingModelId}`} cartValues={temp}/>
+                                                                        </div>
+                                                                    </Accordion.Body>
+                                                                </Accordion.Item>
+                                                            </Accordion>
+                                                        </h4>
                                                     </div>;
                                                 resolve();
                                             }).catch(() => {
@@ -676,10 +716,28 @@ function Basket() {
                                         </div>
                                         <div className="basket_item_title_container">
                                             <div className="basket_item_title_name">{pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</div>
-                                            {/*<div className="basket_item_title_desc">*/}
-                                            {/*    <h3>Fabric Material & Color&nbsp;&nbsp;&nbsp;&nbsp;</h3>*/}
-                                            {/*    <h4>{pageLanguage === 'fa' ? fabricDesignFa + " / " + fabricColorFa : fabricDesign + " / " + fabricColor}</h4>*/}
-                                            {/*</div>*/}
+                                            {SewingModelId==="0326"&&
+                                                <div className="basket_item_title_desc">
+                                                    <h3>{pageLanguage === 'fa' ? "پارچه/رنگ" : "Fabric/Color"}&nbsp;</h3>
+                                                    <h4>
+                                                        <div className={`dk_curtain_preview_container`}>
+                                                            <Accordion>
+                                                                <Accordion.Item eventKey="0">
+                                                                    <ContextAwareToggleViewDetails eventKey="0" textOnHide={t("View Details")} textOnShow={t("Hide Details")} />
+                                                                    <Accordion.Body className="basket_item_title_dropdown dk_curtain_preview_dropdown">
+                                                                        <div className="dk_curtain_preview_detail_container">
+                                                                            {obj["CurtainArr"].map((item,i) =>
+                                                                                <div key={i}
+                                                                                     className="dk_curtain_preview_detail"><h2>{pageLanguage === 'en' ?("VANE "+(+i + +1)+":"):(" شال"+NumberToPersianWord.convertEnToPe(`${+ i + +1}`)+":")}</h2><h3>&nbsp;{(pageLanguage === 'en' ? CapitalizeAllWords(item["DesignEnName"]) : item["DesignName"]).toString() + " / " + (pageLanguage === 'en' ? CapitalizeAllWords(item["ColorEnName"]) : item["ColorName"]).toString()}</h3>
+                                                                                </div>)}
+                                                                        </div>
+                                                                    </Accordion.Body>
+                                                                </Accordion.Item>
+                                                            </Accordion>
+                                                        </div>
+                                                    </h4>
+                                                </div>
+                                            }
                                             {desc}
                                             <div className="basket_item_title_desc">
                                                 <h3>{pageLanguage === 'fa' ? "نام اتاق" : "Room Label"}&nbsp;</h3>
@@ -687,9 +745,35 @@ function Basket() {
                                             </div>
                                             <div className="basket_item_desc_button">
                                                 <Link className="btn basket_desc_button"
-                                                      to={"/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[drapery[i]["SewingPreorder"]["SewingModelId"]]["route"] + "/Bag-Projects/" + drapery[i]["SewingPreorderId"]}>{t("EDIT")}</Link>
+                                                      to={"/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[drapery[i]["SewingPreorder"]["SewingModelId"]]["route"]+(obj["SpecialId"]?obj["SpecialId"]:"") + "/Bag-Projects/" + drapery[i]["SewingPreorderId"]}>{t("EDIT")}</Link>
                                                 <button className="basket_desc_button" onClick={() => copyItem(drapery[i]["SewingPreorder"])}>{t("COPY")}</button>
                                             </div>
+                                            {zipcode &&
+                                                <div className="basket_zipcode_container">
+                                                    <div className="basket_zipcode_left">
+                                                        <h1 className="basket_zipcode_title">{t("basket_zipcode_text1")}</h1>
+                                                        <button className="basket_zipcode_btn text_underline">{t("Remove")}</button>
+                                                    </div>
+                                                    <div className="basket_zipcode_right">
+                                                        <h2 className="basket_zipcode_price">{GetPrice(obj["InstallAmount"], pageLanguage, t("TOMANS"))}</h2>
+                                                    </div>
+                                                    <div className="basket_zipcode_bottom">
+                                                        {/*<div className="basket_zipcode_img_container">*/}
+                                                        {/*    <img src={require('../Images/public/no_image.svg').default} className="img-fluid" alt=""/>*/}
+                                                        {/*</div>*/}
+                                                        <div className="basket_zipcode_desc_container">
+                                                            <h2 className="basket_zipcode_desc_text">{t("basket_zipcode_text2")}
+                                                                <button className="basket_zipcode_desc_btn text_underline">{t("How It Works")}</button>
+                                                            </h2>
+                                                            {/*<div className="basket_zipcode_desc_btn_container">*/}
+                                                            {/*    <button className="basket_zipcode_desc_btn text_underline">{t("How It Works")}</button>*/}
+                                                            {/*    <span/>*/}
+                                                            {/*    <button className="basket_zipcode_desc_btn text_underline">{t("Terms Apply")}</button>*/}
+                                                            {/*</div>*/}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
                                             <div className="basket_item_delivery_section">
                                                 <div className="basket_item_delivery_avail">
                                                     <h1 className="basket_item_delivery_title">{t("AVAILABILITY")}</h1>
@@ -891,8 +975,10 @@ function Basket() {
                             let WindowName = obj["WindowName"] === undefined ? "" : obj["WindowName"];
                             let photoUrl = obj["PhotoUrl"];
                             let SewingModelId = obj["SewingModelId"];
+                            let zipcode = obj["ZipCode"];
                             obj["price"] = values[index].data["price"] / obj1["Count"];
                             obj1["price"] = values[index].data["price"] / obj1["Count"];
+                            obj["InstallAmount"] = values[index].data["InstallAmount"]?values[index].data["InstallAmount"]:0;
                             draperiesTotalPrice += values[index].data["price"];
                             
                             let promiseArr2 = [];
@@ -981,12 +1067,29 @@ function Basket() {
                                                 <img src={`https://api.atlaspood.ir/${photoUrl}`} alt="" className="basket_item_img"/>
                                             </div>
                                             <div className="basket_item_title_container">
-                                                <div
-                                                    className="basket_item_title_name">{pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</div>
-                                                {/*<div className="basket_item_title_desc">*/}
-                                                {/*    <h3>Fabric Material & Color&nbsp;&nbsp;&nbsp;&nbsp;</h3>*/}
-                                                {/*    <h4>{pageLanguage === 'fa' ? fabricDesignFa + " / " + fabricColorFa : fabricDesign + " / " + fabricColor}</h4>*/}
-                                                {/*</div>*/}
+                                                <div className="basket_item_title_name">{pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</div>
+                                                {SewingModelId==="0326"&&
+                                                    <div className="basket_item_title_desc">
+                                                        <h3>{pageLanguage === 'fa' ? "پارچه/رنگ" : "Fabric/Color"}&nbsp;</h3>
+                                                        <h4>
+                                                            <div className={`dk_curtain_preview_container`}>
+                                                                <Accordion>
+                                                                    <Accordion.Item eventKey="0">
+                                                                        <ContextAwareToggleViewDetails eventKey="0" textOnHide={t("View Details")} textOnShow={t("Hide Details")} />
+                                                                        <Accordion.Body className="basket_item_title_dropdown dk_curtain_preview_dropdown">
+                                                                            <div className="dk_curtain_preview_detail_container">
+                                                                                {obj["CurtainArr"].map((item,i) =>
+                                                                                    <div key={i}
+                                                                                         className="dk_curtain_preview_detail"><h2>{pageLanguage === 'en' ?("VANE "+(+i + +1)+":"):(" شال"+NumberToPersianWord.convertEnToPe(`${+ i + +1}`)+":")}</h2><h3>&nbsp;{(pageLanguage === 'en' ? CapitalizeAllWords(item["DesignEnName"]) : item["DesignName"]).toString() + " / " + (pageLanguage === 'en' ? CapitalizeAllWords(item["ColorEnName"]) : item["ColorName"]).toString()}</h3>
+                                                                                    </div>)}
+                                                                            </div>
+                                                                        </Accordion.Body>
+                                                                    </Accordion.Item>
+                                                                </Accordion>
+                                                            </div>
+                                                        </h4>
+                                                    </div>
+                                                }
                                                 {desc}
                                                 <div className="basket_item_title_desc">
                                                     <h3>{pageLanguage === 'fa' ? "نام اتاق" : "Room Label"}&nbsp;</h3>
@@ -994,9 +1097,35 @@ function Basket() {
                                                 </div>
                                                 <div className="basket_item_desc_button">
                                                     <Link className="btn basket_desc_button"
-                                                          to={"/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[obj["SewingModelId"]]["route"] + "/Bag-Projects/" + index}>{t("EDIT")}</Link>
+                                                          to={"/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[obj["SewingModelId"]]["route"]+(obj["SpecialId"]?obj["SpecialId"]:"") + "/Bag-Projects/" + index}>{t("EDIT")}</Link>
                                                     <button className="basket_desc_button" onClick={() => copyItem(index)}>{t("COPY")}</button>
                                                 </div>
+                                                {zipcode &&
+                                                    <div className="basket_zipcode_container">
+                                                        <div className="basket_zipcode_left">
+                                                            <h1 className="basket_zipcode_title">{t("basket_zipcode_text1")}</h1>
+                                                            <button className="basket_zipcode_btn text_underline">{t("Remove")}</button>
+                                                        </div>
+                                                        <div className="basket_zipcode_right">
+                                                            <h2 className="basket_zipcode_price">{GetPrice(obj["InstallAmount"], pageLanguage, t("TOMANS"))}</h2>
+                                                        </div>
+                                                        <div className="basket_zipcode_bottom">
+                                                            {/*<div className="basket_zipcode_img_container">*/}
+                                                            {/*    <img src={require('../Images/public/no_image.svg').default} className="img-fluid" alt=""/>*/}
+                                                            {/*</div>*/}
+                                                            <div className="basket_zipcode_desc_container">
+                                                                <h2 className="basket_zipcode_desc_text">{t("basket_zipcode_text2")}
+                                                                    <button className="basket_zipcode_desc_btn text_underline">{t("How It Works")}</button>
+                                                                </h2>
+                                                                {/*<div className="basket_zipcode_desc_btn_container">*/}
+                                                                {/*    <button className="basket_zipcode_desc_btn text_underline">{t("How It Works")}</button>*/}
+                                                                {/*    <span/>*/}
+                                                                {/*    <button className="basket_zipcode_desc_btn text_underline">{t("Terms Apply")}</button>*/}
+                                                                {/*</div>*/}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
                                                 <div className="basket_item_delivery_section">
                                                     <div className="basket_item_delivery_avail">
                                                         <h1 className="basket_item_delivery_title">{t("AVAILABILITY")}</h1>
@@ -1055,6 +1184,7 @@ function Basket() {
                 });
             }
             else{
+                setDraperyList([]);
                 setTotalPrice(0);
             }
         }

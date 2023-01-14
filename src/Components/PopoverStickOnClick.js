@@ -2,10 +2,12 @@ import PropTypes from 'prop-types';
 import { Overlay, Popover } from 'react-bootstrap';
 import React, {useEffect, useRef, useState} from "react";
 
-function PopoverStickOnClick({ delay, onMouseEnter, children, component, placement, classNames }) {
+function PopoverStickOnClick({ delay, onMouseEnter, children, children2, component, placement, classNames }) {
     const [showPopover, setShowPopover] = useState(false);
     const [showPopover2, setShowPopover2] = useState(0);
     const childNode = useRef(null);
+    const childNode2 = useRef(null);
+    const buttonRef = useRef(null);
     const node = useRef(null);
     let setTimeoutConst = null;
     
@@ -35,7 +37,7 @@ function PopoverStickOnClick({ delay, onMouseEnter, children, component, placeme
     };
 	
 	const handleClickOutside = (event) => {
-        if (node.current && !node.current.contains(event.target) && childNode.current && !childNode.current.contains(event.target)) {
+        if (node.current && !node.current.contains(event.target) && buttonRef.current && !buttonRef.current.contains(event.target)) {
             handleMouseLeave();
         }
     };
@@ -60,6 +62,19 @@ function PopoverStickOnClick({ delay, onMouseEnter, children, component, placeme
         })
     )[0];
     
+    const displayChild2 = children2!==undefined? React.Children.map(children2, child =>
+        React.cloneElement(child, {
+            onClick: handleMouseEnter,
+            ref: node => {
+                childNode2.current = node;
+                const { ref } = child;
+                if (typeof ref === 'function') {
+                    ref(node);
+                }
+            }
+        })
+    )[0]:null;
+    
     const displayComponent =
         React.cloneElement(component, {
             ref: node
@@ -67,11 +82,20 @@ function PopoverStickOnClick({ delay, onMouseEnter, children, component, placeme
     
     return (
         <>
-            {displayChild}
+            <button
+                className="basket_item_title_dropdown_btn"
+                aria-expanded={`${showPopover}`}
+                type="button"
+                ref={buttonRef}
+                onClick={handleMouseEnter}
+            >
+            {(children2===undefined||!showPopover) && displayChild}
+            {(children2!==undefined && showPopover) && displayChild2}
+            </button>
             <Overlay
                 show={showPopover}
                 placement={placement}
-                target={childNode}
+                target={buttonRef}
                 shouldUpdatePosition
             >
                 <Popover

@@ -5,8 +5,10 @@ import authHeader from "../Services/auth-header";
 
 
 const baseURLFilterColor = "https://api.atlaspood.ir/Color/GetBaseColors";
-const baseURLFilterPattern = "https://api.atlaspood.ir/Sewing/GetModelPatternType";
-const baseURLFilterType = "https://api.atlaspood.ir/Sewing/GetModelDesignType";
+// const baseURLFilterPattern = "https://api.atlaspood.ir/Sewing/GetModelPatternType";
+const baseURLFilterPattern = "https://api.atlaspood.ir/BaseType/GetDesignPattern";
+// const baseURLFilterType = "https://api.atlaspood.ir/Sewing/GetModelDesignType";
+const baseURLFilterType = "https://api.atlaspood.ir/BaseType/GetDesignType";
 const baseURLFilterPrice = "https://api.atlaspood.ir/BaseType/GetPriceLevel";
 
 
@@ -42,11 +44,7 @@ async function GetSewingFilters(id, modelId) {
         });
     } else if (id === 2) {
         return await new Promise((resolve, reject) => {
-            axios.get(baseURLFilterPattern, {
-                params: {
-                    modelId: modelId
-                }
-            }).then((response) => {
+            axios.get(baseURLFilterPattern).then((response) => {
                 let tempObj = {
                     "en": [],
                     "fa": []
@@ -54,8 +52,8 @@ async function GetSewingFilters(id, modelId) {
                 
                 let promise2 = new Promise((resolve, reject) => {
                     response.data.forEach((object1, index) => {
-                        tempObj["en"][index] = {value: object1["TypeId"], label: object1["TypeEnName"]};
-                        tempObj["fa"][index] = {value: object1["TypeId"], label: object1["TypeName"]};
+                        tempObj["en"][index] = {value: object1["BaseTypeDetailId"], label: object1["ENName"]};
+                        tempObj["fa"][index] = {value: object1["BaseTypeDetailId"], label: object1["FAName"]};
                         
                         if (index === response.data.length - 1) {
                             resolve();
@@ -74,11 +72,7 @@ async function GetSewingFilters(id, modelId) {
         });
     } else if (id === 3) {
         return await new Promise((resolve, reject) => {
-            axios.get(baseURLFilterType, {
-                params: {
-                    modelId: modelId
-                }
-            }).then((response) => {
+            axios.get(baseURLFilterType).then((response) => {
                 let tempObj = {
                     "en": [],
                     "fa": []
@@ -86,8 +80,8 @@ async function GetSewingFilters(id, modelId) {
                 
                 let promise2 = new Promise((resolve, reject) => {
                     response.data.forEach((object1, index) => {
-                        tempObj["en"][index] = {value: object1["TypeId"], label: object1["TypeEnName"]};
-                        tempObj["fa"][index] = {value: object1["TypeId"], label: object1["TypeName"]};
+                        tempObj["en"][index] = {value: object1["BaseTypeDetailId"], label: object1["ENName"]};
+                        tempObj["fa"][index] = {value: object1["BaseTypeDetailId"], label: object1["FAName"]};
                         
                         if (index === response.data.length - 1) {
                             resolve();

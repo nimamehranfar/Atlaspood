@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useContext, useEffect, useRef, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {Link, useLocation, useNavigate} from "react-router-dom";
 import Breadcrumb from "react-bootstrap/Breadcrumb";
@@ -21,6 +21,8 @@ import CustomDropdownWithSearch from "../Components/CustomDropdownWithSearch";
 import CustomControl from "../Components/CustomControl";
 import CustomControlFiles from "../Components/CustomControlFiles";
 import convertToPersian from "../Components/ConvertToPersian";
+import {Accordion, AccordionContext, useAccordionButton} from "react-bootstrap";
+import {CapitalizeAllWords} from "../Components/TextTransform";
 
 const baseURLGetProjects = "https://api.atlaspood.ir/SewingPreorder/GetAll";
 const baseURLEditProject = "https://api.atlaspood.ir/SewingPreorder/Edit";
@@ -61,6 +63,28 @@ function Projects() {
     
     const projectRef = useRef([]);
     const projectsButtonRef = useRef([]);
+    
+    function ContextAwareToggleViewDetails({ eventKey, callback, textOnHide, textOnShow}) {
+        const { activeEventKey } = useContext(AccordionContext);
+        
+        const decoratedOnClick = useAccordionButton(
+            eventKey,
+            () => callback && callback(eventKey),
+        );
+        
+        const isCurrentEventKey = activeEventKey === eventKey;
+        
+        return (
+            <button
+                className="basket_item_title_dropdown_btn"
+                aria-expanded={`${isCurrentEventKey}`}
+                type="button"
+                onClick={decoratedOnClick}
+            >
+                <h4 className="dk_curtain_preview_item_details">{isCurrentEventKey ? textOnShow:textOnHide}</h4>
+            </button>
+        );
+    }
     
     function getUserProjects() {
         axios.get(baseURLGetProjects, {
@@ -114,7 +138,7 @@ function Projects() {
                             if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
                                 let objLabel = "";
                                 if ((tempObj["apiLabel"] === "WidthCart" || tempObj["apiLabel"] === "HeightCart") && userProjects[i]["PreorderText"][tempObj["apiLabel"]] === undefined) {
-                                    if (userProjects[i]["PreorderText"]["Width1"] || userProjects[i]["PreorderText"]["Width2"] || userProjects[i]["PreorderText"]["Width3"] || userProjects[i]["PreorderText"]["Height1"] || userProjects[i]["PreorderText"]["Height2"] || userProjects[i]["PreorderText"]["Height3"] || userProjects[i]["PreorderText"]["LeftWidthExt"] || userProjects[i]["PreorderText"]["RightWidthExt"] || userProjects[i]["PreorderText"]["HeightOfRodMount"]) {
+                                    if (userProjects[i]["PreorderText"]["Width1"] || userProjects[i]["PreorderText"]["Width2"] || userProjects[i]["PreorderText"]["Width3"] || userProjects[i]["PreorderText"]["Height1"] || userProjects[i]["PreorderText"]["Height2"] || userProjects[i]["PreorderText"]["Height3"] || userProjects[i]["PreorderText"]["LeftWidthExt"] || userProjects[i]["PreorderText"]["RightWidthExt"] || userProjects[i]["PreorderText"]["HeightOfRodMount"] || userProjects[i]["PreorderText"]["HeightOfCeilingToFloor"]) {
                                         if (tempObj["apiLabel"] === "WidthCart") {
                                             tempArr[tempObj["order"]] =
                                                 <div className="basket_item_title_desc" key={index}>
@@ -170,16 +194,54 @@ function Projects() {
                                     <img src={"https://api.atlaspood.ir/" + userProjects[i]["PreorderText"]["PhotoUrl"]} alt="" className="basket_item_img"/>
                                  </div>
                                 <div className="basket_item_title_container">
-                                <div
-                                    className="basket_item_title_name">{pageLanguage === "fa" ? userProjects[i]["PreorderText"]["ModelNameFa"] + " سفارشی " : "Custom " + userProjects[i]["PreorderText"]["ModelNameEn"]}:
-                                    <h5>&nbsp;{pageLanguage === 'fa' ? userProjects[i]["PreorderText"]["RoomNameFa"] + (!userProjects[i]["PreorderText"]["WindowName"] ? "" : " / " + userProjects[i]["PreorderText"]["WindowName"]) : userProjects[i]["PreorderText"]["RoomNameEn"] + (!userProjects[i]["PreorderText"]["WindowName"] ? "" : " / " + userProjects[i]["PreorderText"]["WindowName"])}</h5>
-                                </div>
+                                    <div className="basket_item_title_name">{pageLanguage === "fa" ? userProjects[i]["PreorderText"]["ModelNameFa"] + " سفارشی " : "Custom " + userProjects[i]["PreorderText"]["ModelNameEn"]}:
+                                        <h5>&nbsp;{pageLanguage === 'fa' ? userProjects[i]["PreorderText"]["RoomNameFa"] + (!userProjects[i]["PreorderText"]["WindowName"] ? "" : " / " + userProjects[i]["PreorderText"]["WindowName"]) : userProjects[i]["PreorderText"]["RoomNameEn"] + (!userProjects[i]["PreorderText"]["WindowName"] ? "" : " / " + userProjects[i]["PreorderText"]["WindowName"])}</h5>
+                                    </div>
+                                    {userProjects[i]["PreorderText"]["SewingModelId"] === "0326" && userProjects[i]["PreorderText"]["CurtainArr"] &&
+                                        <div className="basket_item_title_desc">
+                                            <h3>{pageLanguage === 'fa' ? "پارچه/رنگ" : "Fabric/Color"}&nbsp;</h3>
+                                            <h4>
+                                                <div className={`dk_curtain_preview_container`}>
+                                                    <Accordion>
+                                                        <Accordion.Item eventKey="0">
+                                                            <ContextAwareToggleViewDetails eventKey="0" textOnHide={t("View Details")} textOnShow={t("Hide Details")} />
+                                                            <Accordion.Body className="basket_item_title_dropdown dk_curtain_preview_dropdown">
+                                                                <div className="dk_curtain_preview_detail_container">
+                                                                    {userProjects[i]["PreorderText"]["CurtainArr"].map((item,i) =>
+                                                                        <div key={i}
+                                                                             className="dk_curtain_preview_detail"><h2>{pageLanguage === 'en' ?("VANE "+(+i + +1)+":"):(" شال"+NumberToPersianWord.convertEnToPe(`${+ i + +1}`)+":")}</h2><h3>&nbsp;{(pageLanguage === 'en' ? CapitalizeAllWords(item["DesignEnName"]) : item["DesignName"]).toString() + " / " + (pageLanguage === 'en' ? CapitalizeAllWords(item["ColorEnName"]) : item["ColorName"]).toString()}</h3>
+                                                                        </div>)}
+                                                                </div>
+                                                            </Accordion.Body>
+                                                        </Accordion.Item>
+                                                    </Accordion>
+                                                </div>
+                                            </h4>
+                                        </div>
+                                    }
                                     {tempArr}
-    
                                     <div className="basket_item_title_desc">
                                         <h3>{pageLanguage === 'fa' ? "نام اتاق" : "Room Label"}&nbsp;</h3>
                                         <h4>{pageLanguage === 'fa' ? userProjects[i]["PreorderText"]["RoomNameFa"] + (!userProjects[i]["PreorderText"]["WindowName"] ? "" : " / " + userProjects[i]["PreorderText"]["WindowName"]) : userProjects[i]["PreorderText"]["RoomNameEn"] + (!userProjects[i]["PreorderText"]["WindowName"] ? "" : " / " + userProjects[i]["PreorderText"]["WindowName"])}</h4>
                                     </div>
+                                    {userProjects[i]["PreorderText"]["ZipCode"] &&
+                                        <div className="basket_zipcode_container">
+                                            <div className="basket_zipcode_left">
+                                                <h1 className="basket_zipcode_title">{t("basket_zipcode_text1")}</h1>
+                                                <button className="basket_zipcode_btn text_underline">{t("Remove")}</button>
+                                            </div>
+                                            <div className="basket_zipcode_right">
+                                                <h2 className="basket_zipcode_price">{GetPrice(userProjects[i]["Price"], pageLanguage, t("TOMANS"))}</h2>
+                                            </div>
+                                            <div className="basket_zipcode_bottom">
+                                                <div className="basket_zipcode_desc_container">
+                                                    <h2 className="basket_zipcode_desc_text">{t("basket_zipcode_text2")}
+                                                        <button className="basket_zipcode_desc_btn text_underline">{t("How It Works")}</button>
+                                                    </h2>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
                                 </div>
                             </span>
                                 <span
@@ -243,7 +305,7 @@ function Projects() {
                                 {!userProjects[i]["IsCompleted"] &&
                                 <span className="basket_item_btn">
                                         <Link className="projects_add_to_cart_btn btn projects_add_to_cart_btn_long"
-                                              to={"/" + pageLanguage + projectDataObj["route"] + "/Saved-Projects/" + userProjects[i]["SewingPreorderId"]}>{t("FINISH CONFIGURING")}</Link>
+                                              to={"/" + pageLanguage + projectDataObj["route"]+(userProjects[i]["PreorderText"]["SpecialId"]?"/"+userProjects[i]["PreorderText"]["SpecialId"]:"") + "/Saved-Projects/" + userProjects[i]["SewingPreorderId"]}>{t("FINISH CONFIGURING")}</Link>
                                 </span>
                                 }
                                 {userProjects[i]["IsCompleted"] &&
@@ -254,7 +316,7 @@ function Projects() {
                                             addProjectToBag(userProjects[i], i)
                                         }}>{t("ADD TO BAG")}</button>
                                         <Link className="projects_edit_btn btn"
-                                              to={"/" + pageLanguage + projectDataObj["route"] + "/Saved-Projects/" + userProjects[i]["SewingPreorderId"]}>{t("EDIT")}</Link>
+                                              to={"/" + pageLanguage + projectDataObj["route"]+(userProjects[i]["PreorderText"]["SpecialId"]?"/"+userProjects[i]["PreorderText"]["SpecialId"]:"") + "/Saved-Projects/" + userProjects[i]["SewingPreorderId"]}>{t("EDIT")}</Link>
                                 </span>
                                 }
                                 <span className="basket_item_hidden2"/>
@@ -918,6 +980,9 @@ function Projects() {
                     <button className="custom_cart_close" onClick={() => {
                         modalHandleClose("cart_modal");
                         setCartStateAgree(false);
+                        if(cartStateAgree){
+                            navigate("/" + pageLanguage);
+                        }
                     }}>{t("CONTINUE SHOPPING")}
                     </button>
                 </Modal.Header>

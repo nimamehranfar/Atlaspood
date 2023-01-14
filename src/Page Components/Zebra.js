@@ -42,16 +42,20 @@ import AddProjectToCart from "../Components/AddProjectToCart";
 import GetMeasurementArray from "../Components/GetMeasurementArray";
 import GetSewingFilters from "../Components/GetSewingFilters";
 import TruncateMarkup from "react-truncate-markup";
+import {Capitalize, CapitalizeAllWords, Uppercase} from "../Components/TextTransform";
 
 
 const baseURLCats = "https://api.atlaspood.ir/WebsitePage/GetDetailByName";
+const baseURLPageItem = "https://api.atlaspood.ir/WebsitePageItem/GetById";
 const baseURLModel = "https://api.atlaspood.ir/SewingModel/GetById";
 const baseURLFabrics = "https://api.atlaspood.ir/Sewing/GetModelFabric";
 const baseURLWindowSize = "https://api.atlaspood.ir/Sewing/GetWindowSize";
 const baseURLPrice = "https://api.atlaspood.ir/Sewing/GetSewingOrderPrice";
+const baseURLZipCode = "https://api.atlaspood.ir/Sewing/HasInstall";
 const baseURLFreeShipping = "https://api.atlaspood.ir/WebsiteSetting/GetFreeShippingAmount";
 const baseURGetProject = "https://api.atlaspood.ir/SewingPreorder/GetById";
 const baseURLGetCart = "https://api.atlaspood.ir/cart/GetAll";
+const baseURLGetRemoteNames = "https://api.atlaspood.ir/cart/GetRemoteNames";
 const baseURLUploadImg = "https://api.atlaspood.ir/SewingOrderAttachment/ImageUpload";
 const baseURLUploadPdf = "https://api.atlaspood.ir/SewingOrderAttachment/PdfUpload";
 const baseURLDeleteFile = "https://api.atlaspood.ir/SewingOrderAttachment/Delete";
@@ -63,15 +67,19 @@ const baseURLFilterType = "https://api.atlaspood.ir/Sewing/GetModelDesignType";
 const baseURLFilterPrice = "https://api.atlaspood.ir/BaseType/GetPriceLevel";
 
 
-function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
+function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryString, Parameters}) {
     const {t} = useTranslation();
     const location = useLocation();
     const [pageLanguage, setPageLanguage] = React.useState(location.pathname.split('').slice(1, 3).join(''));
     const [firstRender, setFirstRender] = useState(true);
     const [catID, setCatID] = useState(CatID);
     const [modelID, setModelID] = useState(ModelID);
+    const [specialId, setSpecialId] = useState(SpecialId);
     const [projectId, setProjectId] = useState(ProjectId);
     const [editIndex, setEditIndex] = useState(EditIndex);
+    const [pageItem, setPageItem] = useState(PageItem);
+    const [queryString, setQueryString] = useState(QueryString);
+    const [parameters, setParameters] = useState(Parameters);
     const {isLoggedIn, isRegistered, user, showLogin} = useSelector((state) => state.auth);
     let navigate = useNavigate();
     const dispatch = useDispatch();
@@ -86,6 +94,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     const [defaultModelNameFa, setDefaultModelNameFa] = useState("");
     const [price, setPrice] = useState(0);
     const [bagPrice, setBagPrice] = useState(0);
+    const [fabricQty, setFabricQty] = useState(0);
     const [totalCartPrice, setTotalCartPrice] = useState(0);
     const [freeShipPrice, setFreeShipPrice] = useState(0);
     const [show, setShow] = useState(false);
@@ -105,7 +114,9 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     const [cartAgree, setCartAgree] = useState([]);
     // const [pageLanguage, setPageLanguage] = useState("");
     const [cartChanged, setCartChanged] = useState(0);
-    const [bag, setBag] = useState(0);
+    const [bag, setBag] = useState({});
+    const [remoteNames, setRemoteNames] = useState([]);
+    const [showRemoteName, setShowRemoteName] = useState(false);
     const [accordionActiveKey, setAccordionActiveKey] = useState("");
     const [roomLabelText, setRoomLabelText] = useState("");
     const [fabricSelected, setFabricSelected] = useState({
@@ -204,11 +215,11 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
         filter_id: undefined,
         isDelete: false
     });
-    
-    const [filterColors, setFilterColors] = useState([]);
-    const [filterPatterns, setFilterPatterns] = useState([]);
-    const [filterTypes, setFilterTypes] = useState([]);
-    const [filterPrices, setFilterPrices] = useState([]);
+    const [filterColors, setFilterColors] = useState([...queryString["colors"]]);
+    const [filterPatterns, setFilterPatterns] = useState([...queryString["patterns"]]);
+    const [filterTypes, setFilterTypes] = useState([...queryString["types"]]);
+    const [filterPrices, setFilterPrices] = useState([...queryString["prices"]]);
+    const [filterDesigns, setFilterDesigns] = useState([...queryString["designs"]]);
     
     const [step1, setStep1] = useState("");
     const [step2, setStep2] = useState("");
@@ -219,6 +230,12 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     const [step4A, setStep4A] = useState("");
     const [step4B, setStep4B] = useState("");
     const [step5, setStep5] = useState("");
+    const [zipcodeChecked, setZipcodeChecked] = useState("");
+    const [zipcode, setZipcode] = useState("");
+    const [zipcodeButton, setZipcodeButton] = useState(false);
+    const [hasInstall, setHasInstall] = useState(null);
+    const [installPrice, setInstallPrice] = useState(-1);
+    const [transportPrice, setTransportPrice] = useState(-1);
     const [remoteName, setRemoteName] = useState("");
     const [selectedValanceColor1, setSelectedValanceColor1] = useState([]);
     const [selectedValanceColor2, setSelectedValanceColor2] = useState([]);
@@ -254,6 +271,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     const [swatchLogin, setSwatchLogin] = useState(false);
     
     const [helpMeasure, setHelpMeasure] = useState("Inside");
+    const [customMotorAcc, setCustomMotorAcc] = useState({});
     
     function convertToPersian(string_farsi) {
         if (string_farsi !== null && string_farsi !== undefined && string_farsi !== "") {
@@ -279,7 +297,6 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                     tempFabrics[obj["DesignEnName"]] = [];
                 tempFabrics[obj["DesignEnName"]].push(obj);
             });
-            
             setFabrics(tempFabrics);
         }).catch(err => {
             console.log(err);
@@ -341,8 +358,21 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                 resolve();
             }
         });
+        let promise5 = new Promise((resolve, reject) => {
+            if (filterDesigns.length > 0) {
+                paramObj["designs"] = [];
+                filterDesigns.forEach((filter_id, index) => {
+                    paramObj["designs"] = [...paramObj["designs"], filter_id];
+                    if (index === filterDesigns.length - 1) {
+                        resolve();
+                    }
+                });
+            } else {
+                resolve();
+            }
+        });
         
-        Promise.all([promise1, promise2, promise3, promise4]).then(() => {
+        Promise.all([promise1, promise2, promise3, promise4, promise5]).then(() => {
             // console.log(filterColors,paramObj);
             axios.get(baseURLFabrics, {
                 params: paramObj,
@@ -350,14 +380,15 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                     return qs.stringify(params, {arrayFormat: 'repeat'})
                 }
             }).then((response) => {
-                let tempFabrics = [];
+                let tempFabrics = {};
                 response.data.forEach(obj => {
+                    obj["ShowMore"] = false;
                     if (tempFabrics[obj["DesignEnName"]] === "" || tempFabrics[obj["DesignEnName"]] === undefined || tempFabrics[obj["DesignEnName"]] === null || tempFabrics[obj["DesignEnName"]] === [])
                         tempFabrics[obj["DesignEnName"]] = [];
                     tempFabrics[obj["DesignEnName"]].push(obj);
                 });
-                
                 setFabrics(tempFabrics);
+                // console.log(tempFabrics);
             }).catch(err => {
                 console.log(err);
             });
@@ -394,6 +425,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
         let count = 0;
         let cartObj = {};
         let temp = [];
+        
         let pageLanguage1 = location.pathname.split('').slice(1, 3).join('');
         if (Object.keys(bag).length > 0) {
             if (isLoggedIn) {
@@ -454,7 +486,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                     }
                 }
                 // console.log(HasSwatchId);
-                // console.log(step1 === `${FabricId}`, step1, `${FabricId}`, FabricId);
+                // console.log(pageLanguage1,location.pathname);
                 
                 fabric.push(
                     <div className={`radio_group ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key + j}>
@@ -482,7 +514,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                    model-id={modelID} value={FabricId} text-en={DesignEnName} text-fa={DesignName} checked={`${FabricId}` === step1}
                                    ref={ref => (inputs.current[`1${FabricId}`] = ref)}/>
                             <div className="frame_img">
-                                <img className={`img-fluid ${`${FabricId}` === step1?"img-fluid_checked":""}`} src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
+                                <img className={`img-fluid ${`${FabricId}` === step1 ? "img-fluid_checked" : ""}`} src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
                             </div>
                         </label>
                         <div className={`fabric_name_container ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
@@ -496,8 +528,8 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                 current-state={HasSwatchId ? "1" : "0"}
                                 onClick={(e) => {
                                     fabricSwatch(e, SwatchId, swatchDetailId, PhotoPath);
-                                }} disabled={SwatchId === -1}>{HasSwatchId ? t("SWATCH IN CART") : t("ORDER" +
-                            " SWATCH")}</button>
+                                }} disabled={SwatchId === -1}>{HasSwatchId ? (pageLanguage1 === 'en' ? "SWATCH IN CART" : "نمونه در سبد") : (pageLanguage1 === 'en' ? "ORDER" +
+                            " SWATCH" : "سفارش نمونه")}</button>
                     </div>
                 );
                 
@@ -507,7 +539,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                 <div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key}>
                     <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
                         <hr/>
-                        <span>{t("DESIGN NAME")}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</span>
+                        <span>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</span>
                     </div>
                     {fabric}
                 </div>
@@ -602,7 +634,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
         setModals(tempModals);
     }
     
-    function ContextAwareToggle({stepNum, stepTitle, stepSelected, eventKey, callback, stepRef, type, required, cartCustomText}) {
+    function ContextAwareToggle({stepNum, stepTitle, stepTitle2, stepSelected, eventKey, callback, stepRef, type, required, cartCustomText}) {
         const {activeEventKey} = useContext(AccordionContext);
         
         const decoratedOnClick = useAccordionButton(
@@ -638,8 +670,8 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                     <div className="steps_header_num">{stepNum}</div>
                 </div>
                 <div className="steps_header_title_container">
-                    <div className="steps_header_title" type-of-step={type} cart-custom-text={cartCustomText === undefined ? stepTitle : cartCustomText}
-                         ref={ref => (steps.current[stepRef] = ref)}>{stepTitle}</div>
+                    <div className={"steps_header_title "+stepTitle2?"steps_header_title_max_content":""} type-of-step={type} cart-custom-text={cartCustomText === undefined ? stepTitle : cartCustomText}
+                         ref={ref => (steps.current[stepRef] = ref)}>{stepTitle}<h5>{stepTitle2}</h5></div>
                 </div>
                 {/*<div className="steps_header_selected_container">*/}
                 {/*    <PopoverStickOnHover classNames="step_label_popover"*/}
@@ -654,7 +686,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                 {/*</div>*/}
                 <div className="steps_header_selected_container">
                     {/*<div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? stepSelected : null}</div>*/}
-    
+                    
                     {showLabels &&
                         <TruncateMarkup lines={1} tokenize="words">
                             <div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{stepSelected}</div>
@@ -662,9 +694,31 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                     }
                 </div>
                 {required && stepSelected === "" &&
-                <div className="stepRequired"/>
+                    <div className="stepRequired"/>
                 }
             </div>
+        );
+    }
+    
+    function ContextAwareToggleViewDetails({eventKey, callback, textOnHide, textOnShow, customClass, customClass2}) {
+        const {activeEventKey} = useContext(AccordionContext);
+        
+        const decoratedOnClick = useAccordionButton(
+            eventKey,
+            () => callback && callback(eventKey),
+        );
+        
+        const isCurrentEventKey = activeEventKey === eventKey;
+        
+        return (
+            <button
+                className={(customClass ? customClass : "basket_item_title_dropdown_btn") + " accordion_toggle_button"}
+                aria-expanded={`${isCurrentEventKey}`}
+                type="button"
+                onClick={decoratedOnClick}
+            >
+                <h4 className={customClass2 ? customClass2 : "dk_curtain_preview_item_details"}>{isCurrentEventKey ? textOnShow : textOnHide}</h4>
+            </button>
         );
     }
     
@@ -837,12 +891,12 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     function selectChanged(e, nums) {
         let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
         let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-        if(e) {
+        if (e) {
             // console.log(e.target.value);
             let refIndex = e.target.getAttribute('ref-num');
             // selectedTitle.current[refIndex].innerHTML = e.target.getAttribute('text');
             tempLabels[refIndex] = e.target.getAttribute('text');
-    
+            
             tempValue[refIndex] = e.target.value;
         }
         if (nums !== undefined) {
@@ -1028,7 +1082,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
         });
     }
     
-    function setCart(refIndex, cartValue, delRefs, secondRedIndex, secondCartValue) {
+    function setCart(refIndex, cartValue, delRefs, secondRefIndex, secondCartValue, customAcc) {
         let temp = JSON.parse(JSON.stringify(cartValues));
         temp[refIndex] = cartValue;
         if (delRefs !== undefined) {
@@ -1040,8 +1094,8 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                 }
             });
         }
-        if (secondRedIndex !== undefined) {
-            let tempArr1 = secondRedIndex.split(',');
+        if (secondRefIndex !== undefined) {
+            let tempArr1 = secondRefIndex.split(',');
             tempArr1.forEach((ref, index) => {
                 if (ref !== undefined) {
                     temp[ref] = secondCartValue[index]
@@ -1115,6 +1169,11 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                 }
             }
         });
+        if (customAcc) {
+            tempPostObj["SewingOrderDetails"][0]["Accessories"].push(customAcc);
+        } else if (Object.keys(customMotorAcc).length > 0) {
+            tempPostObj["SewingOrderDetails"][0]["Accessories"].push(customMotorAcc);
+        }
         tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
             return el != null;
         });
@@ -1129,8 +1188,9 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                 axios.post(baseURLPrice, tempPostObj)
                     .then((response) => {
                         setPrice(response.data["price"]);
+                        setFabricQty(response.data["FabricQty"]);
+                        // setInstallPrice(response.data["InstallAmount"] ? response.data["InstallAmount"] : 0);
                         
-                        // console.log("1");
                         
                         // setCart("HeightCart", totalHeight, "", "WidthCart", [totalWidth]);
                         if (stepSelectedValue["2"] === "1" && stepSelectedValue["3"] === "2") {
@@ -1161,6 +1221,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                         delete temp["HeightCart"];
                     if (temp["WidthCart"] !== undefined)
                         delete temp["WidthCart"];
+                    setFabricQty(0);
                     resolve();
                     // console.log(err);
                 });
@@ -1173,8 +1234,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
         });
     }
     
-    function measureWindowSize() {
-        
+    function measureWindowSize(zipcode) {
         let promise2 = new Promise((resolve, reject) => {
             let temp = JSON.parse(JSON.stringify(cartValues));
             let tempPostObj = {};
@@ -1233,6 +1293,9 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                     }
                 }
             });
+            if (Object.keys(customMotorAcc).length > 0) {
+                tempPostObj["SewingOrderDetails"][0]["Accessories"].push(customMotorAcc);
+            }
             tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
                 return el != null;
             });
@@ -1243,31 +1306,52 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                 }
                 // if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined && stepSelectedValue["2"] !== undefined && stepSelectedValue["3"] !== undefined) {
                 // console.log(JSON.stringify(tempPostObj));
+                if (zipcode && zipcode !== "") {
+                    tempPostObj["Zipcode"] = zipcode;
+                }
+                
                 axios.post(baseURLPrice, tempPostObj)
                     .then((response) => {
-                        setPrice(response.data["price"]);
-                        
-                        // setCart("HeightCart", totalHeight, "", "WidthCart", [totalWidth]);
-                        getWindowSize(response.data["Width"], response.data["Height"]);
-                        temp["WidthCart"] = response.data["Width"];
-                        temp["HeightCart"] = response.data["Height"];
+                        if (zipcode && zipcode !== "") {
+                            setInstallPrice(response.data["InstallAmount"] ? response.data["InstallAmount"] : 0);
+                            setTransportPrice(response.data["TransportationAmount"] ? response.data["TransportationAmount"] : 0);
+                            setHasInstall(true);
+                        } else {
+                            setPrice(response.data["price"]);
+                            setFabricQty(response.data["FabricQty"]);
+                            
+                            // setCart("HeightCart", totalHeight, "", "WidthCart", [totalWidth]);
+                            getWindowSize(response.data["Width"], response.data["Height"]);
+                            temp["WidthCart"] = response.data["Width"];
+                            temp["HeightCart"] = response.data["Height"];
+                            setCartValues(temp);
+                            setTimeout(() => {
+                                resolve();
+                            }, 1000);
+                        }
+                    }).catch(err => {
+                    if (zipcode && zipcode !== "") {
+                        setInstallPrice(-1);
+                        setTransportPrice(-1);
+                        HasInstall(zipcode);
+                        setTimeout(() => {
+                            reject();
+                        }, 1000);
+                    } else {
+                        setPrice(0);
+                        if (temp["HeightCart"] !== undefined)
+                            delete temp["HeightCart"];
+                        if (temp["WidthCart"] !== undefined)
+                            delete temp["WidthCart"];
+                        // console.log(err);
                         setCartValues(temp);
                         setTimeout(() => {
-                            resolve();
+                            reject();
                         }, 1000);
-                    }).catch(err => {
-                    setPrice(0);
-                    if (temp["HeightCart"] !== undefined)
-                        delete temp["HeightCart"];
-                    if (temp["WidthCart"] !== undefined)
-                        delete temp["WidthCart"];
-                    // console.log(err);
-                    setCartValues(temp);
-                    setTimeout(() => {
-                        reject();
-                    }, 1000);
+                    }
                 });
             } else {
+                HasInstall(zipcode);
                 reject();
             }
             
@@ -1276,6 +1360,18 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
             return true;
         }).catch(() => {
             return false;
+        });
+    }
+    
+    function HasInstall(zipcode) {
+        axios.post(baseURLZipCode, {}, {
+            params: {
+                zipCode: zipcode
+            }
+        }).then((response) => {
+            setHasInstall(response.data);
+        }).catch(err => {
+            setHasInstall(false);
         });
     }
     
@@ -1504,6 +1600,9 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                     }
                 }
             });
+            if (Object.keys(customMotorAcc).length > 0) {
+                tempPostObj["SewingOrderDetails"][0]["Accessories"].push(customMotorAcc);
+            }
             tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
                 return el != null;
             });
@@ -1515,6 +1614,11 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                         setBagPrice(response.data["price"]);
                         tempBagPrice = response.data["price"];
                         temp["price"] = response.data["price"];
+                        if (zipcodeChecked && response.data["InstallAmount"]) {
+                            temp["InstallAmount"] = response.data["InstallAmount"];
+                            temp["TransportationAmount"] = response.data["TransportationAmount"];
+                        }
+                        // setInstallPrice(response.data["InstallAmount"] ? response.data["InstallAmount"] : 0);
                         // console.log(response.data);
                         
                         let roomNameFa = cartValues["RoomNameFa"];
@@ -1693,42 +1797,100 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                     if (draperies.length) {
                         for (let i = 0; i < draperies.length; i++) {
                             let obj = draperies[i]["SewingPreorder"]["PreorderText"];
+                            let sodFabrics = obj["SodFabrics"] ? obj["SodFabrics"] : [];
                             let roomName = (obj["WindowName"] === undefined || obj["WindowName"] === "") ? "" : " / " + obj["WindowName"];
-                            temp1[i] =
-                                <li className="custom_cart_item" key={"drapery" + i} ref={ref => (draperyRef.current[draperies[i]["CartDetailId"]] = ref)}>
-                                    <div className="custom_cart_item_image_container">
-                                        <img src={`https://api.atlaspood.ir/${obj["PhotoUrl"]}`} alt="" className="custom_cart_item_img img-fluid"/>
-                                    </div>
-                                    <div className="custom_cart_item_desc">
-                                        <div className="custom_cart_item_desc_container">
-                                            <h1 className="custom_cart_item_desc_name">{pageLanguage === 'fa' ? obj["ModelNameFa"] + " سفارشی " : "Custom " + obj["ModelNameEn"]}</h1>
-                                            <button type="button" className="btn-close" aria-label="Close"
-                                                    onClick={() => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], 0, 0)}/>
+                            if (obj["SewingModelId"] === "0326") {
+                                temp1[i] =
+                                    <li className="custom_cart_item" key={"drapery" + i} ref={ref => (draperyRef.current[draperies[i]["CartDetailId"]] = ref)}>
+                                        <div className="custom_cart_item_image_container">
+                                            <img src={`https://api.atlaspood.ir/${obj["PhotoUrl"]}`} alt="" className="custom_cart_item_img img-fluid"/>
                                         </div>
-                                        <div className="custom_cart_item_desc_container">
-                                            <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["FabricDesignFa"] + " / " + obj["FabricColorFa"] : obj["FabricDesignEn"] + " / " + obj["FabricColorEn"]}</h2>
-                                        </div>
-                                        <div className="custom_cart_item_desc_container">
-                                            <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["RoomNameFa"] + roomName : obj["RoomNameEn"] + roomName}</h2>
-                                        </div>
-                                        <div className="custom_cart_item_desc_container">
-                                            <div className="custom_cart_item_desc_qty">
-                                                <button type="text" className="basket_qty_minus"
-                                                        onClick={() => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], 0, 0, -1)}>–
-                                                </button>
-                                                <input type="text" className="basket_qty_num"
-                                                       value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${draperies[i]["SewingPreorder"]["Count"]}`) : draperies[i]["SewingPreorder"]["Count"]}
-                                                       onChange={(e) => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], NumberToPersianWord.convertPeToEn(`${e.target.value}`))}/>
-                                                <button type="text" className="basket_qty_plus"
-                                                        onClick={() => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], 0, 0, 1)}>+
-                                                </button>
+                                        <div className="custom_cart_item_desc">
+                                            <div className="custom_cart_item_desc_container">
+                                                <h1 className="custom_cart_item_desc_name">{pageLanguage === 'fa' ? obj["ModelNameFa"] + " سفارشی " : "Custom " + obj["ModelNameEn"]}</h1>
+                                                <button type="button" className="btn-close" aria-label="Close"
+                                                        onClick={() => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], 0, 0)}/>
                                             </div>
-                                            <p className="custom_cart_item_end_price">{GetPrice(obj["price"], pageLanguage, t("TOMANS"))}</p>
+                                            <div className="custom_cart_item_desc_container">
+                                                <h2 className="custom_cart_item_desc_detail">
+                                                    <div className={`dk_curtain_preview_container`}>
+                                                        <Accordion>
+                                                            <Accordion.Item eventKey="0">
+                                                                <ContextAwareToggleViewDetails eventKey="0" textOnHide={t("View Details")} textOnShow={t("Hide Details")}/>
+                                                                <Accordion.Body className="basket_item_title_dropdown dk_curtain_preview_dropdown">
+                                                                    <div className="dk_curtain_preview_detail_container">
+                                                                        {sodFabrics.map((item, i) =>
+                                                                            <div key={i}
+                                                                                 className="dk_curtain_preview_detail">
+                                                                                <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + "/" + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
+                                                                                <h5>&nbsp;X</h5><h3>{item["Qty"]}</h3>
+                                                                            </div>)}
+                                                                    </div>
+                                                                </Accordion.Body>
+                                                            </Accordion.Item>
+                                                        </Accordion>
+                                                    </div>
+                                                </h2>
+                                            </div>
+                                            <div className="custom_cart_item_desc_container">
+                                                <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["RoomNameFa"] + roomName : obj["RoomNameEn"] + roomName}</h2>
+                                            </div>
+                                            <div className="custom_cart_item_desc_container">
+                                                <div className="custom_cart_item_desc_qty">
+                                                    <button type="text" className="basket_qty_minus"
+                                                            onClick={() => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], 0, 0, -1)}>–
+                                                    </button>
+                                                    <input type="text" className="basket_qty_num"
+                                                           value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${draperies[i]["SewingPreorder"]["Count"]}`) : draperies[i]["SewingPreorder"]["Count"]}
+                                                           onChange={(e) => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], NumberToPersianWord.convertPeToEn(`${e.target.value}`))}/>
+                                                    <button type="text" className="basket_qty_plus"
+                                                            onClick={() => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], 0, 0, 1)}>+
+                                                    </button>
+                                                </div>
+                                                <p className="custom_cart_item_end_price">{GetPrice(obj["price"], pageLanguage, t("TOMANS"))}</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                </li>;
-                            if (i === draperies.length - 1) {
-                                resolve();
+                                    </li>;
+                                if (i === draperies.length - 1) {
+                                    resolve();
+                                }
+                            } else {
+                                temp1[i] =
+                                    <li className="custom_cart_item" key={"drapery" + i} ref={ref => (draperyRef.current[draperies[i]["CartDetailId"]] = ref)}>
+                                        <div className="custom_cart_item_image_container">
+                                            <img src={`https://api.atlaspood.ir/${obj["PhotoUrl"]}`} alt="" className="custom_cart_item_img img-fluid"/>
+                                        </div>
+                                        <div className="custom_cart_item_desc">
+                                            <div className="custom_cart_item_desc_container">
+                                                <h1 className="custom_cart_item_desc_name">{pageLanguage === 'fa' ? obj["ModelNameFa"] + " سفارشی " : "Custom " + obj["ModelNameEn"]}</h1>
+                                                <button type="button" className="btn-close" aria-label="Close"
+                                                        onClick={() => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], 0, 0)}/>
+                                            </div>
+                                            <div className="custom_cart_item_desc_container">
+                                                <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["FabricDesignFa"] + " / " + obj["FabricColorFa"] : obj["FabricDesignEn"] + " / " + obj["FabricColorEn"]}</h2>
+                                            </div>
+                                            <div className="custom_cart_item_desc_container">
+                                                <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["RoomNameFa"] + roomName : obj["RoomNameEn"] + roomName}</h2>
+                                            </div>
+                                            <div className="custom_cart_item_desc_container">
+                                                <div className="custom_cart_item_desc_qty">
+                                                    <button type="text" className="basket_qty_minus"
+                                                            onClick={() => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], 0, 0, -1)}>–
+                                                    </button>
+                                                    <input type="text" className="basket_qty_num"
+                                                           value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${draperies[i]["SewingPreorder"]["Count"]}`) : draperies[i]["SewingPreorder"]["Count"]}
+                                                           onChange={(e) => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], NumberToPersianWord.convertPeToEn(`${e.target.value}`))}/>
+                                                    <button type="text" className="basket_qty_plus"
+                                                            onClick={() => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], 0, 0, 1)}>+
+                                                    </button>
+                                                </div>
+                                                <p className="custom_cart_item_end_price">{GetPrice(obj["price"], pageLanguage, t("TOMANS"))}</p>
+                                            </div>
+                                        </div>
+                                    </li>;
+                                if (i === draperies.length - 1) {
+                                    resolve();
+                                }
                             }
                         }
                     } else {
@@ -1892,35 +2054,85 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                 obj["price"] = values[index].data["price"] / obj1["Count"];
                                 obj1["price"] = values[index].data["price"] / obj1["Count"];
                                 draperiesTotalPrice += values[index].data["price"];
+                                let sodFabrics = obj["SodFabrics"] ? obj["SodFabrics"] : [];
                                 let roomName = (obj["WindowName"] === undefined || obj["WindowName"] === "") ? "" : " / " + obj["WindowName"];
-                                temp1[index] =
-                                    <li className="custom_cart_item" key={"drapery" + index} ref={ref => (draperyRef.current[index] = ref)}>
-                                        <div className="custom_cart_item_image_container">
-                                            <img src={`https://api.atlaspood.ir/${obj["PhotoUrl"]}`} alt="" className="custom_cart_item_img img-fluid"/>
-                                        </div>
-                                        <div className="custom_cart_item_desc">
-                                            <div className="custom_cart_item_desc_container">
-                                                <h1 className="custom_cart_item_desc_name">{pageLanguage === 'fa' ? obj["ModelNameFa"] + " سفارشی " : "Custom " + obj["ModelNameEn"]}</h1>
-                                                <button type="button" className="btn-close" aria-label="Close" onClick={() => setBasketNumber(undefined, index, 0, 0)}/>
+                                if (obj["SewingModelId"] === "0326") {
+                                    temp1[index] =
+                                        <li className="custom_cart_item" key={"drapery" + index} ref={ref => (draperyRef.current[index] = ref)}>
+                                            <div className="custom_cart_item_image_container">
+                                                <img src={`https://api.atlaspood.ir/${obj["PhotoUrl"]}`} alt="" className="custom_cart_item_img img-fluid"/>
                                             </div>
-                                            <div className="custom_cart_item_desc_container">
-                                                <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["FabricDesignFa"] + " / " + obj["FabricColorFa"] : obj["FabricDesignEn"] + " / " + obj["FabricColorEn"]}</h2>
-                                            </div>
-                                            <div className="custom_cart_item_desc_container">
-                                                <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["RoomNameFa"] + roomName : obj["RoomNameEn"] + roomName}</h2>
-                                            </div>
-                                            <div className="custom_cart_item_desc_container">
-                                                <div className="custom_cart_item_desc_qty">
-                                                    <button type="text" className="basket_qty_minus" onClick={() => setBasketNumber(undefined, index, 0, 0, -1)}>–</button>
-                                                    <input type="text" className="basket_qty_num"
-                                                           value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${obj1["Count"]}`) : obj1["Count"]}
-                                                           onChange={(e) => setBasketNumber(undefined, index, NumberToPersianWord.convertPeToEn(`${e.target.value}`), 0)}/>
-                                                    <button type="text" className="basket_qty_plus" onClick={() => setBasketNumber(undefined, index, 0, 0, 1)}>+</button>
+                                            <div className="custom_cart_item_desc">
+                                                <div className="custom_cart_item_desc_container">
+                                                    <h1 className="custom_cart_item_desc_name">{pageLanguage === 'fa' ? obj["ModelNameFa"] + " سفارشی " : "Custom " + obj["ModelNameEn"]}</h1>
+                                                    <button type="button" className="btn-close" aria-label="Close" onClick={() => setBasketNumber(undefined, index, 0, 0)}/>
                                                 </div>
-                                                <p className="custom_cart_item_end_price">{GetPrice(obj1["price"] * obj1["Count"], pageLanguage, t("TOMANS"))}</p>
+                                                <div className="custom_cart_item_desc_container">
+                                                    <h2 className="custom_cart_item_desc_detail">
+                                                        <div className={`dk_curtain_preview_container`}>
+                                                            <Accordion>
+                                                                <Accordion.Item eventKey="0">
+                                                                    <ContextAwareToggleViewDetails eventKey="0" textOnHide={t("View Details")} textOnShow={t("Hide Details")}/>
+                                                                    <Accordion.Body className="basket_item_title_dropdown dk_curtain_preview_dropdown">
+                                                                        <div className="dk_curtain_preview_detail_container">
+                                                                            {sodFabrics.map((item, i) =>
+                                                                                <div key={i}
+                                                                                     className="dk_curtain_preview_detail">
+                                                                                    <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + "/" + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
+                                                                                    <h5>&nbsp;X</h5><h3>{item["Qty"]}</h3>
+                                                                                </div>)}
+                                                                        </div>
+                                                                    </Accordion.Body>
+                                                                </Accordion.Item>
+                                                            </Accordion>
+                                                        </div>
+                                                    </h2>
+                                                </div>
+                                                <div className="custom_cart_item_desc_container">
+                                                    <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["RoomNameFa"] + roomName : obj["RoomNameEn"] + roomName}</h2>
+                                                </div>
+                                                <div className="custom_cart_item_desc_container">
+                                                    <div className="custom_cart_item_desc_qty">
+                                                        <button type="text" className="basket_qty_minus" onClick={() => setBasketNumber(undefined, index, 0, 0, -1)}>–</button>
+                                                        <input type="text" className="basket_qty_num"
+                                                               value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${obj1["Count"]}`) : obj1["Count"]}
+                                                               onChange={(e) => setBasketNumber(undefined, index, NumberToPersianWord.convertPeToEn(`${e.target.value}`), 0)}/>
+                                                        <button type="text" className="basket_qty_plus" onClick={() => setBasketNumber(undefined, index, 0, 0, 1)}>+</button>
+                                                    </div>
+                                                    <p className="custom_cart_item_end_price">{GetPrice(obj1["price"] * obj1["Count"], pageLanguage, t("TOMANS"))}</p>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </li>;
+                                        </li>;
+                                } else {
+                                    temp1[index] =
+                                        <li className="custom_cart_item" key={"drapery" + index} ref={ref => (draperyRef.current[index] = ref)}>
+                                            <div className="custom_cart_item_image_container">
+                                                <img src={`https://api.atlaspood.ir/${obj["PhotoUrl"]}`} alt="" className="custom_cart_item_img img-fluid"/>
+                                            </div>
+                                            <div className="custom_cart_item_desc">
+                                                <div className="custom_cart_item_desc_container">
+                                                    <h1 className="custom_cart_item_desc_name">{pageLanguage === 'fa' ? obj["ModelNameFa"] + " سفارشی " : "Custom " + obj["ModelNameEn"]}</h1>
+                                                    <button type="button" className="btn-close" aria-label="Close" onClick={() => setBasketNumber(undefined, index, 0, 0)}/>
+                                                </div>
+                                                <div className="custom_cart_item_desc_container">
+                                                    <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["FabricDesignFa"] + " / " + obj["FabricColorFa"] : obj["FabricDesignEn"] + " / " + obj["FabricColorEn"]}</h2>
+                                                </div>
+                                                <div className="custom_cart_item_desc_container">
+                                                    <h2 className="custom_cart_item_desc_detail">{pageLanguage === 'fa' ? obj["RoomNameFa"] + roomName : obj["RoomNameEn"] + roomName}</h2>
+                                                </div>
+                                                <div className="custom_cart_item_desc_container">
+                                                    <div className="custom_cart_item_desc_qty">
+                                                        <button type="text" className="basket_qty_minus" onClick={() => setBasketNumber(undefined, index, 0, 0, -1)}>–</button>
+                                                        <input type="text" className="basket_qty_num"
+                                                               value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${obj1["Count"]}`) : obj1["Count"]}
+                                                               onChange={(e) => setBasketNumber(undefined, index, NumberToPersianWord.convertPeToEn(`${e.target.value}`), 0)}/>
+                                                        <button type="text" className="basket_qty_plus" onClick={() => setBasketNumber(undefined, index, 0, 0, 1)}>+</button>
+                                                    </div>
+                                                    <p className="custom_cart_item_end_price">{GetPrice(obj1["price"] * obj1["Count"], pageLanguage, t("TOMANS"))}</p>
+                                                </div>
+                                            </div>
+                                        </li>;
+                                }
                                 if (index === cartObjects["drapery"].length - 1) {
                                     resolve();
                                 }
@@ -2416,7 +2628,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
         if (data && Object.keys(data).length !== 0) {
             setProjectData(data);
         }
-    
+        
         let pageLanguage = location.pathname.split('').slice(1, 3).join('');
         let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
         let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
@@ -2490,13 +2702,13 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                             let refIndex = inputs.current["22"].getAttribute('ref-num');
                             tempLabels[refIndex] = inputs.current["22"].getAttribute('text');
                             tempValue[refIndex] = inputs.current["22"].value;
-                            depSetTempArr = new Set([...setGetDeps("", "1", depSetTempArr)]);
+                            depSetTempArr = new Set([...setGetDeps("", "2", depSetTempArr)]);
                         } else {
                             setStep21("true");
                             let refIndex = inputs.current["23"].getAttribute('ref-num');
                             tempLabels[refIndex] = inputs.current["23"].getAttribute('text');
                             tempValue[refIndex] = inputs.current["23"].value;
-                            depSetTempArr = new Set([...setGetDeps("", "1", depSetTempArr)]);
+                            depSetTempArr = new Set([...setGetDeps("", "2", depSetTempArr)]);
                         }
                         setStepSelectedLabel(tempLabels);
                         setStepSelectedValue(tempValue);
@@ -2548,7 +2760,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                     setSelectCustomValues(selectValues);
                                     setStepSelectedLabel(tempLabels);
                                     setStepSelectedValue(tempValue);
-                                } else {
+                                } else if (temp["Mount"] === "Outside") {
                                     let tempWidth = changeLang ? temp["Width3A"] : temp["Width"];
                                     let tempHeight = changeLang ? temp["Height3C"] : temp["Height"];
                                     
@@ -2573,6 +2785,33 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                     }
                                     
                                     depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "3AOut,") + (tempHeight ? "" : "3COut,") + (temp["ExtensionLeft"] !== undefined ? "" : "3BOut1,") + (temp["ExtensionRight"] !== undefined ? "" : "3BOut2,") + (temp["ShadeMount"] !== undefined ? "" : "3DOut,"), "3", depSetTempArr)]);
+                                    setSelectCustomValues(selectValues);
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                } else {
+                                    let tempWidth = changeLang ? temp["Width3A"] : temp["Width"];
+                                    let tempHeight = changeLang ? temp["CeilingToWindow1"] : temp["Height"];
+                                    let tempHeight2 = changeLang ? temp["CeilingToWindow2"] : temp["Height2"];
+                                    let tempHeight3 = changeLang ? temp["CeilingToWindow3"] : temp["Height3"];
+                                    
+                                    selectValues["width3A"] = tempWidth ? [{value: tempWidth}] : [];
+                                    if (tempWidth) {
+                                        tempLabels["3AOut"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                    }
+                                    selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
+                                    selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                    if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
+                                        tempLabels["3BOut"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
+                                    }
+                                    selectValues["CeilingToWindow1"] = tempHeight ? [{value: tempHeight}] : [];
+                                    selectValues["CeilingToWindow2"] = tempHeight2 ? [{value: tempHeight2}] : [];
+                                    selectValues["CeilingToWindow3"] = tempHeight3 ? [{value: tempHeight3}] : [];
+                                    if (tempHeight && tempHeight2 && tempHeight3) {
+                                        let tempMax = Math.max(tempHeight, tempHeight2, tempHeight3);
+                                        tempLabels["3CArc"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + postfixFa : tempMax + postfixEn;
+                                    }
+                                    
+                                    depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "3AOut,") + (temp["ExtensionLeft"] !== undefined ? "" : "3BOut1,") + (temp["ExtensionRight"] !== undefined ? "" : "3BOut2,") + (tempHeight !== undefined ? "" : "3CArc1,") + (tempHeight2 !== undefined ? "" : "3CArc2,") + (tempHeight3 !== undefined ? "" : "3CArc3,"), "3", depSetTempArr)]);
                                     setSelectCustomValues(selectValues);
                                     setStepSelectedLabel(tempLabels);
                                     setStepSelectedValue(tempValue);
@@ -2641,7 +2880,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                             tempLabels[refIndex] = inputs.current["42"].getAttribute('text');
                             tempValue[refIndex] = inputs.current["42"].value;
                             
-                            depSetTempArr = new Set([...setGetDeps((temp["hasPower"] ? ((temp["MotorType"] ? "" : "411,")+(temp["MotorPosition"] ? "" : "412,")) : "41,"), "4", depSetTempArr)]);
+                            depSetTempArr = new Set([...setGetDeps((temp["hasPower"] ? ((temp["MotorType"] ? "" : "411,") + (temp["MotorPosition"] ? "" : "412,")) : "41,"), "4", depSetTempArr)]);
                             setStepSelectedLabel(tempLabels);
                             setStepSelectedValue(tempValue);
                             if (temp["hasPower"] !== undefined) {
@@ -2651,7 +2890,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                 tempValue[refIndex] = inputs.current["411"].value;
                                 setStepSelectedLabel(tempLabels);
                                 setStepSelectedValue(tempValue);
-    
+                                
                                 setSelectedMotorType(temp["MotorType"] ? [{
                                     value: temp["MotorType"],
                                     label: MotorType[pageLanguage].find(opt => opt.value === temp["MotorType"]).label
@@ -2867,7 +3106,19 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
         
     };
     
-    const MotorType = {
+    // const MotorType = {
+    //     "en": [
+    //         {value: 'Standard', label: 'Standard'},
+    //         {value: 'Smart', label: 'Smart'}
+    //     ],
+    //     "fa": [
+    //         {value: 'Standard', label: 'استاندارد'},
+    //         {value: 'Smart', label: 'هوشمند'}
+    //     ],
+    //
+    // };
+    
+    const [MotorType, setMotorType] = useState({
         "en": [
             {value: 'Standard', label: 'Standard'},
             {value: 'Smart', label: 'Smart'}
@@ -2877,7 +3128,65 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
             {value: 'Smart', label: 'هوشمند'}
         ],
         
-    };
+    });
+    
+    useEffect(() => {
+        if (Object.keys(modelAccessories).length > 0 && cartValues["WidthCart"] && cartValues["HeightCart"]) {
+            // let qty=cartValues["WidthCart"]*cartValues["HeightCart"]/10000;
+            let qty = fabricQty;
+            let tempObj = {
+                "en": [
+                    {
+                        value: 'Standard',
+                        label: (modelAccessories["17"] && modelAccessories["17"]["1"] && qty > modelAccessories["17"]["1"]["FromQty"] && qty <= modelAccessories["17"]["1"]["ToQty"]) ? "Standard (" + GetPrice(modelAccessories["17"]["1"]["Price"], pageLanguage, t("TOMANS")) + ")" : ((modelAccessories["17"] && modelAccessories["17"]["14"] && qty > modelAccessories["17"]["14"]["FromQty"] && qty <= modelAccessories["17"]["14"]["ToQty"]) ? "Standard (" + GetPrice(modelAccessories["17"]["14"]["Price"], pageLanguage, t("TOMANS")) + ")" : ""),
+                        apiAccValue: (modelAccessories["17"] && modelAccessories["17"]["1"] && qty > modelAccessories["17"]["1"]["FromQty"] && qty <= modelAccessories["17"]["1"]["ToQty"]) ? {
+                                "SewingAccessoryId": 17,
+                                "SewingModelAccessoryId": 0,
+                                "SewingAccessoryValue": "61500508",
+                                "Qty": 1
+                            }
+                            : ((modelAccessories["17"] && modelAccessories["17"]["14"] && qty > modelAccessories["17"]["14"]["FromQty"] && qty <= modelAccessories["17"]["14"]["ToQty"]) ? {
+                                "SewingAccessoryId": 17,
+                                "SewingModelAccessoryId": 0,
+                                "SewingAccessoryValue": "61500507",
+                                "Qty": 1
+                            } : "")
+                    },
+                    {
+                        value: 'Smart',
+                        label: (modelAccessories["18"] && modelAccessories["18"]["15"] && qty > modelAccessories["18"]["15"]["FromQty"] && qty <= modelAccessories["18"]["15"]["ToQty"]) ? "Smart (" + GetPrice(modelAccessories["18"]["15"]["Price"], pageLanguage, t("TOMANS")) + ")" : ((modelAccessories["18"] && modelAccessories["18"]["16"] && qty > modelAccessories["18"]["16"]["FromQty"] && qty <= modelAccessories["18"]["16"]["ToQty"]) ? "Smart (" + GetPrice(modelAccessories["18"]["16"]["Price"], pageLanguage, t("TOMANS")) + ")" : ""),
+                        apiAccValue: (modelAccessories["18"] && modelAccessories["18"]["15"] && qty > modelAccessories["18"]["15"]["FromQty"] && qty <= modelAccessories["18"]["15"]["ToQty"]) ? {
+                                "SewingAccessoryId": 18,
+                                "SewingModelAccessoryId": 0,
+                                "SewingAccessoryValue": "61500518",
+                                "Qty": 1
+                            }
+                            : ((modelAccessories["18"] && modelAccessories["18"]["16"] && qty > modelAccessories["18"]["16"]["FromQty"] && qty <= modelAccessories["18"]["16"]["ToQty"]) ? {
+                                "SewingAccessoryId": 18,
+                                "SewingModelAccessoryId": 0,
+                                "SewingAccessoryValue": "61500517",
+                                "Qty": 1
+                            } : "")
+                    }
+                ],
+                "fa": [
+                    {value: 'Standard', label: 'استاندارد '},
+                    {value: 'Smart', label: 'هوشمند '}
+                ],
+                
+            }
+            let tempStandardPrice = (modelAccessories["17"] && modelAccessories["17"]["1"] && qty > modelAccessories["17"]["1"]["FromQty"] && qty <= modelAccessories["17"]["1"]["ToQty"]) ? modelAccessories["17"]["1"]["Price"] : ((modelAccessories["17"] && modelAccessories["17"]["14"] && qty > modelAccessories["17"]["14"]["FromQty"] && qty <= modelAccessories["17"]["14"]["ToQty"]) ? modelAccessories["17"]["14"]["Price"] : 0);
+            let tempSmartPrice = (modelAccessories["18"] && modelAccessories["18"]["15"] && qty > modelAccessories["18"]["15"]["FromQty"] && qty <= modelAccessories["18"]["15"]["ToQty"]) ? modelAccessories["18"]["15"]["Price"] : ((modelAccessories["18"] && modelAccessories["18"]["16"] && qty > modelAccessories["18"]["16"]["FromQty"] && qty <= modelAccessories["18"]["16"]["ToQty"]) ? modelAccessories["18"]["16"]["Price"] : 0);
+            setMotorType(tempObj);
+            // console.log(tempObj);
+            setSelectedMotorType([]);
+            setSelectedMotorMinPrice(Math.min(tempStandardPrice, tempSmartPrice));
+            setCart("", "", "MotorType");
+            if (stepSelectedValue["41"] === "1" && stepSelectedValue["4"] === "2") {
+                setDeps("411", "");
+            }
+        }
+    }, [cartValues["WidthCart"], cartValues["HeightCart"], JSON.stringify(modelAccessories)]);
     
     const MotorPosition = {
         "en": [
@@ -2961,7 +3270,9 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     };
     const [selectedMotorChannels, setSelectedMotorChannels] = useState([motorChannels[pageLanguage].find(opt => opt.value === '0')]);
     const [selectedMotorPosition, setSelectedMotorPosition] = useState([]);
+    const [selectedRemoteName, setSelectedRemoteName] = useState([]);
     const [selectedMotorType, setSelectedMotorType] = useState([]);
+    const [selectedMotorMinPrice, setSelectedMotorMinPrice] = useState(0);
     
     const colors = {
         "en": [
@@ -3289,10 +3600,10 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
             // });
             // console.log(tempObj);
             
-            setDefaultFabricPhoto(model["DefaultFabricPhotoUrl"]);
-            setCart("PhotoUrl", model["DefaultFabricPhotoUrl"]);
-            setDefaultModelName(model["ModelENName"]);
-            setDefaultModelNameFa(model["ModelName"]);
+            // setDefaultFabricPhoto(model["DefaultFabricPhotoUrl"]);
+            // setCart("PhotoUrl", model["DefaultFabricPhotoUrl"]);
+            // setDefaultModelName(model["ModelENName"]);
+            // setDefaultModelNameFa(model["ModelName"]);
         }
     }, [model]);
     
@@ -3320,13 +3631,13 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                 let tempObj2 = {};
                 obj["SewingAccessoryDetails"].forEach(el => {
                     tempObj2[el["SewingAccessoryDetailId"]] = JSON.parse(JSON.stringify(el));
-                    tempObj2[el["SewingAccessoryDetailId"]]["Price"]=el["Price"]*cartValues["WidthCart"]/100;
+                    tempObj2[el["SewingAccessoryDetailId"]]["Price"] = obj["CalcMethodId"] === 5602 ? el["Price"] * cartValues["WidthCart"] / 100 : el["Price"];
                 });
                 tempObj[obj["SewingAccessoryId"]] = tempObj2;
             });
             setModelAccessories(tempObj);
-        }
-        else{
+            // console.log(model["Accessories"]);
+        } else {
             setModelAccessories({});
         }
     }, [JSON.stringify(cartValues)]);
@@ -3334,7 +3645,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
     useEffect(() => {
         if (modelID !== '' && catID !== '') {
             // if(firstRender) {
-            getCats();
+            // getCats();
             getModel();
             // getFabrics();
             // setFirstRender(false);
@@ -3342,9 +3653,76 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
         }
     }, [modelID, catID]);
     
+    useEffect(() => {
+        if (pageItem) {
+            setDefaultFabricPhoto(pageItem["MainImageUrl"]);
+            if (specialId) {
+                setCart("PhotoUrl", pageItem["MainImageUrl"], "", "SpecialId", [specialId]);
+            } else {
+                setCart("PhotoUrl", pageItem["MainImageUrl"]);
+            }
+            setDefaultModelName(pageItem["EnTitle"]);
+            setDefaultModelNameFa(pageItem["Title"]);
+        }
+    }, [pageItem]);
+    
     async function setLang() {
         const tempLang = location.pathname.split('');
         setPageLanguage(tempLang.slice(1, 3).join(''));
+    }
+    
+    function getRemoteNames() {
+        if (isLoggedIn) {
+            axios.get(baseURLGetRemoteNames, {
+                headers: authHeader()
+            }).then((response) => {
+                let tempArr = [];
+                response.data.forEach(el => {
+                    tempArr.push({
+                        value: el,
+                        label: el
+                    });
+                });
+                tempArr.push({
+                    value: "addNewRemoteName",
+                    label: t("Add New Remote")
+                });
+                setRemoteNames(tempArr);
+            }).catch(err => {
+                if (err.response.status === 401) {
+                    refreshToken().then((response2) => {
+                        if (response2 !== false) {
+                            getRemoteNames();
+                        } else {
+                            setRemoteNames([]);
+                        }
+                    });
+                } else {
+                    setRemoteNames([]);
+                }
+            });
+        } else {
+            if (Object.keys(bag).length > 0 && bag["drapery"] !== undefined) {
+                let tempArr = bag["drapery"].map((obj, index) => {
+                    if (obj["PreorderText"] && obj["PreorderText"]["RemoteName"] && obj["PreorderText"]["SewingModelId"] === modelID) {
+                        return {
+                            value: obj["PreorderText"]["RemoteName"],
+                            label: obj["PreorderText"]["RemoteName"]
+                        }
+                    } else {
+                        return null;
+                    }
+                }).filter(n => n);
+                tempArr.push({
+                    value: "addNewRemoteName",
+                    label: t("Add New Remote")
+                });
+                // console.log(tempArr);
+                setRemoteNames(tempArr);
+            } else {
+                setRemoteNames([]);
+            }
+        }
     }
     
     async function getCart() {
@@ -3367,7 +3745,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                             }
                         });
                     } else {
-                        setCartChanged(cartChanged + 1);
+                        // setCartChanged(cartChanged + 1);
                         reject();
                     }
                 });
@@ -3390,6 +3768,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                     getCart().then((temp) => {
                         setTimeout(() => {
                             renderFabrics(temp);
+                            getRemoteNames();
                         }, 100);
                     });
                 } else {
@@ -3570,6 +3949,15 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
             setWindowSize("");
             setProjectDetails(cartValues, undefined, true)
         }
+        
+        // setTimeout(() => {
+        //     if (steps.current["6"]) {
+        //         steps.current["6"].scrollIntoView({
+        //             behavior: "smooth",
+        //             block: "center"
+        //         });
+        //     }
+        // }, 500);
     }, [location.pathname]);
     
     return (
@@ -3594,7 +3982,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
             <div className="model_customize_container">
                 <div className="model_customize_image">
                     {defaultFabricPhoto &&
-                    <img src={`https://api.atlaspood.ir/${defaultFabricPhoto}`} className="img-fluid" alt=""/>
+                        <img src={`https://api.atlaspood.ir/${defaultFabricPhoto}`} className="img-fluid" alt=""/>
                     }
                 </div>
                 <div className={`model_customize_section ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
@@ -3623,13 +4011,13 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                                setSearchText(e.target.value);
                                                            }}/>
                                                     {searchShow &&
-                                                    <div className="clear-icon-container" onClick={() => {
-                                                        search_input.current.value = "";
-                                                        setSearchText("");
-                                                        setSearchShow(false)
-                                                    }}>
-                                                        <i className="fa fa-times-circle clear-icon"/>
-                                                    </div>
+                                                        <div className="clear-icon-container" onClick={() => {
+                                                            search_input.current.value = "";
+                                                            setSearchText("");
+                                                            setSearchShow(false)
+                                                        }}>
+                                                            <i className="fa fa-times-circle clear-icon"/>
+                                                        </div>
                                                     }
                                                     <div className="search-icon-container">
                                                         <i className="fa fa-search search-icon"/>
@@ -3749,7 +4137,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                 <Card.Body>
                                     <div className="card_body card_body_radio">
                                         <div className="box33 radio_style">
-                                            <img src={require('../Images/drapery/zebra/mount_inside.svg').default} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/zebra/new_mount_inside.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("mount_Inside")} value="1" name="step2" ref-num="2" id="21" checked={step2 === "Inside"}
                                                    onChange={e => {
                                                        setStep2("Inside");
@@ -3758,7 +4146,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                        if (stepSelectedValue["3"] === "2") {
                                                            setDeps("21", "2,3AOut,3BOut1,3BOut2,3COut,3DOut,3CArc1,3CArc2,3CArc3");
                                                            deleteSpecialSelects();
-                                                           setCart("Mount", "Inside","calcMeasurements,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                           setCart("Mount", "Inside", "calcMeasurements,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
                                                            setStep3("");
                                                            selectChanged(e, "3,3AOut,3BOut,3COut,3DOut,3CArc");
                                                        } else {
@@ -3771,7 +4159,7 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                             <label htmlFor="21">{t("mount_Inside")}</label>
                                         </div>
                                         <div className="box33 radio_style">
-                                            <img src={require('../Images/drapery/zebra/mount_outside.svg').default} className="img-fluid" alt=""/>
+                                            <img src={require('../Images/drapery/zebra/new_mount_outside.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("mount_Outside")} value="2" name="step2" ref-num="2" id="22" checked={step2 === "Outside"}
                                                    onChange={e => {
                                                        setStep2("Outside");
@@ -3791,8 +4179,9 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                             <label htmlFor="22">{t("mount_Outside")}</label>
                                         </div>
                                         <div className="box33 radio_style">
-                                            <img src={require('../Images/drapery/zebra/window-Arc.svg').default} className="img-fluid" alt=""/>
-                                            <input className="radio" type="radio" text={t("mount_Arc")} value="3" name="step1" ref-num="2" id="23" checked={step2 === "HiddenMoulding"}
+                                            <img src={require('../Images/drapery/zebra/new_mount_arc.svg').default} className="img-fluid" alt=""/>
+                                            <input className="radio" type="radio" text={t("mount_Arc")} value="3" name="step1" ref-num="2" id="23"
+                                                   checked={step2 === "HiddenMoulding"}
                                                    onChange={e => {
                                                        setStep2("HiddenMoulding");
                                                        setStep21("");
@@ -3812,86 +4201,86 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                             <label htmlFor="23">{t("mount_Arc")}</label>
                                         </div>
                                         {stepSelectedValue["2"] === "1" &&
-                                        <div className="secondary_options">
-                                            <div className="card-body-display-flex">
-                                                <div className="checkbox_style checkbox_style_step2">
-                                                    <input type="checkbox" value="1" name="step21" ref-num="21" checked={step21 === "true"} onChange={(e) => {
-                                                        if (e.target.checked) {
-                                                            selectChanged(e);
-                                                            setStep21("true");
-                                                            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                            let refIndex = inputs.current["21"].getAttribute('ref-num');
-                                                            tempLabels[refIndex] = inputs.current["21"].getAttribute('text');
-                                                            setStepSelectedLabel(tempLabels);
-                                                            setDeps("", "21");
-                                                        } else {
-                                                            setStep21("");
-                                                            // modalHandleShow("noPower");
-                                                            if (stepSelectedValue["3"] === "2") {
-                                                                setDeps("21,3", "3AOut,3BOut1,3BOut2,3COut,3DOut,3CArc1,3CArc2,3CArc3");
-                                                                deleteSpecialSelects();
-                                                                setCart("", "","calcMeasurements,Width3A,Height3C,Width1,Width2,Width3,Height1,Height2,Height3,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
-                                                                setStep3("");
-                                                                selectChanged(undefined, "3,3AOut,3BOut,3COut,3DOut,3CArc");
+                                            <div className="secondary_options">
+                                                <div className="card-body-display-flex">
+                                                    <div className="checkbox_style checkbox_style_step2">
+                                                        <input type="checkbox" value="1" name="step21" ref-num="21" checked={step21 === "true"} onChange={(e) => {
+                                                            if (e.target.checked) {
+                                                                selectChanged(e);
+                                                                setStep21("true");
+                                                                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                                let refIndex = inputs.current["21"].getAttribute('ref-num');
+                                                                tempLabels[refIndex] = inputs.current["21"].getAttribute('text');
+                                                                setStepSelectedLabel(tempLabels);
+                                                                setDeps("", "21");
                                                             } else {
-                                                                setDeps("21", "");
+                                                                setStep21("");
+                                                                // modalHandleShow("noPower");
+                                                                if (stepSelectedValue["3"] === "2") {
+                                                                    setDeps("21,3", "3AOut,3BOut1,3BOut2,3COut,3DOut,3CArc1,3CArc2,3CArc3");
+                                                                    deleteSpecialSelects();
+                                                                    setCart("", "", "calcMeasurements,Width3A,Height3C,Width1,Width2,Width3,Height1,Height2,Height3,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                                    setStep3("");
+                                                                    selectChanged(undefined, "3,3AOut,3BOut,3COut,3DOut,3CArc");
+                                                                } else {
+                                                                    setDeps("21", "");
+                                                                }
                                                             }
-                                                        }
-                                                    }} id="211" ref={ref => (inputs.current["211"] = ref)}/>
-                                                    <label htmlFor="211" className="checkbox_label">
-                                                        <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
-                                                             alt=""/>
-                                                    </label>
-                                                    <span className="checkbox_text">
+                                                        }} id="211" ref={ref => (inputs.current["211"] = ref)}/>
+                                                        <label htmlFor="211" className="checkbox_label">
+                                                            <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
+                                                                 alt=""/>
+                                                        </label>
+                                                        <span className="checkbox_text">
                                                         {t("inside_checkbox_title")}
                                                     </span>
+                                                    </div>
+                                                
                                                 </div>
-                                            
                                             </div>
-                                        </div>
                                         }
                                         {stepSelectedValue["2"] === "3" &&
-                                        <div className="secondary_options">
-                                            <div className="card-body-display-flex">
-                                                <div className="checkbox_style checkbox_style_step2">
-                                                    <input type="checkbox" value="1" name="step21" ref-num="21" checked={step21 === "true"} onChange={(e) => {
-                                                        if (e.target.checked) {
-                                                            selectChanged(e);
-                                                            setStep21("true");
-                                                            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                            let refIndex = inputs.current["23"].getAttribute('ref-num');
-                                                            tempLabels[refIndex] = inputs.current["23"].getAttribute('text');
-                                                            setStepSelectedLabel(tempLabels);
-                                                            setDeps("", "21");
-                                                        } else {
-                                                            setStep21("");
-                                                            // modalHandleShow("noPower");
-    
-                                                            if (stepSelectedValue["3"] === "2") {
-                                                                setDeps("21,3", "2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWall,2EWall,2FWall,2GWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
-                                                                deleteSpecialSelects();
-                                                                setCart("", "", "calcMeasurements,Width1,Width2,Width3,Height1,Height2,Height3,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
-                                                                setStep3("");
-                                                                selectChanged(undefined, "3,3AIn,3BIn,3AOut,3BOut,3COut,3DOut");
+                                            <div className="secondary_options">
+                                                <div className="card-body-display-flex">
+                                                    <div className="checkbox_style checkbox_style_step2">
+                                                        <input type="checkbox" value="1" name="step21" ref-num="21" checked={step21 === "true"} onChange={(e) => {
+                                                            if (e.target.checked) {
+                                                                selectChanged(e);
+                                                                setStep21("true");
+                                                                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                                let refIndex = inputs.current["23"].getAttribute('ref-num');
+                                                                tempLabels[refIndex] = inputs.current["23"].getAttribute('text');
+                                                                setStepSelectedLabel(tempLabels);
+                                                                setDeps("", "21");
                                                             } else {
-                                                                setDeps("21", "");
+                                                                setStep21("");
+                                                                // modalHandleShow("noPower");
+                                                                
+                                                                if (stepSelectedValue["3"] === "2") {
+                                                                    setDeps("21,3", "2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWall,2EWall,2FWall,2GWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
+                                                                    deleteSpecialSelects();
+                                                                    setCart("", "", "calcMeasurements,Width1,Width2,Width3,Height1,Height2,Height3,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                                    setStep3("");
+                                                                    selectChanged(undefined, "3,3AIn,3BIn,3AOut,3BOut,3COut,3DOut");
+                                                                } else {
+                                                                    setDeps("21", "");
+                                                                }
                                                             }
-                                                        }
-                                                    }} id="211" ref={ref => (inputs.current["211"] = ref)}/>
-                                                    <label htmlFor="211" className="checkbox_label">
-                                                        <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
-                                                             alt=""/>
-                                                    </label>
-                                                    <span className="checkbox_text">
+                                                        }} id="211" ref={ref => (inputs.current["211"] = ref)}/>
+                                                        <label htmlFor="211" className="checkbox_label">
+                                                            <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
+                                                                 alt=""/>
+                                                        </label>
+                                                        <span className="checkbox_text">
                                                         {t("Arc_checkbox_title")}
                                                     </span>
+                                                    </div>
+                                                
                                                 </div>
-                                            
                                             </div>
-                                        </div>
                                         }
-                                        <NextStep eventKey={(stepSelectedValue["2"] === "1"||stepSelectedValue["2"] === "3") && step21 !== "true" ? "2" : "3"} onClick={() => {
-                                            if ((stepSelectedValue["2"] === "1"||stepSelectedValue["2"] === "3") && step21 !== "true")
+                                        <NextStep eventKey={(stepSelectedValue["2"] === "1" || stepSelectedValue["2"] === "3") && step21 !== "true" ? "2" : "3"} onClick={() => {
+                                            if ((stepSelectedValue["2"] === "1" || stepSelectedValue["2"] === "3") && step21 !== "true")
                                                 modalHandleShow("noInsideUnderstand");
                                         }}>{t("NEXT STEP")}</NextStep>
                                     </div>
@@ -4009,132 +4398,134 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                         </div>
                                         
                                         {stepSelectedValue["3"] === "1" &&
-                                        <div className="own_measurements_container">
-                                            <div className="own_measurements_width">
-                                                <label className="select_label">{t("Width")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        values={selectCustomValues.width}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            optionSelectChanged_WidthLength(selected[0], "3", true, "cm", "س\u200Cم", pageLanguage);
-                                                            let temp = selectCustomValues;
-                                                            temp.width = selected;
-                                                            setSelectCustomValues(temp);
-                                                            setDeps("", "31");
-                                                            setCart("Width", selected[0].value);
-                                                        }}
-                                                        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
-                                                    />
+                                            <div className="own_measurements_container">
+                                                <div className="own_measurements_width">
+                                                    <label className="select_label">{t("Width")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            values={selectCustomValues.width}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                            }
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                               postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                optionSelectChanged_WidthLength(selected[0], "3", true, "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = selectCustomValues;
+                                                                temp.width = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "31");
+                                                                setCart("Width", selected[0].value);
+                                                            }}
+                                                            options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="own_measurements_Length">
+                                                    <label className="select_label">{t("Length_step3")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            values={selectCustomValues.length}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                            }
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                               postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                optionSelectChanged_WidthLength(selected[0], "3", false, "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = selectCustomValues;
+                                                                temp.length = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "32");
+                                                                setCart("Height", selected[0].value);
+                                                            }}
+                                                            options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className="own_measurements_Length">
-                                                <label className="select_label">{t("Length_step3")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        values={selectCustomValues.length}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            optionSelectChanged_WidthLength(selected[0], "3", false, "cm", "س\u200Cم", pageLanguage);
-                                                            let temp = selectCustomValues;
-                                                            temp.length = selected;
-                                                            setSelectCustomValues(temp);
-                                                            setDeps("", "32");
-                                                            setCart("Height", selected[0].value);
-                                                        }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
                                         }
                                         
                                         <NextStep eventKey={measurementsNextStep}>{t("NEXT STEP")}</NextStep>
                                     </div>
                                     
                                     {(stepSelectedValue["3"] === "1") &&
-                                    <div className="accordion_help">
-                                        <div className="help_container">
-                                            <div className="help_column help_left_column">
-                                                <p className="help_column_header"/>
-                                                <ul className="help_column_list">
-                                                    <li className="no_listStyle single_line_height">
-                                                        <div className="measurementsHelp_link" onClick={e => modalHandleShow("measurementsHelp")}>
-                                                            {t("step3_help_1")}
-                                                        </div>
-                                                    </li>
-                                                    <li className="no_listStyle single_line_height">
-                                                        <b>{t("Note:&nbsp;")}</b>
-                                                        {t("step3_help_2")}
-                                                    </li>
-                                                </ul>
+                                        <div className="accordion_help">
+                                            <div className="help_container">
+                                                <div className="help_column help_left_column">
+                                                    <p className="help_column_header"/>
+                                                    <ul className="help_column_list">
+                                                        <li className="no_listStyle single_line_height">
+                                                            <div className="measurementsHelp_link" onClick={e => modalHandleShow("measurementsHelp")}>
+                                                                {t("step3_help_1")}
+                                                            </div>
+                                                        </li>
+                                                        <li className="no_listStyle single_line_height">
+                                                            <b>{t("Note:&nbsp;")}</b>
+                                                            {t("step3_help_2")}
+                                                        </li>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
                                     }
                                     {(stepSelectedValue["3"] === "2") &&
-                                    <div className="accordion_help">
-                                        <div className="help_container">
-                                            <div className="help_column help_left_column">
-                                                <p className="help_column_header"/>
-                                                <ul className="help_column_list">
-                                                    <li className="no_listStyle single_line_height">
-                                                        <b>{t("Note:&nbsp;")}</b>
-                                                        {t("step3_help_2.5")}
-                                                    </li>
-                                                    <li className="no_listStyle single_line_height">
-                                                        {t("step3_help_3")}
-                                                    </li>
-                                                </ul>
+                                        <div className="accordion_help">
+                                            <div className="help_container">
+                                                <div className="help_column help_left_column">
+                                                    <p className="help_column_header"/>
+                                                    <ul className="help_column_list">
+                                                        <li className="no_listStyle single_line_height">
+                                                            <b>{t("Note:&nbsp;")}</b>
+                                                            {t("step3_help_2.5")}
+                                                        </li>
+                                                        <li className="no_listStyle single_line_height">
+                                                            {t("step3_help_3")}
+                                                        </li>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
                                     }
                                 </Card.Body>
                             </Accordion.Collapse>
@@ -4142,752 +4533,765 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                         
                         {/* step 3A inside */}
                         {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "1" && step21 === "true" &&
-                        <Card>
-                            <Card.Header>
-                                <ContextAwareToggle eventKey="3A" stepNum={t("3A")} stepTitle={t("zebra_step3AInside")} stepRef="3AIn" type="2" required={requiredStep["3AIn"]}
-                                                    stepSelected={stepSelectedLabel["3AIn"] === undefined ? "" : stepSelectedLabel["3AIn"]}/>
-                            </Card.Header>
-                            <Accordion.Collapse eventKey="3A">
-                                <Card.Body>
-                                    <div className="card_body">
-                                        <div className="box100">
-                                            <p className="step_selection_title">{t("step3A_title")}</p>
-                                            <img
-                                                src={pageLanguage === 'fa' ? require('../Images/drapery/zebra/width_inside_3_fa.svg').default : require('../Images/drapery/zebra/width_inside_3.svg').default}
-                                                className="img-fluid" alt=""/>
-                                        </div>
-                                        <div className="box100 Three_selection_container">
-                                            <div className="Three_select_container">
-                                                <label className="select_label">{t("step3AIn_A")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.width1}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_three(selected[0], "3AIn", 0, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.width1 = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3AIn1");
-                                                                setCart("Width1", selected[0].value);
+                            <Card>
+                                <Card.Header>
+                                    <ContextAwareToggle eventKey="3A" stepNum={t("3A")} stepTitle={t("zebra_step3AInside")} stepRef="3AIn" type="2" required={requiredStep["3AIn"]}
+                                                        stepSelected={stepSelectedLabel["3AIn"] === undefined ? "" : stepSelectedLabel["3AIn"]}/>
+                                </Card.Header>
+                                <Accordion.Collapse eventKey="3A">
+                                    <Card.Body>
+                                        <div className="card_body">
+                                            <div className="box100">
+                                                <p className="step_selection_title">{t("step3A_title")}</p>
+                                                <img
+                                                    src={pageLanguage === 'fa' ? require('../Images/drapery/zebra/width_inside_3_fa.svg').default : require('../Images/drapery/zebra/new_width_inside_3.svg').default}
+                                                    className="img-fluid" alt=""/>
+                                            </div>
+                                            <div className="box100 Three_selection_container">
+                                                <div className="Three_select_container">
+                                                    <label className="select_label">{t("step3AIn_A")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            values={selectCustomValues.width1}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                             }
-                                                        }}
-                                                        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
-                                                    />
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                               postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged_three(selected[0], "3AIn", 0, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.width1 = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "3AIn1");
+                                                                    setCart("Width1", selected[0].value);
+                                                                }
+                                                            }}
+                                                            options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="Three_select_container">
+                                                    <label className="select_label">{t("step3AIn_B")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            values={selectCustomValues.width2}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                            }
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                               postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged_three(selected[0], "3AIn", 1, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.width2 = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "3AIn2");
+                                                                    setCart("Width2", selected[0].value);
+                                                                }
+                                                            }}
+                                                            options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="Three_select_container">
+                                                    <label className="select_label">{t("step3AIn_C")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            values={selectCustomValues.width3}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                            }
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                               postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged_three(selected[0], "3AIn", 2, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.width3 = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "3AIn3");
+                                                                    setCart("Width3", selected[0].value);
+                                                                }
+                                                            }}
+                                                            options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className="Three_select_container">
-                                                <label className="select_label">{t("step3AIn_B")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.width2}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_three(selected[0], "3AIn", 1, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.width2 = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3AIn2");
-                                                                setCart("Width2", selected[0].value);
-                                                            }
-                                                        }}
-                                                        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="Three_select_container">
-                                                <label className="select_label">{t("step3AIn_C")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.width3}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_three(selected[0], "3AIn", 2, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.width3 = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3AIn3");
-                                                                setCart("Width3", selected[0].value);
-                                                            }
-                                                        }}
-                                                        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
-                                                    />
+                                            <NextStep eventKey="3B">{t("NEXT STEP")}</NextStep>
+                                        </div>
+                                        
+                                        <div className="accordion_help">
+                                            <div className="help_container">
+                                                <div className="help_column help_left_column">
+                                                    <p className="help_column_header"/>
+                                                    <ul className="help_column_list">
+                                                        <li className="no_listStyle single_line_height">{t("step3A_help_1")}
+                                                        </li>
+                                                    </ul>
                                                 </div>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="3B">{t("NEXT STEP")}</NextStep>
-                                    </div>
-                                    
-                                    <div className="accordion_help">
-                                        <div className="help_container">
-                                            <div className="help_column help_left_column">
-                                                <p className="help_column_header"/>
-                                                <ul className="help_column_list">
-                                                    <li className="no_listStyle single_line_height">{t("step3A_help_1")}
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Card.Body>
-                            </Accordion.Collapse>
-                        </Card>
+                                    </Card.Body>
+                                </Accordion.Collapse>
+                            </Card>
                         }
                         
                         {/* step 3B inside */}
                         {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "1" && step21 === "true" &&
-                        <Card>
-                            <Card.Header>
-                                <ContextAwareToggle eventKey="3B" stepNum={t("3B")} stepTitle={t("zebra_step3BInside")} stepRef="3BIn" type="2" required={requiredStep["3BIn"]}
-                                                    stepSelected={stepSelectedLabel["3BIn"] === undefined ? "" : stepSelectedLabel["3BIn"]}/>
-                            </Card.Header>
-                            <Accordion.Collapse eventKey="3B">
-                                <Card.Body>
-                                    <div className="card_body">
-                                        <div className="box100">
-                                            <p className="step_selection_title">{t("step3B_title")}</p>
-                                            <img
-                                                src={pageLanguage === 'fa' ? require('../Images/drapery/zebra/height_inside_3_fa.svg').default : require('../Images/drapery/zebra/height_inside_3.svg').default}
-                                                className="img-fluid" alt=""/>
-                                        </div>
-                                        <div className="box100 Three_selection_container">
-                                            <div className="Three_select_container">
-                                                <label className="select_label">{t("step3BIn_A")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.height1}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_three(selected[0], "3BIn", 0, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.height1 = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3BIn1");
-                                                                setCart("Height1", selected[0].value);
+                            <Card>
+                                <Card.Header>
+                                    <ContextAwareToggle eventKey="3B" stepNum={t("3B")} stepTitle={t("zebra_step3BInside")} stepRef="3BIn" type="2" required={requiredStep["3BIn"]}
+                                                        stepSelected={stepSelectedLabel["3BIn"] === undefined ? "" : stepSelectedLabel["3BIn"]}/>
+                                </Card.Header>
+                                <Accordion.Collapse eventKey="3B">
+                                    <Card.Body>
+                                        <div className="card_body">
+                                            <div className="box100">
+                                                <p className="step_selection_title">{t("step3B_title")}</p>
+                                                <img
+                                                    src={pageLanguage === 'fa' ? require('../Images/drapery/zebra/height_inside_3_fa.svg').default : require('../Images/drapery/zebra/new_height_inside_3.svg').default}
+                                                    className="img-fluid" alt=""/>
+                                            </div>
+                                            <div className="box100 Three_selection_container">
+                                                <div className="Three_select_container">
+                                                    <label className="select_label">{t("step3BIn_A")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            values={selectCustomValues.height1}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                             }
-                                                        }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
-                                                    />
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                               postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged_three(selected[0], "3BIn", 0, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.height1 = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "3BIn1");
+                                                                    setCart("Height1", selected[0].value);
+                                                                }
+                                                            }}
+                                                            options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="Three_select_container">
+                                                    <label className="select_label">{t("step3BIn_B")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            values={selectCustomValues.height2}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                            }
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                               postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged_three(selected[0], "3BIn", 1, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.height2 = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "3BIn2");
+                                                                    setCart("Height2", selected[0].value);
+                                                                }
+                                                            }}
+                                                            options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="Three_select_container">
+                                                    <label className="select_label">{t("step3BIn_C")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            values={selectCustomValues.height3}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                            }
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                               postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged_three(selected[0], "3BIn", 2, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.height3 = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "3BIn3");
+                                                                    setCart("Height3", selected[0].value);
+                                                                }
+                                                            }}
+                                                            options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className="Three_select_container">
-                                                <label className="select_label">{t("step3BIn_B")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.height2}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_three(selected[0], "3BIn", 1, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.height2 = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3BIn2");
-                                                                setCart("Height2", selected[0].value);
-                                                            }
-                                                        }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="Three_select_container">
-                                                <label className="select_label">{t("step3BIn_C")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.height3}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_three(selected[0], "3BIn", 2, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.height3 = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3BIn3");
-                                                                setCart("Height3", selected[0].value);
-                                                            }
-                                                        }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
-                                                    />
-                                                </div>
-                                            </div>
+                                            
+                                            <NextStep eventKey="4">{t("NEXT STEP")}</NextStep>
                                         </div>
                                         
-                                        <NextStep eventKey="4">{t("NEXT STEP")}</NextStep>
-                                    </div>
-                                    
-                                    <div className="accordion_help">
-                                        <div className="help_container">
-                                            <div className="help_column help_left_column">
-                                                <p className="help_column_header"/>
-                                                <ul className="help_column_list">
-                                                    <li className="no_listStyle single_line_height">{t("step3B_help_1")}
-                                                    </li>
-                                                </ul>
+                                        <div className="accordion_help">
+                                            <div className="help_container">
+                                                <div className="help_column help_left_column">
+                                                    <p className="help_column_header"/>
+                                                    <ul className="help_column_list">
+                                                        <li className="no_listStyle single_line_height">{t("step3B_help_1")}
+                                                        </li>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </Card.Body>
-                            </Accordion.Collapse>
-                        </Card>
+                                    </Card.Body>
+                                </Accordion.Collapse>
+                            </Card>
                         }
                         
                         {/* step 3A outside */}
-                        {stepSelectedValue["3"] === "2" && !!(stepSelectedValue["2"] === "2"||stepSelectedValue["2"] === "3") &&
-                        <Card>
-                            <Card.Header>
-                                <ContextAwareToggle eventKey="3A" stepNum={t("3A")} stepTitle={t("zebra_step3AOutside")} stepRef="3AOut" type="2" required={requiredStep["3AOut"]}
-                                                    stepSelected={stepSelectedLabel["3AOut"] === undefined ? "" : stepSelectedLabel["3AOut"]}/>
-                            </Card.Header>
-                            <Accordion.Collapse eventKey="3A">
-                                <Card.Body>
-                                    <div className="card_body">
-                                        <div className="box100">
-                                            <p className="step_selection_title">{t("step3A_out_title")}</p>
-                                            <img src={require('../Images/drapery/zebra/FrameSize.svg').default} className="img-fluid" alt=""/>
-                                        </div>
-                                        <div className="box100 Three_selection_container">
+                        {stepSelectedValue["3"] === "2" && !!(stepSelectedValue["2"] === "2" || stepSelectedValue["2"] === "3") &&
+                            <Card>
+                                <Card.Header>
+                                    <ContextAwareToggle eventKey="3A" stepNum={t("3A")} stepTitle={t("zebra_step3AOutside")} stepRef="3AOut" type="2"
+                                                        required={requiredStep["3AOut"]}
+                                                        stepSelected={stepSelectedLabel["3AOut"] === undefined ? "" : stepSelectedLabel["3AOut"]}/>
+                                </Card.Header>
+                                <Accordion.Collapse eventKey="3A">
+                                    <Card.Body>
+                                        <div className="card_body">
                                             <div className="box100">
-                                                <label className="select_label">{t("Width")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.width3A}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged("3AOut", selected[0], "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.width3A = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3AOut");
-                                                                setCart("Width3A", selected[0].value);
+                                                <p className="step_selection_title">{t("step3A_out_title")}</p>
+                                                <img src={require('../Images/drapery/zebra/new_FrameSize.svg').default} className="img-fluid" alt=""/>
+                                            </div>
+                                            <div className="box100 Three_selection_container">
+                                                <div className="box100">
+                                                    <label className="select_label">{t("Width")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            values={selectCustomValues.width3A}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                             }
-                                                        }}
-                                                        options={SelectOptionRange(30, 290, 1, "cm", "", pageLanguage)}
-                                                    />
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                               postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged("3AOut", selected[0], "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.width3A = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "3AOut");
+                                                                    setCart("Width3A", selected[0].value);
+                                                                }
+                                                            }}
+                                                            options={SelectOptionRange(30, 290, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
                                                 </div>
                                             </div>
+                                            <NextStep eventKey="3B">{t("NEXT STEP")}</NextStep>
                                         </div>
-                                        <NextStep eventKey="3B">{t("NEXT STEP")}</NextStep>
-                                    </div>
-                                
-                                </Card.Body>
-                            </Accordion.Collapse>
-                        </Card>
+                                    
+                                    </Card.Body>
+                                </Accordion.Collapse>
+                            </Card>
                         }
                         
                         {/* step 3B outside */}
-                        {stepSelectedValue["3"] === "2" && !!(stepSelectedValue["2"] === "2"||stepSelectedValue["2"] === "3") &&
-                        <Card>
-                            <Card.Header>
-                                <ContextAwareToggle eventKey="3B" stepNum={t("3B")} stepTitle={t("zebra_step3BOutside")} stepRef="3BOut" type="2" required={requiredStep["3BOut"]}
-                                                    stepSelected={stepSelectedLabel["3BOut"] === undefined ? "" : stepSelectedLabel["3BOut"]}/>
-                            </Card.Header>
-                            <Accordion.Collapse eventKey="3B">
-                                <Card.Body>
-                                    <div className="card_body">
-                                        <div className="box100">
-                                            <p className="step_selection_title">{t("step3B_out_title")}</p>
-                                            <img src={require('../Images/drapery/zebra/wall_cover.svg').default} className="img-fluid" alt=""/>
-                                        </div>
-                                        <div className="box100 Three_selection_container dir_ltr">
-                                            <div className="box50">
-                                                <label className="select_label"><p className="farsi_cm">{t("select_cm")}</p>{t("Left")}</label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.left}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_LeftRight(selected[0], "3BOut", true, "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.left = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3BOut1");
-                                                                setCart("ExtensionLeft", selected[0].value);
+                        {stepSelectedValue["3"] === "2" && !!(stepSelectedValue["2"] === "2" || stepSelectedValue["2"] === "3") &&
+                            <Card>
+                                <Card.Header>
+                                    <ContextAwareToggle eventKey="3B" stepNum={t("3B")} stepTitle={t("zebra_step3BOutside")} stepRef="3BOut" type="2"
+                                                        required={requiredStep["3BOut"]}
+                                                        stepSelected={stepSelectedLabel["3BOut"] === undefined ? "" : stepSelectedLabel["3BOut"]}/>
+                                </Card.Header>
+                                <Accordion.Collapse eventKey="3B">
+                                    <Card.Body>
+                                        <div className="card_body">
+                                            <div className="box100">
+                                                <p className="step_selection_title">{t("step3B_out_title")}</p>
+                                                <img src={require('../Images/drapery/zebra/new_wall_cover.svg').default} className="img-fluid" alt=""/>
+                                            </div>
+                                            <div className="box100 Three_selection_container dir_ltr">
+                                                <div className="box50">
+                                                    <label className="select_label"><p className="farsi_cm">{t("select_cm")}</p>{t("Left")}</label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            values={selectCustomValues.left}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                             }
-                                                        }}
-                                                        options={SelectOptionRange(1, 10, 1, "cm", "", pageLanguage)}
-                                                    />
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                               postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged_LeftRight(selected[0], "3BOut", true, "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.left = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "3BOut1");
+                                                                    setCart("ExtensionLeft", selected[0].value);
+                                                                }
+                                                            }}
+                                                            options={SelectOptionRange(1, 10, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="box50">
+                                                    <label className="select_label"><p className="farsi_cm">{t("select_cm")}</p>{t("Right")}</label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            values={selectCustomValues.right}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                            }
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                               postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged_LeftRight(selected[0], "3BOut", false, "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.right = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "3BOut2");
+                                                                    setCart("ExtensionRight", selected[0].value);
+                                                                }
+                                                            }}
+                                                            options={SelectOptionRange(1, 10, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className="box50">
-                                                <label className="select_label"><p className="farsi_cm">{t("select_cm")}</p>{t("Right")}</label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.right}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_LeftRight(selected[0], "3BOut", false, "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.right = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3BOut2");
-                                                                setCart("ExtensionRight", selected[0].value);
-                                                            }
-                                                        }}
-                                                        options={SelectOptionRange(1, 10, 1, "cm", "", pageLanguage)}
-                                                    />
-                                                </div>
-                                            </div>
+                                            
+                                            <NextStep eventKey="3C">{t("NEXT STEP")}</NextStep>
                                         </div>
                                         
-                                        <NextStep eventKey="3C">{t("NEXT STEP")}</NextStep>
-                                    </div>
-                                    
-                                    <div className="accordion_help">
-                                        <div className="help_container">
-                                            <div className="help_column help_left_column">
-                                                <p className="help_column_header"/>
-                                                <ul className="help_column_list">
-                                                    <li className="no_listStyle single_line_height">{t("step3B_out_help_1")}
-                                                    </li>
-                                                </ul>
+                                        <div className="accordion_help">
+                                            <div className="help_container">
+                                                <div className="help_column help_left_column">
+                                                    <p className="help_column_header"/>
+                                                    <ul className="help_column_list">
+                                                        <li className="no_listStyle single_line_height">{t("step3B_out_help_1")}
+                                                        </li>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </Card.Body>
-                            </Accordion.Collapse>
-                        </Card>
+                                    </Card.Body>
+                                </Accordion.Collapse>
+                            </Card>
                         }
                         
                         {/* step 3C outside */}
                         {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "2" &&
-                        <Card>
-                            <Card.Header>
-                                <ContextAwareToggle eventKey="3C" stepNum={t("3C")} stepTitle={t("zebra_step3COutside")} stepRef="3COut" type="2" required={requiredStep["3COut"]}
-                                                    stepSelected={stepSelectedLabel["3COut"] === undefined ? "" : stepSelectedLabel["3COut"]}/>
-                            </Card.Header>
-                            <Accordion.Collapse eventKey="3C">
-                                <Card.Body>
-                                    <div className="card_body">
-                                        <div className="box100">
-                                            <p className="step_selection_title">{t("step3C_out_title")}</p>
-                                            <img src={require('../Images/drapery/zebra/frame_height.svg').default} className="img-fluid" alt=""/>
-                                        </div>
-                                        <div className="box100 Three_selection_container">
+                            <Card>
+                                <Card.Header>
+                                    <ContextAwareToggle eventKey="3C" stepNum={t("3C")} stepTitle={t("zebra_step3COutside")} stepRef="3COut" type="2"
+                                                        required={requiredStep["3COut"]}
+                                                        stepSelected={stepSelectedLabel["3COut"] === undefined ? "" : stepSelectedLabel["3COut"]}/>
+                                </Card.Header>
+                                <Accordion.Collapse eventKey="3C">
+                                    <Card.Body>
+                                        <div className="card_body">
                                             <div className="box100">
-                                                <label className="select_label">{t("Height")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.height3C}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged("3COut", selected[0], "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.height3C = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3COut");
-                                                                setCart("Height3C", selected[0].value);
+                                                <p className="step_selection_title">{t("step3C_out_title")}</p>
+                                                <img src={require('../Images/drapery/zebra/new_frame_height.svg').default} className="img-fluid" alt=""/>
+                                            </div>
+                                            <div className="box100 Three_selection_container">
+                                                <div className="box100">
+                                                    <label className="select_label">{t("Height")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            values={selectCustomValues.height3C}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                             }
-                                                        }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
-                                                    />
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                               postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged("3COut", selected[0], "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.height3C = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "3COut");
+                                                                    setCart("Height3C", selected[0].value);
+                                                                }
+                                                            }}
+                                                            options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
                                                 </div>
                                             </div>
+                                            <NextStep eventKey="3D">{t("NEXT STEP")}</NextStep>
                                         </div>
-                                        <NextStep eventKey="3D">{t("NEXT STEP")}</NextStep>
-                                    </div>
-                                
-                                </Card.Body>
-                            </Accordion.Collapse>
-                        </Card>
+                                    
+                                    </Card.Body>
+                                </Accordion.Collapse>
+                            </Card>
                         }
                         
                         {/* step 3C Arc */}
                         {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "3" &&
-                        <Card>
-                            <Card.Header>
-                                <ContextAwareToggle eventKey="3C" stepNum={t("3C")} stepTitle={t("dk_step2D")} stepRef="3CArc" type="2" required={requiredStep["3CArc"]}
-                                                    stepSelected={stepSelectedLabel["3CArc"] === undefined ? "" : stepSelectedLabel["3CArc"]}/>
-                            </Card.Header>
-                            <Accordion.Collapse eventKey="3C">
-                                <Card.Body>
-                                    <div className="card_body">
-                                        <div className="box100">
-                                            <p className="step_selection_title">{t("arc_step2D_title")}</p>
-                                            <img
-                                                src={pageLanguage === 'fa' ? require('../Images/drapery/dk/ceiling_to_window_3.svg').default : require('../Images/drapery/dk/ceiling_to_window_3.svg').default}
-                                                className="img-fluid" alt=""/>
+                            <Card>
+                                <Card.Header>
+                                    <ContextAwareToggle eventKey="3C" stepNum={t("3C")} stepTitle={t("dk_step2D")} stepRef="3CArc" type="2" required={requiredStep["3CArc"]}
+                                                        stepSelected={stepSelectedLabel["3CArc"] === undefined ? "" : stepSelectedLabel["3CArc"]}/>
+                                </Card.Header>
+                                <Accordion.Collapse eventKey="3C">
+                                    <Card.Body>
+                                        <div className="card_body">
+                                            <div className="box100">
+                                                <p className="step_selection_title">{t("arc_step2D_title")}</p>
+                                                <img
+                                                    src={pageLanguage === 'fa' ? require('../Images/drapery/dk/new_ceiling_to_window_3_arc.svg').default : require('../Images/drapery/dk/new_ceiling_to_window_3_arc.svg').default}
+                                                    className="img-fluid" alt=""/>
+                                            </div>
+                                            <div className="box100 Three_selection_container">
+                                                <div className="Three_select_container">
+                                                    <label className="select_label">{t("step3AIn_A")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            values={selectCustomValues.CeilingToWindow1}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                            }
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                               postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged_three(selected[0], "3CArc", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.CeilingToWindow1 = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "3CArc1");
+                                                                    setCart("CeilingToWindow1", selected[0].value);
+                                                                }
+                                                            }}
+                                                            options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="Three_select_container">
+                                                    <label className="select_label">{t("step3AIn_B")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            values={selectCustomValues.CeilingToWindow2}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                            }
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                               postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged_three(selected[0], "3CArc", 1, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.CeilingToWindow2 = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "3CArc2");
+                                                                    setCart("CeilingToWindow2", selected[0].value);
+                                                                }
+                                                            }}
+                                                            options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="Three_select_container">
+                                                    <label className="select_label">{t("step3AIn_C")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            values={selectCustomValues.CeilingToWindow3}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                            }
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                               postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged_three(selected[0], "3CArc", 2, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.CeilingToWindow3 = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "3CArc3");
+                                                                    setCart("CeilingToWindow3", selected[0].value);
+                                                                }
+                                                            }}
+                                                            options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <NextStep eventKey="4">{t("NEXT STEP")}</NextStep>
                                         </div>
-                                        <div className="box100 Three_selection_container">
-                                            <div className="Three_select_container">
-                                                <label className="select_label">{t("step3AIn_A")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.CeilingToWindow1}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                           postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_three(selected[0], "3CArc", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.CeilingToWindow1 = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3CArc1");
-                                                                setCart("CeilingToWindow1", selected[0].value);
-                                                            }
-                                                        }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="Three_select_container">
-                                                <label className="select_label">{t("step3AIn_B")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.CeilingToWindow2}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                           postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_three(selected[0], "3CArc", 1, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.CeilingToWindow2 = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3CArc2");
-                                                                setCart("CeilingToWindow2", selected[0].value);
-                                                            }
-                                                        }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="Three_select_container">
-                                                <label className="select_label">{t("step3AIn_C")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.CeilingToWindow3}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                           postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_three(selected[0], "3CArc", 2, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.CeilingToWindow3 = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3CArc3");
-                                                                setCart("CeilingToWindow3", selected[0].value);
-                                                            }
-                                                        }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <NextStep eventKey="4">{t("NEXT STEP")}</NextStep>
-                                    </div>
-    
-                                    <div className="accordion_help">
-                                        <div className="help_container">
-                                            <div className="help_column help_left_column">
-                                                <p className="help_column_header"/>
-                                                <ul className="help_column_list">
-                                                    <li className="no_listStyle single_line_height">
+                                        
+                                        <div className="accordion_help">
+                                            <div className="help_container">
+                                                <div className="help_column help_left_column">
+                                                    <p className="help_column_header"/>
+                                                    <ul className="help_column_list">
+                                                        <li className="no_listStyle single_line_height">
                                                         <span className="popover_indicator">
                                                             {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
                                                                                   children={<object className="popover_camera" type="image/svg+xml"
@@ -4922,92 +5326,94 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                                                   }/>
                                                             }
                                                         </span>{t("dk_step2D_help_1")}
-                                                    </li>
-                                                </ul>
+                                                        </li>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </Card.Body>
-                            </Accordion.Collapse>
-                        </Card>
+                                    </Card.Body>
+                                </Accordion.Collapse>
+                            </Card>
                         }
                         
                         {/* step 3D outside */}
                         {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "2" &&
-                        <Card>
-                            <Card.Header>
-                                <ContextAwareToggle eventKey="3D" stepNum={t("3D")} stepTitle={t("zebra_step3DOutside")} stepRef="3DOut" type="2" required={requiredStep["3DOut"]}
-                                                    stepSelected={stepSelectedLabel["3DOut"] === undefined ? "" : stepSelectedLabel["3DOut"]}/>
-                            </Card.Header>
-                            <Accordion.Collapse eventKey="3D">
-                                <Card.Body>
-                                    <div className="card_body">
-                                        <div className="box100">
-                                            <p className="step_selection_title">{t("step3D_out_title")}</p>
-                                            <img src={require('../Images/drapery/zebra/shade_mount.svg').default} className="img-fluid" alt=""/>
-                                        </div>
-                                        <div className="box100 Three_selection_container">
+                            <Card>
+                                <Card.Header>
+                                    <ContextAwareToggle eventKey="3D" stepNum={t("3D")} stepTitle={t("zebra_step3DOutside")} stepRef="3DOut" type="2"
+                                                        required={requiredStep["3DOut"]}
+                                                        stepSelected={stepSelectedLabel["3DOut"] === undefined ? "" : stepSelectedLabel["3DOut"]}/>
+                                </Card.Header>
+                                <Accordion.Collapse eventKey="3D">
+                                    <Card.Body>
+                                        <div className="card_body">
                                             <div className="box100">
-                                                <label className="select_label"/>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.shadeMount}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm" postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged("3DOut", selected[0], "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.shadeMount = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3DOut");
-                                                                setCart("ShadeMount", selected[0].value);
+                                                <p className="step_selection_title">{t("step3D_out_title")}</p>
+                                                <img src={require('../Images/drapery/zebra/new_shade_mount.svg').default} className="img-fluid" alt=""/>
+                                            </div>
+                                            <div className="box100 Three_selection_container">
+                                                <div className="box100">
+                                                    <label className="select_label"/>
+                                                    <div className="select_container select_container_num">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            values={selectCustomValues.shadeMount}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                             }
-                                                        }}
-                                                        options={SelectOptionRange(10, 100, 1, "cm", "", pageLanguage)}
-                                                    />
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                               postfixFa=""/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged("3DOut", selected[0], "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.shadeMount = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "3DOut");
+                                                                    setCart("ShadeMount", selected[0].value);
+                                                                }
+                                                            }}
+                                                            options={SelectOptionRange(10, 100, 1, "cm", "", pageLanguage)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <NextStep eventKey="4">{t("NEXT STEP")}</NextStep>
+                                        </div>
+                                        
+                                        <div className="accordion_help">
+                                            <div className="help_container">
+                                                <div className="help_column help_left_column">
+                                                    <p className="help_column_header"/>
+                                                    <ul className="help_column_list">
+                                                        <li className="no_listStyle single_line_height">{t("step3D_out_help_1")}
+                                                        </li>
+                                                    </ul>
                                                 </div>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="4">{t("NEXT STEP")}</NextStep>
-                                    </div>
-                                    
-                                    <div className="accordion_help">
-                                        <div className="help_container">
-                                            <div className="help_column help_left_column">
-                                                <p className="help_column_header"/>
-                                                <ul className="help_column_list">
-                                                    <li className="no_listStyle single_line_height">{t("step3D_out_help_1")}
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Card.Body>
-                            </Accordion.Collapse>
-                        </Card>
+                                    </Card.Body>
+                                </Accordion.Collapse>
+                            </Card>
                         }
                         
                         {/* step 4 */}
@@ -5043,232 +5449,300 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                        setCart("ControlType", "Motorized", "ControlPosition,ChainLength");
                                                    }} ref={ref => (inputs.current["42"] = ref)}/>
                                             <label htmlFor="42">{t("Motorized")}<br/><p
-                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Starts at "): t("Surcharge Applies")}{(modelAccessories["1"] ? (modelAccessories["1"]["1"] ? GetPrice(modelAccessories["1"]["1"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 || selectedMotorMinPrice > 0 ? t("Starts at ") + GetPrice(selectedMotorMinPrice, pageLanguage, t("TOMANS")) : t("Surcharge Applies")}</p>
                                             </label>
                                         
                                         </div>
                                         {stepSelectedValue["4"] === "2" &&
-                                        <div className="secondary_options">
-                                            {/*<hr/>*/}
-                                            {/*<p className="no_power_title">{t("Motor_title")}</p>*/}
-                                            <div className="card-body-display-flex">
-                                                {/*<div className="box50 radio_style">*/}
-                                                {/*    <input className="radio" type="radio" text={t("Yes")} value="1" name="step41" ref-num="41" id="411" checked={step41 === "true"}*/}
-                                                {/*           onChange={e => {*/}
-                                                {/*               selectChanged(e);*/}
-                                                {/*               setStep41("true");*/}
-                                                {/*               setDeps("411", "41");*/}
-                                                {/*               setCart("hasPower", true, "", "MotorChannels", [selectedMotorChannels.map(obj => obj.value)]);*/}
-                                                {/*           }} ref={ref => (inputs.current["411"] = ref)}/>*/}
-                                                {/*    <label htmlFor="411">{t("Yes")}</label>*/}
-                                                {/*</div>*/}
-                                                {/*<div className="box50 radio_style">*/}
-                                                {/*    <input className="radio" type="radio" text={t("No")} value="2" name="step41" ref-num="41" id="412"*/}
-                                                {/*           onClick={e => {*/}
-                                                {/*               selectUncheck(e);*/}
-                                                {/*               setStep41("");*/}
-                                                {/*               modalHandleShow("noPower");*/}
-                                                {/*               setDeps("41", "411");*/}
-                                                {/*           }} ref={ref => (inputs.current["412"] = ref)}/>*/}
-                                                {/*    <label htmlFor="412">{t("No")}</label>*/}
-                                                {/*</div>*/}
-                                                <div className="width_max checkbox_style">
-                                                    <input type="checkbox" value="1" name="step41" ref-num="41" checked={step41 === "true"} onChange={(e) => {
-                                                        if (e.target.checked) {
-                                                            selectChanged(e);
-                                                            setStep41("true");
-                                                            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                            let refIndex = inputs.current["42"].getAttribute('ref-num');
-                                                            tempLabels[refIndex] = inputs.current["42"].getAttribute('text');
-                                                            setStepSelectedLabel(tempLabels);
-                                                            setSelectedMotorPosition([]);
-                                                            setDeps("411,412", "41");
-                                                            setCart("hasPower", true, "", "MotorChannels", [selectedMotorChannels.map(obj => obj.value)]);
-                                                        } else {
-                                                            selectUncheck(e);
-                                                            setStep41("");
-                                                            // modalHandleShow("noPower");
-                                                            setDeps("41", "411");
-                                                        }
-                                                    }} id="411" ref={ref => (inputs.current["411"] = ref)}/>
-                                                    <label htmlFor="411" className="checkbox_label">
-                                                        <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
-                                                             alt=""/>
-                                                    </label>
-                                                    <span className="checkbox_text">
+                                            <div className="secondary_options">
+                                                {/*<hr/>*/}
+                                                {/*<p className="no_power_title">{t("Motor_title")}</p>*/}
+                                                <div className="card-body-display-flex">
+                                                    {/*<div className="box50 radio_style">*/}
+                                                    {/*    <input className="radio" type="radio" text={t("Yes")} value="1" name="step41" ref-num="41" id="411" checked={step41 === "true"}*/}
+                                                    {/*           onChange={e => {*/}
+                                                    {/*               selectChanged(e);*/}
+                                                    {/*               setStep41("true");*/}
+                                                    {/*               setDeps("411", "41");*/}
+                                                    {/*               setCart("hasPower", true, "", "MotorChannels", [selectedMotorChannels.map(obj => obj.value)]);*/}
+                                                    {/*           }} ref={ref => (inputs.current["411"] = ref)}/>*/}
+                                                    {/*    <label htmlFor="411">{t("Yes")}</label>*/}
+                                                    {/*</div>*/}
+                                                    {/*<div className="box50 radio_style">*/}
+                                                    {/*    <input className="radio" type="radio" text={t("No")} value="2" name="step41" ref-num="41" id="412"*/}
+                                                    {/*           onClick={e => {*/}
+                                                    {/*               selectUncheck(e);*/}
+                                                    {/*               setStep41("");*/}
+                                                    {/*               modalHandleShow("noPower");*/}
+                                                    {/*               setDeps("41", "411");*/}
+                                                    {/*           }} ref={ref => (inputs.current["412"] = ref)}/>*/}
+                                                    {/*    <label htmlFor="412">{t("No")}</label>*/}
+                                                    {/*</div>*/}
+                                                    <div className="width_max checkbox_style">
+                                                        <input type="checkbox" value="1" name="step41" ref-num="41" checked={step41 === "true"} onChange={(e) => {
+                                                            if (e.target.checked) {
+                                                                selectChanged(e);
+                                                                setStep41("true");
+                                                                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                                let refIndex = inputs.current["42"].getAttribute('ref-num');
+                                                                tempLabels[refIndex] = inputs.current["42"].getAttribute('text');
+                                                                setStepSelectedLabel(tempLabels);
+                                                                setSelectedMotorPosition([]);
+                                                                setDeps("411,412", "41");
+                                                                setCart("hasPower", true, "", "MotorChannels", [selectedMotorChannels.map(obj => obj.value)]);
+                                                            } else {
+                                                                selectUncheck(e);
+                                                                setStep41("");
+                                                                // modalHandleShow("noPower");
+                                                                setDeps("41", "411");
+                                                            }
+                                                        }} id="411" ref={ref => (inputs.current["411"] = ref)}/>
+                                                        <label htmlFor="411" className="checkbox_label">
+                                                            <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
+                                                                 alt=""/>
+                                                        </label>
+                                                        <span className="checkbox_text">
                                                         {t("Motor_title")}
                                                     </span>
+                                                    </div>
+                                                
                                                 </div>
-                                            
                                             </div>
-                                        </div>
                                         }
                                         {stepSelectedValue["41"] === "1" && stepSelectedValue["4"] === "2" &&
-                                        <div className="motorized_options same_row_selection">
-                                            <div className="motorized_option_left">
-                                                <p>{t("Motor Type")}</p>
-                                                &nbsp;
-                                                <span onClick={() => modalHandleShow("learnMore")}>{t("(Learn More)")}</span>
-                                            </div>
-                                            <div className="motorized_option_right">
-                                                <div className="select_container">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        values={selectedMotorType}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0]) {
-                                                                setDeps("", "411");
-                                                                setCart("MotorType", selected[0].value);
-                                                                setSelectedMotorType(selected);
+                                            <div className="motorized_options same_row_selection">
+                                                <div className="motorized_option_left">
+                                                    <p>{t("Motor Type")}</p>
+                                                    &nbsp;
+                                                    <span onClick={() => modalHandleShow("learnMore")}>{t("(Learn More)")}</span>
+                                                </div>
+                                                <div className="motorized_option_right">
+                                                    <div className="select_container">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            values={selectedMotorType}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
                                                             }
-                                                        }}
-                                                        options={MotorType[pageLanguage]}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="motorized_option_left">
-                                                <p>{t("Motor Position")}</p>
-                                                &nbsp;
-                                                <span onClick={() => modalHandleShow("learnMore")}>{t("(Learn More)")}</span>
-                                            </div>
-                                            <div className="motorized_option_right">
-                                                <div className="select_container">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        values={selectedMotorPosition}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0]) {
-                                                                setDeps("", "412");
-                                                                setCart("MotorPosition", selected[0].value);
-                                                                setSelectedMotorPosition(selected);
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
                                                             }
-                                                        }}
-                                                        options={MotorPosition[pageLanguage]}
-                                                    />
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0] && cartValues["WidthCart"] && cartValues["HeightCart"]) {
+                                                                    // console.log(MotorType);
+                                                                    setDeps("", "411");
+                                                                    setSelectedMotorType(selected);
+                                                                    if (selected[0]["apiAccValue"]) {
+                                                                        setCustomMotorAcc(selected[0]["apiAccValue"]);
+                                                                        setCart("MotorType", selected[0].value, undefined, undefined, undefined, selected[0]["apiAccValue"]);
+                                                                    } else {
+                                                                        setCart("MotorType", selected[0].value);
+                                                                    }
+                                                                }
+                                                            }}
+                                                            options={MotorType[pageLanguage]}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="motorized_option_left">
+                                                    <p>{t("Motor Position")}</p>
+                                                    &nbsp;
+                                                    <span onClick={() => modalHandleShow("learnMore")}>{t("(Learn More)")}</span>
+                                                </div>
+                                                <div className="motorized_option_right">
+                                                    <div className="select_container">
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            values={selectedMotorPosition}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
+                                                            }
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected[0]) {
+                                                                    setDeps("", "412");
+                                                                    setCart("MotorPosition", selected[0].value);
+                                                                    setSelectedMotorPosition(selected);
+                                                                }
+                                                            }}
+                                                            options={MotorPosition[pageLanguage]}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="motorized_option_left">
+                                                    <p>{t("Remote Name")}</p>
+                                                    &nbsp;
+                                                    <span onClick={() => modalHandleShow("learnMore")}>{t("(Learn More)")}</span>
+                                                </div>
+                                                <div className="motorized_option_right">
+                                                    {!!(remoteNames.length > 0) &&
+                                                        <div className="select_container">
+                                                            <Select
+                                                                className="select"
+                                                                placeholder={t("SELECT EXISTING OR ADD NEW")}
+                                                                portal={document.body}
+                                                                dropdownPosition="bottom"
+                                                                dropdownHandle={false}
+                                                                dropdownGap={0}
+                                                                values={selectedRemoteName}
+                                                                onDropdownOpen={() => {
+                                                                    let temp1 = window.scrollY;
+                                                                    window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                    setTimeout(() => {
+                                                                        let temp2 = window.scrollY;
+                                                                        if (temp2 === temp1)
+                                                                            window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                    }, 100);
+                                                                }}
+                                                                dropdownRenderer={
+                                                                    ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                                }
+                                                                contentRenderer={
+                                                                    ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                                }
+                                                                // optionRenderer={
+                                                                //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                                // }
+                                                                onChange={(selected) => {
+                                                                    if (selected[0]) {
+                                                                        setSelectedRemoteName(selected);
+                                                                        if (selected[0]["value"] === "addNewRemoteName") {
+                                                                            setShowRemoteName(true);
+                                                                            setCart("", "", "RemoteName");
+                                                                            setRemoteName("");
+                                                                        } else {
+                                                                            setShowRemoteName(false);
+                                                                            setCart("RemoteName", selected[0]["value"]);
+                                                                            setRemoteName(selected[0]["value"]);
+                                                                        }
+                                                                    }
+                                                                }}
+                                                                options={remoteNames}
+                                                            />
+                                                        </div>
+                                                    }
+                                                    {!!(remoteNames.length === 0) &&
+                                                        <input className="Remote_name" type="text" name="Remote_name" value={remoteName}
+                                                               placeholder={t("Enter a name for your remote")} onChange={(e) => {
+                                                            setCart("RemoteName", e.target.value);
+                                                            setRemoteName(Capitalize(e.target.value));
+                                                        }}/>
+                                                    }
+                                                </div>
+                                                {showRemoteName &&
+                                                    <div className="motorized_option_left">
+                                                        <p>&nbsp;</p>
+                                                    </div>
+                                                }
+                                                {showRemoteName &&
+                                                    <div className="motorized_option_right">
+                                                        <input className="Remote_name" type="text" name="Remote_name" value={remoteName}
+                                                               placeholder={t("Enter a name for your remote")} onChange={(e) => {
+                                                            setCart("RemoteName", e.target.value);
+                                                            setRemoteName(Capitalize(e.target.value));
+                                                        }}/>
+                                                    </div>
+                                                }
+                                                <div className="motorized_option_left">
+                                                    <p>{t("Channel(s)")}</p>
+                                                    &nbsp;
+                                                    <span onClick={() => modalHandleShow("learnMore")}>{t("(Learn More)")}</span>
+                                                </div>
+                                                <div className="motorized_option_right">
+                                                    <div className="select_container multi_select_container">
+                                                        <Select
+                                                            className="select select_motor_channels"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            multi={true}
+                                                            values={selectedMotorChannels}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdownMulti props={props} state={state} methods={methods}/>
+                                                            }
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControlMulti props={props} state={state} methods={methods}/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                // setDeps("", "412");
+                                                                setCart("MotorChannels", selected.map(obj => obj.value));
+                                                                setSelectedMotorChannels(selected);
+                                                            }}
+                                                            options={motorChannels[pageLanguage]}
+                                                        />
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className="motorized_option_left">
-                                                <p>{t("Remote Name")}</p>
-                                                &nbsp;
-                                                <span onClick={() => modalHandleShow("learnMore")}>{t("(Learn More)")}</span>
-                                            </div>
-                                            <div className="motorized_option_right">
-                                                <input className="Remote_name" type="text" name="Remote_name" value={remoteName}
-                                                       placeholder={t("Enter a name for your remote")} onChange={(e) => {
-                                                    setCart("RemoteName", e.target.value);
-                                                    setRemoteName(e.target.value);
-                                                }}/>
-                                            </div>
-                                            <div className="motorized_option_left">
-                                                <p>{t("Channel(s)")}</p>
-                                                &nbsp;
-                                                <span onClick={() => modalHandleShow("learnMore")}>{t("(Learn More)")}</span>
-                                            </div>
-                                            <div className="motorized_option_right">
-                                                <div className="select_container multi_select_container">
-                                                    <Select
-                                                        className="select select_motor_channels"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        multi={true}
-                                                        values={selectedMotorChannels}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownMulti props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlMulti props={props} state={state} methods={methods}/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            // setDeps("", "412");
-                                                            setCart("MotorChannels", selected.map(obj => obj.value));
-                                                            setSelectedMotorChannels(selected);
-                                                        }}
-                                                        options={motorChannels[pageLanguage]}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
                                         }
                                         
                                         <NextStep eventKey={controlTypeNextStep}>{t("NEXT STEP")}</NextStep>
                                     </div>
                                     
                                     {(stepSelectedValue["4"] === "1" || stepSelectedValue["4"] === undefined) &&
-                                    <div className="accordion_help">
-                                        <div className="help_container">
-                                            <div className="help_column help_left_column">
-                                                <p className="help_column_header">{t("step4_help_1")}</p>
-                                                <ul className="help_column_list">
-                                                    <li>{t("step4_help_2")}</li>
-                                                    <li>{t("step4_help_3")}</li>
-                                                </ul>
-                                            </div>
-                                            <div className="help_column help_right_column">
-                                                <p className="help_column_header">{t("step4_help_4")}</p>
-                                                <ul className="help_column_list">
-                                                    {/*<li>{t("step4_help_5")}</li>*/}
-                                                    <li className="no_listStyle">
+                                        <div className="accordion_help">
+                                            <div className="help_container">
+                                                <div className="help_column help_left_column">
+                                                    <p className="help_column_header">{t("step4_help_1")}</p>
+                                                    <ul className="help_column_list">
+                                                        <li>{t("step4_help_2")}</li>
+                                                        <li>{t("step4_help_3")}</li>
+                                                    </ul>
+                                                </div>
+                                                <div className="help_column help_right_column">
+                                                    <p className="help_column_header">{t("step4_help_4")}</p>
+                                                    <ul className="help_column_list">
+                                                        {/*<li>{t("step4_help_5")}</li>*/}
+                                                        <li className="no_listStyle">
                                                         <span className="popover_indicator">
                                                             {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
                                                                                   children={<object className="popover_camera" type="image/svg+xml"
@@ -5303,12 +5777,12 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                                                   }/>
                                                             }
                                                         </span>{t("step4_help_5")}</li>
-                                                    {/*<li>{t("step4_help_5.5")}</li>*/}
-                                                    <li>{t("step4_help_6")}</li>
-                                                </ul>
+                                                        {/*<li>{t("step4_help_5.5")}</li>*/}
+                                                        <li>{t("step4_help_6")}</li>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
                                     }
                                 </Card.Body>
                             </Accordion.Collapse>
@@ -5316,109 +5790,109 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                         
                         {/* step 4A */}
                         {stepSelectedValue["4"] === "1" &&
-                        <Card>
-                            <Card.Header>
-                                <ContextAwareToggle eventKey="4A" stepNum={t("4A")} stepTitle={t("zebra_step4A")} stepRef="4A" type="1" required={requiredStep["4A"]}
-                                                    stepSelected={stepSelectedLabel["4A"] === undefined ? "" : stepSelectedLabel["4A"]}/>
-                            </Card.Header>
-                            <Accordion.Collapse eventKey="4A">
-                                <Card.Body>
-                                    <div className="card_body card_body_radio special_farsi_card_body">
-                                        <div className="box50 radio_style">
-                                            <img src={require('../Images/drapery/zebra/position_left.svg').default} className="img-fluid" alt=""/>
-                                            <input className="radio" type="radio" text={t("Left")} value="1" name="step4A" ref-num="4A" id="4A1" checked={step4A === "Left"}
-                                                   onChange={e => {
-                                                       selectChanged(e);
-                                                       setStep4A("Left");
-                                                       setDeps("", "4A");
-                                                       setCart("ControlPosition", "Left");
-                                                   }} ref={ref => (inputs.current["4A1"] = ref)}/>
-                                            <label htmlFor="4A1">{t("Left")}</label>
+                            <Card>
+                                <Card.Header>
+                                    <ContextAwareToggle eventKey="4A" stepNum={t("4A")} stepTitle={t("zebra_step4A")} stepRef="4A" type="1" required={requiredStep["4A"]}
+                                                        stepSelected={stepSelectedLabel["4A"] === undefined ? "" : stepSelectedLabel["4A"]}/>
+                                </Card.Header>
+                                <Accordion.Collapse eventKey="4A">
+                                    <Card.Body>
+                                        <div className="card_body card_body_radio special_farsi_card_body">
+                                            <div className="box50 radio_style radio_middle">
+                                                <img src={require('../Images/drapery/zebra/position_left.svg').default} className="img-fluid" alt=""/>
+                                                <input className="radio" type="radio" text={t("Left")} value="1" name="step4A" ref-num="4A" id="4A1" checked={step4A === "Left"}
+                                                       onChange={e => {
+                                                           selectChanged(e);
+                                                           setStep4A("Left");
+                                                           setDeps("", "4A");
+                                                           setCart("ControlPosition", "Left");
+                                                       }} ref={ref => (inputs.current["4A1"] = ref)}/>
+                                                <label htmlFor="4A1">{t("Left")}</label>
+                                            </div>
+                                            <div className="box50 radio_style radio_middle">
+                                                <img src={require('../Images/drapery/zebra/position_right.svg').default} className="img-fluid" alt=""/>
+                                                <input className="radio" type="radio" text={t("Right")} value="2" name="step4A"
+                                                       ref-num="4A" id="4A2" checked={step4A === "Right"}
+                                                       onChange={e => {
+                                                           selectChanged(e);
+                                                           setStep4A("Right");
+                                                           setDeps("", "4A");
+                                                           setCart("ControlPosition", "Right");
+                                                       }} ref={ref => (inputs.current["4A2"] = ref)}/>
+                                                <label htmlFor="4A2">{t("Right")}</label>
+                                            </div>
+                                            <NextStep eventKey="4B">{t("NEXT STEP")}</NextStep>
                                         </div>
-                                        <div className="box50 radio_style">
-                                            <img src={require('../Images/drapery/zebra/position_right.svg').default} className="img-fluid" alt=""/>
-                                            <input className="radio" type="radio" text={t("Right")} value="2" name="step4A"
-                                                   ref-num="4A" id="4A2" checked={step4A === "Right"}
-                                                   onChange={e => {
-                                                       selectChanged(e);
-                                                       setStep4A("Right");
-                                                       setDeps("", "4A");
-                                                       setCart("ControlPosition", "Right");
-                                                   }} ref={ref => (inputs.current["4A2"] = ref)}/>
-                                            <label htmlFor="4A2">{t("Right")}</label>
-                                        </div>
-                                        <NextStep eventKey="4B">{t("NEXT STEP")}</NextStep>
-                                    </div>
-                                    
-                                    
-                                    <div className="accordion_help">
-                                        <div className="help_container">
-                                            <div className="help_column help_left_column">
-                                                <p className="help_column_header"/>
-                                                <ul className="help_column_list">
-                                                    <li className="no_listStyle single_line_height">{t("step4A_help_1")}</li>
-                                                </ul>
+                                        
+                                        
+                                        <div className="accordion_help">
+                                            <div className="help_container">
+                                                <div className="help_column help_left_column">
+                                                    <p className="help_column_header"/>
+                                                    <ul className="help_column_list">
+                                                        <li className="no_listStyle single_line_height">{t("step4A_help_1")}</li>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                
-                                </Card.Body>
-                            </Accordion.Collapse>
-                        </Card>
+                                    
+                                    </Card.Body>
+                                </Accordion.Collapse>
+                            </Card>
                         }
                         
                         {/* step 4B */}
                         {stepSelectedValue["4"] === "1" &&
-                        <Card>
-                            <Card.Header>
-                                <ContextAwareToggle eventKey="4B" stepNum={t("4B")} stepTitle={t("zebra_step4B")} stepRef="4B" type="1" required={requiredStep["4B"]}
-                                                    stepSelected={stepSelectedLabel["4B"] === undefined ? "" : stepSelectedLabel["4B"]}/>
-                            </Card.Header>
-                            <Accordion.Collapse eventKey="4B">
-                                <Card.Body>
-                                    <div className="card_body card_body_radio">
-                                        <div className="box33 radio_style">
-                                            <input className="radio" type="radio" text={t("150cm")} value="1" name="step4B" ref-num="4B" id="4B1" checked={step4B === "150"}
-                                                   onChange={e => {
-                                                       selectChanged(e);
-                                                       setStep4B("150");
-                                                       setDeps("", "4B");
-                                                       setCart("ChainLength", "150");
-                                                   }} ref={ref => (inputs.current["4B1"] = ref)}/>
-                                            <label htmlFor="4B1">{t("150cm")}<br/><p className="no_surcharge_price">{t("(No extra charge)")}</p></label>
+                            <Card>
+                                <Card.Header>
+                                    <ContextAwareToggle eventKey="4B" stepNum={t("4B")} stepTitle={t("zebra_step4B")} stepRef="4B" type="1" required={requiredStep["4B"]}
+                                                        stepSelected={stepSelectedLabel["4B"] === undefined ? "" : stepSelectedLabel["4B"]}/>
+                                </Card.Header>
+                                <Accordion.Collapse eventKey="4B">
+                                    <Card.Body>
+                                        <div className="card_body card_body_radio">
+                                            <div className="box33 radio_style">
+                                                <input className="radio" type="radio" text={t("150cm")} value="1" name="step4B" ref-num="4B" id="4B1" checked={step4B === "150"}
+                                                       onChange={e => {
+                                                           selectChanged(e);
+                                                           setStep4B("150");
+                                                           setDeps("", "4B");
+                                                           setCart("ChainLength", "150");
+                                                       }} ref={ref => (inputs.current["4B1"] = ref)}/>
+                                                <label htmlFor="4B1">{t("150cm")}<br/><p className="no_surcharge_price">{t("(No extra charge)")}</p></label>
+                                            </div>
+                                            <div className="box33 radio_style">
+                                                <input className="radio" type="radio" text={t("300cm")} value="2" name="step4B"
+                                                       ref-num="4B" id="4B2" checked={step4B === "300"}
+                                                       onChange={e => {
+                                                           selectChanged(e);
+                                                           setStep4B("300");
+                                                           setDeps("", "4B");
+                                                           setCart("ChainLength", "300");
+                                                       }} ref={ref => (inputs.current["4B2"] = ref)}/>
+                                                <label htmlFor="4B2">{t("300cm")}<br/><p
+                                                    className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add ") : t("Surcharge Applies")}{(modelAccessories["2"] ? (modelAccessories["2"]["2"] ? GetPrice(modelAccessories["2"]["2"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
+                                                </label>
+                                            </div>
+                                            <div className="box33 radio_style">
+                                                <input className="radio" type="radio" text={t("500cm")} value="3" name="step4B"
+                                                       ref-num="4B" id="4B3" checked={step4B === "500"}
+                                                       onChange={e => {
+                                                           selectChanged(e);
+                                                           setStep4B("500");
+                                                           setDeps("", "4B");
+                                                           setCart("ChainLength", "500");
+                                                       }} ref={ref => (inputs.current["4B3"] = ref)}/>
+                                                <label htmlFor="4B3">{t("500cm")}<br/><p
+                                                    className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add ") : t("Surcharge Applies")}{(modelAccessories["2"] ? (modelAccessories["2"]["3"] ? GetPrice(modelAccessories["2"]["3"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
+                                                </label>
+                                            </div>
+                                            <NextStep eventKey="5">{t("NEXT STEP")}</NextStep>
                                         </div>
-                                        <div className="box33 radio_style">
-                                            <input className="radio" type="radio" text={t("300cm")} value="2" name="step4B"
-                                                   ref-num="4B" id="4B2" checked={step4B === "300"}
-                                                   onChange={e => {
-                                                       selectChanged(e);
-                                                       setStep4B("300");
-                                                       setDeps("", "4B");
-                                                       setCart("ChainLength", "300");
-                                                   }} ref={ref => (inputs.current["4B2"] = ref)}/>
-                                            <label htmlFor="4B2">{t("300cm")}<br/><p
-                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["2"] ? (modelAccessories["2"]["2"] ? GetPrice(modelAccessories["2"]["2"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
-                                            </label>
-                                        </div>
-                                        <div className="box33 radio_style">
-                                            <input className="radio" type="radio" text={t("500cm")} value="3" name="step4B"
-                                                   ref-num="4B" id="4B3" checked={step4B === "500"}
-                                                   onChange={e => {
-                                                       selectChanged(e);
-                                                       setStep4B("500");
-                                                       setDeps("", "4B");
-                                                       setCart("ChainLength", "500");
-                                                   }} ref={ref => (inputs.current["4B3"] = ref)}/>
-                                            <label htmlFor="4B3">{t("500cm")}<br/><p
-                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add "): t("Surcharge Applies")}{(modelAccessories["2"] ? (modelAccessories["2"]["3"] ? GetPrice(modelAccessories["2"]["3"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
-                                            </label>
-                                        </div>
-                                        <NextStep eventKey="5">{t("NEXT STEP")}</NextStep>
-                                    </div>
-                                
-                                </Card.Body>
-                            </Accordion.Collapse>
-                        </Card>
+                                    
+                                    </Card.Body>
+                                </Accordion.Collapse>
+                            </Card>
                         }
                         
                         {/* step 5 */}
@@ -5455,90 +5929,90 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                             <label htmlFor="52">{t("style_Metal Valance")}<br/>{t("style_Fabric Insert")}</label>
                                         </div>
                                         {(stepSelectedValue["5"] === "1" || stepSelectedValue["5"] === "2") &&
-                                        <div className="selection_section">
-                                            <div className="select_container">
-                                                {stepSelectedValue["5"] === "1" &&
-                                                <Select
-                                                    className="select"
-                                                    placeholder={t("Please Select")}
-                                                    portal={document.body}
-                                                    dropdownPosition="bottom"
-                                                    dropdownHandle={false}
-                                                    dropdownGap={0}
-                                                    values={selectedValanceColor1}
-                                                    onDropdownOpen={() => {
-                                                        let temp1 = window.scrollY;
-                                                        window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                        setTimeout(() => {
-                                                            let temp2 = window.scrollY;
-                                                            if (temp2 === temp1)
-                                                                window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                        }, 100);
-                                                    }}
-                                                    dropdownRenderer={
-                                                        ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
+                                            <div className="selection_section">
+                                                <div className="select_container">
+                                                    {stepSelectedValue["5"] === "1" &&
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            values={selectedValanceColor1}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
+                                                            }
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected.length) {
+                                                                    setDeps("", "51");
+                                                                    setCart("MetalValanceColor", selected[0].value);
+                                                                    let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                                    tempLabels["5"] = t("style_Metal Valance") + "/" + selected[0].label;
+                                                                    setStepSelectedLabel(tempLabels);
+                                                                }
+                                                            }}
+                                                            options={optionsMetalValance[pageLanguage]}
+                                                        />
                                                     }
-                                                    contentRenderer={
-                                                        ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                </div>
+                                                <div className="select_container">
+                                                    {stepSelectedValue["5"] === "2" &&
+                                                        <Select
+                                                            className="select"
+                                                            placeholder={t("Please Select")}
+                                                            portal={document.body}
+                                                            dropdownPosition="bottom"
+                                                            dropdownHandle={false}
+                                                            dropdownGap={0}
+                                                            values={selectedValanceColor2}
+                                                            onDropdownOpen={() => {
+                                                                let temp1 = window.scrollY;
+                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                                setTimeout(() => {
+                                                                    let temp2 = window.scrollY;
+                                                                    if (temp2 === temp1)
+                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                                }, 100);
+                                                            }}
+                                                            dropdownRenderer={
+                                                                ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
+                                                            }
+                                                            contentRenderer={
+                                                                ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                            }
+                                                            // optionRenderer={
+                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                            // }
+                                                            onChange={(selected) => {
+                                                                if (selected.length) {
+                                                                    setDeps("", "52");
+                                                                    setCart("MetalValanceColor", selected[0].value);
+                                                                    let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                                    tempLabels["5"] = t("style_Metal Valance") + " " + t("style_Fabric Insert") + "/" + selected[0].label;
+                                                                    setStepSelectedLabel(tempLabels);
+                                                                }
+                                                            }}
+                                                            options={optionsMetalValanceFabricInsert[pageLanguage]}
+                                                        />
                                                     }
-                                                    // optionRenderer={
-                                                    //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                    // }
-                                                    onChange={(selected) => {
-                                                        if (selected.length) {
-                                                            setDeps("", "51");
-                                                            setCart("MetalValanceColor", selected[0].value);
-                                                            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                            tempLabels["5"] = t("style_Metal Valance") + "/" + selected[0].label;
-                                                            setStepSelectedLabel(tempLabels);
-                                                        }
-                                                    }}
-                                                    options={optionsMetalValance[pageLanguage]}
-                                                />
-                                                }
+                                                </div>
                                             </div>
-                                            <div className="select_container">
-                                                {stepSelectedValue["5"] === "2" &&
-                                                <Select
-                                                    className="select"
-                                                    placeholder={t("Please Select")}
-                                                    portal={document.body}
-                                                    dropdownPosition="bottom"
-                                                    dropdownHandle={false}
-                                                    dropdownGap={0}
-                                                    values={selectedValanceColor2}
-                                                    onDropdownOpen={() => {
-                                                        let temp1 = window.scrollY;
-                                                        window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                        setTimeout(() => {
-                                                            let temp2 = window.scrollY;
-                                                            if (temp2 === temp1)
-                                                                window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                        }, 100);
-                                                    }}
-                                                    dropdownRenderer={
-                                                        ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
-                                                    }
-                                                    contentRenderer={
-                                                        ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
-                                                    }
-                                                    // optionRenderer={
-                                                    //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                    // }
-                                                    onChange={(selected) => {
-                                                        if (selected.length) {
-                                                            setDeps("", "52");
-                                                            setCart("MetalValanceColor", selected[0].value);
-                                                            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                            tempLabels["5"] = t("style_Metal Valance") + " " + t("style_Fabric Insert") + "/" + selected[0].label;
-                                                            setStepSelectedLabel(tempLabels);
-                                                        }
-                                                    }}
-                                                    options={optionsMetalValanceFabricInsert[pageLanguage]}
-                                                />
-                                                }
-                                            </div>
-                                        </div>
                                         }
                                         <NextStep eventKey="6">{t("NEXT STEP")}</NextStep>
                                     </div>
@@ -5682,7 +6156,9 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                         <span className="details-label unselectable">{detailsShow ? t("Hide Details") : t("Add Room Image")}</span>
                                                         <span className="details_indicator">
                                                             {/*<i className="arrow_down"/>*/}
-                                                            <img className="arrow_down img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
+                                                            {detailsShow && <img className="arrow_down img-fluid" src={require('../Images/public/arrow_up.svg').default} alt=""/>}
+                                                            {!detailsShow &&
+                                                                <img className="arrow_down img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>}
                                                         </span>
                                                     </div>
                                                     <div className="uploaded_images_section">
@@ -5792,12 +6268,13 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                                setDeps("62", "");
                                                            else
                                                                setDeps("", "62");
-                                                           roomLabelChanged(e.target.value, "6", true);
-                                                           setRoomLabelText(e.target.value);
-                                                           setCart("WindowName", e.target.value);
+                                                           roomLabelChanged(Capitalize(e.target.value), "6", true);
+                                                           setRoomLabelText(Capitalize(e.target.value));
+                                                           setCart("WindowName", Capitalize(e.target.value));
                                                        }}/>
                                             </div>
                                         </div>
+                                        <NextStep eventKey="7">{t("NEXT STEP")}</NextStep>
                                     </div>
                                     <div className=" accordion_help">
                                         <div className=" help_container">
@@ -5812,6 +6289,107 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                                 <ul className=" help_column_list">
                                                     <li className=" no_listStyle">{t("step6_help_4")}</li>
                                                 </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
+                        {/* step 7 */}
+                        <Card>
+                            <Card.Header>
+                                <ContextAwareToggle eventKey="7" stepNum={t("7")} stepTitle={t("zebra_step7")} stepTitle2={t("(Optional)")} stepRef="7" type="2" required={requiredStep["7"]}
+                                                    stepSelected={stepSelectedLabel["7"] === undefined ? "" : stepSelectedLabel["7"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="7">
+                                <Card.Body>
+                                    <div className="card_body card_body_zipcode">
+                                        <div className="zipcode_bag_section">
+                                            <div className="zipcode_section_container">
+                                                <div className="zipcode_text zipcode_section_title_container">
+                                                    <img src={require('../Images/public/W_truck.png')} alt="" className="img-fluid"/>
+                                                    <h3>{t("zipcode_text1")}</h3>
+                                                </div>
+                                                <h3 className="zipcode_text">{t("zipcode_text1.5")}</h3>
+                                                {/*<div className="zipcode_selection_container">*/}
+                                                {/*    <Accordion>*/}
+                                                {/*        <Accordion.Item eventKey="0">*/}
+                                                {/*            <ContextAwareToggleViewDetails eventKey="0" textOnHide={t("Zip code")} textOnShow={t("Zip code")} customClass={"Zipcode_accordion_button"}*/}
+                                                {/*                                           customClass2={"Zipcode_accordion_button_text"}/>*/}
+                                                {/*            <Accordion.Body className="zipcode_dropdown">*/}
+                                                {/*                <div className="zipcode_dropdown_div_container">*/}
+                                                {/*                    <div className="zipcode_input_container">*/}
+                                                {/*                        <input className="zipcode_input form-control" type="text" name="zipcode_input" value={zipcode}*/}
+                                                {/*                               placeholder={t("Enter Zip Code")} onChange={(e) => {*/}
+                                                {/*                            setZipcode(e.target.value.replace(/\D+/g, ''));*/}
+                                                {/*                        }}/>*/}
+                                                {/*                        <button className="zipcode_input_button white_btn"*/}
+                                                {/*                                onClick={() => {*/}
+                                                {/*                                    setZipcodeButton(true);*/}
+                                                {/*                                    measureWindowSize(zipcode);*/}
+                                                {/*                                }}>*/}
+                                                {/*                            <div/>*/}
+                                                {/*                        </button>*/}
+                                                {/*                    </div>*/}
+                                                {/*                </div>*/}
+                                                {/*            </Accordion.Body>*/}
+                                                {/*        </Accordion.Item>*/}
+                                                {/*    </Accordion>*/}
+                                                {/*</div>*/}
+                                                <div className="zipcode_dropdown_div_container">
+                                                    <div className="zipcode_input_container">
+                                                        <input className="zipcode_input form-control" type="text" name="zipcode_input" value={zipcode}
+                                                               placeholder={t("Enter Zip Code")} onChange={(e) => {
+                                                            setZipcode(e.target.value.replace(/\D+/g, ''));
+                                                        }}/>
+                                                        <button className="zipcode_input_button white_btn"
+                                                                onClick={() => {
+                                                                    setZipcodeButton(true);
+                                                                    measureWindowSize(zipcode);
+                                                                }}>
+                                                            <div/>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                {zipcodeButton &&
+                                                    <h3 className="zipcode_text2">
+                                                        {zipcodeButton && hasInstall === false &&
+                                                            t("zipcode_text2")
+                                                        }
+                                                        {zipcodeButton && hasInstall &&
+                                                            t("zipcode_text3")
+                                                        }
+                                                    </h3>
+                                                }
+                                                {zipcodeButton && hasInstall && installPrice === -1 &&
+                                                    <h3 className="zipcode_text">{t("zipcode_text8")}</h3>
+                                                }
+                                                {zipcodeButton && hasInstall && !!installPrice && installPrice !== -1 &&
+                                                    <div className="zipcode_available_container">
+                                                        <div className="checkbox_style">
+                                                            <input type="checkbox" value="1" name="zipcode" disabled={addingLoading} checked={zipcodeChecked === "true"} onChange={(e) => {
+                                                                if (e.target.checked) {
+                                                                    setZipcodeChecked("true");
+                                                                    setCart("ZipCode", zipcode);
+                                                                } else {
+                                                                    setZipcodeChecked("false");
+                                                                    setCart("", "","ZipCode");
+                                                                }
+                                                            }} id="zipcode" ref={ref => (inputs.current["zipcode"] = ref)}/>
+                                                            <label htmlFor="zipcode" className="checkbox_label">
+                                                                <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
+                                                                     alt=""/>
+                                                            </label>
+                                                            <span className="checkbox_text">
+                                                                {t("zipcode_text4")}{GetPrice(installPrice, pageLanguage, t("TOMANS"))}{t("zipcode_text5")}
+                                                                                    <br/>
+                                                                                    {t("zipcode_text5.5")}{GetPrice(transportPrice, pageLanguage, t("TOMANS"))}{t("zipcode_text6")}
+                                                            </span>
+                                                        </div>
+                                                        <h3 className="zipcode_text3">{t("zipcode_text7")}</h3>
+                                                    </div>
+                                                }
                                             </div>
                                         </div>
                                     </div>
@@ -5913,99 +6491,141 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                     <p className="measurementsHelp_modal_title">{t("HOW TO MEASURE FOR ZEBRA SHADES")}</p>
                     <div className="help_options_container">
                         <ul className="help_options">
-                            <li className={`help_option_item ${helpMeasure==="Inside"?"help_option_item_on":""}`} onClick={()=>setHelpMeasure("Inside")}>{t("bold_Inside_mount")}</li>
+                            <li className={`help_option_item ${helpMeasure === "Inside" ? "help_option_item_on" : ""}`}
+                                onClick={() => setHelpMeasure("Inside")}>{t("bold_Inside_mount")}</li>
                             <li className="help_option_item_separator"></li>
-                            <li className={`help_option_item ${helpMeasure==="Outside"?"help_option_item_on":""}`} onClick={()=>setHelpMeasure("Outside")}>{t("bold_Outside_mount")}</li>
+                            <li className={`help_option_item ${helpMeasure === "Outside" ? "help_option_item_on" : ""}`}
+                                onClick={() => setHelpMeasure("Outside")}>{t("bold_Outside_mount")}</li>
+                            <li className="help_option_item_separator"></li>
+                            <li className={`help_option_item ${helpMeasure === "HiddenMoulding" ? "help_option_item_on" : ""}`}
+                                onClick={() => setHelpMeasure("HiddenMoulding")}>{t("bold_Arc_mount")}</li>
                         </ul>
                     </div>
-                    {helpMeasure==="Inside" &&
-                    <div>
-                    <div className="measurementsHelp_modal_img_section">
-                        {/*<p className="measurementsHelp_modal_img_title">{t("Inside Mount")}</p>*/}
-                        <object className="measurementsHelp_modal_img" type="image/svg+xml"
-                                data={pageLanguage === 'fa' ? require('../Images/drapery/zebra/step3_help_inside_fa.svg').default : require('../Images/drapery/zebra/step3_help_inside.svg').default}/>
-                    </div>
-                    <div className="accordion_help measurementsHelp_modal_help_section">
-                        <div className="help_container">
-                            <div className="help_column help_left_column">
-                                <p className="help_column_header">{t("TO DETERMINE INSIDE MOUNT")}</p>
-                                <ul className="help_column_list">
-                                    <li>{t("modal_help_1")}</li>
-                                    <li>{t("modal_help_2")}</li>
-                                    <li>{t("modal_help_2.5")}</li>
-                                    <li>{t("modal_help_3")}</li>
-                                </ul>
+                    {helpMeasure === "Inside" &&
+                        <div>
+                            <div className="measurementsHelp_modal_img_section">
+                                {/*<p className="measurementsHelp_modal_img_title">{t("Inside Mount")}</p>*/}
+                                <object className="measurementsHelp_modal_img" type="image/svg+xml"
+                                        data={pageLanguage === 'fa' ? require('../Images/drapery/zebra/step3_help_inside_fa.svg').default : require('../Images/drapery/zebra/step3_help_inside.svg').default}/>
                             </div>
-                            
-                            <div className="help_column help_left_column">
-                                <p className="help_column_header">{t("STEP 1: MEASURE WIDTH")}</p>
-                                <ul className="help_column_list">
-                                    <li>{t("modal_help_4")}</li>
-                                    <li>{t("modal_help_5")}</li>
-                                </ul>
-                            </div>
-                            
-                            <div className="help_column help_right_column">
-                                <p className="help_column_header">{t("STEP 2: MEASURE LENGTH")}</p>
-                                <ul className="help_column_list">
-                                    <li>{t("modal_help_6")}</li>
-                                    <li>{t("modal_help_7")}</li>
-                                </ul>
+                            <div className="accordion_help measurementsHelp_modal_help_section">
+                                <div className="help_container">
+                                    <div className="help_column help_left_column">
+                                        <p className="help_column_header">{t("TO DETERMINE INSIDE MOUNT")}</p>
+                                        <ul className="help_column_list">
+                                            <li>{t("modal_help_1")}</li>
+                                            <li>{t("modal_help_2")}</li>
+                                            <li>{t("modal_help_2.5")}</li>
+                                            <li>{t("modal_help_3")}</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div className="help_column help_left_column">
+                                        <p className="help_column_header">{t("STEP 1: MEASURE WIDTH")}</p>
+                                        <ul className="help_column_list">
+                                            <li>{t("modal_help_4")}</li>
+                                            <li>{t("modal_help_5")}</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div className="help_column help_right_column">
+                                        <p className="help_column_header">{t("STEP 2: MEASURE LENGTH")}</p>
+                                        <ul className="help_column_list">
+                                            <li>{t("modal_help_6")}</li>
+                                            <li>{t("modal_help_7")}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <br/>
+                                <br/>
+                                <div className="help_container">
+                                    <div className="help_column help_right_column">
+                                        <p className="help_column_header"/>
+                                        <ul className="help_column_list">
+                                            <li><b>{t("Note:&nbsp;")}</b>{t("modal_help_8")}</li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <br/>
-                        <br/>
-                        <div className="help_container">
-                            <div className="help_column help_right_column">
-                                <p className="help_column_header"/>
-                                <ul className="help_column_list">
-                                    <li><b>{t("Note:&nbsp;")}</b>{t("modal_help_8")}</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    </div>
                     }
                     {/*<br/>*/}
                     {/*<br/>*/}
                     {/*<br/>*/}
-    
-                    {helpMeasure==="Outside" &&
+                    
+                    {helpMeasure === "Outside" &&
                         <div>
-                    <div className="measurementsHelp_modal_img_section">
-                        {/*<p className="measurementsHelp_modal_title">{t("HOW TO MEASURE FOR ZEBRA SHADES")}</p>*/}
-                        {/*<p className="measurementsHelp_modal_img_title">{t("Outside Mount")}</p>*/}
-                        <object className="measurementsHelp_modal_img" type="image/svg+xml"
-                                data={pageLanguage === 'fa' ? require('../Images/drapery/zebra/step3_help_outside_fa.svg').default : require('../Images/drapery/zebra/step3_help_outside.svg').default}/>
-                    </div>
-                    <div className="accordion_help measurementsHelp_modal_help_section">
-                        <div className="help_container">
-                            <div className="help_column help_left_column">
-                                <p className="help_column_header">{t("TO DETERMINE OUTSIDE MOUNT")}</p>
-                                <ul className="help_column_list">
-                                    <li>{t("modal_help_9")}</li>
-                                    <li>{t("modal_help_10")}</li>
-                                    <li>{t("modal_help_11")}</li>
-                                </ul>
+                            <div className="measurementsHelp_modal_img_section">
+                                {/*<p className="measurementsHelp_modal_title">{t("HOW TO MEASURE FOR ZEBRA SHADES")}</p>*/}
+                                {/*<p className="measurementsHelp_modal_img_title">{t("Outside Mount")}</p>*/}
+                                <object className="measurementsHelp_modal_img" type="image/svg+xml"
+                                        data={pageLanguage === 'fa' ? require('../Images/drapery/zebra/step3_help_outside_fa.svg').default : require('../Images/drapery/zebra/step3_help_outside.svg').default}/>
                             </div>
-                            
-                            <div className="help_column help_left_column">
-                                <p className="help_column_header">{t("STEP 1: MEASURE WIDTH")}</p>
-                                <ul className="help_column_list">
-                                    <li>{t("modal_help_12")}</li>
-                                    <li>{t("modal_help_13")}</li>
-                                </ul>
-                            </div>
-                            
-                            <div className="help_column help_right_column">
-                                <p className="help_column_header">{t("STEP 2: MEASURE LENGTH")}</p>
-                                <ul className="help_column_list">
-                                    <li>{t("modal_help_14")}</li>
-                                    <li>{t("modal_help_15")}</li>
-                                </ul>
+                            <div className="accordion_help measurementsHelp_modal_help_section">
+                                <div className="help_container">
+                                    <div className="help_column help_left_column">
+                                        <p className="help_column_header">{t("TO DETERMINE OUTSIDE MOUNT")}</p>
+                                        <ul className="help_column_list">
+                                            <li>{t("modal_help_9")}</li>
+                                            <li>{t("modal_help_10")}</li>
+                                            <li>{t("modal_help_11")}</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div className="help_column help_left_column">
+                                        <p className="help_column_header">{t("STEP 1: MEASURE WIDTH")}</p>
+                                        <ul className="help_column_list">
+                                            <li>{t("modal_help_12")}</li>
+                                            <li>{t("modal_help_13")}</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div className="help_column help_right_column">
+                                        <p className="help_column_header">{t("STEP 2: MEASURE LENGTH")}</p>
+                                        <ul className="help_column_list">
+                                            <li>{t("modal_help_14")}</li>
+                                            <li>{t("modal_help_15")}</li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    }
+                    {helpMeasure === "HiddenMoulding" &&
+                        <div>
+                            <div className="measurementsHelp_modal_img_section">
+                                {/*<p className="measurementsHelp_modal_title">{t("HOW TO MEASURE FOR ZEBRA SHADES")}</p>*/}
+                                {/*<p className="measurementsHelp_modal_img_title">{t("Outside Mount")}</p>*/}
+                                <object className="measurementsHelp_modal_img" type="image/svg+xml"
+                                        data={pageLanguage === 'fa' ? require('../Images/drapery/zebra/step3_help_outside_fa.svg').default : require('../Images/drapery/zebra/step3_help_outside.svg').default}/>
+                            </div>
+                            <div className="accordion_help measurementsHelp_modal_help_section">
+                                <div className="help_container">
+                                    <div className="help_column help_left_column">
+                                        <p className="help_column_header">{t("TO DETERMINE HIDDEN MOULDING MOUNT")}</p>
+                                        <ul className="help_column_list">
+                                            <li>{t("modal_help_16")}</li>
+                                            <li>{t("modal_help_17")}</li>
+                                            <li>{t("modal_help_18")}</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div className="help_column help_left_column">
+                                        <p className="help_column_header">{t("STEP 1: MEASURE WIDTH")}</p>
+                                        <ul className="help_column_list">
+                                            <li>{t("modal_help_19")}</li>
+                                            <li>{t("modal_help_20")}</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div className="help_column help_right_column">
+                                        <p className="help_column_header">{t("STEP 2: MEASURE LENGTH")}</p>
+                                        <ul className="help_column_list">
+                                            <li>{t("modal_help_21")}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     }
                     <br/>
@@ -6328,40 +6948,43 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                        setCartStateAgree(false);
                    }} id="cart_modal">
                 {cartStateAgree &&
-                <div
-                    className="custom_cart_header_desc">{`${(freeShipPrice - totalCartPrice) > 0 ? `${t("cart_agree_free_ship1")}${pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${GetPrice(freeShipPrice - totalCartPrice, pageLanguage, t("TOMANS"))}`) : GetPrice(freeShipPrice - totalCartPrice, pageLanguage, t("TOMANS"))}${t("cart_agree_free_ship2")}` : `${t("cart_agree_free_ship")}`}`}</div>
+                    <div
+                        className="custom_cart_header_desc">{`${(freeShipPrice - totalCartPrice) > 0 ? `${t("cart_agree_free_ship1")}${pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${GetPrice(freeShipPrice - totalCartPrice, pageLanguage, t("TOMANS"))}`) : GetPrice(freeShipPrice - totalCartPrice, pageLanguage, t("TOMANS"))}${t("cart_agree_free_ship2")}` : `${t("cart_agree_free_ship")}`}`}</div>
                 }
                 <Modal.Header>
                     {cartStateAgree &&
-                    <span className="custom_cart_title">{t("My Bag")} <h3>({pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${cartCount}`) : cartCount})</h3></span>
+                        <span className="custom_cart_title">{t("My Bag")} <h3>({pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${cartCount}`) : cartCount})</h3></span>
                     }
                     {!cartStateAgree &&
-                    <p className="custom_cart_title">&nbsp;</p>
+                        <p className="custom_cart_title">&nbsp;</p>
                     }
                     <button className="custom_cart_close" onClick={() => {
                         modalHandleClose("cart_modal");
                         setCartStateAgree(false);
+                        if (cartStateAgree) {
+                            navigate("/" + pageLanguage);
+                        }
                     }}>{t("CONTINUE SHOPPING")}
                     </button>
                 </Modal.Header>
                 <Modal.Body>
                     {cartStateAgree &&
-                    <ul className="custom_cart_items_container">
-                        {cartItems}
-                    </ul>
+                        <ul className="custom_cart_items_container">
+                            {cartItems}
+                        </ul>
                     }
                     
                     {!cartStateAgree &&
-                    <h1 className="cart_agree_title1">{t("REVIEW ORDER")}</h1>
+                        <h1 className="cart_agree_title1">{t("REVIEW ORDER")}</h1>
                     }
                     {!cartStateAgree &&
-                    <h2 className="cart_agree_title2">{t("TERMS OF SALE")}</h2>
+                        <h2 className="cart_agree_title2">{t("TERMS OF SALE")}</h2>
                     }
                     {!cartStateAgree &&
-                    <div>{cartAgree}</div>
+                        <div>{cartAgree}</div>
                     }
                     {!cartStateAgree &&
-                    <span className="cart_agree_desc">
+                        <span className="cart_agree_desc">
                         <div className="checkbox_style">
                             <input type="checkbox" checked={cartAgreeDescription} onChange={(e) => {
                                 setCartAgreeDescription(e.target.checked);
@@ -6378,28 +7001,28 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                     </span>
                     }
                     {!cartStateAgree &&
-                    <div className="go_to_checkout">
-                        <button className="basket_checkout" onClick={() => {
-                            setAddingLoading(true);
-                            addToCart_agreed();
-                        }} disabled={addingLoading || !cartAgreeDescription}>{addingLoading ? t("ADDING...") : t("AGREE & ADD TO BAG")}
-                        </button>
-                    </div>
+                        <div className="go_to_checkout">
+                            <button className="basket_checkout" onClick={() => {
+                                setAddingLoading(true);
+                                addToCart_agreed();
+                            }} disabled={addingLoading || !cartAgreeDescription}>{addingLoading ? t("ADDING...") : t("AGREE & ADD TO BAG")}
+                            </button>
+                        </div>
                     }
                 </Modal.Body>
                 <Modal.Footer>
                     {cartStateAgree &&
-                    <div className="go_to_checkout">
-                        <div className="checkout_button_section small_checkout_button_section">
+                        <div className="go_to_checkout">
+                            <div className="checkout_button_section small_checkout_button_section">
                             <span className="checkout_payment_price_detail payment_price_detail">
                                 <h3>{t("SUBTOTAL")}</h3>
                                 <h4>{GetPrice(totalCartPrice, pageLanguage, t("TOMANS"))}</h4>
                             </span>
-                            <Link className="basket_checkout btn" to={"/" + pageLanguage + "/Basket"} onClick={() => {
-                                setCartStateAgree(false);
-                            }}>{t("CHECKOUT")}</Link>
+                                <Link className="basket_checkout btn" to={"/" + pageLanguage + "/Basket"} onClick={() => {
+                                    setCartStateAgree(false);
+                                }}>{t("CHECKOUT")}</Link>
+                            </div>
                         </div>
-                    </div>
                     }
                 </Modal.Footer>
             </Modal>
@@ -6415,124 +7038,124 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                 </Modal.Header>
                 <Modal.Body>
                     {projectModalState === 0 &&
-                    <div className="add_to_project_container2">
-                        <h2 className="project_added_text">{t("Please select a room name")}</h2>
-                        <div className="box100 selectInput_section">
-                            <div className="room_select">
-                                <label className="select_label">{t("Room")}</label>
-                                <div className="select_container">
-                                    <Select
-                                        className="select"
-                                        placeholder={t("Please Select")}
-                                        // portal={document.body}
-                                        dropdownPosition="bottom"
-                                        dropdownHandle={false}
-                                        dropdownGap={0}
-                                        values={selectedRoomLabel}
-                                        // onDropdownOpen={() => {
-                                        //     let temp1 = window.scrollY;
-                                        //     window.scrollTo(window.scrollX, window.scrollY + 1);
-                                        //     setTimeout(() => {
-                                        //         let temp2 = window.scrollY;
-                                        //         if (temp2 === temp1)
-                                        //             window.scrollTo(window.scrollX, window.scrollY - 1);
-                                        //     }, 100);
-                                        // }}
-                                        dropdownRenderer={
-                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                        }
-                                        contentRenderer={
-                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
-                                        }
-                                        // optionRenderer={
-                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                        // }
-                                        onChange={(selected) => {
-                                            setDeps("", "61");
-                                            roomLabelChanged(selected[0], "6", false);
-                                            setSelectedRoomLabel(selected);
-                                            // setCart("RoomNameEn", selected[0].value);
-                                            setCart("RoomNameFa", rooms["fa"].find(opt => opt.value === selected[0].value).label, "", "RoomNameEn", [selected[0].value]);
-                                        }}
-                                        options={rooms[pageLanguage]}
-                                    />
+                        <div className="add_to_project_container2">
+                            <h2 className="project_added_text">{t("Please select a room name")}</h2>
+                            <div className="box100 selectInput_section">
+                                <div className="room_select">
+                                    <label className="select_label">{t("Room")}</label>
+                                    <div className="select_container">
+                                        <Select
+                                            className="select"
+                                            placeholder={t("Please Select")}
+                                            // portal={document.body}
+                                            dropdownPosition="bottom"
+                                            dropdownHandle={false}
+                                            dropdownGap={0}
+                                            values={selectedRoomLabel}
+                                            // onDropdownOpen={() => {
+                                            //     let temp1 = window.scrollY;
+                                            //     window.scrollTo(window.scrollX, window.scrollY + 1);
+                                            //     setTimeout(() => {
+                                            //         let temp2 = window.scrollY;
+                                            //         if (temp2 === temp1)
+                                            //             window.scrollTo(window.scrollX, window.scrollY - 1);
+                                            //     }, 100);
+                                            // }}
+                                            dropdownRenderer={
+                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                            }
+                                            contentRenderer={
+                                                ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                            }
+                                            // optionRenderer={
+                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                            // }
+                                            onChange={(selected) => {
+                                                setDeps("", "61");
+                                                roomLabelChanged(selected[0], "6", false);
+                                                setSelectedRoomLabel(selected);
+                                                // setCart("RoomNameEn", selected[0].value);
+                                                setCart("RoomNameFa", rooms["fa"].find(opt => opt.value === selected[0].value).label, "", "RoomNameEn", [selected[0].value]);
+                                            }}
+                                            options={rooms[pageLanguage]}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="room_select">
+                                    <label className="select_label">{t("Window Description")}</label>
+                                    <input type="text" placeholder={t("Window Description")} className="form-control window_name" name="order_window_name"
+                                           value={roomLabelText}
+                                           onChange={(e) => {
+                                               if (e.target.value === "")
+                                                   setDeps("62", "");
+                                               else
+                                                   setDeps("", "62");
+                                               roomLabelChanged(Capitalize(e.target.value), "6", true);
+                                               setRoomLabelText(Capitalize(e.target.value));
+                                               setCart("WindowName", Capitalize(e.target.value));
+                                           }}/>
                                 </div>
                             </div>
-                            <div className="room_select">
-                                <label className="select_label">{t("Window Description")}</label>
-                                <input type="text" placeholder={t("Window Description")} className="form-control window_name" name="order_window_name"
-                                       value={roomLabelText}
-                                       onChange={(e) => {
-                                           if (e.target.value === "")
-                                               setDeps("62", "");
-                                           else
-                                               setDeps("", "62");
-                                           roomLabelChanged(e.target.value, "6", true);
-                                           setRoomLabelText(e.target.value);
-                                           setCart("WindowName", e.target.value);
-                                       }}/>
-                            </div>
+                            {!!(roomLabelText !== "" && selectedRoomLabel.length) &&
+                                <button className="save_item_btn btn-new-dark"
+                                        onClick={() => {
+                                            if (roomLabelText !== "" && selectedRoomLabel.length) {
+                                                setSavingLoading(true);
+                                                if (projectId && projectId !== "") {
+                                                    SaveUserProject(depSet, cartValues, [uploadedImagesFile, uploadedImagesURL, uploadedPDFFile, uploadedPDFURL], `${modelID}`, price, defaultModelName, defaultModelNameFa, projectData).then((temp) => {
+                                                        if (temp === 401) {
+                                                            setSaveProjectCount(saveProjectCount + 1);
+                                                        } else if (temp) {
+                                                            modalHandleShow("add_to_project_modal");
+                                                            setProjectModalState(1);
+                                                            setSavingLoading(false);
+                                                        } else {
+                                                            console.log("project not saved!");
+                                                            setSavingLoading(false);
+                                                        }
+                                                    }).catch(() => {
+                                                        // console.log("hi4");
+                                                        setProjectModalState(2);
+                                                        setSavingLoading(false);
+                                                    });
+                                                } else {
+                                                    SaveUserProject(depSet, cartValues, [uploadedImagesFile, uploadedImagesURL, uploadedPDFFile, uploadedPDFURL], `${modelID}`, price, defaultModelName, defaultModelNameFa).then((temp) => {
+                                                        if (temp === 401) {
+                                                            setSaveProjectCount(saveProjectCount + 1);
+                                                        } else if (temp) {
+                                                            setProjectModalState(1);
+                                                            setSavingLoading(false);
+                                                        } else {
+                                                            console.log("project not saved!");
+                                                            setSavingLoading(false);
+                                                        }
+                                                    }).catch((err) => {
+                                                        // console.log("hi3",);
+                                                        setProjectModalState(2);
+                                                        setSavingLoading(false);
+                                                    });
+                                                }
+                                            } else {
+                                                setProjectModalState(0);
+                                            }
+                                        }} disabled={savingLoading}>{savingLoading ? t("SAVING...") : t("SAVE ITEM")}
+                                </button>
+                            }
                         </div>
-                        {!!(roomLabelText !== "" && selectedRoomLabel.length) &&
-                        <button className="save_item_btn btn-new-dark"
-                                onClick={() => {
-                                    if (roomLabelText !== "" && selectedRoomLabel.length) {
-                                        setSavingLoading(true);
-                                        if (projectId && projectId !== "") {
-                                            SaveUserProject(depSet, cartValues, [uploadedImagesFile, uploadedImagesURL, uploadedPDFFile, uploadedPDFURL], `${modelID}`, price, defaultModelName, defaultModelNameFa, projectData).then((temp) => {
-                                                if (temp === 401) {
-                                                    setSaveProjectCount(saveProjectCount + 1);
-                                                } else if (temp) {
-                                                    modalHandleShow("add_to_project_modal");
-                                                    setProjectModalState(1);
-                                                    setSavingLoading(false);
-                                                } else {
-                                                    console.log("project not saved!");
-                                                    setSavingLoading(false);
-                                                }
-                                            }).catch(() => {
-                                                // console.log("hi4");
-                                                setProjectModalState(2);
-                                                setSavingLoading(false);
-                                            });
-                                        } else {
-                                            SaveUserProject(depSet, cartValues, [uploadedImagesFile, uploadedImagesURL, uploadedPDFFile, uploadedPDFURL], `${modelID}`, price, defaultModelName, defaultModelNameFa).then((temp) => {
-                                                if (temp === 401) {
-                                                    setSaveProjectCount(saveProjectCount + 1);
-                                                } else if (temp) {
-                                                    setProjectModalState(1);
-                                                    setSavingLoading(false);
-                                                } else {
-                                                    console.log("project not saved!");
-                                                    setSavingLoading(false);
-                                                }
-                                            }).catch((err) => {
-                                                // console.log("hi3",);
-                                                setProjectModalState(2);
-                                                setSavingLoading(false);
-                                            });
-                                        }
-                                    } else {
-                                        setProjectModalState(0);
-                                    }
-                                }} disabled={savingLoading}>{savingLoading ? t("SAVING...") : t("SAVE ITEM")}
-                        </button>
-                        }
-                    </div>
                     }
                     {projectModalState === 1 &&
-                    <div className="add_to_project_container">
-                        <h2 className="project_added_text">{t("1 ITEM ADDED TO YOUR PROJECTS")}</h2>
-                        <Link className="add_to_project_btn btn" to={"/" + pageLanguage + "/Account/Projects"}>{t("VIEW PROJECTS")}</Link>
-                        <button className="continue_shopping_btn" onClick={() => {
-                            modalHandleClose("add_to_project_modal");
-                        }}>{t("CONTINUE SHOPPING")}
-                        </button>
-                    </div>
+                        <div className="add_to_project_container">
+                            <h2 className="project_added_text">{t("1 ITEM ADDED TO YOUR PROJECTS")}</h2>
+                            <Link className="add_to_project_btn btn" to={"/" + pageLanguage + "/Account/Projects"}>{t("VIEW PROJECTS")}</Link>
+                            <button className="continue_shopping_btn" onClick={() => {
+                                modalHandleClose("add_to_project_modal");
+                            }}>{t("CONTINUE SHOPPING")}
+                            </button>
+                        </div>
                     }
                     
                     {projectModalState === 2 &&
-                    <ModalLogin/>
+                        <ModalLogin/>
                     }
                 </Modal.Body>
             </Modal>
@@ -6586,8 +7209,17 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
             <div className={`CustomModelFooter ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
                 <div className="CustomModelFooter_hidden_part"/>
                 <div className="CustomModelFooter_visible_part">
-                    <div className="left_footer">
-                        <button className="save_to_acc" onClick={() => {
+                    <div className="bag_buttons_section_container">
+                        <button className="btn add_to_cart" disabled={addingLoading} onClick={() => {
+                            setAddingLoading(true);
+                            addToCart();
+                        }}>
+                            {addingLoading ? t("ADDING...") : t("footer_Add To Cart")}
+                        </button>
+                        <button className="btn add_to_cart">
+                            {GetPrice(price, pageLanguage, t("TOMANS"))}
+                        </button>
+                        <button className="save_to_acc white_btn btn" onClick={() => {
                             if (roomLabelText !== "" && selectedRoomLabel.length) {
                                 setSavingLoading(true);
                                 if (projectId && projectId !== "") {
@@ -6632,20 +7264,69 @@ function Zebra({CatID, ModelID, ProjectId, EditIndex}) {
                                 setProjectModalState(0);
                                 modalHandleShow("add_to_project_modal");
                             }
-                        }} disabled={savingLoading}>{savingLoading ? t("SAVING...") : t("footer_Save To")}<br/>{savingLoading ? "" : t("footer_My Account")}</button>
+                        }} disabled={savingLoading}>{savingLoading ? t("SAVING...") : t("footer_Save To")} {savingLoading ? "" : t("footer_My Account")}</button>
                     </div>
-                    <div className="hidden_inner_footer">&nbsp;</div>
-                    <div className="footer_price_section">
-                        <div className="showPrice">{t("footer_Price")}</div>
-                        <div className="price">{GetPrice(price, pageLanguage, t("TOMANS"))}</div>
-                    </div>
-                    <div className="right_footer">
-                        <input type="submit" onClick={() => {
-                            setAddingLoading(true);
-                            addToCart();
-                        }} className="btn add_to_cart" disabled={addingLoading} value={addingLoading ? t("ADDING...") : t("footer_Add" +
-                            " To Cart")} readOnly/>
-                    </div>
+                    
+                    {/*<div className="left_footer">*/}
+                    {/*    <button className="save_to_acc" onClick={() => {*/}
+                    {/*        if (roomLabelText !== "" && selectedRoomLabel.length) {*/}
+                    {/*            setSavingLoading(true);*/}
+                    {/*            if (projectId && projectId !== "") {*/}
+                    {/*                SaveUserProject(depSet, cartValues, [uploadedImagesFile, uploadedImagesURL, uploadedPDFFile, uploadedPDFURL], `${modelID}`, price, defaultModelName, defaultModelNameFa, projectData).then((temp) => {*/}
+                    {/*                    if (temp === 401) {*/}
+                    {/*                        setSaveProjectCount(saveProjectCount + 1);*/}
+                    {/*                    } else if (temp) {*/}
+                    {/*                        modalHandleShow("add_to_project_modal");*/}
+                    {/*                        setProjectModalState(1);*/}
+                    {/*                        setSavingLoading(false);*/}
+                    {/*                    } else {*/}
+                    {/*                        console.log("project not saved!");*/}
+                    {/*                        setSavingLoading(false);*/}
+                    {/*                    }*/}
+                    {/*                }).catch(() => {*/}
+                    {/*                    // console.log("hi2");*/}
+                    {/*                    setProjectModalState(2);*/}
+                    {/*                    modalHandleShow("add_to_project_modal");*/}
+                    {/*                    setSavingLoading(false);*/}
+                    {/*                });*/}
+                    {/*            } else {*/}
+                    {/*                SaveUserProject(depSet, cartValues, [uploadedImagesFile, uploadedImagesURL, uploadedPDFFile, uploadedPDFURL], `${modelID}`, price, defaultModelName, defaultModelNameFa).then((temp) => {*/}
+                    {/*                    if (temp === 401) {*/}
+                    {/*                        console.log("hi1");*/}
+                    {/*                        setSaveProjectCount(saveProjectCount + 1);*/}
+                    {/*                    } else if (temp) {*/}
+                    {/*                        modalHandleShow("add_to_project_modal");*/}
+                    {/*                        setProjectModalState(1);*/}
+                    {/*                        setSavingLoading(false);*/}
+                    {/*                    } else {*/}
+                    {/*                        console.log("project not saved!");*/}
+                    {/*                        setSavingLoading(false);*/}
+                    {/*                    }*/}
+                    {/*                }).catch(() => {*/}
+                    {/*                    // console.log("hi1");*/}
+                    {/*                    setProjectModalState(2);*/}
+                    {/*                    modalHandleShow("add_to_project_modal");*/}
+                    {/*                    setSavingLoading(false);*/}
+                    {/*                });*/}
+                    {/*            }*/}
+                    {/*        } else {*/}
+                    {/*            setProjectModalState(0);*/}
+                    {/*            modalHandleShow("add_to_project_modal");*/}
+                    {/*        }*/}
+                    {/*    }} disabled={savingLoading}>{savingLoading ? t("SAVING...") : t("footer_Save To")}<br/>{savingLoading ? "" : t("footer_My Account")}</button>*/}
+                    {/*</div>*/}
+                    {/*<div className="hidden_inner_footer">&nbsp;</div>*/}
+                    {/*<div className="footer_price_section">*/}
+                    {/*    <div className="showPrice">{t("footer_Price")}</div>*/}
+                    {/*    <div className="price">{GetPrice(price, pageLanguage, t("TOMANS"))}</div>*/}
+                    {/*</div>*/}
+                    {/*<div className="right_footer">*/}
+                    {/*    <input type="submit" onClick={() => {*/}
+                    {/*        setAddingLoading(true);*/}
+                    {/*        addToCart();*/}
+                    {/*    }} className="btn add_to_cart" disabled={addingLoading} value={addingLoading ? t("ADDING...") : t("footer_Add" +*/}
+                    {/*        " To Cart")} readOnly/>*/}
+                    {/*</div>*/}
                 </div>
             </div>
         </div>
