@@ -5,6 +5,7 @@ import Carousel from "react-bootstrap/Carousel";
 import {useTranslation} from "react-i18next";
 import {useLocation} from "react-router-dom";
 import axios from "axios";
+import {convertToPersian} from "../Components/TextTransform";
 
 const baseURLGet = "https://api.atlaspood.ir/WebsiteSetting/GetSlider?apiKey=477f46c6-4a17-4163-83cc-29908d";
 
@@ -45,8 +46,8 @@ function Home() {
                 <Carousel.Item interval={4500} key={"slide" + i} slide_id={i} className={`unselectable ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
                     <img src={(url === undefined || url === null || url === "")? `${process.env.PUBLIC_URL}/no_image.svg` : `https://api.atlaspood.ir${url}`} className={`img-fluid ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} alt=""/>
                     <Carousel.Caption className={`unselectable ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
-                        <h3 className={`unselectable ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>{pageLanguage === 'en' ? text1EN : text1}</h3>
-                        <p className={`unselectable ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>{pageLanguage === 'en' ? text2EN : text2}</p>
+                        <h3 className={`unselectable ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>{pageLanguage === 'en' ? text1EN : convertToPersian(text1)}</h3>
+                        <p className={`unselectable ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>{pageLanguage === 'en' ? text2EN : convertToPersian(text2)}</p>
                     </Carousel.Caption>
                 </Carousel.Item>
             );
@@ -56,24 +57,29 @@ function Home() {
     }
     
     useEffect(() => {
-        if (pageLanguage !== '') {
-            getslide();
-            setIndex(0);
-        }
         const tempLang = location.pathname.split('');
         setPageLanguage(tempLang.slice(1, 3).join(''));
-        
+        // setIndex(1);
+        setSlideList([]);
     }, [location.pathname]);
     
     useEffect(() => {
+        if (pageLanguage !== '') {
+            setTimeout(() => {
+                getslide();
+            }, 200);
+        }
+    }, [pageLanguage]);
+    
+    useEffect(() => {
         if (slide.length) {
-            renderslide()
+            renderslide();
         }
     }, [slide]);
     
-    useEffect(() => {
-        getslide();
-    }, []);
+    // useEffect(() => {
+    //     getslide();
+    // }, []);
     
     return (
         <div className="main_page_mid">

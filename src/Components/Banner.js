@@ -3,12 +3,15 @@ import axios from "axios";
 import {InputGroup, FormControl, Toast, ToastContainer} from "react-bootstrap"
 import Form from "react-bootstrap/Form";
 import Select from "react-select";
+import authHeader from "../Services/auth-header";
+import {refreshToken} from "../Services/auth.service";
+import {useNavigate} from "react-router-dom";
 
-const baseURLGet = "https://api.atlaspood.ir/WebsiteSetting/GetBanner?apiKey=477f46c6-4a17-4163-83cc-29908d";
+const baseURLGet = "https://api.atlaspood.ir/WebsiteSetting/GetBanner";
 const baseURLPost = "https://api.atlaspood.ir/WebsiteSetting/SaveBanner";
 
 function Banner() {
-    
+    let navigate = useNavigate();
     const [banner, setBanner] = React.useState([]);
     const [bannerList, setBannerList] = React.useState([]);
     const [showToast, setShowToast] = React.useState(false);
@@ -126,11 +129,21 @@ function Banner() {
         postBannersArray["Value"]["banner"] = banner;
         postBannersArray["ApiKey"] = window.$apikey;
         console.log(JSON.stringify(postBannersArray));
-        axios.post(baseURLPost, postBannersArray)
+        axios.post(baseURLPost, postBannersArray, {
+            headers: authHeader()
+        })
             .then(() => {
                 setShowToast(true);
             }).catch(err => {
-            console.log(err);
+            if (err.response.status === 401) {
+                refreshToken().then((response2) => {
+                    if (response2 !== false) {
+                        updateBanner();
+                    } else {
+                        navigate("/");
+                    }
+                });
+            }
         });
     }
     

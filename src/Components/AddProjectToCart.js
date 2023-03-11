@@ -14,9 +14,7 @@ const baseURLEditProject = "https://api.atlaspood.ir/SewingPreorder/Edit";
 const baseURLGetCart = "https://api.atlaspood.ir/cart/GetAll";
 
 
-async function AddProjectToCart(cartValues, SewingModelId, price, ModelNameEn, ModelNameFa, Files, cartProjectIndex, editIndex, navigate, isLoggedIn) {
-    
-    
+async function AddProjectToCart(cartValues, SewingModelId, price, ModelNameEn, ModelNameFa, Files, cartProjectIndex, editIndex, navigate, isLoggedIn, customMotorAcc, returnObj) {
     return await new Promise((resolve, reject) => {
         let customPageCart = {};
         let userProjects = JSON.parse(JSON.stringify(UserProjects))[SewingModelId]["data"];
@@ -25,7 +23,6 @@ async function AddProjectToCart(cartValues, SewingModelId, price, ModelNameEn, M
         // console.log(cartValues, SewingModelId, price, ModelNameEn, ModelNameFa, Files, cartProjectIndex, editIndex, isLoggedIn);
     
         let tempPostObj = {};
-        tempPostObj["SewingModelId"] = SewingModelId;
         Object.keys(temp).forEach(key => {
             if (temp[key] !== null || temp[key] !== "") {
                 let tempObj = userProjects.find(obj => obj["cart"] === key);
@@ -38,32 +35,66 @@ async function AddProjectToCart(cartValues, SewingModelId, price, ModelNameEn, M
                 }
             }
         });
-        tempPostObj["price"] = price;
+        tempPostObj["Price"] = price;
         tempPostObj["ModelNameEn"] = ModelNameEn;
         tempPostObj["ModelNameFa"] = ModelNameFa;
-        tempPostObj["SewingModelId"] = SewingModelId;
-        tempPostObj["WindowCount"] = 1;
-        if(tempPostObj["CalcWindowSize"]===false){
-            if(tempPostObj["Width1"] && tempPostObj["Height1"]) {
-                tempPostObj["WidthCart"] = tempPostObj["Width1"];
-                tempPostObj["HeightCart"] = tempPostObj["Height1"];
+        // if(tempPostObj["CalcWindowSize"]===false){
+        //     if(tempPostObj["Width1"] && tempPostObj["Height1"]) {
+        //         tempPostObj["WidthCart"] = tempPostObj["Width1"];
+        //         tempPostObj["HeightCart"] = tempPostObj["Height1"];
+        //     }
+        // }
+        
+        if(tempPostObj["ZipCode"] && tempPostObj["ZipCode"]!==""){
+            tempPostObj["NeedInstall"] = true;
+            tempPostObj["InstallAmount"]=tempPostObj["InstallAmount"]?tempPostObj["InstallAmount"]:0;
+            tempPostObj["TransportationAmount"]=tempPostObj["TransportationAmount"]?tempPostObj["TransportationAmount"]:0;
+        }
+        else{
+            tempPostObj["NeedInstall"] = false;
+            tempPostObj["InstallAmount"]=0;
+            tempPostObj["TransportationAmount"]=0;
+        }
+        
+        tempPostObj["Accessories"] = [];
+        Object.keys(temp).forEach(key => {
+            if (temp[key] !== null || temp[key] !== "") {
+                let tempObj = userProjects.find(obj => obj["cart"] === key);
+                if (tempObj) {
+                    if (tempObj["apiAcc"] !== undefined) {
+                        if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
+                            tempPostObj["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
+                        } else {
+                        
+                        }
+                    }
+                }
             }
+        });
+        if (customMotorAcc && Object.keys(customMotorAcc).length > 0) {
+            tempPostObj["Accessories"].push(customMotorAcc);
         }
-    
-        let tempObj = {};
-        tempObj["Count"] = 1;
-        if (tempPostObj["FabricId"] !== undefined)
-            tempObj["FabricId"] = tempPostObj["FabricId"];
-        tempObj["SewingModelId"] = SewingModelId;
-        tempObj["isCompleted"] = isCompleted;
-        tempObj["price"] = price;
+        tempPostObj["Accessories"]=tempPostObj["Accessories"].filter(n => n);
+        
+        tempPostObj["SewingModelId"] = SewingModelId;
+        tempPostObj["isCompleted"] = isCompleted;
+        tempPostObj["WindowCount"] = 1;
+        tempPostObj["Count"] = 1;
+        tempPostObj["IsLowWrinkle"] = true;
+        tempPostObj["IsCoverAll"] = true;
+        tempPostObj["IsAltogether"] = true;
+        tempPostObj["IsActive"] = true;
+        tempPostObj["Price"] = price;
+        tempPostObj["WindowDescription"] = tempPostObj["WindowName"];
         // tempObj["hasAutomate"] = tempPostObj["hasAutomate"] === undefined ? false : tempPostObj["hasAutomate"];
-        tempObj["PreorderText"] = tempPostObj;
+    
+        tempPostObj["PreorderText"] = JSON.parse(JSON.stringify(tempPostObj));
+        
         if (cartProjectIndex && cartProjectIndex !== -1) {
-            tempObj["SewingPreorderId"] = cartProjectIndex;
+            tempPostObj["SewingPreorderId"] = cartProjectIndex;
         }
-        if (tempObj["SewingPreorderId"] && (tempObj["SewingPreorderId"] === -1 || tempObj["SewingPreorderId"] === "-1")) {
-            delete tempObj["SewingPreorderId"];
+        if (tempPostObj["SewingPreorderId"] && (tempPostObj["SewingPreorderId"] === -1 || tempPostObj["SewingPreorderId"] === "-1")) {
+            delete tempPostObj["SewingPreorderId"];
         }
     
         Files[0]=Files[0].filter(x => !!x);
@@ -72,96 +103,102 @@ async function AddProjectToCart(cartValues, SewingModelId, price, ModelNameEn, M
         Files[3]=Files[3].filter(x => !!x);
     
         if(Files[0].length+Files[2].length>0){
-            tempObj["SewingOrderAttachments"]=[];
+            tempPostObj["SewingOrderAttachments"]=[];
             Files[0].forEach((obj,index) => {
-                tempObj["SewingOrderAttachments"].push({
+                tempPostObj["SewingOrderAttachments"].push({
                     "FileUrl": Files[1][index],
                     "UserFileName": obj
                 })
             });
             Files[2].forEach((obj,index) => {
-                tempObj["SewingOrderAttachments"].push({
+                tempPostObj["SewingOrderAttachments"].push({
                     "FileUrl": Files[3][index],
                     "UserFileName": obj
                 })
             });
         }
     
-        // console.log(tempPostObj,isLoggedIn);
-        if (isLoggedIn) {
-            // console.log(tempObj);
-            axios.post(editIndex ? baseURLEditProject : baseURLAddProjectToCart, tempObj, {
-                headers: authHeader()
-            })
-                .then(() => {
-                    axios.get(baseURLGetCart, {
-                        headers: authHeader()
-                    }).then((response) => {
-                        resolve(response.data)
-                    }).catch(err => {
+        // console.log(tempPostObj,customMotorAcc);
+        if(returnObj){
+            resolve(tempPostObj);
+        }
+        else {
+            if (isLoggedIn) {
+                // console.log(tempPostObj);
+                axios.post(editIndex ? baseURLEditProject : baseURLAddProjectToCart, tempPostObj, {
+                    headers: authHeader()
+                })
+                    .then(() => {
+                        axios.get(baseURLGetCart, {
+                            headers: authHeader()
+                        }).then((response) => {
+                            // console.log(response.data ? response.data : {});
+                            resolve(response.data ? response.data : {})
+                        }).catch(err => {
+                            if (err.response.status === 401) {
+                                refreshToken().then((response2) => {
+                                    if (response2 !== false) {
+                                        resolve(401);
+                                    } else {
+                                        navigate("/en" + "/User");
+                                        reject();
+                                    }
+                                });
+                            } else {
+                                resolve(false);
+                            }
+                        });
+                    })
+                    .catch(err => {
                         if (err.response.status === 401) {
                             refreshToken().then((response2) => {
                                 if (response2 !== false) {
                                     resolve(401);
                                 } else {
-                                    navigate("/en" + "/User");
                                     reject();
                                 }
                             });
                         } else {
+                            console.log("project not added to cart");
                             resolve(false);
                         }
                     });
-                })
-                .catch(err => {
-                    if (err.response.status === 401) {
-                        refreshToken().then((response2) => {
-                            if (response2 !== false) {
-                                resolve(401);
-                            } else {
-                                reject();
-                            }
-                        });
-                    } else {
-                        console.log("project not added to cart");
-                        resolve(false);
-                    }
-                });
-        } else {
-            if (localStorage.getItem("cart") === null) {
-                let newCartObj = {};
-                let newCartArr = [];
-                newCartArr[0] = tempObj;
-                newCartObj["drapery"] = newCartArr;
-                newCartObj["product"] = [];
-                newCartObj["swatches"] = [];
-                localStorage.setItem('cart', JSON.stringify(newCartObj));
-                customPageCart = newCartObj;
             } else {
-                let cartObj = JSON.parse(localStorage.getItem("cart"));
-                if (cartObj["drapery"] === undefined || cartObj["drapery"].length === 0) {
+                if (localStorage.getItem("cart") === null) {
+                    let newCartObj = {};
                     let newCartArr = [];
-                    newCartArr[0] = tempObj;
-                    cartObj["drapery"] = newCartArr;
-                    localStorage.setItem('cart', JSON.stringify(cartObj));
-                    customPageCart = cartObj;
+                    newCartArr[0] = tempPostObj;
+                    newCartObj["drapery"] = newCartArr;
+                    newCartObj["product"] = [];
+                    newCartObj["swatches"] = [];
+                    localStorage.setItem('cart', JSON.stringify(newCartObj));
+                    customPageCart = newCartObj;
                 } else {
-                    if (cartProjectIndex !== -1) {
-                        if (cartObj["drapery"][cartProjectIndex]) {
-                            cartObj["drapery"][cartProjectIndex] = tempObj;
-                            localStorage.setItem('cart', JSON.stringify(cartObj));
-                            customPageCart = cartObj;
-                        } else {
-                            customPageCart = cartObj;
-                        }
-                    } else {
-                        cartObj["drapery"].push(tempObj);
+                    let cartObj = JSON.parse(localStorage.getItem("cart"));
+                    if (cartObj["drapery"] === undefined || cartObj["drapery"].length === 0) {
+                        let newCartArr = [];
+                        newCartArr[0] = tempPostObj;
+                        cartObj["drapery"] = newCartArr;
                         localStorage.setItem('cart', JSON.stringify(cartObj));
                         customPageCart = cartObj;
+                    } else {
+                        if (cartProjectIndex !== -1) {
+                            if (cartObj["drapery"][cartProjectIndex]) {
+                                cartObj["drapery"][cartProjectIndex] = tempPostObj;
+                                localStorage.setItem('cart', JSON.stringify(cartObj));
+                                customPageCart = cartObj;
+                            } else {
+                                customPageCart = cartObj;
+                            }
+                        } else {
+                            cartObj["drapery"].push(tempPostObj);
+                            localStorage.setItem('cart', JSON.stringify(cartObj));
+                            customPageCart = cartObj;
+                        }
                     }
                 }
+                resolve(customPageCart);
             }
-            resolve(customPageCart);
         }
     });
     

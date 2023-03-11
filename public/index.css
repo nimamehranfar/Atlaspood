@@ -1,0 +1,259 @@
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+
+@font-face {
+    font-family: "proximanova-nova";
+    src: url('./Fonts/proxima-nova.woff2') format('woff2'),
+    url('./Fonts/proxima-nova.woff') format('woff'),
+    url('./Fonts/proxima-nova.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "proximanova-nova";
+    src: url('./Fonts/proxima-nova-two.woff2') format('woff2'),
+    url('./Fonts/proxima-nova-two.woff') format('woff'),
+    url('./Fonts/proxima-nova-two.otf') format('opentype');
+    font-weight: 100;
+    font-style: normal;
+}
+
+
+@font-face {
+    font-family: "proximanova-nova";
+    src: url('./Fonts/proxima-nova-three.woff2') format('woff2'),
+    url('./Fonts/proxima-nova-three.woff') format('woff'),
+    url('./Fonts/proxima-nova-three.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "proximanova-nova";
+    src: url('./Fonts/proxima-nova-thin.woff2') format('woff2'),
+    url('./Fonts/proxima-nova-thin.woff') format('woff'),
+    url('./Fonts/proxima-nova-thin.otf') format('opentype');
+    font-weight: 300;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'proximanova-nova';
+    /*font-family: 'proximanova-semiBold';*/
+    src: url('./Fonts/proximanova-sbold-webfont-webfont.eot');
+    src: url('./Fonts/proximanova-sbold-webfont-webfont.eot?#iefix') format('embedded-opentype'),
+    url('./Fonts/proximanova-sbold-webfont-webfont.woff') format('woff'),
+    url('./Fonts/proximanova-sbold-webfont-webfont.otf') format('opentype'),
+    url('./Fonts/proximanova-sbold-webfont-webfont.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'iransans';
+    src: url('./Fonts/Farsi/IRANSansWeb_Light.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 300;
+}
+
+@font-face {
+    font-family: 'iransans';
+    src: url('./Fonts/Farsi/IRANSansWeb.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: 'iransans';
+    src: url('./Fonts/Farsi/IRANSansWeb_Medium.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 500;
+}
+
+@font-face {
+    font-family: 'iransans';
+    src: url('./Fonts/Farsi/IRANSansWeb_Bold.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 600;
+}
+
+@font-face {
+    font-family: 'yekan';
+    src: url('./Fonts/Farsi/YekanBakh-Light.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 300;
+}
+
+@font-face {
+    font-family: 'yekan';
+    src: url('./Fonts/Farsi/YekanBakh-Regular.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: 'yekan';
+    src: url('./Fonts/Farsi/YekanBakh-Medium.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 500;
+}
+
+@font-face {
+    font-family: 'yekan';
+    src: url('./Fonts/Farsi/YekanBakh-Bold.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 600;
+}
+
+@font-face {
+    font-family: 'sharp';
+    src: url('./Fonts/Farsi/iransharp_light_web.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 300;
+}
+
+@font-face {
+    font-family: 'sharp';
+    src: url('./Fonts/Farsi/iransharp_regular_web.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: 'sharp';
+    src: url('./Fonts/Farsi/iransharp_bold_web.ttf') format('truetype');
+    font-style: normal;
+    font-weight: 600;
+}
+
+@font-face {
+    font-family: 'sahel';
+    src: url('./Fonts/Farsi/Sahel.eot'),
+    url('./Fonts/Farsi/Sahel.eot?#iefix') format('embedded-opentype'),
+    url('./Fonts/Farsi/Sahel.woff') format('woff'),
+    url('./Fonts/Farsi/Sahel.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'sahel';
+    src: url('./Fonts/Farsi/Sahel-Black.eot'),
+    url('./Fonts/Farsi/Sahel-Black.eot?#iefix') format('embedded-opentype'),
+    url('./Fonts/Farsi/Sahel-Black.woff') format('woff'),
+    url('./Fonts/Farsi/Sahel-Black.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'sahel';
+    src: url('./Fonts/Farsi/Sahel-Bold.eot'),
+    url('./Fonts/Farsi/Sahel-Bold.eot?#iefix') format('embedded-opentype'),
+    url('./Fonts/Farsi/Sahel-Bold.woff') format('woff'),
+    url('./Fonts/Farsi/Sahel-Bold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+}
+
+
+@font-face {
+    font-family: 'peyda';
+    src: url('./Fonts/Farsi/peyda.ttf') format('truetype');
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'adobe-caslon-pro';
+    src: url('./Fonts/adobe-caslon-pro.otf') format('opentype'),
+    url('./Fonts/adobe-caslon-pro.woff') format('woff');
+    font-style: normal;
+}
+

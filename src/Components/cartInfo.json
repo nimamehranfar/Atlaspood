@@ -537,7 +537,7 @@
         ]
       },
       {
-        "cart": "price",
+        "cart": "Price",
         "title": "",
         "titleValue": null,
         "titlePostfix": "",
@@ -1217,7 +1217,7 @@
         ]
       },
       {
-        "cart": "price",
+        "cart": "Price",
         "title": "",
         "titleValue": null,
         "titlePostfix": "",

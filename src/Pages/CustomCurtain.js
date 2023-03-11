@@ -25,17 +25,7 @@ function CustomCurtain() {
     const {websitePageItemId} = useParams();
     const [pageModel, setPageModel] = React.useState([]);
     
-    function convertToPersian(string_farsi) {
-        if (string_farsi !== null && string_farsi !== undefined && string_farsi !== "") {
-            let tempString = string_farsi.replace("ي", "ی");
-            tempString = tempString.replace("ي", "ی");
-            tempString = tempString.replace("ي", "ی");
-            tempString = tempString.replace("ي", "ی");
-            tempString = tempString.replace('ك', 'ک');
-            return tempString;
-        } else
-            return string_farsi;
-    }
+    
     
     const setPage = () => {
         let queryObj;
@@ -105,23 +95,23 @@ function CustomCurtain() {
             if(specialID){
                 if (modelID === "0326" && specialID==="1") {
                     setPageModel(<DK2 CatID={catID} ModelID={modelID} SpecialId={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem} QueryString={queryObj}
-                                     Parameters={parameters}/>)
+                                     Parameters={parameters} PageId={websitePageItemId}/>)
                 }
             }
             else {
                 if (modelID === "0303") {
                     // console.log(projectId,editCart,localStorage.getItem("edit_project") !== null);
                     setPageModel(<Zebra CatID={catID} ModelID={modelID} SpecialId={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem} QueryString={queryObj}
-                                        Parameters={parameters}/>)
+                                        Parameters={parameters} PageId={websitePageItemId}/>)
                 } else if (modelID === "0324") {
                     setPageModel(<Roller CatID={catID} ModelID={modelID} SpecialId={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem} QueryString={queryObj}
-                                         Parameters={parameters}/>)
+                                         Parameters={parameters} PageId={websitePageItemId}/>)
                 } else if (modelID === "0325") {
                     setPageModel(<DualRoller CatID={catID} ModelID={modelID} SpecialId={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem} QueryString={queryObj}
-                                             Parameters={parameters}/>)
+                                             Parameters={parameters} PageId={websitePageItemId}/>)
                 } else if (modelID === "0326") {
                     setPageModel(<DK CatID={catID} ModelID={modelID} SpecialId={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem} QueryString={queryObj}
-                                     Parameters={parameters}/>)
+                                     Parameters={parameters} PageId={websitePageItemId}/>)
                 }
             }
         }).catch(err => {

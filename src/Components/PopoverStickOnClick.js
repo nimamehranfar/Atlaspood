@@ -2,7 +2,8 @@ import PropTypes from 'prop-types';
 import { Overlay, Popover } from 'react-bootstrap';
 import React, {useEffect, useRef, useState} from "react";
 
-function PopoverStickOnClick({ delay, onMouseEnter, children, children2, component, placement, classNames }) {
+function PopoverStickOnClick({ delay, onMouseEnter, children, children2, component, placement, classNames, btnClassNames, isHover }) {
+    const [showPopoverHover, setShowPopoverHover] = useState(false);
     const [showPopover, setShowPopover] = useState(false);
     const [showPopover2, setShowPopover2] = useState(0);
     const childNode = useRef(null);
@@ -18,6 +19,22 @@ function PopoverStickOnClick({ delay, onMouseEnter, children, children2, compone
             }
         };
     });
+    
+    const handleMouseEnterHover = () => {
+		if(isHover) {
+            setShowPopoverHover(true);
+            onMouseEnter();
+        }
+    };
+    
+    const handleMouseLeaveHover = () => {
+        if(isHover) {
+            setTimeoutConst = setTimeout(() => {
+                clearTimeout(setTimeoutConst);
+                setShowPopoverHover(false);
+            }, delay);
+        }
+    };
     
     const handleMouseEnter = () => {
 		if(showPopover2===1){
@@ -52,6 +69,8 @@ function PopoverStickOnClick({ delay, onMouseEnter, children, children2, compone
     const displayChild = React.Children.map(children, child =>
         React.cloneElement(child, {
             onClick: handleMouseEnter,
+            onMouseEnter: handleMouseEnterHover,
+            onMouseLeave: handleMouseLeaveHover,
             ref: node => {
                 childNode.current = node;
                 const { ref } = child;
@@ -83,8 +102,8 @@ function PopoverStickOnClick({ delay, onMouseEnter, children, children2, compone
     return (
         <>
             <button
-                className="basket_item_title_dropdown_btn"
-                aria-expanded={`${showPopover}`}
+                className={btnClassNames?btnClassNames:"basket_item_title_dropdown_btn"}
+                aria-expanded={`${showPopover || showPopoverHover}`}
                 type="button"
                 ref={buttonRef}
                 onClick={handleMouseEnter}
@@ -93,14 +112,18 @@ function PopoverStickOnClick({ delay, onMouseEnter, children, children2, compone
             {(children2!==undefined && showPopover) && displayChild2}
             </button>
             <Overlay
-                show={showPopover}
+                show={showPopover || showPopoverHover}
                 placement={placement}
-                target={buttonRef}
+                target={buttonRef.current}
                 shouldUpdatePosition
             >
                 <Popover
                     id="popover"
                     className={classNames}
+                    onMouseEnter={() => {
+                        setShowPopover(true);
+                    }}
+                    onMouseLeave={handleMouseLeave}
                 >
                     {displayComponent}
                 </Popover>

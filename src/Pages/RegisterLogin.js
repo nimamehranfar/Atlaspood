@@ -322,6 +322,7 @@ function RegisterLogin() {
             // setShowToast_login_fail(true);
             setErrorText(t("Invalid email or password."));
             setTimeout(() => {
+                signIn.current.innerHTML=t("SIGN IN");
                 setBtn_disabled(false);
             }, 1000);
         });
@@ -449,6 +450,7 @@ function RegisterLogin() {
                         <h1 className="login_title">{t("CREATE AN ACCOUNT")}</h1>
                         <p className="login_text">{t("register_list_title")}</p>
                         <ul className="register_list">
+                            <li className="register_list_item">{t("register_list_item0")}</li>
                             <li className="register_list_item">{t("register_list_item1")}</li>
                             <li className="register_list_item">{t("register_list_item2")}</li>
                             <li className="register_list_item">{t("register_list_item3")}</li>

@@ -9,12 +9,16 @@ import axios from "axios";
 import {useTranslation} from "react-i18next";
 import Modal from "react-bootstrap/Modal";
 import {useDispatch, useSelector} from "react-redux";
-import {HideLogin2Modal, HideLoginModal, LOGIN, LOGOUT, REGISTER, ShowLoginModal} from "../Actions/types";
+import {CartUpdatedFalse, HideLogin2Modal, HideLoginModal, LOGIN, LOGOUT, REGISTER, ShowLoginModal} from "../Actions/types";
 import ModalLogin from "./ModalLogin";
 import SaveUserProject from "./SaveUserProject";
 import GetUserProjectData from "./GetUserProjectData";
 import AddProjectToCart from "./AddProjectToCart";
 import UserProjects from "./UserProjects";
+import authHeader from "../Services/auth-header";
+import {refreshToken} from "../Services/auth.service";
+import PopoverStickOnClick from "./PopoverStickOnClick";
+import NumberToPersianWord from "number_to_persian_word";
 
 const baseURLGet = "https://api.atlaspood.ir/WebsiteSetting/GetBanner?apiKey=477f46c6-4a17-4163-83cc-29908d";
 const baseURLMenu = "https://api.atlaspood.ir/WebsiteMenu/GetByChildren?apikey=477f46c6-4a17-4163-83cc-29908d";
@@ -23,13 +27,15 @@ const baseURLLogin = "https://api.atlaspood.ir/login";
 const baseURLRegister = "https://api.atlaspood.ir/user/register";
 const baseURLCheckEmail = "https://api.atlaspood.ir/user/UserNameIsAvailable";
 const baseURLReset = "https://api.atlaspood.ir/user/SendResetPasswordEmail";
+const baseURLGetCartCount = "https://api.atlaspood.ir/cart/GetCount";
+const baseURLaddMulti = "https://api.atlaspood.ir/Cart/AddMultiple";
 
 
 function Header() {
     const {t, i18n} = useTranslation();
     const location = useLocation();
     const [pageLanguage, setPageLanguage] = React.useState(location.pathname.split('').slice(1, 3).join(''));
-    const {isLoggedIn, user, showLogin, showLogin2} = useSelector((state) => state.auth);
+    const {isLoggedIn, user, showLogin, showLogin2, cartUpdated, mainCart} = useSelector((state) => state.auth);
     const dispatch = useDispatch();
     let navigate = useNavigate();
     const [banner, setBanner] = React.useState([]);
@@ -51,6 +57,12 @@ function Header() {
         level3: ""
     });
     
+    const [cart, setCart] = useState({});
+    const [draperyCount, setDraperyCount] = useState(0);
+    const [productCount, setProductCount] = useState(0);
+    const [swatchesCount, setSwatchesCount] = useState(0);
+    
+    const [cartCount, setCartCount] = useState(0);
     
     const [forgotEmail, setForgotEmail] = useState("");
     const [resetPage, setResetPage] = useState(false);
@@ -349,6 +361,7 @@ function Header() {
             // setShowToast_login_fail(true);
             setErrorText(t("Invalid email or password."));
             setTimeout(() => {
+                signIn.current.innerHTML = t("SIGN IN");
                 setBtn_disabled(false);
             }, 1000);
         });
@@ -416,7 +429,6 @@ function Header() {
         }).catch(err => {
             console.log(err);
         });
-        
     }
     
     // function renderCatMenu() {
@@ -738,6 +750,26 @@ function Header() {
         setModals(tempModals);
     }
     
+    function getCartCount() {
+        axios.get(baseURLGetCartCount, {
+            headers: authHeader()
+        }).then((response) => {
+            setCartCount(response.data);
+        }).catch(err => {
+            if (err.response.status === 401) {
+                refreshToken().then((response2) => {
+                    if (response2 !== false) {
+                        getCartCount();
+                    } else {
+                        setCartCount(0);
+                    }
+                });
+            } else {
+                setCartCount(0);
+            }
+        });
+    }
+    
     useEffect(() => {
         setLang().then(() => {
             if (pageLanguage !== '') {
@@ -760,7 +792,16 @@ function Header() {
         // console.log(currentPageInfo.level3);
         setCurrentPage(currentPageInfo);
         
-        
+        if (isLoggedIn) {
+            getCartCount();
+        } else {
+            if (localStorage.getItem("cart") !== null) {
+                setCart(JSON.parse(localStorage.getItem("cart")));
+            } else {
+                setCart(mainCart || {});
+            }
+            setCartCount(0);
+        }
     }, [location.pathname]);
     
     useEffect(() => {
@@ -822,43 +863,164 @@ function Header() {
         }
     }, [bannerOneSlide]);
     
+    useEffect(() => {
+        if (cartUpdated) {
+            setCart(mainCart || {});
+            setTimeout(() => {
+                dispatch({
+                    type: CartUpdatedFalse,
+                });
+            }, 500);
+            // console.log(mainCart);
+        }
+    }, [cartUpdated]);
+    
+    useEffect(() => {
+        if (Object.keys(cart).length !== 0) {
+            if (isLoggedIn) {
+                if (cart["CartDetails"]) {
+                    let draperies = cart["CartDetails"].filter((object1) => {
+                        return object1["TypeId"] === 6403;
+                    });
+                    
+                    let swatches = cart["CartDetails"].filter((object1) => {
+                        return object1["TypeId"] === 6402;
+                    });
+                    setDraperyCount(draperies.length);
+                    setSwatchesCount(swatches.length);
+                } else {
+                    setDraperyCount(0);
+                    setSwatchesCount(0);
+                    setSwatchesCount(0);
+                }
+            } else {
+                if (cart["drapery"] === undefined || cart["drapery"].length === 0) {
+                    setDraperyCount(0);
+                } else {
+                    setDraperyCount(cart["drapery"].length);
+                }
+                if (cart["product"] === undefined || cart["product"] === []) {
+                    setProductCount(0);
+                } else {
+                    setSwatchesCount(cart["swatches"].length);
+                }
+                if (cart["swatches"] === undefined || cart["swatches"] === []) {
+                    setSwatchesCount(0);
+                } else {
+                    setSwatchesCount(cart["swatches"].length);
+                }
+            }
+        } else {
+            setDraperyCount(0);
+            setSwatchesCount(0);
+            setSwatchesCount(0);
+        }
+        setCartCount(0);
+    }, [JSON.stringify(cart)]);
     
     useEffect(() => {
         
-        if (isLoggedIn && showLogin2) {
+        if (isLoggedIn && showLogin2 && localStorage.getItem("cart") !== null && JSON.parse(localStorage.getItem("cart"))["drapery"] !== undefined && JSON.parse(localStorage.getItem("cart"))["drapery"].length > 0) {
             dispatch({
                 type: HideLogin2Modal,
-            })
-        }
-        if(isLoggedIn && localStorage.getItem("cart") !== null){
-            let tempDrapery=JSON.parse(localStorage.getItem("cart"))["drapery"];
+            });
+            let tempDrapery = JSON.parse(localStorage.getItem("cart"))["drapery"];
             if (tempDrapery !== undefined) {
-                let tempDrapery2=JSON.parse(JSON.stringify(tempDrapery));
-                tempDrapery2.forEach((obj,index)=>{
-                    GetUserProjectData(obj).then((temp) => {
-                        let projectObj=obj["PreorderText"];
-                        AddProjectToCart(temp, projectObj["SewingModelId"], projectObj["price"], temp["ModelNameEn"], temp["ModelNameFa"], [temp["uploadedImagesFile"]?temp["uploadedImagesFile"]:[], temp["uploadedImagesURL"]?temp["uploadedImagesURL"]:[], temp["uploadedPDFFile"]?temp["uploadedPDFFile"]:[], temp["uploadedPDFURL"]?temp["uploadedPDFURL"]:[]], projectObj["SewingPreorderId"], undefined, navigate, true).then((temp2) => {
-                            if (temp2 === 401) {
-                            } else if (temp2) {
-                                tempDrapery.splice(index, 1);
-                            } else {
-                                console.log("project not added");
-                            }
-                            if(tempDrapery.length===0){
-                                localStorage.removeItem("cart");
-                            }
-                            else if(index===tempDrapery2.length-1){
-                                let newCartObj = {};
-                                newCartObj["drapery"] = tempDrapery;
-                                newCartObj["product"] = [];
-                                newCartObj["swatches"] = [];
-                                localStorage.setItem('cart', JSON.stringify(newCartObj));
-                            }
-                        }).catch(()=>{
-                            tempDrapery.splice(index, 1);
+                let tempArr = [];
+                let promiseArr = [];
+                let tempDrapery2 = JSON.parse(JSON.stringify(tempDrapery));
+                tempDrapery2.forEach((obj, index) => {
+                    promiseArr[index] = new Promise((resolve, reject) => {
+                        // setTimeout(function () {
+                        GetUserProjectData(obj).then((temp) => {
+                            let projectObj = obj["PreorderText"];
+                            AddProjectToCart(temp, projectObj["SewingModelId"], projectObj["Price"], temp["ModelNameEn"], temp["ModelNameFa"], [temp["uploadedImagesFile"] ? temp["uploadedImagesFile"] : [], temp["uploadedImagesURL"] ? temp["uploadedImagesURL"] : [], temp["uploadedPDFFile"] ? temp["uploadedPDFFile"] : [], temp["uploadedPDFURL"] ? temp["uploadedPDFURL"] : []], projectObj["SewingPreorderId"], undefined, navigate, true, temp["Accessories"][0], true).then((temp2) => {
+                                tempArr.push({
+                                    "TypeId": 6403,
+                                    "Count": 1,
+                                    "SewingPreorder": temp2
+                                });
+                                resolve();
+                            }).catch((err) => {
+                                console.log(err);
+                                resolve();
+                            });
+                        }).catch((err) => {
+                            console.log(err);
+                            resolve();
                         });
-                    }).catch(()=>{
-                        tempDrapery.splice(index, 1);
+                        // }, index * 500);
+                    })
+                });
+                
+                Promise.all(promiseArr).then(() => {
+                    axios.post(baseURLaddMulti, tempArr, {
+                        headers: authHeader()
+                    }).then((response) => {
+                        let tempCart = response.data ? response.data : {};
+                        setCart(response.data ? response.data : {});
+                        localStorage.removeItem("cart");
+                    }).catch(err => {
+                        if (err.response.status === 401) {
+                            refreshToken().then((response2) => {
+                                if (response2 !== false) {
+                                } else {
+                                }
+                            });
+                        } else {
+                            console.log("project not added to cart");
+                        }
+                    });
+                });
+            }
+        }
+        if (isLoggedIn && localStorage.getItem("cart") !== null && JSON.parse(localStorage.getItem("cart"))["drapery"] !== undefined && JSON.parse(localStorage.getItem("cart"))["drapery"].length > 0) {
+            let tempDrapery = JSON.parse(localStorage.getItem("cart"))["drapery"];
+            if (tempDrapery !== undefined) {
+                let tempArr = [];
+                let promiseArr = [];
+                let tempDrapery2 = JSON.parse(JSON.stringify(tempDrapery));
+                tempDrapery2.forEach((obj, index) => {
+                    promiseArr[index] = new Promise((resolve, reject) => {
+                        // setTimeout(function () {
+                        GetUserProjectData(obj).then((temp) => {
+                            let projectObj = obj["PreorderText"];
+                            AddProjectToCart(temp, projectObj["SewingModelId"], projectObj["Price"], temp["ModelNameEn"], temp["ModelNameFa"], [temp["uploadedImagesFile"] ? temp["uploadedImagesFile"] : [], temp["uploadedImagesURL"] ? temp["uploadedImagesURL"] : [], temp["uploadedPDFFile"] ? temp["uploadedPDFFile"] : [], temp["uploadedPDFURL"] ? temp["uploadedPDFURL"] : []], projectObj["SewingPreorderId"], undefined, navigate, true, temp["Accessories"][0], true).then((temp2) => {
+                                tempArr.push({
+                                    "TypeId": 6403,
+                                    "Count": 1,
+                                    "SewingPreorder": temp2
+                                });
+                                resolve();
+                            }).catch((err) => {
+                                console.log(err);
+                                resolve();
+                            });
+                        }).catch((err) => {
+                            console.log(err);
+                            resolve();
+                        });
+                        // }, index * 500);
+                    })
+                });
+                
+                Promise.all(promiseArr).then(() => {
+                    axios.post(baseURLaddMulti, tempArr, {
+                        headers: authHeader()
+                    }).then((response) => {
+                        let tempCart = response.data ? response.data : {};
+                        setCart(response.data ? response.data : {});
+                        localStorage.removeItem("cart");
+                    }).catch(err => {
+                        if (err.response.status === 401) {
+                            refreshToken().then((response2) => {
+                                if (response2 !== false) {
+                                } else {
+                                }
+                            });
+                        } else {
+                            console.log("project not added to cart");
+                        }
                     });
                 });
             }
@@ -866,18 +1028,18 @@ function Header() {
     }, [isLoggedIn]);
     
     return (
-        <div className={`header_container padding-clear ${pageLanguage === 'fa' ? "font_farsi" : "font_en"} ${currentPage.level1 === "Checkout" ?"noDisplay":""}`}>
+        <div className={`header_container padding-clear ${pageLanguage === 'fa' ? "font_farsi" : "font_en"} ${currentPage.level1 === "Checkout" ? "noDisplay" : ""}`}>
             <div className="top_header">
                 <div className="col-lg-12">
                     <div className="top_title">
                         {bannerItemOneSlide.length === 0 &&
-                        <Link to={"/" + bannerItem.url}>
-                            <span>{bannerItem.text1}</span>&nbsp;
-                            <span className="text_underline">{bannerItem.text2}</span>
-                        </Link>
+                            <Link to={"/" + bannerItem.url}>
+                                <span>{bannerItem.text1}</span>&nbsp;
+                                <span className="text_underline">{bannerItem.text2}</span>
+                            </Link>
                         }
                         {bannerItemOneSlide.length !== 0 &&
-                        bannerItemOneSlide
+                            bannerItemOneSlide
                         }
                     </div>
                 </div>
@@ -898,42 +1060,76 @@ function Header() {
                     <div className="mid_header_right">
                         <ul className={pageLanguage === 'fa' ? "float_left icons" : "float_right icons"}>
                             {currentPage.level1 === "Curtain" && currentPage.level3 !== undefined &&
-                            <li className="login-open" onClick={() => {
-                                if (isLoggedIn) {
-                                    navigate("/" + pageLanguage + "/Account")
-                                } else {
-                                    dispatch({
-                                        type: ShowLoginModal,
-                                    })
-                                }
-                            }}>
-                                <Person/>
-                            </li>
+                                <li className="login-open" onClick={() => {
+                                    if (isLoggedIn) {
+                                        navigate("/" + pageLanguage + "/Account")
+                                    } else {
+                                        dispatch({
+                                            type: ShowLoginModal,
+                                        })
+                                    }
+                                }}>
+                                    <Person/>
+                                </li>
                             }
                             {!(currentPage.level1 === "Curtain" && currentPage.level3 !== undefined) &&
-                            <Link className="login-open" to={isLoggedIn ? "/" + pageLanguage + "/Account" : "/" + pageLanguage + "/User/NewUser"}><Person/></Link>
+                                <Link className="login-open" to={isLoggedIn ? "/" + pageLanguage + "/Account" : "/" + pageLanguage + "/User/NewUser"}><Person/></Link>
                             }
                             <li className="favorite">
                                 <a href="https://www.doopsalta.com/en/account/login/">
                                     <Favorite/>
                                 </a>
                             </li>
-                            <li className="checkout">
-                                <Link to={"/" + pageLanguage + "/Basket"}>
-                                    <div className="display_grid">
-                                        <Basket/>
-                                        <div className="count">0</div>
+                            {(cartCount > 0 || (draperyCount + productCount + swatchesCount > 0)) &&
+                                <li className="checkout">
+                                    <div onClick={() => {
+                                        navigate("/" + pageLanguage + "/Basket");
+                                    }}>
+                                        <div className="display_grid">
+                                            <Basket/>
+                                            <div
+                                                className="count">{pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${cartCount > 0 ? cartCount : draperyCount + productCount + swatchesCount}`) : cartCount > 0 ? cartCount : draperyCount + productCount + swatchesCount}</div>
+                                        </div>
                                     </div>
-                                </Link>
-                                <div className="card_menu">
-                                    <div className="card_menu_title">
-                                        <span>Shopping Bag</span>
+                                    {/*<div className="card_menu">*/}
+                                    {/*    <div className="card_menu_title">*/}
+                                    {/*        <span>Shopping Bag</span>*/}
+                                    {/*    </div>*/}
+                                    {/*</div>*/}
+                                </li>
+                            }
+                            {cartCount === 0 && (draperyCount + productCount + swatchesCount === 0) &&
+                                <li className="checkout">
+                                    <div>
+                                        <PopoverStickOnClick btnClassNames="Header_Basket_icon"
+                                                             classNames={isLoggedIn ? "Header_Basket_icon_popover Header_Basket_icon_popover2" : "Header_Basket_icon_popover"}
+                                                             placement="bottom"
+                                                             isHover={true}
+                                                             onMouseEnter={() => {
+                                                             }}
+                                                             children={<div className="display_grid">
+                                                                 <Basket/>
+                                                                 <div
+                                                                     className="count">{cartCount > 0 ? cartCount : draperyCount + productCount + swatchesCount}</div>
+                                                             </div>}
+                                                             component={
+                                                                 <div className="card_menu_title">
+                                                                     <div className="basket_empty_header_1">{t("basket_empty_header_1")}</div>
+                                                                     {!isLoggedIn && <div className="basket_empty_header_2">{t("basket_empty_header_2")}<span
+                                                                         className="text_underline header_basket_sign_in"
+                                                                         onClick={() => navigate("/" + pageLanguage + "/User")}>{t("basket_empty_header_3")}</span>{t("basket_empty_header_4")}
+                                                                     </div>}
+                                                                 </div>
+                                                             }/>
+                                    
                                     </div>
-                                    <Link className="card_button" to={"/"+ pageLanguage+"/Basket/Swatches"}>Swatches (<span id="swatch">0</span>)</Link>
-                                    <Link className="card_button" to="/">Product (<span id="procount">0</span>)</Link>
-                                    <Link className="card_button"  to={"/" + pageLanguage + "/Basket"}>Go To Bag</Link>
-                                </div>
-                            </li>
+                                    {/*<div className="card_menu">*/}
+                                    {/*    <div className="card_menu_title">*/}
+                                    {/*        <span>Shopping Bag</span>*/}
+                                    {/*    </div>*/}
+                                    {/*</div>*/}
+                                </li>
+                            }
                         </ul>
                         <ul className={`Lang_change_container ${pageLanguage === 'fa' ? "float_left" : "float_right"}`}>
                             <li className="Lang_change">
@@ -978,245 +1174,248 @@ function Header() {
                         </div>
                     </div>
                     {!resetPage && errorText !== "" &&
-                    <div className="login_page_error_text">{errorText}</div>
+                        <div className="login_page_error_text">{errorText}</div>
                     }
                     {!resetPage && successText !== "" &&
-                    <div className="login_page_success_text">{successText}</div>
+                        <div className="login_page_success_text">{successText}</div>
                     }
                     {!resetPage &&
-                    <div className="login_register_container">
-                        <div className="login_container">
-                            <div className="login_inside_container">
-                                <h1 className="login_title">{t("SIGN IN TO YOUR ACCOUNT")}</h1>
-                                <input type="text" placeholder={t("Email*")} className="form-control" name="Email" value={loginInfo.email}
-                                       onChange={(e) => {
-                                           let temp = JSON.parse(JSON.stringify(loginInfo));
-                                           temp.email = e.target.value;
-                                           setLoginInfo(temp);
-                                       }}/>
-                                <input type="password" placeholder={t("Password*")} className="form-control form-control-password" name="Password" value={loginInfo.password}
-                                       autoComplete="new-password"
-                                       onChange={(e) => {
-                                           let temp = JSON.parse(JSON.stringify(loginInfo));
-                                           temp.password = e.target.value;
-                                           setLoginInfo(temp);
-                                       }}/>
-                                <div className="remember_forgot_container">
-                                    <div className="remember_container">
-                                        {/*<label className="remember_label">*/}
-                                        {/*    <input type="checkbox" value={loginInfo.remember}*/}
-                                        {/*           onChange={(e) => {*/}
-                                        {/*               let temp = JSON.parse(JSON.stringify(loginInfo));*/}
-                                        {/*               temp.remember = e.target.value;*/}
-                                        {/*               setLoginInfo(temp);*/}
-                                        {/*           }}/>*/}
-                                        {/*    {t("Remember Me")}*/}
-                                        {/*</label>*/}
+                        <div className="login_register_container">
+                            <div className="login_container">
+                                <div className="login_inside_container">
+                                    <h1 className="login_title">{t("SIGN IN TO YOUR ACCOUNT")}</h1>
+                                    <input type="text" placeholder={t("Email*")} className="form-control" name="Email" value={loginInfo.email}
+                                           onChange={(e) => {
+                                               let temp = JSON.parse(JSON.stringify(loginInfo));
+                                               temp.email = e.target.value;
+                                               setLoginInfo(temp);
+                                           }}/>
+                                    <input type="password" placeholder={t("Password*")} className="form-control form-control-password" name="Password" value={loginInfo.password}
+                                           autoComplete="new-password"
+                                           onChange={(e) => {
+                                               let temp = JSON.parse(JSON.stringify(loginInfo));
+                                               temp.password = e.target.value;
+                                               setLoginInfo(temp);
+                                           }}/>
+                                    <div className="remember_forgot_container">
+                                        <div className="remember_container">
+                                            {/*<label className="remember_label">*/}
+                                            {/*    <input type="checkbox" value={loginInfo.remember}*/}
+                                            {/*           onChange={(e) => {*/}
+                                            {/*               let temp = JSON.parse(JSON.stringify(loginInfo));*/}
+                                            {/*               temp.remember = e.target.value;*/}
+                                            {/*               setLoginInfo(temp);*/}
+                                            {/*           }}/>*/}
+                                            {/*    {t("Remember Me")}*/}
+                                            {/*</label>*/}
+                                        </div>
+                                        <div className="forgot text_underline" onClick={() => setResetPage(true)}>{t("Forgot your password?")}</div>
                                     </div>
-                                    <div className="forgot text_underline" onClick={() => setResetPage(true)}>{t("Forgot your password?")}</div>
-                                </div>
-                                <div className="login_btn_container">
-                                    {/*<button className="login_btn btn btn-new-dark">SIGN IN</button>*/}
-                                    <button className="login_btn btn btn-new-dark" onClick={() => loginUser()} disabled={btn_disabled} ref={signIn}>{t("SIGN IN")}</button>
+                                    <div className="login_btn_container">
+                                        {/*<button className="login_btn btn btn-new-dark">SIGN IN</button>*/}
+                                        <button className="login_btn btn btn-new-dark" onClick={() => loginUser()} disabled={btn_disabled} ref={signIn}>{t("SIGN IN")}</button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div className="register_container">
-                            <div className="register_inside_container">
-                                <h1 className="login_title">{t("CREATE AN ACCOUNT")}</h1>
-                                <p className="login_text">{t("register_list_title")}</p>
-                                <ul className="register_list">
-                                    <li className="register_list_item">{t("register_list_item1")}</li>
-                                    <li className="register_list_item">{t("register_list_item2")}</li>
-                                    <li className="register_list_item">{t("register_list_item3")}</li>
-                                </ul>
-                                {!showRegister && <button className="register_btn btn" onClick={() => setShowRegister(true)}>{t("LET'S GO")}</button>}
-                                {showRegister && <div className="register_section_container">
-                                    <div className="register_section_item">
-                                        <input type="text" placeholder={t("First Name*")} className={"form-control " + (firstNotExist ? "password_not_valid" : "")} name="name"
-                                               value={registerInfo.firstName}
-                                               onChange={(e) => {
-                                                   let temp = JSON.parse(JSON.stringify(registerInfo));
-                                                   temp.firstName = e.target.value;
-                                                   setRegisterInfo(temp);
-                                                   if (e.target.value.length > 0) {
-                                                       setFirstNotExist(false);
-                                                   }
-                                               }}/>
-                                        {firstNotExist && <div className="input_not_valid">{t("First Name Required.")}</div>}
-                                    </div>
-                                    <div className="register_section_item">
-                                        <input type="text" placeholder={t("Last Name*")} className={"form-control " + (lastNotExist ? "password_not_valid" : "")} name="lastName"
-                                               value={registerInfo.lastName}
-                                               onChange={(e) => {
-                                                   let temp = JSON.parse(JSON.stringify(registerInfo));
-                                                   temp.lastName = e.target.value;
-                                                   setRegisterInfo(temp);
-                                                   if (e.target.value.length > 0) {
-                                                       setLastNotExist(false);
-                                                   }
-                                               }}/>
-                                        {lastNotExist && <div className="input_not_valid">{t("Last Name Required.")}</div>}
-                                    </div>
-                                    <div className="register_section_item">
-                                        <input type="email" placeholder={t("Email*")} className={"form-control " + (emailNotValid || emailNotExist ? "password_not_valid" : "")}
-                                               name="Email"
-                                               value={registerInfo.email}
-                                               onChange={(e) => {
-                                                   let temp = JSON.parse(JSON.stringify(registerInfo));
-                                                   temp.email = e.target.value;
-                                                   setRegisterInfo(temp);
-                                                   if (e.target.value.length > 0) {
-                                                       setEmailNotExist(false);
-                                                       if (validateEmail(e.target.value)) {
-                                                           setEmailNotValid(false);
+                            <div className="register_container">
+                                <div className="register_inside_container">
+                                    <h1 className="login_title">{t("CREATE AN ACCOUNT")}</h1>
+                                    <p className="login_text">{t("register_list_title")}</p>
+                                    <ul className="register_list">
+                                        <li className="register_list_item">{t("register_list_item0")}</li>
+                                        <li className="register_list_item">{t("register_list_item1")}</li>
+                                        <li className="register_list_item">{t("register_list_item2")}</li>
+                                        <li className="register_list_item">{t("register_list_item3")}</li>
+                                    </ul>
+                                    {!showRegister && <button className="register_btn btn" onClick={() => setShowRegister(true)}>{t("LET'S GO")}</button>}
+                                    {showRegister && <div className="register_section_container">
+                                        <div className="register_section_item">
+                                            <input type="text" placeholder={t("First Name*")} className={"form-control " + (firstNotExist ? "password_not_valid" : "")} name="name"
+                                                   value={registerInfo.firstName}
+                                                   onChange={(e) => {
+                                                       let temp = JSON.parse(JSON.stringify(registerInfo));
+                                                       temp.firstName = e.target.value;
+                                                       setRegisterInfo(temp);
+                                                       if (e.target.value.length > 0) {
+                                                           setFirstNotExist(false);
                                                        }
-                                                   }
-                                               }}/>
-                                        {emailNotValid && <div className="input_not_valid">{emailError[pageLanguage][emailErrorState]["error"]}</div>}
-                                        {emailNotExist && <div className="input_not_valid">{t("Email Required.")}</div>}
-                                    </div>
-                                    <div className="register_section_item">
-                                        <input type="text" placeholder={t("Mobile Number (Optional)")} className={"form-control " + (mobileNotExist ? "password_not_valid" : "")}
-                                               name="mobile" value={registerInfo.phone}
-                                               onChange={(e) => {
-                                                   let temp = JSON.parse(JSON.stringify(registerInfo));
-                                                   temp.phone = e.target.value.replace(/\D/g, '').replace(/[^0-9]/g, "");
-                                                   setRegisterInfo(temp);
-                                                   validateNumber(e.target.value.toString());
-                                               }}/>
-                                        {mobileNotExist && <div className="input_not_valid">{mobileError[pageLanguage][mobileErrorState]["error"]}</div>}
-                                    </div>
-                                    <div className="register_section_item">
-                                        <input type="password" placeholder={t("Password*")}
-                                               className={"form-control form-control-password " + (passwordNotValid ? "password_not_valid" : "")}
-                                               name="Register_Password"
-                                               value={registerInfo.password}
-                                               autoComplete="new-password"
-                                               onChange={(e) => {
-                                                   let temp = JSON.parse(JSON.stringify(registerInfo));
-                                                   temp.password = e.target.value.replace(/\s/g, '');
-                                                   // temp.password = temp.password.replace(/[^0-9A-Za-z\s]/g, '');
-                                                   setRegisterInfo(temp);
-                                                   if (temp.password === temp.passwordConfirm) {
-                                                       setPasswordMatch(true);
-                                                       setPasswordMatchNotValid(false);
-                                                   } else
-                                                       setPasswordMatch(false);
-                                                   checkPasswordStrength(temp.password);
-                                               }}
-                                               onClick={() => setShowPasswordValidation(true)}
-                                        />
-                                        {showPasswordValidation && <div className="input_not_valid_password ">
-                                            <h2 className="input_not_valid_password_title">{t("Your password must contain:")}</h2>
-                                            <ul className="input_not_valid_password_list">
-                                                <li className={"input_not_valid_password_item " + (passwordValidation.count ? "input_not_valid_password_item_check" : "")}>
+                                                   }}/>
+                                            {firstNotExist && <div className="input_not_valid">{t("First Name Required.")}</div>}
+                                        </div>
+                                        <div className="register_section_item">
+                                            <input type="text" placeholder={t("Last Name*")} className={"form-control " + (lastNotExist ? "password_not_valid" : "")}
+                                                   name="lastName"
+                                                   value={registerInfo.lastName}
+                                                   onChange={(e) => {
+                                                       let temp = JSON.parse(JSON.stringify(registerInfo));
+                                                       temp.lastName = e.target.value;
+                                                       setRegisterInfo(temp);
+                                                       if (e.target.value.length > 0) {
+                                                           setLastNotExist(false);
+                                                       }
+                                                   }}/>
+                                            {lastNotExist && <div className="input_not_valid">{t("Last Name Required.")}</div>}
+                                        </div>
+                                        <div className="register_section_item">
+                                            <input type="email" placeholder={t("Email*")} className={"form-control " + (emailNotValid || emailNotExist ? "password_not_valid" : "")}
+                                                   name="Email"
+                                                   value={registerInfo.email}
+                                                   onChange={(e) => {
+                                                       let temp = JSON.parse(JSON.stringify(registerInfo));
+                                                       temp.email = e.target.value;
+                                                       setRegisterInfo(temp);
+                                                       if (e.target.value.length > 0) {
+                                                           setEmailNotExist(false);
+                                                           if (validateEmail(e.target.value)) {
+                                                               setEmailNotValid(false);
+                                                           }
+                                                       }
+                                                   }}/>
+                                            {emailNotValid && <div className="input_not_valid">{emailError[pageLanguage][emailErrorState]["error"]}</div>}
+                                            {emailNotExist && <div className="input_not_valid">{t("Email Required.")}</div>}
+                                        </div>
+                                        <div className="register_section_item">
+                                            <input type="text" placeholder={t("Mobile Number (Optional)")}
+                                                   className={"form-control " + (mobileNotExist ? "password_not_valid" : "")}
+                                                   name="mobile" value={registerInfo.phone}
+                                                   onChange={(e) => {
+                                                       let temp = JSON.parse(JSON.stringify(registerInfo));
+                                                       temp.phone = e.target.value.replace(/\D/g, '').replace(/[^0-9]/g, "");
+                                                       setRegisterInfo(temp);
+                                                       validateNumber(e.target.value.toString());
+                                                   }}/>
+                                            {mobileNotExist && <div className="input_not_valid">{mobileError[pageLanguage][mobileErrorState]["error"]}</div>}
+                                        </div>
+                                        <div className="register_section_item">
+                                            <input type="password" placeholder={t("Password*")}
+                                                   className={"form-control form-control-password " + (passwordNotValid ? "password_not_valid" : "")}
+                                                   name="Register_Password"
+                                                   value={registerInfo.password}
+                                                   autoComplete="new-password"
+                                                   onChange={(e) => {
+                                                       let temp = JSON.parse(JSON.stringify(registerInfo));
+                                                       temp.password = e.target.value.replace(/\s/g, '');
+                                                       // temp.password = temp.password.replace(/[^0-9A-Za-z\s]/g, '');
+                                                       setRegisterInfo(temp);
+                                                       if (temp.password === temp.passwordConfirm) {
+                                                           setPasswordMatch(true);
+                                                           setPasswordMatchNotValid(false);
+                                                       } else
+                                                           setPasswordMatch(false);
+                                                       checkPasswordStrength(temp.password);
+                                                   }}
+                                                   onClick={() => setShowPasswordValidation(true)}
+                                            />
+                                            {showPasswordValidation && <div className="input_not_valid_password ">
+                                                <h2 className="input_not_valid_password_title">{t("Your password must contain:")}</h2>
+                                                <ul className="input_not_valid_password_list">
+                                                    <li className={"input_not_valid_password_item " + (passwordValidation.count ? "input_not_valid_password_item_check" : "")}>
                                             <span>
                                             {passwordValidation.count &&
-                                            <img className="checkmark1 img-fluid" src={require('../Images/public/checkmark1.png')} alt=""/>
+                                                <img className="checkmark1 img-fluid" src={require('../Images/public/checkmark1.png')} alt=""/>
                                             }
                                                 {t("password_required_text1")}
                                             </span>
-                                                </li>
-                                                <li className={"input_not_valid_password_item " + (passwordValidation.lowercase ? "input_not_valid_password_item_check" : "")}>
+                                                    </li>
+                                                    <li className={"input_not_valid_password_item " + (passwordValidation.lowercase ? "input_not_valid_password_item_check" : "")}>
                                             <span>
                                             {passwordValidation.lowercase &&
-                                            <img className="checkmark1 img-fluid" src={require('../Images/public/checkmark1.png')} alt=""/>
+                                                <img className="checkmark1 img-fluid" src={require('../Images/public/checkmark1.png')} alt=""/>
                                             }
                                                 {t("password_required_text2")}
                                             </span>
-                                                </li>
-                                                <li className={"input_not_valid_password_item " + (passwordValidation.uppercase ? "input_not_valid_password_item_check" : "")}>
+                                                    </li>
+                                                    <li className={"input_not_valid_password_item " + (passwordValidation.uppercase ? "input_not_valid_password_item_check" : "")}>
                                             <span>
                                             {passwordValidation.uppercase &&
-                                            <img className="checkmark1 img-fluid" src={require('../Images/public/checkmark1.png')} alt=""/>
+                                                <img className="checkmark1 img-fluid" src={require('../Images/public/checkmark1.png')} alt=""/>
                                             }
                                                 {t("password_required_text3")}
                                             </span>
-                                                </li>
-                                                <li className={"input_not_valid_password_item " + (passwordValidation.numbers ? "input_not_valid_password_item_check" : "")}>
+                                                    </li>
+                                                    <li className={"input_not_valid_password_item " + (passwordValidation.numbers ? "input_not_valid_password_item_check" : "")}>
                                             <span>
                                             {passwordValidation.numbers &&
-                                            <img className="checkmark1 img-fluid" src={require('../Images/public/checkmark1.png')} alt=""/>
+                                                <img className="checkmark1 img-fluid" src={require('../Images/public/checkmark1.png')} alt=""/>
                                             }
                                                 {t("password_required_text4")}
                                             </span>
-                                                </li>
-                                            </ul>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            }
+                                            {/*<div className={"password_details " + passwordNotValidTextClass}>Minimum length of this field must be equal or greater than 8 characters and less or*/}
+                                            {/*    equal than 20 characters. There must be minimum one letter and one number character. Any spaces*/}
+                                            {/*    will be ignored.*/}
+                                            {/*</div>*/}
                                         </div>
-                                        }
-                                        {/*<div className={"password_details " + passwordNotValidTextClass}>Minimum length of this field must be equal or greater than 8 characters and less or*/}
-                                        {/*    equal than 20 characters. There must be minimum one letter and one number character. Any spaces*/}
-                                        {/*    will be ignored.*/}
-                                        {/*</div>*/}
-                                    </div>
-                                    <div className="register_section_item">
-                                        <input type="password" placeholder={t("Confirm Password*")}
-                                               className={"form-control form-control-password " + (passwordMatchNotValid ? "password_not_valid" : "")}
-                                               name="Register_PasswordConfirm"
-                                               value={registerInfo.passwordConfirm}
-                                               autoComplete="new-password"
-                                               onChange={(e) => {
-                                                   let temp = JSON.parse(JSON.stringify(registerInfo));
-                                                   temp.passwordConfirm = e.target.value;
-                                                   setRegisterInfo(temp);
-                                                   if (temp.password === temp.passwordConfirm) {
-                                                       setPasswordMatch(true);
-                                                       setPasswordMatchNotValid(false);
-                                                   } else
-                                                       setPasswordMatch(false);
-                                               }}/>
-                                        {passwordMatchNotValid && <div className="input_not_valid">{t("Password confirmation is required.")}
-                                        </div>}
-                                    </div>
-                                    <div className="news_signup">
-                                        <div className="checkbox_style">
-                                            <input type="checkbox" checked={registerInfo.news}
+                                        <div className="register_section_item">
+                                            <input type="password" placeholder={t("Confirm Password*")}
+                                                   className={"form-control form-control-password " + (passwordMatchNotValid ? "password_not_valid" : "")}
+                                                   name="Register_PasswordConfirm"
+                                                   value={registerInfo.passwordConfirm}
+                                                   autoComplete="new-password"
                                                    onChange={(e) => {
                                                        let temp = JSON.parse(JSON.stringify(registerInfo));
-                                                       temp.news = e.target.checked;
+                                                       temp.passwordConfirm = e.target.value;
                                                        setRegisterInfo(temp);
-                                                   }} id="registerInfonews"/>
-                                            <label htmlFor="registerInfonews" className="checkbox_label">
-                                                <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
-                                                     alt=""/>
-                                            </label>
-                                            <span className="checkbox_text">
+                                                       if (temp.password === temp.passwordConfirm) {
+                                                           setPasswordMatch(true);
+                                                           setPasswordMatchNotValid(false);
+                                                       } else
+                                                           setPasswordMatch(false);
+                                                   }}/>
+                                            {passwordMatchNotValid && <div className="input_not_valid">{t("Password confirmation is required.")}
+                                            </div>}
+                                        </div>
+                                        <div className="news_signup">
+                                            <div className="checkbox_style">
+                                                <input type="checkbox" checked={registerInfo.news}
+                                                       onChange={(e) => {
+                                                           let temp = JSON.parse(JSON.stringify(registerInfo));
+                                                           temp.news = e.target.checked;
+                                                           setRegisterInfo(temp);
+                                                       }} id="registerInfonews"/>
+                                                <label htmlFor="registerInfonews" className="checkbox_label">
+                                                    <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
+                                                         alt=""/>
+                                                </label>
+                                                <span className="checkbox_text">
                                                 {t("signup to email")}
                                             </span>
+                                            </div>
+                                        </div>
+                                        <div className="login_btn_container">
+                                            <button className="login_btn btn btn-new-dark" onClick={() => registerUser()} disabled={btn_disabled}>{t("CREATE AN ACCOUNT")}</button>
                                         </div>
                                     </div>
-                                    <div className="login_btn_container">
-                                        <button className="login_btn btn btn-new-dark" onClick={() => registerUser()} disabled={btn_disabled}>{t("CREATE AN ACCOUNT")}</button>
-                                    </div>
+                                    }
                                 </div>
-                                }
                             </div>
                         </div>
-                    </div>
                     }
                     
                     {resetPage &&
-                    <div className="Forgot_page_container login_register_container">
-                        <div className="login_container">
-                            <div className="login_inside_container">
-                                <h1 className="login_title">{t("Forgot Password")}</h1>
-                                <h2 className="forget_text forget_text_small">{t("forgot_page_text")}</h2>
-                                <input type="text" placeholder={t("Email*")} className="form-control" name="Email" value={forgotEmail}
-                                       onChange={(e) => {
-                                           setForgotEmail(e.target.value);
-                                       }}/>
-                                
-                                <div className="login_btn_container">
-                                    {/*<button className="login_btn btn btn-new-dark">SIGN IN</button>*/}
-                                    <button className="login_btn btn btn-new-dark" onClick={() => {
-                                        sendResetPasswordRequest();
-                                        setResetPage(false);
-                                    }}>{t("SUBMIT")}</button>
+                        <div className="Forgot_page_container login_register_container">
+                            <div className="login_container">
+                                <div className="login_inside_container">
+                                    <h1 className="login_title">{t("Forgot Password")}</h1>
+                                    <h2 className="forget_text forget_text_small">{t("forgot_page_text")}</h2>
+                                    <input type="text" placeholder={t("Email*")} className="form-control" name="Email" value={forgotEmail}
+                                           onChange={(e) => {
+                                               setForgotEmail(e.target.value);
+                                           }}/>
+                                    
+                                    <div className="login_btn_container">
+                                        {/*<button className="login_btn btn btn-new-dark">SIGN IN</button>*/}
+                                        <button className="login_btn btn btn-new-dark" onClick={() => {
+                                            sendResetPasswordRequest();
+                                            setResetPage(false);
+                                        }}>{t("SUBMIT")}</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
                     }
                 </Modal.Body>
             </Modal>

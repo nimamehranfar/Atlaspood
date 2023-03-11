@@ -29,7 +29,7 @@ import CustomControlFiles from "../Components/CustomControlFiles";
 import Dropdown from "react-bootstrap/Dropdown";
 import GetMeasurementArray from "../Components/GetMeasurementArray";
 import GetUserProjectData from "../Components/GetUserProjectData";
-import convertToPersian from "../Components/ConvertToPersian";
+import {convertToPersian, NumToFa} from "../Components/TextTransform";
 import {Accordion, AccordionContext, useAccordionButton} from "react-bootstrap";
 import {CapitalizeAllWords, Uppercase} from "../Components/TextTransform";
 
@@ -39,6 +39,7 @@ const baseURLGetStates = "https://api.atlaspood.ir/City/GetStates";
 const baseURLGetCities = "https://api.atlaspood.ir/City/GetCities/";
 const baseURLGetCart = "https://api.atlaspood.ir/cart/GetAll";
 const baseURLAddDiscount = "https://api.atlaspood.ir/Cart/AddDiscountCode";
+const baseURLAddDiscountGuest = "https://api.atlaspood.ir/Cart/AddGuestDiscountCode";
 const baseURLDeleteDiscount = "https://api.atlaspood.ir/Cart/DeleteDiscountCode";
 
 
@@ -53,8 +54,13 @@ function Checkout() {
     const [userName, setUserName] = React.useState("");
     const [userEmail, setUserEmail] = React.useState("");
     
-    const [totalPrice, setTotalPrice] = useState(0);
+    const [noShipping, setNoShipping] = useState(false);
+    const [subTotalPrice, setSubTotalPrice] = useState(0);
+    const [installPrice, setInstallPrice] = useState(0);
+    const [transportPrice, setTransportPrice] = useState(0);
     const [shippingPrice, setShippingPrice] = useState(0);
+    const [totalPrice, setTotalPrice] = useState(0);
+    const [totalSaving, setTotalSaving] = useState(0);
     const [cart, setCart] = useState({});
     const [drapery, setDrapery] = useState([]);
     const [discounts, setDiscounts] = useState([]);
@@ -68,6 +74,7 @@ function Checkout() {
     const [swatchesCount, setSwatchesCount] = useState(0);
     const [cartChanged, setCartChanged] = useState(0);
     const [discount, setDiscount] = useState("");
+    const [discountErr, setDiscountErr] = useState("");
     const [discountList, setDiscountList] = useState([]);
     
     const [loginInfo, setLoginInfo] = useState({
@@ -161,10 +168,10 @@ function Checkout() {
     const [selectedCity, setSelectedCity] = useState([]);
     const [tempCity, setTempCity] = useState([]);
     const [tempCityId, setTempCityId] = useState(undefined);
-	
-	const popperConfig = {
-		strategy: "fixed"
-	};
+    
+    const popperConfig = {
+        strategy: "fixed"
+    };
     
     function checkPasswordStrength(user_password) {
         let temp = JSON.parse(JSON.stringify(passwordValidation));
@@ -282,26 +289,127 @@ function Checkout() {
     }
     
     function checkDiscount() {
-        let discountText = discount;
-        axios.post(baseURLAddDiscount, {}, {
-            params: {
-                code: discountText
-            },
-            headers: authHeader()
-        }).then((response) => {
-            setDiscount("");
-            setCartChanged(cartChanged + 1);
-        }).catch(err => {
-            if (err.response.status === 401) {
-                refreshToken().then((response2) => {
-                    if (response2 !== false) {
-                        checkDiscount();
-                    } else {
-                    }
-                });
-            } else {
+        let discountText = JSON.parse(JSON.stringify(discount));
+        
+        if(isLoggedIn) {
+            axios.post(baseURLAddDiscount, {}, {
+                params: {
+                    code: discountText
+                },
+                headers: authHeader()
+            }).then((response) => {
+                setDiscount("");
+                setDiscountErr("");
+                setCartChanged(cartChanged + 1);
+            }).catch(err => {
+                if (err.response.status === 401) {
+                    refreshToken().then((response2) => {
+                        if (response2 !== false) {
+                            checkDiscount();
+                        } else {
+                        }
+                    });
+                } else {
+                    setDiscountErr(err.response.data.toString());
+                }
+            });
+        }
+        else{
+            let postObj={
+                "CartId": 0,
+                "UserId": 0,
+                "TotalAmount": 0,
+                "InstallAmount": 0,
+                "TransportationAmount": 0,
+                "TotalDiscount": 0,
+                "PayableAmount": 0,
+                "CartDetails": [],
+                "DiscountCodes": []
             }
-        });
+            if (localStorage.getItem("cart") !== null) {
+                let cartObj = JSON.parse(localStorage.getItem("cart"));
+                let draperies = cartObj["drapery"] ||[];
+                if(draperies.length){
+                    let promiseArr = [];
+                    Object.keys(draperies).forEach((key, index) => {
+                        promiseArr[index] = new Promise((resolve, reject) => {
+                            postObj["CartDetails"][index]={
+                                "CartDetailId": index,
+                                "CartId": 0,
+                                "TypeId": 6403,
+                                "Discount": 0,
+                                "Count": draperies[index]["Count"],
+                                "ProductId": null,
+                                "ProductName": null,
+                                "ProductEnName": null,
+                                "ProductGroupId": null,
+                                "ProductDesignCode": null,
+                                "SewingPreorderId": index,
+                                "PhotoUrl": null,
+                                "ProductDesignEnName": null,
+                                "ProductDesignName": null,
+                                "ProductColorEnName": null,
+                                "ProductColorName": null,
+                                "ProductColorId": null,
+                                "UnitPrice": draperies[index]["Price"],
+                                "Amount": draperies[index]["Price"]*draperies[index]["Count"],
+                                "PayableAmount": draperies[index]["Price"]*draperies[index]["Count"],
+                                "SewingPreorder": {
+                                    "SewingPreorderId": index,
+                                    "IsCompleted": true,
+                                    ...draperies[index]
+                                }
+                            };
+                            postObj["TotalAmount"]+=draperies[index]["Price"]*draperies[index]["Count"];
+                            if(draperies[index]["ZipCode"] && draperies[index]["ZipCode"]!==""){
+                                postObj["InstallAmount"]+=draperies[index]["InstallAmount"]||0;
+                                if(postObj["InstallAmount"]===0){
+                                    postObj["TransportationAmount"]=draperies[index]["TransportationAmount"]||0;
+                                }
+                            }
+                            resolve();
+                        })
+                    });
+                    Promise.all(promiseArr).then(() => {
+                        postObj["PayableAmount"]=postObj["TotalAmount"]+postObj["InstallAmount"]+postObj["TransportationAmount"];
+                        axios.post(baseURLAddDiscountGuest, postObj, {
+                            params: {
+                                code: discountText
+                            }
+                        }).then((response) => {
+    
+                            setTotalSaving(response.data["TotalDiscount"]);
+                            setDiscounts(response.data["DiscountCodes"]);
+                            
+                            if (localStorage.getItem("cart") !== null) {
+                                let cartObj = JSON.parse(localStorage.getItem("cart"));
+                                let temp = cartObj["drapery"];
+                                let promiseArr = [];
+    
+                                response.data["CartDetails"].forEach((tempObj, index) => {
+                                    promiseArr[index] = new Promise((resolve, reject) => {
+                                        temp[tempObj["CartDetailId"]]["Discount"]=tempObj["Discount"];
+                                        temp[tempObj["CartDetailId"]]["PreorderText"]["Discount"]=tempObj["Discount"];
+                                        resolve();
+                                    })
+                                })
+        
+                                Promise.all(promiseArr).then(() => {
+                                    cartObj["drapery"] = temp;
+                                    localStorage.setItem('cart', JSON.stringify(cartObj));
+                                    setCartChanged(cartChanged + 1);
+                                })
+                            } else {
+                                setCartChanged(cartChanged + 1);
+                            }
+                            // localStorage.setItem('discount', JSON.stringify(response.data["DiscountCodes"]));
+                        }).catch(err => {
+                            setDiscountErr(err.response.data.toString());
+                        });
+                    })
+                }
+            }
+        }
     }
     
     function removeDiscount(discountText) {
@@ -518,8 +626,8 @@ function Checkout() {
         }
     }
     
-    function ContextAwareToggleViewDetails({ eventKey, callback, textOnHide, textOnShow}) {
-        const { activeEventKey } = useContext(AccordionContext);
+    function ContextAwareToggleViewDetails({eventKey, callback, textOnHide, textOnShow}) {
+        const {activeEventKey} = useContext(AccordionContext);
         
         const decoratedOnClick = useAccordionButton(
             eventKey,
@@ -535,7 +643,7 @@ function Checkout() {
                 type="button"
                 onClick={decoratedOnClick}
             >
-                <h4 className="dk_curtain_preview_item_details">{isCurrentEventKey ? textOnShow:textOnHide}</h4>
+                <h4 className="dk_curtain_preview_item_details">{isCurrentEventKey ? textOnShow : textOnHide}</h4>
             </button>
         );
     }
@@ -553,7 +661,7 @@ function Checkout() {
             axios.get(baseURLGetCart, {
                 headers: authHeader()
             }).then((response) => {
-                setCart(response.data);
+                setCart(response.data ? response.data : {});
             }).catch(err => {
                 if (err.response.status === 401) {
                     refreshToken().then((response2) => {
@@ -583,19 +691,23 @@ function Checkout() {
         if (Object.keys(cart).length !== 0) {
             if (isLoggedIn) {
                 if (swatchOnly === undefined) {
-                let draperies = cart["CartDetails"].filter((object1) => {
-                    return object1["TypeId"] === 6403;
-                });
-    
-                let swatches = cart["CartDetails"].filter((object1) => {
-                    return object1["TypeId"] === 6402;
-                });
-                setTotalPrice(cart["TotalAmount"]);
-                setDrapery(draperies);
-                setDraperyCount(draperies.length);
-                setSwatches(swatches);
-                setSwatchesCount(swatches.length);
-                setDiscounts(cart["DiscountCodes"]);
+                    let draperies = cart["CartDetails"].filter((object1) => {
+                        return object1["TypeId"] === 6403;
+                    });
+                    
+                    let swatches = cart["CartDetails"].filter((object1) => {
+                        return object1["TypeId"] === 6402;
+                    });
+                    setSubTotalPrice(cart["TotalAmount"]);
+                    setInstallPrice(cart["InstallAmount"]);
+                    setTransportPrice(cart["TransportationAmount"]);
+                    setTotalPrice(cart["PayableAmount"]);
+                    setTotalSaving(cart["TotalDiscount"]);
+                    setDrapery(draperies);
+                    setDraperyCount(draperies.length);
+                    setSwatches(swatches);
+                    setSwatchesCount(swatches.length);
+                    setDiscounts(cart["DiscountCodes"]);
                 } else if (swatchOnly && swatchOnly === "Swatches") {
                     let swatches = cart["CartDetails"].filter((object1) => {
                         return object1["TypeId"] === 6402;
@@ -636,8 +748,11 @@ function Checkout() {
         if (isLoggedIn) {
             let projectData = JSON.parse(JSON.stringify(UserProjects));
             let temp = [];
+            let tempNoShip = true;
             let promise2 = new Promise((resolve, reject) => {
-                for (let i = 0; i < drapery.length; i++) {
+                drapery.sort(function(a, b) {
+                    return b["CartDetailId"] - a["CartDetailId"]  ||  b["SewingPreorderId"] - a["SewingPreorderId"];
+                }).forEach((tempObj,i)=>{
                     let projectDataObj = projectData[drapery[i]["SewingPreorder"]["SewingModelId"]];
                     let desc = [];
                     let projectId = drapery[i]["SewingPreorderId"];
@@ -656,10 +771,14 @@ function Checkout() {
                     let photoUrl = obj["PhotoUrl"];
                     let ModelId = obj["ModelId"];
                     let hasDiscount = drapery[i]["Discount"] > 0;
-                    obj["price"] = drapery[i]["UnitPrice"];
-                    obj["price"] = drapery[i]["UnitPrice"];
-                    obj["qty"] = drapery[i]["Count"];
+                    let SewingModelId = obj["SewingModelId"];
+                    let zipcode = obj["ZipCode"];
+                    obj["Price"] = drapery[i]["PayableAmount"];
+                    obj["qty"] = drapery[i]["WindowCount"];
                     
+                    if (tempNoShip) {
+                        tempNoShip = zipcode && zipcode !== "";
+                    }
                     if (projectDataObj) {
                         let promise1 = new Promise((resolve, reject) => {
                             projectDataObj["data"].forEach((tempObj, index) => {
@@ -668,7 +787,9 @@ function Checkout() {
                                     if (obj[tempObj["apiLabel"]] === undefined) {
                                     } else {
                                         let apiValue = obj[tempObj["apiLabel"]] === null ? "null" : obj[tempObj["apiLabel"]].toString();
-                                        if (tempObj["titleValue"] === null) {
+                                        if (tempObj["apiLabel"] === "ControlType" && obj["ControlType"] === "Motorized") {
+                                            objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(obj[tempObj["apiLabel"]].toString())} / ${t(obj["MotorType"].toString())}`).toString() : `${t(obj[tempObj["apiLabel"]].toString())} / ${t(obj["MotorType"].toString())}`;
+                                        } else if (tempObj["titleValue"] === null) {
                                             if (tempObj["titlePostfix"] === "") {
                                                 objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(apiValue)}`).toString() : t(apiValue);
                                             } else {
@@ -705,40 +826,40 @@ function Checkout() {
                         });
                         
                         promise1.then(() => {
-                            if(obj["SewingModelId"] === "0326"){
-                                desc=[
-                                <div className="basket_item_title_desc" key={"fabric/color"}>
-                                    <h3>{t("Fabric/Color")}&nbsp;</h3>
-                                    <h4>{obj["SodFabrics"].map((item, i) =>
-                                        <div key={i}
-                                             className="dk_curtain_preview_detail">
-                                            <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + " / " + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
-                                            <h5>&nbsp;X</h5><h3>{item["Qty"]}</h3>
-                                        </div>)}
-                                    </h4>
-                                </div>
-                                ,...desc];
+                            if (obj["SewingModelId"] === "0326") {
+                                desc = [
+                                    <div className="basket_item_title_desc" key={"fabric/color"}>
+                                        <h3>{t("Fabric/Color")}&nbsp;</h3>
+                                        <h4>{obj["SodFabrics"].map((item, i) =>
+                                            <div key={i}
+                                                 className="dk_curtain_preview_detail">
+                                                <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + " / " + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
+                                                <h5>&nbsp;X</h5><h3>{item["Qty"]}</h3>
+                                            </div>)}
+                                        </h4>
+                                    </div>
+                                    , ...desc];
                             }
                             // console.log(desc);
                             temp[i] =
                                 <li className="checkout_item_container" key={i}>
                                     <div className="checkout_item_image_container">
                                         <img src={`https://api.atlaspood.ir/${photoUrl}`} alt="" className="checkout_item_img"/>
-                                        <p className="checkout_item_image_qty">{pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${obj["qty"]}`) : obj["qty"]}</p>
+                                        <p className="checkout_item_image_qty">{pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${obj["WindowCount"]}`) : obj["WindowCount"]}</p>
                                     </div>
                                     <div className={`checkout_item_desc_container  ${!hasDiscount ? "checkout_item_desc_container_without_discount" : ""}`}>
                                         <div className="checkout_item">
                                             <h1 className="checkout_item_name">{pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</h1>
                                             <div className="checkout_item_price_section">
                                                 <span
-                                                    className={`checkout_item_price ${hasDiscount ? "checkout_item_price_with_discount" : ""}`}>{GetPrice(obj["price"], pageLanguage, t("TOMANS"))}</span>
+                                                    className={`checkout_item_price ${hasDiscount ? "checkout_item_price_with_discount" : ""}`}>{GetPrice(hasDiscount? drapery[i]["Amount"]:obj["Price"], pageLanguage, t("TOMANS"))}</span>
                                                 {hasDiscount &&
-                                                <span className="checkout_item_price">{GetPrice(obj["price"] - drapery[i]["Discount"], pageLanguage, t("TOMANS"))}</span>}
+                                                    <span className="checkout_item_price">{GetPrice(drapery[i]["PayableAmount"], pageLanguage, t("TOMANS"))}</span>}
                                             </div>
                                         </div>
-                                        {!hasDiscount &&
-                                            <h4 className="checkout_item_room_name">{pageLanguage === 'fa' ? roomNameFa + " / "+ WindowName : roomName + " / "+ WindowName}</h4>
-                                        }
+                                        
+                                        <h4 className="checkout_item_room_name">{pageLanguage === 'fa' ? roomNameFa + " / " + WindowName : roomName + " / " + WindowName}</h4>
+                                        
                                         {/*<PopoverStickOnClick classNames="checkout_view_detail_popover"*/}
                                         {/*                     placement="bottom"*/}
                                         {/*                     children={<h2 className="checkout_item_details">{t("View Details")}</h2>}*/}
@@ -748,7 +869,7 @@ function Checkout() {
                                         {/*                             {desc}*/}
                                         {/*                         </div>*/}
                                         {/*                     }/>*/}
-										{/*<div className="checkout_item_dropdown">
+                                        {/*<div className="checkout_item_dropdown">
 											<Dropdown autoClose="outside" title="" align={{sm: pageLanguage === "fa" ? "end" : "start"}}>
 												<Dropdown.Toggle className="basket_item_title_dropdown_btn" style={{ position: "static" }}>
 													<h2 className="checkout_item_details">{t("View Details")}</h2>
@@ -763,7 +884,7 @@ function Checkout() {
 										</div>*/}
                                         <Accordion>
                                             <Accordion.Item eventKey="0">
-                                                <ContextAwareToggleViewDetails eventKey="0" textOnHide={t("View Details")} textOnShow={t("Hide Details")} />
+                                                <ContextAwareToggleViewDetails eventKey="0" textOnHide={t("View Details")} textOnShow={t("Hide Details")}/>
                                                 <Accordion.Body className="basket_item_title_dropdown dk_curtain_preview_dropdown">
                                                     <div className="basket_item_title_container">
                                                         {desc}
@@ -772,7 +893,7 @@ function Checkout() {
                                             </Accordion.Item>
                                         </Accordion>
                                         {hasDiscount &&
-                                        <span className="checkout_item_discount">{t('Discount')} (-{GetPrice(drapery[i]["Discount"], pageLanguage, t("TOMANS"))})</span>}
+                                            <span className="checkout_item_discount">{t('Discount')} (-{GetPrice(drapery[i]["Discount"], pageLanguage, t("TOMANS"))})</span>}
                                     </div>
                                 </li>;
                         });
@@ -780,10 +901,11 @@ function Checkout() {
                             resolve();
                         }
                     }
-                }
+                })
             });
             promise2.then(() => {
                 setDraperyList(temp);
+                setNoShipping(tempNoShip);
             });
         } else {
             if (drapery.length) {
@@ -793,7 +915,10 @@ function Checkout() {
                 let delArr = [];
                 
                 let draperiesTotalPrice = 0;
+                let draperiesTotalInstall = 0;
+                let draperiesTotalTransport = 0;
                 let promiseArr = [];
+                let tempNoShip = true;
                 
                 tempDrapery.forEach((obj, index) => {
                     let tempPostObj = {};
@@ -808,7 +933,7 @@ function Checkout() {
                                 if (temp[key] !== null || temp[key] !== "") {
                                     let tempObj = userProjects.find(obj => obj["cart"] === key);
                                     // console.log(key,tempObj);
-                                    if (tempObj["apiLabel"] !== "") {
+                                    if (tempObj && tempObj["apiLabel"] !== "") {
                                         if (tempObj["apiValue"] === null) {
                                             tempPostObj[tempObj["apiLabel"]] = temp[key];
                                         } else {
@@ -842,7 +967,7 @@ function Checkout() {
                                 if (temp[key] !== null || temp[key] !== "") {
                                     let tempObj = userProjects.find(obj => obj["cart"] === key);
                                     if (tempObj["apiAcc"] !== undefined) {
-                                        if (tempObj["apiAcc"] === true) {
+                                        if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
                                             tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
                                         } else {
                                         
@@ -850,9 +975,17 @@ function Checkout() {
                                     }
                                 }
                             });
-                            tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
-                                return el != null;
-                            });
+                            if (obj["PreorderText"]["Accessories"] && obj["PreorderText"]["Accessories"].filter(n => n).length > 0) {
+                                tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].concat(obj["PreorderText"]["Accessories"])
+                                let uniqueAcc = [...tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(n => n).reduce((map, obj) => map.set(obj.SewingAccessoryValue, obj), new Map()).values()];
+                                tempPostObj["SewingOrderDetails"][0]["Accessories"] = uniqueAcc.filter(function (el) {
+                                    return el != null;
+                                });
+                            } else {
+                                tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
+                                    return el != null;
+                                });
+                            }
                             
                             // delete tempPostObj["SewingOrderDetails"][0]["SewingModelId"];
                             // delete tempPostObj["SewingModelId"];
@@ -881,111 +1014,179 @@ function Checkout() {
                 });
                 
                 Promise.all(promiseArr).then(function (values) {
+                    let tempDraperiesTotalTransport = values.find(function (el) {
+                        return el["data"] && el["data"]["TransportationAmount"] && el["data"]["TransportationAmount"] > 0;
+                    });
+                    if (tempDraperiesTotalTransport && tempDraperiesTotalTransport["data"] && tempDraperiesTotalTransport["data"]["TransportationAmount"]) {
+                        draperiesTotalTransport = tempDraperiesTotalTransport["data"]["TransportationAmount"]
+                    } else {
+                        draperiesTotalTransport = 0;
+                    }
                     
-                    tempDrapery.forEach((obj1, index) => {
-                        let obj = obj1["PreorderText"];
-                        let fabricColorFa = obj["FabricColorFa"];
-                        let fabricColor = obj["FabricColorEn"];
-                        let fabricDesignFa = obj["FabricDesignFa"];
-                        let fabricDesign = obj["FabricDesignEn"];
-                        let defaultModelNameFa = obj["ModelNameFa"];
-                        let defaultModelName = obj["ModelNameEn"];
-                        let roomNameFa = obj["RoomNameFa"];
-                        let roomName = obj["RoomNameEn"];
-                        let WindowName = obj["WindowName"] === undefined ? "" : obj["WindowName"];
-                        let photoUrl = obj["PhotoUrl"];
-                        let desc = [];
-                        obj["price"] = values[index].data["price"] / obj1["Count"];
-                        obj1["price"] = values[index].data["price"] / obj1["Count"];
-                        draperiesTotalPrice += values[index].data["price"];
-                        
-                        Object.keys(obj).forEach(key => {
+                    let promise2 = new Promise((resolve, reject) => {
+                        tempDrapery.forEach((obj1, index) => {
+                            let obj = obj1["PreorderText"];
+                            let fabricColorFa = obj["FabricColorFa"];
+                            let fabricColor = obj["FabricColorEn"];
+                            let fabricDesignFa = obj["FabricDesignFa"];
+                            let fabricDesign = obj["FabricDesignEn"];
+                            let defaultModelNameFa = obj["ModelNameFa"];
+                            let defaultModelName = obj["ModelNameEn"];
+                            let roomNameFa = obj["RoomNameFa"];
+                            let roomName = obj["RoomNameEn"];
+                            let WindowName = obj["WindowName"] === undefined ? "" : obj["WindowName"];
+                            let photoUrl = obj["PhotoUrl"];
+                            let SewingModelId = obj["SewingModelId"];
+                            let zipcode = obj["ZipCode"];
+                            let hasDiscount = obj1["Discount"] > 0 && discountList.length>0;
+                            let desc = [];
+                            obj["Price"] = values[index].data["price"] / obj1["WindowCount"];
+                            obj1["Price"] = values[index].data["price"] / obj1["WindowCount"];
+                            obj["InstallAmount"] = values[index].data["InstallAmount"] ? values[index].data["InstallAmount"] : 0;
+                            obj["TransportationAmount"] = values[index].data["TransportationAmount"] ? values[index].data["TransportationAmount"] : 0;
+                            draperiesTotalPrice += values[index].data["price"];
+                            draperiesTotalInstall += values[index].data["InstallAmount"];
+                            
+                            if (tempNoShip) {
+                                tempNoShip = zipcode && zipcode !== "";
+                            }
+                            
+                            let promiseArr2 = [];
                             let userProjects = JSON.parse(JSON.stringify(UserProjects))[obj["SewingModelId"]]["data"];
-                            let tempObj = userProjects.find(obj => obj["apiLabel"] === key);
-                            if (tempObj === undefined) {
-                                delArr.push(index);
-                            } else {
-                                if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
-                                    let objLabel = "";
-                                    let apiValue = obj[tempObj["apiLabel"]] === null ? "null" : obj[tempObj["apiLabel"]].toString();
-                                    if (tempObj["titleValue"] === null) {
-                                        if (tempObj["titlePostfix"] === "") {
-                                            objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(apiValue.toString())}`).toString() : t(apiValue.toString());
-                                        } else {
-                                            objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${apiValue}`).toString() + t(tempObj["titlePostfix"]) : apiValue.toString() + t(tempObj["titlePostfix"]);
-                                        }
+                            Object.keys(obj).forEach((key, i) => {
+                                promiseArr2[i] = new Promise((resolve, reject) => {
+                                    let tempObj = userProjects.find(obj => obj["apiLabel"] === key);
+                                    if (tempObj === undefined) {
+                                        delArr.push(index);
+                                        resolve();
+                                    } else if (tempObj["apiLabel"] === "WidthCart") {
+                                        desc[tempObj["order"]] =
+                                            <div className="basket_item_title_desc" key={index}>
+                                                <h3>{t("DIMENSIONS")}&nbsp;</h3>
+                                                <h4>{NumToFa((obj["WidthCart"]) + t("Zebra Measurements W") + " \u00d7 " + obj["HeightCart"] + t("Zebra Measurements H") + t("basket Measurements cm"),pageLanguage)}</h4>
+                                            </div>;
+                                        resolve();
                                     } else {
-                                        if (tempObj["titleValue"][apiValue.toString()] === null) {
-                                            if (tempObj["titlePostfix"] === "") {
-                                                objLabel = t(apiValue.toString());
+                                        if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
+                                            let objLabel = "";
+                                            let apiValue = obj[tempObj["apiLabel"]] === null ? "null" : obj[tempObj["apiLabel"]].toString();
+                                            if (tempObj["apiLabel"] === "ControlType" && obj["ControlType"] === "Motorized") {
+                                                objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(obj[key].toString())} / ${t(obj["MotorType"].toString())}`).toString() : `${t(obj[key].toString())} / ${t(obj["MotorType"].toString())}`;
+                                            } else if (tempObj["titleValue"] === null) {
+                                                if (tempObj["titlePostfix"] === "") {
+                                                    objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(apiValue.toString())}`).toString() : t(apiValue.toString());
+                                                } else {
+                                                    objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${apiValue}`).toString() + t(tempObj["titlePostfix"]) : apiValue.toString() + t(tempObj["titlePostfix"]);
+                                                }
                                             } else {
-                                                objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${apiValue}`).toString() + t(tempObj["titlePostfix"]) : apiValue.toString() + t(tempObj["titlePostfix"]);
+                                                if (tempObj["titleValue"][apiValue.toString()] === null) {
+                                                    if (tempObj["titlePostfix"] === "") {
+                                                        objLabel = t(apiValue.toString());
+                                                    } else {
+                                                        objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${apiValue}`).toString() + t(tempObj["titlePostfix"]) : apiValue.toString() + t(tempObj["titlePostfix"]);
+                                                    }
+                                                } else {
+                                                    objLabel = t(tempObj["titleValue"][apiValue.toString()]);
+                                                }
                                             }
+                                            desc[tempObj["order"]] =
+                                                <div className="basket_item_title_desc" key={key}>
+                                                    <h3>{t(tempObj["title"])}&nbsp;</h3>
+                                                    <h4>{objLabel}</h4>
+                                                </div>;
+                                            resolve();
                                         } else {
-                                            objLabel = t(tempObj["titleValue"][apiValue.toString()]);
+                                            resolve();
                                         }
                                     }
-                                    desc[tempObj["order"]] =
-                                        <div className="basket_item_title_desc" key={key}>
-                                            <h3>{t(tempObj["title"])}&nbsp;</h3>
-                                            <h4>{objLabel}</h4>
-                                        </div>;
+                                });
+                                
+                            });
+                            
+                            Promise.all(promiseArr2).then(() => {
+                                temp[tempDrapery.length-index-1] =
+                                    <li className="checkout_item_container" key={index}>
+                                        <div className="checkout_item_image_container">
+                                            <img src={`https://api.atlaspood.ir/${photoUrl}`} alt="" className="checkout_item_img"/>
+                                            <p className="checkout_item_image_qty">{pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${obj1["Count"]}`) : obj1["Count"]}</p>
+                                        </div>
+                                        <div className="checkout_item_desc_container">
+                                            <div className="checkout_item">
+                                                <h1 className="checkout_item_name">{pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</h1>
+                                                <div className="checkout_item_price_section">
+                                                    <span className={`checkout_item_price ${hasDiscount ? "checkout_item_price_with_discount" : ""}`}>{GetPrice(obj1["Price"] * obj1["Count"], pageLanguage, t("TOMANS"))}</span>
+                                                    {hasDiscount &&
+                                                        <span className="checkout_item_price">{GetPrice((obj1["Price"] * obj1["Count"])-obj["Discount"], pageLanguage, t("TOMANS"))}</span>}
+                                                </div>
+                                            </div>
+                                            {/*<PopoverStickOnHover classNames="basket_view_detail_popover"*/}
+                                            {/*                      placement="bottom"*/}
+                                            {/*                      children={<h2 className="checkout_item_details">{t("View Details")}</h2>}*/}
+                                            {/*                      component={*/}
+                                            {/*                          <div className="basket_item_title_container">*/}
+                                            {/*                              {desc}*/}
+                                            {/*                          </div>*/}
+                                            {/*                      }/>*/}
+                                            
+                                            {/*<div className="checkout_item_dropdown">*/}
+                                            {/*	<Dropdown autoClose="outside" title="" align={{sm: pageLanguage === "fa" ? "end" : "start"}}>*/}
+                                            {/*		<Dropdown.Toggle className="basket_item_title_dropdown_btn">*/}
+                                            {/*			<h2 className="checkout_item_details">{t("View Details")}</h2>*/}
+                                            {/*			<img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>*/}
+                                            {/*		</Dropdown.Toggle>*/}
+                                            {/*		<Dropdown.Menu popperConfig={popperConfig} positionFixed={true} className="basket_view_detail_popover">*/}
+                                            {/*			<div className="basket_item_title_container">*/}
+                                            {/*				{desc}*/}
+                                            {/*			</div>*/}
+                                            {/*		</Dropdown.Menu>*/}
+                                            {/*	</Dropdown>*/}
+                                            {/*</div>*/}
+                                            <h4 className="checkout_item_room_name">{pageLanguage === 'fa' ? roomNameFa + " / " + WindowName : roomName + " / " + WindowName}</h4>
+                                            <Accordion>
+                                                <Accordion.Item eventKey="0">
+                                                    <ContextAwareToggleViewDetails eventKey="0" textOnHide={t("View Details")} textOnShow={t("Hide Details")}/>
+                                                    <Accordion.Body className="basket_item_title_dropdown dk_curtain_preview_dropdown">
+                                                        <div className="basket_item_title_container">
+                                                            {desc}
+                                                        </div>
+                                                    </Accordion.Body>
+                                                </Accordion.Item>
+                                            </Accordion>
+                                        </div>
+                                    </li>;
+                                if (index === tempDrapery.length - 1) {
+                                    resolve();
                                 }
-                            }
+                            });
                         });
-                        
-                        temp[index] =
-                            <li className="checkout_item_container" key={index}>
-                                <div className="checkout_item_image_container">
-                                    <img src={`https://api.atlaspood.ir/${photoUrl}`} alt="" className="checkout_item_img"/>
-                                    <p className="checkout_item_image_qty">{pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${obj1["Count"]}`) : obj1["Count"]}</p>
-                                </div>
-                                <div className="checkout_item_desc_container">
-                                    <div className="checkout_item">
-                                        <h1 className="checkout_item_name">{pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</h1>
-                                        <span className="checkout_item_price">{GetPrice(obj1["price"] * obj1["Count"], pageLanguage, t("TOMANS"))}</span>
-                                    </div>
-                                    {/*<PopoverStickOnHover classNames="basket_view_detail_popover"*/}
-                                    {/*                      placement="bottom"*/}
-                                    {/*                      children={<h2 className="checkout_item_details">{t("View Details")}</h2>}*/}
-                                    {/*                      component={*/}
-                                    {/*                          <div className="basket_item_title_container">*/}
-                                    {/*                              {desc}*/}
-                                    {/*                          </div>*/}
-                                    {/*                      }/>*/}
-									
-                                    <div className="checkout_item_dropdown">
-										<Dropdown autoClose="outside" title="" align={{sm: pageLanguage === "fa" ? "end" : "start"}}>
-											<Dropdown.Toggle className="basket_item_title_dropdown_btn">
-												<h2 className="checkout_item_details">{t("View Details")}</h2>
-												<img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>
-											</Dropdown.Toggle>
-											<Dropdown.Menu popperConfig={popperConfig} positionFixed={true} className="basket_view_detail_popover">
-												<div className="basket_item_title_container">
-													{desc}
-												</div>
-											</Dropdown.Menu>
-										</Dropdown>
-									</div>
-                                </div>
-                            </li>;
                     });
-                    setDraperyList(temp);
-                    if (localStorage.getItem("cart") !== null) {
-                        let cartObjects = JSON.parse(localStorage.getItem("cart"));
-                        cartObjects["drapery"] = tempDrapery;
-                        localStorage.setItem('cart', JSON.stringify(cartObjects));
-                    } else {
-                        setCart({});
-                    }
-                    setTotalPrice(draperiesTotalPrice);
+                    
+                    promise2.then(() => {
+                        setDraperyList(temp);
+                        if (localStorage.getItem("cart") !== null) {
+                            let cartObjects = JSON.parse(localStorage.getItem("cart"));
+                            cartObjects["drapery"] = tempDrapery;
+                            localStorage.setItem('cart', JSON.stringify(cartObjects));
+                        } else {
+                            setCart({});
+                        }
+                        setSubTotalPrice(draperiesTotalPrice);
+                        setInstallPrice(draperiesTotalInstall);
+                        setTransportPrice(draperiesTotalTransport);
+                        setTotalPrice(draperiesTotalPrice + draperiesTotalInstall + draperiesTotalTransport);
+                        setNoShipping(tempNoShip);
+                    });
                 }).catch(err => {
                     console.log(err);
                 });
                 
-            }
-            else{
+            } else {
+                setSubTotalPrice(0);
+                setInstallPrice(0);
+                setTransportPrice(0);
                 setTotalPrice(0);
+                setTotalSaving(0);
+                setNoShipping(true);
             }
         }
     }, [drapery]);
@@ -1005,10 +1206,10 @@ function Checkout() {
                     let ProductColorEnName = obj["ProductColorEnName"];
                     let ProductColorName = obj["ProductColorName"];
                     let photoUrl = obj["PhotoUrl"];
-                    let price = obj["TotalAmount"];
+                    let price = obj["PayableAmount"];
                     let count = obj["Count"];
                     tempTotal += price;
-    
+                    
                     temp[i] =
                         <li className="checkout_item_container" key={i}>
                             <div className="checkout_item_image_container">
@@ -1017,11 +1218,11 @@ function Checkout() {
                             </div>
                             <div className="checkout_item_desc_container">
                                 <div className="checkout_item">
-                                    <h1 className="checkout_item_name">{t('Fabric Swatch')}</h1>
-                                    <span className="checkout_item_price">{price === 0 ? t("Free") :GetPrice(price * count, pageLanguage, t("TOMANS"))}</span>
+                                    <h1 className="checkout_item_name">{t("Fabric Swatch")}</h1>
+                                    <span className="checkout_item_price">{price === 0 ? t("Free") : GetPrice(price * count, pageLanguage, t("TOMANS"))}</span>
                                 </div>
                                 <h2 className="checkout_item_details checkout_item_details_design">{pageLanguage === 'fa' ? ProductDesignName : ProductDesignEnName}</h2>
-								<span className="checkout_item_discount  checkout_item_details_color">{pageLanguage === 'fa' ? ProductColorName : ProductColorEnName}</span>
+                                <span className="checkout_item_discount  checkout_item_details_color">{pageLanguage === 'fa' ? ProductColorName : ProductColorEnName}</span>
                             </div>
                         </li>;
                     if (i === swatches.length - 1) {
@@ -1060,8 +1261,7 @@ function Checkout() {
             promise1.then(() => {
                 setDiscountList(tempArr);
             });
-        }
-        else{
+        } else {
             setDiscountList([]);
         }
     }, [discounts]);
@@ -1106,39 +1306,39 @@ function Checkout() {
                                     </div>
                                     <div className="checkout_left_info_flex_right">
                                         {!isLoggedIn &&
-                                        <span className="checkout_left_info_text" onClick={() => dispatch({
-                                            type: ShowLoginModal,
-                                        })}>{t("Already have an account? ")}<p>{t("Log in")}</p></span>
+                                            <span className="checkout_left_info_text" onClick={() => dispatch({
+                                                type: ShowLoginModal,
+                                            })}>{t("Already have an account? ")}<p>{t("Log in")}</p></span>
                                         }
                                     </div>
                                 </div>
                                 <div className="checkout_left_info_flex">
                                     {!isLoggedIn &&
-                                    <div className="checkout_left_info_flex_left">
-                                        <input type="text" placeholder={t("Email*")} className="form-control" name="Email" value={loginInfo.email}
-                                               onChange={(e) => {
-                                                   let temp = JSON.parse(JSON.stringify(loginInfo));
-                                                   temp.email = e.target.value;
-                                                   setLoginInfo(temp);
-                                                   if (e.target.value.length > 0) {
-                                                       setEmailNotExist(false);
-                                                       if (validateEmail(e.target.value)) {
-                                                           setEmailNotValid(false);
+                                        <div className="checkout_left_info_flex_left">
+                                            <input type="text" placeholder={t("Email*")} className="form-control" name="Email" value={loginInfo.email}
+                                                   onChange={(e) => {
+                                                       let temp = JSON.parse(JSON.stringify(loginInfo));
+                                                       temp.email = e.target.value;
+                                                       setLoginInfo(temp);
+                                                       if (e.target.value.length > 0) {
+                                                           setEmailNotExist(false);
+                                                           if (validateEmail(e.target.value)) {
+                                                               setEmailNotValid(false);
+                                                           }
                                                        }
-                                                   }
-                                               }}/>
-                                        {emailNotValid && <div className="input_not_valid">{emailError[pageLanguage][emailErrorState]["error"]}</div>}
-                                        {emailNotExist && <div className="input_not_valid">{t("Email Required.")}</div>}
-                                    </div>
+                                                   }}/>
+                                            {emailNotValid && <div className="input_not_valid">{emailError[pageLanguage][emailErrorState]["error"]}</div>}
+                                            {emailNotExist && <div className="input_not_valid">{t("Email Required.")}</div>}
+                                        </div>
                                     }
                                     {isLoggedIn &&
-                                    <div className="checkout_left_info_flex_left">
+                                        <div className="checkout_left_info_flex_left">
                                         <span className="logged_user">
                                             <h1 className="logged_user_name">{userName}</h1>
                                             <h2 className="logged_user_email">({userEmail})</h2>
                                         </span>
-                                        <span className="user_logout text_underline" onClick={() => logoutUser()}>{t("LOG OUT")}</span>
-                                    </div>
+                                            <span className="user_logout text_underline" onClick={() => logoutUser()}>{t("LOG OUT")}</span>
+                                        </div>
                                     }
                                     <div className="checkout_left_info_flex_right">
                                     </div>
@@ -1154,38 +1354,38 @@ function Checkout() {
                                     </div>
                                 </div>
                                 {isLoggedIn && hasAddress && userAddressRender.length > 0 &&
-                                <div className="checkout_left_info_flex">
-                                    <div className="checkout_left_info_flex_all">
-                                        <div className="select_container">
-                                            <Select
-                                                className="select"
-                                                placeholder={t("Select a different address")}
-                                                portal={document.body}
-                                                dropdownPosition="bottom"
-                                                dropdownHandle={false}
-                                                dropdownGap={0}
-                                                values={selectedAddress}
-                                                dropdownRenderer={
-                                                    ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                }
-                                                contentRenderer={
-                                                    ({props, state, methods}) => <CustomControlStaticPlaceholder props={props} state={state} methods={methods}/>
-                                                }
-                                                onChange={(selected) => {
-                                                    if (selected.length) {
-                                                        setSelectedAddress(selected);
-                                                        if (selected[0].value === -1) {
-                                                            clearAddressFields();
-                                                        } else {
-                                                            setAllAddress(selected[0].value);
-                                                        }
+                                    <div className="checkout_left_info_flex">
+                                        <div className="checkout_left_info_flex_all">
+                                            <div className="select_container">
+                                                <Select
+                                                    className="select"
+                                                    placeholder={t("Select a different address")}
+                                                    portal={document.body}
+                                                    dropdownPosition="bottom"
+                                                    dropdownHandle={false}
+                                                    dropdownGap={0}
+                                                    values={selectedAddress}
+                                                    dropdownRenderer={
+                                                        ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                     }
-                                                }}
-                                                options={userAddressRender}
-                                            />
+                                                    contentRenderer={
+                                                        ({props, state, methods}) => <CustomControlStaticPlaceholder props={props} state={state} methods={methods}/>
+                                                    }
+                                                    onChange={(selected) => {
+                                                        if (selected.length) {
+                                                            setSelectedAddress(selected);
+                                                            if (selected[0].value === -1) {
+                                                                clearAddressFields();
+                                                            } else {
+                                                                setAllAddress(selected[0].value);
+                                                            }
+                                                        }
+                                                    }}
+                                                    options={userAddressRender}
+                                                />
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
                                 }
                                 <div className="checkout_left_info_flex">
                                     <div className="checkout_left_info_flex_left">
@@ -1291,291 +1491,291 @@ function Checkout() {
                                     </div>
                                 </div>
                                 {!isLoggedIn &&
-                                <div className="checkout_left_info_shipping_agree">
-                                    <div className="checkout_left_info_flex">
-                                        <div className="checkout_left_info_flex_checkbox">
-                                            <input type="checkbox" checked={passwordsEnable} onChange={(e) => {
-                                                setPasswordsEnable(e.target.checked);
-                                                setAddress2Enable(false);
-                                            }} id="passwordEnable"/>
-                                            <label htmlFor="passwordEnable" className="checkbox_label">
-                                                <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')} alt=""/>
-                                            </label>
-                                            <p>{t("checkout_confirm")}</p>
+                                    <div className="checkout_left_info_shipping_agree">
+                                        <div className="checkout_left_info_flex">
+                                            <div className="checkout_left_info_flex_checkbox">
+                                                <input type="checkbox" checked={passwordsEnable} onChange={(e) => {
+                                                    setPasswordsEnable(e.target.checked);
+                                                    setAddress2Enable(false);
+                                                }} id="passwordEnable"/>
+                                                <label htmlFor="passwordEnable" className="checkbox_label">
+                                                    <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')} alt=""/>
+                                                </label>
+                                                <p>{t("checkout_confirm")}</p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
                                 }
                                 {passwordsEnable &&
-                                <div className="checkout_left_info_flex">
-                                    <div className="checkout_left_info_flex_left">
-                                        <input type="password" placeholder={t("Password*")} className="form-control form-control-password" name="Password"
-                                               value={loginInfo.password}
-                                               onChange={(e) => {
-                                                   let temp = JSON.parse(JSON.stringify(loginInfo));
-                                                   temp.password = e.target.value;
-                                                   temp.password = e.target.value.replace(/\s/g, '');
-                                                   temp.password = temp.password.replace(/[^0-9A-Za-z\s]/g, '');
-                                                   setLoginInfo(temp);
-                                                   if (temp.password === temp.passwordConfirm)
-                                                       setPasswordMatch(true);
-                                                   else
-                                                       setPasswordMatch(false);
-                                                   setAddress2Enable(false);
-                                                   checkPasswordStrength(temp.password);
-                                               }}
-                                               onClick={() => setShowPasswordValidation(true)}
-                                        />
-                                        {showPasswordValidation && <div className="input_not_valid_password ">
-                                            <h2 className="input_not_valid_password_title">{t("Your password must contain:")}</h2>
-                                            <ul className="input_not_valid_password_list">
-                                                <li className={"input_not_valid_password_item " + (passwordValidation.count ? "input_not_valid_password_item_check" : "")}>
+                                    <div className="checkout_left_info_flex">
+                                        <div className="checkout_left_info_flex_left">
+                                            <input type="password" placeholder={t("Password*")} className="form-control form-control-password" name="Password"
+                                                   value={loginInfo.password}
+                                                   onChange={(e) => {
+                                                       let temp = JSON.parse(JSON.stringify(loginInfo));
+                                                       temp.password = e.target.value;
+                                                       temp.password = e.target.value.replace(/\s/g, '');
+                                                       temp.password = temp.password.replace(/[^0-9A-Za-z\s]/g, '');
+                                                       setLoginInfo(temp);
+                                                       if (temp.password === temp.passwordConfirm)
+                                                           setPasswordMatch(true);
+                                                       else
+                                                           setPasswordMatch(false);
+                                                       setAddress2Enable(false);
+                                                       checkPasswordStrength(temp.password);
+                                                   }}
+                                                   onClick={() => setShowPasswordValidation(true)}
+                                            />
+                                            {showPasswordValidation && <div className="input_not_valid_password ">
+                                                <h2 className="input_not_valid_password_title">{t("Your password must contain:")}</h2>
+                                                <ul className="input_not_valid_password_list">
+                                                    <li className={"input_not_valid_password_item " + (passwordValidation.count ? "input_not_valid_password_item_check" : "")}>
                                             <span>
                                             {passwordValidation.count &&
-                                            <img className="checkmark1 img-fluid" src={require('../Images/public/checkmark1.png')} alt=""/>
+                                                <img className="checkmark1 img-fluid" src={require('../Images/public/checkmark1.png')} alt=""/>
                                             }
                                                 {t("password_required_text1")}
                                             </span>
-                                                </li>
-                                                <li className={"input_not_valid_password_item " + (passwordValidation.lowercase ? "input_not_valid_password_item_check" : "")}>
+                                                    </li>
+                                                    <li className={"input_not_valid_password_item " + (passwordValidation.lowercase ? "input_not_valid_password_item_check" : "")}>
                                             <span>
                                             {passwordValidation.lowercase &&
-                                            <img className="checkmark1 img-fluid" src={require('../Images/public/checkmark1.png')} alt=""/>
+                                                <img className="checkmark1 img-fluid" src={require('../Images/public/checkmark1.png')} alt=""/>
                                             }
                                                 {t("password_required_text2")}
                                             </span>
-                                                </li>
-                                                <li className={"input_not_valid_password_item " + (passwordValidation.uppercase ? "input_not_valid_password_item_check" : "")}>
+                                                    </li>
+                                                    <li className={"input_not_valid_password_item " + (passwordValidation.uppercase ? "input_not_valid_password_item_check" : "")}>
                                             <span>
                                             {passwordValidation.uppercase &&
-                                            <img className="checkmark1 img-fluid" src={require('../Images/public/checkmark1.png')} alt=""/>
+                                                <img className="checkmark1 img-fluid" src={require('../Images/public/checkmark1.png')} alt=""/>
                                             }
                                                 {t("password_required_text3")}
                                             </span>
-                                                </li>
-                                                <li className={"input_not_valid_password_item " + (passwordValidation.numbers ? "input_not_valid_password_item_check" : "")}>
+                                                    </li>
+                                                    <li className={"input_not_valid_password_item " + (passwordValidation.numbers ? "input_not_valid_password_item_check" : "")}>
                                             <span>
                                             {passwordValidation.numbers &&
-                                            <img className="checkmark1 img-fluid" src={require('../Images/public/checkmark1.png')} alt=""/>
+                                                <img className="checkmark1 img-fluid" src={require('../Images/public/checkmark1.png')} alt=""/>
                                             }
                                                 {t("password_required_text4")}
                                             </span>
-                                                </li>
-                                            </ul>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            }
                                         </div>
-                                        }
+                                        <div className="checkout_left_info_flex_right">
+                                            <input type="password" placeholder={t("Confirm Password*")} className="form-control form-control-password" name="PasswordConfirm"
+                                                   value={loginInfo.passwordConfirm}
+                                                   onChange={(e) => {
+                                                       let temp = JSON.parse(JSON.stringify(loginInfo));
+                                                       temp.passwordConfirm = e.target.value;
+                                                       setLoginInfo(temp);
+                                                       if (temp.password === temp.passwordConfirm)
+                                                           setPasswordMatch(true);
+                                                       else
+                                                           setPasswordMatch(false);
+                                                       setAddress2Enable(false);
+                                                   }}/>
+                                        </div>
                                     </div>
-                                    <div className="checkout_left_info_flex_right">
-                                        <input type="password" placeholder={t("Confirm Password*")} className="form-control form-control-password" name="PasswordConfirm"
-                                               value={loginInfo.passwordConfirm}
-                                               onChange={(e) => {
-                                                   let temp = JSON.parse(JSON.stringify(loginInfo));
-                                                   temp.passwordConfirm = e.target.value;
-                                                   setLoginInfo(temp);
-                                                   if (temp.password === temp.passwordConfirm)
-                                                       setPasswordMatch(true);
-                                                   else
-                                                       setPasswordMatch(false);
-                                                   setAddress2Enable(false);
-                                               }}/>
-                                    </div>
-                                </div>
                                 }
                                 {passwordsEnable && passwordMatch &&
-                                <div className="checkout_left_info_shipping_address">
-                                    <div className="checkout_left_info_flex">
-                                        <div className="checkout_left_info_flex_radios">
-                                            <div className="radio_style">
-                                                <input className="radio" type="radio" checked={!address2Enable} name="checkout_address" id="1"
-                                                       onClick={e => {
-                                                           setAddress2Enable(false);
-                                                       }}/>
-                                                <label htmlFor="1">{t("SHIP TO ABOVE ADDRESS")}</label>
-                                            </div>
-                                            <div className="radio_style">
-                                                <input className="radio" type="radio" checked={address2Enable} name="checkout_address" id="2"
-                                                       onClick={e => {
-                                                           setAddress2Enable(true);
-                                                       }
-                                                       }/>
-                                                <label htmlFor="2">{t("SHIP TO NEW ADDRESS")}<br/></label>
+                                    <div className="checkout_left_info_shipping_address">
+                                        <div className="checkout_left_info_flex">
+                                            <div className="checkout_left_info_flex_radios">
+                                                <div className="radio_style">
+                                                    <input className="radio" type="radio" checked={!address2Enable} name="checkout_address" id="1"
+                                                           onClick={e => {
+                                                               setAddress2Enable(false);
+                                                           }}/>
+                                                    <label htmlFor="1">{t("SHIP TO ABOVE ADDRESS")}</label>
+                                                </div>
+                                                <div className="radio_style">
+                                                    <input className="radio" type="radio" checked={address2Enable} name="checkout_address" id="2"
+                                                           onClick={e => {
+                                                               setAddress2Enable(true);
+                                                           }
+                                                           }/>
+                                                    <label htmlFor="2">{t("SHIP TO NEW ADDRESS")}<br/></label>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
                                 }
                             </div>
                             
                             
                             {passwordsEnable && passwordMatch && address2Enable &&
-                            <div className="checkout_left_info_shipping_address checkout_left_info_shipping_address2">
-                                {/*<div className="checkout_left_info_flex checkout_left_info_flex_title">*/}
-                                {/*    <div className="checkout_left_info_flex_left">*/}
-                                {/*        <h1 className="checkout_left_info_title">*/}
-                                {/*        </h1>*/}
-                                {/*    </div>*/}
-                                {/*    <div className="checkout_left_info_flex_right">*/}
-                                {/*    </div>*/}
-                                {/*</div>*/}
-                                <div className="checkout_left_info_flex">
-                                    <div className="checkout_left_info_flex_left">
-                                        <input type="text" placeholder={t("First Name*")} className="form-control" name="Name2" value={address2["Name"]}
-                                               onChange={(e) => {
-                                                   setAddress(2, "Name", e.target.value);
-                                               }}/>
-                                    </div>
-                                    <div className="checkout_left_info_flex_right">
-                                        <input type="text" placeholder={t("Last Name*")} className="form-control" name="Last2" value={address2["Last"]}
-                                               onChange={(e) => {
-                                                   setAddress(2, "Last", e.target.value);
-                                               }}/>
-                                    </div>
-                                </div>
-                                <div className="checkout_left_info_flex">
-                                    <div className="checkout_left_info_flex_left">
-                                        <div className="select_container">
-                                            <Select
-                                                className="select"
-                                                placeholder={t("State*")}
-                                                portal={document.body}
-                                                dropdownPosition="bottom"
-                                                dropdownHandle={false}
-                                                dropdownGap={0}
-                                                values={selectedState}
-                                                dropdownRenderer={
-                                                    ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                }
-                                                contentRenderer={
-                                                    ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
-                                                }
-                                                onChange={(selected) => {
-                                                    if (selected.length) {
-                                                        setSelectedState(selected);
-                                                        getCities(pageLanguage, selected[0].value);
-                                                    }
-                                                }}
-                                                options={states}
-                                            />
+                                <div className="checkout_left_info_shipping_address checkout_left_info_shipping_address2">
+                                    {/*<div className="checkout_left_info_flex checkout_left_info_flex_title">*/}
+                                    {/*    <div className="checkout_left_info_flex_left">*/}
+                                    {/*        <h1 className="checkout_left_info_title">*/}
+                                    {/*        </h1>*/}
+                                    {/*    </div>*/}
+                                    {/*    <div className="checkout_left_info_flex_right">*/}
+                                    {/*    </div>*/}
+                                    {/*</div>*/}
+                                    <div className="checkout_left_info_flex">
+                                        <div className="checkout_left_info_flex_left">
+                                            <input type="text" placeholder={t("First Name*")} className="form-control" name="Name2" value={address2["Name"]}
+                                                   onChange={(e) => {
+                                                       setAddress(2, "Name", e.target.value);
+                                                   }}/>
+                                        </div>
+                                        <div className="checkout_left_info_flex_right">
+                                            <input type="text" placeholder={t("Last Name*")} className="form-control" name="Last2" value={address2["Last"]}
+                                                   onChange={(e) => {
+                                                       setAddress(2, "Last", e.target.value);
+                                                   }}/>
                                         </div>
                                     </div>
-                                    <div className="checkout_left_info_flex_right">
-                                        <div className="select_container">
-                                            <Select
-                                                className="select"
-                                                placeholder={t("City*")}
-                                                portal={document.body}
-                                                dropdownPosition="bottom"
-                                                dropdownHandle={false}
-                                                dropdownGap={0}
-                                                values={selectedCity}
-                                                dropdownRenderer={
-                                                    ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                }
-                                                contentRenderer={
-                                                    ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
-                                                }
-                                                onChange={(selected) => {
-                                                    if (selected.length) {
-                                                        setSelectedCity(selected);
+                                    <div className="checkout_left_info_flex">
+                                        <div className="checkout_left_info_flex_left">
+                                            <div className="select_container">
+                                                <Select
+                                                    className="select"
+                                                    placeholder={t("State*")}
+                                                    portal={document.body}
+                                                    dropdownPosition="bottom"
+                                                    dropdownHandle={false}
+                                                    dropdownGap={0}
+                                                    values={selectedState}
+                                                    dropdownRenderer={
+                                                        ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                     }
-                                                }}
-                                                options={cities}
-                                            />
+                                                    contentRenderer={
+                                                        ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                    }
+                                                    onChange={(selected) => {
+                                                        if (selected.length) {
+                                                            setSelectedState(selected);
+                                                            getCities(pageLanguage, selected[0].value);
+                                                        }
+                                                    }}
+                                                    options={states}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="checkout_left_info_flex_right">
+                                            <div className="select_container">
+                                                <Select
+                                                    className="select"
+                                                    placeholder={t("City*")}
+                                                    portal={document.body}
+                                                    dropdownPosition="bottom"
+                                                    dropdownHandle={false}
+                                                    dropdownGap={0}
+                                                    values={selectedCity}
+                                                    dropdownRenderer={
+                                                        ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                    }
+                                                    contentRenderer={
+                                                        ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                    }
+                                                    onChange={(selected) => {
+                                                        if (selected.length) {
+                                                            setSelectedCity(selected);
+                                                        }
+                                                    }}
+                                                    options={cities}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="checkout_left_info_flex">
+                                        <div className="checkout_left_info_flex_all">
+                                            <input type="text" placeholder={t("Address 1*")} className="form-control" name="Address12" value={address2["Address1"]}
+                                                   onChange={(e) => {
+                                                       setAddress(2, "Address1", e.target.value);
+                                                   }}/>
+                                        </div>
+                                    </div>
+                                    <div className="checkout_left_info_flex">
+                                        <div className="checkout_left_info_flex_all">
+                                            <input type="text" placeholder={t("Address 2*")} className="form-control" name="Address22" value={address2["Address2"]}
+                                                   onChange={(e) => {
+                                                       setAddress(2, "Address2", e.target.value);
+                                                   }}/>
+                                        </div>
+                                    </div>
+                                    <div className="checkout_left_info_flex">
+                                        <div className="checkout_left_info_flex_left">
+                                            <input type="text" placeholder={t("Zip Code*")} className="form-control" name="ZipCode2" value={address2["ZipCode"]}
+                                                   onChange={(e) => {
+                                                       setAddress(2, "ZipCode", e.target.value);
+                                                   }}/>
+                                        </div>
+                                        <div className="checkout_left_info_flex_right">
+                                            <input type="text" placeholder={t("Phone Number*")} className="form-control" name="PhoneNumber2" value={address2["PhoneNumber"]}
+                                                   onChange={(e) => {
+                                                       setAddress(2, "PhoneNumber", e.target.value);
+                                                   }}/>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="checkout_left_info_flex">
-                                    <div className="checkout_left_info_flex_all">
-                                        <input type="text" placeholder={t("Address 1*")} className="form-control" name="Address12" value={address2["Address1"]}
-                                               onChange={(e) => {
-                                                   setAddress(2, "Address1", e.target.value);
-                                               }}/>
-                                    </div>
-                                </div>
-                                <div className="checkout_left_info_flex">
-                                    <div className="checkout_left_info_flex_all">
-                                        <input type="text" placeholder={t("Address 2*")} className="form-control" name="Address22" value={address2["Address2"]}
-                                               onChange={(e) => {
-                                                   setAddress(2, "Address2", e.target.value);
-                                               }}/>
-                                    </div>
-                                </div>
-                                <div className="checkout_left_info_flex">
-                                    <div className="checkout_left_info_flex_left">
-                                        <input type="text" placeholder={t("Zip Code*")} className="form-control" name="ZipCode2" value={address2["ZipCode"]}
-                                               onChange={(e) => {
-                                                   setAddress(2, "ZipCode", e.target.value);
-                                               }}/>
-                                    </div>
-                                    <div className="checkout_left_info_flex_right">
-                                        <input type="text" placeholder={t("Phone Number*")} className="form-control" name="PhoneNumber2" value={address2["PhoneNumber"]}
-                                               onChange={(e) => {
-                                                   setAddress(2, "PhoneNumber", e.target.value);
-                                               }}/>
-                                    </div>
-                                </div>
-                            </div>
                             }
                         
                         </div>
                         <div className="checkout_left_payment">
-						{(totalPrice + shippingPrice) > 0 &&
+                            {(totalPrice + shippingPrice) > 0 &&
+                                <div className="checkout_left_info_flex checkout_left_info_flex_title">
+                                    <div className="checkout_left_info_flex_left">
+                                        <h1 className="checkout_left_info_title">{t("PLEASE SELECT A PAYMENT METHOD")}</h1>
+                                    </div>
+                                    <div className="checkout_left_info_flex_right">
+                                    </div>
+                                </div>
+                            }
+                            
+                            {(totalPrice + shippingPrice) > 0 &&
+                                <div className="checkout_left_info_flex checkout_left_info_flex_title">
+                                    <div className="checkout_left_info_flex_all">
+                                        <ul className="box-list gateway-list">
+                                            <li className={bank === 1 ? "selected" : ""}>
+                                                <input className="radio" type="radio" value={bank === 1} name="bank" id="bank1"
+                                                       onClick={e => {
+                                                           setBank(1);
+                                                       }
+                                                       }/>
+                                                <label htmlFor="bank1">
+                                                    <img src={require('../Images/public/bank-saman.png')} className="img-fluid" alt=""/>
+                                                </label>
+                                            
+                                            </li>
+                                            <li className={bank === 2 ? "selected" : ""}>
+                                                <input className="radio" type="radio" value={bank === 2} name="bank" id="bank2"
+                                                       onClick={e => {
+                                                           setBank(2);
+                                                       }
+                                                       }/>
+                                                <label htmlFor="bank2">
+                                                    <img src={require('../Images/public/bank-mellat.png')} className="img-fluid" alt=""/>
+                                                </label>
+                                            </li>
+                                            <li className={bank === 3 ? "selected" : ""}>
+                                                <input className="radio" type="radio" value={bank === 3} name="bank" id="bank3"
+                                                       onClick={e => {
+                                                           setBank(3);
+                                                       }
+                                                       }/>
+                                                <label htmlFor="bank3">
+                                                    <img src={require('../Images/public/bank-parsian.png')} className="img-fluid" alt=""/>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            }
                             <div className="checkout_left_info_flex checkout_left_info_flex_title">
                                 <div className="checkout_left_info_flex_left">
-                                    <h1 className="checkout_left_info_title">{t("PLEASE SELECT A PAYMENT METHOD")}</h1>
-                                </div>
-                                <div className="checkout_left_info_flex_right">
-                                </div>
-                            </div>
-						}
-						
-						{(totalPrice + shippingPrice) > 0 &&
-                            <div className="checkout_left_info_flex checkout_left_info_flex_title">
-                                <div className="checkout_left_info_flex_all">
-                                    <ul className="box-list gateway-list">
-                                        <li className={bank === 1 ? "selected" : ""}>
-                                            <input className="radio" type="radio" value={bank === 1} name="bank" id="bank1"
-                                                   onClick={e => {
-                                                       setBank(1);
-                                                   }
-                                                   }/>
-                                            <label htmlFor="bank1">
-                                                <img src={require('../Images/public/bank-saman.png')} className="img-fluid" alt=""/>
-                                            </label>
-                                        
-                                        </li>
-                                        <li className={bank === 2 ? "selected" : ""}>
-                                            <input className="radio" type="radio" value={bank === 2} name="bank" id="bank2"
-                                                   onClick={e => {
-                                                       setBank(2);
-                                                   }
-                                                   }/>
-                                            <label htmlFor="bank2">
-                                                <img src={require('../Images/public/bank-mellat.png')} className="img-fluid" alt=""/>
-                                            </label>
-                                        </li>
-                                        <li className={bank === 3 ? "selected" : ""}>
-                                            <input className="radio" type="radio" value={bank === 3} name="bank" id="bank3"
-                                                   onClick={e => {
-                                                       setBank(3);
-                                                   }
-                                                   }/>
-                                            <label htmlFor="bank3">
-                                                <img src={require('../Images/public/bank-parsian.png')} className="img-fluid" alt=""/>
-                                            </label>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-						}
-                            <div className="checkout_left_info_flex checkout_left_info_flex_title">
-                                <div className="checkout_left_info_flex_left">
-						{(totalPrice + shippingPrice) > 0 &&
-                                    <button className="checkout_payment_button" onClick={() => validateInputs()}>{t("Continue to Payment")}</button>
-						}
-						{(totalPrice + shippingPrice) === 0 &&
-						            <button className="checkout_payment_button" onClick={() => validateInputs()}>{t("Submit Order")}</button>
-						}
+                                    {(totalPrice + shippingPrice) > 0 &&
+                                        <button className="checkout_payment_button" onClick={() => validateInputs()}>{t("Continue to Payment")}</button>
+                                    }
+                                    {(totalPrice + shippingPrice) === 0 &&
+                                        <button className="checkout_payment_button" onClick={() => validateInputs()}>{t("Submit Order")}</button>
+                                    }
                                 </div>
                                 <div className="checkout_left_info_flex_right">
                                     <Link to={"/" + pageLanguage + "/Basket"} className="checkout_payment_button_return"><span>{t("Return to Bag")}</span><i
@@ -1599,7 +1799,11 @@ function Checkout() {
                                     <button className="checkout_right_discount_apply" disabled={discount === ""} onClick={() => checkDiscount()}>{t("Apply")}</button>
                                 </div>
                             </div>
-                            
+                            {discountErr && discountErr!=="" &&
+                                <div className="discount_err_container">
+                                    <h2>{discountErr}</h2>
+                                </div>
+                            }
                             <div className="discount_applied_container">
                                 {discountList}
                             </div>
@@ -1607,19 +1811,39 @@ function Checkout() {
                         </div>
                         <div className="checkout_right_price_detail">
                             <span className="checkout_right_price_sub payment_price_detail">
-                                <h3>{t("SUBTOTAL")}</h3>
-                                <h4>{totalPrice > 0 ? GetPrice(totalPrice, pageLanguage, t("TOMANS")) : t("FREE")}</h4>
+                                <h3>{t("PRODUCT TOTAL")}</h3>
+                                <h4>{subTotalPrice > 0 ? GetPrice(subTotalPrice, pageLanguage, t("TOMANS")) : t("FREE")}</h4>
                             </span>
-                            <span className="checkout_right_price_sub payment_price_detail">
-                                <h3>{t("SHIPPING")}</h3>
-                                <h4>{shippingPrice > 0 ? GetPrice(shippingPrice, pageLanguage, t("TOMANS")) : t("FREE")}</h4>
-                            </span>
+                            {installPrice > 0 &&
+                                <span className="checkout_right_price_sub payment_price_detail">
+                                    <h3>{t("INSTALLATION SERVICES")}</h3>
+                                    <h4>{installPrice > 0 ? GetPrice(installPrice, pageLanguage, t("TOMANS")) : t("FREE")}</h4>
+                                </span>
+                            }
+                            {transportPrice > 0 &&
+                                <span className="checkout_right_price_sub payment_price_detail">
+                                    <h3>{t("TRANSPORTATION FEE")}</h3>
+                                    <h4>{transportPrice > 0 ? GetPrice(transportPrice, pageLanguage, t("TOMANS")) : t("FREE")}</h4>
+                                </span>
+                            }
+                            {(!noShipping || swatches.length > 0) &&
+                                <span className="checkout_right_price_sub payment_price_detail">
+                                    <h3>{t("SHIPPING")}</h3>
+                                    <h4>{shippingPrice > 0 ? GetPrice(shippingPrice, pageLanguage, t("TOMANS")) : t("TBD")}</h4>
+                                </span>
+                            }
                         </div>
                         <div className="checkout_right_price_detail">
                             <span className="checkout_right_price_total payment_price_detail">
                                 <h3>{t("TOTAL")}</h3>
-                                <h4>{(totalPrice + shippingPrice) === 0 ? t("Free") :GetPrice((totalPrice + shippingPrice), pageLanguage, t("TOMANS"))}</h4>
+                                <h4>{(totalPrice + shippingPrice) === 0 ? t("Free") : GetPrice((totalPrice + shippingPrice), pageLanguage, t("TOMANS"))}</h4>
                             </span>
+                            {totalSaving > 0 &&
+                                <span className="checkout_right_price_sub payment_price_detail">
+                                    <h3>{t("TOTAL SAVING")}</h3>
+                                    <h4>{totalSaving > 0 ? GetPrice(totalSaving, pageLanguage, t("TOMANS")) : t("FREE")}</h4>
+                                </span>
+                            }
                         </div>
                     </div>
                 </div>

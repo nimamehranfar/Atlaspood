@@ -6,3 +6,5 @@ export const ShowLoginModal = "ShowLoginModal";
 export const HideLoginModal = "HideLoginModal";
 export const ShowLogin2Modal = "ShowLogin2Modal";
 export const HideLogin2Modal = "HideLogin2Modal";
+export const CartUpdatedTrue = "CartUpdatedTrue";
+export const CartUpdatedFalse = "CartUpdatedFalse";

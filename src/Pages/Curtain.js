@@ -5,6 +5,7 @@ import {useTranslation} from "react-i18next";
 import parse, {domToReact} from 'html-react-parser';
 import Breadcrumb from 'react-bootstrap/Breadcrumb';
 import GetPrice from "../Components/GetPrice";
+import {convertToPersian} from "../Components/TextTransform";
 
 const baseURLCats = "https://api.atlaspood.ir/WebsitePage/GetDetailByName";
 
@@ -18,18 +19,8 @@ function Curtain() {
     const [modelList, setModelList] = React.useState([]);
     const [defaultModelName, setDefaultModelName] = useState("");
     const [defaultModelNameFa, setDefaultModelNameFa] = useState("");
-    
-    function convertToPersian(string_farsi) {
-        if (string_farsi !== null && string_farsi !== undefined && string_farsi !== "") {
-            let tempString = string_farsi.replace("ي", "ی");
-            tempString = tempString.replace("ي", "ی");
-            tempString = tempString.replace("ي", "ی");
-            tempString = tempString.replace("ي", "ی");
-            tempString = tempString.replace('ك', 'ک');
-            return tempString;
-        } else
-            return string_farsi;
-    }
+    const [defaultDesc, setDefaultDesc] = useState("");
+    const [defaultDescFa, setDefaultDescFa] = useState("");
     
     const getCats = () => {
         axios.get(baseURLCats, {
@@ -59,7 +50,9 @@ function Curtain() {
                 }
     
                 setDefaultModelName(response.data["TitleEn"]);
-                setDefaultModelNameFa(response.data["Title"]);
+                setDefaultModelNameFa(convertToPersian(response.data["Title"]));
+                setDefaultDesc(response.data["DescriptionEn"]);
+                setDefaultDescFa(convertToPersian(response.data["Description"]));
             }
             else{
                 setModelList(<p>No Page Item</p>);
@@ -77,7 +70,7 @@ function Curtain() {
             let WebsitePageItemId = models[i].WebsitePageItemId;
             let ModelName = convertToPersian(models[i].Title);
             let ModelENName = models[i].EnTitle;
-            let DiscountDescription = models[i].DiscountDesc;
+            let DiscountDescription = convertToPersian(models[i].DiscountDesc);
             let DiscountEnDescription = models[i].DiscountEnDesc;
             let Description = convertToPersian(models[i].HtmlContent);
             let ENDescription = models[i].HtmlEnContent;
@@ -182,7 +175,7 @@ function Curtain() {
                             <span className={`model_item_info_price_off`}>{GetPrice(DiscountPrice, pageLanguage, t("TOMANS"))}</span>
                             }
                             <div className={`model_item_info_description_section`}>
-                                {pageLanguage === 'en' ? parse(ENDescription, options) : parse(Description, options)}
+                                {pageLanguage === 'en' ? parse(ENDescription, options) : parse(convertToPersian(Description), options)}
                             </div>
                             <Link to={"/" + pageLanguage + "/Curtain/" + catID + "/" + SewingModelId + "/Page-ID/" + WebsitePageItemId} className="btn_normal model_item_btn_normal"
                                   onClick={() => sessionStorage.clear()}>{t("Start" +
@@ -225,8 +218,9 @@ function Curtain() {
             {/*</div>*/}
             <div className="models_title_div">
                 <h1>{defaultModelName === undefined || defaultModelName === "" ? "" : pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa): defaultModelName}</h1>
+                <h2>{pageLanguage === 'fa' ?defaultDescFa:defaultDesc}</h2>
                 {/*<h1>{t("model_zebra_temp1")}</h1>*/}
-                <h2>{t("model_zebra_temp2")}</h2>
+                {/*<h2>{t("model_zebra_temp2")}</h2>*/}
             </div>
             <div className="cat_models_list_container">
                 <hr/>

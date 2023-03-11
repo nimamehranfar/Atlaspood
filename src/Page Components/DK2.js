@@ -21,7 +21,7 @@ import NumberToPersianWord from "number_to_persian_word";
 import UserProjects from "../Components/UserProjects";
 import GetPrice from "../Components/GetPrice";
 import {useDispatch, useSelector} from "react-redux";
-import {ShowLogin2Modal} from "../Actions/types";
+import {CartUpdatedTrue, ShowLogin2Modal} from "../Actions/types";
 import authHeader from "../Services/auth-header";
 import SaveUserProject from "../Components/SaveUserProject";
 import {refreshToken} from "../Services/auth.service";
@@ -32,8 +32,11 @@ import AddProjectToCart from "../Components/AddProjectToCart";
 import GetMeasurementArray from "../Components/GetMeasurementArray";
 import GetSewingFilters from "../Components/GetSewingFilters";
 import TruncateMarkup from "react-truncate-markup";
-import convertToPersian from "../Components/ConvertToPersian";
 import {Capitalize, CapitalizeAllWords, Uppercase} from "../Components/TextTransform";
+import {DebounceInput} from "react-debounce-input";
+import {convertToPersian} from "../Components/TextTransform";
+import GetBasketZipcode from "../Components/GetBasketZipcode";
+import {rooms} from "../Components/Static_Labels";
 
 
 const baseURLCats = "https://api.atlaspood.ir/WebsitePage/GetDetailByName";
@@ -43,6 +46,7 @@ const baseURLFabrics = "https://api.atlaspood.ir/Sewing/GetModelFabric";
 const baseURLWindowSize = "https://api.atlaspood.ir/Sewing/GetWindowSize";
 const baseURLPrice = "https://api.atlaspood.ir/Sewing/GetSewingOrderPrice";
 const baseURLZipCode = "https://api.atlaspood.ir/Sewing/HasInstall";
+const baseURLHasZipCode = "https://api.atlaspood.ir/Cart/GetAlreadyZipCode/1";
 const baseURLFreeShipping = "https://api.atlaspood.ir/WebsiteSetting/GetFreeShippingAmount";
 const baseURGetProject = "https://api.atlaspood.ir/SewingPreorder/GetById";
 const baseURLGetCart = "https://api.atlaspood.ir/cart/GetAll";
@@ -51,18 +55,18 @@ const baseURLUploadPdf = "https://api.atlaspood.ir/SewingOrderAttachment/PdfUplo
 const baseURLDeleteFile = "https://api.atlaspood.ir/SewingOrderAttachment/Delete";
 const baseURLEditProject = "https://api.atlaspood.ir/SewingPreorder/Edit";
 const baseURLDeleteBasketProject = "https://api.atlaspood.ir/Cart/DeleteItem";
-
 const baseURLAddSwatch = "https://api.atlaspood.ir/Cart/Add";
 const baseURLFilterPattern = "https://api.atlaspood.ir/Sewing/GetModelPatternType";
 const baseURLFilterType = "https://api.atlaspood.ir/Sewing/GetModelDesignType";
 const baseURLFilterPrice = "https://api.atlaspood.ir/BaseType/GetPriceLevel";
 
 
-function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryString, Parameters}) {
+function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryString, Parameters, PageId}) {
     const {t} = useTranslation();
     const location = useLocation();
     const [pageLanguage, setPageLanguage] = React.useState(location.pathname.split('').slice(1, 3).join(''));
-    const [firstRender, setFirstRender] = useState(true);
+    const firstRender = useRef(true);
+    const firstRenderDK = useRef(true);
     const [catID, setCatID] = useState(CatID);
     const [modelID, setModelID] = useState(ModelID);
     const [specialId, setSpecialId] = useState(SpecialId);
@@ -71,10 +75,11 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
     const [pageItem, setPageItem] = useState(PageItem);
     const [queryString, setQueryString] = useState(QueryString);
     const [parameters, setParameters] = useState(Parameters);
+    const [pageId, setPageId] = useState(PageId);
     const {isLoggedIn, isRegistered, user, showLogin} = useSelector((state) => state.auth);
     let navigate = useNavigate();
     const dispatch = useDispatch();
-    const [pageLoad, setPageLoad] = useState(false);
+    const [pageLoad, setPageLoad] = useState(undefined);
     const [models, setModels] = useState([]);
     const [projectData, setProjectData] = useState({});
     const [model, setModel] = useState({});
@@ -91,6 +96,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
     const [dkCurtainList, setDkCurtainList] = useState([]);
     const [dkCurtainPreviewList, setDkCurtainPreviewList] = useState([]);
     const [showMoreFabric, setShowMoreFabric] = useState("");
+    const [showLessFabric, setShowLessFabric] = useState("");
     const [dkCurtainArr, setDkCurtainArr] = useState([]);
     const [curtainChangeId, setCurtainChangeId] = useState(-1);
     const [dkCurtainArrComplete, setDkCurtainArrComplete] = useState(false);
@@ -100,6 +106,8 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
     const [defaultFabricPhoto, setDefaultFabricPhoto] = useState(null);
     const [defaultModelName, setDefaultModelName] = useState("");
     const [defaultModelNameFa, setDefaultModelNameFa] = useState("");
+    const [defaultModelDesc, setDefaultModelDesc] = useState("");
+    const [defaultModelDescFa, setDefaultModelDescFa] = useState("");
     const [price, setPrice] = useState(0);
     const [bagPrice, setBagPrice] = useState(0);
     const [totalCartPrice, setTotalCartPrice] = useState(0);
@@ -244,6 +252,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
     const [zipcodeChecked, setZipcodeChecked] = useState("");
     const [zipcode, setZipcode] = useState("");
     const [zipcodeButton, setZipcodeButton] = useState(false);
+    const [hasZipcode, setHasZipcode] = useState(null);
     const [hasInstall, setHasInstall] = useState(null);
     const [installPrice, setInstallPrice] = useState(-1);
     const [transportPrice, setTransportPrice] = useState(-1);
@@ -274,6 +283,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
     const [deleteUploadPdfIndex, setDeleteUploadPdfIndex] = useState(-1);
     
     const [addingLoading, setAddingLoading] = useState(false);
+    const [cartLoading, setCartLoading] = useState(false);
     const [savingLoading, setSavingLoading] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [swatchLogin, setSwatchLogin] = useState(false);
@@ -385,6 +395,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     tempFabrics[obj["DesignEnName"]].push(obj);
                 });
                 setShowMoreFabric("");
+                setShowLessFabric("");
                 setFabrics(tempFabrics);
                 // console.log(tempFabrics);
             }).catch(err => {
@@ -444,7 +455,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             let DesignName = convertToPersian(fabrics[key][0].DesignName);
             let DesignEnName = fabrics[key][0].DesignEnName;
             let DesignCode = fabrics[key][0]["DesignCode"].toString();
-            let designOrderSelected = params["Designs"] && params["Designs"][DesignCode] && params["Designs"][DesignCode]["order"] ? params["Designs"][DesignCode]["order"] : -1;
+            let designOrderSelected = params["Designs"] && params["Designs"][DesignCode] && (params["Designs"][DesignCode]["order"] || params["Fabrics"][DesignCode]["order"] === 0) ? params["Designs"][DesignCode]["order"] : -1;
             let designTypeSelected = params["Designs"] && params["Designs"][DesignCode] && params["Designs"][DesignCode]["type"] ? params["Designs"][DesignCode]["type"] : "none";
             let designOnlyOneSelected = params["Designs"] && params["Designs"][DesignCode] && params["Designs"][DesignCode]["onlyOne"] ? params["Designs"][DesignCode]["onlyOne"] : false;
             let showMoreCount = designTypeSelected === "Base" ? 4 : 8;
@@ -455,14 +466,14 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     fabric.push(
                         <div key={j} className="dk_fabric_show_more_button_container">
                             <button className="dk_fabric_show_more_button btn"
-                                    onClick={() => setShowMoreFabric(key)}>{pageLanguage1 === 'fa' ? "همه رنگ ها را ببینید" : "SEE ALL COLOR OPTIONS"}</button>
+                                    onClick={() => setShowMoreFabric(key)}>{pageLanguage1 === 'fa' ? "رنگ های بیشتری را ببینید" : "VIEW ALL COLOR OPTIONS"}</button>
                         </div>
                     );
                 } else if (j > showMoreCount && !fabrics[key][j]["ShowMore"]) {
                 
                 } else {
                     let FabricId = fabrics[key][j].FabricId;
-                    let fabricOrderSelected = params["Fabrics"] && params["Fabrics"][FabricId] && params["Fabrics"][FabricId]["order"] ? params["Fabrics"][FabricId]["order"] : -1;
+                    let fabricOrderSelected = params["Fabrics"] && params["Fabrics"][FabricId] && (params["Fabrics"][FabricId]["order"] || params["Fabrics"][FabricId]["order"] === 0) ? params["Fabrics"][FabricId]["order"] : -1;
                     
                     // console.log(fabrics,key);
                     let PhotoPath = "";
@@ -561,21 +572,32 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                     onClick={(e) => {
                                         fabricSwatch(e, SwatchId, swatchDetailId, PhotoPath);
                                     }} disabled={SwatchId === -1}>{HasSwatchId ? (pageLanguage1 === 'en' ? "SWATCH IN CART" : "نمونه در سبد") : (pageLanguage1 === 'en' ? "ORDER" +
-                            " SWATCH" : "سفارش نمونه")}</button>
+                                " SWATCH" : "سفارش نمونه")}</button>
                         </div>;
+                    if (j === fabrics[key].length - 1 && fabrics[key][j]["ShowMore"]) {
+                        fabric.push(
+                            <div key={j} className="dk_fabric_show_more_button_container">
+                                <button className="dk_fabric_show_more_button btn"
+                                        onClick={() => setShowLessFabric(key)}>{pageLanguage1 === 'fa' ? "رنگ های کمتری را ببینید" : "VIEW LESS COLOR OPTIONS"}</button>
+                            </div>
+                        );
+                    }
                 }
             }
             
             let pushIndex = 0;
-            if (designOrderSelected !== -1 && !fabricList[designOrderSelected]) {
-                pushIndex = designOrderSelected;
-            } else if (designOrderSelected !== -1 && fabricList[designOrderSelected]) {
-                fabricList[fabricList.length] = JSON.parse(JSON.stringify(fabricList[designOrderSelected]));
-                pushIndex = designOrderSelected;
-            } else {
-                pushIndex = fabricList.length;
-            }
+            
             if (designTypeSelected === "Base") {
+                if (designOrderSelected !== -1 && !fabricList[designOrderSelected]) {
+                    pushIndex = designOrderSelected;
+                } else if (designOrderSelected !== -1 && fabricList[designOrderSelected]) {
+                    fabricList[fabricList.length] = JSON.parse(JSON.stringify(fabricList[designOrderSelected]));
+                    pushIndex = designOrderSelected;
+                } else {
+                    let index = fabricList.findIndex(Object.is.bind(null, undefined));
+                    pushIndex = index === -1 ? fabricList.length : index;
+                }
+                
                 baseOneArr.push(DesignCode);
                 fabricList[pushIndex] =
                     <div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key}>
@@ -586,8 +608,17 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         {fabric}
                     </div>;
             } else {
+                if (designOrderSelected !== -1 && !fabricList2[designOrderSelected]) {
+                    pushIndex = designOrderSelected;
+                } else if (designOrderSelected !== -1 && fabricList2[designOrderSelected]) {
+                    fabricList2[fabricList2.length] = JSON.parse(JSON.stringify(fabricList2[designOrderSelected]));
+                    pushIndex = designOrderSelected;
+                } else {
+                    let index = fabricList2.findIndex(Object.is.bind(null, undefined));
+                    pushIndex = index === -1 ? fabricList2.length : index;
+                }
+                
                 decorativeOneArr.push(DesignCode);
-                // console.log(pushIndex,fabric);
                 fabricList2[pushIndex] =
                     <div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key}>
                         <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
@@ -611,7 +642,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
         } else {
             setFabricsList2(fabricList2);
         }
-    
+        
         // console.log(baseMore,fabricList.filter(el => el).slice(0, 1),decorativeMore,fabricList2.filter(el => el).slice(0, 1));
         setBaseOneArr(baseOneArr);
         setDecorativeOneArr(decorativeOneArr);
@@ -622,11 +653,11 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
         const curtainList = [];
         let count = Math.floor(curtainWidth / 11.5);
         let DkCurtainArr = JSON.parse(JSON.stringify(dkCurtainArr));
-        if (dkCurtainArrCount !== count && !pageLoad) {
-            setDkCurtainArr([]);
-            DkCurtainArr = []
-            setDkCurtainArrCount(count);
-        }
+        // if (dkCurtainArrCount !== count && !pageLoad) {
+        //     setDkCurtainArr([]);
+        //     DkCurtainArr = []
+        //     setDkCurtainArrCount(count);
+        // }
         // console.log(dkCurtainArr,DkCurtainArr.filter(el => el).length,count);
         
         let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
@@ -750,7 +781,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
         setModals(tempModals);
     }
     
-    function ContextAwareToggle({stepNum, stepTitle, stepSelected, eventKey, callback, stepRef, type, required, cartCustomText}) {
+    function ContextAwareToggle({stepNum, stepTitle, stepTitle2, stepSelected, eventKey, callback, stepRef, type, required, cartCustomText}) {
         const {activeEventKey} = useContext(AccordionContext);
         
         const decoratedOnClick = useAccordionButton(
@@ -786,8 +817,9 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     <div className="steps_header_num">{stepNum}</div>
                 </div>
                 <div className="steps_header_title_container">
-                    <div className="steps_header_title" type-of-step={type} cart-custom-text={cartCustomText === undefined ? stepTitle : cartCustomText}
-                         ref={ref => (steps.current[stepRef] = ref)}>{stepTitle}</div>
+                    <div className={"steps_header_title " + stepTitle2 ? "steps_header_title_max_content" : ""} type-of-step={type}
+                         cart-custom-text={cartCustomText === undefined ? stepTitle : cartCustomText}
+                         ref={ref => (steps.current[stepRef] = ref)}>{stepTitle}<h5>{stepTitle2}</h5></div>
                 </div>
                 {/*<div className="steps_header_selected_container">*/}
                 {/*    <PopoverStickOnHover classNames="step_label_popover"*/}
@@ -1040,6 +1072,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             
             if (Object.keys(tempProjectContainer).length !== 0) {
                 let tempProject = tempProjectContainer["SewingPreorder"];
+                tempProject["Count"] = tempProject["WindowCount"];
                 if (minusPlus !== undefined) {
                     if (tempProject["Count"] + minusPlus <= 0 || tempProject["Count"] + minusPlus > 10)
                         setBasketNumber(cart, refIndex, tempProject["Count"] + minusPlus, type);
@@ -1106,6 +1139,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                             setBasketNumber(refIndex, temp[refIndex]["Count"] + minusPlus);
                         else {
                             temp[refIndex]["Count"] = temp[refIndex]["Count"] + minusPlus;
+                            temp[refIndex]["WindowCount"] = temp[refIndex]["Count"];
                             temp[refIndex]["PreorderText"]["WindowCount"] = temp[refIndex]["Count"];
                             cartObj[typeString] = temp;
                             localStorage.setItem('cart', JSON.stringify(cartObj));
@@ -1116,6 +1150,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     if (!isNaN(numValue) || numValue === 10 || numValue === "10") {
                         if (numValue > 10) {
                             temp[refIndex]["Count"] = 10;
+                            temp[refIndex]["WindowCount"] = temp[refIndex]["Count"];
                             temp[refIndex]["PreorderText"]["WindowCount"] = temp[refIndex]["Count"];
                             cartObj[typeString] = temp;
                             localStorage.setItem('cart', JSON.stringify(cartObj));
@@ -1132,6 +1167,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                             }, 1500);
                         } else {
                             temp[refIndex]["Count"] = numValue;
+                            temp[refIndex]["WindowCount"] = temp[refIndex]["Count"];
                             temp[refIndex]["PreorderText"]["WindowCount"] = temp[refIndex]["Count"];
                             cartObj[typeString] = temp;
                             localStorage.setItem('cart', JSON.stringify(cartObj));
@@ -1139,6 +1175,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         }
                     } else {
                         temp[refIndex]["Count"] = 1;
+                        temp[refIndex]["WindowCount"] = temp[refIndex]["Count"];
                         temp[refIndex]["PreorderText"]["WindowCount"] = temp[refIndex]["Count"];
                         cartObj[typeString] = temp;
                         localStorage.setItem('cart', JSON.stringify(cartObj));
@@ -1151,7 +1188,9 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
     
     
     function editBasketProject(projectObj) {
+        projectObj["WindowCount"] = projectObj["Count"];
         projectObj["PreorderText"]["WindowCount"] = projectObj["Count"];
+        projectObj["PreorderText"]["Count"] = projectObj["Count"];
         axios.post(baseURLEditProject, projectObj, {
             headers: authHeader()
         })
@@ -1171,7 +1210,9 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
     }
     
     function deleteBasketProject(refIndex) {
-        draperyRef.current[refIndex].className = "custom_cart_item is_loading";
+        if (draperyRef.current[refIndex]) {
+            draperyRef.current[refIndex].className = "custom_cart_item is_loading";
+        }
         axios.delete(baseURLDeleteBasketProject, {
             params: {
                 detailId: refIndex
@@ -1238,7 +1279,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     console.log(key);
                     // window.location.reload();
                 } else {
-                    if (tempObj["apiLabel"] !== "") {
+                    if (tempObj && tempObj["apiLabel"] !== "") {
                         if (tempObj["apiValue"] === null) {
                             tempPostObj[tempObj["apiLabel"]] = temp[key];
                         } else {
@@ -1279,7 +1320,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                 if (tempObj) {
                     if (tempObj["apiAcc"] !== undefined) {
-                        if (tempObj["apiAcc"] === true) {
+                        if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
                             tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
                         } else {
                         
@@ -1295,10 +1336,13 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
         // tempPostObj["SewingOrderDetails"][0]["SodFabrics"] = JSON.parse(JSON.stringify(sodFabrics));
         // console.log(dkCurtainArrComplete,refIndex, cartValue, delRefs, secondRefIndex, secondCartValue);
         let promise2 = new Promise((resolve, reject) => {
-            if (stepSelectedValue["2"] !== undefined && refIndex !== "FabricId") {
-                let count = temp["WidthCart"] ? Math.floor(temp["WidthCart"] / 11.5):16;
+            if (stepSelectedValue["2"] !== undefined && !pageLoad && refIndex !== "FabricId") {
+                let count = temp["WidthCart"] ? Math.floor(temp["WidthCart"] / 11.5) : 16;
                 if ((temp["CurtainArr"] ? temp["CurtainArr"] : []).filter(el => el).length !== count) {
                     delete tempPostObj["SewingOrderDetails"];
+                }
+                if (zipcode && zipcode !== "") {
+                    tempPostObj["ZipCode"] = zipcode;
                 }
                 // if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined && stepSelectedValue["2"] !== undefined && stepSelectedValue["3"] !== undefined) {
                 // console.log(tempPostObj);
@@ -1306,24 +1350,31 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     .then((response) => {
                         setPrice(response.data["price"]);
                         
+                        if (response.data["price"]) {
+                            setInstallPrice(response.data["InstallAmount"] ? response.data["InstallAmount"] : 0);
+                            setTransportPrice(response.data["TransportationAmount"] ? response.data["TransportationAmount"] : 0);
+                            setHasInstall(!!(response.data["TransportationAmount"]))
+                        }
                         // console.log("1");
                         
                         // setCart("HeightCart", totalHeight, "", "WidthCart", [totalWidth]);
                         
-                        getWindowSize(response.data["Width"], response.data["Height"]);
+                        getWindowSize(response.data["WindowWidth"], response.data["WindowHeight"]);
+                        temp["WindowWidth"] = response.data["WindowWidth"];
+                        temp["WindowHeight"] = response.data["WindowHeight"];
                         temp["WidthCart"] = response.data["Width"];
                         temp["HeightCart"] = response.data["Height"];
                         // if (stepSelectedValue["1"] === "1" && stepSelectedValue["2"] === "2") {
                         //     if (temp["Width1"] !== undefined && temp["Width2"] !== undefined && temp["Width3"] !== undefined && temp["Height1"] !== undefined && temp["Height2"] !== undefined && temp["Height3"] !== undefined) {
                         //         // console.log("2");
-                        //         getWindowSize(response.data["Width"], response.data["Height"]);
+                        //         getWindowSize(response.data["WindowWidth"], response.data["WindowHeight"]);
                         //         temp["WidthCart"] = response.data["Width"];
                         //         temp["HeightCart"] = response.data["Height"];
                         //
                         //     }
                         // } else if (stepSelectedValue["1"] === "2" && stepSelectedValue["2"] === "2") {
                         //     if (temp["Width3A"] !== undefined && temp["Height3C"] !== undefined && temp["ExtensionRight"] !== undefined && temp["ExtensionLeft"] !== undefined && temp["ShadeMount"] !== undefined) {
-                        //         getWindowSize(response.data["Width"], response.data["Height"]);
+                        //         getWindowSize(response.data["WindowWidth"], response.data["WindowHeight"]);
                         //         temp["WidthCart"] = response.data["Width"];
                         //         temp["HeightCart"] = response.data["Height"];
                         //         // console.log("3");
@@ -1348,12 +1399,12 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
         promise2.then(() => {
             if (!pageLoad) {
                 setCartValues(temp);
-                // console.log("hi1");
             }
+            setCartLoading(false);
         });
     }
     
-    function measureWindowSize(onlyPrice, zipcode) {
+    function measureWindowSize(zipcode) {
         let promise2 = new Promise((resolve, reject) => {
             let temp = JSON.parse(JSON.stringify(cartValues));
             let tempPostObj = {};
@@ -1369,7 +1420,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         // window.location.reload();
                         console.log(key);
                     } else {
-                        if (tempObj["apiLabel"] !== "") {
+                        if (tempObj && tempObj["apiLabel"] !== "") {
                             if (tempObj["apiValue"] === null) {
                                 tempPostObj[tempObj["apiLabel"]] = temp[key];
                             } else {
@@ -1405,7 +1456,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                 if (temp[key] !== null || temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
                     if (tempObj["apiAcc"] !== undefined) {
-                        if (tempObj["apiAcc"] === true) {
+                        if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
                             tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
                         } else {
                         
@@ -1426,25 +1477,30 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                 // if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined && stepSelectedValue["2"] !== undefined && stepSelectedValue["3"] !== undefined) {
                 // console.log(JSON.stringify(tempPostObj));
                 if (zipcode && zipcode !== "") {
-                    tempPostObj["Zipcode"] = zipcode;
+                    tempPostObj["ZipCode"] = zipcode;
                 }
+                
                 axios.post(baseURLPrice, tempPostObj)
                     .then((response) => {
                         if (zipcode && zipcode !== "") {
-                            setInstallPrice(response.data["InstallAmount"] ? response.data["InstallAmount"] : 0);
-                            setTransportPrice(response.data["TransportationAmount"] ? response.data["TransportationAmount"] : 0);
-                            setHasInstall(true);
+                            if (response.data["price"]) {
+                                setInstallPrice(response.data["InstallAmount"] ? response.data["InstallAmount"] : 0);
+                                setTransportPrice(response.data["TransportationAmount"] ? response.data["TransportationAmount"] : 0);
+                                setHasInstall(!!(response.data["TransportationAmount"]));
+                                setZipcodeButton(true);
+                            } else {
+                                HasInstall(zipcode);
+                            }
                         } else {
                             setPrice(response.data["price"]);
                             
                             // setCart("HeightCart", totalHeight, "", "WidthCart", [totalWidth]);
-                            getWindowSize(response.data["Width"], response.data["Height"]);
+                            getWindowSize(response.data["WindowWidth"], response.data["WindowHeight"]);
+                            temp["WindowWidth"] = response.data["WindowWidth"];
+                            temp["WindowHeight"] = response.data["WindowHeight"];
                             temp["WidthCart"] = response.data["Width"];
                             temp["HeightCart"] = response.data["Height"];
-                            
-                            if (!onlyPrice) {
-                                setCartValues(temp);
-                            }
+                            setCartValues(temp);
                             setTimeout(() => {
                                 resolve();
                             }, 1000);
@@ -1464,9 +1520,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         if (temp["WidthCart"] !== undefined)
                             delete temp["WidthCart"];
                         // console.log(err);
-                        if (!onlyPrice) {
-                            setCartValues(temp);
-                        }
+                        setCartValues(temp);
                         setTimeout(() => {
                             reject();
                         }, 1000);
@@ -1492,8 +1546,12 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             }
         }).then((response) => {
             setHasInstall(response.data);
+            setZipcodeButton(true);
         }).catch(err => {
             setHasInstall(false);
+            setZipcodeChecked("false");
+            setCart("", "", "ZipCode");
+            setZipcodeButton(true);
         });
     }
     
@@ -1672,7 +1730,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                 if (temp[key] !== null || temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
                     // console.log(key,tempObj);
-                    if (tempObj["apiLabel"] !== "") {
+                    if (tempObj && tempObj["apiLabel"] !== "") {
                         if (tempObj["apiValue"] === null) {
                             tempPostObj[tempObj["apiLabel"]] = temp[key];
                         } else {
@@ -1706,7 +1764,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                 if (temp[key] !== null || temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
                     if (tempObj["apiAcc"] !== undefined) {
-                        if (tempObj["apiAcc"] === true) {
+                        if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
                             tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
                         } else {
                         
@@ -1724,7 +1782,11 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     .then((response) => {
                         setBagPrice(response.data["price"]);
                         tempBagPrice = response.data["price"];
-                        temp["price"] = response.data["price"];
+                        temp["Price"] = response.data["price"];
+                        if (zipcodeChecked && response.data["InstallAmount"]) {
+                            temp["InstallAmount"] = response.data["InstallAmount"];
+                            temp["TransportationAmount"] = response.data["TransportationAmount"];
+                        }
                         // console.log(response.data);
                         
                         let roomNameFa = cartValues["RoomNameFa"];
@@ -1733,13 +1795,16 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         Object.keys(cartValues).forEach(key => {
                             let tempObj = userProjects.find(obj => obj["cart"] === key);
                             if (tempObj === undefined) {
-                                window.location.reload();
+                                // window.location.reload();
+                                console.log(key);
                             } else {
                                 if (key === "HeightCart" || key === "WidthCart") {
                                 
                                 } else if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
                                     let objLabel = "";
-                                    if (tempObj["titleValue"] === null || true) {
+                                    if (key === "ControlType" && cartValues["ControlType"] === "Motorized") {
+                                        objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(cartValues[key].toString())} / ${t(cartValues["MotorType"].toString())}`).toString() : `${t(cartValues[key].toString())} / ${t(cartValues["MotorType"].toString())}`;
+                                    } else if (tempObj["titleValue"] === null || true) {
                                         if (tempObj["titlePostfix"] === "") {
                                             objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(cartValues[key].toString())}`).toString() : t(cartValues[key].toString());
                                         } else {
@@ -1820,7 +1885,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                             } else {
                                 setPrice(0);
                                 setBagPrice(0);
-                                temp["price"] = 0;
+                                temp["Price"] = 0;
                                 setCartValues(temp);
                                 setAddingLoading(false);
                                 navigate("/" + pageLanguage + "/User");
@@ -1829,7 +1894,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     } else {
                         setPrice(0);
                         setBagPrice(0);
-                        temp["price"] = 0;
+                        temp["Price"] = 0;
                         setCartValues(temp);
                         setAddingLoading(false);
                     }
@@ -1853,6 +1918,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             } else if (temp) {
                 setCartAgreeDescription(false);
                 renderCart(temp);
+                setBag(temp);
                 setTimeout(() => {
                     // modalHandleShow("cart_modal");
                     setCartStateAgree(true);
@@ -1879,7 +1945,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     axios.get(baseURLGetCart, {
                         headers: authHeader()
                     }).then((response) => {
-                        cartObjects = response.data;
+                        cartObjects = response.data ? response.data : {};
                         resolve();
                     }).catch(err => {
                         if (err.response.status === 401) {
@@ -1915,16 +1981,18 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                 let totalPrice = cartObjects["TotalAmount"];
                 
                 let draperies = cartObjects["CartDetails"].filter((object1) => {
-                    return object1["SewingPreorderId"] !== null;
+                    return object1["TypeId"] === 6403;
                 });
                 
                 let swatches = cartObjects["CartDetails"].filter((object1) => {
-                    return object1["ProductId"] !== null;
+                    return object1["TypeId"] === 6402;
                 });
                 
                 let promise1 = new Promise((resolve, reject) => {
                     if (draperies.length) {
-                        for (let i = 0; i < draperies.length; i++) {
+                        draperies.sort(function (a, b) {
+                            return b["CartDetailId"] - a["CartDetailId"] || b["SewingPreorderId"] - a["SewingPreorderId"];
+                        }).forEach((tempObj, i) => {
                             let obj = draperies[i]["SewingPreorder"]["PreorderText"];
                             let sodFabrics = obj["SodFabrics"] ? obj["SodFabrics"] : [];
                             let roomName = (obj["WindowName"] === undefined || obj["WindowName"] === "") ? "" : " / " + obj["WindowName"];
@@ -1970,13 +2038,13 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             onClick={() => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], 0, 0, -1)}>–
                                                     </button>
                                                     <input type="text" className="basket_qty_num"
-                                                           value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${draperies[i]["SewingPreorder"]["Count"]}`) : draperies[i]["SewingPreorder"]["Count"]}
+                                                           value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${draperies[i]["SewingPreorder"]["WindowCount"]}`) : draperies[i]["SewingPreorder"]["WindowCount"]}
                                                            onChange={(e) => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], NumberToPersianWord.convertPeToEn(`${e.target.value}`))}/>
                                                     <button type="text" className="basket_qty_plus"
                                                             onClick={() => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], 0, 0, 1)}>+
                                                     </button>
                                                 </div>
-                                                <p className="custom_cart_item_end_price">{GetPrice(obj["price"], pageLanguage, t("TOMANS"))}</p>
+                                                <p className="custom_cart_item_end_price">{GetPrice(obj["Price"], pageLanguage, t("TOMANS"))}</p>
                                             </div>
                                         </div>
                                     </li>;
@@ -2007,13 +2075,13 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             onClick={() => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], 0, 0, -1)}>–
                                                     </button>
                                                     <input type="text" className="basket_qty_num"
-                                                           value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${draperies[i]["SewingPreorder"]["Count"]}`) : draperies[i]["SewingPreorder"]["Count"]}
+                                                           value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${draperies[i]["SewingPreorder"]["WindowCount"]}`) : draperies[i]["SewingPreorder"]["WindowCount"]}
                                                            onChange={(e) => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], NumberToPersianWord.convertPeToEn(`${e.target.value}`))}/>
                                                     <button type="text" className="basket_qty_plus"
                                                             onClick={() => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], 0, 0, 1)}>+
                                                     </button>
                                                 </div>
-                                                <p className="custom_cart_item_end_price">{GetPrice(obj["price"], pageLanguage, t("TOMANS"))}</p>
+                                                <p className="custom_cart_item_end_price">{GetPrice(obj["Price"], pageLanguage, t("TOMANS"))}</p>
                                             </div>
                                         </div>
                                     </li>;
@@ -2021,7 +2089,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                     resolve();
                                 }
                             }
-                        }
+                        })
                     } else {
                         resolve();
                     }
@@ -2038,29 +2106,29 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                     </div>
                                     <div className="custom_cart_item_desc">
                                         <div className="custom_cart_item_desc_container">
-                                            <h1 className="custom_cart_item_desc_name">{pageLanguage === 'fa' ? obj["ProductName"] : obj["ProductEnName"]}</h1>
+                                            <h1 className="custom_cart_item_desc_name">{t("FABRIC SWATCH")}</h1>
                                             <button type="button" className="btn-close" aria-label="Close"
-                                                    onClick={() => setBasketNumber(cartObjects, swatches[i]["CartDetailId"], 0, 0)}/>
+                                                    onClick={() => deleteBasketProject(swatches[i]["CartDetailId"])}/>
                                         </div>
                                         <div className="custom_cart_item_desc_container">
-                                            <h2 className="custom_cart_item_desc_detail"/>
+                                            <h2 className="custom_cart_item_desc_detail">{(pageLanguage === 'en' ? CapitalizeAllWords(obj["ProductDesignEnName"]) : obj["ProductDesignName"]).toString() + " / " + (pageLanguage === 'en' ? CapitalizeAllWords(obj["ProductColorEnName"]) : obj["ProductColorName"]).toString()}</h2>
                                         </div>
                                         <div className="custom_cart_item_desc_container">
-                                            <h2 className="custom_cart_item_desc_detail"/>
+                                            <h2 className="custom_cart_item_desc_detail">{t("Qty: ")}{obj["Count"]}</h2>
                                         </div>
                                         <div className="custom_cart_item_desc_container">
                                             <div className="custom_cart_item_desc_qty">
-                                                <button type="text" className="basket_qty_minus"
-                                                        onClick={() => setBasketNumber(cartObjects, swatches[i]["CartDetailId"], 0, 0, -1)}>–
-                                                </button>
-                                                <input type="text" className="basket_qty_num"
-                                                       value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${swatches[i]["Count"]}`) : swatches[i]["Count"]}
-                                                       onChange={(e) => setBasketNumber(cartObjects, swatches[i]["CartDetailId"], NumberToPersianWord.convertPeToEn(`${e.target.value}`))}/>
-                                                <button type="text" className="basket_qty_plus"
-                                                        onClick={() => setBasketNumber(cartObjects, swatches[i]["CartDetailId"], 0, 0, 1)}>+
-                                                </button>
+                                                {/*<button type="text" className="basket_qty_minus"*/}
+                                                {/*        onClick={() => setBasketNumber(cartObjects, swatches[i]["CartDetailId"], 0, 0, -1)}>–*/}
+                                                {/*</button>*/}
+                                                {/*<input type="text" className="basket_qty_num"*/}
+                                                {/*       value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${swatches[i]["Count"]}`) : swatches[i]["Count"]}*/}
+                                                {/*       onChange={(e) => setBasketNumber(cartObjects, swatches[i]["CartDetailId"], NumberToPersianWord.convertPeToEn(`${e.target.value}`))}/>*/}
+                                                {/*<button type="text" className="basket_qty_plus"*/}
+                                                {/*        onClick={() => setBasketNumber(cartObjects, swatches[i]["CartDetailId"], 0, 0, 1)}>+*/}
+                                                {/*</button>*/}
                                             </div>
-                                            <p className="custom_cart_item_end_price">{GetPrice(obj["UnitPrice"], pageLanguage, t("TOMANS"))}</p>
+                                            <p className="custom_cart_item_end_price">{obj["PayableAmount"] === 0 ? t("Free") : GetPrice(obj["PayableAmount"], pageLanguage, t("TOMANS"))}</p>
                                         </div>
                                     </div>
                                 </li>;
@@ -2108,7 +2176,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                             if (temp[key] !== null || temp[key] !== "") {
                                                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                                                 // console.log(key,tempObj);
-                                                if (tempObj["apiLabel"] !== "") {
+                                                if (tempObj && tempObj["apiLabel"] !== "") {
                                                     if (tempObj["apiValue"] === null) {
                                                         tempPostObj[tempObj["apiLabel"]] = temp[key];
                                                     } else {
@@ -2142,7 +2210,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                             if (temp[key] !== null || temp[key] !== "") {
                                                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                                                 if (tempObj["apiAcc"] !== undefined) {
-                                                    if (tempObj["apiAcc"] === true) {
+                                                    if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
                                                         tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
                                                     } else {
                                                     
@@ -2150,9 +2218,17 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                 }
                                             }
                                         });
-                                        tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
-                                            return el != null;
-                                        });
+                                        if (obj["PreorderText"]["Accessories"] && obj["PreorderText"]["Accessories"].filter(n => n).length > 0) {
+                                            tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].concat(obj["PreorderText"]["Accessories"])
+                                            let uniqueAcc = [...tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(n => n).reduce((map, obj) => map.set(obj.SewingAccessoryValue, obj), new Map()).values()];
+                                            tempPostObj["SewingOrderDetails"][0]["Accessories"] = uniqueAcc.filter(function (el) {
+                                                return el != null;
+                                            });
+                                        } else {
+                                            tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
+                                                return el != null;
+                                            });
+                                        }
                                         
                                         // delete tempPostObj["SewingOrderDetails"][0]["SewingModelId"];
                                         // delete tempPostObj["SewingModelId"];
@@ -2180,13 +2256,13 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                             // console.log(values);
                             cartObjects["drapery"].forEach((obj1, index) => {
                                 let obj = obj1["PreorderText"];
-                                obj["price"] = values[index].data["price"] / obj1["Count"];
-                                obj1["price"] = values[index].data["price"] / obj1["Count"];
+                                obj["Price"] = values[index].data["price"] / obj1["WindowCount"];
+                                obj1["Price"] = values[index].data["price"] / obj1["WindowCount"];
                                 draperiesTotalPrice += values[index].data["price"];
                                 let sodFabrics = obj["SodFabrics"] ? obj["SodFabrics"] : [];
                                 let roomName = (obj["WindowName"] === undefined || obj["WindowName"] === "") ? "" : " / " + obj["WindowName"];
                                 if (obj["SewingModelId"] === "0326") {
-                                    temp1[index] =
+                                    temp1[cartObjects["drapery"].length - index - 1] =
                                         <li className="custom_cart_item" key={"drapery" + index} ref={ref => (draperyRef.current[index] = ref)}>
                                             <div className="custom_cart_item_image_container">
                                                 <img src={`https://api.atlaspood.ir/${obj["PhotoUrl"]}`} alt="" className="custom_cart_item_img img-fluid"/>
@@ -2224,16 +2300,16 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                     <div className="custom_cart_item_desc_qty">
                                                         <button type="text" className="basket_qty_minus" onClick={() => setBasketNumber(undefined, index, 0, 0, -1)}>–</button>
                                                         <input type="text" className="basket_qty_num"
-                                                               value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${obj1["Count"]}`) : obj1["Count"]}
+                                                               value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${obj1["WindowCount"]}`) : obj1["WindowCount"]}
                                                                onChange={(e) => setBasketNumber(undefined, index, NumberToPersianWord.convertPeToEn(`${e.target.value}`), 0)}/>
                                                         <button type="text" className="basket_qty_plus" onClick={() => setBasketNumber(undefined, index, 0, 0, 1)}>+</button>
                                                     </div>
-                                                    <p className="custom_cart_item_end_price">{GetPrice(obj1["price"] * obj1["Count"], pageLanguage, t("TOMANS"))}</p>
+                                                    <p className="custom_cart_item_end_price">{GetPrice(obj1["Price"] * obj1["WindowCount"], pageLanguage, t("TOMANS"))}</p>
                                                 </div>
                                             </div>
                                         </li>;
                                 } else {
-                                    temp1[index] =
+                                    temp1[cartObjects["drapery"].length - index - 1] =
                                         <li className="custom_cart_item" key={"drapery" + index} ref={ref => (draperyRef.current[index] = ref)}>
                                             <div className="custom_cart_item_image_container">
                                                 <img src={`https://api.atlaspood.ir/${obj["PhotoUrl"]}`} alt="" className="custom_cart_item_img img-fluid"/>
@@ -2253,11 +2329,11 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                     <div className="custom_cart_item_desc_qty">
                                                         <button type="text" className="basket_qty_minus" onClick={() => setBasketNumber(undefined, index, 0, 0, -1)}>–</button>
                                                         <input type="text" className="basket_qty_num"
-                                                               value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${obj1["Count"]}`) : obj1["Count"]}
+                                                               value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${obj1["WindowCount"]}`) : obj1["WindowCount"]}
                                                                onChange={(e) => setBasketNumber(undefined, index, NumberToPersianWord.convertPeToEn(`${e.target.value}`), 0)}/>
                                                         <button type="text" className="basket_qty_plus" onClick={() => setBasketNumber(undefined, index, 0, 0, 1)}>+</button>
                                                     </div>
-                                                    <p className="custom_cart_item_end_price">{GetPrice(obj1["price"] * obj1["Count"], pageLanguage, t("TOMANS"))}</p>
+                                                    <p className="custom_cart_item_end_price">{GetPrice(obj1["Price"] * obj1["WindowCount"], pageLanguage, t("TOMANS"))}</p>
                                                 </div>
                                             </div>
                                         </li>;
@@ -2313,7 +2389,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         count: 1
                     }
                 }).then((response) => {
-                    setBag(response.data);
+                    setBag(response.data ? response.data : {});
                     renderFabrics(response.data);
                     if (show) {
                         if (response.data["CartDetails"]) {
@@ -2794,8 +2870,10 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
         }
         
         let pageLanguage = location.pathname.split('').slice(1, 3).join('');
-        let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-        let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
+        // let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+        // let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
+        let tempLabels = {};
+        let tempValue = {};
         let selectValues = JSON.parse(JSON.stringify(selectCustomValues));
         let tempSelect = JSON.parse(JSON.stringify(roomLabelSelect));
         let depSetTempArr = new Set([...depSet]);
@@ -2945,351 +3023,357 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                     setStepSelectedValue(tempValue);
                                 } else if (temp["Mount"] === "HiddenMoulding") {
                                     if (temp["FinishedLengthType"]) {
-                                        setStep2A(temp["FinishedLengthType"]);
-                                        
-                                        if (temp["FinishedLengthType"] === "Sill") {
-                                            let refIndex = inputs.current["2A1"].getAttribute('ref-num');
-                                            tempLabels[refIndex] = inputs.current["2A1"].getAttribute('text');
-                                            tempValue[refIndex] = inputs.current["2A1"].value;
-                                            setStepSelectedLabel(tempLabels);
-                                            setStepSelectedValue(tempValue);
+                                        setTimeout(() => {
+                                            setStep2A(temp["FinishedLengthType"]);
                                             
-                                            let tempWidth = changeLang ? temp["Width2B"] : temp["Width"];
-                                            // let tempHeight = changeLang ? temp["Height2D"] : temp["Height"];
-                                            // console.log(temp,tempWidth,tempHeight);
-                                            
-                                            selectValues["Width2B"] = tempWidth ? [{value: tempWidth}] : [];
-                                            if (tempWidth) {
-                                                tempLabels["2B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                            if (temp["FinishedLengthType"] === "Sill") {
+                                                let refIndex = inputs.current["2A1"].getAttribute('ref-num');
+                                                tempLabels[refIndex] = inputs.current["2A1"].getAttribute('text');
+                                                tempValue[refIndex] = inputs.current["2A1"].value;
+                                                setStepSelectedLabel(tempLabels);
+                                                setStepSelectedValue(tempValue);
+                                                
+                                                let tempWidth = changeLang ? temp["Width2B"] : temp["Width"];
+                                                // let tempHeight = changeLang ? temp["Height2D"] : temp["Height"];
+                                                // console.log(temp,tempWidth,tempHeight);
+                                                
+                                                selectValues["Width2B"] = tempWidth ? [{value: tempWidth}] : [];
+                                                if (tempWidth) {
+                                                    tempLabels["2B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                }
+                                                selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
+                                                selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                                if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
+                                                    tempLabels["2C"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
+                                                }
+                                                selectValues["CeilingToWindow1"] = temp["CeilingToWindow1"] ? [{value: temp["CeilingToWindow1"]}] : [];
+                                                selectValues["CeilingToWindow2"] = temp["CeilingToWindow2"] ? [{value: temp["CeilingToWindow2"]}] : [];
+                                                selectValues["CeilingToWindow3"] = temp["CeilingToWindow3"] ? [{value: temp["CeilingToWindow3"]}] : [];
+                                                if (temp["CeilingToWindow1"] && temp["CeilingToWindow2"] && temp["CeilingToWindow3"]) {
+                                                    let tempMin = Math.min(temp["CeilingToWindow1"], temp["CeilingToWindow2"], temp["CeilingToWindow3"]);
+                                                    tempLabels["2D"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
+                                                }
+                                                // selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
+                                                // if (temp["CeilingToFloor"]) {
+                                                //     tempLabels["2E"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
+                                                // }
+                                                
+                                                depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (temp["ExtensionLeft"] !== undefined ? "" : "2C1,") + (temp["ExtensionRight"] !== undefined ? "" : "2C2,") + (temp["CeilingToWindow1"] !== undefined ? "" : "2D1,") + (temp["CeilingToWindow2"] !== undefined ? "" : "2D2,") + (temp["CeilingToWindow3"] !== undefined ? "" : "2D3,"), "2,2A", depSetTempArr)]);
+                                                setSelectCustomValues(selectValues);
+                                                setStepSelectedLabel(tempLabels);
+                                                setStepSelectedValue(tempValue);
+                                            } else if (temp["FinishedLengthType"] === "Apron") {
+                                                let refIndex = inputs.current["2A2"].getAttribute('ref-num');
+                                                tempLabels[refIndex] = inputs.current["2A2"].getAttribute('text');
+                                                tempValue[refIndex] = inputs.current["2A2"].value;
+                                                setStepSelectedLabel(tempLabels);
+                                                setStepSelectedValue(tempValue);
+                                                
+                                                let tempWidth = changeLang ? temp["Width2B"] : temp["Width"];
+                                                // let tempHeight = changeLang ? temp["Height2D"] : temp["Height"];
+                                                // console.log(temp,tempWidth,tempHeight);
+                                                
+                                                selectValues["Width2B"] = tempWidth ? [{value: tempWidth}] : [];
+                                                if (tempWidth) {
+                                                    tempLabels["2B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                }
+                                                selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
+                                                selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                                if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
+                                                    tempLabels["2C"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
+                                                }
+                                                selectValues["CeilingToWindow1"] = temp["CeilingToWindow1"] ? [{value: temp["CeilingToWindow1"]}] : [];
+                                                selectValues["CeilingToWindow2"] = temp["CeilingToWindow2"] ? [{value: temp["CeilingToWindow2"]}] : [];
+                                                selectValues["CeilingToWindow3"] = temp["CeilingToWindow3"] ? [{value: temp["CeilingToWindow3"]}] : [];
+                                                if (temp["CeilingToWindow1"] && temp["CeilingToWindow2"] && temp["CeilingToWindow3"]) {
+                                                    let tempMin = Math.min(temp["CeilingToWindow1"], temp["CeilingToWindow2"], temp["CeilingToWindow3"]);
+                                                    tempLabels["2D"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
+                                                }
+                                                // selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
+                                                // if (temp["CeilingToFloor"]) {
+                                                //     tempLabels["2E"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
+                                                // }
+                                                
+                                                depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (temp["ExtensionLeft"] !== undefined ? "" : "2C1,") + (temp["ExtensionRight"] !== undefined ? "" : "2C2,") + (temp["CeilingToWindow1"] !== undefined ? "" : "2D1,") + (temp["CeilingToWindow2"] !== undefined ? "" : "2D2,") + (temp["CeilingToWindow3"] !== undefined ? "" : "2D3,"), "2,2A", depSetTempArr)]);
+                                                setSelectCustomValues(selectValues);
+                                                setStepSelectedLabel(tempLabels);
+                                                setStepSelectedValue(tempValue);
+                                            } else {
+                                                let refIndex = inputs.current["2A3"].getAttribute('ref-num');
+                                                tempLabels[refIndex] = inputs.current["2A3"].getAttribute('text');
+                                                tempValue[refIndex] = inputs.current["2A3"].value;
+                                                setStepSelectedLabel(tempLabels);
+                                                setStepSelectedValue(tempValue);
+                                                
+                                                let tempWidth = changeLang ? temp["Width2B"] : temp["Width"];
+                                                // let tempHeight = changeLang ? temp["Height2D"] : temp["Height"];
+                                                // console.log(temp,tempWidth,tempHeight);
+                                                
+                                                selectValues["Width2B"] = tempWidth ? [{value: tempWidth}] : [];
+                                                if (tempWidth) {
+                                                    tempLabels["2B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                }
+                                                selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
+                                                selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                                if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
+                                                    tempLabels["2C"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
+                                                }
+                                                selectValues["CeilingToFloor1"] = temp["CeilingToFloor1"] ? [{value: temp["CeilingToFloor1"]}] : [];
+                                                selectValues["CeilingToFloor2"] = temp["CeilingToFloor2"] ? [{value: temp["CeilingToFloor2"]}] : [];
+                                                selectValues["CeilingToFloor3"] = temp["CeilingToFloor3"] ? [{value: temp["CeilingToFloor3"]}] : [];
+                                                if (temp["CeilingToFloor1"] && temp["CeilingToFloor2"] && temp["CeilingToFloor3"]) {
+                                                    let tempMin = Math.min(temp["CeilingToFloor1"], temp["CeilingToFloor2"], temp["CeilingToFloor3"]);
+                                                    tempLabels["2DFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
+                                                }
+                                                
+                                                depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (temp["ExtensionLeft"] !== undefined ? "" : "2C1,") + (temp["ExtensionRight"] !== undefined ? "" : "2C2,") + (temp["CeilingToFloor1"] !== undefined ? "" : "2DFloor1,") + (temp["CeilingToFloor2"] !== undefined ? "" : "2DFloor2,") + (temp["CeilingToFloor3"] !== undefined ? "" : "2DFloor3,"), "2,2A", depSetTempArr)]);
+                                                setSelectCustomValues(selectValues);
+                                                setStepSelectedLabel(tempLabels);
+                                                setStepSelectedValue(tempValue);
                                             }
-                                            selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
-                                            selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
-                                            if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
-                                                tempLabels["2C"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
-                                            }
-                                            selectValues["CeilingToWindow1"] = temp["CeilingToWindow1"] ? [{value: temp["CeilingToWindow1"]}] : [];
-                                            selectValues["CeilingToWindow2"] = temp["CeilingToWindow2"] ? [{value: temp["CeilingToWindow2"]}] : [];
-                                            selectValues["CeilingToWindow3"] = temp["CeilingToWindow3"] ? [{value: temp["CeilingToWindow3"]}] : [];
-                                            if (temp["CeilingToWindow1"] && temp["CeilingToWindow2"] && temp["CeilingToWindow3"]) {
-                                                let tempMin = Math.min(temp["CeilingToWindow1"], temp["CeilingToWindow2"], temp["CeilingToWindow3"]);
-                                                tempLabels["2D"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
-                                            }
-                                            // selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
-                                            // if (temp["CeilingToFloor"]) {
-                                            //     tempLabels["2E"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
-                                            // }
-                                            
-                                            depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (temp["ExtensionLeft"] !== undefined ? "" : "2C1,") + (temp["ExtensionRight"] !== undefined ? "" : "2C2,") + (temp["CeilingToWindow1"] !== undefined ? "" : "2D1,") + (temp["CeilingToWindow2"] !== undefined ? "" : "2D2,") + (temp["CeilingToWindow3"] !== undefined ? "" : "2D3,"), "2,2A", depSetTempArr)]);
-                                            setSelectCustomValues(selectValues);
-                                            setStepSelectedLabel(tempLabels);
-                                            setStepSelectedValue(tempValue);
-                                        } else if (temp["FinishedLengthType"] === "Apron") {
-                                            let refIndex = inputs.current["2A2"].getAttribute('ref-num');
-                                            tempLabels[refIndex] = inputs.current["2A2"].getAttribute('text');
-                                            tempValue[refIndex] = inputs.current["2A2"].value;
-                                            setStepSelectedLabel(tempLabels);
-                                            setStepSelectedValue(tempValue);
-                                            
-                                            let tempWidth = changeLang ? temp["Width2B"] : temp["Width"];
-                                            // let tempHeight = changeLang ? temp["Height2D"] : temp["Height"];
-                                            // console.log(temp,tempWidth,tempHeight);
-                                            
-                                            selectValues["Width2B"] = tempWidth ? [{value: tempWidth}] : [];
-                                            if (tempWidth) {
-                                                tempLabels["2B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
-                                            }
-                                            selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
-                                            selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
-                                            if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
-                                                tempLabels["2C"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
-                                            }
-                                            selectValues["CeilingToWindow1"] = temp["CeilingToWindow1"] ? [{value: temp["CeilingToWindow1"]}] : [];
-                                            selectValues["CeilingToWindow2"] = temp["CeilingToWindow2"] ? [{value: temp["CeilingToWindow2"]}] : [];
-                                            selectValues["CeilingToWindow3"] = temp["CeilingToWindow3"] ? [{value: temp["CeilingToWindow3"]}] : [];
-                                            if (temp["CeilingToWindow1"] && temp["CeilingToWindow2"] && temp["CeilingToWindow3"]) {
-                                                let tempMin = Math.min(temp["CeilingToWindow1"], temp["CeilingToWindow2"], temp["CeilingToWindow3"]);
-                                                tempLabels["2D"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
-                                            }
-                                            // selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
-                                            // if (temp["CeilingToFloor"]) {
-                                            //     tempLabels["2E"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
-                                            // }
-                                            
-                                            depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (temp["ExtensionLeft"] !== undefined ? "" : "2C1,") + (temp["ExtensionRight"] !== undefined ? "" : "2C2,") + (temp["CeilingToWindow1"] !== undefined ? "" : "2D1,") + (temp["CeilingToWindow2"] !== undefined ? "" : "2D2,") + (temp["CeilingToWindow3"] !== undefined ? "" : "2D3,"), "2,2A", depSetTempArr)]);
-                                            setSelectCustomValues(selectValues);
-                                            setStepSelectedLabel(tempLabels);
-                                            setStepSelectedValue(tempValue);
-                                        } else {
-                                            let refIndex = inputs.current["2A3"].getAttribute('ref-num');
-                                            tempLabels[refIndex] = inputs.current["2A3"].getAttribute('text');
-                                            tempValue[refIndex] = inputs.current["2A3"].value;
-                                            setStepSelectedLabel(tempLabels);
-                                            setStepSelectedValue(tempValue);
-                                            
-                                            let tempWidth = changeLang ? temp["Width2B"] : temp["Width"];
-                                            // let tempHeight = changeLang ? temp["Height2D"] : temp["Height"];
-                                            // console.log(temp,tempWidth,tempHeight);
-                                            
-                                            selectValues["Width2B"] = tempWidth ? [{value: tempWidth}] : [];
-                                            if (tempWidth) {
-                                                tempLabels["2B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
-                                            }
-                                            selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
-                                            selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
-                                            if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
-                                                tempLabels["2C"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
-                                            }
-                                            selectValues["CeilingToFloor1"] = temp["CeilingToFloor1"] ? [{value: temp["CeilingToFloor1"]}] : [];
-                                            selectValues["CeilingToFloor2"] = temp["CeilingToFloor2"] ? [{value: temp["CeilingToFloor2"]}] : [];
-                                            selectValues["CeilingToFloor3"] = temp["CeilingToFloor3"] ? [{value: temp["CeilingToFloor3"]}] : [];
-                                            if (temp["CeilingToFloor1"] && temp["CeilingToFloor2"] && temp["CeilingToFloor3"]) {
-                                                let tempMin = Math.min(temp["CeilingToFloor1"], temp["CeilingToFloor2"], temp["CeilingToFloor3"]);
-                                                tempLabels["2DFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
-                                            }
-                                            
-                                            depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (temp["ExtensionLeft"] !== undefined ? "" : "2C1,") + (temp["ExtensionRight"] !== undefined ? "" : "2C2,") + (temp["CeilingToFloor1"] !== undefined ? "" : "2DFloor1,") + (temp["CeilingToFloor2"] !== undefined ? "" : "2DFloor2,") + (temp["CeilingToFloor3"] !== undefined ? "" : "2DFloor3,"), "2,2A", depSetTempArr)]);
-                                            setSelectCustomValues(selectValues);
-                                            setStepSelectedLabel(tempLabels);
-                                            setStepSelectedValue(tempValue);
-                                        }
+                                        }, 200);
                                     }
                                 } else {
                                     if (temp["IsWalled"]) {
                                         // console.log([{value: temp["IsWalled"]}]);
                                         if (temp["IsWalled"] === "Ceiling") {
                                             if (temp["FinishedLengthType"]) {
-                                                setStep2A(temp["FinishedLengthType"]);
-                                                
-                                                if (temp["FinishedLengthType"] === "Sill") {
-                                                    let refIndex = inputs.current["2A1"].getAttribute('ref-num');
-                                                    tempLabels[refIndex] = inputs.current["2A1"].getAttribute('text');
-                                                    tempValue[refIndex] = inputs.current["2A1"].value;
-                                                    setStepSelectedLabel(tempLabels);
-                                                    setStepSelectedValue(tempValue);
+                                                setTimeout(() => {
+                                                    setStep2A(temp["FinishedLengthType"]);
                                                     
-                                                    let tempWidth = changeLang ? temp["Width2B"] : temp["Width"];
-                                                    // let tempHeight = changeLang ? temp["Height2D"] : temp["Height"];
-                                                    // console.log(temp,tempWidth,tempHeight);
-                                                    
-                                                    selectValues["Width2B"] = tempWidth ? [{value: tempWidth}] : [];
-                                                    if (tempWidth) {
-                                                        tempLabels["2B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                    if (temp["FinishedLengthType"] === "Sill") {
+                                                        let refIndex = inputs.current["2A1"].getAttribute('ref-num');
+                                                        tempLabels[refIndex] = inputs.current["2A1"].getAttribute('text');
+                                                        tempValue[refIndex] = inputs.current["2A1"].value;
+                                                        setStepSelectedLabel(tempLabels);
+                                                        setStepSelectedValue(tempValue);
+                                                        
+                                                        let tempWidth = changeLang ? temp["Width2B"] : temp["Width"];
+                                                        // let tempHeight = changeLang ? temp["Height2D"] : temp["Height"];
+                                                        // console.log(temp,tempWidth,tempHeight);
+                                                        
+                                                        selectValues["Width2B"] = tempWidth ? [{value: tempWidth}] : [];
+                                                        if (tempWidth) {
+                                                            tempLabels["2B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                        }
+                                                        selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
+                                                        selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                                        if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
+                                                            tempLabels["2CCeiling"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
+                                                        }
+                                                        selectValues["CeilingToWindow1"] = temp["CeilingToWindow1"] ? [{value: temp["CeilingToWindow1"]}] : [];
+                                                        selectValues["CeilingToWindow2"] = temp["CeilingToWindow2"] ? [{value: temp["CeilingToWindow2"]}] : [];
+                                                        selectValues["CeilingToWindow3"] = temp["CeilingToWindow3"] ? [{value: temp["CeilingToWindow3"]}] : [];
+                                                        if (temp["CeilingToWindow1"] && temp["CeilingToWindow2"] && temp["CeilingToWindow3"]) {
+                                                            let tempMin = Math.min(temp["CeilingToWindow1"], temp["CeilingToWindow2"], temp["CeilingToWindow3"]);
+                                                            tempLabels["2D"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
+                                                        }
+                                                        // selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
+                                                        // if (temp["CeilingToFloor"]) {
+                                                        //     tempLabels["2E"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
+                                                        // }
+                                                        
+                                                        depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (temp["ExtensionLeft"] !== undefined ? "" : "2CCeiling1,") + (temp["ExtensionRight"] !== undefined ? "" : "2CCeiling2,") + (temp["CeilingToWindow1"] !== undefined ? "" : "2D1,") + (temp["CeilingToWindow2"] !== undefined ? "" : "2D2,") + (temp["CeilingToWindow3"] !== undefined ? "" : "2D3,"), "2,2A", depSetTempArr)]);
+                                                        setSelectCustomValues(selectValues);
+                                                        setStepSelectedLabel(tempLabels);
+                                                        setStepSelectedValue(tempValue);
+                                                    } else if (temp["FinishedLengthType"] === "Apron") {
+                                                        let refIndex = inputs.current["2A2"].getAttribute('ref-num');
+                                                        tempLabels[refIndex] = inputs.current["2A2"].getAttribute('text');
+                                                        tempValue[refIndex] = inputs.current["2A2"].value;
+                                                        setStepSelectedLabel(tempLabels);
+                                                        setStepSelectedValue(tempValue);
+                                                        
+                                                        let tempWidth = changeLang ? temp["Width2B"] : temp["Width"];
+                                                        // let tempHeight = changeLang ? temp["Height2D"] : temp["Height"];
+                                                        // console.log(temp,tempWidth,tempHeight);
+                                                        
+                                                        selectValues["Width2B"] = tempWidth ? [{value: tempWidth}] : [];
+                                                        if (tempWidth) {
+                                                            tempLabels["2B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                        }
+                                                        selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
+                                                        selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                                        if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
+                                                            tempLabels["2CCeiling"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
+                                                        }
+                                                        selectValues["CeilingToWindow1"] = temp["CeilingToWindow1"] ? [{value: temp["CeilingToWindow1"]}] : [];
+                                                        selectValues["CeilingToWindow2"] = temp["CeilingToWindow2"] ? [{value: temp["CeilingToWindow2"]}] : [];
+                                                        selectValues["CeilingToWindow3"] = temp["CeilingToWindow3"] ? [{value: temp["CeilingToWindow3"]}] : [];
+                                                        if (temp["CeilingToWindow1"] && temp["CeilingToWindow2"] && temp["CeilingToWindow3"]) {
+                                                            let tempMin = Math.min(temp["CeilingToWindow1"], temp["CeilingToWindow2"], temp["CeilingToWindow3"]);
+                                                            tempLabels["2D"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
+                                                        }
+                                                        // selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
+                                                        // if (temp["CeilingToFloor"]) {
+                                                        //     tempLabels["2E"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
+                                                        // }
+                                                        
+                                                        depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (temp["ExtensionLeft"] !== undefined ? "" : "2CCeiling1,") + (temp["ExtensionRight"] !== undefined ? "" : "2CCeiling2,") + (temp["CeilingToWindow1"] !== undefined ? "" : "2D1,") + (temp["CeilingToWindow2"] !== undefined ? "" : "2D2,") + (temp["CeilingToWindow3"] !== undefined ? "" : "2D3,"), "2,2A", depSetTempArr)]);
+                                                        setSelectCustomValues(selectValues);
+                                                        setStepSelectedLabel(tempLabels);
+                                                        setStepSelectedValue(tempValue);
+                                                    } else {
+                                                        let refIndex = inputs.current["2A3"].getAttribute('ref-num');
+                                                        tempLabels[refIndex] = inputs.current["2A3"].getAttribute('text');
+                                                        tempValue[refIndex] = inputs.current["2A3"].value;
+                                                        setStepSelectedLabel(tempLabels);
+                                                        setStepSelectedValue(tempValue);
+                                                        
+                                                        let tempWidth = changeLang ? temp["Width2B"] : temp["Width"];
+                                                        // let tempHeight = changeLang ? temp["Height2D"] : temp["Height"];
+                                                        // console.log(temp,tempWidth,tempHeight);
+                                                        
+                                                        selectValues["Width2B"] = tempWidth ? [{value: tempWidth}] : [];
+                                                        if (tempWidth) {
+                                                            tempLabels["2B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                        }
+                                                        selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
+                                                        selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                                        if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
+                                                            tempLabels["2CCeiling"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
+                                                        }
+                                                        selectValues["CeilingToFloor1"] = temp["CeilingToFloor1"] ? [{value: temp["CeilingToFloor1"]}] : [];
+                                                        selectValues["CeilingToFloor2"] = temp["CeilingToFloor2"] ? [{value: temp["CeilingToFloor2"]}] : [];
+                                                        selectValues["CeilingToFloor3"] = temp["CeilingToFloor3"] ? [{value: temp["CeilingToFloor3"]}] : [];
+                                                        if (temp["CeilingToFloor1"] && temp["CeilingToFloor2"] && temp["CeilingToFloor3"]) {
+                                                            let tempMin = Math.min(temp["CeilingToFloor1"], temp["CeilingToFloor2"], temp["CeilingToFloor3"]);
+                                                            tempLabels["2DFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
+                                                        }
+                                                        
+                                                        depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (temp["ExtensionLeft"] !== undefined ? "" : "2CCeiling1,") + (temp["ExtensionRight"] !== undefined ? "" : "2CCeiling2,") + (temp["CeilingToFloor1"] !== undefined ? "" : "2DFloor1,") + (temp["CeilingToFloor2"] !== undefined ? "" : "2DFloor2,") + (temp["CeilingToFloor3"] !== undefined ? "" : "2DFloor3,"), "2,2A", depSetTempArr)]);
+                                                        setSelectCustomValues(selectValues);
+                                                        setStepSelectedLabel(tempLabels);
+                                                        setStepSelectedValue(tempValue);
                                                     }
-                                                    selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
-                                                    selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
-                                                    if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
-                                                        tempLabels["2CCeiling"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
-                                                    }
-                                                    selectValues["CeilingToWindow1"] = temp["CeilingToWindow1"] ? [{value: temp["CeilingToWindow1"]}] : [];
-                                                    selectValues["CeilingToWindow2"] = temp["CeilingToWindow2"] ? [{value: temp["CeilingToWindow2"]}] : [];
-                                                    selectValues["CeilingToWindow3"] = temp["CeilingToWindow3"] ? [{value: temp["CeilingToWindow3"]}] : [];
-                                                    if (temp["CeilingToWindow1"] && temp["CeilingToWindow2"] && temp["CeilingToWindow3"]) {
-                                                        let tempMin = Math.min(temp["CeilingToWindow1"], temp["CeilingToWindow2"], temp["CeilingToWindow3"]);
-                                                        tempLabels["2D"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
-                                                    }
-                                                    // selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
-                                                    // if (temp["CeilingToFloor"]) {
-                                                    //     tempLabels["2E"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
-                                                    // }
-                                                    
-                                                    depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (temp["ExtensionLeft"] !== undefined ? "" : "2CCeiling1,") + (temp["ExtensionRight"] !== undefined ? "" : "2CCeiling2,") + (temp["CeilingToWindow1"] !== undefined ? "" : "2D1,") + (temp["CeilingToWindow2"] !== undefined ? "" : "2D2,") + (temp["CeilingToWindow3"] !== undefined ? "" : "2D3,"), "2,2A", depSetTempArr)]);
-                                                    setSelectCustomValues(selectValues);
-                                                    setStepSelectedLabel(tempLabels);
-                                                    setStepSelectedValue(tempValue);
-                                                } else if (temp["FinishedLengthType"] === "Apron") {
-                                                    let refIndex = inputs.current["2A2"].getAttribute('ref-num');
-                                                    tempLabels[refIndex] = inputs.current["2A2"].getAttribute('text');
-                                                    tempValue[refIndex] = inputs.current["2A2"].value;
-                                                    setStepSelectedLabel(tempLabels);
-                                                    setStepSelectedValue(tempValue);
-                                                    
-                                                    let tempWidth = changeLang ? temp["Width2B"] : temp["Width"];
-                                                    // let tempHeight = changeLang ? temp["Height2D"] : temp["Height"];
-                                                    // console.log(temp,tempWidth,tempHeight);
-                                                    
-                                                    selectValues["Width2B"] = tempWidth ? [{value: tempWidth}] : [];
-                                                    if (tempWidth) {
-                                                        tempLabels["2B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
-                                                    }
-                                                    selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
-                                                    selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
-                                                    if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
-                                                        tempLabels["2CCeiling"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
-                                                    }
-                                                    selectValues["CeilingToWindow1"] = temp["CeilingToWindow1"] ? [{value: temp["CeilingToWindow1"]}] : [];
-                                                    selectValues["CeilingToWindow2"] = temp["CeilingToWindow2"] ? [{value: temp["CeilingToWindow2"]}] : [];
-                                                    selectValues["CeilingToWindow3"] = temp["CeilingToWindow3"] ? [{value: temp["CeilingToWindow3"]}] : [];
-                                                    if (temp["CeilingToWindow1"] && temp["CeilingToWindow2"] && temp["CeilingToWindow3"]) {
-                                                        let tempMin = Math.min(temp["CeilingToWindow1"], temp["CeilingToWindow2"], temp["CeilingToWindow3"]);
-                                                        tempLabels["2D"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
-                                                    }
-                                                    // selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
-                                                    // if (temp["CeilingToFloor"]) {
-                                                    //     tempLabels["2E"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
-                                                    // }
-                                                    
-                                                    depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (temp["ExtensionLeft"] !== undefined ? "" : "2CCeiling1,") + (temp["ExtensionRight"] !== undefined ? "" : "2CCeiling2,") + (temp["CeilingToWindow1"] !== undefined ? "" : "2D1,") + (temp["CeilingToWindow2"] !== undefined ? "" : "2D2,") + (temp["CeilingToWindow3"] !== undefined ? "" : "2D3,"), "2,2A", depSetTempArr)]);
-                                                    setSelectCustomValues(selectValues);
-                                                    setStepSelectedLabel(tempLabels);
-                                                    setStepSelectedValue(tempValue);
-                                                } else {
-                                                    let refIndex = inputs.current["2A3"].getAttribute('ref-num');
-                                                    tempLabels[refIndex] = inputs.current["2A3"].getAttribute('text');
-                                                    tempValue[refIndex] = inputs.current["2A3"].value;
-                                                    setStepSelectedLabel(tempLabels);
-                                                    setStepSelectedValue(tempValue);
-                                                    
-                                                    let tempWidth = changeLang ? temp["Width2B"] : temp["Width"];
-                                                    // let tempHeight = changeLang ? temp["Height2D"] : temp["Height"];
-                                                    // console.log(temp,tempWidth,tempHeight);
-                                                    
-                                                    selectValues["Width2B"] = tempWidth ? [{value: tempWidth}] : [];
-                                                    if (tempWidth) {
-                                                        tempLabels["2B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
-                                                    }
-                                                    selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
-                                                    selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
-                                                    if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
-                                                        tempLabels["2CCeiling"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
-                                                    }
-                                                    selectValues["CeilingToFloor1"] = temp["CeilingToFloor1"] ? [{value: temp["CeilingToFloor1"]}] : [];
-                                                    selectValues["CeilingToFloor2"] = temp["CeilingToFloor2"] ? [{value: temp["CeilingToFloor2"]}] : [];
-                                                    selectValues["CeilingToFloor3"] = temp["CeilingToFloor3"] ? [{value: temp["CeilingToFloor3"]}] : [];
-                                                    if (temp["CeilingToFloor1"] && temp["CeilingToFloor2"] && temp["CeilingToFloor3"]) {
-                                                        let tempMin = Math.min(temp["CeilingToFloor1"], temp["CeilingToFloor2"], temp["CeilingToFloor3"]);
-                                                        tempLabels["2DFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
-                                                    }
-                                                    
-                                                    depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (temp["ExtensionLeft"] !== undefined ? "" : "2CCeiling1,") + (temp["ExtensionRight"] !== undefined ? "" : "2CCeiling2,") + (temp["CeilingToFloor1"] !== undefined ? "" : "2DFloor1,") + (temp["CeilingToFloor2"] !== undefined ? "" : "2DFloor2,") + (temp["CeilingToFloor3"] !== undefined ? "" : "2DFloor3,"), "2,2A", depSetTempArr)]);
-                                                    setSelectCustomValues(selectValues);
-                                                    setStepSelectedLabel(tempLabels);
-                                                    setStepSelectedValue(tempValue);
-                                                }
+                                                }, 200);
                                             }
                                         } else {
                                             if (temp["FinishedLengthType"]) {
-                                                setStep2A(temp["FinishedLengthType"]);
-                                                
-                                                if (temp["FinishedLengthType"] === "Sill") {
-                                                    let refIndex = inputs.current["2A1"].getAttribute('ref-num');
-                                                    tempLabels[refIndex] = inputs.current["2A1"].getAttribute('text');
-                                                    tempValue[refIndex] = inputs.current["2A1"].value;
-                                                    setStepSelectedLabel(tempLabels);
-                                                    setStepSelectedValue(tempValue);
+                                                setTimeout(() => {
+                                                    setStep2A(temp["FinishedLengthType"]);
                                                     
-                                                    let tempWidth = changeLang ? temp["Width2B"] : temp["Width"];
-                                                    let tempHeight = changeLang ? temp["Height2D"] : temp["Height"];
-                                                    // console.log(temp,tempWidth,tempHeight);
-                                                    
-                                                    selectValues["Width2B"] = tempWidth ? [{value: tempWidth}] : [];
-                                                    if (tempWidth) {
-                                                        tempLabels["2B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                    if (temp["FinishedLengthType"] === "Sill") {
+                                                        let refIndex = inputs.current["2A1"].getAttribute('ref-num');
+                                                        tempLabels[refIndex] = inputs.current["2A1"].getAttribute('text');
+                                                        tempValue[refIndex] = inputs.current["2A1"].value;
+                                                        setStepSelectedLabel(tempLabels);
+                                                        setStepSelectedValue(tempValue);
+                                                        
+                                                        let tempWidth = changeLang ? temp["Width2B"] : temp["Width"];
+                                                        let tempHeight = changeLang ? temp["Height2D"] : temp["Height"];
+                                                        // console.log(temp,tempWidth,tempHeight);
+                                                        
+                                                        selectValues["Width2B"] = tempWidth ? [{value: tempWidth}] : [];
+                                                        if (tempWidth) {
+                                                            tempLabels["2B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                        }
+                                                        selectValues["Height2D"] = tempHeight ? [{value: tempHeight}] : [];
+                                                        if (tempHeight) {
+                                                            tempLabels["2DWall"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
+                                                        }
+                                                        selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
+                                                        selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                                        if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
+                                                            tempLabels["2CCeiling"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
+                                                        }
+                                                        selectValues["WindowToFloor"] = temp["WindowToFloor"] ? [{value: temp["WindowToFloor"]}] : [];
+                                                        if (temp["WindowToFloor"]) {
+                                                            tempLabels["2DWallFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["WindowToFloor"]}`) + postfixFa : temp["WindowToFloor"] + postfixEn;
+                                                        }
+                                                        selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
+                                                        if (temp["ShadeMount"] !== undefined) {
+                                                            tempLabels["2EWall"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["ShadeMount"]}`) + postfixFa : temp["ShadeMount"] + postfixEn;
+                                                        }
+                                                        selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
+                                                        if (temp["CeilingToFloor"]) {
+                                                            tempLabels["2FWall"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
+                                                        }
+                                                        
+                                                        depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (tempHeight ? "" : "2DWall,") + (temp["ExtensionLeft"] !== undefined ? "" : "2CCeiling1,") + (temp["ExtensionRight"] !== undefined ? "" : "2CCeiling2,") + (temp["WindowToFloor"] !== undefined ? "" : "2DWallFloor,") + (temp["ShadeMount"] !== undefined ? "" : "2EWall,") + (temp["CeilingToFloor"] !== undefined ? "" : "2FWall,"), "2,2A", depSetTempArr)]);
+                                                        setSelectCustomValues(selectValues);
+                                                        setStepSelectedLabel(tempLabels);
+                                                        setStepSelectedValue(tempValue);
+                                                    } else if (temp["FinishedLengthType"] === "Apron") {
+                                                        let refIndex = inputs.current["2A2"].getAttribute('ref-num');
+                                                        tempLabels[refIndex] = inputs.current["2A2"].getAttribute('text');
+                                                        tempValue[refIndex] = inputs.current["2A2"].value;
+                                                        setStepSelectedLabel(tempLabels);
+                                                        setStepSelectedValue(tempValue);
+                                                        
+                                                        let tempWidth = changeLang ? temp["Width2B"] : temp["Width"];
+                                                        let tempHeight = changeLang ? temp["Height2D"] : temp["Height"];
+                                                        // console.log(temp,tempWidth,tempHeight);
+                                                        
+                                                        selectValues["Width2B"] = tempWidth ? [{value: tempWidth}] : [];
+                                                        if (tempWidth) {
+                                                            tempLabels["2B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                        }
+                                                        selectValues["Height2D"] = tempHeight ? [{value: tempHeight}] : [];
+                                                        if (tempHeight) {
+                                                            tempLabels["2DWall"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
+                                                        }
+                                                        selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
+                                                        selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                                        if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
+                                                            tempLabels["2CCeiling"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
+                                                        }
+                                                        selectValues["WindowToFloor"] = temp["WindowToFloor"] ? [{value: temp["WindowToFloor"]}] : [];
+                                                        if (temp["WindowToFloor"]) {
+                                                            tempLabels["2DWallFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["WindowToFloor"]}`) + postfixFa : temp["WindowToFloor"] + postfixEn;
+                                                        }
+                                                        selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
+                                                        if (temp["ShadeMount"] !== undefined) {
+                                                            tempLabels["2EWall"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["ShadeMount"]}`) + postfixFa : temp["ShadeMount"] + postfixEn;
+                                                        }
+                                                        selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
+                                                        if (temp["CeilingToFloor"]) {
+                                                            tempLabels["2FWall"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
+                                                        }
+                                                        
+                                                        depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (tempHeight ? "" : "2DWall,") + (temp["ExtensionLeft"] !== undefined ? "" : "2CCeiling1,") + (temp["ExtensionRight"] !== undefined ? "" : "2CCeiling2,") + (temp["WindowToFloor"] !== undefined ? "" : "2DWallFloor,") + (temp["ShadeMount"] !== undefined ? "" : "2EWall,") + (temp["CeilingToFloor"] !== undefined ? "" : "2FWall,"), "2,2A", depSetTempArr)]);
+                                                        setSelectCustomValues(selectValues);
+                                                        setStepSelectedLabel(tempLabels);
+                                                        setStepSelectedValue(tempValue);
+                                                    } else {
+                                                        let refIndex = inputs.current["2A3"].getAttribute('ref-num');
+                                                        tempLabels[refIndex] = inputs.current["2A3"].getAttribute('text');
+                                                        tempValue[refIndex] = inputs.current["2A3"].value;
+                                                        setStepSelectedLabel(tempLabels);
+                                                        setStepSelectedValue(tempValue);
+                                                        
+                                                        let tempWidth = changeLang ? temp["Width2B"] : temp["Width"];
+                                                        // let tempHeight = changeLang ? temp["Height2D"] : temp["Height"];
+                                                        // console.log(temp,tempWidth,tempHeight);
+                                                        
+                                                        selectValues["Width2B"] = tempWidth ? [{value: tempWidth}] : [];
+                                                        if (tempWidth) {
+                                                            tempLabels["2B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                        }
+                                                        selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
+                                                        selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                                        if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
+                                                            tempLabels["2CCeiling"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
+                                                        }
+                                                        selectValues["WindowToFloor"] = temp["WindowToFloor"] ? [{value: temp["WindowToFloor"]}] : [];
+                                                        if (temp["WindowToFloor"]) {
+                                                            tempLabels["2DWallFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["WindowToFloor"]}`) + postfixFa : temp["WindowToFloor"] + postfixEn;
+                                                        }
+                                                        selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
+                                                        if (temp["ShadeMount"] !== undefined) {
+                                                            tempLabels["2EWallFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["ShadeMount"]}`) + postfixFa : temp["ShadeMount"] + postfixEn;
+                                                        }
+                                                        selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
+                                                        if (temp["CeilingToFloor"]) {
+                                                            tempLabels["2FWallFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
+                                                        }
+                                                        
+                                                        depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (temp["ExtensionLeft"] !== undefined ? "" : "2CCeiling1,") + (temp["ExtensionRight"] !== undefined ? "" : "2CCeiling2,") + (temp["WindowToFloor"] !== undefined ? "" : "2DWallFloor,") + (temp["ShadeMount"] !== undefined ? "" : "2EWallFloor,") + (temp["CeilingToFloor"] !== undefined ? "" : "2FWallFloor,"), "2,2A", depSetTempArr)]);
+                                                        setSelectCustomValues(selectValues);
+                                                        setStepSelectedLabel(tempLabels);
+                                                        setStepSelectedValue(tempValue);
                                                     }
-                                                    selectValues["Height2D"] = tempHeight ? [{value: tempHeight}] : [];
-                                                    if (tempHeight) {
-                                                        tempLabels["2DWall"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
-                                                    }
-                                                    selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
-                                                    selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
-                                                    if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
-                                                        tempLabels["2CCeiling"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
-                                                    }
-                                                    selectValues["WindowToFloor"] = temp["WindowToFloor"] ? [{value: temp["WindowToFloor"]}] : [];
-                                                    if (temp["WindowToFloor"]) {
-                                                        tempLabels["2DWallFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["WindowToFloor"]}`) + postfixFa : temp["WindowToFloor"] + postfixEn;
-                                                    }
-                                                    selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
-                                                    if (temp["ShadeMount"] !== undefined) {
-                                                        tempLabels["2EWall"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["ShadeMount"]}`) + postfixFa : temp["ShadeMount"] + postfixEn;
-                                                    }
-                                                    selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
-                                                    if (temp["CeilingToFloor"]) {
-                                                        tempLabels["2FWall"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
-                                                    }
-                                                    
-                                                    depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (tempHeight ? "" : "2DWall,") + (temp["ExtensionLeft"] !== undefined ? "" : "2CCeiling1,") + (temp["ExtensionRight"] !== undefined ? "" : "2CCeiling2,") + (temp["WindowToFloor"] !== undefined ? "" : "2DWallFloor,") + (temp["ShadeMount"] !== undefined ? "" : "2EWall,") + (temp["CeilingToFloor"] !== undefined ? "" : "2FWall,"), "2,2A", depSetTempArr)]);
-                                                    setSelectCustomValues(selectValues);
-                                                    setStepSelectedLabel(tempLabels);
-                                                    setStepSelectedValue(tempValue);
-                                                } else if (temp["FinishedLengthType"] === "Apron") {
-                                                    let refIndex = inputs.current["2A2"].getAttribute('ref-num');
-                                                    tempLabels[refIndex] = inputs.current["2A2"].getAttribute('text');
-                                                    tempValue[refIndex] = inputs.current["2A2"].value;
-                                                    setStepSelectedLabel(tempLabels);
-                                                    setStepSelectedValue(tempValue);
-                                                    
-                                                    let tempWidth = changeLang ? temp["Width2B"] : temp["Width"];
-                                                    let tempHeight = changeLang ? temp["Height2D"] : temp["Height"];
-                                                    // console.log(temp,tempWidth,tempHeight);
-                                                    
-                                                    selectValues["Width2B"] = tempWidth ? [{value: tempWidth}] : [];
-                                                    if (tempWidth) {
-                                                        tempLabels["2B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
-                                                    }
-                                                    selectValues["Height2D"] = tempHeight ? [{value: tempHeight}] : [];
-                                                    if (tempHeight) {
-                                                        tempLabels["2DWall"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
-                                                    }
-                                                    selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
-                                                    selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
-                                                    if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
-                                                        tempLabels["2CCeiling"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
-                                                    }
-                                                    selectValues["WindowToFloor"] = temp["WindowToFloor"] ? [{value: temp["WindowToFloor"]}] : [];
-                                                    if (temp["WindowToFloor"]) {
-                                                        tempLabels["2DWallFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["WindowToFloor"]}`) + postfixFa : temp["WindowToFloor"] + postfixEn;
-                                                    }
-                                                    selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
-                                                    if (temp["ShadeMount"] !== undefined) {
-                                                        tempLabels["2EWall"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["ShadeMount"]}`) + postfixFa : temp["ShadeMount"] + postfixEn;
-                                                    }
-                                                    selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
-                                                    if (temp["CeilingToFloor"]) {
-                                                        tempLabels["2FWall"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
-                                                    }
-                                                    
-                                                    depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (tempHeight ? "" : "2DWall,") + (temp["ExtensionLeft"] !== undefined ? "" : "2CCeiling1,") + (temp["ExtensionRight"] !== undefined ? "" : "2CCeiling2,") + (temp["WindowToFloor"] !== undefined ? "" : "2DWallFloor,") + (temp["ShadeMount"] !== undefined ? "" : "2EWall,") + (temp["CeilingToFloor"] !== undefined ? "" : "2FWall,"), "2,2A", depSetTempArr)]);
-                                                    setSelectCustomValues(selectValues);
-                                                    setStepSelectedLabel(tempLabels);
-                                                    setStepSelectedValue(tempValue);
-                                                } else {
-                                                    let refIndex = inputs.current["2A3"].getAttribute('ref-num');
-                                                    tempLabels[refIndex] = inputs.current["2A3"].getAttribute('text');
-                                                    tempValue[refIndex] = inputs.current["2A3"].value;
-                                                    setStepSelectedLabel(tempLabels);
-                                                    setStepSelectedValue(tempValue);
-                                                    
-                                                    let tempWidth = changeLang ? temp["Width2B"] : temp["Width"];
-                                                    // let tempHeight = changeLang ? temp["Height2D"] : temp["Height"];
-                                                    // console.log(temp,tempWidth,tempHeight);
-                                                    
-                                                    selectValues["Width2B"] = tempWidth ? [{value: tempWidth}] : [];
-                                                    if (tempWidth) {
-                                                        tempLabels["2B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
-                                                    }
-                                                    selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
-                                                    selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
-                                                    if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
-                                                        tempLabels["2CCeiling"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
-                                                    }
-                                                    selectValues["WindowToFloor"] = temp["WindowToFloor"] ? [{value: temp["WindowToFloor"]}] : [];
-                                                    if (temp["WindowToFloor"]) {
-                                                        tempLabels["2DWallFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["WindowToFloor"]}`) + postfixFa : temp["WindowToFloor"] + postfixEn;
-                                                    }
-                                                    selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
-                                                    if (temp["ShadeMount"] !== undefined) {
-                                                        tempLabels["2EWallFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["ShadeMount"]}`) + postfixFa : temp["ShadeMount"] + postfixEn;
-                                                    }
-                                                    selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
-                                                    if (temp["CeilingToFloor"]) {
-                                                        tempLabels["2FWallFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
-                                                    }
-                                                    
-                                                    depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (temp["ExtensionLeft"] !== undefined ? "" : "2CCeiling1,") + (temp["ExtensionRight"] !== undefined ? "" : "2CCeiling2,") + (temp["WindowToFloor"] !== undefined ? "" : "2DWallFloor,") + (temp["ShadeMount"] !== undefined ? "" : "2EWallFloor,") + (temp["CeilingToFloor"] !== undefined ? "" : "2FWallFloor,"), "2,2A", depSetTempArr)]);
-                                                    setSelectCustomValues(selectValues);
-                                                    setStepSelectedLabel(tempLabels);
-                                                    setStepSelectedValue(tempValue);
-                                                }
+                                                }, 200);
                                             }
                                         }
                                     }
@@ -3297,8 +3381,8 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                             }
                         }
                     }
-                    if (temp["WidthCart"] && temp["HeightCart"]) {
-                        getWindowSize(temp["WidthCart"], temp["HeightCart"]);
+                    if (temp["WindowWidth"] && temp["WindowHeight"]) {
+                        getWindowSize(temp["WindowWidth"], temp["WindowHeight"]);
                     }
                     
                     if (temp["StackPosition"]) {
@@ -3362,6 +3446,15 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         setSavedProjectRoomText(temp["WindowName"]);
                         depSetTempArr = new Set([...setGetDeps("", "62", depSetTempArr)]);
                         setRoomLabelText(temp["WindowName"]);
+                    }
+                    
+                    if (temp["ZipCode"] && temp["ZipCode"] !== "" && temp["InstallAmount"] && temp["InstallAmount"] > 0 && temp["TransportationAmount"] && temp["TransportationAmount"] > 0) {
+                        setZipcode(temp["ZipCode"]);
+                        setZipcodeButton(true);
+                        setHasInstall(true);
+                        setZipcodeChecked("true");
+                        setInstallPrice(temp["InstallAmount"]);
+                        setTransportPrice(temp["TransportationAmount"]);
                     }
                     
                     if (temp["uploadedImagesURL"] && temp["uploadedImagesURL"].length > 0) {
@@ -3688,78 +3781,6 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
         ]
     };
     
-    const rooms = {
-        "en": [
-            {value: 'Family Room', label: 'Family Room'},
-            {value: 'Den', label: 'Den'},
-            {value: 'Living Room', label: 'Living Room'},
-            {value: 'Dining Room', label: 'Dining Room'},
-            {value: 'Kitchen', label: 'Kitchen'},
-            {value: 'Pantry', label: 'Pantry'},
-            {value: 'Breakfast Nook', label: 'Breakfast Nook'},
-            {value: 'Main Bedroom', label: 'Main Bedroom'},
-            {value: 'Bedroom', label: 'Bedroom'},
-            {value: 'Closet', label: 'Closet'},
-            {value: 'Main Bathroom', label: 'Main Bathroom'},
-            {value: 'Bathroom', label: 'Bathroom'},
-            {value: 'Office', label: 'Office'},
-            {value: 'Basement', label: 'Basement'},
-            {value: 'Entry', label: 'Entry'},
-            {value: 'Mud Room', label: 'Mud Room'},
-            {value: 'Hall', label: 'Hall'},
-            {value: 'Media', label: 'Media'},
-            {value: 'Laundry', label: 'Laundry'},
-            {value: 'Nursery', label: 'Nursery'},
-            {value: 'Study', label: 'Study'},
-            {value: 'Garage', label: 'Garage'},
-            {value: 'Attic', label: 'Attic'},
-            {value: 'Powder Room', label: 'Powder Room'},
-            {value: 'Guest Bedroom', label: 'Guest Bedroom'},
-            {value: 'Sunroom', label: 'Sunroom'},
-            {value: 'Playroom', label: 'Playroom'},
-            {value: 'Gym', label: 'Gym'},
-            {value: 'Pool House', label: 'Pool House'},
-            {value: 'ADU', label: 'ADU'},
-            {value: 'Stairway', label: 'Stairway'},
-            {value: 'Other', label: 'Other'}
-        ],
-        "fa": [
-            {value: 'Family Room', label: 'اتاق خانواده'},
-            {value: 'Den', label: 'خلوتگاه'},
-            {value: 'Living Room', label: 'اتاق نشیمن'},
-            {value: 'Dining Room', label: 'غذاخوری'},
-            {value: 'Kitchen', label: 'آشپزخانه'},
-            {value: 'Pantry', label: 'آبدارخانه'},
-            {value: 'Breakfast Nook', label: 'گوشه صبحانه'},
-            {value: 'Main Bedroom', label: 'اتاق خواب اصلی'},
-            {value: 'Bedroom', label: 'اتاق خواب'},
-            {value: 'Closet', label: 'کمد لباس'},
-            {value: 'Main Bathroom', label: 'سرویس بهداشتی اصلی'},
-            {value: 'Bathroom', label: 'سرویس بهداشتی'},
-            {value: 'Office', label: 'دفتر'},
-            {value: 'Basement', label: 'زیر زمین'},
-            {value: 'Entry', label: 'ورودی'},
-            {value: 'Mud Room', label: 'اتاق گلی'},
-            {value: 'Hall', label: 'هال'},
-            {value: 'Media', label: 'رسانه'},
-            {value: 'Laundry', label: 'خشکشویی'},
-            {value: 'Nursery', label: 'مهد کودک'},
-            {value: 'Study', label: 'کتابخانه'},
-            {value: 'Garage', label: 'کاراژ'},
-            {value: 'Attic', label: 'اتاق زیر شیروانی'},
-            {value: 'Powder Room', label: 'توالت زنانه'},
-            {value: 'Guest Bedroom', label: 'اتاق خواب مهمان'},
-            {value: 'Sunroom', label: 'اتاق افتاب رو'},
-            {value: 'Playroom', label: 'اتاق بازی'},
-            {value: 'Gym', label: 'باشگاه'},
-            {value: 'Pool House', label: 'استخر خانه'},
-            {value: 'ADU', label: 'واحد مسکونی لوازم جانبی'},
-            {value: 'Stairway', label: 'راه پله'},
-            {value: 'Other', label: 'دیگر'}
-        ],
-        
-    };
-    
     useEffect(() => {
         if (fabricSelected.selectedFabricId && fabricSelected.selectedFabricId !== 0) {
             // fabricClicked(fabricSelected.selectedPhoto, fabricSelected.selectedHasTrim);
@@ -3976,7 +3997,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             setNoWidth(true);
             renderDkCurtains(184);
         }
-    }, [JSON.stringify(cartValues)]);
+    }, [JSON.stringify(cartValues["WidthCart"])]);
     
     // useEffect(() => {
     //     if (currentDkCurtainIndex !== -1 && cartValues["WidthCart"] !== undefined) {
@@ -4003,136 +4024,140 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
     // }, [currentDkCurtainIndex]);
     
     useEffect(() => {
-        if (cartValues["WidthCart"] !== undefined) {
-            renderDkCurtains(cartValues["WidthCart"]);
+        if (firstRenderDK.current) {
+            firstRenderDK.current = false;
+        } else {
+            if (cartValues["WidthCart"] !== undefined) {
+                renderDkCurtains(cartValues["WidthCart"]);
+        
+                let pageLanguage = location.pathname.split('').slice(1, 3).join('');
+                let tempArr = [];
+                let tempObj = [];
+                let tempObjFabric = [];
+                let promiseArr = [];
+                if (dkCurtainArr.length) {
+                    for (let i = 0; i <= dkCurtainArr.length; i++) {
+                        if (dkCurtainArr[i] && Object.keys(dkCurtainArr[i]).length > 0) {
+                            promiseArr[i] = new Promise((resolve, reject) => {
+                                // console.log(dkCurtainArr[i]);
+                                let objKey = (pageLanguage === 'en' ? Uppercase(dkCurtainArr[i]["DesignEnName"]) : dkCurtainArr[i]["DesignName"]).toString() + "/" + (pageLanguage === 'en' ? Uppercase(dkCurtainArr[i]["ColorEnName"]) : dkCurtainArr[i]["ColorName"]).toString();
+                                tempObj[i] = objKey;
+                                // tempObjFabric[i] = dkCurtainArr[i]["FabricId"];
+                                tempObjFabric[i] = dkCurtainArr[i];
+                                // console.log(tempObjFabric);
+                                resolve();
+                            });
+                        }
+                    }
             
-            let pageLanguage = location.pathname.split('').slice(1, 3).join('');
-            let tempArr = [];
-            let tempObj = [];
-            let tempObjFabric = [];
-            let promiseArr = [];
-            if (dkCurtainArr.length) {
-                for (let i = 0; i <= dkCurtainArr.length; i++) {
-                    if (dkCurtainArr[i] && Object.keys(dkCurtainArr[i]).length > 0) {
-                        promiseArr[i] = new Promise((resolve, reject) => {
-                            // console.log(dkCurtainArr[i]);
-                            let objKey = (pageLanguage === 'en' ? Uppercase(dkCurtainArr[i]["DesignEnName"]) : dkCurtainArr[i]["DesignName"]).toString() + "/" + (pageLanguage === 'en' ? Uppercase(dkCurtainArr[i]["ColorEnName"]) : dkCurtainArr[i]["ColorName"]).toString();
-                            tempObj[i] = objKey;
-                            // tempObjFabric[i] = dkCurtainArr[i]["FabricId"];
-                            tempObjFabric[i] = dkCurtainArr[i];
-                            // console.log(tempObjFabric);
-                            resolve();
-                        });
-                    }
-                }
+                    Promise.all(promiseArr).then(() => {
+                        let promiseArr2 = [];
+                        let lastString = tempObj[0];
+                        let lastFabric = tempObjFabric[0] ? tempObjFabric[0]["FabricId"] : undefined;
+                        let lastFabricObj = tempObjFabric[0] ? tempObjFabric[0] : undefined;
+                        let tempObjCount = {};
+                        let count = 0;
+                        let lastRef = 0;
                 
-                Promise.all(promiseArr).then(() => {
-                    let promiseArr2 = [];
-                    let lastString = tempObj[0];
-                    let lastFabric = tempObjFabric[0] ? tempObjFabric[0]["FabricId"] : undefined;
-                    let lastFabricObj = tempObjFabric[0] ? tempObjFabric[0] : undefined;
-                    let tempObjCount = {};
-                    let count = 0;
-                    let lastRef = 0;
-                    
-                    const doPush = (refIndex) => {
-                        tempObjCount[refIndex] = {
-                            "count": count,
-                            "string": lastString,
-                            "fabricId": lastFabric,
-                            "fabricObj": lastFabricObj
+                        const doPush = (refIndex) => {
+                            tempObjCount[refIndex] = {
+                                "count": count,
+                                "string": lastString,
+                                "fabricId": lastFabric,
+                                "fabricObj": lastFabricObj
+                            };
                         };
-                    };
-                    for (let i = 0; i < tempObj.length; i++) {
-                        let string = tempObj[i];
-                        promiseArr2[i] = new Promise((resolve, reject) => {
-                            if (string !== lastString) {
-                                doPush(lastRef);
-                                lastString = string;
-                                lastFabric = tempObjFabric[i] ? tempObjFabric[i]["FabricId"] : undefined;
-                                lastFabricObj = tempObjFabric[i] ? tempObjFabric[i] : undefined;
-                                count = 1;
-                                lastRef = i;
-                                resolve();
-                            } else {
-                                count++;
-                                resolve();
-                            }
-                        });
-                    }
-                    
-                    Promise.all(promiseArr2).then(() => {
-                        doPush(lastRef);
-                        
-                        let promiseArr3 = [];
-                        Object.keys(tempObjCount).forEach((key, index) => {
-                            // if (index < 8) {
-                            promiseArr3[index] = new Promise((resolve, reject) => {
-                                if (tempObjCount[key]["string"]) {
-                                    tempArr.push(
-                                        <div key={index}
-                                             className="dk_curtain_preview_detail"><h2>{tempObjCount[key]["string"]}</h2><h5>&nbsp;X</h5><h3>{tempObjCount[key]["count"]}</h3>
-                                        </div>
-                                    );
+                        for (let i = 0; i < tempObj.length; i++) {
+                            let string = tempObj[i];
+                            promiseArr2[i] = new Promise((resolve, reject) => {
+                                if (string !== lastString) {
+                                    doPush(lastRef);
+                                    lastString = string;
+                                    lastFabric = tempObjFabric[i] ? tempObjFabric[i]["FabricId"] : undefined;
+                                    lastFabricObj = tempObjFabric[i] ? tempObjFabric[i] : undefined;
+                                    count = 1;
+                                    lastRef = i;
                                     resolve();
                                 } else {
+                                    count++;
                                     resolve();
                                 }
                             });
-                            // } else {
-                            //     if (showMorePreview) {
-                            //         promiseArr2[index] = new Promise((resolve, reject) => {
-                            //             tempArr.push(
-                            //                 <div key={index}
-                            //                      className="dk_curtain_preview_detail"><h2>{key}</h2><h3>&nbsp;{"/ " + tempObj[key]}</h3></div>
-                            //             );
-                            //             resolve();
-                            //         });
-                            //     } else if (index === 8) {
-                            //         promiseArr2[index] = new Promise((resolve, reject) => {
-                            //             tempArr.push(
-                            //                 <div key={index} className="dk_curtain_preview_detail_more_button_container">
-                            //                     <button className="dk_curtain_preview_detail_more_button btn" onClick={() => setShowMorePreview(true)}>See More Color Options</button>
-                            //                 </div>
-                            //             );
-                            //             resolve();
-                            //         });
-                            //     }
-                            // }
-                        });
-                        Promise.all(promiseArr3).then(() => {
-                            setDkCurtainPreviewList(tempArr);
-                            
-                            let tempSodFabrics = [];
-                            let promiseArr4 = [];
+                        }
+                
+                        Promise.all(promiseArr2).then(() => {
+                            doPush(lastRef);
+                    
+                            let promiseArr3 = [];
                             Object.keys(tempObjCount).forEach((key, index) => {
-                                promiseArr4[index] = new Promise((resolve, reject) => {
-                                    if (tempObjCount[key]["fabricId"]) {
-                                        tempSodFabrics.push(
-                                            {
-                                                "FabricId": tempObjCount[key]["fabricId"].toString(),
-                                                "Qty": tempObjCount[key]["count"].toString(),
-                                                "FabricOrder": (+key + +1).toString(),
-                                                "FabricObj": tempObjCount[key]["fabricObj"]
-                                            });
+                                // if (index < 8) {
+                                promiseArr3[index] = new Promise((resolve, reject) => {
+                                    if (tempObjCount[key]["string"]) {
+                                        tempArr.push(
+                                            <div key={index}
+                                                 className="dk_curtain_preview_detail"><h2>{tempObjCount[key]["string"]}</h2><h5>&nbsp;X</h5><h3>{tempObjCount[key]["count"]}</h3>
+                                            </div>
+                                        );
+                                        resolve();
+                                    } else {
+                                        resolve();
                                     }
-                                    resolve();
+                                });
+                                // } else {
+                                //     if (showMorePreview) {
+                                //         promiseArr2[index] = new Promise((resolve, reject) => {
+                                //             tempArr.push(
+                                //                 <div key={index}
+                                //                      className="dk_curtain_preview_detail"><h2>{key}</h2><h3>&nbsp;{"/ " + tempObj[key]}</h3></div>
+                                //             );
+                                //             resolve();
+                                //         });
+                                //     } else if (index === 8) {
+                                //         promiseArr2[index] = new Promise((resolve, reject) => {
+                                //             tempArr.push(
+                                //                 <div key={index} className="dk_curtain_preview_detail_more_button_container">
+                                //                     <button className="dk_curtain_preview_detail_more_button btn" onClick={() => setShowMorePreview(true)}>See More Color Options</button>
+                                //                 </div>
+                                //             );
+                                //             resolve();
+                                //         });
+                                //     }
+                                // }
+                            });
+                            Promise.all(promiseArr3).then(() => {
+                                setDkCurtainPreviewList(tempArr);
+                        
+                                let tempSodFabrics = [];
+                                let promiseArr4 = [];
+                                Object.keys(tempObjCount).forEach((key, index) => {
+                                    promiseArr4[index] = new Promise((resolve, reject) => {
+                                        if (tempObjCount[key]["fabricId"]) {
+                                            tempSodFabrics.push(
+                                                {
+                                                    "FabricId": tempObjCount[key]["fabricId"].toString(),
+                                                    "Qty": tempObjCount[key]["count"].toString(),
+                                                    "FabricOrder": (+key + +1).toString(),
+                                                    "FabricObj": tempObjCount[key]["fabricObj"]
+                                                });
+                                        }
+                                        resolve();
+                                    });
+                                });
+                        
+                                Promise.all(promiseArr4).then(() => {
+                                    setSodFabrics(tempSodFabrics);
+                                    setCart("CurtainArr", dkCurtainArr, "", "SodFabrics", [tempSodFabrics]);
+                                    // console.log(tempSodFabrics);
                                 });
                             });
-                            
-                            Promise.all(promiseArr4).then(() => {
-                                setSodFabrics(tempSodFabrics);
-                                setCart("CurtainArr", dkCurtainArr, "", "SodFabrics", [tempSodFabrics]);
-                                // console.log(tempSodFabrics);
-                            });
+                            // console.log(curtainList)
                         });
-                        // console.log(curtainList)
                     });
-                });
-            } else {
-                setDkCurtainPreviewList([]);
-                setSodFabrics([]);
-                setCart("", "", "CurtainArr,SodFabrics");
+                } else {
+                    setDkCurtainPreviewList([]);
+                    setSodFabrics([]);
+                    setCart("", "", "CurtainArr,SodFabrics");
+                }
             }
         }
     }, [JSON.stringify(dkCurtainArr), symmetric]);
@@ -4256,10 +4281,36 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             
             Promise.all(promiseArr).then(() => {
                 setFabrics(tempFabrics);
+                setShowMoreFabric("");
+                setShowLessFabric("");
                 // console.log(tempFabrics);
             });
         }
     }, [showMoreFabric]);
+    
+    useEffect(() => {
+        if (showLessFabric !== "") {
+            let tempFabrics = JSON.parse(JSON.stringify(fabrics));
+            
+            let promiseArr = [];
+            if (fabrics[showLessFabric]) {
+                tempFabrics[showLessFabric].forEach((el, index) => {
+                    promiseArr[index] = new Promise((resolve, reject) => {
+                        el["ShowMore"] = false;
+                        // console.log(fabrics[showMoreFabric],el,index);
+                        resolve();
+                    });
+                })
+            }
+            
+            Promise.all(promiseArr).then(() => {
+                setFabrics(tempFabrics);
+                setShowMoreFabric("");
+                setShowLessFabric("");
+                // console.log(tempFabrics);
+            });
+        }
+    }, [showLessFabric]);
     
     useEffect(() => {
         if ((baseMore || baseMore === false) || (decorativeMore || decorativeMore === false)) {
@@ -4271,6 +4322,12 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             }
         }
     }, [baseMore, decorativeMore]);
+    
+    useEffect(() => {
+        if (pageLoad === false) {
+            setCart("", "");
+        }
+    }, [pageLoad]);
     
     useEffect(() => {
         if (modelID !== '' && catID !== '') {
@@ -4287,12 +4344,14 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
         if (pageItem) {
             setDefaultFabricPhoto(pageItem["MainImageUrl"]);
             if (specialId) {
-                setCart("PhotoUrl", pageItem["MainImageUrl"], "", "SpecialId", [specialId]);
+                setCart("PhotoUrl", pageItem["MainImageUrl"], "", "SpecialId,PageId", [specialId, pageId]);
             } else {
-                setCart("PhotoUrl", pageItem["MainImageUrl"]);
+                setCart("PhotoUrl", pageItem["MainImageUrl"], "", "PageId", [pageId]);
             }
             setDefaultModelName(pageItem["EnTitle"]);
             setDefaultModelNameFa(pageItem["Title"]);
+            setDefaultModelDesc(pageItem["DescriptionEn"]);
+            setDefaultModelDescFa(pageItem["Description"]);
         }
     }, [pageItem]);
     
@@ -4301,14 +4360,39 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
         setPageLanguage(tempLang.slice(1, 3).join(''));
     }
     
+    function getHasZipcode() {
+        GetBasketZipcode(isLoggedIn).then((temp) => {
+            if (temp === 401) {
+                getHasZipcode();
+            } else if (temp && temp !== "") {
+                setHasZipcode(temp);
+                setZipcode(temp);
+                setZipcodeButton(true);
+                setHasInstall(true);
+                setCart("", "", "ZipCode");
+            } else {
+                setHasZipcode("");
+                setZipcode("");
+                setZipcodeButton(false);
+                setHasInstall(false);
+            }
+        }).catch((err) => {
+            console.log(err);
+            setHasZipcode("");
+            setZipcode("");
+            setZipcodeButton(false);
+            setHasInstall(false);
+        });
+    }
+    
     async function getCart() {
         return await new Promise((resolve, reject) => {
             if (isLoggedIn) {
                 axios.get(baseURLGetCart, {
                     headers: authHeader()
                 }).then((response) => {
-                    setBag(response.data);
-                    resolve(response.data);
+                    setBag(response.data ? response.data : {});
+                    resolve(response.data ? response.data : {});
                 }).catch(err => {
                     if (err.response.status === 401) {
                         refreshToken().then((response2) => {
@@ -4342,6 +4426,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             if (pageLanguage !== '') {
                 if (Object.keys(fabrics).length) {
                     getCart().then((temp) => {
+                        getHasZipcode();
                         setTimeout(() => {
                             renderFabrics(temp);
                         }, 100);
@@ -4353,6 +4438,17 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             }
         });
     }, [fabrics, cartChanged, isLoggedIn, location.pathname]);
+    
+    useEffect(() => {
+        if (firstRender.current) {
+            firstRender.current = false;
+        } else {
+            dispatch({
+                type: CartUpdatedTrue,
+                payload: {mainCart: bag}
+            });
+        }
+    }, [bag]);
     
     useEffect(() => {
         if (filterChanged["filter"] !== 0) {
@@ -4398,27 +4494,90 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                 </Dropdown.Item>
             )));
         });
-        GetSewingFilters(2, `${modelID}`).then((temp) => {
-            setSewingPatterns(temp[location.pathname.split('').slice(1, 3).join('')].map((obj, index) => (
-                <Dropdown.Item as={Button} key={index}>
-                    <label className="dropdown_label">
-                        <input type="checkbox" filter-id={obj.value} defaultChecked={queryString["patterns"].includes(obj.value.toString())}
-                               ref={ref => (filterCheckboxes.current["patterns"] = [...filterCheckboxes.current["patterns"], ref])}
-                               onChange={(e) => {
-                                   setFilterChanged({
-                                       filter: 2,
-                                       filter_id: e.target.getAttribute("filter-id"),
-                                       isDelete: e.target.checked
-                                   });
-                               }} id={"dropdown_pattern" + obj.value + index}/>
-                        <label htmlFor={"dropdown_pattern" + obj.value + index} className="checkbox_label">
-                            <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')} alt=""/>
-                        </label>
-                        {obj.label}
-                    </label>
-                </Dropdown.Item>
-            )));
+        // GetSewingFilters(2, `${modelID}`).then((temp) => {
+        //     setSewingPatterns(temp[location.pathname.split('').slice(1, 3).join('')].map((obj, index) => (
+        //         <Dropdown.Item as={Button} key={index}>
+        //             <label className="dropdown_label">
+        //                 <input type="checkbox" filter-id={obj.value} defaultChecked={queryString["patterns"].includes(obj.value.toString())}
+        //                        ref={ref => (filterCheckboxes.current["patterns"] = [...filterCheckboxes.current["patterns"], ref])}
+        //                        onChange={(e) => {
+        //                            setFilterChanged({
+        //                                filter: 2,
+        //                                filter_id: e.target.getAttribute("filter-id"),
+        //                                isDelete: e.target.checked
+        //                            });
+        //                        }} id={"dropdown_pattern" + obj.value + index}/>
+        //                 <label htmlFor={"dropdown_pattern" + obj.value + index} className="checkbox_label">
+        //                     <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')} alt=""/>
+        //                 </label>
+        //                 {obj.label}
+        //             </label>
+        //         </Dropdown.Item>
+        //     )));
+        // });
+        
+        axios.get(baseURLCats, {
+            params: {
+                pageName: catID
+                // apiKey: window.$apikey
+            }
+        }).then((response) => {
+            if (response.data["WebsitePageItems"].length) {
+                let tempArr = [];
+                let promiseArr = [];
+                if (response.data["PageItems"].split(':')[1]) {
+                    response.data["WebsitePageItems"].forEach((obj, index) => {
+                        promiseArr[index] = new Promise((resolve, reject) => {
+                            let tempSplit1 = response.data["PageItems"].split(obj["WebsitePageItemId"].toString() + ":");
+                            let tempSplit2 = tempSplit1[1] ? parseInt(tempSplit1[1].split(",")[0]) : 0;
+                            tempArr[tempSplit2 - 1] = obj;
+                            resolve();
+                        });
+                    })
+                    Promise.all(promiseArr).then(() => {
+                        setSewingPatterns(tempArr.map((obj, index) => (
+                            <Dropdown.Item as={Button} key={index}>
+                                <label className="dropdown_label" onClick={() => {
+                                    navigate("/" + pageLanguage + "/Curtain/" + catID + "/" + obj.Link + "/Page-ID/" + obj.WebsitePageItemId);
+                                    window.location.reload();
+                                }}>
+                                    <input type="checkbox" disabled
+                                           onChange={(e) => {
+                                           }} id={"dropdown_pattern" + index}/>
+                                    <label htmlFor={"dropdown_pattern" + index} className="checkbox_label">
+                                        <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')} alt=""/>
+                                    </label>
+                                    {location.pathname.split('').slice(1, 3).join('') === "fa" ? obj.Title : obj.EnTitle}
+                                </label>
+                            </Dropdown.Item>
+                        )));
+                    });
+                } else {
+                    setSewingPatterns(response.data["WebsitePageItems"].map((obj, index) => (
+                        <Dropdown.Item as={Button} key={index}>
+                            <label className="dropdown_label" onClick={() => {
+                                navigate("/" + pageLanguage + "/Curtain/" + catID + "/" + obj.Link + "/Page-ID/" + obj.WebsitePageItemId);
+                                window.location.reload();
+                            }}>
+                                <input type="checkbox" disabled
+                                       onChange={(e) => {
+                                       }} id={"dropdown_pattern" + index}/>
+                                <label htmlFor={"dropdown_pattern" + index} className="checkbox_label">
+                                    <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')} alt=""/>
+                                </label>
+                                {location.pathname.split('').slice(1, 3).join('') === "fa" ? obj.Title : obj.EnTitle}
+                            </label>
+                        </Dropdown.Item>
+                    )));
+                }
+            } else {
+                setSewingPatterns([]);
+            }
+        }).catch(err => {
+            console.log(err);
+            setSewingPatterns([]);
         });
+        
         GetSewingFilters(3, `${modelID}`).then((temp) => {
             setSewingTypes(temp[location.pathname.split('').slice(1, 3).join('')].map((obj, index) => (
                 <Dropdown.Item as={Button} key={index}>
@@ -4522,10 +4681,22 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             }
         } else if (projectId && projectId !== "") {
             getProjectDetail();
+        } else if(sessionStorage.getItem("cartCopy") !== null){
+            let tempCartValues = JSON.parse(sessionStorage.getItem("cartCopy"));
+            if (Object.keys(tempCartValues).length !== 0) {
+                if (tempCartValues["SewingModelId"] && tempCartValues["SewingModelId"] === `${modelID}`) {
+                    setStepSelectedLabel({});
+                    setWindowSize("");
+                    setProjectDetails(tempCartValues);
+                }
+            }
+            sessionStorage.clear();
         } else if (Object.keys(cartValues).length !== 0) {
             setStepSelectedLabel({});
             setWindowSize("");
-            setProjectDetails(cartValues, undefined, true)
+            setTimeout(() => {
+                setProjectDetails(cartValues, undefined, true);
+            }, 700);
         }
     }, [location.pathname]);
     
@@ -4547,6 +4718,9 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             
             <div className="models_title_div">
                 <h1>{defaultModelName === undefined || defaultModelName === "" ? " " : pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</h1>
+                {defaultModelDesc && defaultModelDesc !== "" &&
+                    <h2>{pageLanguage === 'fa' ? convertToPersian(defaultModelDescFa) : defaultModelDesc}</h2>
+                }
             </div>
             <div className="model_customize_container">
                 <div className="model_customize_image">
@@ -5052,7 +5226,9 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                 className="img-fluid" alt=""/> */}
                                             </div>
                                             <div className="box33 radio_style">
-                                                <img src={require('../Images/drapery/dk/small_height.svg').default} className="img-fluid height_auto" alt=""/>
+                                                <img
+                                                    src={pageLanguage === "fa" ? require('../Images/drapery/dk/small_height_fa.svg').default : require('../Images/drapery/dk/small_height.svg').default}
+                                                    className="img-fluid height_auto" alt=""/>
                                                 <input className="radio" type="radio" text={t("Sill")} value="1" name="step2A" ref-num="2A" id="2A1" checked={step2A === "Sill"}
                                                        onChange={e => {
                                                            setStep2A("Sill");
@@ -5078,7 +5254,9 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                 <label htmlFor="2A1">{t("Sill")}</label>
                                             </div>
                                             <div className="box33 radio_style">
-                                                <img src={require('../Images/drapery/dk/medium_height.svg').default} className="img-fluid height_auto" alt=""/>
+                                                <img
+                                                    src={pageLanguage === "fa" ? require('../Images/drapery/dk/medium_height_fa.svg').default : require('../Images/drapery/dk/medium_height.svg').default}
+                                                    className="img-fluid height_auto" alt=""/>
                                                 <input className="radio" type="radio" text={t("Apron")} value="2" name="step2A" ref-num="2A" id="2A2" checked={step2A === "Apron"}
                                                        onChange={e => {
                                                            setStep2A("Apron");
@@ -5103,7 +5281,9 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                 <label htmlFor="2A2">{t("Apron")}</label>
                                             </div>
                                             <div className="box33 radio_style">
-                                                <img src={require('../Images/drapery/dk/large_height.svg').default} className="img-fluid height_auto" alt=""/>
+                                                <img
+                                                    src={pageLanguage === "fa" ? require('../Images/drapery/dk/large_height_fa.svg').default : require('../Images/drapery/dk/large_height.svg').default}
+                                                    className="img-fluid height_auto" alt=""/>
                                                 <input className="radio" type="radio" text={t("Floor")} value="3" name="step2A" ref-num="2A" id="2A3" checked={step2A === "Floor"}
                                                        onChange={e => {
                                                            setStep2A("Floor");
@@ -5135,15 +5315,9 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                 <div className="help_column help_left_column">
                                                     <p className="help_column_header"></p>
                                                     <ul className="help_column_list">
-                                                        <li className="no_listStyle"><b>Sill:</b> 1cm above window sill.</li>
-                                                        <li className="no_listStyle"><b>Apron:</b> 10cm below the window. We recommend this length type for windows where radiators
-                                                            or
-                                                            furniture will block full-length shades.
-                                                        </li>
-                                                        <li className="no_listStyle"><b>Floor:</b> 1.5cm above the floor. We recommend this length type for windows that do not have
-                                                            any
-                                                            obstruction for full length shades.
-                                                        </li>
+                                                        <li className="no_listStyle"><b>{t("dk_step2a_help1")}</b>{t("dk_step2a_help2")}</li>
+                                                        <li className="no_listStyle"><b>{t("dk_step2a_help3")}</b>{t("dk_step2a_help4")}</li>
+                                                        <li className="no_listStyle"><b>{t("dk_step2a_help5")}</b>{t("dk_step2a_help6")}</li>
                                                     </ul>
                                                 </div>
                                             </div>
@@ -5483,7 +5657,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                             <div className="box100">
                                                 <p className="step_selection_title">{t("arc_step2D_title")}</p>
                                                 <img
-                                                    src={stepSelectedValue["1"] === "3" ? require('../Images/drapery/dk/new_ceiling_to_window_3_arc.svg').default : require('../Images/drapery/dk/new_ceiling_to_window_3.svg').default}
+                                                    src={stepSelectedValue["1"] === "3" ? pageLanguage === 'fa' ? require('../Images/drapery/dk/new_ceiling_to_window_3_arc_fa.svg').default : require('../Images/drapery/dk/new_ceiling_to_window_3_arc.svg').default : pageLanguage === 'fa' ? require('../Images/drapery/dk/new_ceiling_to_window_3_fa.svg').default : require('../Images/drapery/dk/new_ceiling_to_window_3.svg').default}
                                                     className="img-fluid tall_curtain_image" alt=""/>
                                             </div>
                                             <div className="box100 Three_selection_container">
@@ -5753,7 +5927,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                             <div className="box100">
                                                 <p className="step_selection_title">{t("arc_step2E_title")}</p>
                                                 <img
-                                                    src={stepSelectedValue["1"] === "3" ? require('../Images/drapery/dk/new_ceiling_to_floor_3_arc.svg').default : require('../Images/drapery/dk/new_ceiling_to_floor_3.svg').default}
+                                                    src={stepSelectedValue["1"] === "3" ? pageLanguage === 'fa' ? require('../Images/drapery/dk/new_ceiling_to_floor_3_arc_fa.svg').default : require('../Images/drapery/dk/new_ceiling_to_floor_3_arc.svg').default : pageLanguage === 'fa' ? require('../Images/drapery/dk/new_ceiling_to_floor_3_fa.svg').default : require('../Images/drapery/dk/new_ceiling_to_floor_3.svg').default}
                                                     className="img-fluid tall_curtain_image" alt=""/>
                                             </div>
                                             <div className="box100 Three_selection_container">
@@ -6068,8 +6242,9 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                         <div className="card_body">
                                             <div className="box100">
                                                 <p className="step_selection_title">{t("dk_step2GWall_title")}</p>
-                                                <img src={require('../Images/drapery/dk/new_CeilingToFloor1_track_full.svg').default} className="img-fluid tall_curtain_image"
-                                                     alt=""/>
+                                                <img
+                                                    src={pageLanguage === 'fa' ? require('../Images/drapery/dk/new_CeilingToFloor1_track_full_fa.svg').default : require('../Images/drapery/dk/new_CeilingToFloor1_track_full.svg').default}
+                                                    className="img-fluid tall_curtain_image" alt=""/>
                                             </div>
                                             <div className="box100 Three_selection_container">
                                                 <div className="box100">
@@ -6138,7 +6313,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                             <div className="box100">
                                                 <p className="step_selection_title">{t("dk_step2DWall_title")}</p>
                                                 <img
-                                                    src={pageLanguage === 'fa' ? require('../Images/drapery/dk/new_WindowtoFloor.svg').default : require('../Images/drapery/dk/new_WindowtoFloor.svg').default}
+                                                    src={pageLanguage === 'fa' ? require('../Images/drapery/dk/new_WindowtoFloor_fa.svg').default : require('../Images/drapery/dk/new_WindowtoFloor.svg').default}
                                                     className="img-fluid tall_curtain_image" alt=""/>
                                             </div>
                                             <div className="box100 Three_selection_container">
@@ -6288,8 +6463,9 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                         <div className="card_body">
                                             <div className="box100">
                                                 <p className="step_selection_title">{t("dk_step2GWall_title")}</p>
-                                                <img src={require('../Images/drapery/dk/new_CeilingToFloor1_track_full.svg').default} className="img-fluid tall_curtain_image"
-                                                     alt=""/>
+                                                <img
+                                                    src={pageLanguage === 'fa' ? require('../Images/drapery/dk/new_CeilingToFloor1_track_full_fa.svg').default : require('../Images/drapery/dk/new_CeilingToFloor1_track_full.svg').default}
+                                                    className="img-fluid tall_curtain_image" alt=""/>
                                             </div>
                                             <div className="box100 Three_selection_container">
                                                 <div className="box100">
@@ -6357,7 +6533,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                             <div className="box100">
                                                 <p className="step_selection_title">{t("step3A_title")}</p>
                                                 <img
-                                                    src={pageLanguage === 'fa' ? require('../Images/drapery/zebra/width_inside_3_fa.svg').default : require('../Images/drapery/zebra/new_width_inside_3.svg').default}
+                                                    src={pageLanguage === 'fa' ? require('../Images/drapery/zebra/new_width_inside_3_fa.svg').default : require('../Images/drapery/zebra/new_width_inside_3.svg').default}
                                                     className="img-fluid frame_with_top" alt=""/>
                                             </div>
                                             <div className="box100 Three_selection_container">
@@ -6526,7 +6702,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                             <div className="box100">
                                                 <p className="step_selection_title">{t("step3B_title")}</p>
                                                 <img
-                                                    src={pageLanguage === 'fa' ? require('../Images/drapery/zebra/height_inside_3_fa.svg').default : require('../Images/drapery/zebra/new_height_inside_3.svg').default}
+                                                    src={pageLanguage === 'fa' ? require('../Images/drapery/zebra/new_height_inside_3_fa.svg').default : require('../Images/drapery/zebra/new_height_inside_3.svg').default}
                                                     className="img-fluid frame_with_top" alt=""/>
                                             </div>
                                             <div className="box100 Three_selection_container">
@@ -7123,17 +7299,18 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                             </div>
                                             <div className="room_select">
                                                 <label className="select_label">{t("Window Description")}</label>
-                                                <input type="text" placeholder={t("Window Description")} className="form-control window_name" name="order_window_name"
-                                                       value={roomLabelText}
-                                                       onChange={(e) => {
-                                                           if (e.target.value === "")
-                                                               setDeps("62", "");
-                                                           else
-                                                               setDeps("", "62");
-                                                           roomLabelChanged(Capitalize(e.target.value), "6", true);
-                                                           setRoomLabelText(Capitalize(e.target.value));
-                                                           setCart("WindowName", Capitalize(e.target.value));
-                                                       }}/>
+                                                <DebounceInput debounceTimeout={500} onKeyDown={() => setCartLoading(true)} type="text" placeholder={t("Window Description")}
+                                                               className="form-control window_name" name="order_window_name"
+                                                               value={roomLabelText}
+                                                               onChange={(e) => {
+                                                                   if (e.target.value === "")
+                                                                       setDeps("62", "");
+                                                                   else
+                                                                       setDeps("", "62");
+                                                                   roomLabelChanged(e.target.value, "6", true);
+                                                                   setRoomLabelText(e.target.value);
+                                                                   setCart("WindowName", e.target.value);
+                                                               }}/>
                                             </div>
                                         </div>
                                         <NextStep eventKey="7">{t("NEXT STEP")}</NextStep>
@@ -7161,7 +7338,8 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         {/* step 7 */}
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="7" stepNum={t("7")} stepTitle={t("zebra_step7")} stepTitle2={t("(Optional)")} stepRef="7" type="2" required={requiredStep["7"]}
+                                <ContextAwareToggle eventKey="7" stepNum={t("7")} stepTitle={t("zebra_step7")} stepTitle2={t("(Optional)")} stepRef="7" type="2"
+                                                    required={requiredStep["7"]}
                                                     stepSelected={stepSelectedLabel["7"] === undefined ? "" : stepSelectedLabel["7"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="7">
@@ -7173,7 +7351,9 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                     <img src={require('../Images/public/W_truck.png')} alt="" className="img-fluid"/>
                                                     <h3>{t("zipcode_text1")}</h3>
                                                 </div>
-                                                <h3 className="zipcode_text">{t("zipcode_text1.5")}</h3>
+                                                {hasZipcode === "" &&
+                                                    <h3 className="zipcode_text">{t("zipcode_text1.5")}</h3>
+                                                }
                                                 {/*<div className="zipcode_selection_container">*/}
                                                 {/*    <Accordion>*/}
                                                 {/*        <Accordion.Item eventKey="0">*/}
@@ -7199,27 +7379,31 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                 {/*        </Accordion.Item>*/}
                                                 {/*    </Accordion>*/}
                                                 {/*</div>*/}
-                                                <div className="zipcode_dropdown_div_container">
-                                                    <div className="zipcode_input_container">
-                                                        <input className="zipcode_input form-control" type="text" name="zipcode_input" value={zipcode}
-                                                               placeholder={t("Enter Zip Code")} onChange={(e) => {
-                                                            setZipcode(e.target.value.replace(/\D+/g, ''));
-                                                        }}/>
-                                                        <button className="zipcode_input_button white_btn"
-                                                                onClick={() => {
-                                                                    setZipcodeButton(true);
-                                                                    measureWindowSize(zipcode);
-                                                                }}>
-                                                            <div/>
-                                                        </button>
+                                                {hasZipcode === "" &&
+                                                    <div className="zipcode_dropdown_div_container">
+                                                        <div className="zipcode_input_container">
+                                                            <input className="zipcode_input form-control" type="text" name="zipcode_input" value={zipcode}
+                                                                   placeholder={t("Enter Zip Code")} onChange={(e) => {
+                                                                setZipcode(e.target.value.replace(/\D+/g, ''));
+                                                            }}/>
+                                                            <button className="zipcode_input_button white_btn"
+                                                                    onClick={() => {
+                                                                        measureWindowSize(zipcode);
+                                                                    }}>
+                                                                <div/>
+                                                            </button>
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                }
                                                 {zipcodeButton &&
                                                     <h3 className="zipcode_text2">
                                                         {zipcodeButton && hasInstall === false &&
                                                             t("zipcode_text2")
                                                         }
-                                                        {zipcodeButton && hasInstall &&
+                                                        {zipcodeButton && hasInstall && hasZipcode === "" &&
+                                                            t("zipcode_text3")
+                                                        }
+                                                        {zipcodeButton && hasInstall && hasZipcode !== "" && installPrice === -1 &&
                                                             t("zipcode_text3")
                                                         }
                                                     </h3>
@@ -7227,18 +7411,19 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                 {zipcodeButton && hasInstall && installPrice === -1 &&
                                                     <h3 className="zipcode_text">{t("zipcode_text8")}</h3>
                                                 }
-                                                {zipcodeButton && hasInstall && !!installPrice && installPrice !== -1 &&
+                                                {zipcodeButton && hasInstall && !!installPrice && installPrice !== -1 && hasZipcode === "" &&
                                                     <div className="zipcode_available_container">
                                                         <div className="checkbox_style">
-                                                            <input type="checkbox" value="1" name="zipcode" disabled={addingLoading} checked={zipcodeChecked === "true"} onChange={(e) => {
-                                                                if (e.target.checked) {
-                                                                    setZipcodeChecked("true");
-                                                                    setCart("ZipCode", zipcode);
-                                                                } else {
-                                                                    setZipcodeChecked("false");
-                                                                    setCart("", "","ZipCode");
-                                                                }
-                                                            }} id="zipcode" ref={ref => (inputs.current["zipcode"] = ref)}/>
+                                                            <input type="checkbox" value="1" name="zipcode" disabled={addingLoading} checked={zipcodeChecked === "true"}
+                                                                   onChange={(e) => {
+                                                                       if (e.target.checked) {
+                                                                           setZipcodeChecked("true");
+                                                                           setCart("ZipCode", zipcode);
+                                                                       } else {
+                                                                           setZipcodeChecked("false");
+                                                                           setCart("", "", "ZipCode");
+                                                                       }
+                                                                   }} id="zipcode" ref={ref => (inputs.current["zipcode"] = ref)}/>
                                                             <label htmlFor="zipcode" className="checkbox_label">
                                                                 <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
                                                                      alt=""/>
@@ -7249,9 +7434,43 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                                 {t("zipcode_text5.5")}{GetPrice(transportPrice, pageLanguage, t("TOMANS"))}{t("zipcode_text6")}
                                                             </span>
                                                         </div>
-                                                        <h3 className="zipcode_text3">{t("zipcode_text7")}</h3>
+                                                        {/*<h3 className="zipcode_text3">{t("zipcode_text7")}</h3>*/}
                                                     </div>
                                                 }
+                                                {zipcodeButton && hasInstall && !!installPrice && installPrice !== -1 && hasZipcode !== "" &&
+                                                    <div className="checkbox_style checkbox_style_hasZipcode">
+                                                        <input type="checkbox" value="1" name="zipcode" disabled={addingLoading} checked={zipcodeChecked === "true"}
+                                                               onChange={(e) => {
+                                                                   if (e.target.checked) {
+                                                                       setZipcodeChecked("true");
+                                                                       setCart("ZipCode", zipcode);
+                                                                   } else {
+                                                                       setZipcodeChecked("false");
+                                                                       setCart("", "", "ZipCode");
+                                                                   }
+                                                               }} id="zipcode" ref={ref => (inputs.current["zipcode"] = ref)}/>
+                                                        <label htmlFor="zipcode" className="checkbox_label">
+                                                            <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
+                                                                 alt=""/>
+                                                        </label>
+                                                        <span className="checkbox_text">
+                                                            {t("zipcode_text4")}{GetPrice(installPrice, pageLanguage, t("TOMANS"))}{t("zipcode_text5")}
+                                                        </span>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className=" accordion_help">
+                                        <div className=" help_container">
+                                            <div className=" help_column help_left_column">
+                                                <p className=" help_column_header"/>
+                                                <ul className=" help_column_list">
+                                                    <li>{t("stepZip_help_1")}</li>
+                                                    <li>{t("stepZip_help_2")}</li>
+                                                    <li>{t("stepZip_help_3")}<h5 className="text_underline pointer"
+                                                                                 onClick={() => modalHandleShow("Zipcode_how_it_works")}>{t("zipcode_measure_verify")}</h5></li>
+                                                </ul>
                                             </div>
                                         </div>
                                     </div>
@@ -7411,7 +7630,13 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             <Modal backdrop="static" keyboard={false}
                    dialogClassName={`measurementsHelp_modal dk_measurementsHelp_modal largeSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["measurementsHelp"] === undefined ? false : modals["measurementsHelp"]}
-                   onHide={() => modalHandleClose("measurementsHelp")} scrollable={true}>
+                   onHide={() => {
+                       modalHandleClose("measurementsHelp");
+                       setTimeout(() => {
+                           setHelpMeasure("Inside");
+                           setHelpMeasureLengthType("Floor");
+                       }, 300);
+                   }} scrollable={true}>
                 <Modal.Header closeButton>
                     {/*<Modal.Title>Modal heading</Modal.Title>*/}
                 </Modal.Header>
@@ -7438,11 +7663,11 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                 {/*<p className="measurementsHelp_modal_img_title">{t("Inside Mount")}</p>*/}
                                 <span>
                                     <object className="measurementsHelp_modal_img" type="image/svg+xml"
-                                            data={pageLanguage === 'fa' ? require('../Images/drapery/zebra/step3_help_inside_fa.svg').default : require('../Images/drapery/zebra/new_height_inside_3.svg').default}/>
+                                            data={pageLanguage === 'fa' ? require('../Images/drapery/dk/help_new_height_inside_3_fa.svg').default : require('../Images/drapery/dk/help_new_height_inside_3.svg').default}/>
                                 </span>
                                 <span>
                                     <object className="measurementsHelp_modal_img" type="image/svg+xml"
-                                            data={pageLanguage === 'fa' ? require('../Images/drapery/zebra/step3_help_inside_fa.svg').default : require('../Images/drapery/zebra/new_width_inside_3.svg').default}/>
+                                            data={pageLanguage === 'fa' ? require('../Images/drapery/dk/help_new_width_inside_3_fa.svg').default : require('../Images/drapery/dk/help_new_width_inside_3.svg').default}/>
                                 </span>
                             </div>
                             <div className="accordion_help measurementsHelp_modal_help_section">
@@ -7485,8 +7710,8 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                             <div className="measurementsHelp_modal_img_section dk_measurementsHelp_modal_img_section">
                                 {/*<p className="measurementsHelp_modal_title">{t("HOW TO MEASURE FOR ZEBRA SHADES")}</p>*/}
                                 {/*<p className="measurementsHelp_modal_img_title">{t("Outside Mount")}</p>*/}
-                                <object className="measurementsHelp_modal_img" type="image/svg+xml"
-                                        data={require('../Images/drapery/dk/dk_Help_wall.svg').default}/>
+                                <object className="measurementsHelp_modal_img help_img_margin_top" type="image/svg+xml"
+                                        data={pageLanguage === 'fa' ? require('../Images/drapery/dk/new_dk_Help_wall_fa.svg').default : require('../Images/drapery/dk/new_dk_Help_wall.svg').default}/>
                             </div>
                             <div className="accordion_help measurementsHelp_modal_help_section">
                                 <div className="help_container">
@@ -7536,17 +7761,18 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                 {helpMeasureLengthType === "Sill" &&
                                     <span>
                                         <object className="measurementsHelp_modal_img" type="image/svg+xml"
-                                                data={require('../Images/drapery/dk/new_ceiling_to_window_3.svg').default}/>
+                                                data={pageLanguage === 'fa' ? require('../Images/drapery/dk/help_new_ceiling_to_window_3_fa.svg').default : require('../Images/drapery/dk/help_new_ceiling_to_window_3.svg').default}/>
                                     </span>
                                 }
                                 {helpMeasureLengthType === "Floor" &&
                                     <span>
                                         <object className="measurementsHelp_modal_img" type="image/svg+xml"
-                                                data={require('../Images/drapery/dk/new_ceiling_to_floor_3.svg').default}/>
+                                                data={pageLanguage === 'fa' ? require('../Images/drapery/dk/help_new_ceiling_to_floor_3_fa.svg').default : require('../Images/drapery/dk/help_new_ceiling_to_floor_3.svg').default}/>
                                     </span>
                                 }
                                 <span>
-                                    <object className="measurementsHelp_modal_img" type="image/svg+xml" data={require('../Images/drapery/zebra/new_FrameSize.svg').default}/>
+                                    <object className="measurementsHelp_modal_img" type="image/svg+xml"
+                                            data={pageLanguage === 'fa' ? require('../Images/drapery/dk/help_new_FrameSize.svg').default : require('../Images/drapery/dk/help_new_FrameSize.svg').default}/>
                                 </span>
                             </div>
                             <div className="accordion_help measurementsHelp_modal_help_section">
@@ -7590,17 +7816,18 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                 {helpMeasureLengthType === "Sill" &&
                                     <span>
                                         <object className="measurementsHelp_modal_img" type="image/svg+xml"
-                                                data={require('../Images/drapery/dk/new_ceiling_to_window_3_arc.svg').default}/>
+                                                data={pageLanguage === 'fa' ? require('../Images/drapery/dk/help_new_ceiling_to_window_3_arc_fa.svg').default : require('../Images/drapery/dk/help_new_ceiling_to_window_3_arc.svg').default}/>
                                     </span>
                                 }
                                 {helpMeasureLengthType === "Floor" &&
                                     <span>
                                         <object className="measurementsHelp_modal_img" type="image/svg+xml"
-                                                data={require('../Images/drapery/dk/new_ceiling_to_floor_3_arc.svg').default}/>
+                                                data={pageLanguage === 'fa' ? require('../Images/drapery/dk/help_new_ceiling_to_floor_3_arc_fa.svg').default : require('../Images/drapery/dk/help_new_ceiling_to_floor_3_arc.svg').default}/>
                                     </span>
                                 }
                                 <span>
-                                    <object className="measurementsHelp_modal_img" type="image/svg+xml" data={require('../Images/drapery/zebra/new_FrameSize.svg').default}/>
+                                    <object className="measurementsHelp_modal_img" type="image/svg+xml"
+                                            data={pageLanguage === 'fa' ? require('../Images/drapery/dk/help_new_FrameSize.svg').default : require('../Images/drapery/dk/help_new_FrameSize.svg').default}/>
                                 </span>
                             </div>
                             <div className="accordion_help measurementsHelp_modal_help_section">
@@ -7624,22 +7851,28 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                         </ul>
                                     </div>
                                 </div>
-                            </div>
-                            <br/>
-                            <br/>
-                            <div className="help_container">
-                                <div className="help_column help_right_column">
-                                    <p className="help_column_header"/>
-                                    <ul className="help_column_list">
-                                        <li><b>{t("Note:&nbsp;")}</b>{t("dk_arc_modal_help_4")}</li>
-                                    </ul>
+                                <br/>
+                                <br/>
+                                <div className="help_container">
+                                    <div className="help_column help_right_column">
+                                        <p className="help_column_header"/>
+                                        <ul className="help_column_list">
+                                            <li><b>{t("Note:&nbsp;")}</b>{t("dk_arc_modal_help_4")}</li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     }
                     <br/>
                     <div className="text_center">
-                        <button className="btn btn-new-dark" onClick={() => modalHandleClose("measurementsHelp")}>{t("CONTINUE")}</button>
+                        <button className="btn btn-new-dark" onClick={() => {
+                            modalHandleClose("measurementsHelp");
+                            setTimeout(() => {
+                                setHelpMeasure("Inside");
+                                setHelpMeasureLengthType("Floor");
+                            }, 300);
+                        }}>{t("CONTINUE")}</button>
                     </div>
                 </Modal.Body>
             </Modal>
@@ -7862,7 +8095,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                             let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
                             delete tempLabels["3AIn"];
                             setStepSelectedLabel(tempLabels);
-                        }}>CHANGE MEASUREMENTS
+                        }}>{t("CHANGE MEASUREMENTS")}
                         </button>
                         <button className="btn white_btn" onClick={() => {
                             modalHandleClose("widthDifferent");
@@ -7904,6 +8137,78 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                 {/*</Modal.Footer>*/}
             </Modal>
             
+            <Modal keyboard={false} dialogClassName={`Zipcode_how_it_works customSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                   show={modals["Zipcode_how_it_works"] === undefined ? false : modals["Zipcode_how_it_works"]}
+                   onHide={() => {
+                       modalHandleClose("Zipcode_how_it_works");
+                   }}>
+                <Modal.Header closeButton>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="zipcode_modal_title_container">
+                        <h1 className="zipcode_modal_title">{t("zipcode_modal_text1")}</h1>
+                    </div>
+                    <div className="zipcode_modal_body">
+                        <div className="zipcode_modal_item">
+                            <div className="zipcode_modal_item_img_container">
+                                <img src={require('../Images/public/zipcode_bag.png')} className="img-fluid" alt=""/>
+                            </div>
+                            <div className="zipcode_modal_item_title_container">
+                                {t("zipcode_modal_text2")}
+                            </div>
+                            <div className="zipcode_modal_item_text_container">
+                                {t("zipcode_modal_text3")}
+                            </div>
+                        </div>
+                        <div className="zipcode_modal_item">
+                            <div className="zipcode_modal_item_img_container">
+                                <img src={require('../Images/public/zipcode_mark.png')} className="img-fluid" alt=""/>
+                            </div>
+                            <div className="zipcode_modal_item_title_container">
+                                {t("zipcode_modal_text4")}
+                            </div>
+                            <div className="zipcode_modal_item_text_container">
+                                {t("zipcode_modal_text5")}
+                            </div>
+                        </div>
+                        <div className="zipcode_modal_item">
+                            <div className="zipcode_modal_item_img_container">
+                                <img src={require('../Images/public/zipcode_truck.png')} className="img-fluid" alt=""/>
+                            </div>
+                            <div className="zipcode_modal_item_title_container">
+                                {t("zipcode_modal_text6")}
+                            </div>
+                            <div className="zipcode_modal_item_text_container">
+                                {t("zipcode_modal_text7")}
+                            </div>
+                        </div>
+                        <div className="zipcode_modal_item">
+                            <div className="zipcode_modal_item_img_container">
+                                <img src={require('../Images/public/zipcode_tools.png')} className="img-fluid" alt=""/>
+                            </div>
+                            <div className="zipcode_modal_item_title_container">
+                                {t("zipcode_modal_text8")}
+                            </div>
+                            <div className="zipcode_modal_item_text_container">
+                                {t("zipcode_modal_text9")}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="zipcode_modal_footer">
+                        <div className="zipcode_modal_item_text_container">{t("zipcode_modal_text10")}</div>
+                    </div>
+                    
+                    {/*<br/>*/}
+                    {/*<div className="text_center">*/}
+                    {/*    <button className="btn btn-new-dark" onClick={() => modalHandleClose("Zipcode_how_it_works")}>{t("OK")}</button>*/}
+                    {/*</div>*/}
+                
+                </Modal.Body>
+                {/*<Modal.Footer>*/}
+                {/*    */}
+                {/*</Modal.Footer>*/}
+            </Modal>
+            
             <Modal backdrop="static" keyboard={false} dialogClassName={`warning_modal bigSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["heightDifferent"] === undefined ? false : modals["heightDifferent"]}
                    onHide={() => {
@@ -7934,7 +8239,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                             let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
                             delete tempLabels["3BIn"];
                             setStepSelectedLabel(tempLabels);
-                        }}>CHANGE MEASUREMENTS
+                        }}>{t("CHANGE MEASUREMENTS")}
                         </button>
                         <button className="btn white_btn" onClick={() => {
                             modalHandleClose("heightDifferent");
@@ -7970,6 +8275,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     <button className="custom_cart_close" onClick={() => {
                         modalHandleClose("cart_modal");
                         setCartStateAgree(false);
+                        setAddingLoading(false);
                         if (cartStateAgree) {
                             navigate("/" + pageLanguage);
                         }
@@ -8092,17 +8398,18 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                 </div>
                                 <div className="room_select">
                                     <label className="select_label">{t("Window Description")}</label>
-                                    <input type="text" placeholder={t("Window Description")} className="form-control window_name" name="order_window_name"
-                                           value={roomLabelText}
-                                           onChange={(e) => {
-                                               if (e.target.value === "")
-                                                   setDeps("62", "");
-                                               else
-                                                   setDeps("", "62");
-                                               roomLabelChanged(Capitalize(e.target.value), "6", true);
-                                               setRoomLabelText(Capitalize(e.target.value));
-                                               setCart("WindowName", Capitalize(e.target.value));
-                                           }}/>
+                                    <DebounceInput debounceTimeout={500} onKeyDown={() => setCartLoading(true)} type="text" placeholder={t("Window Description")}
+                                                   className="form-control window_name" name="order_window_name"
+                                                   value={roomLabelText}
+                                                   onChange={(e) => {
+                                                       if (e.target.value === "")
+                                                           setDeps("62", "");
+                                                       else
+                                                           setDeps("", "62");
+                                                       roomLabelChanged(e.target.value, "6", true);
+                                                       setRoomLabelText(e.target.value);
+                                                       setCart("WindowName", e.target.value);
+                                                   }}/>
                                 </div>
                             </div>
                             {!!(roomLabelText !== "" && selectedRoomLabel.length) &&
@@ -8219,13 +8526,13 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                 <div className="CustomModelFooter_hidden_part"/>
                 <div className="CustomModelFooter_visible_part">
                     <div className="bag_buttons_section_container">
-                        <button className="btn add_to_cart" disabled={addingLoading} onClick={() => {
+                        <button className="btn add_to_cart" disabled={addingLoading || cartLoading} onClick={() => {
                             setAddingLoading(true);
                             addToCart();
                         }}>
                             {addingLoading ? t("ADDING...") : t("footer_Add To Cart")}
                         </button>
-                        <button className="btn add_to_cart">
+                        <button className="btn add_to_cart no_pointer">
                             {GetPrice(price, pageLanguage, t("TOMANS"))}
                         </button>
                         <button className="save_to_acc white_btn btn" onClick={() => {
@@ -8273,7 +8580,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                 setProjectModalState(0);
                                 modalHandleShow("add_to_project_modal");
                             }
-                        }} disabled={savingLoading}>{savingLoading ? t("SAVING...") : t("footer_Save To")} {savingLoading ? "" : t("footer_My Account")}</button>
+                        }} disabled={savingLoading || cartLoading}>{savingLoading ? t("SAVING...") : t("footer_Save To")} {savingLoading ? "" : t("footer_My Account")}</button>
                     </div>
                 </div>
             </div>

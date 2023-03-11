@@ -52,17 +52,18 @@ function App({t}) {
     const [roles, setRoles] = useState([]);
     
     useEffect(() => {
-        if (isLoggedIn) {
-            refreshToken().then((response2) => {
-                if (response2 !== false) {
-                } else {
-                }
-                setShowPage(true);
-            });
-        }
-        else{
-            setShowPage(true);
-        }
+        // if (isLoggedIn) {
+        //     refreshToken().then((response2) => {
+        //         if (response2 !== false) {
+        //         } else {
+        //         }
+        //         setShowPage(true);
+        //     });
+        // }
+        // else{
+        //     setShowPage(true);
+        // }
+        setShowPage(true);
     }, []);
     
     useEffect(() => {
@@ -80,21 +81,21 @@ function App({t}) {
         }
     }, [isLoggedIn]);
     
-    useEffect(() => {
-        const interval = setInterval(() => {
-            if (isLoggedIn) {
-                refreshToken().then((response2) => {
-                    if (response2 !== false) {
-                    } else {
-                    }
-                });
-            }
-            else{
-            }
-        }, 300000);
-    
-        return () => clearInterval(interval);
-    }, []);
+    // useEffect(() => {
+    //     const interval = setInterval(() => {
+    //         if (isLoggedIn) {
+    //             refreshToken().then((response2) => {
+    //                 if (response2 !== false) {
+    //                 } else {
+    //                 }
+    //             });
+    //         }
+    //         else{
+    //         }
+    //     }, 180000);
+    //
+    //     return () => clearInterval(interval);
+    // }, []);
     
     useEffect(() => {
         if (isRegistered) {
@@ -165,8 +166,12 @@ function App({t}) {
                 
                         <Route path="/en" element={<HeaderWithOutlet/>}>
                             {/*<Route path="Curtain/:catID/:modelID" element={<CustomCurtain/>}/>*/}
-                            <Route path="Curtain/:catID/:modelID/Saved-Projects/:projectId" element={<CustomCurtain/>}/>
-                            <Route path="Curtain/:catID/:modelID/Bag-Projects/:editIndex" element={<CustomCurtain/>}/>
+                            <Route path="Curtain/:catID/:modelID/Saved-Projects/:projectId/Page-ID/:websitePageItemId" element={<CustomCurtain/>}/>
+                            <Route path="Curtain/:catID/:modelID/:specialID/Saved-Projects/:projectId/Page-ID/:websitePageItemId" element={<CustomCurtain/>}/>
+                            <Route path="Curtain/:catID/:modelID/Bag-Projects/:editIndex/Page-ID/:websitePageItemId" element={<CustomCurtain/>}/>
+                            <Route path="Curtain/:catID/:modelID/:specialID/Bag-Projects/:editIndex/Page-ID/:websitePageItemId" element={<CustomCurtain/>}/>
+                            <Route path="Curtain/:catID/:modelID/Copy-Projects/:editIndex/Page-ID/:websitePageItemId" element={<CustomCurtain/>}/>
+                            <Route path="Curtain/:catID/:modelID/:specialID/Bag-Projects/:editIndex/Page-ID/:websitePageItemId" element={<CustomCurtain/>}/>
                             <Route path="Curtain/:catID/:modelID/Page-ID/:websitePageItemId" element={<CustomCurtain/>}/>
                             <Route path="Curtain/:catID/:modelID/:specialID/Page-ID/:websitePageItemId" element={<CustomCurtain/>}/>
                             <Route path="Checkout" element={<Checkout/>}/>
@@ -174,8 +179,10 @@ function App({t}) {
                         </Route>
                         <Route path="/fa" element={<HeaderWithOutlet/>}>
                             {/*<Route path="Curtain/:catID/:modelID" element={<CustomCurtain/>}/>*/}
-                            <Route path="Curtain/:catID/:modelID/Saved-Projects/:projectId" element={<CustomCurtain/>}/>
-                            <Route path="Curtain/:catID/:modelID/Bag-Projects/:editIndex" element={<CustomCurtain/>}/>
+                            <Route path="Curtain/:catID/:modelID/Saved-Projects/:projectId/Page-ID/:websitePageItemId" element={<CustomCurtain/>}/>
+                            <Route path="Curtain/:catID/:modelID/:specialID/Saved-Projects/:projectId/Page-ID/:websitePageItemId" element={<CustomCurtain/>}/>
+                            <Route path="Curtain/:catID/:modelID/Bag-Projects/:editIndex/Page-ID/:websitePageItemId" element={<CustomCurtain/>}/>
+                            <Route path="Curtain/:catID/:modelID/:specialID/Bag-Projects/:editIndex/Page-ID/:websitePageItemId" element={<CustomCurtain/>}/>
                             <Route path="Curtain/:catID/:modelID/Page-ID/:websitePageItemId" element={<CustomCurtain/>}/>
                             <Route path="Curtain/:catID/:modelID/:specialID/Page-ID/:websitePageItemId" element={<CustomCurtain/>}/>
                             <Route path="Checkout" element={<Checkout/>}/>

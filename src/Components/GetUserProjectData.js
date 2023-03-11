@@ -13,12 +13,13 @@ async function GetUserProjectData(projectObj, isLoggedIn, editIndex,changeLang) 
     }
     else if (editIndex !== undefined) {
         return await new Promise((resolve, reject) => {
-            if (isLoggedIn) {
-                // console.log(projectObj);
-                resolve(GetUserProjectData(projectObj, isLoggedIn, undefined,changeLang));
-            } else {
-                resolve(GetUserProjectData(projectObj, isLoggedIn, undefined,changeLang));
-            }
+            // if (isLoggedIn) {
+            //     // console.log(projectObj);
+            //     resolve(GetUserProjectData(projectObj, isLoggedIn, undefined,changeLang));
+            // } else {
+            //     resolve(GetUserProjectData(projectObj, isLoggedIn, undefined,changeLang));
+            // }
+            resolve(GetUserProjectData(projectObj, isLoggedIn, undefined,changeLang));
         });
     } else {
         return await new Promise((resolve, reject) => {
@@ -73,8 +74,30 @@ async function GetUserProjectData(projectObj, isLoggedIn, editIndex,changeLang) 
                         }
                     }
                     if (index === Object.keys(projectObj["PreorderText"]).length - 1) {
-                        // console.log(temp);
-                        resolve(temp);
+                        temp["Accessories"]=projectObj["PreorderText"]["Accessories"] || [];
+                        // console.log(temp["Accessories"]);
+                        Object.keys(temp).forEach((key,j) => {
+                            if (temp[key] !== null || temp[key] !== "") {
+                                let tempObj = userProjects.find(obj => obj["cart"] === key);
+                                if (tempObj) {
+                                    if (tempObj["apiAcc"] !== undefined) {
+                                        if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
+                                            const i = temp["Accessories"].filter(n => n).findIndex(e => e&& e.SewingAccessoryValue && e.SewingAccessoryValue ===tempObj["apiAccValue"][temp[key]]&& tempObj["apiAccValue"][temp[key]]["SewingAccessoryValue"]);
+                                            if (i > -1) {
+                                                temp["Accessories"].splice(i,1);
+                                            }
+                                        } else {
+                        
+                                        }
+                                    }
+                                }
+                            }
+    
+                            if (j === Object.keys(temp).length - 1) {
+                                // console.log(temp);
+                                resolve(temp);
+                            }
+                        });
                     }
                 });
             });

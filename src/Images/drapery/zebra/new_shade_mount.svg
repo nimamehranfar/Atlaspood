@@ -5,37 +5,41 @@
 	 width="144px" height="168px" viewBox="0 0 384.9 448.5" enable-background="new 0 0 384.9 448.5" xml:space="preserve">
 <g>
 	<g>
-		<line fill="none" stroke="#464545" stroke-width="3" x1="0" y1="8.9" x2="5.3" y2="8.9"/>
-		<line fill="none" stroke="#464545" stroke-width="3" stroke-dasharray="10.6945,10.6945" x1="16" y1="8.9" x2="374.2" y2="8.9"/>
-		<line fill="none" stroke="#464545" stroke-width="3" x1="379.6" y1="8.9" x2="384.9" y2="8.9"/>
+		<rect x="9.3" y="7.5" fill="#464545" width="8.9" height="2.9"/>
+		<path fill="#464545" d="M356.4,10.4h-9.9V7.5h9.9V10.4z M336.5,10.4h-9.9V7.5h9.9V10.4z M316.6,10.4h-9.9V7.5h9.9V10.4z
+			 M296.7,10.4h-9.9V7.5h9.9V10.4z M276.8,10.4h-9.9V7.5h9.9V10.4z M256.9,10.4H247V7.5h9.9V10.4z M237,10.4h-9.9V7.5h9.9V10.4z
+			 M217.2,10.4h-9.9V7.5h9.9V10.4z M197.3,10.4h-9.9V7.5h9.9V10.4z M177.4,10.4h-9.9V7.5h9.9V10.4z M157.5,10.4h-9.9V7.5h9.9V10.4z
+			 M137.6,10.4h-9.9V7.5h9.9V10.4z M117.7,10.4h-9.9V7.5h9.9V10.4z M97.8,10.4h-9.9V7.5h9.9V10.4z M77.9,10.4H68V7.5h9.9V10.4z
+			 M58,10.4h-9.9V7.5H58V10.4z M38.1,10.4h-9.9V7.5h9.9V10.4z"/>
+		<rect x="366.4" y="7.5" fill="#464545" width="8.9" height="2.9"/>
 	</g>
-</g>
-<g>
 	<g>
-		<line fill="none" stroke="#464545" stroke-width="2" x1="28.1" y1="40.4" x2="28.1" y2="18.5"/>
 		<g>
-			<polygon fill="#464545" points="34.1,38.6 28.1,49 22.1,38.6 			"/>
-		</g>
-		<g>
-			<polygon fill="#464545" points="34.1,20.2 28.1,9.9 22.1,20.2 			"/>
+			<line fill="none" stroke="#464545" stroke-width="2" x1="33" y1="40.4" x2="33" y2="18.5"/>
+			<g>
+				<polygon fill="#464545" points="38.9,38.6 33,49 27,38.6 				"/>
+			</g>
+			<g>
+				<polygon fill="#464545" points="38.9,20.2 33,9.9 27,20.2 				"/>
+			</g>
 		</g>
 	</g>
-</g>
-<g>
 	<g>
-		<line fill="none" stroke="#464545" stroke-width="2" x1="358.3" y1="40.4" x2="358.3" y2="18.5"/>
 		<g>
-			<polygon fill="#464545" points="364.3,38.6 358.3,49 352.3,38.6 			"/>
-		</g>
-		<g>
-			<polygon fill="#464545" points="364.3,20.2 358.3,9.9 352.3,20.2 			"/>
+			<line fill="none" stroke="#464545" stroke-width="2" x1="352.1" y1="40.4" x2="352.1" y2="18.5"/>
+			<g>
+				<polygon fill="#464545" points="358.1,38.6 352.1,49 346.2,38.6 				"/>
+			</g>
+			<g>
+				<polygon fill="#464545" points="358.1,20.2 352.1,9.9 346.2,20.2 				"/>
+			</g>
 		</g>
 	</g>
-</g>
-<line fill="none" stroke="#464545" stroke-width="3" x1="375.7" y1="49.9" x2="333.3" y2="49.9"/>
-<line fill="none" stroke="#464545" stroke-width="3" x1="53.1" y1="49.9" x2="10.7" y2="49.9"/>
-<g>
-	<rect x="53.1" y="49.9" fill="none" stroke="#616261" stroke-width="3" stroke-miterlimit="10" width="280.2" height="389"/>
-	<rect x="76.2" y="73" fill="none" stroke="#616261" stroke-width="3" stroke-miterlimit="10" width="234" height="342.8"/>
+	<line fill="none" stroke="#464545" stroke-width="3" x1="375.6" y1="49.9" x2="333.1" y2="49.9"/>
+	<line fill="none" stroke="#464545" stroke-width="3" x1="53" y1="49.9" x2="10.6" y2="49.9"/>
+	<g>
+		<rect x="53" y="49.9" fill="none" stroke="#616261" stroke-width="3" stroke-miterlimit="10" width="280.2" height="389"/>
+		<rect x="76" y="73" fill="none" stroke="#616261" stroke-width="3" stroke-miterlimit="10" width="234" height="342.8"/>
+	</g>
 </g>
 </svg>

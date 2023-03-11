@@ -4,15 +4,20 @@ import axios from "axios";
 import {InputGroup, FormControl, Toast, ToastContainer} from "react-bootstrap"
 import {ReactComponent as noImage} from '../Images/public/no_image.svg';
 import Draggable from "react-draggable";
+import authHeader from "../Services/auth-header";
+import {refreshToken} from "../Services/auth.service";
+import {useNavigate} from "react-router-dom";
 
-const baseURLGet = "https://api.atlaspood.ir/WebsiteSetting/GetSlider?apiKey=477f46c6-4a17-4163-83cc-29908d";
+const baseURLGet = "https://api.atlaspood.ir/WebsiteSetting/GetSlider";
 const baseURLPost = "https://api.atlaspood.ir/WebsiteSetting/SaveSlider";
 const baseURLUpload = "https://api.atlaspood.ir/WebsiteSetting/ImageUploder";
 
 function Slideshow() {
+    let navigate = useNavigate();
     const [slide, setslide] = React.useState([]);
     const [slideList, setslideList] = React.useState([]);
     const [showToast, setShowToast] = React.useState(false);
+    const [isUploading, setIsUploading] = React.useState(false);
     // const [selectedFile, setSelectedFile] = React.useState(require('../Images/public/no_image.svg'));
     
     async function getslide() {
@@ -81,16 +86,31 @@ function Slideshow() {
         formData.append("ImageFile", file);
         const config = {
             headers: {
-                'content-type': 'multipart/form-data'
+                'content-type': 'multipart/form-data',
+                ...authHeader()
             }
         };
+        setIsUploading(true);
         axios.post(baseURLUpload, formData, config)
             .then((response) => {
                 const tempslide = [...slide];
                 tempslide[e.target.getAttribute('slide_id')][e.target.getAttribute('slide_text_id')]=response.data;
                 setslide(tempslide);
+                setIsUploading(false);
             }).catch(err => {
-            console.log(err);
+            if (err.response.status === 401) {
+                refreshToken().then((response2) => {
+                    if (response2 !== false) {
+                        updatePicture(e);
+                    } else {
+                        navigate("/");
+                        setIsUploading(false);
+                    }
+                });
+            }
+            else{
+                setIsUploading(false);
+            }
         });
     }
     
@@ -99,12 +119,22 @@ function Slideshow() {
         postslidesArray["Value"] = {};
         postslidesArray["Value"]["slide"] = slide;
         postslidesArray["ApiKey"] = window.$apikey;
-        console.log(JSON.stringify(postslidesArray));
-        axios.post(baseURLPost, postslidesArray)
+        // console.log(JSON.stringify(postslidesArray));
+        axios.post(baseURLPost, postslidesArray, {
+            headers: authHeader()
+        })
             .then(() => {
                 setShowToast(true);
             }).catch(err => {
-            console.log(err);
+            if (err.response.status === 401) {
+                refreshToken().then((response2) => {
+                    if (response2 !== false) {
+                        updateslide();
+                    } else {
+                        navigate("/");
+                    }
+                });
+            }
         });
     }
     
@@ -154,9 +184,9 @@ function Slideshow() {
             </button>
         </div>
         <div>
-            <button className="btn btn-primary admin_panel_button" onClick={() => {
+            <button className="btn btn-primary admin_panel_button" disabled={isUploading} onClick={() => {
                 updateslide()
-            }}>Save Settings
+            }}>{isUploading?"Image Uploading":"Save Settings"}
             </button>
         </div>
         

@@ -17,12 +17,51 @@
         ]
       },
       {
+        "cart": "PageId",
+        "title": "PageId",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "PageId",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
         "cart": "ZipCode",
         "title": "ZipCode",
         "titleValue": null,
         "titlePostfix": "",
         "order": -1,
         "apiLabel": "ZipCode",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "InstallAmount",
+        "title": "InstallAmount",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "InstallAmount",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "TransportationAmount",
+        "title": "TransportationAmount",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "TransportationAmount",
         "apiValue": null,
         "lang": [
           "en",
@@ -142,7 +181,7 @@
         "title": "Width",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": 3,
+        "order": -1,
         "apiLabel": "Width1",
         "apiValue": null,
         "measurements": true,
@@ -156,7 +195,7 @@
         "title": "Height",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": 4,
+        "order": -1,
         "apiLabel": "Height1",
         "apiValue": null,
         "measurements": true,
@@ -184,8 +223,36 @@
         "title": "Height",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": 4,
+        "order": -1,
         "apiLabel": "HeightCart",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "WindowWidth",
+        "title": "WindowWidth",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "WindowWidth",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "WindowHeight",
+        "title": "WindowHeight",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "WindowHeight",
         "apiValue": null,
         "measurements": true,
         "lang": [
@@ -433,24 +500,9 @@
         "title": "Motor Type",
         "titleValue": null,
         "titlePostfix": "",
-        "order": 6,
+        "order": -1,
         "apiLabel": "MotorType",
         "apiValue": null,
-        "apiAcc": false,
-        "apiAccValue": {
-          "Standard": {
-            "SewingAccessoryId": 17,
-            "SewingModelAccessoryId": 0,
-            "SewingAccessoryValue": "61500508",
-            "Qty": 1
-          },
-          "Smart": {
-            "SewingAccessoryId": 18,
-            "SewingModelAccessoryId": 0,
-            "SewingAccessoryValue": "61500518",
-            "Qty": 1
-          }
-        },
         "lang": [
           "en",
           "fa"
@@ -692,12 +744,25 @@
         ]
       },
       {
-        "cart": "price",
+        "cart": "Price",
         "title": "",
         "titleValue": null,
         "titlePostfix": "",
         "order": -1,
-        "apiLabel": "price",
+        "apiLabel": "Price",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Accessories",
+        "title": "Accessories",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "Accessories",
         "apiValue": null,
         "lang": [
           "en",
@@ -732,6 +797,58 @@
         "apiValue": null,
         "apiLabel2": "FabricId",
         "apiValue2": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "PageId",
+        "title": "PageId",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "PageId",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "ZipCode",
+        "title": "ZipCode",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "ZipCode",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "InstallAmount",
+        "title": "InstallAmount",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "InstallAmount",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "TransportationAmount",
+        "title": "TransportationAmount",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "TransportationAmount",
+        "apiValue": null,
         "lang": [
           "en",
           "fa"
@@ -850,7 +967,7 @@
         "title": "Width",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": 3,
+        "order": -1,
         "apiLabel": "Width1",
         "apiValue": null,
         "measurements": true,
@@ -864,7 +981,7 @@
         "title": "Height",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": 4,
+        "order": -1,
         "apiLabel": "Height1",
         "apiValue": null,
         "measurements": true,
@@ -892,8 +1009,36 @@
         "title": "Height",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": 4,
+        "order": -1,
         "apiLabel": "HeightCart",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "WindowWidth",
+        "title": "WindowWidth",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "WindowWidth",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "WindowHeight",
+        "title": "WindowHeight",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "WindowHeight",
         "apiValue": null,
         "measurements": true,
         "lang": [
@@ -1042,6 +1187,48 @@
         ]
       },
       {
+        "cart": "CeilingToWindow1",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Height1",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "CeilingToWindow2",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Height2",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "CeilingToWindow3",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Height3",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
         "cart": "ShadeMount",
         "title": "",
         "titleValue": null,
@@ -1063,16 +1250,6 @@
         "order": 5,
         "apiLabel": "ControlType",
         "apiValue": null,
-        "apiAcc": true,
-        "apiAccValue": {
-          "Motorized": {
-            "SewingAccessoryId": 1,
-            "SewingModelAccessoryId": 1,
-            "SewingAccessoryValue": "61500508",
-            "Qty": 1
-          },
-          "ContinuousLoop": null
-        },
         "lang": [
           "en",
           "fa"
@@ -1109,7 +1286,7 @@
         "title": "Motor Type",
         "titleValue": null,
         "titlePostfix": "",
-        "order": 6,
+        "order": -1,
         "apiLabel": "MotorType",
         "apiValue": null,
         "lang": [
@@ -1318,7 +1495,7 @@
         "apiAcc": true,
         "apiAccValue": {
           "Sewn-In": null,
-          "Exposed - Designer": {
+          "Decorative Metal Bar": {
             "SewingAccessoryId": 6,
             "SewingModelAccessoryId": 12,
             "SewingAccessoryValue": "900007",
@@ -1472,12 +1649,25 @@
         ]
       },
       {
-        "cart": "price",
+        "cart": "Price",
         "title": "",
         "titleValue": null,
         "titlePostfix": "",
         "order": -1,
         "apiLabel": "",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Accessories",
+        "title": "Accessories",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "Accessories",
         "apiValue": null,
         "lang": [
           "en",
@@ -1527,6 +1717,58 @@
         "apiValue": null,
         "apiLabel2": "FabricId2",
         "apiValue2": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "PageId",
+        "title": "PageId",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "PageId",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "ZipCode",
+        "title": "ZipCode",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "ZipCode",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "InstallAmount",
+        "title": "InstallAmount",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "InstallAmount",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "TransportationAmount",
+        "title": "TransportationAmount",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "TransportationAmount",
+        "apiValue": null,
         "lang": [
           "en",
           "fa"
@@ -1706,7 +1948,7 @@
         "title": "Width",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": 3,
+        "order": -1,
         "apiLabel": "Width1",
         "apiValue": null,
         "measurements": true,
@@ -1720,7 +1962,7 @@
         "title": "Height",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": 4,
+        "order": -1,
         "apiLabel": "Height1",
         "apiValue": null,
         "measurements": true,
@@ -1748,8 +1990,36 @@
         "title": "Height",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": 4,
+        "order": -1,
         "apiLabel": "HeightCart",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "WindowWidth",
+        "title": "WindowWidth",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "WindowWidth",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "WindowHeight",
+        "title": "WindowHeight",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "WindowHeight",
         "apiValue": null,
         "measurements": true,
         "lang": [
@@ -1898,6 +2168,48 @@
         ]
       },
       {
+        "cart": "CeilingToWindow1",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Height1",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "CeilingToWindow2",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Height2",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "CeilingToWindow3",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Height3",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
         "cart": "ShadeMount",
         "title": "",
         "titleValue": null,
@@ -1919,16 +2231,6 @@
         "order": 5,
         "apiLabel": "ControlType",
         "apiValue": null,
-        "apiAcc": true,
-        "apiAccValue": {
-          "Motorized": {
-            "SewingAccessoryId": 1,
-            "SewingModelAccessoryId": 1,
-            "SewingAccessoryValue": "61500508",
-            "Qty": 1
-          },
-          "ContinuousLoop": null
-        },
         "lang": [
           "en",
           "fa"
@@ -1965,7 +2267,7 @@
         "title": "Motor Type",
         "titleValue": null,
         "titlePostfix": "",
-        "order": 6,
+        "order": -1,
         "apiLabel": "MotorType",
         "apiValue": null,
         "lang": [
@@ -2017,7 +2319,7 @@
         "title": "Control Position Back",
         "titleValue": null,
         "titlePostfix": "",
-        "order": 6,
+        "order": 7,
         "apiLabel": "controlPositionBack",
         "apiValue": null,
         "lang": [
@@ -2030,7 +2332,7 @@
         "title": "Chain Length",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": 7,
+        "order": 8,
         "apiLabel": "ChainLength",
         "apiValue": null,
         "apiAcc": true,
@@ -2187,7 +2489,7 @@
         "apiAcc": true,
         "apiAccValue": {
           "Sewn-In": null,
-          "Exposed - Designer": {
+          "Decorative Metal Bar": {
             "SewingAccessoryId": 6,
             "SewingModelAccessoryId": 12,
             "SewingAccessoryValue": "900007",
@@ -2341,12 +2643,25 @@
         ]
       },
       {
-        "cart": "price",
+        "cart": "Price",
         "title": "",
         "titleValue": null,
         "titlePostfix": "",
         "order": -1,
         "apiLabel": "",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Accessories",
+        "title": "Accessories",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "Accessories",
         "apiValue": null,
         "lang": [
           "en",
@@ -2409,6 +2724,58 @@
         "apiValue": null,
         "apiLabel2": "FabricId",
         "apiValue2": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "PageId",
+        "title": "PageId",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "PageId",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "ZipCode",
+        "title": "ZipCode",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "ZipCode",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "InstallAmount",
+        "title": "InstallAmount",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "InstallAmount",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "TransportationAmount",
+        "title": "TransportationAmount",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "TransportationAmount",
+        "apiValue": null,
         "lang": [
           "en",
           "fa"
@@ -2574,7 +2941,7 @@
         "title": "Width",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": 2,
+        "order": -1,
         "apiLabel": "Width1",
         "apiValue": null,
         "measurements": true,
@@ -2588,7 +2955,7 @@
         "title": "Height",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": 3,
+        "order": -1,
         "apiLabel": "Height1",
         "apiValue": null,
         "measurements": true,
@@ -2602,7 +2969,7 @@
         "title": "Width",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": 2,
+        "order": 3,
         "apiLabel": "WidthCart",
         "apiValue": null,
         "measurements": true,
@@ -2616,8 +2983,36 @@
         "title": "Height",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": 3,
+        "order": -1,
         "apiLabel": "HeightCart",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "WindowWidth",
+        "title": "WindowWidth",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "WindowWidth",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "WindowHeight",
+        "title": "WindowHeight",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "WindowHeight",
         "apiValue": null,
         "measurements": true,
         "lang": [
@@ -3081,12 +3476,25 @@
         ]
       },
       {
-        "cart": "price",
+        "cart": "Price",
         "title": "",
         "titleValue": null,
         "titlePostfix": "",
         "order": -1,
         "apiLabel": "",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Accessories",
+        "title": "Accessories",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "Accessories",
         "apiValue": null,
         "lang": [
           "en",

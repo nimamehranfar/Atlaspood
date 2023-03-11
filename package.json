@@ -28,11 +28,13 @@
     "jsx": "^0.9.89",
     "jwt-decode": "^3.1.2",
     "number_to_persian_word": "^1.5.3",
+    "persistent-package-linker": "^2.1.2",
     "prop-types": "latest",
     "qs": "^6.11.0",
     "react": "^17.0.2",
     "react-beautiful-dnd": "^13.1.1",
     "react-bootstrap": "^2.0.4",
+    "react-debounce-input": "^3.3.0",
     "react-dom": "^17.0.2",
     "react-draggable": "^4.4.4",
     "react-draggable-lists": "^1.0.1",
@@ -86,6 +88,7 @@
   },
   "devDependencies": {
     "@svgr/webpack": "^6.2.1",
-    "react-redux": "^8.0.2"
+    "react-redux": "^8.0.2",
+    "webpack": "^5.75.0"
   }
 }

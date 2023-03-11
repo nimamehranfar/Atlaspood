@@ -82,7 +82,7 @@ video {
     margin: 0;
     padding: 0;
     border: 0;
-    font-size: 100%;
+    /*font-size: 100%;*/
     font: inherit;
     vertical-align: baseline;
 }
@@ -94,6 +94,7 @@ video {
     url('./Fonts/proxima-nova.otf') format('opentype');
     font-weight: 700;
     font-style: normal;
+    font-display: block;
 }
 
 @font-face {
@@ -103,6 +104,7 @@ video {
     url('./Fonts/proxima-nova-two.otf') format('opentype');
     font-weight: 100;
     font-style: normal;
+    font-display: block;
 }
 
 
@@ -113,6 +115,7 @@ video {
     url('./Fonts/proxima-nova-three.otf') format('opentype');
     font-weight: 400;
     font-style: normal;
+    font-display: block;
 }
 
 @font-face {
@@ -122,6 +125,7 @@ video {
     url('./Fonts/proxima-nova-thin.otf') format('opentype');
     font-weight: 300;
     font-style: normal;
+    font-display: block;
 }
 
 @font-face {
@@ -134,6 +138,7 @@ video {
     url('./Fonts/proximanova-sbold-webfont-webfont.ttf') format('truetype');
     font-weight: 500;
     font-style: normal;
+    font-display: block;
 }
 
 @font-face {
@@ -141,6 +146,7 @@ video {
     src: url('./Fonts/Farsi/IRANSansWeb_Light.ttf') format('truetype');
     font-style: normal;
     font-weight: 300;
+    font-display: block;
 }
 
 @font-face {
@@ -148,6 +154,7 @@ video {
     src: url('./Fonts/Farsi/IRANSansWeb.ttf') format('truetype');
     font-style: normal;
     font-weight: 400;
+    font-display: block;
 }
 
 @font-face {
@@ -155,6 +162,7 @@ video {
     src: url('./Fonts/Farsi/IRANSansWeb_Medium.ttf') format('truetype');
     font-style: normal;
     font-weight: 500;
+    font-display: block;
 }
 
 @font-face {
@@ -162,6 +170,7 @@ video {
     src: url('./Fonts/Farsi/IRANSansWeb_Bold.ttf') format('truetype');
     font-style: normal;
     font-weight: 600;
+    font-display: block;
 }
 
 @font-face {
@@ -169,6 +178,7 @@ video {
     src: url('./Fonts/Farsi/YekanBakh-Light.ttf') format('truetype');
     font-style: normal;
     font-weight: 300;
+    font-display: block;
 }
 
 @font-face {
@@ -176,6 +186,7 @@ video {
     src: url('./Fonts/Farsi/YekanBakh-Regular.ttf') format('truetype');
     font-style: normal;
     font-weight: 400;
+    font-display: block;
 }
 
 @font-face {
@@ -183,6 +194,7 @@ video {
     src: url('./Fonts/Farsi/YekanBakh-Medium.ttf') format('truetype');
     font-style: normal;
     font-weight: 500;
+    font-display: block;
 }
 
 @font-face {
@@ -190,6 +202,7 @@ video {
     src: url('./Fonts/Farsi/YekanBakh-Bold.ttf') format('truetype');
     font-style: normal;
     font-weight: 600;
+    font-display: block;
 }
 
 @font-face {
@@ -197,6 +210,7 @@ video {
     src: url('./Fonts/Farsi/iransharp_light_web.ttf') format('truetype');
     font-style: normal;
     font-weight: 300;
+    font-display: block;
 }
 
 @font-face {
@@ -204,6 +218,7 @@ video {
     src: url('./Fonts/Farsi/iransharp_regular_web.ttf') format('truetype');
     font-style: normal;
     font-weight: 400;
+    font-display: block;
 }
 
 @font-face {
@@ -211,6 +226,7 @@ video {
     src: url('./Fonts/Farsi/iransharp_bold_web.ttf') format('truetype');
     font-style: normal;
     font-weight: 600;
+    font-display: block;
 }
 
 @font-face {
@@ -221,6 +237,7 @@ video {
     url('./Fonts/Farsi/Sahel.ttf') format('truetype');
     font-weight: 400;
     font-style: normal;
+    font-display: block;
 }
 
 @font-face {
@@ -231,6 +248,7 @@ video {
     url('./Fonts/Farsi/Sahel-Black.ttf') format('truetype');
     font-weight: 500;
     font-style: normal;
+    font-display: block;
 }
 
 @font-face {
@@ -241,6 +259,7 @@ video {
     url('./Fonts/Farsi/Sahel-Bold.ttf') format('truetype');
     font-weight: 600;
     font-style: normal;
+    font-display: block;
 }
 
 
@@ -248,6 +267,7 @@ video {
     font-family: 'peyda';
     src: url('./Fonts/Farsi/peyda.ttf') format('truetype');
     font-style: normal;
+    font-display: block;
 }
 
 @font-face {
@@ -255,5 +275,6 @@ video {
     src: url('./Fonts/adobe-caslon-pro.otf') format('opentype'),
     url('./Fonts/adobe-caslon-pro.woff') format('woff');
     font-style: normal;
+    font-display: block;
 }
 

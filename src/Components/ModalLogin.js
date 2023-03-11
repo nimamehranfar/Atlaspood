@@ -12,7 +12,7 @@ const baseURLRegister = "https://api.atlaspood.ir/user/register";
 const baseURLCheckEmail = "https://api.atlaspood.ir/user/UserNameIsAvailable";
 const baseURLReset = "https://api.atlaspood.ir/user/SendResetPasswordEmail";
 
-function ModalLogin() {
+function ModalLogin({text}) {
     
     const {t} = useTranslation();
     const location = useLocation();
@@ -20,6 +20,7 @@ function ModalLogin() {
     let navigate = useNavigate();
     const dispatch = useDispatch();
     const {activeId} = useParams();
+    const [headerText, setHeaderText] = useState(text);
     const [forgotEmail, setForgotEmail] = useState("");
     const [resetPage, setResetPage] = useState(false);
     const [registerPage, setRegisterPage] = useState(false);
@@ -310,6 +311,7 @@ function ModalLogin() {
             // setShowToast_login_fail(true);
             setErrorText(t("Invalid email or password."));
             setTimeout(() => {
+                signIn.current.innerHTML=t("SIGN IN");
                 setBtn_disabled(false);
             }, 1000);
         });
@@ -373,6 +375,7 @@ function ModalLogin() {
                 {!registerPage &&
                 <div className="login_container">
                     <div className="login_inside_container">
+                        {headerText!==undefined && <h3 className="header_outer_text">{headerText}</h3>}
                         <h1 className="login_title">{t("SIGN IN TO YOUR ACCOUNT")}</h1>
                         <input type="text" placeholder={t("Email*")} className="form-control" name="Email" value={loginInfo.email}
                                onChange={(e) => {
@@ -420,6 +423,7 @@ function ModalLogin() {
                         <h1 className="login_title">{t("CREATE AN ACCOUNT")}</h1>
                         <p className="login_text">{t("register_list_title")}</p>
                         <ul className="register_list">
+                            <li className="register_list_item">{t("register_list_item0")}</li>
                             <li className="register_list_item">{t("register_list_item1")}</li>
                             <li className="register_list_item">{t("register_list_item2")}</li>
                             <li className="register_list_item">{t("register_list_item3")}</li>
