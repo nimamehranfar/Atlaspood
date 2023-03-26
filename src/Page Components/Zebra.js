@@ -145,6 +145,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
     const [hasTrim, setHasTrim] = useState(false);
     const [showLabels, setShowLabels] = useState(true);
     const [detailsShow, setDetailsShow] = useState(false);
+    const [filtersShow, setFiltersShow] = useState(false);
     const [windowSize, setWindowSize] = useState("");
     const [windowSizeBool, setWindowSizeBool] = useState(false);
     const [stepSelectedLabel, setStepSelectedLabel] = useState({});
@@ -252,6 +253,10 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
     const [selectedValanceColor2, setSelectedValanceColor2] = useState([]);
     const [selectedRoomLabel, setSelectedRoomLabel] = useState([]);
     
+    const [step21Err1, setStep21Err1] = useState(false);
+    const [step21Err3, setStep21Err3] = useState(false);
+    const [motorErr1, setMotorErr1] = useState(false);
+    
     const [savedProjectRoomLabel, setSavedProjectRoomLabel] = useState("");
     const [savedProjectRoomText, setSavedProjectRoomText] = useState("");
     
@@ -281,6 +286,8 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
     const [savingLoading, setSavingLoading] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [swatchLogin, setSwatchLogin] = useState(false);
+    const [swatchLoginSwatchId, setSwatchLoginSwatchId] = useState(null);
+    const [swatchLoginSwatchDetailId, setSwatchLoginSwatchDetailId] = useState(null);
     
     const [helpMeasure, setHelpMeasure] = useState("Inside");
     const [customMotorAcc, setCustomMotorAcc] = useState({});
@@ -1229,7 +1236,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                         }
                         
                         // setCart("HeightCart", totalHeight, "", "WidthCart", [totalWidth]);
-                        if (stepSelectedValue["2"] === "1" && stepSelectedValue["3"] === "2") {
+                        if (step2 === "Inside" && stepSelectedValue["3"] === "2") {
                             if (temp["Width1"] !== undefined && temp["Width2"] !== undefined && temp["Width3"] !== undefined && temp["Height1"] !== undefined && temp["Height2"] !== undefined && temp["Height3"] !== undefined) {
                                 // console.log("2");
                                 getWindowSize(response.data["WindowWidth"], response.data["WindowHeight"]);
@@ -1239,7 +1246,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                 temp["HeightCart"] = response.data["Height"];
                                 
                             }
-                        } else if (stepSelectedValue["2"] === "2" && stepSelectedValue["3"] === "2") {
+                        } else if (step2 === "Outside" && stepSelectedValue["3"] === "2") {
                             if (temp["Width3A"] !== undefined && temp["Height3C"] !== undefined && temp["ExtensionRight"] !== undefined && temp["ExtensionLeft"] !== undefined && temp["ShadeMount"] !== undefined) {
                                 getWindowSize(response.data["WindowWidth"], response.data["WindowHeight"]);
                                 temp["WindowWidth"] = response.data["WindowWidth"];
@@ -1524,12 +1531,12 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                 }
             });
         }
-        // console.log([...new Set(depSet)]);
+        // console.log([...new Set(depSetTempArr)]);
         setDepSet(depSetTempArr);
     }
     
-    const doNotShow = ["ModelId", "qty", "Width1", "Height1", "Width2", "Height2", "Width3", "Height3", "RoomNameEn", "RoomNameFa", "calcMeasurements", "FabricId", "PhotoUrl", "RemoteName",
-        "hasPower", "WindowName", "ExtensionLeft", "ExtensionRight", "Height3C", "Width3A", "ShadeMount", "ModelNameEn", "ModelNameFa", "FabricColorEn", "FabricColorFa", "FabricDesignEn", "FabricDesignFa"];
+    // const doNotShow = ["ModelId", "qty", "Width1", "Height1", "Width2", "Height2", "Width3", "Height3", "RoomNameEn", "RoomNameFa", "calcMeasurements,Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight", "FabricId", "PhotoUrl", "RemoteName",
+    //     "hasPower", "WindowName", "ExtensionLeft", "ExtensionRight", "Height3C", "Width3A", "ShadeMount", "ModelNameEn", "ModelNameFa", "FabricColorEn", "FabricColorFa", "FabricDesignEn", "FabricDesignFa"];
     
     function addToCart() {
         let tempDepSet = [...depSet];
@@ -1686,7 +1693,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                 // window.location.reload();
                                 console.log(key);
                             } else {
-                                if (key === "HeightCart" || key === "WidthCart") {
+                                if (key === "WindowHeight" || key === "WindowWidth") {
                                 
                                 } else if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
                                     let objLabel = "";
@@ -1856,9 +1863,9 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                 
                 let promise1 = new Promise((resolve, reject) => {
                     if (draperies.length) {
-                        draperies.sort(function(a, b) {
-                            return b["CartDetailId"] - a["CartDetailId"]  ||  b["SewingPreorderId"] - a["SewingPreorderId"];
-                        }).forEach((tempObj,i)=>{
+                        draperies.sort(function (a, b) {
+                            return b["CartDetailId"] - a["CartDetailId"] || b["SewingPreorderId"] - a["SewingPreorderId"];
+                        }).forEach((tempObj, i) => {
                             let obj = draperies[i]["SewingPreorder"]["PreorderText"];
                             let sodFabrics = obj["SodFabrics"] ? obj["SodFabrics"] : [];
                             let roomName = (obj["WindowName"] === undefined || obj["WindowName"] === "") ? "" : " / " + obj["WindowName"];
@@ -2128,7 +2135,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                 let sodFabrics = obj["SodFabrics"] ? obj["SodFabrics"] : [];
                                 let roomName = (obj["WindowName"] === undefined || obj["WindowName"] === "") ? "" : " / " + obj["WindowName"];
                                 if (obj["SewingModelId"] === "0326") {
-                                    temp1[cartObjects["drapery"].length-index-1] =
+                                    temp1[cartObjects["drapery"].length - index - 1] =
                                         <li className="custom_cart_item" key={"drapery" + index} ref={ref => (draperyRef.current[index] = ref)}>
                                             <div className="custom_cart_item_image_container">
                                                 <img src={`https://api.atlaspood.ir/${obj["PhotoUrl"]}`} alt="" className="custom_cart_item_img img-fluid"/>
@@ -2175,7 +2182,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                             </div>
                                         </li>;
                                 } else {
-                                    temp1[cartObjects["drapery"].length-index-1] =
+                                    temp1[cartObjects["drapery"].length - index - 1] =
                                         <li className="custom_cart_item" key={"drapery" + index} ref={ref => (draperyRef.current[index] = ref)}>
                                             <div className="custom_cart_item_image_container">
                                                 <img src={`https://api.atlaspood.ir/${obj["PhotoUrl"]}`} alt="" className="custom_cart_item_img img-fluid"/>
@@ -2242,7 +2249,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
     }
     
     function fabricSwatch(e, SwatchId, SwatchDetailId, PhotoPath) {
-        let currentState = e.target.getAttribute('current-state');
+        let currentState = e.target ? e.target.getAttribute('current-state') : e;
         let cartObj = {};
         let temp = [];
         if (isLoggedIn) {
@@ -2280,10 +2287,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                 });
             } else {
                 if (SwatchDetailId) {
-                    axios.delete(baseURLDeleteBasketProject, {
-                        params: {
-                            detailId: SwatchDetailId
-                        },
+                    axios.post(baseURLDeleteBasketProject + "/" + SwatchDetailId, {}, {
                         headers: authHeader()
                     }).then((response) => {
                         setCartChanged(cartChanged + 1);
@@ -2311,6 +2315,8 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
             
         } else {
             setSwatchLogin(true);
+            setSwatchLoginSwatchId(SwatchId);
+            setSwatchLoginSwatchDetailId(SwatchDetailId);
             modalHandleShow("side_login_modal");
             // dispatch({
             //     type: ShowLoginModal,
@@ -3606,6 +3612,9 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
         if (swatchLogin) {
             setSwatchLogin(false);
             modalHandleClose("side_login_modal");
+            setTimeout(() => {
+                fabricSwatch("0", swatchLoginSwatchId, swatchLoginSwatchDetailId);
+            }, 500);
         } else if ((projectModalState === 2 && isLoggedIn) || (saveProjectCount !== 0 && isLoggedIn)) {
             if (roomLabelText !== "" && selectedRoomLabel.length) {
                 if (projectId && projectId !== "") {
@@ -3892,8 +3901,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
     useEffect(() => {
         if (firstRender.current) {
             firstRender.current = false;
-        }
-        else {
+        } else {
             dispatch({
                 type: CartUpdatedTrue,
                 payload: {mainCart: bag}
@@ -4069,7 +4077,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
             }
         } else if (projectId && projectId !== "") {
             getProjectDetail();
-        } else if(sessionStorage.getItem("cartCopy") !== null){
+        } else if (sessionStorage.getItem("cartCopy") !== null) {
             let tempCartValues = JSON.parse(sessionStorage.getItem("cartCopy"));
             if (Object.keys(tempCartValues).length !== 0) {
                 if (tempCartValues["SewingModelId"] && tempCartValues["SewingModelId"] === `${modelID}`) {
@@ -4097,6 +4105,24 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
         // }, 500);
     }, [location.pathname]);
     
+    const fixedDiv = useRef(null);
+    const [offset, setOffset] = useState(false);
+    
+    useEffect(() => {
+        const onScroll = () => {
+            if (fixedDiv.current.offsetTop < window.pageYOffset + 92) {
+                setOffset(true);
+            } else {
+                setOffset(false);
+            }
+        };
+        
+        // clean up code
+        window.removeEventListener('scroll', onScroll);
+        window.addEventListener('scroll', onScroll, {passive: true});
+        return () => window.removeEventListener('scroll', onScroll);
+    }, []);
+    
     return (
         <div className={`Custom_model_container ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
             {/*<div className="breadcrumb_container dir_ltr">*/}
@@ -4120,10 +4146,12 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                 }
             </div>
             <div className="model_customize_container">
-                <div className="model_customize_image">
-                    {defaultFabricPhoto &&
-                        <img src={`https://api.atlaspood.ir/${defaultFabricPhoto}`} className="img-fluid" alt=""/>
-                    }
+                <div className={offset ? "model_customize_image model_customize_image_fixed" : "model_customize_image"} ref={fixedDiv}>
+                    <div>
+                        {defaultFabricPhoto &&
+                            <img src={`https://api.atlaspood.ir/${defaultFabricPhoto}`} className="img-fluid" alt=""/>
+                        }
+                    </div>
                 </div>
                 <div className={`model_customize_section ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
                     <Accordion ref={accordion} flush activeKey={accordionActiveKey}>
@@ -4163,9 +4191,22 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                                         <i className="fa fa-search search-icon"/>
                                                     </div>
                                                 </div>
-                                                <button className="reset_filters" onClick={() => setIsClearAll(true)}>{t("Reset Filters")}</button>
+                                                <div className="filters_show_hide_container" onClick={()=>{
+                                                    if(filtersShow){
+                                                        setFiltersShow(false);
+                                                    }else{
+                                                        setFiltersShow(true);
+                                                    }
+                                                }}>
+                                                    <span className="filters_toggle">{t("Filters")}</span>
+                                                    <span className="filters_indicator">
+                                                        {filtersShow && <img className="arrow_down img-fluid" src={require('../Images/public/arrow_up.svg').default} alt=""/>}
+                                                        {!filtersShow &&
+                                                            <img className="arrow_down img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>}
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <div className="filters_container">
+                                            <div className={filtersShow?"filters_container":"filters_container filters_container_hidden"}>
                                                 <div className="filter_container">
                                                     <Dropdown autoClose="outside" title="">
                                                         <Dropdown.Toggle className="dropdown_btn">
@@ -4278,15 +4319,16 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                     <div className="card_body card_body_radio">
                                         <div className="box33 radio_style">
                                             <img src={require('../Images/drapery/zebra/new_mount_inside.svg').default} className="img-fluid" alt=""/>
-                                            <input className="radio" type="radio" text={t("mount_Inside")} value="1" name="step2" ref-num="2" id="21" checked={step2 === "Inside"}
+                                            <input className="radio" type="radio" value="1" name="step2" ref-num="2" id="21" checked={step2 === "Inside"}
                                                    onChange={e => {
                                                        setStep2("Inside");
                                                        setStep21("");
+                                                       setStep21Err3(false);
                                                        setMeasurementsNextStep("4");
-                                                       if (stepSelectedValue["3"] === "2") {
+                                                       if (step3 !== "") {
                                                            setDeps("21", "2,3AOut,3BOut1,3BOut2,3COut,3DOut,3CArc1,3CArc2,3CArc3");
                                                            deleteSpecialSelects();
-                                                           setCart("Mount", "Inside", "calcMeasurements,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                           setCart("Mount", "Inside", "calcMeasurements,Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
                                                            setStep3("");
                                                            selectChanged(e, "3,3AOut,3BOut,3COut,3DOut,3CArc");
                                                        } else {
@@ -4304,10 +4346,12 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                                    onChange={e => {
                                                        setStep2("Outside");
                                                        setStep21("");
-                                                       if (stepSelectedValue["3"] === "2") {
+                                                       setStep21Err1(false);
+                                                       setStep21Err3(false);
+                                                       if (step3 !== "") {
                                                            setDeps("3AOut,3BOut1,3BOut2,3COut,3DOut", "2,21,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3,3CArc1,3CArc2,3CArc3");
                                                            deleteSpecialSelects();
-                                                           setCart("Mount", "Outside", "calcMeasurements,Width1,Width2,Width3,Height1,Height2,Height3,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                           setCart("Mount", "Outside", "calcMeasurements,Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width1,Width2,Width3,Height1,Height2,Height3,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
                                                            setStep3("");
                                                            selectChanged(e, "3,3AIn,3BIn,3AOut,3BOut,3CArc");
                                                        } else {
@@ -4320,16 +4364,18 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                         </div>
                                         <div className="box33 radio_style">
                                             <img src={require('../Images/drapery/zebra/new_mount_arc.svg').default} className="img-fluid" alt=""/>
-                                            <input className="radio" type="radio" text={t("mount_Arc")} value="3" name="step1" ref-num="2" id="23"
+                                            <input className="radio" type="radio" value="3" name="step1" ref-num="2" id="23"
                                                    checked={step2 === "HiddenMoulding"}
                                                    onChange={e => {
                                                        setStep2("HiddenMoulding");
                                                        setStep21("");
+                                                       setStep21Err1(false);
+                                                       setStep21Err1(false);
                                                        setMeasurementsNextStep("4");
-                                                       if (stepSelectedValue["3"] === "2") {
+                                                       if (step3 !== "") {
                                                            setDeps("21", "2,2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWall,2EWall,2FWall,2GWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
                                                            deleteSpecialSelects();
-                                                           setCart("Mount", "HiddenMoulding", "calcMeasurements,Width1,Width2,Width3,Height1,Height2,Height3,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
+                                                           setCart("Mount", "HiddenMoulding", "calcMeasurements,Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width1,Width2,Width3,Height1,Height2,Height3,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
                                                            setStep3("");
                                                            selectChanged(e, "3,3AIn,3BIn,3AOut,3BOut,3COut,3DOut");
                                                        } else {
@@ -4340,33 +4386,36 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                                    }} ref={ref => (inputs.current["23"] = ref)}/>
                                             <label htmlFor="23">{t("mount_Arc")}</label>
                                         </div>
-                                        {stepSelectedValue["2"] === "1" &&
-                                            <div className="secondary_options">
+                                        {step2 === "Inside" &&
+                                            <div className={step21Err1 ? "secondary_options secondary_options_err" : "secondary_options"}>
                                                 <div className="card-body-display-flex">
                                                     <div className="checkbox_style checkbox_style_step2">
-                                                        <input type="checkbox" value="1" name="step21" ref-num="21" checked={step21 === "true"} onChange={(e) => {
-                                                            if (e.target.checked) {
-                                                                selectChanged(e);
-                                                                setStep21("true");
-                                                                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                                let refIndex = inputs.current["21"].getAttribute('ref-num');
-                                                                tempLabels[refIndex] = inputs.current["21"].getAttribute('text');
-                                                                setStepSelectedLabel(tempLabels);
-                                                                setDeps("", "21");
-                                                            } else {
-                                                                setStep21("");
-                                                                // modalHandleShow("noPower");
-                                                                if (stepSelectedValue["3"] === "2") {
-                                                                    setDeps("21,3", "3AOut,3BOut1,3BOut2,3COut,3DOut,3CArc1,3CArc2,3CArc3");
-                                                                    deleteSpecialSelects();
-                                                                    setCart("", "", "calcMeasurements,Width3A,Height3C,Width1,Width2,Width3,Height1,Height2,Height3,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
-                                                                    setStep3("");
-                                                                    selectChanged(undefined, "3,3AOut,3BOut,3COut,3DOut,3CArc");
-                                                                } else {
-                                                                    setDeps("21", "");
-                                                                }
-                                                            }
-                                                        }} id="211" ref={ref => (inputs.current["211"] = ref)}/>
+                                                        <input type="checkbox" text={t("mount_Inside")} value="1" name="step21" ref-num="2" checked={step21 === "true"}
+                                                               onChange={(e) => {
+                                                                   if (e.target.checked) {
+                                                                       selectChanged(e);
+                                                                       setStep21("true");
+                                                                       setStep21Err1(false);
+                                                                       // let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                                       // let refIndex = inputs.current["21"].getAttribute('ref-num');
+                                                                       // tempLabels[refIndex] = inputs.current["21"].getAttribute('text');
+                                                                       // setStepSelectedLabel(tempLabels);
+                                                                       setDeps("", "21");
+                                                                   } else {
+                                                                       setStep21("");
+                                                                       // modalHandleShow("noPower");
+                                                                       if (step3 !== "") {
+                                                                           setDeps("21,3", "3AOut,3BOut1,3BOut2,3COut,3DOut,3CArc1,3CArc2,3CArc3");
+                                                                           deleteSpecialSelects();
+                                                                           setCart("", "", "calcMeasurements,Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width3A,Height3C,Width1,Width2,Width3,Height1,Height2,Height3,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                                           setStep3("");
+                                                                           selectChanged(undefined, "2,3,3AOut,3BOut,3COut,3DOut,3CArc");
+                                                                       } else {
+                                                                           setDeps("21", "");
+                                                                           selectChanged(undefined, "2");
+                                                                       }
+                                                                   }
+                                                               }} id="211" ref={ref => (inputs.current["211"] = ref)}/>
                                                         <label htmlFor="211" className="checkbox_label">
                                                             <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
                                                                  alt=""/>
@@ -4375,38 +4424,44 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                                         {t("inside_checkbox_title")}
                                                     </span>
                                                     </div>
-                                                
                                                 </div>
                                             </div>
                                         }
-                                        {stepSelectedValue["2"] === "3" &&
-                                            <div className="secondary_options">
+                                        {step21Err1 &&
+                                            <div className="input_not_valid">{t("step21Err1")}</div>
+                                        }
+                                        {step2 === "HiddenMoulding" &&
+                                            <div className={step21Err3 ? "secondary_options secondary_options_err" : "secondary_options"}>
                                                 <div className="card-body-display-flex">
                                                     <div className="checkbox_style checkbox_style_step2">
-                                                        <input type="checkbox" value="1" name="step21" ref-num="21" checked={step21 === "true"} onChange={(e) => {
-                                                            if (e.target.checked) {
-                                                                selectChanged(e);
-                                                                setStep21("true");
-                                                                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                                let refIndex = inputs.current["23"].getAttribute('ref-num');
-                                                                tempLabels[refIndex] = inputs.current["23"].getAttribute('text');
-                                                                setStepSelectedLabel(tempLabels);
-                                                                setDeps("", "21");
-                                                            } else {
-                                                                setStep21("");
-                                                                // modalHandleShow("noPower");
+                                                        <input type="checkbox" text={t("mount_Arc")} value="3" name="step21" ref-num="2" checked={step21 === "true"}
+                                                               onChange={(e) => {
+                                                                   if (e.target.checked) {
+                                                                       selectChanged(e);
+                                                                       setStep21("true");
+                                                                       setStep21Err3(false);
+                                                                       // let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                                       // let refIndex = inputs.current["23"].getAttribute('ref-num');
+                                                                       // tempLabels[refIndex] = inputs.current["23"].getAttribute('text');
+                                                                       // setStepSelectedLabel(tempLabels);
+                                                                       setDeps("", "21");
+                                                                   } else {
+                                                                       setStep21("");
+                                                                       // modalHandleShow("noPower");
                                                                 
-                                                                if (stepSelectedValue["3"] === "2") {
-                                                                    setDeps("21,3", "2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWall,2EWall,2FWall,2GWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
-                                                                    deleteSpecialSelects();
-                                                                    setCart("", "", "calcMeasurements,Width1,Width2,Width3,Height1,Height2,Height3,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
-                                                                    setStep3("");
-                                                                    selectChanged(undefined, "3,3AIn,3BIn,3AOut,3BOut,3COut,3DOut");
-                                                                } else {
-                                                                    setDeps("21", "");
-                                                                }
-                                                            }
-                                                        }} id="211" ref={ref => (inputs.current["211"] = ref)}/>
+                                                                       if (step3 !== "") {
+                                                                           setDeps("21,3", "2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWall,2EWall,2FWall,2GWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
+                                                                           deleteSpecialSelects();
+                                                                           setCart("", "", "calcMeasurements,Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width1,Width2,Width3,Height1,Height2,Height3,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                                           setStep3("");
+                                                                           selectChanged(undefined, "2,3,3AIn,3BIn,3AOut,3BOut,3COut,3DOut");
+                                                                           setWindowSizeBool(false);
+                                                                       } else {
+                                                                           setDeps("21", "");
+                                                                           selectChanged(undefined, "2");
+                                                                       }
+                                                                   }
+                                                               }} id="211" ref={ref => (inputs.current["211"] = ref)}/>
                                                         <label htmlFor="211" className="checkbox_label">
                                                             <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
                                                                  alt=""/>
@@ -4415,13 +4470,20 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                                         {t("Arc_checkbox_title")}
                                                     </span>
                                                     </div>
-                                                
                                                 </div>
                                             </div>
                                         }
-                                        <NextStep eventKey={(stepSelectedValue["2"] === "1" || stepSelectedValue["2"] === "3") && step21 !== "true" ? "2" : "3"} onClick={() => {
-                                            if ((stepSelectedValue["2"] === "1" || stepSelectedValue["2"] === "3") && step21 !== "true")
-                                                modalHandleShow("noInsideUnderstand");
+                                        {step21Err3 &&
+                                            <div className="input_not_valid">{t("step21Err3")}</div>
+                                        }
+                                        <NextStep eventKey={(step2 === "Inside" || step2 === "HiddenMoulding") && step21 !== "true" ? "2" : "3"} onClick={() => {
+                                            if ((step2 === "Inside" || step2 === "HiddenMoulding") && step21 !== "true") {
+                                                if (step2 === "Inside") {
+                                                    setStep21Err1(true);
+                                                } else {
+                                                    setStep21Err3(true);
+                                                }
+                                            }
                                         }}>{t("NEXT STEP")}</NextStep>
                                     </div>
                                     {/*<div className="accordion_help">*/}
@@ -4475,12 +4537,20 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                             <input className="radio" type="radio" text={t("I have my own measurements")} value="1" name="step3" ref-num="3" id="31"
                                                    checked={step3 === "false"}
                                                    onChange={e => {
-                                                       setStep3("false");
-                                                       selectChanged(e, "3AIn,3BIn,3AOut,3BOut,3COut,3DOut,3CArc");
-                                                       setMeasurementsNextStep("4");
-                                                       setDeps("31,32", "3,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3,3AOut,3BOut1,3BOut2,3COut,3DOut,3CArc1,3CArc2,3CArc3");
-                                                       deleteSpecialSelects();
-                                                       setCart("calcMeasurements", false, "WidthCart,HeightCart,Width1,Width2,Width3,Height1,Height2,Height3,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                       if (step2 === "" || (step2 === "Inside" && step21 !== "true") || (step2 === "HiddenMoulding" && step21 !== "true")) {
+                                                           setStep3("");
+                                                           selectUncheck(e);
+                                                           modalHandleShow("noMount");
+                                                           setDeps("3", "31,32");
+                                                           setCart("", "", "Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,calcMeasurements");
+                                                       } else {
+                                                           setStep3("false");
+                                                           selectChanged(e, "3AIn,3BIn,3AOut,3BOut,3COut,3DOut,3CArc");
+                                                           setMeasurementsNextStep("4");
+                                                           setDeps("31,32", "3,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3,3AOut,3BOut1,3BOut2,3COut,3DOut,3CArc1,3CArc2,3CArc3");
+                                                           deleteSpecialSelects();
+                                                           setCart("calcMeasurements", false, "WidthCart,HeightCart,Width1,Width2,Width3,Height1,Height2,Height3,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                       }
                                                    }} ref={ref => (inputs.current["31"] = ref)}/>
                                             <label htmlFor="31">{t("I have my own measurements.")}</label>
                                         </div>
@@ -4488,41 +4558,41 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                             <input className="radio" type="radio" text={t("Calculate my measurements")} value="2" name="step3" checked={step3 === "true"}
                                                    ref-num="3" id="32" ref={ref => (inputs.current["32"] = ref)}
                                                    onChange={e => {
-                                                       if (stepSelectedValue["2"] === undefined) {
+                                                       if (step2 === "") {
                                                            setStep3("");
                                                            selectUncheck(e);
                                                            modalHandleShow("noMount");
                                                            setDeps("3", "31,32");
-                                                           setCart("calcMeasurements", true, "Width,height,calcMeasurements");
-                                                       } else if (stepSelectedValue["2"] === "1") {
-                                                           if (stepSelectedValue["2"] === "1" && step21 !== "true") {
+                                                           setCart("", "", "Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,calcMeasurements");
+                                                       } else if (step2 === "Inside") {
+                                                           if (step2 === "Inside" && step21 !== "true") {
                                                                modalHandleShow("noInsideUnderstand");
                                                                setStep3("");
                                                                selectUncheck(e);
                                                                setDeps("3", "31,32");
-                                                               setCart("calcMeasurements", true, "Width,height,calcMeasurements");
+                                                               setCart("", "", "Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,calcMeasurements");
                                                            } else {
                                                                setStep3("true");
                                                                deleteSpecialSelects();
                                                                selectChanged(e);
                                                                setMeasurementsNextStep("3A");
                                                                setDeps("3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3", "3,3AOut,3BOut1,3BOut2,3COut,3DOut,31,32,3CArc1,3CArc2,3CArc3");
-                                                               setCart("calcMeasurements", true, "Width,Height,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                               setCart("calcMeasurements", true, "Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
                                                            }
-                                                       } else if (stepSelectedValue["2"] === "3") {
-                                                           if (stepSelectedValue["2"] === "3" && step21 !== "true") {
+                                                       } else if (step2 === "HiddenMoulding") {
+                                                           if (step2 === "HiddenMoulding" && step21 !== "true") {
                                                                modalHandleShow("noInsideUnderstand");
                                                                setStep3("");
                                                                selectUncheck(e);
                                                                setDeps("3", "31,32");
-                                                               setCart("calcMeasurements", true, "Width,height,calcMeasurements");
+                                                               setCart("", "", "Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,calcMeasurements");
                                                            } else {
                                                                setStep3("true");
                                                                deleteSpecialSelects();
                                                                selectChanged(e);
                                                                setMeasurementsNextStep("3A");
                                                                setDeps("3AOut,3BOut1,3BOut2,3CArc1,3CArc2,3CArc3", "3,3COut,3DOut,31,32");
-                                                               setCart("calcMeasurements", true, "Width,Height,Width1,Width2,Width3,Height1,Height2,Height3,Height3C,ShadeMount");
+                                                               setCart("calcMeasurements", true, "Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width1,Width2,Width3,Height1,Height2,Height3,Height3C,ShadeMount");
                                                            }
                                                        } else {
                                                            setStep3("true");
@@ -4530,7 +4600,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                                            selectChanged(e);
                                                            setMeasurementsNextStep("3A");
                                                            setDeps("3AOut,3BOut1,3BOut2,3COut,3DOut", "3,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3,31,32,3CArc1,3CArc2,3CArc3");
-                                                           setCart("calcMeasurements", true, "Width,Height,Width1,Width2,Width3,Height1,Height2,Height3,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                           setCart("calcMeasurements", true, "Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width1,Width2,Width3,Height1,Height2,Height3,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
                                                        }
                                                    }}/>
                                             <label htmlFor="32">{t("Calculate my measurements.")}</label>
@@ -4570,12 +4640,14 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                                             //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                             // }
                                                             onChange={(selected) => {
-                                                                optionSelectChanged_WidthLength(selected[0], "3", true, "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.width = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "31");
-                                                                setCart("Width", selected[0].value);
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged_WidthLength(selected[0], "3", true, "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.width = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "31");
+                                                                    setCart("Width", selected[0].value);
+                                                                }
                                                             }}
                                                             options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
                                                         />
@@ -4612,12 +4684,14 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                                             //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                             // }
                                                             onChange={(selected) => {
-                                                                optionSelectChanged_WidthLength(selected[0], "3", false, "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.length = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "32");
-                                                                setCart("Height", selected[0].value);
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged_WidthLength(selected[0], "3", false, "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.length = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "32");
+                                                                    setCart("Height", selected[0].value);
+                                                                }
                                                             }}
                                                             options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
                                                         />
@@ -4659,9 +4733,9 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                                             <b>{t("Note:&nbsp;")}</b>
                                                             {t("step3_help_2.5")}
                                                         </li>
-                                                        <li className="no_listStyle single_line_height">
-                                                            {t("step3_help_3")}
-                                                        </li>
+                                                        {/*<li className="no_listStyle single_line_height">*/}
+                                                        {/*    {t("step3_help_3")}*/}
+                                                        {/*</li>*/}
                                                     </ul>
                                                 </div>
                                             </div>
@@ -4672,7 +4746,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                         </Card>
                         
                         {/* step 3A inside */}
-                        {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "1" && step21 === "true" &&
+                        {stepSelectedValue["3"] === "2" && step2 === "Inside" && step21 === "true" &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="3A" stepNum={t("3A")} stepTitle={t("zebra_step3AInside")} stepRef="3AIn" type="2" required={requiredStep["3AIn"]}
@@ -4841,7 +4915,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                         }
                         
                         {/* step 3B inside */}
-                        {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "1" && step21 === "true" &&
+                        {stepSelectedValue["3"] === "2" && step2 === "Inside" && step21 === "true" &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="3B" stepNum={t("3B")} stepTitle={t("zebra_step3BInside")} stepRef="3BIn" type="2" required={requiredStep["3BIn"]}
@@ -5011,7 +5085,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                         }
                         
                         {/* step 3A outside */}
-                        {stepSelectedValue["3"] === "2" && !!(stepSelectedValue["2"] === "2" || stepSelectedValue["2"] === "3") &&
+                        {stepSelectedValue["3"] === "2" && !!(step2 === "Outside" || step2 === "HiddenMoulding") &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="3A" stepNum={t("3A")} stepTitle={t("zebra_step3AOutside")} stepRef="3AOut" type="2"
@@ -5073,14 +5147,25 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                             </div>
                                             <NextStep eventKey="3B">{t("NEXT STEP")}</NextStep>
                                         </div>
-                                    
+                                        
+                                        {/*<div className="accordion_help">*/}
+                                        {/*    <div className="help_container">*/}
+                                        {/*        <div className="help_column help_left_column">*/}
+                                        {/*            <p className="help_column_header"/>*/}
+                                        {/*            <ul className="help_column_list">*/}
+                                        {/*                <li className="no_listStyle single_line_height">{t("step3A_out_help_1")}*/}
+                                        {/*                </li>*/}
+                                        {/*            </ul>*/}
+                                        {/*        </div>*/}
+                                        {/*    </div>*/}
+                                        {/*</div>*/}
                                     </Card.Body>
                                 </Accordion.Collapse>
                             </Card>
                         }
                         
                         {/* step 3B outside */}
-                        {stepSelectedValue["3"] === "2" && !!(stepSelectedValue["2"] === "2" || stepSelectedValue["2"] === "3") &&
+                        {stepSelectedValue["3"] === "2" && !!(step2 === "Outside" || step2 === "HiddenMoulding") &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="3B" stepNum={t("3B")} stepTitle={t("zebra_step3BOutside")} stepRef="3BOut" type="2"
@@ -5205,7 +5290,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                         }
                         
                         {/* step 3C outside */}
-                        {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "2" &&
+                        {stepSelectedValue["3"] === "2" && step2 === "Outside" &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="3C" stepNum={t("3C")} stepTitle={t("zebra_step3COutside")} stepRef="3COut" type="2"
@@ -5274,7 +5359,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                         }
                         
                         {/* step 3C Arc */}
-                        {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "3" &&
+                        {stepSelectedValue["3"] === "2" && step2 === "HiddenMoulding" &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="3C" stepNum={t("3C")} stepTitle={t("dk_step2D")} stepRef="3CArc" type="2" required={requiredStep["3CArc"]}
@@ -5477,7 +5562,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                         }
                         
                         {/* step 3D outside */}
-                        {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "2" &&
+                        {stepSelectedValue["3"] === "2" && step2 === "Outside" &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="3D" stepNum={t("3D")} stepTitle={t("zebra_step3DOutside")} stepRef="3DOut" type="2"
@@ -5572,6 +5657,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                                        selectChanged(e);
                                                        setStep4("Continuous Loop");
                                                        setStep41("false");
+                                                       setMotorErr1(false);
                                                        setControlTypeNextStep("4A");
                                                        setDeps("4A,4B", "4,41,411,412");
                                                        setCart("ControlType", "Continuous Loop", "hasPower,MotorType,MotorPosition,RemoteName,MotorChannels");
@@ -5580,22 +5666,22 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                             <label htmlFor="41">{t("Continuous")}<br/><p>{t("Loop")}</p></label>
                                         </div>
                                         <div className="box50 radio_style">
-                                            <input className="radio" type="radio" text={t("Motorized")} value="2" name="step4" checked={step4 === "Motorized"}
+                                            <input className="radio" type="radio" value="2" name="step4" checked={step4 === "Motorized"}
                                                    ref-num="4" id="42"
                                                    onChange={e => {
                                                        selectChanged(e, "41", "4A,4B");
                                                        setStep4("Motorized");
                                                        setControlTypeNextStep("5");
                                                        setDeps("41", "4,4A,4B");
-                                                       setCart("ControlType", "Motorized", "ControlPosition,ChainLength");
+                                                       setCart("", "", "ControlPosition,ChainLength");
                                                    }} ref={ref => (inputs.current["42"] = ref)}/>
                                             <label htmlFor="42">{t("Motorized")}<br/><p
                                                 className="surcharge_price">{Object.keys(modelAccessories).length !== 0 || selectedMotorMinPrice > 0 ? t("Starts at ") + GetPrice(selectedMotorMinPrice, pageLanguage, t("TOMANS")) : t("Surcharge Applies")}</p>
                                             </label>
                                         
                                         </div>
-                                        {stepSelectedValue["4"] === "2" &&
-                                            <div className="secondary_options">
+                                        {step4 === "Motorized" &&
+                                            <div className={motorErr1 ? "secondary_options secondary_options_err" : "secondary_options"}>
                                                 {/*<hr/>*/}
                                                 {/*<p className="no_power_title">{t("Motor_title")}</p>*/}
                                                 <div className="card-body-display-flex">
@@ -5620,27 +5706,29 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                                     {/*    <label htmlFor="412">{t("No")}</label>*/}
                                                     {/*</div>*/}
                                                     <div className="width_max checkbox_style">
-                                                        <input type="checkbox" value="1" name="step41" ref-num="41" checked={step41 === "true"} onChange={(e) => {
-                                                            if (e.target.checked) {
-                                                                selectChanged(e);
-                                                                setStep41("true");
-                                                                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                                let refIndex = inputs.current["42"].getAttribute('ref-num');
-                                                                tempLabels[refIndex] = inputs.current["42"].getAttribute('text');
-                                                                setStepSelectedLabel(tempLabels);
-                                                                setSelectedMotorPosition([]);
-                                                                setSelectedMotorType([]);
-                                                                setDeps("411,412", "41");
-                                                                setCart("hasPower", true, "", "MotorChannels", [selectedMotorChannels.map(obj => obj.value)]);
-                                                            } else {
-                                                                selectUncheck(e);
-                                                                setStep41("");
-                                                                // modalHandleShow("noPower");
-                                                                setCustomMotorAcc({});
-                                                                setDeps("41", "411");
-                                                                setCart("", "", "hasPower,MotorType,MotorPosition,RemoteName,MotorChannels");
-                                                            }
-                                                        }} id="411" ref={ref => (inputs.current["411"] = ref)}/>
+                                                        <input type="checkbox" text={t("Motorized")} value="2" name="step41" ref-num="4" checked={step41 === "true"}
+                                                               onChange={(e) => {
+                                                                   if (e.target.checked) {
+                                                                       selectChanged(e);
+                                                                       setStep41("true");
+                                                                       setMotorErr1(false);
+                                                                       // let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                                       // let refIndex = inputs.current["42"].getAttribute('ref-num');
+                                                                       // tempLabels[refIndex] = inputs.current["42"].getAttribute('text');
+                                                                       // setStepSelectedLabel(tempLabels);
+                                                                       setSelectedMotorPosition([]);
+                                                                       setSelectedMotorType([]);
+                                                                       setDeps("411,412", "41");
+                                                                       setCart("hasPower", true, "", "ControlType,MotorChannels", ["Motorized", selectedMotorChannels.map(obj => obj.value)]);
+                                                                   } else {
+                                                                       selectUncheck(e);
+                                                                       setStep41("");
+                                                                       // modalHandleShow("noPower");
+                                                                       setCustomMotorAcc({});
+                                                                       setDeps("41", "411");
+                                                                       setCart("", "", "ControlType,hasPower,MotorType,MotorPosition,RemoteName,MotorChannels");
+                                                                   }
+                                                               }} id="411" ref={ref => (inputs.current["411"] = ref)}/>
                                                         <label htmlFor="411" className="checkbox_label">
                                                             <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
                                                                  alt=""/>
@@ -5653,7 +5741,10 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                                 </div>
                                             </div>
                                         }
-                                        {stepSelectedValue["41"] === "1" && stepSelectedValue["4"] === "2" &&
+                                        {motorErr1 &&
+                                            <div className="input_not_valid">{t("motorErr1")}</div>
+                                        }
+                                        {step41 === "true" && step4 === "Motorized" &&
                                             <div className="motorized_options same_row_selection">
                                                 <div className="motorized_option_left">
                                                     <p>{t("Motor Type")}</p>
@@ -5871,7 +5962,11 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                             </div>
                                         }
                                         
-                                        <NextStep eventKey={controlTypeNextStep}>{t("NEXT STEP")}</NextStep>
+                                        <NextStep eventKey={step4 === "Motorized" && step41 !== "true" ? "4" : controlTypeNextStep} onClick={() => {
+                                            if (step4 === "Motorized" && step41 !== "true") {
+                                                setMotorErr1(true);
+                                            }
+                                        }}>{t("NEXT STEP")}</NextStep>
                                     </div>
                                     
                                     {(stepSelectedValue["4"] === "1" || stepSelectedValue["4"] === undefined) &&
@@ -6395,11 +6490,13 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                                         //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                         // }
                                                         onChange={(selected) => {
-                                                            setDeps("", "61");
-                                                            roomLabelChanged(selected[0], "6", false);
-                                                            setSelectedRoomLabel(selected);
-                                                            // setCart("RoomNameEn", selected[0].value);
-                                                            setCart("RoomNameFa", rooms["fa"].find(opt => opt.value === selected[0].value).label, "", "RoomNameEn", [selected[0].value]);
+                                                            if (selected[0] !== undefined) {
+                                                                setDeps("", "61");
+                                                                roomLabelChanged(selected[0], "6", false);
+                                                                setSelectedRoomLabel(selected);
+                                                                // setCart("RoomNameEn", selected[0].value);
+                                                                setCart("RoomNameFa", rooms["fa"].find(opt => opt.value === selected[0].value).label, "", "RoomNameEn", [selected[0].value]);
+                                                            }
                                                         }}
                                                         options={rooms[pageLanguage]}
                                                     />
@@ -6576,7 +6673,8 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                                 <ul className=" help_column_list">
                                                     <li>{t("stepZip_help_1")}</li>
                                                     <li>{t("stepZip_help_2")}</li>
-                                                    <li>{t("stepZip_help_3")}<h5 className="text_underline pointer" onClick={()=>modalHandleShow("Zipcode_how_it_works")}>{t("zipcode_measure_verify")}</h5></li>
+                                                    <li>{t("stepZip_help_3")}<h5 className="text_underline pointer"
+                                                                                 onClick={() => modalHandleShow("Zipcode_how_it_works")}>{t("zipcode_measure_verify")}</h5></li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -7383,11 +7481,13 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                             //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                             // }
                                             onChange={(selected) => {
-                                                setDeps("", "61");
-                                                roomLabelChanged(selected[0], "6", false);
-                                                setSelectedRoomLabel(selected);
-                                                // setCart("RoomNameEn", selected[0].value);
-                                                setCart("RoomNameFa", rooms["fa"].find(opt => opt.value === selected[0].value).label, "", "RoomNameEn", [selected[0].value]);
+                                                if (selected[0] !== undefined) {
+                                                    setDeps("", "61");
+                                                    roomLabelChanged(selected[0], "6", false);
+                                                    setSelectedRoomLabel(selected);
+                                                    // setCart("RoomNameEn", selected[0].value);
+                                                    setCart("RoomNameFa", rooms["fa"].find(opt => opt.value === selected[0].value).label, "", "RoomNameEn", [selected[0].value]);
+                                                }
                                             }}
                                             options={rooms[pageLanguage]}
                                         />
@@ -7399,14 +7499,14 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                                    className="form-control window_name" name="order_window_name"
                                                    value={roomLabelText}
                                                    onChange={(e) => {
-                                                                   if (e.target.value === "")
-                                                                       setDeps("62", "");
-                                                                   else
-                                                                       setDeps("", "62");
-                                                                   roomLabelChanged(e.target.value, "6", true);
-                                                                   setRoomLabelText(e.target.value);
-                                                                   setCart("WindowName", e.target.value);
-                                                               }}/>
+                                                       if (e.target.value === "")
+                                                           setDeps("62", "");
+                                                       else
+                                                           setDeps("", "62");
+                                                       roomLabelChanged(e.target.value, "6", true);
+                                                       setRoomLabelText(e.target.value);
+                                                       setCart("WindowName", e.target.value);
+                                                   }}/>
                                 </div>
                             </div>
                             {!!(roomLabelText !== "" && selectedRoomLabel.length) &&

@@ -11,6 +11,7 @@ function CustomDropdownMultiWithSearch({props, state, methods}) {
         <div className={props.className}>
             <div>
                 <input
+                    autoFocus
                     type="text"
                     value={state.search}
                     onChange={methods.setSearch}

@@ -62,6 +62,7 @@ function PageItems() {
     const [parameters, setParameters] = React.useState(undefined);
     const [refIndex, setRefIndex] = React.useState(-1);
     const [fabricsDragList, setFabricsDragList] = React.useState({});
+    const [designOrderList, setDesignOrderList] = React.useState({});
     const [dragListFabricsList, setDragListFabricsList] = React.useState([]);
     const [dragListDesignsList, setDragListDesignsList] = React.useState([]);
     const [isDesignDrag, setIsDesignDrag] = React.useState(false);
@@ -126,6 +127,11 @@ function PageItems() {
         {value: 'Decorative', label: 'Decorative'}
     ];
     
+    const DesignOne = [
+        {value: 'none', label: 'no'},
+        {value: 'one', label: 'yes'},
+    ];
+    
     function convertToPersian(string_farsi) {
         let tempString = string_farsi.replace("ي", "ی");
         tempString = tempString.replace("ي", "ی");
@@ -135,7 +141,7 @@ function PageItems() {
         return tempString;
     }
     
-    function dragOnChange(sourceId, sourceIndex, targetIndex, targetId,key) {
+    function dragOnChange(sourceId, sourceIndex, targetIndex, targetId, key) {
         let temp = JSON.parse(JSON.stringify(fabricsDragList));
         let params = JSON.parse(JSON.stringify(parameters));
         // setDragListDesignsList([]);
@@ -143,7 +149,7 @@ function PageItems() {
         setFabricIsLoading(true);
         
         const nextState = swap(temp[key], sourceIndex, targetIndex);
-    
+        
         for (let j = 0; j < nextState.length; j++) {
             if (params["Fabrics"]) {
                 if (params["Fabrics"][nextState[j]["FabricId"]]) {
@@ -161,11 +167,30 @@ function PageItems() {
         setParameters(params);
     }
     
-    function dragOnChangeDesigns(sourceId, sourceIndex, targetIndex, targetId) {
-        // let temp = JSON.parse(JSON.stringify(fabricsDragList));
-        // const nextState = swap(temp[key], sourceIndex, targetIndex);
-        // temp[key]=nextState
-        // setFabricsDragList(temp);
+    function dragOnChangeDesigns(sourceId, sourceIndex, targetIndex, targetId, designOrders) {
+        let temp = JSON.parse(JSON.stringify(designOrders));
+        let params = JSON.parse(JSON.stringify(parameters));
+        setFabricIsLoading(true);
+    
+        // console.log(temp);
+        const nextState = swap(temp, sourceIndex, targetIndex);
+        //
+        // console.log(nextState);
+        for (let j = 0; j < nextState.length; j++) {
+            if (params["Designs"]) {
+                if (params["Designs"][nextState[j]]) {
+                    params["Designs"][nextState[j]]["order"] = j;
+                } else {
+                    params["Designs"][nextState[j]] = {};
+                    params["Designs"][nextState[j]]["order"] = j;
+                }
+            } else {
+                params["Designs"] = {};
+                params["Designs"][nextState[j]] = {};
+                params["Designs"][nextState[j]]["order"] = j;
+            }
+        }
+        setParameters(params);
     }
     
     function getPageItems() {
@@ -319,7 +344,7 @@ function PageItems() {
             
             let QueryString = pageItems[i].QueryString ? pageItems[i].QueryString : "";
             if (i === 0) {
-                // console.log(Parameters);
+                // console.log(Fabrics);
             }
             
             let paramColorsArr = QueryString.split('colors=');
@@ -501,8 +526,8 @@ function PageItems() {
                                         onClick={() => {
                                             sortFabric.current.setAttribute("disabled", "disabled");
                                             // if(i===0){
-                                            let tempArr=paramDesignsSelected.map(el => el["label"]);
-                                            if(tempArr.length) {
+                                            let tempArr = paramDesignsSelected.map(el => el["label"]);
+                                            if (tempArr.length) {
                                                 let fillteredFabrics = tempArr.reduce((result, el) => ({...result, [el]: Fabrics[el]}), {});
                                                 // console.log(fillteredFabrics);
                                                 // let newFabrics={};
@@ -510,8 +535,7 @@ function PageItems() {
                                                 //     newFabrics[key]={"value":fillteredFabrics[key],"order":-1}
                                                 // });
                                                 setFabricsDragList(fillteredFabrics);
-                                            }
-                                            else{
+                                            } else {
                                                 setFabricsDragList(Fabrics);
                                             }
                                             setParameters(JSON.parse(Parameters === undefined || Parameters === null || Parameters === "undefined" || Parameters === "null" || Parameters === "" ? "{}" : Parameters))
@@ -757,9 +781,10 @@ function PageItems() {
         setTimeout(() => {
             const fabricList = [];
             const designList = [];
+            const tempDesignOrderList=[];
             let promiseArr = [];
-            let tempFabrics=JSON.parse(JSON.stringify(fabricsDragList));
-    
+            let tempFabrics = JSON.parse(JSON.stringify(fabricsDragList));
+            
             Object.keys(fabricsDragList).forEach((key, index) => {
                 promiseArr[index] = new Promise((resolve, reject) => {
                     let DesignCode = fabricsDragList[key][0]["DesignCode"].toString();
@@ -768,26 +793,37 @@ function PageItems() {
                             value: parameters["Designs"][DesignCode]["type"].toString(),
                             label: DesignType.find(opt => opt.value === parameters["Designs"][DesignCode]["type"].toString())["label"]
                         }] : []
-    
+                    
                     let designOrderSelected = parameters["Designs"] && parameters["Designs"][DesignCode] && parameters["Designs"][DesignCode]["order"] ? parameters["Designs"][DesignCode]["order"] : -1;
-                    let designOnlyOneSelected = parameters["Designs"] && parameters["Designs"][DesignCode] && parameters["Designs"][DesignCode]["onlyOne"] ? parameters["Designs"][DesignCode]["onlyOne"] : false;
-    
+                    let designOnlyOneSelected = parameters["Designs"] && parameters["Designs"][DesignCode] && parameters["Designs"][DesignCode]["onlyOne"] ?
+                        [{
+                            value: "one",
+                            label: DesignOne.find(opt => opt.value === "one")["label"]
+                        }]
+                        :
+                        [{
+                            value: "none",
+                            label: DesignOne.find(opt => opt.value === "none")["label"]
+                        }]
+                    ;
+                    console.log(parameters);
+                    
                     const fabric = [];
-                    tempFabrics[key]=[];
-    
+                    tempFabrics[key] = [];
+                    
                     for (let j = 0; j < fabricsDragList[key].length; j++) {
                         let FabricId = fabricsDragList[key][j].FabricId;
                         let fabricOrderSelected = parameters["Fabrics"] && parameters["Fabrics"][FabricId] && parameters["Fabrics"][FabricId]["order"] ? parameters["Fabrics"][FabricId]["order"] : -1;
-        
+                        
                         let PhotoPath = "";
                         fabricsDragList[key][j]["FabricPhotos"].forEach(obj => {
                             if (obj["PhotoTypeId"] === 4702)
                                 PhotoPath = obj["PhotoUrl"];
                         });
                         let ColorEnName = fabricsDragList[key][j]["ColorEnName"];
-        
+                        
                         if (fabricOrderSelected !== -1 && !fabric[fabricOrderSelected]) {
-                            tempFabrics[key][fabricOrderSelected]=fabricsDragList[key][j];
+                            tempFabrics[key][fabricOrderSelected] = fabricsDragList[key][j];
                             fabric[fabricOrderSelected] =
                                 <GridItem key={j} className="drag_grid">
                                     <div
@@ -810,7 +846,7 @@ function PageItems() {
                         } else {
                             let index = fabric.findIndex(Object.is.bind(null, undefined));
                             let pushIndex = index === -1 ? fabric.length : index;
-                            tempFabrics[key][pushIndex]=fabricsDragList[key][j];
+                            tempFabrics[key][pushIndex] = fabricsDragList[key][j];
                             fabric[pushIndex] =
                                 <GridItem key={j} className="drag_grid">
                                     <div
@@ -833,8 +869,12 @@ function PageItems() {
                         }
                     }
                     tempFabrics[key].filter(n => n);
-    
+                    
                     if (designOrderSelected !== -1 && !designList[designOrderSelected]) {
+                        if(fabricsDragList && fabricsDragList[key] && fabricsDragList[key][0] && fabricsDragList[key][0]["DesignCode"]) {
+                            tempDesignOrderList[designOrderSelected] = fabricsDragList[key][0]["DesignCode"];
+                            // console.log(tempDesignOrderList[designOrderSelected],designOrderSelected);
+                        }
                         designList[designOrderSelected] =
                             <GridItem key={index} className="drag_grid">
                                 <div className={`material_detail`} key={"fabric" + key}>
@@ -878,12 +918,63 @@ function PageItems() {
                                         options={DesignType}
                                     />
                                 </div>
+                                <div className="select_container select_container2">
+                                    <Select
+                                        className="select select_page_item"
+                                        style={{zIndex: "9999"}}
+                                        placeholder={"Please Select"}
+                                        portal={document.body}
+                                        dropdownPosition="bottom"
+                                        dropdownHandle={false}
+                                        dropdownGap={0}
+                                        values={designOnlyOneSelected}
+                                        onDropdownOpen={() => {
+                                            let temp1 = window.scrollY;
+                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                            setTimeout(() => {
+                                                let temp2 = window.scrollY;
+                                                if (temp2 === temp1)
+                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                            }, 100);
+                                        }}
+                                        dropdownRenderer={
+                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                        }
+                                        contentRenderer={
+                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                        }
+                                        onChange={(selected) => {
+                                            if (selected.length) {
+                                                if (selected[0]["value"] === "one") {
+                                                    let temp = JSON.parse(JSON.stringify(fabricDesigns2));
+                                                    temp["refIndex"] = refIndex;
+                                                    temp["id"] = DesignCode;
+                                                    temp["onlyOne"] = true;
+                                                    temp["fabrics"] = tempFabrics;
+                                                    setFabricDesigns2(temp);
+                                                } else {
+                                                    let temp = JSON.parse(JSON.stringify(fabricDesigns2));
+                                                    temp["refIndex"] = refIndex;
+                                                    temp["id"] = DesignCode;
+                                                    temp["onlyOne"] = false;
+                                                    temp["fabrics"] = tempFabrics;
+                                                    setFabricDesigns2(temp);
+                                                }
+                                            }
+                                        }}
+                                        options={DesignOne}
+                                    />
+                                </div>
                             </GridItem>;
                     } else {
                         let index = designList.findIndex(Object.is.bind(null, undefined));
                         let pushIndex = index === -1 ? designList.length : index;
+                        if(fabricsDragList && fabricsDragList[key] && fabricsDragList[key][0] && fabricsDragList[key][0]["DesignCode"]) {
+                            tempDesignOrderList[pushIndex] = fabricsDragList[key][0]["DesignCode"];
+                            // console.log(tempDesignOrderList[pushIndex],pushIndex);
+                        }
                         designList[pushIndex] =
-                            <GridItem key={index} className="drag_grid">
+                            <GridItem key={pushIndex} className="drag_grid">
                                 <div className={`material_detail`} key={"fabric" + key}>
                                     <span>{"DESIGN NAME"}: {key}</span>
                                 </div>
@@ -924,9 +1015,56 @@ function PageItems() {
                                         options={DesignType}
                                     />
                                 </div>
+                                <div className="select_container select_container2">
+                                    <Select
+                                        className="select select_page_item"
+                                        style={{zIndex: "9999"}}
+                                        placeholder={"Please Select"}
+                                        portal={document.body}
+                                        dropdownPosition="bottom"
+                                        dropdownHandle={false}
+                                        dropdownGap={0}
+                                        values={designOnlyOneSelected}
+                                        onDropdownOpen={() => {
+                                            let temp1 = window.scrollY;
+                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                            setTimeout(() => {
+                                                let temp2 = window.scrollY;
+                                                if (temp2 === temp1)
+                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                            }, 100);
+                                        }}
+                                        dropdownRenderer={
+                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                        }
+                                        contentRenderer={
+                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                        }
+                                        onChange={(selected) => {
+                                            if (selected.length) {
+                                                if (selected[0]["value"] === "one") {
+                                                    let temp = JSON.parse(JSON.stringify(fabricDesigns2));
+                                                    temp["refIndex"] = refIndex;
+                                                    temp["id"] = DesignCode;
+                                                    temp["onlyOne"] = true;
+                                                    temp["fabrics"] = tempFabrics;
+                                                    setFabricDesigns2(temp);
+                                                } else {
+                                                    let temp = JSON.parse(JSON.stringify(fabricDesigns2));
+                                                    temp["refIndex"] = refIndex;
+                                                    temp["id"] = DesignCode;
+                                                    temp["onlyOne"] = false;
+                                                    temp["fabrics"] = tempFabrics;
+                                                    setFabricDesigns2(temp);
+                                                }
+                                            }
+                                        }}
+                                        options={DesignOne}
+                                    />
+                                </div>
                             </GridItem>;
                     }
-    
+                    
                     if (designOrderSelected !== -1 && !fabricList[designOrderSelected]) {
                         fabricList[index] =
                             <div className={`material_detail`} key={"fabric" + key}>
@@ -970,16 +1108,16 @@ function PageItems() {
                     }
                 })
             });
-    
+            
             Promise.all(promiseArr).then(() => {
                 
                 setDragListDesignsList(
-                    [<GridContextProvider onChange={(sourceId,sourceIndex,targetIndex,targetId)=>dragOnChangeDesigns(sourceId,sourceIndex,targetIndex,targetId)}>
+                    [<GridContextProvider onChange={(sourceId, sourceIndex, targetIndex, targetId) => dragOnChangeDesigns(sourceId, sourceIndex, targetIndex, targetId, tempDesignOrderList)}>
                         <GridDropZone
                             id="designs"
                             boxesPerRow={1}
                             rowHeight={40}
-                            style={{ height: "400px" }}
+                            style={{height: "400px"}}
                             className="drag_grid_container design_drag_grid_container"
                         >
                             {designList.filter(n => n)}
@@ -989,8 +1127,9 @@ function PageItems() {
                 setDragListFabricsList(fabricList.filter(n => n));
                 setFabricsDragList(tempFabrics);
                 setFabricIsLoading(false);
+                setDesignOrderList(tempDesignOrderList);
                 
-                console.log(fabricList.filter(n => n),tempFabrics);
+                // console.log(tempDesignOrderList);
             });
             
             
@@ -1165,8 +1304,8 @@ function PageItems() {
                                                 temp["fabrics"] = fabrics;
                                                 setFabricDesigns(temp);
                                             }
-                                        }} id={DesignEnName+key}/>
-                                        <label htmlFor={DesignEnName+key} className="checkbox_label">
+                                        }} id={DesignEnName + key}/>
+                                        <label htmlFor={DesignEnName + key} className="checkbox_label">
                                             <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
                                                  alt=""/>
                                         </label>
@@ -1253,8 +1392,8 @@ function PageItems() {
                                                 temp["fabrics"] = fabrics;
                                                 setFabricDesigns(temp);
                                             }
-                                        }} id={DesignEnName+key}/>
-                                        <label htmlFor={DesignEnName+key} className="checkbox_label">
+                                        }} id={DesignEnName + key}/>
+                                        <label htmlFor={DesignEnName + key} className="checkbox_label">
                                             <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
                                                  alt=""/>
                                         </label>
@@ -1266,8 +1405,8 @@ function PageItems() {
                         </div>;
                 }
             });
-            let fabricsButtonList=[];
-    
+            let fabricsButtonList = [];
+            
             fabricsButtonList[0] =
                 <button className="btn btn-primary mt-4 mb-2" key={"button1"}
                         onClick={e => {
@@ -1719,6 +1858,17 @@ function PageItems() {
             tempPageItems[fabricDesigns2["refIndex"]]["Parameters"] = JSON.stringify(params);
             setParameters(params);
             setPageItems(tempPageItems);
+            
+            // console.log(fabricDesigns2,params["Designs"][fabricDesigns2["id"]])
+            
+            setFabricDesigns2({
+                "refIndex": null,
+                "id": null,
+                "type": null,
+                "order": -1,
+                "onlyOne": null,
+                "fabrics": []
+            });
         }
     }, [fabricDesigns2]);
     
@@ -1888,54 +2038,54 @@ function PageItems() {
                     </Modal.Header>
                     <Modal.Body>
                         <div className="card_body card-body-fabric">
-                            <div className={fabricIsLoading?"is_loading fabrics_list_container":"fabrics_list_container"}>
+                            <div className={fabricIsLoading ? "is_loading fabrics_list_container" : "fabrics_list_container"}>
                                 {isDesignDrag === false && dragListFabricsList
-                                //     Object.keys(fabricsDragList).map((key, index) => {
-                                //     return (
-                                //         <div className={`material_detail`} key={"fabric" + key}>
-                                //             <div className={`material_traits`}>
-                                //                 <span>{"DESIGN NAME"}: {key}</span>
-                                //             </div>
-                                //             <GridContextProvider onChange={(sourceId,sourceIndex,targetIndex,targetId)=>dragOnChange(sourceId,sourceIndex,targetIndex,targetId,key)}>
-                                //                 <GridDropZone
-                                //                     id="items"
-                                //                     boxesPerRow={4}
-                                //                     rowHeight={155}
-                                //                     style={{ height: "465px" }}
-                                //                     className="drag_grid_container"
-                                //                 >
-                                //                     {fabricsDragList[key] && fabricsDragList[key].map(function(item,index) {
-                                //                         let PhotoPath = "";
-                                //                         item["FabricPhotos"].forEach(obj => {
-                                //                             if (obj["PhotoTypeId"] === 4702)
-                                //                                 PhotoPath = obj["PhotoUrl"];
-                                //                         });
-                                //                         return (
-                                //                             <GridItem key={index} className="drag_grid">
-                                //                                 <div
-                                //                                     style={{
-                                //                                         width: "90%",
-                                //                                         height: "100%"
-                                //                                     }}
-                                //                                     className="radio_group"
-                                //                                 >
-                                //                                     <label>
-                                //                                         <div className="frame_img">
-                                //                                             <img className={`img-fluid`} src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
-                                //                                         </div>
-                                //                                     </label>
-                                //                                     <div className={`fabric_name_container`}>
-                                //                                         <h1>{item["ColorEnName"]}</h1>
-                                //                                     </div>
-                                //                                 </div>
-                                //                             </GridItem>
-                                //                         );
-                                //                     })}
-                                //                 </GridDropZone>
-                                //             </GridContextProvider>
-                                //         </div>
-                                //     );
-                                // })
+                                    //     Object.keys(fabricsDragList).map((key, index) => {
+                                    //     return (
+                                    //         <div className={`material_detail`} key={"fabric" + key}>
+                                    //             <div className={`material_traits`}>
+                                    //                 <span>{"DESIGN NAME"}: {key}</span>
+                                    //             </div>
+                                    //             <GridContextProvider onChange={(sourceId,sourceIndex,targetIndex,targetId)=>dragOnChange(sourceId,sourceIndex,targetIndex,targetId,key)}>
+                                    //                 <GridDropZone
+                                    //                     id="items"
+                                    //                     boxesPerRow={4}
+                                    //                     rowHeight={155}
+                                    //                     style={{ height: "465px" }}
+                                    //                     className="drag_grid_container"
+                                    //                 >
+                                    //                     {fabricsDragList[key] && fabricsDragList[key].map(function(item,index) {
+                                    //                         let PhotoPath = "";
+                                    //                         item["FabricPhotos"].forEach(obj => {
+                                    //                             if (obj["PhotoTypeId"] === 4702)
+                                    //                                 PhotoPath = obj["PhotoUrl"];
+                                    //                         });
+                                    //                         return (
+                                    //                             <GridItem key={index} className="drag_grid">
+                                    //                                 <div
+                                    //                                     style={{
+                                    //                                         width: "90%",
+                                    //                                         height: "100%"
+                                    //                                     }}
+                                    //                                     className="radio_group"
+                                    //                                 >
+                                    //                                     <label>
+                                    //                                         <div className="frame_img">
+                                    //                                             <img className={`img-fluid`} src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
+                                    //                                         </div>
+                                    //                                     </label>
+                                    //                                     <div className={`fabric_name_container`}>
+                                    //                                         <h1>{item["ColorEnName"]}</h1>
+                                    //                                     </div>
+                                    //                                 </div>
+                                    //                             </GridItem>
+                                    //                         );
+                                    //                     })}
+                                    //                 </GridDropZone>
+                                    //             </GridContextProvider>
+                                    //         </div>
+                                    //     );
+                                    // })
                                 }
                                 {isDesignDrag === true && dragListDesignsList
                                     // <GridContextProvider onChange={(sourceId,sourceIndex,targetIndex,targetId)=>dragOnChangeDesigns(sourceId,sourceIndex,targetIndex,targetId)}>
@@ -1963,13 +2113,15 @@ function PageItems() {
                                 <div className="help_options_container">
                                     <ul className="help_options help_options_lengthType">
                                         <li className={`help_option_lengthType_item ${isDesignDrag === false ? "help_option_lengthType_item_on" : ""}`}
-                                            onClick={() => setIsDesignDrag(false)}>Fabrics</li>
+                                            onClick={() => setIsDesignDrag(false)}>Fabrics
+                                        </li>
                                         <li className={`help_option_lengthType_item ${isDesignDrag === true ? "help_option_lengthType_item_on" : ""}`}
-                                            onClick={() => setIsDesignDrag(true)}>Designs</li>
+                                            onClick={() => setIsDesignDrag(true)}>Designs
+                                        </li>
                                     </ul>
                                 </div>
                                 <div>
-                                    <button className="btn btn-success mt-4 mb-2" onClick={()=>{
+                                    <button className="btn btn-success mt-4 mb-2" onClick={() => {
                                         let tempPageItems = JSON.parse(JSON.stringify(pageItems));
                                         tempPageItems[refIndex]["Parameters"] = JSON.stringify(parameters);
                                         setPageItems(tempPageItems);
@@ -1983,8 +2135,10 @@ function PageItems() {
                                     }}
                                     >SAVE
                                     </button>
-                                    <button className="btn btn-warning mt-4 mb-2"
-                                    >DISCARD
+                                    <button className="btn btn-warning mt-4 mb-2" onClick={() => {
+                                        setShowFabrics2(false);
+                                        sortFabric.current.removeAttribute("disabled");
+                                    }}>DISCARD
                                     </button>
                                 </div>
                             </div>

@@ -12,9 +12,36 @@ function CustomDropdownWithSearch({props, state, methods}) {
             <div className="select_search_container">
                 <i className="fa fa-search" aria-hidden="true"/>
                 <input
+                    autoFocus
                     type="text"
                     value={state.search}
-                    onChange={methods.setSearch}
+                    onChange={(e)=> {
+                        methods.setSearch(e);
+                    }}
+                    onKeyDown={(e)=>{
+                        if (e.key === 'Enter') {
+                            let promiseArr=[];
+                            let exist=false;
+                            let tempOption={};
+                            props.options.forEach((obj,index) => {
+                                promiseArr[index] = new Promise((resolve, reject) => {
+                                    if (obj.value.toString() === state.search.toString() && state.search.toString()!==""){
+                                        exist=true;
+                                        tempOption=obj;
+                                        resolve();
+                                    }
+                                    else{
+                                        resolve();
+                                    }
+                                });
+                            });
+                            Promise.all(promiseArr).then(() => {
+                                if(exist){
+                                    methods.addItem(tempOption);
+                                }
+                            });
+                        }
+                    }}
                     placeholder={t("Search")}
                 />
             </div>

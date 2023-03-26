@@ -82,6 +82,7 @@ function Checkout() {
         password: "",
         passwordConfirm: ""
     });
+    const [emailNews, setEmailNews] = useState(false);
     const [passwordsEnable, setPasswordsEnable] = useState(false);
     const [passwordMatch, setPasswordMatch] = useState(false);
     const [passwordNotValidState, setPasswordNotValidState] = useState(0);
@@ -300,7 +301,8 @@ function Checkout() {
             }).then((response) => {
                 setDiscount("");
                 setDiscountErr("");
-                setCartChanged(cartChanged + 1);
+    
+                setCart(response.data ? response.data : {});
             }).catch(err => {
                 if (err.response.status === 401) {
                     refreshToken().then((response2) => {
@@ -380,6 +382,8 @@ function Checkout() {
     
                             setTotalSaving(response.data["TotalDiscount"]);
                             setDiscounts(response.data["DiscountCodes"]);
+                            setDiscount("");
+                            setDiscountErr("");
                             
                             if (localStorage.getItem("cart") !== null) {
                                 let cartObj = JSON.parse(localStorage.getItem("cart"));
@@ -1059,14 +1063,16 @@ function Checkout() {
                                     if (tempObj === undefined) {
                                         delArr.push(index);
                                         resolve();
-                                    } else if (tempObj["apiLabel"] === "WidthCart") {
-                                        desc[tempObj["order"]] =
-                                            <div className="basket_item_title_desc" key={index}>
-                                                <h3>{t("DIMENSIONS")}&nbsp;</h3>
-                                                <h4>{NumToFa((obj["WidthCart"]) + t("Zebra Measurements W") + " \u00d7 " + obj["HeightCart"] + t("Zebra Measurements H") + t("basket Measurements cm"),pageLanguage)}</h4>
-                                            </div>;
-                                        resolve();
-                                    } else {
+                                    }
+                                    // else if (tempObj["apiLabel"] === "WidthCart") {
+                                    //     desc[tempObj["order"]] =
+                                    //         <div className="basket_item_title_desc" key={index}>
+                                    //             <h3>{t("DIMENSIONS")}&nbsp;</h3>
+                                    //             <h4>{NumToFa((obj["WidthCart"]) + t("Zebra Measurements W") + " \u00d7 " + obj["HeightCart"] + t("Zebra Measurements H") + t("basket Measurements cm"),pageLanguage)}</h4>
+                                    //         </div>;
+                                    //     resolve();
+                                    // }
+                                    else {
                                         if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
                                             let objLabel = "";
                                             let apiValue = obj[tempObj["apiLabel"]] === null ? "null" : obj[tempObj["apiLabel"]].toString();
@@ -1152,6 +1158,8 @@ function Checkout() {
                                                     </Accordion.Body>
                                                 </Accordion.Item>
                                             </Accordion>
+                                            {hasDiscount &&
+                                                <span className="checkout_item_discount">{t('Discount')} (-{GetPrice(obj["Discount"], pageLanguage, t("TOMANS"))})</span>}
                                         </div>
                                     </li>;
                                 if (index === tempDrapery.length - 1) {
@@ -1343,8 +1351,23 @@ function Checkout() {
                                     <div className="checkout_left_info_flex_right">
                                     </div>
                                 </div>
+                                {!isLoggedIn &&
+                                    <div className="checkout_left_info_shipping_agree">
+                                        <div className="checkout_left_info_flex">
+                                            <div className="checkout_left_info_flex_checkbox">
+                                                <input type="checkbox" checked={emailNews} onChange={(e) => {
+                                                    setEmailNews(e.target.checked);
+                                                }} id="emailNews"/>
+                                                <label htmlFor="emailNews" className="checkbox_label">
+                                                    <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')} alt=""/>
+                                                </label>
+                                                <p>{t("checkout_emailNews")}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
                             </div>
-                            
+    
                             <div className="checkout_left_info_shipping_address">
                                 <div className="checkout_left_info_flex checkout_left_info_flex_title">
                                     <div className="checkout_left_info_flex_left">

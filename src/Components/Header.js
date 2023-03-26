@@ -1,7 +1,9 @@
 import React, {useEffect, useRef, useState} from "react";
 import {Link, useLocation, useNavigate} from "react-router-dom";
-import {ReactComponent as Logoen} from '../Images/public/logoen.svg';
-import {ReactComponent as Logofa} from '../Images/public/logofa.svg';
+// import {ReactComponent as Logoen} from '../Images/public/logoen.svg';
+// import {ReactComponent as Logofa} from '../Images/public/logofa.svg';
+import {ReactComponent as Logoen} from '../Images/public/logo_temp_en.svg';
+import {ReactComponent as Logofa} from '../Images/public/logo_temp_fa.svg';
 import {ReactComponent as Favorite} from '../Images/public/favorite.svg';
 import {ReactComponent as Person} from '../Images/public/person-2.svg';
 import {ReactComponent as Basket} from '../Images/public/basket-2.svg';
@@ -102,6 +104,7 @@ function Header() {
     const [mobileNotExist, setMobileNotExist] = useState(false);
     
     const signIn = useRef(null);
+    const fixedHeader = useRef(null);
     
     const mobileError = {
         "en": [
@@ -245,7 +248,7 @@ function Header() {
             setLastNotExist(true);
         }
         if (registerInfo.phone === "") {
-            setMobileNotExist(false);
+            setMobileNotExist(true);
         } else if (!validateNumber(registerInfo.phone)) {
             setMobileNotExist(true);
         } else {
@@ -1027,6 +1030,27 @@ function Header() {
         }
     }, [isLoggedIn]);
     
+    // const [offset2, setOffset2] = useState(0);
+    // const [offset3, setOffset3] = useState(0);
+    const [offset, setOffset] = useState(false);
+    
+    useEffect(() => {
+        const onScroll = () => {
+            // setOffset3(window.pageYOffset);
+            // setOffset2(fixedHeader.current.offsetTop);
+            if (fixedHeader.current.offsetTop < window.pageYOffset) {
+                setOffset(true);
+            } else {
+                setOffset(false);
+            }
+        };
+        
+        // clean up code
+        window.removeEventListener('scroll', onScroll);
+        window.addEventListener('scroll', onScroll, {passive: true});
+        return () => window.removeEventListener('scroll', onScroll);
+    }, []);
+    
     return (
         <div className={`header_container padding-clear ${pageLanguage === 'fa' ? "font_farsi" : "font_en"} ${currentPage.level1 === "Checkout" ? "noDisplay" : ""}`}>
             <div className="top_header">
@@ -1044,119 +1068,122 @@ function Header() {
                     </div>
                 </div>
             </div>
-            <div className="mid_header">
-                <div className="col-lg-12">
-                    <div className="mid_header_left">
-                        <div className="search-box">
-                            <button className="btn-search">
-                                <img src={require('../Images/public/main_search_icon.svg').default}
-                                     className="img-fluid" alt=""/>
-                                <input type="text" className={`input-search ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} placeholder={t("Search_placeholder")}
-                                       autoComplete="new-search"/>
-                            </button>
-                        </div>
-                    </div>
-                    <div className="Logo"><Link to="/">{pageLanguage === 'en' ? <Logoen/> : <Logofa/>}</Link></div>
-                    <div className="mid_header_right">
-                        <ul className={pageLanguage === 'fa' ? "float_left icons" : "float_right icons"}>
-                            {currentPage.level1 === "Curtain" && currentPage.level3 !== undefined &&
-                                <li className="login-open" onClick={() => {
-                                    if (isLoggedIn) {
-                                        navigate("/" + pageLanguage + "/Account")
-                                    } else {
-                                        dispatch({
-                                            type: ShowLoginModal,
-                                        })
+            <div className={offset ? "fixed_header" : ""} ref={fixedHeader}>
+                <div>
+                    <div className="mid_header">
+                        <div className="col-lg-12">
+                            <div className="mid_header_left">
+                                <div className="search-box">
+                                    <button className="btn-search">
+                                        <img src={require('../Images/public/main_search_icon.svg').default}
+                                             className="img-fluid" alt=""/>
+                                        <input type="text" className={`input-search ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} placeholder={t("Search_placeholder")}
+                                               autoComplete="new-search"/>
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="Logo"><Link to="/">{pageLanguage === 'en' ? <Logoen/> : <Logofa/>}</Link></div>
+                            <div className="mid_header_right">
+                                <ul className={pageLanguage === 'fa' ? "float_left icons" : "float_right icons"}>
+                                    {currentPage.level1 === "Curtain" && currentPage.level3 !== undefined &&
+                                        <li className="login-open" onClick={() => {
+                                            if (isLoggedIn) {
+                                                navigate("/" + pageLanguage + "/Account")
+                                            } else {
+                                                dispatch({
+                                                    type: ShowLoginModal,
+                                                })
+                                            }
+                                        }}>
+                                            <Person/>
+                                        </li>
                                     }
-                                }}>
-                                    <Person/>
-                                </li>
-                            }
-                            {!(currentPage.level1 === "Curtain" && currentPage.level3 !== undefined) &&
-                                <Link className="login-open" to={isLoggedIn ? "/" + pageLanguage + "/Account" : "/" + pageLanguage + "/User/NewUser"}><Person/></Link>
-                            }
-                            <li className="favorite">
-                                <a href="https://www.doopsalta.com/en/account/login/">
-                                    <Favorite/>
-                                </a>
-                            </li>
-                            {(cartCount > 0 || (draperyCount + productCount + swatchesCount > 0)) &&
-                                <li className="checkout">
-                                    <div onClick={() => {
-                                        navigate("/" + pageLanguage + "/Basket");
-                                    }}>
-                                        <div className="display_grid">
-                                            <Basket/>
-                                            <div
-                                                className="count">{pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${cartCount > 0 ? cartCount : draperyCount + productCount + swatchesCount}`) : cartCount > 0 ? cartCount : draperyCount + productCount + swatchesCount}</div>
-                                        </div>
-                                    </div>
-                                    {/*<div className="card_menu">*/}
-                                    {/*    <div className="card_menu_title">*/}
-                                    {/*        <span>Shopping Bag</span>*/}
-                                    {/*    </div>*/}
-                                    {/*</div>*/}
-                                </li>
-                            }
-                            {cartCount === 0 && (draperyCount + productCount + swatchesCount === 0) &&
-                                <li className="checkout">
-                                    <div>
-                                        <PopoverStickOnClick btnClassNames="Header_Basket_icon"
-                                                             classNames={isLoggedIn ? "Header_Basket_icon_popover Header_Basket_icon_popover2" : "Header_Basket_icon_popover"}
-                                                             placement="bottom"
-                                                             isHover={true}
-                                                             onMouseEnter={() => {
-                                                             }}
-                                                             children={<div className="display_grid">
-                                                                 <Basket/>
-                                                                 <div
-                                                                     className="count">{cartCount > 0 ? cartCount : draperyCount + productCount + swatchesCount}</div>
-                                                             </div>}
-                                                             component={
-                                                                 <div className="card_menu_title">
-                                                                     <div className="basket_empty_header_1">{t("basket_empty_header_1")}</div>
-                                                                     {!isLoggedIn && <div className="basket_empty_header_2">{t("basket_empty_header_2")}<span
-                                                                         className="text_underline header_basket_sign_in"
-                                                                         onClick={() => navigate("/" + pageLanguage + "/User")}>{t("basket_empty_header_3")}</span>{t("basket_empty_header_4")}
+                                    {!(currentPage.level1 === "Curtain" && currentPage.level3 !== undefined) &&
+                                        <Link className="login-open" to={isLoggedIn ? "/" + pageLanguage + "/Account" : "/" + pageLanguage + "/User/NewUser"}><Person/></Link>
+                                    }
+                                    <li className="favorite">
+                                        <a href="https://www.doopsalta.com/en/account/login/">
+                                            <Favorite/>
+                                        </a>
+                                    </li>
+                                    {(cartCount > 0 || (draperyCount + productCount + swatchesCount > 0)) &&
+                                        <li className="checkout">
+                                            <div onClick={() => {
+                                                navigate("/" + pageLanguage + "/Basket");
+                                            }}>
+                                                <div className="display_grid">
+                                                    <Basket/>
+                                                    <div
+                                                        className="count">{pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${cartCount > 0 ? cartCount : draperyCount + productCount + swatchesCount}`) : cartCount > 0 ? cartCount : draperyCount + productCount + swatchesCount}</div>
+                                                </div>
+                                            </div>
+                                            {/*<div className="card_menu">*/}
+                                            {/*    <div className="card_menu_title">*/}
+                                            {/*        <span>Shopping Bag</span>*/}
+                                            {/*    </div>*/}
+                                            {/*</div>*/}
+                                        </li>
+                                    }
+                                    {cartCount === 0 && (draperyCount + productCount + swatchesCount === 0) &&
+                                        <li className="checkout">
+                                            <div>
+                                                <PopoverStickOnClick btnClassNames="Header_Basket_icon"
+                                                                     classNames={isLoggedIn ? "Header_Basket_icon_popover Header_Basket_icon_popover2" : "Header_Basket_icon_popover"}
+                                                                     placement="bottom"
+                                                                     isHover={true}
+                                                                     onMouseEnter={() => {
+                                                                     }}
+                                                                     children={<div className="display_grid">
+                                                                         <Basket/>
+                                                                         <div
+                                                                             className="count">{cartCount > 0 ? cartCount : draperyCount + productCount + swatchesCount}</div>
                                                                      </div>}
-                                                                 </div>
-                                                             }/>
-                                    
-                                    </div>
-                                    {/*<div className="card_menu">*/}
-                                    {/*    <div className="card_menu_title">*/}
-                                    {/*        <span>Shopping Bag</span>*/}
-                                    {/*    </div>*/}
-                                    {/*</div>*/}
-                                </li>
-                            }
-                        </ul>
-                        <ul className={`Lang_change_container ${pageLanguage === 'fa' ? "float_left" : "float_right"}`}>
-                            <li className="Lang_change">
-                                <Link to={langLocation.locationEN} onClick={() => i18n.changeLanguage("en")}
-                                      style={pageLanguage === 'en' ? {pointerEvents: "none", color: "#383838"} : null}>ENGLISH</Link>
-                            </li>
-                            <li className="lang_separator">&nbsp;|&nbsp;</li>
-                            <li className="Lang_change">
-                                <Link to={langLocation.locationFA} onClick={() => i18n.changeLanguage("fa")}
-                                      style={pageLanguage === 'fa' ? {pointerEvents: "none", color: "#383838"} : null}>فارسی</Link>
-                            </li>
-                        </ul>
+                                                                     component={
+                                                                         <div className="card_menu_title">
+                                                                             <div className="basket_empty_header_1">{t("basket_empty_header_1")}</div>
+                                                                             {!isLoggedIn && <div className="basket_empty_header_2">{t("basket_empty_header_2")}<span
+                                                                                 className="text_underline header_basket_sign_in"
+                                                                                 onClick={() => navigate("/" + pageLanguage + "/User")}>{t("basket_empty_header_3")}</span>{t("basket_empty_header_4")}
+                                                                             </div>}
+                                                                         </div>
+                                                                     }/>
+                                            
+                                            </div>
+                                            {/*<div className="card_menu">*/}
+                                            {/*    <div className="card_menu_title">*/}
+                                            {/*        <span>Shopping Bag</span>*/}
+                                            {/*    </div>*/}
+                                            {/*</div>*/}
+                                        </li>
+                                    }
+                                </ul>
+                                <ul className={`Lang_change_container ${pageLanguage === 'fa' ? "float_left" : "float_right"}`}>
+                                    <li className="Lang_change">
+                                        <Link to={langLocation.locationEN} onClick={() => i18n.changeLanguage("en")}
+                                              style={pageLanguage === 'en' ? {pointerEvents: "none", color: "#383838"} : null}>ENGLISH</Link>
+                                    </li>
+                                    <li className="lang_separator">&nbsp;|&nbsp;</li>
+                                    <li className="Lang_change">
+                                        <Link to={langLocation.locationFA} onClick={() => i18n.changeLanguage("fa")}
+                                              style={pageLanguage === 'fa' ? {pointerEvents: "none", color: "#383838"} : null}>فارسی</Link>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div className="bottom_header">
-                <div className="col-lg-12">
-                    <div className="menu">
-                        <ul>
-                            {menuRender}
-                        </ul>
-                        <div className="bghover">
+                    <div className="bottom_header">
+                        <div className="col-lg-12">
+                            <div className="menu">
+                                <ul>
+                                    {menuRender}
+                                </ul>
+                                <div className="bghover">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
             
             {/* Modals */}
             

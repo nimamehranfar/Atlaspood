@@ -209,7 +209,7 @@
         "title": "Width",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": 3,
+        "order": -1,
         "apiLabel": "WidthCart",
         "apiValue": null,
         "measurements": true,
@@ -234,10 +234,10 @@
       },
       {
         "cart": "WindowWidth",
-        "title": "WindowWidth",
+        "title": "Width",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": -1,
+        "order": 3,
         "apiLabel": "WindowWidth",
         "apiValue": null,
         "measurements": true,
@@ -248,10 +248,10 @@
       },
       {
         "cart": "WindowHeight",
-        "title": "WindowHeight",
+        "title": "Height",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": -1,
+        "order": 4,
         "apiLabel": "WindowHeight",
         "apiValue": null,
         "measurements": true,
@@ -995,7 +995,7 @@
         "title": "Width",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": 3,
+        "order": -1,
         "apiLabel": "WidthCart",
         "apiValue": null,
         "measurements": true,
@@ -1020,10 +1020,10 @@
       },
       {
         "cart": "WindowWidth",
-        "title": "WindowWidth",
+        "title": "Width",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": -1,
+        "order": 3,
         "apiLabel": "WindowWidth",
         "apiValue": null,
         "measurements": true,
@@ -1034,10 +1034,10 @@
       },
       {
         "cart": "WindowHeight",
-        "title": "WindowHeight",
+        "title": "Height",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": -1,
+        "order": 4,
         "apiLabel": "WindowHeight",
         "apiValue": null,
         "measurements": true,
@@ -1459,8 +1459,8 @@
         "apiValue": null,
         "apiAcc": true,
         "apiAccValue": {
-          "Standard": null,
-          "Scallop": {
+          "Straight": null,
+          "Classic": {
             "SewingAccessoryId": 4,
             "SewingModelAccessoryId": 6,
             "SewingAccessoryValue": "900001",
@@ -1472,7 +1472,7 @@
             "SewingAccessoryValue": "900002",
             "Qty": 1
           },
-          "Colonial": {
+          "Traditional": {
             "SewingAccessoryId": 4,
             "SewingModelAccessoryId": 6,
             "SewingAccessoryValue": "900003",
@@ -1976,7 +1976,7 @@
         "title": "Width",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": 3,
+        "order": -1,
         "apiLabel": "WidthCart",
         "apiValue": null,
         "measurements": true,
@@ -2001,10 +2001,10 @@
       },
       {
         "cart": "WindowWidth",
-        "title": "WindowWidth",
+        "title": "Width",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": -1,
+        "order": 3,
         "apiLabel": "WindowWidth",
         "apiValue": null,
         "measurements": true,
@@ -2015,10 +2015,10 @@
       },
       {
         "cart": "WindowHeight",
-        "title": "WindowHeight",
+        "title": "Height",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": -1,
+        "order": 4,
         "apiLabel": "WindowHeight",
         "apiValue": null,
         "measurements": true,
@@ -2453,8 +2453,8 @@
         "apiValue": null,
         "apiAcc": true,
         "apiAccValue": {
-          "Standard": null,
-          "Scallop": {
+          "Straight": null,
+          "Classic": {
             "SewingAccessoryId": 4,
             "SewingModelAccessoryId": 6,
             "SewingAccessoryValue": "900001",
@@ -2466,7 +2466,7 @@
             "SewingAccessoryValue": "900002",
             "Qty": 1
           },
-          "Colonial": {
+          "Traditional": {
             "SewingAccessoryId": 4,
             "SewingModelAccessoryId": 6,
             "SewingAccessoryValue": "900003",
@@ -2969,7 +2969,7 @@
         "title": "Width",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": 3,
+        "order": -1,
         "apiLabel": "WidthCart",
         "apiValue": null,
         "measurements": true,
@@ -2994,10 +2994,10 @@
       },
       {
         "cart": "WindowWidth",
-        "title": "WindowWidth",
+        "title": "Width",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": -1,
+        "order": 3,
         "apiLabel": "WindowWidth",
         "apiValue": null,
         "measurements": true,
@@ -3008,10 +3008,10 @@
       },
       {
         "cart": "WindowHeight",
-        "title": "WindowHeight",
+        "title": "Height",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": -1,
+        "order": 4,
         "apiLabel": "WindowHeight",
         "apiValue": null,
         "measurements": true,

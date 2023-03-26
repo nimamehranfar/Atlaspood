@@ -786,7 +786,7 @@ function Basket() {
                                         let objLabel = "";
                                         if (obj[tempObj["apiLabel"]] === undefined) {
                                             resolve();
-                                        } else if (tempObj["apiLabel"] === "WidthCart" && tempObj["measurements"]) {
+                                        } else if (tempObj["apiLabel"] === "WindowWidth" && tempObj["measurements"]) {
                                             if (firstMeasurements) {
                                                 firstMeasurements = false;
                                                 GetUserProjectData(drapery[i]["SewingPreorder"], true).then((temp) => {
@@ -835,6 +835,8 @@ function Basket() {
                                             } else {
                                                 resolve();
                                             }
+                                        } else if (tempObj["apiLabel"] === "WindowHeight" && tempObj["measurements"]) {
+                                            resolve();
                                         } else {
                                             let apiValue = obj[tempObj["apiLabel"]] === null ? "null" : obj[tempObj["apiLabel"]].toString();
                                             if (tempObj["apiLabel"] === "ControlType" && obj["ControlType"] === "Motorized") {
@@ -1220,7 +1222,7 @@ function Basket() {
                                     if (tempObj === undefined) {
                                         delArr.push(index);
                                         resolve();
-                                    } else if (tempObj["apiLabel"] === "WidthCart" && tempObj["measurements"]) {
+                                    } else if (tempObj["apiLabel"] === "WindowWidth" && tempObj["measurements"]) {
                                         if (firstMeasurements) {
                                             firstMeasurements = false;
                                             GetUserProjectData(obj1, false).then((temp) => {
@@ -1267,6 +1269,8 @@ function Basket() {
                                         } else {
                                             resolve();
                                         }
+                                    } else if (tempObj["apiLabel"] === "WindowHeight" && tempObj["measurements"]) {
+                                        resolve();
                                     } else {
                                         if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
                                             let objLabel = "";

@@ -90,8 +90,10 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
     const [fabricsList2, setFabricsList2] = useState([]);
     const [baseOneArr, setBaseOneArr] = useState([]);
     const [decorativeOneArr, setDecorativeOneArr] = useState([]);
-    const [baseMore, setBaseMore] = useState(null);
-    const [decorativeMore, setDecorativeMore] = useState(null);
+    const [baseMore, setBaseMore] = useState(true);
+    const [decorativeMore, setDecorativeMore] = useState(true);
+    const [baseActive, setBaseActive] = useState(null);
+    const [decorativeActive, setDecorativeActive] = useState(null);
     const [fabricColorHtmlCode, setFabricColorHtmlCode] = useState("#000");
     const [dkCurtainList, setDkCurtainList] = useState([]);
     const [dkCurtainPreviewList, setDkCurtainPreviewList] = useState([]);
@@ -150,6 +152,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
     const [hasTrim, setHasTrim] = useState(false);
     const [showLabels, setShowLabels] = useState(true);
     const [detailsShow, setDetailsShow] = useState(false);
+    const [filtersShow, setFiltersShow] = useState(false);
     const [windowSize, setWindowSize] = useState("");
     const [windowSizeBool, setWindowSizeBool] = useState(false);
     const [stepSelectedLabel, setStepSelectedLabel] = useState({});
@@ -258,6 +261,10 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
     const [transportPrice, setTransportPrice] = useState(-1);
     const [selectedRoomLabel, setSelectedRoomLabel] = useState([]);
     
+    const [step21Err1, setStep21Err1] = useState(false);
+    const [step21Err2, setStep21Err2] = useState(false);
+    const [step21Err3, setStep21Err3] = useState(false);
+    
     const [savedProjectRoomLabel, setSavedProjectRoomLabel] = useState("");
     const [savedProjectRoomText, setSavedProjectRoomText] = useState("");
     
@@ -287,6 +294,8 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
     const [savingLoading, setSavingLoading] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [swatchLogin, setSwatchLogin] = useState(false);
+    const [swatchLoginSwatchId, setSwatchLoginSwatchId] = useState(null);
+    const [swatchLoginSwatchDetailId, setSwatchLoginSwatchDetailId] = useState(null);
     
     const [helpMeasure, setHelpMeasure] = useState("Inside");
     const [helpMeasureLengthType, setHelpMeasureLengthType] = useState("Sill");
@@ -631,6 +640,18 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             }
         });
         // console.log(fabricList,fabricList2);
+        if (fabricList.filter(el => el).length < 2) {
+            setBaseActive(false);
+        } else {
+            setBaseActive(true);
+        }
+        
+        if (fabricList2.filter(el => el).length < 2) {
+            setDecorativeActive(false);
+        } else {
+            setDecorativeActive(true);
+        }
+        
         if (!baseMore) {
             setFabricsList(fabricList.filter(el => el).slice(0, 1))
         } else {
@@ -1336,8 +1357,8 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
         // tempPostObj["SewingOrderDetails"][0]["SodFabrics"] = JSON.parse(JSON.stringify(sodFabrics));
         // console.log(dkCurtainArrComplete,refIndex, cartValue, delRefs, secondRefIndex, secondCartValue);
         let promise2 = new Promise((resolve, reject) => {
-            if (stepSelectedValue["2"] !== undefined && !pageLoad && refIndex !== "FabricId") {
-                let count = temp["WidthCart"] ? Math.floor(temp["WidthCart"] / 11.5) : 16;
+            let count = temp["WidthCart"] ? Math.floor(temp["WidthCart"] / 11.5) : 16;
+            if (stepSelectedValue["2"] !== undefined && !pageLoad && refIndex !== "FabricId" && !(refIndex === "CurtainArr" && (temp["CurtainArr"] ? temp["CurtainArr"] : []).filter(el => el).length !== count)) {
                 if ((temp["CurtainArr"] ? temp["CurtainArr"] : []).filter(el => el).length !== count) {
                     delete tempPostObj["SewingOrderDetails"];
                 }
@@ -1645,8 +1666,8 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
         setDepSet(depSetTempArr);
     }
     
-    const doNotShow = ["ModelId", "qty", "Width1", "Height1", "Width2", "Height2", "Width3", "Height3", "RoomNameEn", "RoomNameFa", "calcMeasurements", "FabricId", "PhotoUrl", "RemoteName",
-        "hasPower", "WindowName", "ExtensionLeft", "ExtensionRight", "Height3C", "Width3A", "ShadeMount", "ModelNameEn", "ModelNameFa", "FabricColorEn", "FabricColorFa", "FabricDesignEn", "FabricDesignFa"];
+    // const doNotShow = ["ModelId", "qty", "Width1", "Height1", "Width2", "Height2", "Width3", "Height3", "RoomNameEn", "RoomNameFa", "calcMeasurements,Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight", "FabricId", "PhotoUrl", "RemoteName",
+    //     "hasPower", "WindowName", "ExtensionLeft", "ExtensionRight", "Height3C", "Width3A", "ShadeMount", "ModelNameEn", "ModelNameFa", "FabricColorEn", "FabricColorFa", "FabricDesignEn", "FabricDesignFa"];
     
     function addToCart() {
         let tempDepSet = [...depSet];
@@ -1798,7 +1819,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                 // window.location.reload();
                                 console.log(key);
                             } else {
-                                if (key === "HeightCart" || key === "WidthCart") {
+                                if (key === "WindowHeight" || key === "WindowWidth") {
                                 
                                 } else if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
                                     let objLabel = "";
@@ -2415,10 +2436,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                 });
             } else {
                 if (SwatchDetailId) {
-                    axios.delete(baseURLDeleteBasketProject, {
-                        params: {
-                            detailId: SwatchDetailId
-                        },
+                    axios.post(baseURLDeleteBasketProject + "/" + SwatchDetailId, {}, {
                         headers: authHeader()
                     }).then((response) => {
                         setCartChanged(cartChanged + 1);
@@ -2446,6 +2464,8 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             
         } else {
             setSwatchLogin(true);
+            setSwatchLoginSwatchId(SwatchId);
+            setSwatchLoginSwatchDetailId(SwatchDetailId);
             modalHandleShow("side_login_modal");
             // dispatch({
             //     type: ShowLoginModal,
@@ -3902,6 +3922,9 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
         if (swatchLogin) {
             setSwatchLogin(false);
             modalHandleClose("side_login_modal");
+            setTimeout(() => {
+                fabricSwatch("0", swatchLoginSwatchId, swatchLoginSwatchDetailId);
+            }, 500);
         } else if ((projectModalState === 2 && isLoggedIn) || (saveProjectCount !== 0 && isLoggedIn)) {
             if (roomLabelText !== "" && selectedRoomLabel.length) {
                 if (projectId && projectId !== "") {
@@ -4029,7 +4052,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
         } else {
             if (cartValues["WidthCart"] !== undefined) {
                 renderDkCurtains(cartValues["WidthCart"]);
-        
+                
                 let pageLanguage = location.pathname.split('').slice(1, 3).join('');
                 let tempArr = [];
                 let tempObj = [];
@@ -4049,7 +4072,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                             });
                         }
                     }
-            
+                    
                     Promise.all(promiseArr).then(() => {
                         let promiseArr2 = [];
                         let lastString = tempObj[0];
@@ -4058,7 +4081,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         let tempObjCount = {};
                         let count = 0;
                         let lastRef = 0;
-                
+                        
                         const doPush = (refIndex) => {
                             tempObjCount[refIndex] = {
                                 "count": count,
@@ -4084,10 +4107,10 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                 }
                             });
                         }
-                
+                        
                         Promise.all(promiseArr2).then(() => {
                             doPush(lastRef);
-                    
+                            
                             let promiseArr3 = [];
                             Object.keys(tempObjCount).forEach((key, index) => {
                                 // if (index < 8) {
@@ -4126,7 +4149,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                             });
                             Promise.all(promiseArr3).then(() => {
                                 setDkCurtainPreviewList(tempArr);
-                        
+                                
                                 let tempSodFabrics = [];
                                 let promiseArr4 = [];
                                 Object.keys(tempObjCount).forEach((key, index) => {
@@ -4143,7 +4166,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                         resolve();
                                     });
                                 });
-                        
+                                
                                 Promise.all(promiseArr4).then(() => {
                                     setSodFabrics(tempSodFabrics);
                                     setCart("CurtainArr", dkCurtainArr, "", "SodFabrics", [tempSodFabrics]);
@@ -4185,6 +4208,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     
                     let DesignCode = fabricObject["DesignCode"].toString();
                     let designOnlyOneSelected = params["Designs"] && params["Designs"][DesignCode] && params["Designs"][DesignCode]["onlyOne"] ? params["Designs"][DesignCode]["onlyOne"] : false;
+                    console.log(params, params["Designs"], designOnlyOneSelected);
                     
                     let baseNotOne = false;
                     let decorNotOne = false;
@@ -4312,16 +4336,16 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
         }
     }, [showLessFabric]);
     
-    useEffect(() => {
-        if ((baseMore || baseMore === false) || (decorativeMore || decorativeMore === false)) {
-            if (Object.keys(fabrics).length) {
-                renderFabrics(bag);
-            } else {
-                setFabricsList([]);
-                setFabricsList2([]);
-            }
-        }
-    }, [baseMore, decorativeMore]);
+    // useEffect(() => {
+    //     if ((baseMore || baseMore === false) || (decorativeMore || decorativeMore === false)) {
+    //         if (Object.keys(fabrics).length) {
+    //             renderFabrics(bag);
+    //         } else {
+    //             setFabricsList([]);
+    //             setFabricsList2([]);
+    //         }
+    //     }
+    // }, [baseMore, decorativeMore]);
     
     useEffect(() => {
         if (pageLoad === false) {
@@ -4681,7 +4705,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             }
         } else if (projectId && projectId !== "") {
             getProjectDetail();
-        } else if(sessionStorage.getItem("cartCopy") !== null){
+        } else if (sessionStorage.getItem("cartCopy") !== null) {
             let tempCartValues = JSON.parse(sessionStorage.getItem("cartCopy"));
             if (Object.keys(tempCartValues).length !== 0) {
                 if (tempCartValues["SewingModelId"] && tempCartValues["SewingModelId"] === `${modelID}`) {
@@ -4699,6 +4723,24 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             }, 700);
         }
     }, [location.pathname]);
+    
+    const fixedDiv = useRef(null);
+    const [offset, setOffset] = useState(false);
+    
+    useEffect(() => {
+        const onScroll = () => {
+            if (fixedDiv.current.offsetTop < window.pageYOffset + 92) {
+                setOffset(true);
+            } else {
+                setOffset(false);
+            }
+        };
+        
+        // clean up code
+        window.removeEventListener('scroll', onScroll);
+        window.addEventListener('scroll', onScroll, {passive: true});
+        return () => window.removeEventListener('scroll', onScroll);
+    }, []);
     
     return (
         <div className={`Custom_model_container ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
@@ -4723,9 +4765,57 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                 }
             </div>
             <div className="model_customize_container">
-                <div className="model_customize_image">
-                    {defaultFabricPhoto &&
-                        <img src={`https://api.atlaspood.ir/${defaultFabricPhoto}`} className="img-fluid" alt=""/>
+                <div className={offset ? "model_customize_image model_customize_image_fixed" : "model_customize_image"} ref={fixedDiv}>
+                    {(accordionActiveKey !== "3" && accordionActiveKey !== "35") &&
+                        <div>
+                            {defaultFabricPhoto &&
+                                <img src={`https://api.atlaspood.ir/${defaultFabricPhoto}`} className="img-fluid" alt=""/>
+                            }
+                        </div>
+                    }
+                    {(accordionActiveKey === "3" || accordionActiveKey === "35") &&
+                        <div>
+                            <div className="card_body card-body-dk">
+                                <div className="dk_curtain_container">
+                                    <div className="dk_curtain_button_container">
+                                        <div className="dk_curtain_symmetric_buttons">
+                                            <button className={`dk_curtain_symmetric_button_left btn ${symmetric ? "dk_curtain_symmetric_button_on" : ""}`}
+                                                    onClick={() => setSymmetric(true)}>
+                                                {t("SYMMETRIC COLORING")}
+                                            </button>
+                                            <button className={`dk_curtain_symmetric_button_right btn ${!symmetric ? "dk_curtain_symmetric_button_on" : ""}`}
+                                                    onClick={() => setSymmetric(false)}>
+                                                {t("INDIVIDUAL COLORING")}
+                                            </button>
+                                        </div>
+                                        <button className="dk_curtain_clear btn" onClick={() => setDkCurtainArr([])}>{t("CLEAR")}</button>
+                                    </div>
+                                    <div className="dk_curtain">
+                                        <div className="dk_curtain_inside">
+                                            {dkCurtainList}
+                                        </div>
+                                    </div>
+                                    {dkCurtainArr.length > 0 &&
+                                        <div className={`dk_curtain_preview_container`}>
+                                            <Accordion>
+                                                <Accordion.Item eventKey="0">
+                                                    <ContextAwareToggleViewDetails eventKey="0" textOnHide={t("Selection Fabric Preview")} textOnShow={t("Hide Preview")}/>
+                                                    {/*<Accordion.Header className="basket_item_title_dropdown_btn">*/}
+                                                    {/*    <h4 className="dk_curtain_preview_item_details">{t("Selection Fabric Preview")}</h4>*/}
+                                                    {/*    /!*<img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>*!/*/}
+                                                    {/*</Accordion.Header>*/}
+                                                    <Accordion.Body className="basket_item_title_dropdown dk_curtain_preview_dropdown">
+                                                        <div className="dk_curtain_preview_detail_container">
+                                                            {dkCurtainPreviewList}
+                                                        </div>
+                                                    </Accordion.Body>
+                                                </Accordion.Item>
+                                            </Accordion>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
                     }
                 </div>
                 <div className={`model_customize_section ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
@@ -4741,12 +4831,14 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                     <div className="card_body card_body_radio tall_img_card_body">
                                         <div className="box33 radio_style">
                                             <img src={require('../Images/drapery/dk/window-Inside.svg').default} className="img-fluid" alt=""/>
-                                            <input className="radio" type="radio" text={t("mount_Inside")} value="1" name="step1" ref-num="1" id="11" checked={step1 === "Inside"}
+                                            <input className="radio" type="radio" value="1" name="step1" ref-num="1" id="11" checked={step1 === "Inside"}
                                                    onChange={e => {
                                                        setStep1("Inside");
                                                        setStep11("");
+                                                       setStep21Err2(false);
+                                                       setStep21Err3(false);
                                                        setMeasurementsNextStep("3");
-                                                       if (stepSelectedValue["2"] === "2") {
+                                                       if (step2 !== "") {
                                                            setDeps("11,2", "1,2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWallFloor,2DWall,2EWall,2FWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
                                                            deleteSpecialSelects();
                                                            setCart("Mount", "Inside", "IsWalled,calcMeasurements,Width1,Width2,Width3,Height1,Height2,Height3,FinishedLengthType,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
@@ -4767,7 +4859,9 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                    onChange={e => {
                                                        setStep1("Outside");
                                                        setStep11("");
-                                                       if (stepSelectedValue["2"] === "2") {
+                                                       setStep21Err1(false);
+                                                       setStep21Err3(false);
+                                                       if (step2 !== "") {
                                                            setDeps("2", "1,11,2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWallFloor,2DWall,2EWall,2FWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
                                                            deleteSpecialSelects();
                                                            setCart("Mount", "Outside", "IsWalled,calcMeasurements,Width1,Width2,Width3,Height1,Height2,Height3,FinishedLengthType,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
@@ -4784,13 +4878,15 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                         </div>
                                         <div className="box33 radio_style">
                                             <img src={require('../Images/drapery/dk/window-Arc.svg').default} className="img-fluid" alt=""/>
-                                            <input className="radio" type="radio" text={t("mount_Arc")} value="3" name="step1" ref-num="1" id="13"
+                                            <input className="radio" type="radio" value="3" name="step1" ref-num="1" id="13"
                                                    checked={step1 === "HiddenMoulding"}
                                                    onChange={e => {
                                                        setStep1("HiddenMoulding");
                                                        setStep11("");
+                                                       setStep21Err1(false);
+                                                       setStep21Err2(false);
                                                        setMeasurementsNextStep("3");
-                                                       if (stepSelectedValue["2"] === "2") {
+                                                       if (step2 !== "") {
                                                            setDeps("11,2", "1,2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWallFloor,2DWall,2EWall,2FWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
                                                            deleteSpecialSelects();
                                                            setCart("Mount", "HiddenMoulding", "IsWalled,calcMeasurements,Width1,Width2,Width3,Height1,Height2,Height3,FinishedLengthType,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
@@ -4805,33 +4901,36 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                             <label htmlFor="13">{t("mount_Arc")}</label>
                                         </div>
                                         
-                                        {stepSelectedValue["1"] === "1" &&
-                                            <div className="secondary_options">
+                                        {step1 === "Inside" &&
+                                            <div className={step21Err1 ? "secondary_options secondary_options_err" : "secondary_options"}>
                                                 <div className="card-body-display-flex">
                                                     <div className="checkbox_style checkbox_style_step2">
-                                                        <input type="checkbox" value="1" name="step11" ref-num="11" checked={step11 === "true"} onChange={(e) => {
-                                                            if (e.target.checked) {
-                                                                selectChanged(e);
-                                                                setStep11("true");
-                                                                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                                let refIndex = inputs.current["11"].getAttribute('ref-num');
-                                                                tempLabels[refIndex] = inputs.current["11"].getAttribute('text');
-                                                                setStepSelectedLabel(tempLabels);
-                                                                setDeps("", "11");
-                                                            } else {
-                                                                setStep11("");
-                                                                // modalHandleShow("noPower");
-                                                                if (stepSelectedValue["2"] === "2") {
-                                                                    setDeps("11,2", "2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWallFloor,2DWall,2EWall,2FWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
-                                                                    deleteSpecialSelects();
-                                                                    setCart("", "", "calcMeasurements,Width1,Width2,Width3,Height1,Height2,Height3,FinishedLengthType,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
-                                                                    setStep2("");
-                                                                    selectChanged(undefined, "2,2AIn,2BIn,2A,2B,2E,2DWallFloor,2DWall,2EWall,2FWall,2EWallFloor,2FWallFloor,2C,2CCeiling,2D,2DFloor");
-                                                                } else {
-                                                                    setDeps("11", "");
-                                                                }
-                                                            }
-                                                        }} id="111" ref={ref => (inputs.current["111"] = ref)}/>
+                                                        <input type="checkbox" text={t("mount_Inside")} value="1" name="step11" ref-num="1" checked={step11 === "true"}
+                                                               onChange={(e) => {
+                                                                   if (e.target.checked) {
+                                                                       selectChanged(e);
+                                                                       setStep11("true");
+                                                                       setStep21Err1(false);
+                                                                       // let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                                       // let refIndex = inputs.current["11"].getAttribute('ref-num');
+                                                                       // tempLabels[refIndex] = inputs.current["11"].getAttribute('text');
+                                                                       // setStepSelectedLabel(tempLabels);
+                                                                       setDeps("", "11");
+                                                                   } else {
+                                                                       setStep11("");
+                                                                       // modalHandleShow("noPower");
+                                                                       if (step2 !== "") {
+                                                                           setDeps("11,2", "2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWallFloor,2DWall,2EWall,2FWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
+                                                                           deleteSpecialSelects();
+                                                                           setCart("", "", "calcMeasurements,Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width1,Width2,Width3,Height1,Height2,Height3,FinishedLengthType,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
+                                                                           setStep2("");
+                                                                           selectChanged(undefined, "1,2,2AIn,2BIn,2A,2B,2E,2DWallFloor,2DWall,2EWall,2FWall,2EWallFloor,2FWallFloor,2C,2CCeiling,2D,2DFloor");
+                                                                       } else {
+                                                                           setDeps("11", "");
+                                                                           selectChanged(undefined, "1");
+                                                                       }
+                                                                   }
+                                                               }} id="111" ref={ref => (inputs.current["111"] = ref)}/>
                                                         <label htmlFor="111" className="checkbox_label">
                                                             <img className="checkbox_label_img checkmark1 img-fluid"
                                                                  src={require('../Images/public/checkmark1_checkbox.png')}
@@ -4844,9 +4943,12 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                 </div>
                                             </div>
                                         }
-                                        {stepSelectedValue["1"] === "2" &&
+                                        {step21Err1 &&
+                                            <div className="input_not_valid">{t("step21Err1")}</div>
+                                        }
+                                        {step1 === "Outside" &&
                                             <div className="selection_section">
-                                                <div className="select_container">
+                                                <div className={step21Err2 ? "select_container select_container_red" : "select_container"}>
                                                     <Select
                                                         className="select"
                                                         placeholder={t("Please Select")}
@@ -4876,15 +4978,16 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                         onChange={(selected) => {
                                                             if (selected.length) {
                                                                 setSelectedMountOutsideType(selected);
+                                                                setStep21Err2(false);
                                                                 // setDeps("", "11");
                                                                 // setCart("IsWalled", selected[0].value);
                                                                 let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
                                                                 tempLabels["1"] = t("mount_Outside") + "/" + selected[0].label;
                                                                 setStepSelectedLabel(tempLabels);
-                                                                if (stepSelectedValue["2"] === "2") {
+                                                                if (step2 !== "") {
                                                                     setDeps("2", "1,11,2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWallFloor,2DWall,2EWall,2FWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
                                                                     deleteSpecialSelects();
-                                                                    setCart("IsWalled", selected[0].value, "calcMeasurements,Width1,Width2,Width3,Height1,Height2,Height3,FinishedLengthType,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
+                                                                    setCart("IsWalled", selected[0].value, "calcMeasurements,Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width1,Width2,Width3,Height1,Height2,Height3,FinishedLengthType,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
                                                                     setStep2("");
                                                                     // selectChanged(undefined, "2,2AIn,2BIn,2A,2B,2E,2DWallFloor,2DWall,2EWall,2FWall,2EWallFloor,2FWallFloor,2C,2CCeiling,2D,2DFloor");
                                                                 } else {
@@ -4899,34 +5002,37 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                 </div>
                                             </div>
                                         }
-                                        {stepSelectedValue["1"] === "3" &&
-                                            <div className="secondary_options">
+                                        {step1 === "HiddenMoulding" &&
+                                            <div className={step21Err3 ? "secondary_options secondary_options_err" : "secondary_options"}>
                                                 <div className="card-body-display-flex">
                                                     <div className="checkbox_style checkbox_style_step2">
-                                                        <input type="checkbox" value="1" name="step11" ref-num="11" checked={step11 === "true"} onChange={(e) => {
-                                                            if (e.target.checked) {
-                                                                selectChanged(e);
-                                                                setStep11("true");
-                                                                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                                let refIndex = inputs.current["13"].getAttribute('ref-num');
-                                                                tempLabels[refIndex] = inputs.current["13"].getAttribute('text');
-                                                                setStepSelectedLabel(tempLabels);
-                                                                setDeps("", "11");
-                                                            } else {
-                                                                setStep11("");
-                                                                // modalHandleShow("noPower");
+                                                        <input type="checkbox" text={t("mount_Arc")} value="3" name="step11" ref-num="1" checked={step11 === "true"}
+                                                               onChange={(e) => {
+                                                                   if (e.target.checked) {
+                                                                       selectChanged(e);
+                                                                       setStep11("true");
+                                                                       setStep21Err3(false);
+                                                                       // let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                                       // let refIndex = inputs.current["13"].getAttribute('ref-num');
+                                                                       // tempLabels[refIndex] = inputs.current["13"].getAttribute('text');
+                                                                       // setStepSelectedLabel(tempLabels);
+                                                                       setDeps("", "11");
+                                                                   } else {
+                                                                       setStep11("");
+                                                                       // modalHandleShow("noPower");
                                                                 
-                                                                if (stepSelectedValue["2"] === "2") {
-                                                                    setDeps("11,2", "2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWallFloor,2DWall,2EWall,2FWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
-                                                                    deleteSpecialSelects();
-                                                                    setCart("", "", "calcMeasurements,Width1,Width2,Width3,Height1,Height2,Height3,FinishedLengthType,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
-                                                                    setStep2("");
-                                                                    selectChanged(undefined, "2,2AIn,2BIn,2A,2B,2E,2DWallFloor,2DWall,2EWall,2FWall,2DWallFloor,2FWallFloor,2C,2CCeiling,2D,2DFloor");
-                                                                } else {
-                                                                    setDeps("11", "");
-                                                                }
-                                                            }
-                                                        }} id="111" ref={ref => (inputs.current["111"] = ref)}/>
+                                                                       if (step2 !== "") {
+                                                                           setDeps("11,2", "2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWallFloor,2DWall,2EWall,2FWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
+                                                                           deleteSpecialSelects();
+                                                                           setCart("", "", "calcMeasurements,Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width1,Width2,Width3,Height1,Height2,Height3,FinishedLengthType,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
+                                                                           setStep2("");
+                                                                           selectChanged(undefined, "1,2,2AIn,2BIn,2A,2B,2E,2DWallFloor,2DWall,2EWall,2FWall,2DWallFloor,2FWallFloor,2C,2CCeiling,2D,2DFloor");
+                                                                       } else {
+                                                                           setDeps("11", "");
+                                                                           selectChanged(undefined, "1");
+                                                                       }
+                                                                   }
+                                                               }} id="111" ref={ref => (inputs.current["111"] = ref)}/>
                                                         <label htmlFor="111" className="checkbox_label">
                                                             <img className="checkbox_label_img checkmark1 img-fluid"
                                                                  src={require('../Images/public/checkmark1_checkbox.png')}
@@ -4939,11 +5045,21 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                 </div>
                                             </div>
                                         }
+                                        {step21Err3 &&
+                                            <div className="input_not_valid">{t("step21Err3")}</div>
+                                        }
                                         <NextStep
-                                            eventKey={(stepSelectedValue["1"] === "1" && step11 !== "true") || (stepSelectedValue["1"] === "3" && step11 !== "true") ? "1" : "2"}
+                                            eventKey={(step1 === "Inside" && step11 !== "true") || (step1 === "HiddenMoulding" && step11 !== "true") || (step1 === "Outside" && !selectedMountOutsideType.length) ? "1" : "2"}
                                             onClick={() => {
-                                                if ((stepSelectedValue["1"] === "1" && step11 !== "true") || (stepSelectedValue["1"] === "3" && step11 !== "true"))
-                                                    modalHandleShow("noInsideUnderstand");
+                                                if ((step1 === "Inside" && step11 !== "true") || (step1 === "HiddenMoulding" && step11 !== "true")) {
+                                                    if (step1 === "Inside") {
+                                                        setStep21Err1(true);
+                                                    } else {
+                                                        setStep21Err3(true);
+                                                    }
+                                                } else if (step1 === "Outside" && !selectedMountOutsideType.length) {
+                                                    setStep21Err2(true);
+                                                }
                                             }}>{t("NEXT STEP")}</NextStep>
                                     </div>
                                     {/*<div className="accordion_help accordion_help_three">*/}
@@ -5005,12 +5121,20 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                             <input className="radio" type="radio" text={t("I have my own measurements")} value="1" name="step2" ref-num="2" id="21"
                                                    checked={step2 === "false"}
                                                    onChange={e => {
-                                                       setStep2("false");
-                                                       selectChanged(e, "");
-                                                       setMeasurementsNextStep("3");
-                                                       setDeps("21,22", "2,2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWallFloor,2DWall,2EWall,2FWall,2DWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
-                                                       deleteSpecialSelects();
-                                                       setCart("calcMeasurements", false, "WidthCart,HeightCart,Width1,Width2,Width3,Height1,Height2,Height3,FinishedLengthType,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
+                                                       if (step1 === "" || (step1 === "Inside" && step11 !== "true") || (step1 === "HiddenMoulding" && step11 !== "true")) {
+                                                           setStep2("");
+                                                           selectUncheck(e);
+                                                           modalHandleShow("noMount");
+                                                           setDeps("2", "21,22");
+                                                           setCart("", "", "Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,calcMeasurements");
+                                                       } else {
+                                                           setStep2("false");
+                                                           selectChanged(e, "");
+                                                           setMeasurementsNextStep("3");
+                                                           setDeps("21,22", "2,2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWallFloor,2DWall,2EWall,2FWall,2DWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
+                                                           deleteSpecialSelects();
+                                                           setCart("calcMeasurements", false, "WidthCart,HeightCart,Width1,Width2,Width3,Height1,Height2,Height3,FinishedLengthType,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
+                                                       }
                                                    }} ref={ref => (inputs.current["21"] = ref)}/>
                                             <label htmlFor="21">{t("I have my own measurements.")}</label>
                                         </div>
@@ -5024,21 +5148,21 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                            selectUncheck(e);
                                                            modalHandleShow("noMount");
                                                            setDeps("2", "21,22");
-                                                           setCart("calcMeasurements", true, "Width,height,calcMeasurements");
+                                                           setCart("", "", "Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,calcMeasurements");
                                                        } else if (stepSelectedValue["1"] === "1") {
                                                            if (step11 !== "true") {
                                                                modalHandleShow("noInsideUnderstand");
                                                                setStep2("");
                                                                selectUncheck(e);
                                                                setDeps("2", "21,22");
-                                                               setCart("calcMeasurements", true, "Width,height,calcMeasurements");
+                                                               setCart("", "", "Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,calcMeasurements");
                                                            } else {
                                                                setStep2("true");
                                                                deleteSpecialSelects();
                                                                selectChanged(e);
                                                                setMeasurementsNextStep("2A");
                                                                setDeps("2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3", "2,21,22");
-                                                               setCart("calcMeasurements", true, "Width,Height,FinishedLengthType,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
+                                                               setCart("calcMeasurements", true, "Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,FinishedLengthType,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
                                                            }
                                                        } else if (stepSelectedValue["1"] === "3") {
                                                            if (step11 !== "true") {
@@ -5046,14 +5170,14 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                                setStep2("");
                                                                selectUncheck(e);
                                                                setDeps("2", "21,22");
-                                                               setCart("calcMeasurements", true, "Width,height,calcMeasurements");
+                                                               setCart("", "", "Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,calcMeasurements");
                                                            } else {
                                                                setStep2("true");
                                                                deleteSpecialSelects();
                                                                selectChanged(e);
                                                                setMeasurementsNextStep("2A");
                                                                setDeps("2A", "2,21,22");
-                                                               setCart("calcMeasurements", true, "Width,Height,FinishedLengthType");
+                                                               setCart("calcMeasurements", true, "Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,FinishedLengthType");
                                                            }
                                                        } else {
                                                            if (!selectedMountOutsideType.length) {
@@ -5061,14 +5185,14 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                                setStep2("");
                                                                selectUncheck(e);
                                                                setDeps("2", "21,22");
-                                                               setCart("calcMeasurements", true, "Width,height,calcMeasurements");
+                                                               setCart("", "", "Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,calcMeasurements");
                                                            } else {
                                                                setStep2("true");
                                                                deleteSpecialSelects();
                                                                selectChanged(e);
                                                                setMeasurementsNextStep("2A");
                                                                setDeps("2A", "2,21,22");
-                                                               setCart("calcMeasurements", true, "Width,Height,FinishedLengthType");
+                                                               setCart("calcMeasurements", true, "Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,FinishedLengthType");
                                                            }
                                                        }
                                                    }}/>
@@ -5109,12 +5233,14 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                             // }
                                                             onChange={(selected) => {
-                                                                optionSelectChanged_WidthLength(selected[0], "2", true, "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.width = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "21");
-                                                                setCart("Width", selected[0].value);
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged_WidthLength(selected[0], "2", true, "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.width = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "21");
+                                                                    setCart("Width", selected[0].value);
+                                                                }
                                                             }}
                                                             options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
                                                         />
@@ -5151,12 +5277,14 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                             // }
                                                             onChange={(selected) => {
-                                                                optionSelectChanged_WidthLength(selected[0], "2", false, "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.length = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "22");
-                                                                setCart("Height", selected[0].value);
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged_WidthLength(selected[0], "2", false, "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.length = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "22");
+                                                                    setCart("Height", selected[0].value);
+                                                                }
                                                             }}
                                                             options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
                                                         />
@@ -5211,125 +5339,124 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         </Card>
                         
                         {/* step 2A */}
-                        {stepSelectedValue["2"] === "2" && !!((stepSelectedValue["1"] === "3" && step11 === "true") || (stepSelectedValue["1"] === "2" && selectedMountOutsideType.length)) &&
-                            <Card>
-                                <Card.Header>
-                                    <ContextAwareToggle eventKey="2A" stepNum={t("2A")} stepTitle={t("dk_step2A")} stepRef="2A" type="1" required={requiredStep["2A"]}
-                                                        stepSelected={stepSelectedLabel["2A"] === undefined ? "" : stepSelectedLabel["2A"]}/>
-                                </Card.Header>
-                                <Accordion.Collapse eventKey="2A">
-                                    <Card.Body>
-                                        <div className="card_body card_body_radio card_body_finished_length">
-                                            <div className="box100">
-                                                <p className="step_selection_title">{t("dk_step2A_title")}</p>
-                                                {/* <img src={pageLanguage === 'fa' ? require('../Images/drapery/zebra/width_inside_3_fa.svg').default : require('../Images/drapery/zebra/new_width_inside_3.svg').default}
+                        <Card
+                            className={stepSelectedValue["2"] === "2" && !!((stepSelectedValue["1"] === "3" && step11 === "true") || (step1 === "Outside" && selectedMountOutsideType.length)) ? "" : "noDisplay"}>
+                            <Card.Header>
+                                <ContextAwareToggle eventKey="2A" stepNum={t("2A")} stepTitle={t("dk_step2A")} stepRef="2A" type="1" required={requiredStep["2A"]}
+                                                    stepSelected={stepSelectedLabel["2A"] === undefined ? "" : stepSelectedLabel["2A"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="2A">
+                                <Card.Body>
+                                    <div className="card_body card_body_radio card_body_finished_length">
+                                        <div className="box100">
+                                            <p className="step_selection_title">{t("dk_step2A_title")}</p>
+                                            {/* <img src={pageLanguage === 'fa' ? require('../Images/drapery/zebra/width_inside_3_fa.svg').default : require('../Images/drapery/zebra/new_width_inside_3.svg').default}
                                                 className="img-fluid" alt=""/> */}
-                                            </div>
-                                            <div className="box33 radio_style">
-                                                <img
-                                                    src={pageLanguage === "fa" ? require('../Images/drapery/dk/small_height_fa.svg').default : require('../Images/drapery/dk/small_height.svg').default}
-                                                    className="img-fluid height_auto" alt=""/>
-                                                <input className="radio" type="radio" text={t("Sill")} value="1" name="step2A" ref-num="2A" id="2A1" checked={step2A === "Sill"}
-                                                       onChange={e => {
-                                                           setStep2A("Sill");
-                                                           deleteSpecialSelects();
-                                                           if (stepSelectedValue["1"] === "3") {
+                                        </div>
+                                        <div className="box33 radio_style">
+                                            <img
+                                                src={pageLanguage === "fa" ? require('../Images/drapery/dk/small_height_fa.svg').default : require('../Images/drapery/dk/small_height.svg').default}
+                                                className="img-fluid height_auto" alt=""/>
+                                            <input className="radio" type="radio" text={t("Sill")} value="1" name="step2A" ref-num="2A" id="2A1" checked={step2A === "Sill"}
+                                                   onChange={e => {
+                                                       setStep2A("Sill");
+                                                       deleteSpecialSelects();
+                                                       if (stepSelectedValue["1"] === "3") {
+                                                           setCart("FinishedLengthType", "Sill", "Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
+                                                           setDeps("2B,2C1,2C2,2D1,2D2,2D3", "2A,2DFloor1,2DFloor2,2DFloor3");
+                                                           selectChanged(e, "2B,2C,2D,2E");
+                                                       } else {
+                                                           if (selectedMountOutsideType[0].value === "Ceiling") {
                                                                setCart("FinishedLengthType", "Sill", "Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
-                                                               setDeps("2B,2C1,2C2,2D1,2D2,2D3", "2A,2DFloor1,2DFloor2,2DFloor3");
-                                                               selectChanged(e, "2B,2C,2D,2E");
+                                                               setDeps("2B,2CCeiling1,2CCeiling2,2D1,2D2,2D3", "2A,2DFloor1,2DFloor2,2DFloor3");
+                                                               selectChanged(e, "2B,2CCeiling,2D,2E");
                                                            } else {
-                                                               if (selectedMountOutsideType[0].value === "Ceiling") {
-                                                                   setCart("FinishedLengthType", "Sill", "Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
-                                                                   setDeps("2B,2CCeiling1,2CCeiling2,2D1,2D2,2D3", "2A,2DFloor1,2DFloor2,2DFloor3");
-                                                                   selectChanged(e, "2B,2CCeiling,2D,2E");
-                                                               } else {
-                                                                   setCart("FinishedLengthType", "Sill", "Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
-                                                                   setDeps("2B,2CCeiling1,2CCeiling2,2DWallFloor,2DWall,2EWall,2FWall", "2A,2DWallFloor,2FWallFloor");
-                                                                   selectChanged(e, "2B,2CCeiling,2EWallFloor,2DWall,2EWall,2FWall");
-                                                               }
-                                                        
+                                                               setCart("FinishedLengthType", "Sill", "Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
+                                                               setDeps("2B,2CCeiling1,2CCeiling2,2DWallFloor,2DWall,2EWall,2FWall", "2A,2DWallFloor,2FWallFloor");
+                                                               selectChanged(e, "2B,2CCeiling,2EWallFloor,2DWall,2EWall,2FWall");
                                                            }
                                                     
-                                                       }} ref={ref => (inputs.current["2A1"] = ref)}/>
-                                                <label htmlFor="2A1">{t("Sill")}</label>
-                                            </div>
-                                            <div className="box33 radio_style">
-                                                <img
-                                                    src={pageLanguage === "fa" ? require('../Images/drapery/dk/medium_height_fa.svg').default : require('../Images/drapery/dk/medium_height.svg').default}
-                                                    className="img-fluid height_auto" alt=""/>
-                                                <input className="radio" type="radio" text={t("Apron")} value="2" name="step2A" ref-num="2A" id="2A2" checked={step2A === "Apron"}
-                                                       onChange={e => {
-                                                           setStep2A("Apron");
-                                                           deleteSpecialSelects();
-                                                           if (stepSelectedValue["1"] === "3") {
+                                                       }
+                                                
+                                                   }} ref={ref => (inputs.current["2A1"] = ref)}/>
+                                            <label htmlFor="2A1">{t("Sill")}</label>
+                                        </div>
+                                        <div className="box33 radio_style">
+                                            <img
+                                                src={pageLanguage === "fa" ? require('../Images/drapery/dk/medium_height_fa.svg').default : require('../Images/drapery/dk/medium_height.svg').default}
+                                                className="img-fluid height_auto" alt=""/>
+                                            <input className="radio" type="radio" text={t("Apron")} value="2" name="step2A" ref-num="2A" id="2A2" checked={step2A === "Apron"}
+                                                   onChange={e => {
+                                                       setStep2A("Apron");
+                                                       deleteSpecialSelects();
+                                                       if (stepSelectedValue["1"] === "3") {
+                                                           setCart("FinishedLengthType", "Apron", "Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
+                                                           setDeps("2B,2C1,2C2,2D1,2D2,2D3", "2A,2DFloor1,2DFloor2,2DFloor3");
+                                                           selectChanged(e, "2B,2C,2D,2E");
+                                                       } else {
+                                                           if (selectedMountOutsideType[0].value === "Ceiling") {
                                                                setCart("FinishedLengthType", "Apron", "Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
-                                                               setDeps("2B,2C1,2C2,2D1,2D2,2D3", "2A,2DFloor1,2DFloor2,2DFloor3");
-                                                               selectChanged(e, "2B,2C,2D,2E");
+                                                               setDeps("2B,2CCeiling1,2CCeiling2,2D1,2D2,2D3", "2A,2DFloor1,2DFloor2,2DFloor3");
+                                                               selectChanged(e, "2B,2CCeiling,2D,2E");
                                                            } else {
-                                                               if (selectedMountOutsideType[0].value === "Ceiling") {
-                                                                   setCart("FinishedLengthType", "Apron", "Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
-                                                                   setDeps("2B,2CCeiling1,2CCeiling2,2D1,2D2,2D3", "2A,2DFloor1,2DFloor2,2DFloor3");
-                                                                   selectChanged(e, "2B,2CCeiling,2D,2E");
-                                                               } else {
-                                                                   setCart("FinishedLengthType", "Apron", "Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
-                                                                   setDeps("2B,2CCeiling1,2CCeiling2,2DWallFloor,2DWall,2EWall,2FWall", "2A,2EWallFloor,2FWallFloor");
-                                                                   selectChanged(e, "2B,2CCeiling,2EWallFloor,2DWall,2EWall,2FWall");
-                                                               }
-                                                        
+                                                               setCart("FinishedLengthType", "Apron", "Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
+                                                               setDeps("2B,2CCeiling1,2CCeiling2,2DWallFloor,2DWall,2EWall,2FWall", "2A,2EWallFloor,2FWallFloor");
+                                                               selectChanged(e, "2B,2CCeiling,2EWallFloor,2DWall,2EWall,2FWall");
                                                            }
-                                                       }} ref={ref => (inputs.current["2A2"] = ref)}/>
-                                                <label htmlFor="2A2">{t("Apron")}</label>
-                                            </div>
-                                            <div className="box33 radio_style">
-                                                <img
-                                                    src={pageLanguage === "fa" ? require('../Images/drapery/dk/large_height_fa.svg').default : require('../Images/drapery/dk/large_height.svg').default}
-                                                    className="img-fluid height_auto" alt=""/>
-                                                <input className="radio" type="radio" text={t("Floor")} value="3" name="step2A" ref-num="2A" id="2A3" checked={step2A === "Floor"}
-                                                       onChange={e => {
-                                                           setStep2A("Floor");
-                                                           deleteSpecialSelects();
-                                                           if (stepSelectedValue["1"] === "3") {
+                                                    
+                                                       }
+                                                   }} ref={ref => (inputs.current["2A2"] = ref)}/>
+                                            <label htmlFor="2A2">{t("Apron")}</label>
+                                        </div>
+                                        <div className="box33 radio_style">
+                                            <img
+                                                src={pageLanguage === "fa" ? require('../Images/drapery/dk/large_height_fa.svg').default : require('../Images/drapery/dk/large_height.svg').default}
+                                                className="img-fluid height_auto" alt=""/>
+                                            <input className="radio" type="radio" text={t("Floor")} value="3" name="step2A" ref-num="2A" id="2A3" checked={step2A === "Floor"}
+                                                   onChange={e => {
+                                                       setStep2A("Floor");
+                                                       deleteSpecialSelects();
+                                                       if (stepSelectedValue["1"] === "3") {
+                                                           setCart("FinishedLengthType", "Floor", "Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
+                                                           setDeps("2B,2C1,2C2,2DFloor1,2DFloor2,2DFloor3", "2A,2D1,2D2,2D3,2E");
+                                                           selectChanged(e, "2B,2C,2DFloor");
+                                                       } else {
+                                                           if (selectedMountOutsideType[0].value === "Ceiling") {
                                                                setCart("FinishedLengthType", "Floor", "Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
-                                                               setDeps("2B,2C1,2C2,2DFloor1,2DFloor2,2DFloor3", "2A,2D1,2D2,2D3,2E");
-                                                               selectChanged(e, "2B,2C,2DFloor");
+                                                               setDeps("2B,2CCeiling1,2CCeiling2,2DFloor1,2DFloor2,2DFloor3", "2A,2D1,2D2,2D3,2E");
+                                                               selectChanged(e, "2B,2CCeiling,2DFloor");
                                                            } else {
-                                                               if (selectedMountOutsideType[0].value === "Ceiling") {
-                                                                   setCart("FinishedLengthType", "Floor", "Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
-                                                                   setDeps("2B,2CCeiling1,2CCeiling2,2DFloor1,2DFloor2,2DFloor3", "2A,2D1,2D2,2D3,2E");
-                                                                   selectChanged(e, "2B,2CCeiling,2DFloor");
-                                                               } else {
-                                                                   setCart("FinishedLengthType", "Floor", "Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
-                                                                   setDeps("2B,2CCeiling1,2CCeiling2,2DWallFloor,2EWallFloor,2FWallFloor", "2A,2DWall,2EWall,2FWall");
-                                                                   selectChanged(e, "2B,2CCeiling,2DWallFloor,2EWallFloor,2FWallFloor");
-                                                               }
-                                                        
+                                                               setCart("FinishedLengthType", "Floor", "Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
+                                                               setDeps("2B,2CCeiling1,2CCeiling2,2DWallFloor,2EWallFloor,2FWallFloor", "2A,2DWall,2EWall,2FWall");
+                                                               selectChanged(e, "2B,2CCeiling,2DWallFloor,2EWallFloor,2FWallFloor");
                                                            }
-                                                       }} ref={ref => (inputs.current["2A3"] = ref)}/>
-                                                <label htmlFor="2A3">{t("Floor")}</label>
-                                            </div>
-                                            <NextStep eventKey="2B">{t("NEXT STEP")}</NextStep>
+                                                    
+                                                       }
+                                                   }} ref={ref => (inputs.current["2A3"] = ref)}/>
+                                            <label htmlFor="2A3">{t("Floor")}</label>
                                         </div>
-                                        
-                                        <div className="accordion_help">
-                                            <div className="help_container">
-                                                <div className="help_column help_left_column">
-                                                    <p className="help_column_header"></p>
-                                                    <ul className="help_column_list">
-                                                        <li className="no_listStyle"><b>{t("dk_step2a_help1")}</b>{t("dk_step2a_help2")}</li>
-                                                        <li className="no_listStyle"><b>{t("dk_step2a_help3")}</b>{t("dk_step2a_help4")}</li>
-                                                        <li className="no_listStyle"><b>{t("dk_step2a_help5")}</b>{t("dk_step2a_help6")}</li>
-                                                    </ul>
-                                                </div>
+                                        <NextStep eventKey="2B">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                    
+                                    <div className="accordion_help">
+                                        <div className="help_container">
+                                            <div className="help_column help_left_column">
+                                                <p className="help_column_header"></p>
+                                                <ul className="help_column_list">
+                                                    <li className="no_listStyle"><b>{t("dk_step2a_help1")}</b>{t("dk_step2a_help2")}</li>
+                                                    <li className="no_listStyle"><b>{t("dk_step2a_help3")}</b>{t("dk_step2a_help4")}</li>
+                                                    <li className="no_listStyle"><b>{t("dk_step2a_help5")}</b>{t("dk_step2a_help6")}</li>
+                                                </ul>
                                             </div>
                                         </div>
-                                    </Card.Body>
-                                </Accordion.Collapse>
-                            </Card>
-                        }
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
                         
                         
                         {/* step 2B*/}
-                        {stepSelectedValue["2"] === "2" && stepSelectedValue["2A"] && !!((stepSelectedValue["1"] === "3" && step11 === "true") || (stepSelectedValue["1"] === "2" && selectedMountOutsideType.length)) &&
+                        {stepSelectedValue["2"] === "2" && stepSelectedValue["2A"] && !!((stepSelectedValue["1"] === "3" && step11 === "true") || (step1 === "Outside" && selectedMountOutsideType.length)) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2B" stepNum={t("2B")} stepTitle={t("dk_step2B")} stepRef="2B" type="2" required={requiredStep["2B"]}
@@ -5520,7 +5647,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         }
                         
                         {/* step 2CCeiling and wall*/}
-                        {stepSelectedValue["2"] === "2" && stepSelectedValue["2A"] && !!((stepSelectedValue["1"] === "2" && selectedMountOutsideType.length)) &&
+                        {stepSelectedValue["2"] === "2" && stepSelectedValue["2A"] && !!((step1 === "Outside" && selectedMountOutsideType.length)) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2C" stepNum={t("2C")} stepTitle={t("dk_step2CCeiling")} stepRef="2CCeiling" type="2"
@@ -5645,7 +5772,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         }
                         
                         {/* step 2D */}
-                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && !!((stepSelectedValue["1"] === "3" && step11 === "true") || (stepSelectedValue["1"] === "2" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Ceiling")) &&
+                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && !!((stepSelectedValue["1"] === "3" && step11 === "true") || (step1 === "Outside" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Ceiling")) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2D" stepNum={t("2D")} stepTitle={t("dk_step2D_sill")} stepRef="2D" type="2" required={requiredStep["2D"]}
@@ -5848,7 +5975,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         }
                         
                         {/* step 2E*/}
-                        {/*{stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && !!((stepSelectedValue["1"] === "3" && step11 === "true") || (stepSelectedValue["1"] === "2" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Ceiling")) &&*/}
+                        {/*{stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && !!((stepSelectedValue["1"] === "3" && step11 === "true") || (step1 === "Outside" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Ceiling")) &&*/}
                         {/*    <Card>*/}
                         {/*        <Card.Header>*/}
                         {/*            <ContextAwareToggle eventKey="2E" stepNum={t("2E")} stepTitle={t("dk_step2E_sill")} stepRef="2E" type="2" required={requiredStep["2E"]}*/}
@@ -5915,7 +6042,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         {/*}*/}
                         
                         {/* step 2DFloor */}
-                        {stepSelectedValue["2"] === "2" && stepSelectedValue["2A"] === "3" && !!((stepSelectedValue["1"] === "3" && step11 === "true") || (stepSelectedValue["1"] === "2" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Ceiling")) &&
+                        {stepSelectedValue["2"] === "2" && stepSelectedValue["2A"] === "3" && !!((stepSelectedValue["1"] === "3" && step11 === "true") || (step1 === "Outside" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Ceiling")) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2D" stepNum={t("2D")} stepTitle={t("dk_step2E")} stepRef="2DFloor" type="2" required={requiredStep["2DFloor"]}
@@ -6084,7 +6211,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         }
                         
                         {/* step 2DWall*/}
-                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && !!((stepSelectedValue["1"] === "2" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
+                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && !!((step1 === "Outside" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2D" stepNum={t("2D")} stepTitle={t("dk_step2EWall")} stepRef="2DWall" type="2" required={requiredStep["2DWall"]}
@@ -6151,7 +6278,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         }
                         
                         {/* step 2EWall */}
-                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && !!((stepSelectedValue["1"] === "2" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
+                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && !!((step1 === "Outside" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2E" stepNum={t("2E")} stepTitle={t("dk_step2FWall")} stepRef="2EWall" type="2" required={requiredStep["2EWall"]}
@@ -6231,7 +6358,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         }
                         
                         {/* step 2FWall*/}
-                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && !!((stepSelectedValue["1"] === "2" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
+                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && !!((step1 === "Outside" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2F" stepNum={t("2F")} stepTitle={t("dk_step2GWall")} stepRef="2FWall" type="2" required={requiredStep["2FWall"]}
@@ -6300,7 +6427,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         }
                         
                         {/* step 2DWallFloor */}
-                        {stepSelectedValue["2"] === "2" && stepSelectedValue["2A"] === "3" && !!((stepSelectedValue["1"] === "2" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
+                        {stepSelectedValue["2"] === "2" && stepSelectedValue["2A"] === "3" && !!((step1 === "Outside" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2D" stepNum={t("2D")} stepTitle={t("dk_step2DWall")} stepRef="2DWallFloor" type="2"
@@ -6370,7 +6497,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         }
                         
                         {/* step 2EWallFloor */}
-                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "3") && !!((stepSelectedValue["1"] === "2" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
+                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "3") && !!((step1 === "Outside" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2E" stepNum={t("2E")} stepTitle={t("dk_step2FWall")} stepRef="2EWallFloor" type="2"
@@ -6678,7 +6805,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                 <div className="help_column help_left_column">
                                                     <p className="help_column_header"/>
                                                     <ul className="help_column_list">
-                                                        <li className="no_listStyle single_line_height">{t("step3A_help_1")}
+                                                        <li className="no_listStyle single_line_height">{t("step3A_help_dk_1")}
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -6862,82 +6989,18 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         {/* step 3 */}
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="3" stepNum={t("3")} stepTitle={t("zebra_step1")} stepRef="3" type="1" required={requiredStep["3"]}
+                                <ContextAwareToggle eventKey="3" stepNum={t("3")} stepTitle={t("dk_base_fabric_step_title")} stepRef="3" type="1" required={requiredStep["3"]}
                                                     stepSelected={stepSelectedLabel["3"] === undefined ? "" : stepSelectedLabel["3"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="3">
                                 <Card.Body>
-                                    <div className="card_body card-body-dk">
-                                        {/*<h1 className="dk_no_width">Please complete previous steps to continue</h1>*/}
-                                        <div className="dk_curtain_container">
-                                            <div className="dk_curtain_button_container">
-                                                {/*<button className="dk_curtain_symmetric btn" onClick={() => setSymmetric(false)}>*/}
-                                                {/*    <img className="checkmark1 img-fluid" src={require('../Images/public/checkmark1.png')}*/}
-                                                {/*         alt=""/>Deactivate symmetric coloring*/}
-                                                {/*</button>*/}
-                                                {/*<button className="dk_curtain_not_symmetric btn" onClick={() => setSymmetric(true)}>*/}
-                                                {/*    <button className="btn-close"></button>*/}
-                                                {/*    <h1>Activate symmetric coloring</h1></button>*/}
-                                                <div className="dk_curtain_symmetric_buttons">
-                                                    <button className={`dk_curtain_symmetric_button_left btn ${symmetric ? "dk_curtain_symmetric_button_on" : ""}`}
-                                                            onClick={() => setSymmetric(true)}>
-                                                        {t("SYMMETRIC COLORING")}
-                                                    </button>
-                                                    <button className={`dk_curtain_symmetric_button_right btn ${!symmetric ? "dk_curtain_symmetric_button_on" : ""}`}
-                                                            onClick={() => setSymmetric(false)}>
-                                                        {t("INDIVIDUAL COLORING")}
-                                                    </button>
-                                                </div>
-                                                <button className="dk_curtain_clear btn" onClick={() => setDkCurtainArr([])}>{t("CLEAR")}</button>
-                                            </div>
-                                            <div className="dk_curtain">
-                                                <div className="dk_curtain_inside">
-                                                    {dkCurtainList}
-                                                </div>
-                                            </div>
-                                            {/*{dkCurtainArr.length > 0 &&*/}
-                                            {/*    <div className={`dk_curtain_preview_container`}>*/}
-                                            {/*        <Dropdown autoClose="outside" title="" align={pageLanguage === "fa" ? "end" : "start"}>*/}
-                                            {/*            <Dropdown.Toggle className="basket_item_title_dropdown_btn">*/}
-                                            {/*                <h4 className="dk_curtain_preview_item_details">{t("Selection Fabric Preview")}</h4>*/}
-                                            {/*                <img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default}*/}
-                                            {/*                     alt=""/>*/}
-                                            {/*            </Dropdown.Toggle>*/}
-                                            {/*            <Dropdown.Menu className="basket_item_title_dropdown dk_curtain_preview_dropdown">*/}
-                                            {/*                <div className="dk_curtain_preview_detail_container">*/}
-                                            {/*                    {dkCurtainPreviewList}*/}
-                                            {/*                </div>*/}
-                                            {/*            </Dropdown.Menu>*/}
-                                            {/*        </Dropdown>*/}
-                                            {/*    </div>*/}
-                                            {/*}*/}
-                                            {dkCurtainArr.length > 0 &&
-                                                <div className={`dk_curtain_preview_container`}>
-                                                    <Accordion>
-                                                        <Accordion.Item eventKey="0">
-                                                            <ContextAwareToggleViewDetails eventKey="0" textOnHide={t("Selection Fabric Preview")} textOnShow={t("Hide Preview")}/>
-                                                            {/*<Accordion.Header className="basket_item_title_dropdown_btn">*/}
-                                                            {/*    <h4 className="dk_curtain_preview_item_details">{t("Selection Fabric Preview")}</h4>*/}
-                                                            {/*    /!*<img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>*!/*/}
-                                                            {/*</Accordion.Header>*/}
-                                                            <Accordion.Body className="basket_item_title_dropdown dk_curtain_preview_dropdown">
-                                                                <div className="dk_curtain_preview_detail_container">
-                                                                    {dkCurtainPreviewList}
-                                                                </div>
-                                                            </Accordion.Body>
-                                                        </Accordion.Item>
-                                                    </Accordion>
-                                                </div>
-                                            }
-                                            <div className="dk_curtain_text_container">
-                                                <h1 className="dk_curtain_text">
-                                                    {t("dk_curtain_preview_help")}
-                                                </h1>
-                                            </div>
-                                        </div>
-                                    </div>
                                     {/*<div className="card_body card-body-fabric card-body-dk-fabric">*/}
                                     <div className="card_body card-body-fabric">
+                                        <div className="dk_curtain_text_container">
+                                            <h1 className="dk_curtain_text">
+                                                {t("dk_curtain_preview_help")}
+                                            </h1>
+                                        </div>
                                         <div className="search_filter_container">
                                             <div className="search_container">
                                                 <div className="search_box">
@@ -6965,9 +7028,22 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                         <i className="fa fa-search search-icon"/>
                                                     </div>
                                                 </div>
-                                                <button className="reset_filters" onClick={() => clearAllFilters()}>{t("Reset Filters")}</button>
+                                                <div className="filters_show_hide_container" onClick={() => {
+                                                    if (filtersShow) {
+                                                        setFiltersShow(false);
+                                                    } else {
+                                                        setFiltersShow(true);
+                                                    }
+                                                }}>
+                                                    <span className="filters_toggle">{t("Filters")}</span>
+                                                    <span className="filters_indicator">
+                                                        {filtersShow && <img className="arrow_down img-fluid" src={require('../Images/public/arrow_up.svg').default} alt=""/>}
+                                                        {!filtersShow &&
+                                                            <img className="arrow_down img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>}
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <div className="filters_container">
+                                            <div className={filtersShow ? "filters_container" : "filters_container filters_container_hidden"}>
                                                 <div className="filter_container">
                                                     <Dropdown autoClose="outside" title="">
                                                         <Dropdown.Toggle className="dropdown_btn">
@@ -7047,21 +7123,193 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                             </div>
                                         </div>
                                         <div className="fabrics_list_container dk2_fabrics_list_container">
-                                            <div className="fabric_design_type">
-                                                <h1>{t("BASE FABRIC SELECTION")}</h1>
-                                                {!baseMore && <span onClick={() => setBaseMore(true)}>{t("View More")}<h6>&nbsp;&nbsp;+</h6></span>}
-                                                {baseMore && <span onClick={() => setBaseMore(false)}>{t("View Less")}<h6>&nbsp;&nbsp;&#8722;</h6></span>}
-                                            </div>
+                                            {/*<div className="fabric_design_type">*/}
+                                            {/*    <h1>{t("BASE FABRIC SELECTION")}</h1>*/}
+                                            {/*    {baseActive && !baseMore && <span onClick={() => setBaseMore(true)}>{t("View More")}<h6>&nbsp;&nbsp;+</h6></span>}*/}
+                                            {/*    {baseActive && baseMore && <span onClick={() => setBaseMore(false)}>{t("View Less")}<h6>&nbsp;&nbsp;&#8722;</h6></span>}*/}
+                                            {/*</div>*/}
                                             {fabricsList}
                                             
-                                            <div className="fabric_design_type">
-                                                <h1>{t("DECORATIVE FABRIC SELECTION")}</h1>
-                                                {!decorativeMore && <span onClick={() => setDecorativeMore(true)}>{t("View More")}<h6>&nbsp;&nbsp;+</h6></span>}
-                                                {decorativeMore && <span onClick={() => setDecorativeMore(false)}>{t("View Less")}<h6>&nbsp;&nbsp;&#8722;</h6></span>}
-                                            </div>
-                                            {fabricsList2}
+                                            {/*<div className="fabric_design_type">*/}
+                                            {/*    <h1>{t("DECORATIVE FABRIC SELECTION")}</h1>*/}
+                                            {/*    {decorativeActive && !decorativeMore && <span onClick={() => setDecorativeMore(true)}>{t("View More")}<h6>&nbsp;&nbsp;+</h6></span>}*/}
+                                            {/*    {decorativeActive && decorativeMore &&*/}
+                                            {/*        <span onClick={() => setDecorativeMore(false)}>{t("View Less")}<h6>&nbsp;&nbsp;&#8722;</h6></span>}*/}
+                                            {/*</div>*/}
+                                            {/*{fabricsList2}*/}
                                         </div>
                                         <Modal dialogClassName="zoomModal" show={show} onHide={() => handleClose()}>
+                                            <Modal.Header closeButton>
+                                                {zoomModalHeader}
+                                            </Modal.Header>
+                                            <Modal.Body>{zoomModalBody}</Modal.Body>
+                                            <Modal.Footer>
+                                                <button className={`swatchButton ${hasSwatchId ? "activeSwatch" : ""} ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                                                        current-state={hasSwatchId ? "1" : "0"}
+                                                        onClick={(e) => {
+                                                            fabricSwatch(e, swatchId, swatchDetailId, swatchPhotoPath);
+                                                        }}
+                                                        disabled={swatchId === -1}>{hasSwatchId ? t("SWATCH IN CART") : t("ORDER SWATCH")}</button>
+                                            </Modal.Footer>
+                                        </Modal>
+                                        <NextStep eventKey="35">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
+                        {/* step 4 */}
+                        <Card>
+                            <Card.Header>
+                                <ContextAwareToggle eventKey="35" stepNum={t("4")} stepTitle={t("dk_decor_fabric_step_title")} stepRef="35" type="1" required={requiredStep["35"]}
+                                                    stepSelected={stepSelectedLabel["35"] === undefined ? "" : stepSelectedLabel["35"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="35">
+                                <Card.Body>
+                                    <div className="card_body card-body-fabric">
+                                        <div className="dk_curtain_text_container">
+                                            <h1 className="dk_curtain_text">
+                                                {t("dk_curtain_preview_help")}
+                                            </h1>
+                                        </div>
+                                        <div className="search_filter_container">
+                                            <div className="search_container">
+                                                <div className="search_box">
+                                                    <input type="text" placeholder={t("Search for product Name/Code")}
+                                                           className="form-control search_input"
+                                                           name="search_input" value={searchText}
+                                                           ref={search_input}
+                                                           onChange={(e) => {
+                                                               if (e.target.value !== "")
+                                                                   setSearchShow(true);
+                                                               else
+                                                                   setSearchShow(false);
+                                                               setSearchText(e.target.value);
+                                                           }}/>
+                                                    {searchShow &&
+                                                        <div className="clear-icon-container" onClick={() => {
+                                                            search_input.current.value = "";
+                                                            setSearchText("");
+                                                            setSearchShow(false)
+                                                        }}>
+                                                            <i className="fa fa-times-circle clear-icon"/>
+                                                        </div>
+                                                    }
+                                                    <div className="search-icon-container">
+                                                        <i className="fa fa-search search-icon"/>
+                                                    </div>
+                                                </div>
+                                                <div className="filters_show_hide_container" onClick={() => {
+                                                    if (filtersShow) {
+                                                        setFiltersShow(false);
+                                                    } else {
+                                                        setFiltersShow(true);
+                                                    }
+                                                }}>
+                                                    <span className="filters_toggle">{t("Filters")}</span>
+                                                    <span className="filters_indicator">
+                                                        {filtersShow && <img className="arrow_down img-fluid" src={require('../Images/public/arrow_up.svg').default} alt=""/>}
+                                                        {!filtersShow &&
+                                                            <img className="arrow_down img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div className={filtersShow ? "filters_container" : "filters_container filters_container_hidden"}>
+                                                <div className="filter_container">
+                                                    <Dropdown autoClose="outside" title="">
+                                                        <Dropdown.Toggle className="dropdown_btn">
+                                                            <p>{t("filter_Color")}</p>
+                                                            {/*<img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>*/}
+                                                            <div className="select_control_handle_close img-fluid"/>
+                                                        </Dropdown.Toggle>
+                                                        <Dropdown.Menu className="filter_color_items">
+                                                            <div className="filter_items_container">
+                                                                {sewingColors}
+                                                            </div>
+                                                            <div className="filter_inside_button_section">
+                                                                <div className="clear_inside_filter" text="colors"
+                                                                     onClick={(e) => clearFilters(e)}>{t("filter_Clear Filters")}</div>
+                                                                <Dropdown.Toggle as="div" className="done_inside_filter">{t("filter_Done")}</Dropdown.Toggle>
+                                                            </div>
+                                                        </Dropdown.Menu>
+                                                    </Dropdown>
+                                                </div>
+                                                <div className="filter_container">
+                                                    <Dropdown autoClose="outside" title="">
+                                                        <Dropdown.Toggle className="dropdown_btn">
+                                                            <p>{t("filter_Pattern")}</p>
+                                                            {/*<img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>*/}
+                                                            <div className="select_control_handle_close img-fluid"/>
+                                                        </Dropdown.Toggle>
+                                                        <Dropdown.Menu>
+                                                            <div className="filter_items_container">
+                                                                {sewingPatterns}
+                                                            </div>
+                                                            <div className="filter_inside_button_section">
+                                                                <div className="clear_inside_filter" text="patterns"
+                                                                     onClick={(e) => clearFilters(e)}>{t("filter_Clear Filters")}</div>
+                                                                <Dropdown.Toggle as="div" className="done_inside_filter">{t("filter_Done")}</Dropdown.Toggle>
+                                                            </div>
+                                                        </Dropdown.Menu>
+                                                    </Dropdown>
+                                                </div>
+                                                <div className="filter_container">
+                                                    <Dropdown autoClose="outside" title="">
+                                                        <Dropdown.Toggle className="dropdown_btn">
+                                                            <p>{t("filter_Type")}</p>
+                                                            {/*<img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>*/}
+                                                            <div className="select_control_handle_close img-fluid"/>
+                                                        </Dropdown.Toggle>
+                                                        <Dropdown.Menu>
+                                                            <div className="filter_items_container">
+                                                                {sewingTypes}
+                                                            </div>
+                                                            <div className="filter_inside_button_section">
+                                                                <div className="clear_inside_filter" text="types" onClick={(e) => clearFilters(e)}>{t("filter_Clear Filters")}</div>
+                                                                <Dropdown.Toggle as="div" className="done_inside_filter">{t("filter_Done")}</Dropdown.Toggle>
+                                                            </div>
+                                                        </Dropdown.Menu>
+                                                    </Dropdown>
+                                                </div>
+                                                <div className="filter_container">
+                                                    <Dropdown autoClose="outside" title="">
+                                                        <Dropdown.Toggle className="dropdown_btn">
+                                                            <p>{t("filter_Price")}</p>
+                                                            {/*<img className="select_control_handle_close img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>*/}
+                                                            <div className="select_control_handle_close img-fluid"/>
+                                                        </Dropdown.Toggle>
+                                                        <Dropdown.Menu>
+                                                            <div className="filter_items_container">
+                                                                {/*<div className="price_filter_description">{t("filter_price_title")}</div>*/}
+                                                                {sewingPrices}
+                                                            </div>
+                                                            <div className="filter_inside_button_section">
+                                                                <div className="clear_inside_filter" text="prices"
+                                                                     onClick={(e) => clearFilters(e)}>{t("filter_Clear Filters")}</div>
+                                                                <Dropdown.Toggle as="div" className="done_inside_filter">{t("filter_Done")}</Dropdown.Toggle>
+                                                            </div>
+                                                        </Dropdown.Menu>
+                                                    </Dropdown>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="fabrics_list_container dk2_fabrics_list_container">
+                                            {/*<div className="fabric_design_type">*/}
+                                            {/*    <h1>{t("BASE FABRIC SELECTION")}</h1>*/}
+                                            {/*    {baseActive && !baseMore && <span onClick={() => setBaseMore(true)}>{t("View More")}<h6>&nbsp;&nbsp;+</h6></span>}*/}
+                                            {/*    {baseActive && baseMore && <span onClick={() => setBaseMore(false)}>{t("View Less")}<h6>&nbsp;&nbsp;&#8722;</h6></span>}*/}
+                                            {/*</div>*/}
+                                            {/*{fabricsList}*/}
+                                            
+                                            {/*<div className="fabric_design_type">*/}
+                                            {/*    <h1>{t("DECORATIVE FABRIC SELECTION")}</h1>*/}
+                                            {/*    {decorativeActive && !decorativeMore && <span onClick={() => setDecorativeMore(true)}>{t("View More")}<h6>&nbsp;&nbsp;+</h6></span>}*/}
+                                            {/*    {decorativeActive && decorativeMore &&*/}
+                                            {/*        <span onClick={() => setDecorativeMore(false)}>{t("View Less")}<h6>&nbsp;&nbsp;&#8722;</h6></span>}*/}
+                                            {/*</div>*/}
+                                            {fabricsList2}
+                                        </div>
+                                        <Modal dialogClassName="zoomModal" show={false} onHide={() => handleClose()}>
                                             <Modal.Header closeButton>
                                                 {zoomModalHeader}
                                             </Modal.Header>

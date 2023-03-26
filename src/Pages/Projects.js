@@ -158,7 +158,7 @@ function Projects() {
                         promiseArr[index] = new Promise((resolve, reject) => {
                             if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
                                 let objLabel = "";
-                                if (tempObj["apiLabel"] === "WidthCart" && userProjects[i]["PreorderText"][tempObj["apiLabel"]] === undefined) {
+                                if (tempObj["apiLabel"] === "WindowWidth" && userProjects[i]["PreorderText"][tempObj["apiLabel"]] === undefined) {
                                     if (userProjects[i]["PreorderText"]["Width1"] || userProjects[i]["PreorderText"]["Width2"] || userProjects[i]["PreorderText"]["Width3"] || userProjects[i]["PreorderText"]["Height1"] || userProjects[i]["PreorderText"]["Height2"] || userProjects[i]["PreorderText"]["Height3"] || userProjects[i]["PreorderText"]["LeftWidthExt"] || userProjects[i]["PreorderText"]["RightWidthExt"] || userProjects[i]["PreorderText"]["HeightOfRodMount"] || userProjects[i]["PreorderText"]["HeightOfCeilingToFloor"]) {
                                         tempArr[tempObj["order"]] =
                                             <div className="basket_item_title_desc" key={index}>
@@ -172,7 +172,7 @@ function Projects() {
                                     }
                                 } else if (userProjects[i]["PreorderText"][tempObj["apiLabel"]] === undefined) {
                                     resolve();
-                                } else if (tempObj["apiLabel"] === "WidthCart" && tempObj["measurements"] && userProjects[i]["PreorderText"]["WidthCart"] && userProjects[i]["PreorderText"]["HeightCart"]) {
+                                } else if (tempObj["apiLabel"] === "WindowWidth" && tempObj["measurements"] && userProjects[i]["PreorderText"]["WindowWidth"] && userProjects[i]["PreorderText"]["WindowHeight"]) {
                                     if (firstMeasurements) {
                                         firstMeasurements = false;
                                         GetUserProjectData(userProjects[i], true).then((temp) => {
@@ -698,7 +698,7 @@ function Projects() {
                                 // window.location.reload();
                                 console.log(key);
                             } else {
-                                if (key === "HeightCart" || key === "WidthCart") {
+                                if (key === "WindowHeight" || key === "WindowWidth") {
         
                                 } else if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
                                     let objLabel = "";

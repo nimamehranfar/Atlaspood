@@ -209,7 +209,7 @@ function RegisterLogin() {
             setLastNotExist(true);
         }
         if (registerInfo.phone === "") {
-            setMobileNotExist(false);
+            setMobileNotExist(true);
         } else if (!validateNumber(registerInfo.phone)) {
             setMobileNotExist(true);
         } else {

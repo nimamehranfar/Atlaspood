@@ -80,8 +80,8 @@ function GetMeasurementArray({modelId, cartValues}) {
                         </div>
                     </span>
                         <span className="cart_agree_measurement_row_bottom">
-                        <p className="cart_agree_measurement_row_bottom_left">{t("Shade Dimension= ")}{NumToFa((cartValues["WidthCart"]) + t("Zebra Measurements W") + " \u00d7 " + cartValues["HeightCart"] + t("Zebra Measurements H") + t("Zebra Measurements cm"))}</p>
-                        <p className="cart_agree_measurement_row_bottom_right">{t("Zebra Measurements text")}</p>
+                        {/*<p className="cart_agree_measurement_row_bottom_left">{t("Shade Dimension= ")}{NumToFa((cartValues["WidthCart"]) + t("Zebra Measurements W") + " \u00d7 " + cartValues["HeightCart"] + t("Zebra Measurements H") + t("Zebra Measurements cm"))}</p>*/}
+                        <p className="cart_agree_measurement_row_bottom_right">{modelId === "0303"?t("Zebra Measurements text"):(modelId === "0324"?t("roller Measurements text"):t("dualroller Measurements text"))}</p>
                     </span>
                     </li>);
                 } else if (cartValues["Mount"] === "Outside") {
@@ -139,8 +139,8 @@ function GetMeasurementArray({modelId, cartValues}) {
                         </div>
                     </span>
                         <span className="cart_agree_measurement_row_bottom">
-                        <p className="cart_agree_measurement_row_bottom_left">{t("Shade Dimension= ")}{NumToFa((cartValues["WidthCart"]) + t("Zebra Measurements W") + " \u00d7 " + cartValues["HeightCart"] + t("Zebra Measurements H") + t("Zebra Measurements cm"))}</p>
-                        <p className="cart_agree_measurement_row_bottom_right">{t("Zebra Measurements text")}</p>
+                        {/*<p className="cart_agree_measurement_row_bottom_left">{t("Shade Dimension= ")}{NumToFa((cartValues["WidthCart"]) + t("Zebra Measurements W") + " \u00d7 " + cartValues["HeightCart"] + t("Zebra Measurements H") + t("Zebra Measurements cm"))}</p>*/}
+                        <p className="cart_agree_measurement_row_bottom_right">{modelId === "0303"?t("Zebra Measurements text"):(modelId === "0324"?t("roller Measurements text"):t("dualroller Measurements text"))}</p>
                     </span>
                     </li>);
                 } else {
@@ -206,8 +206,8 @@ function GetMeasurementArray({modelId, cartValues}) {
                             </div>
                         </span>
                         <span className="cart_agree_measurement_row_bottom">
-                            <p className="cart_agree_measurement_row_bottom_left">{t("Shade Dimension= ")}{NumToFa((cartValues["WidthCart"]) + t("Zebra Measurements W") + " \u00d7 " + cartValues["HeightCart"] + t("Zebra Measurements H") + t("Zebra Measurements cm"))}</p>
-                            <p className="cart_agree_measurement_row_bottom_right">{t("Zebra Measurements text")}</p>
+                            {/*<p className="cart_agree_measurement_row_bottom_left">{t("Shade Dimension= ")}{NumToFa((cartValues["WidthCart"]) + t("Zebra Measurements W") + " \u00d7 " + cartValues["HeightCart"] + t("Zebra Measurements H") + t("Zebra Measurements cm"))}</p>*/}
+                            <p className="cart_agree_measurement_row_bottom_right">{modelId === "0303"?t("Zebra Measurements text"):(modelId === "0324"?t("roller Measurements text"):t("dualroller Measurements text"))}</p>
                         </span>
                     </li>);
                 }
@@ -224,8 +224,8 @@ function GetMeasurementArray({modelId, cartValues}) {
                         </div>
                     </span>
                     <span className="cart_agree_measurement_row_bottom">
-                        <p className="cart_agree_measurement_row_bottom_left">{t("Shade Dimension= ")}{NumToFa((cartValues["WidthCart"]) + t("Zebra Measurements W") + " \u00d7 " + cartValues["HeightCart"] + t("Zebra Measurements H") + t("Zebra Measurements cm"))}</p>
-                        <p className="cart_agree_measurement_row_bottom_right">{t("Zebra Measurements text")}</p>
+                        {/*<p className="cart_agree_measurement_row_bottom_left">{t("Shade Dimension= ")}{NumToFa((cartValues["WidthCart"]) + t("Zebra Measurements W") + " \u00d7 " + cartValues["HeightCart"] + t("Zebra Measurements H") + t("Zebra Measurements cm"))}</p>*/}
+                        <p className="cart_agree_measurement_row_bottom_right">{modelId === "0303"?t("Zebra Measurements text"):(modelId === "0324"?t("roller Measurements text"):t("dualroller Measurements text"))}</p>
                     </span>
                 </li>);
             }

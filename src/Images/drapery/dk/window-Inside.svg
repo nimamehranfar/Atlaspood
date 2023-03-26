@@ -4,65 +4,74 @@
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="411px" height="571px" viewBox="0 0 411 571" enable-background="new 0 0 411 571" xml:space="preserve">
 <rect x="0" y="-0.5" fill="#EDEDED" width="411" height="572"/>
-<rect x="63.8" y="59.6" fill="#FFFFFF" stroke="#878787" stroke-width="2.8983" stroke-miterlimit="10" width="283.5" height="396.9"/>
-<rect x="83.6" y="81.4" fill="#FFFFFF" stroke="#878787" stroke-width="2" stroke-miterlimit="10" width="243.8" height="353.1"/>
-<rect x="95.9" y="93.8" fill="none" stroke="#878787" stroke-width="2" stroke-miterlimit="10" width="219.2" height="328.4"/>
+<rect x="44.8" y="33" fill="#FFFFFF" stroke="#878787" stroke-width="3.2864" stroke-miterlimit="10" width="321.4" height="450"/>
+<rect x="67.3" y="57.8" fill="#FFFFFF" stroke="#878787" stroke-width="2.2679" stroke-miterlimit="10" width="276.4" height="400.4"/>
+<rect x="81.2" y="71.8" fill="none" stroke="#878787" stroke-width="2.2679" stroke-miterlimit="10" width="248.6" height="372.4"/>
 <g>
 	<g>
 		<g>
-			<rect x="83.6" y="84.1" fill="#B2B2B2" width="243.8" height="6.2"/>
+			<rect x="67.3" y="60.9" fill="#B2B2B2" width="276.4" height="7.1"/>
 			
-				<rect x="83.6" y="84.1" fill="none" stroke="#717070" stroke-width="0.6357" stroke-miterlimit="10" width="243.8" height="6.2"/>
+				<rect x="67.3" y="60.9" fill="none" stroke="#717070" stroke-width="0.7208" stroke-miterlimit="10" width="276.4" height="7.1"/>
 		</g>
 	</g>
 </g>
-<g opacity="0.78">
+<g opacity="0.72">
 	<g>
-		<path fill="#DADADA" stroke="#706F6F" stroke-miterlimit="10" d="M88.4,93.8v331.1h0.2c1.2,3.1,8.1,5.6,16.5,5.6
-			s15.3-2.4,16.5-5.6h0.2V93.8H88.4z"/>
+		<g>
+			<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9931" stroke-miterlimit="10" d="M72.5,71.8v376.5h0.2
+				c1.2,3.1,8.1,5.5,16.4,5.5s15.2-2.4,16.4-5.5h0.2V71.8H72.5z"/>
+		</g>
+		<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9931" stroke-miterlimit="10" d="M72.5,101.2c0,0,13.2,6.8,33.2,0"/>
 	</g>
-	<path fill="#DADADA" stroke="#706F6F" stroke-miterlimit="10" d="M88.4,123.4c0,0,13.3,6.8,33.4,0"/>
-</g>
-<g opacity="0.78">
 	<g>
-		<path fill="#DADADA" stroke="#706F6F" stroke-miterlimit="10" d="M121.9,93.8v331.1h0.2c1.2,3.1,8.1,5.6,16.5,5.6
-			s15.3-2.4,16.5-5.6h0.2V93.8H121.9z"/>
+		<g>
+			<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9931" stroke-miterlimit="10" d="M105.7,71.8v376.5h0.2
+				c1.2,3.1,8.1,5.5,16.4,5.5s15.2-2.4,16.4-5.5h0.2V71.8H105.7z"/>
+		</g>
+		<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9931" stroke-miterlimit="10" d="M105.7,101.2c0,0,13.2,6.8,33.2,0"/>
 	</g>
-	<path fill="#DADADA" stroke="#706F6F" stroke-miterlimit="10" d="M121.9,123.4c0,0,13.3,6.8,33.4,0"/>
-</g>
-<g opacity="0.78">
 	<g>
-		<path fill="#DADADA" stroke="#706F6F" stroke-miterlimit="10" d="M155.3,93.8v331.1h0.2c1.2,3.1,8.1,5.6,16.5,5.6
-			s15.3-2.4,16.5-5.6h0.2V93.8H155.3z"/>
+		<g>
+			<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9931" stroke-miterlimit="10" d="M139,71.8v376.5h0.2
+				c1.2,3.1,8.1,5.5,16.4,5.5s15.2-2.4,16.4-5.5h0.2V71.8H139z"/>
+		</g>
+		<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9931" stroke-miterlimit="10" d="M139,101.2c0,0,13.2,6.8,33.2,0"/>
 	</g>
-	<path fill="#DADADA" stroke="#706F6F" stroke-miterlimit="10" d="M155.3,123.4c0,0,13.3,6.8,33.4,0"/>
-</g>
-<g opacity="0.78">
 	<g>
-		<path fill="#DADADA" stroke="#706F6F" stroke-miterlimit="10" d="M188.8,93.8v331.1h0.2c1.2,3.1,8.1,5.6,16.5,5.6
-			s15.3-2.4,16.5-5.6h0.2V93.8H188.8z"/>
+		<g>
+			<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9931" stroke-miterlimit="10" d="M205.5,71.8v376.5h0.2
+				c1.2,3.1,8.1,5.5,16.4,5.5s15.2-2.4,16.4-5.5h0.2V71.8H205.5z"/>
+		</g>
+		<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9931" stroke-miterlimit="10" d="M205.5,101.2c0,0,13.2,6.8,33.2,0"/>
 	</g>
-	<path fill="#DADADA" stroke="#706F6F" stroke-miterlimit="10" d="M188.8,123.4c0,0,13.3,6.8,33.4,0"/>
-</g>
-<g opacity="0.78">
 	<g>
-		<path fill="#DADADA" stroke="#706F6F" stroke-miterlimit="10" d="M222.2,93.8v331.1h0.2c1.2,3.1,8.1,5.6,16.5,5.6
-			s15.3-2.4,16.5-5.6h0.2V93.8H222.2z"/>
+		<g>
+			<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9931" stroke-miterlimit="10" d="M238.8,71.8v376.5h0.2
+				c1.2,3.1,8.1,5.5,16.4,5.5c8.3,0,15.2-2.4,16.4-5.5h0.2V71.8H238.8z"/>
+		</g>
+		<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9931" stroke-miterlimit="10" d="M238.8,101.2c0,0,13.2,6.8,33.2,0"/>
 	</g>
-	<path fill="#DADADA" stroke="#706F6F" stroke-miterlimit="10" d="M222.2,123.4c0,0,13.3,6.8,33.4,0"/>
-</g>
-<g opacity="0.78">
 	<g>
-		<path fill="#DADADA" stroke="#706F6F" stroke-miterlimit="10" d="M255.7,93.8v331.1h0.2c1.2,3.1,8.1,5.6,16.5,5.6
-			s15.3-2.4,16.5-5.6h0.2V93.8H255.7z"/>
+		<g>
+			<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9931" stroke-miterlimit="10" d="M272.1,71.8v376.5h0.2
+				c1.2,3.1,8.1,5.5,16.4,5.5c8.3,0,15.2-2.4,16.4-5.5h0.2V71.8H272.1z"/>
+		</g>
+		<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9931" stroke-miterlimit="10" d="M272.1,101.2c0,0,13.2,6.8,33.2,0"/>
 	</g>
-	<path fill="#DADADA" stroke="#706F6F" stroke-miterlimit="10" d="M255.7,123.4c0,0,13.3,6.8,33.4,0"/>
-</g>
-<g opacity="0.78">
 	<g>
-		<path fill="#DADADA" stroke="#706F6F" stroke-miterlimit="10" d="M289.1,93.8v331.1h0.2c1.2,3.1,8.1,5.6,16.5,5.6
-			s15.3-2.4,16.5-5.6h0.2V93.8H289.1z"/>
+		<g>
+			<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9931" stroke-miterlimit="10" d="M305.3,71.8v376.5h0.2
+				c1.2,3.1,8.1,5.5,16.4,5.5c8.3,0,15.2-2.4,16.4-5.5h0.2V71.8H305.3z"/>
+		</g>
+		<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9931" stroke-miterlimit="10" d="M305.3,101.2c0,0,13.2,6.8,33.2,0"/>
 	</g>
-	<path fill="#DADADA" stroke="#706F6F" stroke-miterlimit="10" d="M289.1,123.4c0,0,13.3,6.8,33.4,0"/>
+	<g>
+		<g>
+			<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9931" stroke-miterlimit="10" d="M172.2,71.8v376.5h0.2
+				c1.2,3.1,8.1,5.5,16.4,5.5s15.2-2.4,16.4-5.5h0.2V71.8H172.2z"/>
+		</g>
+		<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9931" stroke-miterlimit="10" d="M172.2,101.2c0,0,13.2,6.8,33.2,0"/>
+	</g>
 </g>
 </svg>

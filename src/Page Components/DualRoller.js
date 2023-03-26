@@ -159,6 +159,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
     const [hasTrim, setHasTrim] = useState(false);
     const [showLabels, setShowLabels] = useState(true);
     const [detailsShow, setDetailsShow] = useState(false);
+    const [filtersShow, setFiltersShow] = useState(false);
     const [windowSize, setWindowSize] = useState("");
     const [windowSizeBool, setWindowSizeBool] = useState(false);
     const [stepSelectedLabel, setStepSelectedLabel] = useState({});
@@ -277,6 +278,10 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
     const [selectedPosition2, setSelectedPosition2] = useState([]);
     const [selectedRoomLabel, setSelectedRoomLabel] = useState([]);
     
+    const [step21Err1, setStep21Err1] = useState(false);
+    const [step21Err3, setStep21Err3] = useState(false);
+    const [motorErr1, setMotorErr1] = useState(false);
+    
     const [selectedFrontPosition, setSelectedFrontPosition] = useState("");
     const [selectedBackPosition, setSelectedBackPosition] = useState("");
     
@@ -309,6 +314,8 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
     const [savingLoading, setSavingLoading] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [swatchLogin, setSwatchLogin] = useState(false);
+    const [swatchLoginSwatchId, setSwatchLoginSwatchId] = useState(null);
+    const [swatchLoginSwatchDetailId, setSwatchLoginSwatchDetailId] = useState(null);
     
     const [helpMeasure, setHelpMeasure] = useState("Inside");
     const [customMotorAcc, setCustomMotorAcc] = useState({});
@@ -1363,7 +1370,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                         // console.log("1");
                         
                         // setCart("HeightCart", totalHeight, "", "WidthCart", [totalWidth]);
-                        if (stepSelectedValue["2"] === "1" && stepSelectedValue["3"] === "2") {
+                        if (step2 === "Inside" && stepSelectedValue["3"] === "2") {
                             if (temp["Width1"] !== undefined && temp["Width2"] !== undefined && temp["Width3"] !== undefined && temp["Height1"] !== undefined && temp["Height2"] !== undefined && temp["Height3"] !== undefined) {
                                 // console.log("2");
                                 getWindowSize(response.data["WindowWidth"], response.data["WindowHeight"]);
@@ -1373,7 +1380,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                 temp["HeightCart"] = response.data["Height"];
                                 
                             }
-                        } else if (stepSelectedValue["2"] === "2" && stepSelectedValue["3"] === "2") {
+                        } else if (step2 === "Outside" && stepSelectedValue["3"] === "2") {
                             if (temp["Width3A"] !== undefined && temp["Height3C"] !== undefined && temp["ExtensionRight"] !== undefined && temp["ExtensionLeft"] !== undefined && temp["ShadeMount"] !== undefined) {
                                 getWindowSize(response.data["WindowWidth"], response.data["WindowHeight"]);
                                 temp["WindowWidth"] = response.data["WindowWidth"];
@@ -1667,8 +1674,8 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
         setDepSet(depSetTempArr);
     }
     
-    const doNotShow = ["ModelId", "qty", "Width1", "Height1", "Width2", "Height2", "Width3", "Height3", "RoomNameEn", "RoomNameFa", "calcMeasurements", "FabricId", "PhotoUrl", "RemoteName",
-        "hasPower", "WindowName", "ExtensionLeft", "ExtensionRight", "Height3C", "Width3A", "ShadeMount", "ModelNameEn", "ModelNameFa", "FabricColorEn", "FabricColorFa", "FabricDesignEn", "FabricDesignFa"];
+    // const doNotShow = ["ModelId", "qty", "Width1", "Height1", "Width2", "Height2", "Width3", "Height3", "RoomNameEn", "RoomNameFa", "calcMeasurements,Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight", "FabricId", "PhotoUrl", "RemoteName",
+    //     "hasPower", "WindowName", "ExtensionLeft", "ExtensionRight", "Height3C", "Width3A", "ShadeMount", "ModelNameEn", "ModelNameFa", "FabricColorEn", "FabricColorFa", "FabricDesignEn", "FabricDesignFa"];
     
     function addToCart() {
         let tempDepSet = [...depSet];
@@ -1826,7 +1833,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                 // window.location.reload();
                                 console.log(key);
                             } else {
-                                if (key === "HeightCart" || key === "WidthCart") {
+                                if (key === "WindowHeight" || key === "WindowWidth") {
                                 
                                 } else if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
                                     let objLabel = "";
@@ -2420,10 +2427,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                 });
             } else {
                 if (SwatchDetailId) {
-                    axios.delete(baseURLDeleteBasketProject, {
-                        params: {
-                            detailId: SwatchDetailId
-                        },
+                    axios.post(baseURLDeleteBasketProject + "/" + SwatchDetailId, {}, {
                         headers: authHeader()
                     }).then((response) => {
                         setCartChanged(cartChanged + 1);
@@ -2451,6 +2455,8 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
             
         } else {
             setSwatchLogin(true);
+            setSwatchLoginSwatchId(SwatchId);
+            setSwatchLoginSwatchDetailId(SwatchDetailId);
             modalHandleShow("side_login_modal");
             // dispatch({
             //     type: ShowLoginModal,
@@ -3343,7 +3349,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                     if (temp["HemStyle"]) {
                         setStep6(temp["HemStyle"]);
                         
-                        if (temp["HemStyle"] === "Scallop") {
+                        if (temp["HemStyle"] === "Classic") {
                             let refIndex = inputs.current["62"].getAttribute('ref-num');
                             tempLabels[refIndex] = inputs.current["62"].getAttribute('text');
                             tempValue[refIndex] = inputs.current["62"].value;
@@ -3357,7 +3363,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                             setStepSelectedLabel(tempLabels);
                             setStepSelectedValue(tempValue);
                             depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
-                        } else if (temp["HemStyle"] === "Colonial") {
+                        } else if (temp["HemStyle"] === "Traditional") {
                             let refIndex = inputs.current["64"].getAttribute('ref-num');
                             tempLabels[refIndex] = inputs.current["64"].getAttribute('text');
                             tempValue[refIndex] = inputs.current["64"].value;
@@ -4033,6 +4039,9 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
         if (swatchLogin) {
             setSwatchLogin(false);
             modalHandleClose("side_login_modal");
+            setTimeout(() => {
+                fabricSwatch("0", swatchLoginSwatchId, swatchLoginSwatchDetailId);
+            }, 500);
         } else if ((projectModalState === 2 && isLoggedIn) || (saveProjectCount !== 0 && isLoggedIn)) {
             if (roomLabelText !== "" && selectedRoomLabel.length) {
                 if (projectId && projectId !== "") {
@@ -4302,8 +4311,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
     useEffect(() => {
         if (firstRender.current) {
             firstRender.current = false;
-        }
-        else {
+        } else {
             dispatch({
                 type: CartUpdatedTrue,
                 payload: {mainCart: bag}
@@ -4478,7 +4486,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
             }
         } else if (projectId && projectId !== "") {
             getProjectDetail();
-        } else if(sessionStorage.getItem("cartCopy") !== null){
+        } else if (sessionStorage.getItem("cartCopy") !== null) {
             let tempCartValues = JSON.parse(sessionStorage.getItem("cartCopy"));
             if (Object.keys(tempCartValues).length !== 0) {
                 if (tempCartValues["SewingModelId"] && tempCartValues["SewingModelId"] === `${modelID}`) {
@@ -4496,6 +4504,24 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
             }, 700);
         }
     }, [location.pathname]);
+    
+    const fixedDiv = useRef(null);
+    const [offset, setOffset] = useState(false);
+    
+    useEffect(() => {
+        const onScroll = () => {
+            if (fixedDiv.current.offsetTop < window.pageYOffset + 92) {
+                setOffset(true);
+            } else {
+                setOffset(false);
+            }
+        };
+        
+        // clean up code
+        window.removeEventListener('scroll', onScroll);
+        window.addEventListener('scroll', onScroll, {passive: true});
+        return () => window.removeEventListener('scroll', onScroll);
+    }, []);
     
     return (
         <div className={`Custom_model_container ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
@@ -4520,10 +4546,12 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                 }
             </div>
             <div className="model_customize_container">
-                <div className="model_customize_image">
-                    {defaultFabricPhoto &&
-                        <img src={`https://api.atlaspood.ir/${defaultFabricPhoto}`} className="img-fluid" alt=""/>
-                    }
+                <div className={offset ? "model_customize_image model_customize_image_fixed" : "model_customize_image"} ref={fixedDiv}>
+                    <div>
+                        {defaultFabricPhoto &&
+                            <img src={`https://api.atlaspood.ir/${defaultFabricPhoto}`} className="img-fluid" alt=""/>
+                        }
+                    </div>
                 </div>
                 <div className={`model_customize_section ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>
                     <Accordion ref={accordion} flush activeKey={accordionActiveKey}>
@@ -4563,9 +4591,22 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                         <i className="fa fa-search search-icon"/>
                                                     </div>
                                                 </div>
-                                                <button className="reset_filters" onClick={() => clearAllFilters()}>{t("Reset Filters")}</button>
+                                                <div className="filters_show_hide_container" onClick={()=>{
+                                                    if(filtersShow){
+                                                        setFiltersShow(false);
+                                                    }else{
+                                                        setFiltersShow(true);
+                                                    }
+                                                }}>
+                                                    <span className="filters_toggle">{t("Filters")}</span>
+                                                    <span className="filters_indicator">
+                                                        {filtersShow && <img className="arrow_down img-fluid" src={require('../Images/public/arrow_up.svg').default} alt=""/>}
+                                                        {!filtersShow &&
+                                                            <img className="arrow_down img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>}
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <div className="filters_container">
+                                            <div className={filtersShow?"filters_container":"filters_container filters_container_hidden"}>
                                                 <div className="filter_container">
                                                     <Dropdown autoClose="outside" title="">
                                                         <Dropdown.Toggle className="dropdown_btn">
@@ -4703,9 +4744,22 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                         <i className="fa fa-search search-icon"/>
                                                     </div>
                                                 </div>
-                                                <button className="reset_filters" onClick={() => clearAllFilters()}>{t("Reset Filters")}</button>
+                                                <div className="filters_show_hide_container" onClick={()=>{
+                                                    if(filtersShow){
+                                                        setFiltersShow(false);
+                                                    }else{
+                                                        setFiltersShow(true);
+                                                    }
+                                                }}>
+                                                    <span className="filters_toggle">{t("Filters")}</span>
+                                                    <span className="filters_indicator">
+                                                        {filtersShow && <img className="arrow_down img-fluid" src={require('../Images/public/arrow_up.svg').default} alt=""/>}
+                                                        {!filtersShow &&
+                                                            <img className="arrow_down img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>}
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <div className="filters_container">
+                                            <div className={filtersShow?"filters_container":"filters_container filters_container_hidden"}>
                                                 <div className="filter_container">
                                                     <Dropdown autoClose="outside" title="">
                                                         <Dropdown.Toggle className="dropdown_btn">
@@ -4819,16 +4873,17 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                     <div className="card_body card_body_radio">
                                         <div className="box33 radio_style">
                                             <img src={require('../Images/drapery/zebra/new_mount_inside.svg').default} className="img-fluid" alt=""/>
-                                            <input className="radio" type="radio" text={t("mount_Inside")} value="1" name="step2" ref-num="2" id="21" checked={step2 === "Inside"}
+                                            <input className="radio" type="radio" value="1" name="step2" ref-num="2" id="21" checked={step2 === "Inside"}
                                                    onChange={e => {
                                                        setStep2("Inside");
                                                        setStep21("");
+                                                       setStep21Err3(false);
                                                        setMeasurementsNextStep("4");
                                                        setStep5Arc("");
-                                                       if (stepSelectedValue["3"] === "2") {
+                                                       if (step3 !== "") {
                                                            setDeps("21,5", "2,3AOut,3BOut1,3BOut2,3COut,3DOut,3CArc1,3CArc2,3CArc3,5Arc,5Arc,5BArc");
                                                            deleteSpecialSelects();
-                                                           setCart("Mount", "Inside", "calcMeasurements,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                           setCart("Mount", "Inside", "calcMeasurements,Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
                                                            setStep3("");
                                                            selectChanged(e, "3,3AOut,3BOut,3COut,3DOut,3CArc,5Arc,5Arc,5BArc");
                                                        } else {
@@ -4846,11 +4901,13 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                    onChange={e => {
                                                        setStep2("Outside");
                                                        setStep21("");
+                                                       setStep21Err1(false);
+                                                       setStep21Err3(false);
                                                        setStep5Arc("");
-                                                       if (stepSelectedValue["3"] === "2") {
+                                                       if (step3 !== "") {
                                                            setDeps("3AOut,3BOut1,3BOut2,3COut,3DOut,5", "2,21,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3,3CArc1,3CArc2,3CArc3,5Arc,5Arc,5BArc");
                                                            deleteSpecialSelects();
-                                                           setCart("Mount", "Outside", "calcMeasurements,Width1,Width2,Width3,Height1,Height2,Height3,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                           setCart("Mount", "Outside", "calcMeasurements,Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width1,Width2,Width3,Height1,Height2,Height3,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
                                                            setStep3("");
                                                            selectChanged(e, "3,3AIn,3BIn,3AOut,3BOut,3CArc,5Arc,5Arc,5BArc");
                                                        } else {
@@ -4863,17 +4920,18 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                         </div>
                                         <div className="box33 radio_style">
                                             <img src={require('../Images/drapery/zebra/new_mount_arc.svg').default} className="img-fluid" alt=""/>
-                                            <input className="radio" type="radio" text={t("mount_Arc")} value="3" name="step1" ref-num="2" id="23"
+                                            <input className="radio" type="radio" value="3" name="step1" ref-num="2" id="23"
                                                    checked={step2 === "HiddenMoulding"}
                                                    onChange={e => {
                                                        setStep2("HiddenMoulding");
                                                        setStep21("");
+                                                       setStep21Err1(false);
                                                        setStep5("");
                                                        setMeasurementsNextStep("4");
-                                                       if (stepSelectedValue["3"] === "2") {
+                                                       if (step3 !== "") {
                                                            setDeps("21,5Arc,5Arc,5BArc", "2,2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWall,2EWall,2FWall,2GWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3,5,53,54,5A,5B,5C");
                                                            deleteSpecialSelects();
-                                                           setCart("Mount", "HiddenMoulding", "calcMeasurements,Width1,Width2,Width3,Height1,Height2,Height3,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
+                                                           setCart("Mount", "HiddenMoulding", "calcMeasurements,Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width1,Width2,Width3,Height1,Height2,Height3,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
                                                            setStep3("");
                                                            selectChanged(e, "3,3AIn,3BIn,3AOut,3BOut,3COut,3DOut,5,5A,5B,5C");
                                                        } else {
@@ -4884,33 +4942,36 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                    }} ref={ref => (inputs.current["23"] = ref)}/>
                                             <label htmlFor="23">{t("mount_Arc")}</label>
                                         </div>
-                                        {stepSelectedValue["2"] === "1" &&
-                                            <div className="secondary_options">
+                                        {step2 === "Inside" &&
+                                            <div className={step21Err1 ? "secondary_options secondary_options_err" : "secondary_options"}>
                                                 <div className="card-body-display-flex">
                                                     <div className="checkbox_style checkbox_style_step2">
-                                                        <input type="checkbox" value="1" name="step21" ref-num="21" checked={step21 === "true"} onChange={(e) => {
-                                                            if (e.target.checked) {
-                                                                selectChanged(e);
-                                                                setStep21("true");
-                                                                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                                let refIndex = inputs.current["21"].getAttribute('ref-num');
-                                                                tempLabels[refIndex] = inputs.current["21"].getAttribute('text');
-                                                                setStepSelectedLabel(tempLabels);
-                                                                setDeps("", "21");
-                                                            } else {
-                                                                setStep21("");
-                                                                // modalHandleShow("noPower");
-                                                                if (stepSelectedValue["3"] === "2") {
-                                                                    setDeps("21,3", "3AOut,3BOut1,3BOut2,3COut,3DOut,3CArc1,3CArc2,3CArc3");
-                                                                    deleteSpecialSelects();
-                                                                    setCart("", "", "calcMeasurements,Width3A,Height3C,Width1,Width2,Width3,Height1,Height2,Height3,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
-                                                                    setStep3("");
-                                                                    selectChanged(undefined, "3,3AOut,3BOut,3COut,3DOut,3CArc");
-                                                                } else {
-                                                                    setDeps("21", "");
-                                                                }
-                                                            }
-                                                        }} id="211" ref={ref => (inputs.current["211"] = ref)}/>
+                                                        <input type="checkbox" text={t("mount_Inside")} value="1" name="step21" ref-num="2" checked={step21 === "true"}
+                                                               onChange={(e) => {
+                                                                   if (e.target.checked) {
+                                                                       selectChanged(e);
+                                                                       setStep21("true");
+                                                                       setStep21Err1(false);
+                                                                       // let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                                       // let refIndex = inputs.current["21"].getAttribute('ref-num');
+                                                                       // tempLabels[refIndex] = inputs.current["21"].getAttribute('text');
+                                                                       // setStepSelectedLabel(tempLabels);
+                                                                       setDeps("", "21");
+                                                                   } else {
+                                                                       setStep21("");
+                                                                       // modalHandleShow("noPower");
+                                                                       if (step3 !== "") {
+                                                                           setDeps("21,3", "3AOut,3BOut1,3BOut2,3COut,3DOut,3CArc1,3CArc2,3CArc3");
+                                                                           deleteSpecialSelects();
+                                                                           setCart("", "", "calcMeasurements,Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width3A,Height3C,Width1,Width2,Width3,Height1,Height2,Height3,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                                           setStep3("");
+                                                                           selectChanged(undefined, "2,3,3AOut,3BOut,3COut,3DOut,3CArc");
+                                                                       } else {
+                                                                           setDeps("21", "");
+                                                                           selectChanged(undefined, "2");
+                                                                       }
+                                                                   }
+                                                               }} id="211" ref={ref => (inputs.current["211"] = ref)}/>
                                                         <label htmlFor="211" className="checkbox_label">
                                                             <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
                                                                  alt=""/>
@@ -4919,38 +4980,43 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                         {t("inside_checkbox_title")}
                                                     </span>
                                                     </div>
-                                                
                                                 </div>
                                             </div>
                                         }
-                                        {stepSelectedValue["2"] === "3" &&
-                                            <div className="secondary_options">
+                                        {step21Err1 &&
+                                            <div className="input_not_valid">{t("step21Err1")}</div>
+                                        }
+                                        {step2 === "HiddenMoulding" &&
+                                            <div className={step21Err3 ? "secondary_options secondary_options_err" : "secondary_options"}>
                                                 <div className="card-body-display-flex">
                                                     <div className="checkbox_style checkbox_style_step2">
-                                                        <input type="checkbox" value="1" name="step21" ref-num="21" checked={step21 === "true"} onChange={(e) => {
-                                                            if (e.target.checked) {
-                                                                selectChanged(e);
-                                                                setStep21("true");
-                                                                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                                let refIndex = inputs.current["23"].getAttribute('ref-num');
-                                                                tempLabels[refIndex] = inputs.current["23"].getAttribute('text');
-                                                                setStepSelectedLabel(tempLabels);
-                                                                setDeps("", "21");
-                                                            } else {
-                                                                setStep21("");
-                                                                // modalHandleShow("noPower");
+                                                        <input type="checkbox" text={t("mount_Arc")} value="3" name="step21" ref-num="2" checked={step21 === "true"}
+                                                               onChange={(e) => {
+                                                                   if (e.target.checked) {
+                                                                       selectChanged(e);
+                                                                       setStep21("true");
+                                                                       setStep21Err3(false);
+                                                                       // let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                                       // let refIndex = inputs.current["23"].getAttribute('ref-num');
+                                                                       // tempLabels[refIndex] = inputs.current["23"].getAttribute('text');
+                                                                       // setStepSelectedLabel(tempLabels);
+                                                                       setDeps("", "21");
+                                                                   } else {
+                                                                       setStep21("");
+                                                                       // modalHandleShow("noPower");
                                                                 
-                                                                if (stepSelectedValue["3"] === "2") {
-                                                                    setDeps("21,3", "2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWall,2EWall,2FWall,2GWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
-                                                                    deleteSpecialSelects();
-                                                                    setCart("", "", "calcMeasurements,Width1,Width2,Width3,Height1,Height2,Height3,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
-                                                                    setStep3("");
-                                                                    selectChanged(undefined, "3,3AIn,3BIn,3AOut,3BOut,3COut,3DOut");
-                                                                } else {
-                                                                    setDeps("21", "");
-                                                                }
-                                                            }
-                                                        }} id="211" ref={ref => (inputs.current["211"] = ref)}/>
+                                                                       if (step3 !== "") {
+                                                                           setDeps("21,3", "2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWall,2EWall,2FWall,2GWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
+                                                                           deleteSpecialSelects();
+                                                                           setCart("", "", "calcMeasurements,Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width1,Width2,Width3,Height1,Height2,Height3,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                                           setStep3("");
+                                                                           selectChanged(undefined, "2,3,3AIn,3BIn,3AOut,3BOut,3COut,3DOut");
+                                                                       } else {
+                                                                           setDeps("21", "");
+                                                                           selectChanged(undefined, "2");
+                                                                       }
+                                                                   }
+                                                               }} id="211" ref={ref => (inputs.current["211"] = ref)}/>
                                                         <label htmlFor="211" className="checkbox_label">
                                                             <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
                                                                  alt=""/>
@@ -4959,13 +5025,20 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                         {t("Arc_checkbox_title")}
                                                     </span>
                                                     </div>
-                                                
                                                 </div>
                                             </div>
                                         }
-                                        <NextStep eventKey={(stepSelectedValue["2"] === "1" || stepSelectedValue["2"] === "3") && step21 !== "true" ? "2" : "3"} onClick={() => {
-                                            if ((stepSelectedValue["2"] === "1" || stepSelectedValue["2"] === "3") && step21 !== "true")
-                                                modalHandleShow("noInsideUnderstand");
+                                        {step21Err3 &&
+                                            <div className="input_not_valid">{t("step21Err3")}</div>
+                                        }
+                                        <NextStep eventKey={(step2 === "Inside" || step2 === "HiddenMoulding") && step21 !== "true" ? "2" : "3"} onClick={() => {
+                                            if ((step2 === "Inside" || step2 === "HiddenMoulding") && step21 !== "true") {
+                                                if (step2 === "Inside") {
+                                                    setStep21Err1(true);
+                                                } else {
+                                                    setStep21Err3(true);
+                                                }
+                                            }
                                         }}>{t("NEXT STEP")}</NextStep>
                                     </div>
                                     {/*<div className="accordion_help">*/}
@@ -5019,12 +5092,21 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                             <input className="radio" type="radio" text={t("I have my own measurements")} value="1" name="step3" ref-num="3" id="31"
                                                    checked={step3 === "false"}
                                                    onChange={e => {
-                                                       setStep3("false");
-                                                       selectChanged(e, "3AIn,3BIn,3AOut,3BOut,3COut,3DOut,3CArc");
-                                                       setMeasurementsNextStep("4");
-                                                       setDeps("31,32", "3,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3,3AOut,3BOut1,3BOut2,3COut,3DOut,3CArc1,3CArc2,3CArc3");
-                                                       deleteSpecialSelects();
-                                                       setCart("calcMeasurements", false, "WidthCart,HeightCart,Width1,Width2,Width3,Height1,Height2,Height3,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                       if (step2 === "" || (step2 === "Inside" && step21 !== "true") || (step2 === "HiddenMoulding" && step21 !== "true")) {
+                                                           setStep3("");
+                                                           selectUncheck(e);
+                                                           modalHandleShow("noMount");
+                                                           setDeps("3", "31,32");
+                                                           setCart("", "", "Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,calcMeasurements");
+                                                       }
+                                                       else {
+                                                           setStep3("false");
+                                                           selectChanged(e, "3AIn,3BIn,3AOut,3BOut,3COut,3DOut,3CArc");
+                                                           setMeasurementsNextStep("4");
+                                                           setDeps("31,32", "3,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3,3AOut,3BOut1,3BOut2,3COut,3DOut,3CArc1,3CArc2,3CArc3");
+                                                           deleteSpecialSelects();
+                                                           setCart("calcMeasurements", false, "WidthCart,HeightCart,Width1,Width2,Width3,Height1,Height2,Height3,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                       }
                                                    }} ref={ref => (inputs.current["31"] = ref)}/>
                                             <label htmlFor="31">{t("I have my own measurements.")}</label>
                                         </div>
@@ -5032,41 +5114,41 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                             <input className="radio" type="radio" text={t("Calculate my measurements")} value="2" name="step3" checked={step3 === "true"}
                                                    ref-num="3" id="32" ref={ref => (inputs.current["32"] = ref)}
                                                    onChange={e => {
-                                                       if (stepSelectedValue["2"] === undefined) {
+                                                       if (step2 === "") {
                                                            setStep3("");
                                                            selectUncheck(e);
                                                            modalHandleShow("noMount");
                                                            setDeps("3", "31,32");
-                                                           setCart("calcMeasurements", true, "Width,height,calcMeasurements");
-                                                       } else if (stepSelectedValue["2"] === "1") {
-                                                           if (stepSelectedValue["2"] === "1" && step21 !== "true") {
+                                                           setCart("", "", "Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,calcMeasurements");
+                                                       } else if (step2 === "Inside") {
+                                                           if (step2 === "Inside" && step21 !== "true") {
                                                                modalHandleShow("noInsideUnderstand");
                                                                setStep3("");
                                                                selectUncheck(e);
                                                                setDeps("3", "31,32");
-                                                               setCart("calcMeasurements", true, "Width,height,calcMeasurements");
+                                                               setCart("", "", "Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,calcMeasurements");
                                                            } else {
                                                                setStep3("true");
                                                                deleteSpecialSelects();
                                                                selectChanged(e);
                                                                setMeasurementsNextStep("3A");
                                                                setDeps("3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3", "3,3AOut,3BOut1,3BOut2,3COut,3DOut,31,32,3CArc1,3CArc2,3CArc3");
-                                                               setCart("calcMeasurements", true, "Width,Height,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                               setCart("calcMeasurements", true, "Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
                                                            }
-                                                       } else if (stepSelectedValue["2"] === "3") {
-                                                           if (stepSelectedValue["2"] === "3" && step21 !== "true") {
+                                                       } else if (step2 === "HiddenMoulding") {
+                                                           if (step2 === "HiddenMoulding" && step21 !== "true") {
                                                                modalHandleShow("noInsideUnderstand");
                                                                setStep3("");
                                                                selectUncheck(e);
                                                                setDeps("3", "31,32");
-                                                               setCart("calcMeasurements", true, "Width,height,calcMeasurements");
+                                                               setCart("", "", "Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,calcMeasurements");
                                                            } else {
                                                                setStep3("true");
                                                                deleteSpecialSelects();
                                                                selectChanged(e);
                                                                setMeasurementsNextStep("3A");
                                                                setDeps("3AOut,3BOut1,3BOut2,3CArc1,3CArc2,3CArc3", "3,3COut,3DOut,31,32");
-                                                               setCart("calcMeasurements", true, "Width,Height,Width1,Width2,Width3,Height1,Height2,Height3,Height3C,ShadeMount");
+                                                               setCart("calcMeasurements", true, "Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width1,Width2,Width3,Height1,Height2,Height3,Height3C,ShadeMount");
                                                            }
                                                        } else {
                                                            setStep3("true");
@@ -5074,7 +5156,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                            selectChanged(e);
                                                            setMeasurementsNextStep("3A");
                                                            setDeps("3AOut,3BOut1,3BOut2,3COut,3DOut", "3,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3,31,32,3CArc1,3CArc2,3CArc3");
-                                                           setCart("calcMeasurements", true, "Width,Height,Width1,Width2,Width3,Height1,Height2,Height3,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                           setCart("calcMeasurements", true, "Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width1,Width2,Width3,Height1,Height2,Height3,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
                                                        }
                                                    }}/>
                                             <label htmlFor="32">{t("Calculate my measurements.")}</label>
@@ -5114,12 +5196,14 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                             //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                             // }
                                                             onChange={(selected) => {
-                                                                optionSelectChanged_WidthLength(selected[0], "3", true, "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.width = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "31");
-                                                                setCart("Width", selected[0].value);
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged_WidthLength(selected[0], "3", true, "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.width = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "31");
+                                                                    setCart("Width", selected[0].value);
+                                                                }
                                                             }}
                                                             options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
                                                         />
@@ -5156,12 +5240,14 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                             //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                             // }
                                                             onChange={(selected) => {
-                                                                optionSelectChanged_WidthLength(selected[0], "3", false, "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = selectCustomValues;
-                                                                temp.length = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "32");
-                                                                setCart("Height", selected[0].value);
+                                                                if (selected[0] !== undefined) {
+                                                                    optionSelectChanged_WidthLength(selected[0], "3", false, "cm", "س\u200Cم", pageLanguage);
+                                                                    let temp = selectCustomValues;
+                                                                    temp.length = selected;
+                                                                    setSelectCustomValues(temp);
+                                                                    setDeps("", "32");
+                                                                    setCart("Height", selected[0].value);
+                                                                }
                                                             }}
                                                             options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
                                                         />
@@ -5186,7 +5272,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                         </li>
                                                         <li className="no_listStyle single_line_height">
                                                             <b>{t("Note:&nbsp;")}</b>
-                                                            {t("step3_help_2")}
+                                                            {t("step3_help_roller_2")}
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -5203,9 +5289,9 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                             <b>{t("Note:&nbsp;")}</b>
                                                             {t("step3_help_2.5")}
                                                         </li>
-                                                        <li className="no_listStyle single_line_height">
-                                                            {t("step3_help_3")}
-                                                        </li>
+                                                        {/*<li className="no_listStyle single_line_height">*/}
+                                                        {/*    {t("step3_help_3")}*/}
+                                                        {/*</li>*/}
                                                     </ul>
                                                 </div>
                                             </div>
@@ -5216,7 +5302,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                         </Card>
                         
                         {/* step 4A inside */}
-                        {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "1" && step21 === "true" &&
+                        {stepSelectedValue["3"] === "2" && step2 === "Inside" && step21 === "true" &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="3A" stepNum={t("4A")} stepTitle={t("zebra_step3AInside")} stepRef="3AIn" type="2" required={requiredStep["3AIn"]}
@@ -5373,7 +5459,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                 <div className="help_column help_left_column">
                                                     <p className="help_column_header"/>
                                                     <ul className="help_column_list">
-                                                        <li className="no_listStyle single_line_height">{t("step3A_help_1")}
+                                                        <li className="no_listStyle single_line_height">{t("step3A_help_roller_1")}
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -5385,7 +5471,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                         }
                         
                         {/* step 4B inside */}
-                        {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "1" && step21 === "true" &&
+                        {stepSelectedValue["3"] === "2" && step2 === "Inside" && step21 === "true" &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="3B" stepNum={t("4B")} stepTitle={t("zebra_step3BInside")} stepRef="3BIn" type="2" required={requiredStep["3BIn"]}
@@ -5555,7 +5641,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                         }
                         
                         {/* step 4A outside */}
-                        {stepSelectedValue["3"] === "2" && !!(stepSelectedValue["2"] === "2" || stepSelectedValue["2"] === "3") &&
+                        {stepSelectedValue["3"] === "2" && !!(step2 === "Outside" || step2 === "HiddenMoulding") &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="3A" stepNum={t("4A")} stepTitle={t("zebra_step3AOutside")} stepRef="3AOut" type="2"
@@ -5617,14 +5703,25 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                             </div>
                                             <NextStep eventKey="3B">{t("NEXT STEP")}</NextStep>
                                         </div>
-                                    
+                                        
+                                        {/*<div className="accordion_help">*/}
+                                        {/*    <div className="help_container">*/}
+                                        {/*        <div className="help_column help_left_column">*/}
+                                        {/*            <p className="help_column_header"/>*/}
+                                        {/*            <ul className="help_column_list">*/}
+                                        {/*                <li className="no_listStyle single_line_height">{t("step3A_out_help__roller1")}*/}
+                                        {/*                </li>*/}
+                                        {/*            </ul>*/}
+                                        {/*        </div>*/}
+                                        {/*    </div>*/}
+                                        {/*</div>*/}
                                     </Card.Body>
                                 </Accordion.Collapse>
                             </Card>
                         }
                         
                         {/* step 4B outside */}
-                        {stepSelectedValue["3"] === "2" && !!(stepSelectedValue["2"] === "2" || stepSelectedValue["2"] === "3") &&
+                        {stepSelectedValue["3"] === "2" && !!(step2 === "Outside" || step2 === "HiddenMoulding") &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="3B" stepNum={t("4B")} stepTitle={t("zebra_step3BOutside")} stepRef="3BOut" type="2"
@@ -5749,7 +5846,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                         }
                         
                         {/* step 4C outside */}
-                        {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "2" &&
+                        {stepSelectedValue["3"] === "2" && step2 === "Outside" &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="3C" stepNum={t("4C")} stepTitle={t("zebra_step3COutside")} stepRef="3COut" type="2"
@@ -5818,7 +5915,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                         }
                         
                         {/* step 4C Arc */}
-                        {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "3" &&
+                        {stepSelectedValue["3"] === "2" && step2 === "HiddenMoulding" &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="3C" stepNum={t("3C")} stepTitle={t("dk_step2D")} stepRef="3CArc" type="2" required={requiredStep["3CArc"]}
@@ -6021,7 +6118,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                         }
                         
                         {/* step 4D outside */}
-                        {stepSelectedValue["3"] === "2" && stepSelectedValue["2"] === "2" &&
+                        {stepSelectedValue["3"] === "2" && step2 === "Outside" &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="3D" stepNum={t("4D")} stepTitle={t("zebra_step3DOutside")} stepRef="3DOut" type="2"
@@ -6116,6 +6213,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                        selectChanged(e);
                                                        setStep4("Continuous Loop");
                                                        setStep41("false");
+                                                       setMotorErr1(false);
                                                        setControlTypeNextStep("4A");
                                                        setDeps("4A1,4A2,4B", "4,41,411");
                                                        setCart("ControlType", "Continuous Loop", "hasPower,MotorPosition,RemoteName,MotorChannels");
@@ -6124,7 +6222,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                             <label htmlFor="41">{t("Continuous")}<br/><p>{t("Loop")}</p></label>
                                         </div>
                                         <div className="box50 radio_style">
-                                            <input className="radio" type="radio" text={t("Motorized")} value="2" name="step4" checked={step4 === "Motorized"}
+                                            <input className="radio" type="radio" value="2" name="step4" checked={step4 === "Motorized"}
                                                    ref-num="4" id="42"
                                                    onChange={e => {
                                                        selectChanged(e, "41", "4A,4B");
@@ -6135,15 +6233,15 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                        setSelectedFrontPosition("");
                                                        setSelectedBackPosition("");
                                                        setDeps("41", "4,4A1,4A2,4B");
-                                                       setCart("ControlType", "Motorized", "ControlPositionFront,ControlPositionBack,ChainLength");
+                                                       setCart("", "", "ControlPositionFront,ControlPositionBack,ChainLength");
                                                    }} ref={ref => (inputs.current["42"] = ref)}/>
                                             <label htmlFor="42">{t("Motorized")}<br/><p
                                                 className="surcharge_price">{Object.keys(modelAccessories).length !== 0 || selectedMotorMinPrice > 0 ? t("Starts at ") + GetPrice(selectedMotorMinPrice, pageLanguage, t("TOMANS")) : t("Surcharge Applies")}</p>
                                             </label>
                                         
                                         </div>
-                                        {stepSelectedValue["4"] === "2" &&
-                                            <div className="secondary_options">
+                                        {step4 === "Motorized" &&
+                                            <div className={motorErr1?"secondary_options secondary_options_err":"secondary_options"}>
                                                 {/*<hr/>*/}
                                                 {/*<p className="no_power_title">{t("Motor_title")}</p>*/}
                                                 <div className="card-body-display-flex">
@@ -6168,24 +6266,26 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                     {/*    <label htmlFor="412">{t("No")}</label>*/}
                                                     {/*</div>*/}
                                                     <div className="width_max checkbox_style">
-                                                        <input type="checkbox" value="1" name="step41" ref-num="41" checked={step41 === "true"} onChange={(e) => {
+                                                        <input type="checkbox" text={t("Motorized")} value="2" name="step41" ref-num="4" checked={step41 === "true"} onChange={(e) => {
                                                             if (e.target.checked) {
                                                                 selectChanged(e);
                                                                 setStep41("true");
-                                                                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                                let refIndex = inputs.current["42"].getAttribute('ref-num');
-                                                                tempLabels[refIndex] = inputs.current["42"].getAttribute('text');
-                                                                setStepSelectedLabel(tempLabels);
+                                                                setMotorErr1(false);
+                                                                // let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                                // let refIndex = inputs.current["42"].getAttribute('ref-num');
+                                                                // tempLabels[refIndex] = inputs.current["42"].getAttribute('text');
+                                                                // setStepSelectedLabel(tempLabels);
                                                                 setSelectedMotorPosition([]);
                                                                 setSelectedMotorType([]);
-                                                                setDeps("411", "41");
-                                                                setCart("hasPower", true, "", "MotorChannels", [selectedMotorChannels.map(obj => obj.value)]);
+                                                                setDeps("411,412", "41");
+                                                                setCart("hasPower", true, "", "ControlType,MotorChannels", ["Motorized",selectedMotorChannels.map(obj => obj.value)]);
                                                             } else {
                                                                 selectUncheck(e);
                                                                 setStep41("");
                                                                 // modalHandleShow("noPower");
                                                                 setCustomMotorAcc({});
                                                                 setDeps("41", "411");
+                                                                setCart("", "", "ControlType,hasPower,MotorType,MotorPosition,RemoteName,MotorChannels");
                                                             }
                                                         }} id="411" ref={ref => (inputs.current["411"] = ref)}/>
                                                         <label htmlFor="411" className="checkbox_label">
@@ -6200,7 +6300,10 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                 </div>
                                             </div>
                                         }
-                                        {stepSelectedValue["41"] === "1" && stepSelectedValue["4"] === "2" &&
+                                        {motorErr1 &&
+                                            <div className="input_not_valid">{t("motorErr1")}</div>
+                                        }
+                                        {step41 === "true" && step4 === "Motorized" &&
                                             <div className="motorized_options">
                                                 <div className="motorized_option_left">
                                                     <p>{t("Motor Type")}</p>
@@ -6418,7 +6521,11 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                             </div>
                                         }
                                         
-                                        <NextStep eventKey={controlTypeNextStep}>{t("NEXT STEP")}</NextStep>
+                                        <NextStep eventKey={step4 === "Motorized" && step41 !== "true" ? "4" : controlTypeNextStep} onClick={() => {
+                                            if (step4 === "Motorized" && step41 !== "true") {
+                                                setMotorErr1(true);
+                                            }
+                                        }}>{t("NEXT STEP")}</NextStep>
                                     </div>
                                     
                                     {(stepSelectedValue["4"] === "1" || stepSelectedValue["4"] === undefined) &&
@@ -6714,7 +6821,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                 <input className="radio" type="radio" text={t("roller_headrail1")} value="1" name="step5" ref-num="5" id="51"
                                                        checked={step5 === "Exposed"}
                                                        onChange={e => {
-                                                           if (stepSelectedValue["2"] === undefined) {
+                                                           if (step2 === "") {
                                                                setStep5("");
                                                                selectUncheck(e);
                                                                modalHandleShow("noMount");
@@ -6735,7 +6842,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                 <input className="radio" type="radio" text={t("roller_headrail2")} value="2" name="step5" ref-num="5" id="52"
                                                        checked={step5 === "Upholstered"}
                                                        onChange={e => {
-                                                           if (stepSelectedValue["2"] === undefined) {
+                                                           if (step2 === "") {
                                                                setStep5("");
                                                                selectUncheck(e);
                                                                modalHandleShow("noMount");
@@ -6758,7 +6865,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                 <input className="radio" type="radio" text={t("roller_headrail3")} value="3" name="step5" ref-num="5" id="53"
                                                        checked={step5 === "MetalValance"}
                                                        onChange={e => {
-                                                           if (stepSelectedValue["2"] === undefined) {
+                                                           if (step2 === "") {
                                                                setStep5("");
                                                                selectUncheck(e);
                                                                modalHandleShow("noMount");
@@ -6781,7 +6888,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                 <input className="radio" type="radio" text={t("roller_headrail4")} value="4" name="step5" ref-num="5" id="54"
                                                        checked={step5 === "MetalValanceFabricInsert"}
                                                        onChange={e => {
-                                                           if (stepSelectedValue["2"] === undefined) {
+                                                           if (step2 === "") {
                                                                setStep5("");
                                                                selectUncheck(e);
                                                                modalHandleShow("noMount");
@@ -7210,7 +7317,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                         }
                         
                         {/* step 6Arc */}
-                        {stepSelectedValue["2"] === "3" &&
+                        {step2 === "HiddenMoulding" &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="5" stepNum={t("6")} stepTitle={t("roller_step5A")} stepRef="5Arc" type="1" required={requiredStep["5Arc"]}
@@ -7337,7 +7444,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                         }
                         
                         {/* step 6AArc */}
-                        {stepSelectedValue["2"] === "3" &&
+                        {step2 === "HiddenMoulding" &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="5A" stepNum={t("6A")} stepTitle={t("roller_step5B")} stepRef="5AArc" type="1" required={requiredStep["5AArc"]}
@@ -7378,7 +7485,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                         }
                         
                         {/* step 6BArc */}
-                        {stepSelectedValue["2"] === "3" &&
+                        {step2 === "HiddenMoulding" &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="5B" stepNum={t("6B")} stepTitle={t("roller_step5C")} stepRef="5BArc" type="1" required={requiredStep["5BArc"]}
@@ -7524,12 +7631,12 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                         <div className="box50 radio_style">
                                             <img src={require('../Images/drapery/dualRoller/Standard_dual.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("roller_HemStyle1")} value="1" name="step6" ref-num="6" id="61"
-                                                   checked={step6 === "Standard"}
+                                                   checked={step6 === "Straight"}
                                                    onChange={e => {
                                                        selectChanged(e);
-                                                       setStep6("Standard");
+                                                       setStep6("Straight");
                                                        setDeps("", "6");
-                                                       setCart("HemStyle", "Standard");
+                                                       setCart("HemStyle", "Straight");
                                                        setHemStyleNextStep("6A");
                                                    }} ref={ref => (inputs.current["61"] = ref)}/>
                                             <label htmlFor="61">{t("roller_HemStyle1")}</label>
@@ -7537,12 +7644,12 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                         <div className="box50 radio_style">
                                             <img src={require('../Images/drapery/dualRoller/Scallop_dual.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("roller_HemStyle2")} value="2" name="step6" ref-num="6" id="62"
-                                                   checked={step6 === "Scallop"}
+                                                   checked={step6 === "Classic"}
                                                    onChange={e => {
                                                        selectChanged(e);
-                                                       setStep6("Scallop");
+                                                       setStep6("Classic");
                                                        setDeps("", "6");
-                                                       setCart("HemStyle", "Scallop");
+                                                       setCart("HemStyle", "Classic");
                                                        setHemStyleNextStep("7");
                                                    }} ref={ref => (inputs.current["62"] = ref)}/>
                                             <label htmlFor="62">{t("roller_HemStyle2")}<br/><p
@@ -7566,12 +7673,12 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                         <div className="box50 radio_style">
                                             <img src={require('../Images/drapery/dualRoller/Colonial_dual.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("roller_HemStyle4")} value="4" name="step6" ref-num="6" id="64"
-                                                   checked={step6 === "Colonial"}
+                                                   checked={step6 === "Traditional"}
                                                    onChange={e => {
                                                        selectChanged(e);
-                                                       setStep6("Colonial");
+                                                       setStep6("Traditional");
                                                        setDeps("", "6");
-                                                       setCart("HemStyle", "Colonial");
+                                                       setCart("HemStyle", "Traditional");
                                                        setHemStyleNextStep("7");
                                                    }} ref={ref => (inputs.current["64"] = ref)}/>
                                             <label htmlFor="64">{t("roller_HemStyle4")}<br/><p
@@ -7989,7 +8096,8 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                 <ul className=" help_column_list">
                                                     <li>{t("stepZip_help_1")}</li>
                                                     <li>{t("stepZip_help_2")}</li>
-                                                    <li>{t("stepZip_help_3")}<h5 className="text_underline pointer" onClick={()=>modalHandleShow("Zipcode_how_it_works")}>{t("zipcode_measure_verify")}</h5></li>
+                                                    <li>{t("stepZip_help_3")}<h5 className="text_underline pointer"
+                                                                                 onClick={() => modalHandleShow("Zipcode_how_it_works")}>{t("zipcode_measure_verify")}</h5></li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -8308,6 +8416,25 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                             </div>
                         </div>
                         <div className="accordion_help help_largeSizeModal_modal">
+                            <p className="help_column_header">{t("headrailHelp13")}</p>
+                            <div className="largeSizeModal_img_plus_help">
+                                <img src={require('../Images/drapery/roller/roller_help_UphosteredValance.jpg')} className="img-fluid" alt=""/>
+                                <div className="help_container">
+                                    <div className="help_column help_left_column">
+                                        <ul className="help_column_list">
+                                            <li>{t("headrailHelp14")}</li>
+                                            <li>{t("headrailHelp15")}</li>
+                                            <li>{t("headrailHelp16")}</li>
+                                            <li>{t("headrailHelp17")}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="largeSizeModal_modal_body_container">
+                        <div className="accordion_help help_largeSizeModal_modal">
                             <p className="help_column_header">{t("headrailHelp4")}</p>
                             <div className="largeSizeModal_img_plus_help">
                                 <img src={require('../Images/drapery/roller/roller_help_MetalValance.jpg')} className="img-fluid" alt=""/>
@@ -8322,9 +8449,6 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div className="largeSizeModal_modal_body_container">
                         <div className="accordion_help help_largeSizeModal_modal">
                             <p className="help_column_header">{t("headrailHelp8")}</p>
                             <div className="largeSizeModal_img_plus_help">
@@ -8336,22 +8460,6 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                             <li>{t("headrailHelp10")}</li>
                                             <li>{t("headrailHelp11")}</li>
                                             <li>{t("headrailHelp12")}</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="accordion_help help_largeSizeModal_modal">
-                            <p className="help_column_header">{t("headrailHelp13")}</p>
-                            <div className="largeSizeModal_img_plus_help">
-                                <img src={require('../Images/drapery/roller/roller_help_UphosteredValance.jpg')} className="img-fluid" alt=""/>
-                                <div className="help_container">
-                                    <div className="help_column help_left_column">
-                                        <ul className="help_column_list">
-                                            <li>{t("headrailHelp14")}</li>
-                                            <li>{t("headrailHelp15")}</li>
-                                            <li>{t("headrailHelp16")}</li>
-                                            <li>{t("headrailHelp17")}</li>
                                         </ul>
                                     </div>
                                 </div>
@@ -8639,7 +8747,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                 {/*    */}
                 {/*</Modal.Footer>*/}
             </Modal>
-    
+            
             <Modal keyboard={false} dialogClassName={`Zipcode_how_it_works customSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["Zipcode_how_it_works"] === undefined ? false : modals["Zipcode_how_it_works"]}
                    onHide={() => {
@@ -8700,18 +8808,18 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                     <div className="zipcode_modal_footer">
                         <div className="zipcode_modal_item_text_container">{t("zipcode_modal_text10")}</div>
                     </div>
-            
+                    
                     {/*<br/>*/}
                     {/*<div className="text_center">*/}
                     {/*    <button className="btn btn-new-dark" onClick={() => modalHandleClose("Zipcode_how_it_works")}>{t("OK")}</button>*/}
                     {/*</div>*/}
-        
+                
                 </Modal.Body>
                 {/*<Modal.Footer>*/}
                 {/*    */}
                 {/*</Modal.Footer>*/}
             </Modal>
-    
+            
             <Modal backdrop="static" keyboard={false} dialogClassName={`warning_modal bigSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["heightDifferent"] === undefined ? false : modals["heightDifferent"]}
                    onHide={() => {
