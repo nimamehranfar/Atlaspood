@@ -1038,10 +1038,12 @@ function Header() {
         const onScroll = () => {
             // setOffset3(window.pageYOffset);
             // setOffset2(fixedHeader.current.offsetTop);
-            if (fixedHeader.current.offsetTop < window.pageYOffset) {
+            if (fixedHeader.current.offsetTop + 100 < window.pageYOffset) {
                 setOffset(true);
             } else {
-                setOffset(false);
+                if(offset && fixedHeader.current.offsetTop + 64 > window.pageYOffset){
+                    setOffset(false);
+                }
             }
         };
         
@@ -1053,414 +1055,420 @@ function Header() {
     
     return (
         <div className={`header_container padding-clear ${pageLanguage === 'fa' ? "font_farsi" : "font_en"} ${currentPage.level1 === "Checkout" ? "noDisplay" : ""}`}>
-            <div className="top_header">
-                <div className="col-lg-12">
-                    <div className="top_title">
-                        {bannerItemOneSlide.length === 0 &&
-                            <Link to={"/" + bannerItem.url}>
-                                <span>{bannerItem.text1}</span>&nbsp;
-                                <span className="text_underline">{bannerItem.text2}</span>
-                            </Link>
-                        }
-                        {bannerItemOneSlide.length !== 0 &&
-                            bannerItemOneSlide
-                        }
+            <div>
+                <div className={offset ? "fixed_header_top top_header" : "top_header"}>
+                    <div className="col-lg-12">
+                        <div className="top_title">
+                            {bannerItemOneSlide.length === 0 &&
+                                <Link to={"/" + bannerItem.url}>
+                                    <span>{bannerItem.text1}</span>&nbsp;
+                                    <span className="text_underline">{bannerItem.text2}</span>
+                                </Link>
+                            }
+                            {bannerItemOneSlide.length !== 0 &&
+                                bannerItemOneSlide
+                            }
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div className={offset ? "fixed_header" : ""} ref={fixedHeader}>
-                <div>
-                    <div className="mid_header">
-                        <div className="col-lg-12">
-                            <div className="mid_header_left">
-                                <div className="search-box">
-                                    <button className="btn-search">
-                                        <img src={require('../Images/public/main_search_icon.svg').default}
-                                             className="img-fluid" alt=""/>
-                                        <input type="text" className={`input-search ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} placeholder={t("Search_placeholder")}
-                                               autoComplete="new-search"/>
-                                    </button>
+                <div className={offset ? "fixed_header" : ""} ref={fixedHeader}>
+                    <div>
+                        <div className="mid_header">
+                            <div className="col-lg-12">
+                                <div className="mid_header_left">
+                                    <div className="search-box">
+                                        <button className="btn-search">
+                                            <img src={require('../Images/public/main_search_icon.svg').default}
+                                                 className="img-fluid" alt=""/>
+                                            <input type="text" className={`input-search ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`} placeholder={t("Search_placeholder")}
+                                                   autoComplete="new-search"/>
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="Logo"><Link to="/">{pageLanguage === 'en' ? <Logoen/> : <Logofa/>}</Link></div>
-                            <div className="mid_header_right">
-                                <ul className={pageLanguage === 'fa' ? "float_left icons" : "float_right icons"}>
-                                    {currentPage.level1 === "Curtain" && currentPage.level3 !== undefined &&
-                                        <li className="login-open" onClick={() => {
-                                            if (isLoggedIn) {
-                                                navigate("/" + pageLanguage + "/Account")
-                                            } else {
-                                                dispatch({
-                                                    type: ShowLoginModal,
-                                                })
-                                            }
-                                        }}>
-                                            <Person/>
-                                        </li>
-                                    }
-                                    {!(currentPage.level1 === "Curtain" && currentPage.level3 !== undefined) &&
-                                        <Link className="login-open" to={isLoggedIn ? "/" + pageLanguage + "/Account" : "/" + pageLanguage + "/User/NewUser"}><Person/></Link>
-                                    }
-                                    <li className="favorite">
-                                        <a href="https://www.doopsalta.com/en/account/login/">
-                                            <Favorite/>
-                                        </a>
-                                    </li>
-                                    {(cartCount > 0 || (draperyCount + productCount + swatchesCount > 0)) &&
-                                        <li className="checkout">
-                                            <div onClick={() => {
-                                                navigate("/" + pageLanguage + "/Basket");
+                                <div className="Logo"><Link to="/">{pageLanguage === 'en' ? <Logoen/> : <Logofa/>}</Link></div>
+                                <div className="mid_header_right">
+                                    <ul className={pageLanguage === 'fa' ? "float_left icons" : "float_right icons"}>
+                                        {currentPage.level1 === "Curtain" && currentPage.level3 !== undefined &&
+                                            <li className="login-open" onClick={() => {
+                                                if (isLoggedIn) {
+                                                    navigate("/" + pageLanguage + "/Account")
+                                                } else {
+                                                    dispatch({
+                                                        type: ShowLoginModal,
+                                                    })
+                                                }
                                             }}>
-                                                <div className="display_grid">
-                                                    <Basket/>
-                                                    <div
-                                                        className="count">{pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${cartCount > 0 ? cartCount : draperyCount + productCount + swatchesCount}`) : cartCount > 0 ? cartCount : draperyCount + productCount + swatchesCount}</div>
+                                                <Person/>
+                                            </li>
+                                        }
+                                        {!(currentPage.level1 === "Curtain" && currentPage.level3 !== undefined) &&
+                                            <Link className="login-open" to={isLoggedIn ? "/" + pageLanguage + "/Account" : "/" + pageLanguage + "/User/NewUser"}><Person/></Link>
+                                        }
+                                        <li className="favorite">
+                                            <a href="https://www.doopsalta.com/en/account/login/">
+                                                <Favorite/>
+                                            </a>
+                                        </li>
+                                        {(cartCount > 0 || (draperyCount + productCount + swatchesCount > 0)) &&
+                                            <li className="checkout">
+                                                <div onClick={() => {
+                                                    navigate("/" + pageLanguage + "/Basket");
+                                                }}>
+                                                    <div className="display_grid">
+                                                        <Basket/>
+                                                        <div
+                                                            className="count">{pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${cartCount > 0 ? cartCount : draperyCount + productCount + swatchesCount}`) : cartCount > 0 ? cartCount : draperyCount + productCount + swatchesCount}</div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            {/*<div className="card_menu">*/}
-                                            {/*    <div className="card_menu_title">*/}
-                                            {/*        <span>Shopping Bag</span>*/}
-                                            {/*    </div>*/}
-                                            {/*</div>*/}
+                                                {/*<div className="card_menu">*/}
+                                                {/*    <div className="card_menu_title">*/}
+                                                {/*        <span>Shopping Bag</span>*/}
+                                                {/*    </div>*/}
+                                                {/*</div>*/}
+                                            </li>
+                                        }
+                                        {cartCount === 0 && (draperyCount + productCount + swatchesCount === 0) &&
+                                            <li className="checkout">
+                                                <div>
+                                                    <PopoverStickOnClick btnClassNames="Header_Basket_icon"
+                                                                         classNames={isLoggedIn ? "Header_Basket_icon_popover Header_Basket_icon_popover2" : "Header_Basket_icon_popover"}
+                                                                         placement="bottom"
+                                                                         isHover={false}
+                                                                         onMouseEnter={() => {
+                                                                         }}
+                                                                         children={<div className="display_grid">
+                                                                             <Basket/>
+                                                                             <div
+                                                                                 className="count">{cartCount > 0 ? cartCount : draperyCount + productCount + swatchesCount}</div>
+                                                                         </div>}
+                                                                         component={
+                                                                             <div className="card_menu_title">
+                                                                                 <div className="basket_empty_header_1">{t("basket_empty_header_1")}</div>
+                                                                                 {!isLoggedIn && <div className="basket_empty_header_2">{t("basket_empty_header_2")}<span
+                                                                                     className="text_underline header_basket_sign_in"
+                                                                                     onClick={() => navigate("/" + pageLanguage + "/User")}>{t("basket_empty_header_3")}</span>{t("basket_empty_header_4")}
+                                                                                 </div>}
+                                                                             </div>
+                                                                         }/>
+                                                
+                                                </div>
+                                                {/*<div className="card_menu">*/}
+                                                {/*    <div className="card_menu_title">*/}
+                                                {/*        <span>Shopping Bag</span>*/}
+                                                {/*    </div>*/}
+                                                {/*</div>*/}
+                                            </li>
+                                        }
+                                    </ul>
+                                    <ul className={`Lang_change_container ${pageLanguage === 'fa' ? "float_left" : "float_right"}`}>
+                                        <li className="Lang_change">
+                                            <Link to={langLocation.locationEN} onClick={() => i18n.changeLanguage("en")}
+                                                  style={pageLanguage === 'en' ? {pointerEvents: "none", color: "#383838"} : null}>ENGLISH</Link>
                                         </li>
-                                    }
-                                    {cartCount === 0 && (draperyCount + productCount + swatchesCount === 0) &&
-                                        <li className="checkout">
-                                            <div>
-                                                <PopoverStickOnClick btnClassNames="Header_Basket_icon"
-                                                                     classNames={isLoggedIn ? "Header_Basket_icon_popover Header_Basket_icon_popover2" : "Header_Basket_icon_popover"}
-                                                                     placement="bottom"
-                                                                     isHover={true}
-                                                                     onMouseEnter={() => {
-                                                                     }}
-                                                                     children={<div className="display_grid">
-                                                                         <Basket/>
-                                                                         <div
-                                                                             className="count">{cartCount > 0 ? cartCount : draperyCount + productCount + swatchesCount}</div>
-                                                                     </div>}
-                                                                     component={
-                                                                         <div className="card_menu_title">
-                                                                             <div className="basket_empty_header_1">{t("basket_empty_header_1")}</div>
-                                                                             {!isLoggedIn && <div className="basket_empty_header_2">{t("basket_empty_header_2")}<span
-                                                                                 className="text_underline header_basket_sign_in"
-                                                                                 onClick={() => navigate("/" + pageLanguage + "/User")}>{t("basket_empty_header_3")}</span>{t("basket_empty_header_4")}
-                                                                             </div>}
-                                                                         </div>
-                                                                     }/>
-                                            
-                                            </div>
-                                            {/*<div className="card_menu">*/}
-                                            {/*    <div className="card_menu_title">*/}
-                                            {/*        <span>Shopping Bag</span>*/}
-                                            {/*    </div>*/}
-                                            {/*</div>*/}
+                                        <li className="lang_separator">&nbsp;|&nbsp;</li>
+                                        <li className="Lang_change">
+                                            <Link to={langLocation.locationFA} onClick={() => i18n.changeLanguage("fa")}
+                                                  style={pageLanguage === 'fa' ? {pointerEvents: "none", color: "#383838"} : null}>فارسی</Link>
                                         </li>
-                                    }
-                                </ul>
-                                <ul className={`Lang_change_container ${pageLanguage === 'fa' ? "float_left" : "float_right"}`}>
-                                    <li className="Lang_change">
-                                        <Link to={langLocation.locationEN} onClick={() => i18n.changeLanguage("en")}
-                                              style={pageLanguage === 'en' ? {pointerEvents: "none", color: "#383838"} : null}>ENGLISH</Link>
-                                    </li>
-                                    <li className="lang_separator">&nbsp;|&nbsp;</li>
-                                    <li className="Lang_change">
-                                        <Link to={langLocation.locationFA} onClick={() => i18n.changeLanguage("fa")}
-                                              style={pageLanguage === 'fa' ? {pointerEvents: "none", color: "#383838"} : null}>فارسی</Link>
-                                    </li>
-                                </ul>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div className="bottom_header">
-                        <div className="col-lg-12">
-                            <div className="menu">
-                                <ul>
-                                    {menuRender}
-                                </ul>
-                                <div className="bghover">
+                        <div className="bottom_header">
+                            <div className="col-lg-12">
+                                <div className="menu">
+                                    <ul>
+                                        {menuRender}
+                                    </ul>
+                                    <div className="bghover">
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            {/* Modals */}
-            
-            <Modal backdrop="static" keyboard={false} dialogClassName={`login_modal fullSizeModal login_page_container ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
-                   show={showLogin}
-                   onHide={() => dispatch({
-                       type: HideLoginModal,
-                   })}>
-                <Modal.Header closeButton>
-                </Modal.Header>
-                <Modal.Body>
-                    <div className="logo_container">
-                        <div className="Logo">
-                            <Link to="/">{pageLanguage === 'en' ? <Logoen/> : <Logofa/>}</Link>
+                
+                {/* Modals */}
+                
+                <Modal backdrop="static" keyboard={false} dialogClassName={`login_modal fullSizeModal login_page_container ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                       show={showLogin}
+                       onHide={() => dispatch({
+                           type: HideLoginModal,
+                       })}>
+                    <Modal.Header closeButton>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <div className="logo_container">
+                            <div className="Logo">
+                                <Link to="/">{pageLanguage === 'en' ? <Logoen/> : <Logofa/>}</Link>
+                            </div>
                         </div>
-                    </div>
-                    {!resetPage && errorText !== "" &&
-                        <div className="login_page_error_text">{errorText}</div>
-                    }
-                    {!resetPage && successText !== "" &&
-                        <div className="login_page_success_text">{successText}</div>
-                    }
-                    {!resetPage &&
-                        <div className="login_register_container">
-                            <div className="login_container">
-                                <div className="login_inside_container">
-                                    <h1 className="login_title">{t("SIGN IN TO YOUR ACCOUNT")}</h1>
-                                    <input type="text" placeholder={t("Email*")} className="form-control" name="Email" value={loginInfo.email}
-                                           onChange={(e) => {
-                                               let temp = JSON.parse(JSON.stringify(loginInfo));
-                                               temp.email = e.target.value;
-                                               setLoginInfo(temp);
-                                           }}/>
-                                    <input type="password" placeholder={t("Password*")} className="form-control form-control-password" name="Password" value={loginInfo.password}
-                                           autoComplete="new-password"
-                                           onChange={(e) => {
-                                               let temp = JSON.parse(JSON.stringify(loginInfo));
-                                               temp.password = e.target.value;
-                                               setLoginInfo(temp);
-                                           }}/>
-                                    <div className="remember_forgot_container">
-                                        <div className="remember_container">
-                                            {/*<label className="remember_label">*/}
-                                            {/*    <input type="checkbox" value={loginInfo.remember}*/}
-                                            {/*           onChange={(e) => {*/}
-                                            {/*               let temp = JSON.parse(JSON.stringify(loginInfo));*/}
-                                            {/*               temp.remember = e.target.value;*/}
-                                            {/*               setLoginInfo(temp);*/}
-                                            {/*           }}/>*/}
-                                            {/*    {t("Remember Me")}*/}
-                                            {/*</label>*/}
+                        {!resetPage && errorText !== "" &&
+                            <div className="login_page_error_text">{errorText}</div>
+                        }
+                        {!resetPage && successText !== "" &&
+                            <div className="login_page_success_text">{successText}</div>
+                        }
+                        {!resetPage &&
+                            <div className="login_register_container">
+                                <div className="login_container">
+                                    <div className="login_inside_container">
+                                        <h1 className="login_title">{t("SIGN IN TO YOUR ACCOUNT")}</h1>
+                                        <input type="text" placeholder={t("Email*")} className="form-control" name="Email" value={loginInfo.email}
+                                               onChange={(e) => {
+                                                   let temp = JSON.parse(JSON.stringify(loginInfo));
+                                                   temp.email = e.target.value;
+                                                   setLoginInfo(temp);
+                                               }}/>
+                                        <input type="password" placeholder={t("Password*")} className="form-control form-control-password" name="Password"
+                                               value={loginInfo.password}
+                                               autoComplete="new-password"
+                                               onChange={(e) => {
+                                                   let temp = JSON.parse(JSON.stringify(loginInfo));
+                                                   temp.password = e.target.value;
+                                                   setLoginInfo(temp);
+                                               }}/>
+                                        <div className="remember_forgot_container">
+                                            <div className="remember_container">
+                                                {/*<label className="remember_label">*/}
+                                                {/*    <input type="checkbox" value={loginInfo.remember}*/}
+                                                {/*           onChange={(e) => {*/}
+                                                {/*               let temp = JSON.parse(JSON.stringify(loginInfo));*/}
+                                                {/*               temp.remember = e.target.value;*/}
+                                                {/*               setLoginInfo(temp);*/}
+                                                {/*           }}/>*/}
+                                                {/*    {t("Remember Me")}*/}
+                                                {/*</label>*/}
+                                            </div>
+                                            <div className="forgot text_underline" onClick={() => setResetPage(true)}>{t("Forgot your password?")}</div>
                                         </div>
-                                        <div className="forgot text_underline" onClick={() => setResetPage(true)}>{t("Forgot your password?")}</div>
-                                    </div>
-                                    <div className="login_btn_container">
-                                        {/*<button className="login_btn btn btn-new-dark">SIGN IN</button>*/}
-                                        <button className="login_btn btn btn-new-dark" onClick={() => loginUser()} disabled={btn_disabled} ref={signIn}>{t("SIGN IN")}</button>
+                                        <div className="login_btn_container">
+                                            {/*<button className="login_btn btn btn-new-dark">SIGN IN</button>*/}
+                                            <button className="login_btn btn btn-new-dark" onClick={() => loginUser()} disabled={btn_disabled} ref={signIn}>{t("SIGN IN")}</button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="register_container">
-                                <div className="register_inside_container">
-                                    <h1 className="login_title">{t("CREATE AN ACCOUNT")}</h1>
-                                    <p className="login_text">{t("register_list_title")}</p>
-                                    <ul className="register_list">
-                                        <li className="register_list_item">{t("register_list_item0")}</li>
-                                        <li className="register_list_item">{t("register_list_item1")}</li>
-                                        <li className="register_list_item">{t("register_list_item2")}</li>
-                                        <li className="register_list_item">{t("register_list_item3")}</li>
-                                    </ul>
-                                    {!showRegister && <button className="register_btn btn" onClick={() => setShowRegister(true)}>{t("LET'S GO")}</button>}
-                                    {showRegister && <div className="register_section_container">
-                                        <div className="register_section_item">
-                                            <input type="text" placeholder={t("First Name*")} className={"form-control " + (firstNotExist ? "password_not_valid" : "")} name="name"
-                                                   value={registerInfo.firstName}
-                                                   onChange={(e) => {
-                                                       let temp = JSON.parse(JSON.stringify(registerInfo));
-                                                       temp.firstName = e.target.value;
-                                                       setRegisterInfo(temp);
-                                                       if (e.target.value.length > 0) {
-                                                           setFirstNotExist(false);
-                                                       }
-                                                   }}/>
-                                            {firstNotExist && <div className="input_not_valid">{t("First Name Required.")}</div>}
-                                        </div>
-                                        <div className="register_section_item">
-                                            <input type="text" placeholder={t("Last Name*")} className={"form-control " + (lastNotExist ? "password_not_valid" : "")}
-                                                   name="lastName"
-                                                   value={registerInfo.lastName}
-                                                   onChange={(e) => {
-                                                       let temp = JSON.parse(JSON.stringify(registerInfo));
-                                                       temp.lastName = e.target.value;
-                                                       setRegisterInfo(temp);
-                                                       if (e.target.value.length > 0) {
-                                                           setLastNotExist(false);
-                                                       }
-                                                   }}/>
-                                            {lastNotExist && <div className="input_not_valid">{t("Last Name Required.")}</div>}
-                                        </div>
-                                        <div className="register_section_item">
-                                            <input type="email" placeholder={t("Email*")} className={"form-control " + (emailNotValid || emailNotExist ? "password_not_valid" : "")}
-                                                   name="Email"
-                                                   value={registerInfo.email}
-                                                   onChange={(e) => {
-                                                       let temp = JSON.parse(JSON.stringify(registerInfo));
-                                                       temp.email = e.target.value;
-                                                       setRegisterInfo(temp);
-                                                       if (e.target.value.length > 0) {
-                                                           setEmailNotExist(false);
-                                                           if (validateEmail(e.target.value)) {
-                                                               setEmailNotValid(false);
+                                <div className="register_container">
+                                    <div className="register_inside_container">
+                                        <h1 className="login_title">{t("CREATE AN ACCOUNT")}</h1>
+                                        <p className="login_text">{t("register_list_title")}</p>
+                                        <ul className="register_list">
+                                            <li className="register_list_item">{t("register_list_item0")}</li>
+                                            <li className="register_list_item">{t("register_list_item1")}</li>
+                                            <li className="register_list_item">{t("register_list_item2")}</li>
+                                            <li className="register_list_item">{t("register_list_item3")}</li>
+                                        </ul>
+                                        {!showRegister && <button className="register_btn btn" onClick={() => setShowRegister(true)}>{t("LET'S GO")}</button>}
+                                        {showRegister && <div className="register_section_container">
+                                            <div className="register_section_item">
+                                                <input type="text" placeholder={t("First Name*")} className={"form-control " + (firstNotExist ? "password_not_valid" : "")}
+                                                       name="name"
+                                                       value={registerInfo.firstName}
+                                                       onChange={(e) => {
+                                                           let temp = JSON.parse(JSON.stringify(registerInfo));
+                                                           temp.firstName = e.target.value;
+                                                           setRegisterInfo(temp);
+                                                           if (e.target.value.length > 0) {
+                                                               setFirstNotExist(false);
                                                            }
-                                                       }
-                                                   }}/>
-                                            {emailNotValid && <div className="input_not_valid">{emailError[pageLanguage][emailErrorState]["error"]}</div>}
-                                            {emailNotExist && <div className="input_not_valid">{t("Email Required.")}</div>}
-                                        </div>
-                                        <div className="register_section_item">
-                                            <input type="text" placeholder={t("Mobile Number (Optional)")}
-                                                   className={"form-control " + (mobileNotExist ? "password_not_valid" : "")}
-                                                   name="mobile" value={registerInfo.phone}
-                                                   onChange={(e) => {
-                                                       let temp = JSON.parse(JSON.stringify(registerInfo));
-                                                       temp.phone = e.target.value.replace(/\D/g, '').replace(/[^0-9]/g, "");
-                                                       setRegisterInfo(temp);
-                                                       validateNumber(e.target.value.toString());
-                                                   }}/>
-                                            {mobileNotExist && <div className="input_not_valid">{mobileError[pageLanguage][mobileErrorState]["error"]}</div>}
-                                        </div>
-                                        <div className="register_section_item">
-                                            <input type="password" placeholder={t("Password*")}
-                                                   className={"form-control form-control-password " + (passwordNotValid ? "password_not_valid" : "")}
-                                                   name="Register_Password"
-                                                   value={registerInfo.password}
-                                                   autoComplete="new-password"
-                                                   onChange={(e) => {
-                                                       let temp = JSON.parse(JSON.stringify(registerInfo));
-                                                       temp.password = e.target.value.replace(/\s/g, '');
-                                                       // temp.password = temp.password.replace(/[^0-9A-Za-z\s]/g, '');
-                                                       setRegisterInfo(temp);
-                                                       if (temp.password === temp.passwordConfirm) {
-                                                           setPasswordMatch(true);
-                                                           setPasswordMatchNotValid(false);
-                                                       } else
-                                                           setPasswordMatch(false);
-                                                       checkPasswordStrength(temp.password);
-                                                   }}
-                                                   onClick={() => setShowPasswordValidation(true)}
-                                            />
-                                            {showPasswordValidation && <div className="input_not_valid_password ">
-                                                <h2 className="input_not_valid_password_title">{t("Your password must contain:")}</h2>
-                                                <ul className="input_not_valid_password_list">
-                                                    <li className={"input_not_valid_password_item " + (passwordValidation.count ? "input_not_valid_password_item_check" : "")}>
+                                                       }}/>
+                                                {firstNotExist && <div className="input_not_valid">{t("First Name Required.")}</div>}
+                                            </div>
+                                            <div className="register_section_item">
+                                                <input type="text" placeholder={t("Last Name*")} className={"form-control " + (lastNotExist ? "password_not_valid" : "")}
+                                                       name="lastName"
+                                                       value={registerInfo.lastName}
+                                                       onChange={(e) => {
+                                                           let temp = JSON.parse(JSON.stringify(registerInfo));
+                                                           temp.lastName = e.target.value;
+                                                           setRegisterInfo(temp);
+                                                           if (e.target.value.length > 0) {
+                                                               setLastNotExist(false);
+                                                           }
+                                                       }}/>
+                                                {lastNotExist && <div className="input_not_valid">{t("Last Name Required.")}</div>}
+                                            </div>
+                                            <div className="register_section_item">
+                                                <input type="email" placeholder={t("Email*")}
+                                                       className={"form-control " + (emailNotValid || emailNotExist ? "password_not_valid" : "")}
+                                                       name="Email"
+                                                       value={registerInfo.email}
+                                                       onChange={(e) => {
+                                                           let temp = JSON.parse(JSON.stringify(registerInfo));
+                                                           temp.email = e.target.value;
+                                                           setRegisterInfo(temp);
+                                                           if (e.target.value.length > 0) {
+                                                               setEmailNotExist(false);
+                                                               if (validateEmail(e.target.value)) {
+                                                                   setEmailNotValid(false);
+                                                               }
+                                                           }
+                                                       }}/>
+                                                {emailNotValid && <div className="input_not_valid">{emailError[pageLanguage][emailErrorState]["error"]}</div>}
+                                                {emailNotExist && <div className="input_not_valid">{t("Email Required.")}</div>}
+                                            </div>
+                                            <div className="register_section_item">
+                                                <input type="text" placeholder={t("Mobile Number (Optional)")}
+                                                       className={"form-control " + (mobileNotExist ? "password_not_valid" : "")}
+                                                       name="mobile" value={registerInfo.phone}
+                                                       onChange={(e) => {
+                                                           let temp = JSON.parse(JSON.stringify(registerInfo));
+                                                           temp.phone = e.target.value.replace(/\D/g, '').replace(/[^0-9]/g, "");
+                                                           setRegisterInfo(temp);
+                                                           validateNumber(e.target.value.toString());
+                                                       }}/>
+                                                {mobileNotExist && <div className="input_not_valid">{mobileError[pageLanguage][mobileErrorState]["error"]}</div>}
+                                            </div>
+                                            <div className="register_section_item">
+                                                <input type="password" placeholder={t("Password*")}
+                                                       className={"form-control form-control-password " + (passwordNotValid ? "password_not_valid" : "")}
+                                                       name="Register_Password"
+                                                       value={registerInfo.password}
+                                                       autoComplete="new-password"
+                                                       onChange={(e) => {
+                                                           let temp = JSON.parse(JSON.stringify(registerInfo));
+                                                           temp.password = e.target.value.replace(/\s/g, '');
+                                                           // temp.password = temp.password.replace(/[^0-9A-Za-z\s]/g, '');
+                                                           setRegisterInfo(temp);
+                                                           if (temp.password === temp.passwordConfirm) {
+                                                               setPasswordMatch(true);
+                                                               setPasswordMatchNotValid(false);
+                                                           } else
+                                                               setPasswordMatch(false);
+                                                           checkPasswordStrength(temp.password);
+                                                       }}
+                                                       onClick={() => setShowPasswordValidation(true)}
+                                                />
+                                                {showPasswordValidation && <div className="input_not_valid_password ">
+                                                    <h2 className="input_not_valid_password_title">{t("Your password must contain:")}</h2>
+                                                    <ul className="input_not_valid_password_list">
+                                                        <li className={"input_not_valid_password_item " + (passwordValidation.count ? "input_not_valid_password_item_check" : "")}>
                                             <span>
                                             {passwordValidation.count &&
                                                 <img className="checkmark1 img-fluid" src={require('../Images/public/checkmark1.png')} alt=""/>
                                             }
                                                 {t("password_required_text1")}
                                             </span>
-                                                    </li>
-                                                    <li className={"input_not_valid_password_item " + (passwordValidation.lowercase ? "input_not_valid_password_item_check" : "")}>
+                                                        </li>
+                                                        <li className={"input_not_valid_password_item " + (passwordValidation.lowercase ? "input_not_valid_password_item_check" : "")}>
                                             <span>
                                             {passwordValidation.lowercase &&
                                                 <img className="checkmark1 img-fluid" src={require('../Images/public/checkmark1.png')} alt=""/>
                                             }
                                                 {t("password_required_text2")}
                                             </span>
-                                                    </li>
-                                                    <li className={"input_not_valid_password_item " + (passwordValidation.uppercase ? "input_not_valid_password_item_check" : "")}>
+                                                        </li>
+                                                        <li className={"input_not_valid_password_item " + (passwordValidation.uppercase ? "input_not_valid_password_item_check" : "")}>
                                             <span>
                                             {passwordValidation.uppercase &&
                                                 <img className="checkmark1 img-fluid" src={require('../Images/public/checkmark1.png')} alt=""/>
                                             }
                                                 {t("password_required_text3")}
                                             </span>
-                                                    </li>
-                                                    <li className={"input_not_valid_password_item " + (passwordValidation.numbers ? "input_not_valid_password_item_check" : "")}>
+                                                        </li>
+                                                        <li className={"input_not_valid_password_item " + (passwordValidation.numbers ? "input_not_valid_password_item_check" : "")}>
                                             <span>
                                             {passwordValidation.numbers &&
                                                 <img className="checkmark1 img-fluid" src={require('../Images/public/checkmark1.png')} alt=""/>
                                             }
                                                 {t("password_required_text4")}
                                             </span>
-                                                    </li>
-                                                </ul>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                }
+                                                {/*<div className={"password_details " + passwordNotValidTextClass}>Minimum length of this field must be equal or greater than 8 characters and less or*/}
+                                                {/*    equal than 20 characters. There must be minimum one letter and one number character. Any spaces*/}
+                                                {/*    will be ignored.*/}
+                                                {/*</div>*/}
                                             </div>
-                                            }
-                                            {/*<div className={"password_details " + passwordNotValidTextClass}>Minimum length of this field must be equal or greater than 8 characters and less or*/}
-                                            {/*    equal than 20 characters. There must be minimum one letter and one number character. Any spaces*/}
-                                            {/*    will be ignored.*/}
-                                            {/*</div>*/}
-                                        </div>
-                                        <div className="register_section_item">
-                                            <input type="password" placeholder={t("Confirm Password*")}
-                                                   className={"form-control form-control-password " + (passwordMatchNotValid ? "password_not_valid" : "")}
-                                                   name="Register_PasswordConfirm"
-                                                   value={registerInfo.passwordConfirm}
-                                                   autoComplete="new-password"
-                                                   onChange={(e) => {
-                                                       let temp = JSON.parse(JSON.stringify(registerInfo));
-                                                       temp.passwordConfirm = e.target.value;
-                                                       setRegisterInfo(temp);
-                                                       if (temp.password === temp.passwordConfirm) {
-                                                           setPasswordMatch(true);
-                                                           setPasswordMatchNotValid(false);
-                                                       } else
-                                                           setPasswordMatch(false);
-                                                   }}/>
-                                            {passwordMatchNotValid && <div className="input_not_valid">{t("Password confirmation is required.")}
-                                            </div>}
-                                        </div>
-                                        <div className="news_signup">
-                                            <div className="checkbox_style">
-                                                <input type="checkbox" checked={registerInfo.news}
+                                            <div className="register_section_item">
+                                                <input type="password" placeholder={t("Confirm Password*")}
+                                                       className={"form-control form-control-password " + (passwordMatchNotValid ? "password_not_valid" : "")}
+                                                       name="Register_PasswordConfirm"
+                                                       value={registerInfo.passwordConfirm}
+                                                       autoComplete="new-password"
                                                        onChange={(e) => {
                                                            let temp = JSON.parse(JSON.stringify(registerInfo));
-                                                           temp.news = e.target.checked;
+                                                           temp.passwordConfirm = e.target.value;
                                                            setRegisterInfo(temp);
-                                                       }} id="registerInfonews"/>
-                                                <label htmlFor="registerInfonews" className="checkbox_label">
-                                                    <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
-                                                         alt=""/>
-                                                </label>
-                                                <span className="checkbox_text">
+                                                           if (temp.password === temp.passwordConfirm) {
+                                                               setPasswordMatch(true);
+                                                               setPasswordMatchNotValid(false);
+                                                           } else
+                                                               setPasswordMatch(false);
+                                                       }}/>
+                                                {passwordMatchNotValid && <div className="input_not_valid">{t("Password confirmation is required.")}
+                                                </div>}
+                                            </div>
+                                            <div className="news_signup">
+                                                <div className="checkbox_style">
+                                                    <input type="checkbox" checked={registerInfo.news}
+                                                           onChange={(e) => {
+                                                               let temp = JSON.parse(JSON.stringify(registerInfo));
+                                                               temp.news = e.target.checked;
+                                                               setRegisterInfo(temp);
+                                                           }} id="registerInfonews"/>
+                                                    <label htmlFor="registerInfonews" className="checkbox_label">
+                                                        <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
+                                                             alt=""/>
+                                                    </label>
+                                                    <span className="checkbox_text">
                                                 {t("signup to email")}
                                             </span>
+                                                </div>
+                                            </div>
+                                            <div className="login_btn_container">
+                                                <button className="login_btn btn btn-new-dark" onClick={() => registerUser()}
+                                                        disabled={btn_disabled}>{t("CREATE AN ACCOUNT")}</button>
                                             </div>
                                         </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        
+                        {resetPage &&
+                            <div className="Forgot_page_container login_register_container">
+                                <div className="login_container">
+                                    <div className="login_inside_container">
+                                        <h1 className="login_title">{t("Forgot Password")}</h1>
+                                        <h2 className="forget_text forget_text_small">{t("forgot_page_text")}</h2>
+                                        <input type="text" placeholder={t("Email*")} className="form-control" name="Email" value={forgotEmail}
+                                               onChange={(e) => {
+                                                   setForgotEmail(e.target.value);
+                                               }}/>
+                                        
                                         <div className="login_btn_container">
-                                            <button className="login_btn btn btn-new-dark" onClick={() => registerUser()} disabled={btn_disabled}>{t("CREATE AN ACCOUNT")}</button>
+                                            {/*<button className="login_btn btn btn-new-dark">SIGN IN</button>*/}
+                                            <button className="login_btn btn btn-new-dark" onClick={() => {
+                                                sendResetPasswordRequest();
+                                                setResetPage(false);
+                                            }}>{t("SUBMIT")}</button>
                                         </div>
                                     </div>
-                                    }
                                 </div>
                             </div>
-                        </div>
-                    }
-                    
-                    {resetPage &&
-                        <div className="Forgot_page_container login_register_container">
-                            <div className="login_container">
-                                <div className="login_inside_container">
-                                    <h1 className="login_title">{t("Forgot Password")}</h1>
-                                    <h2 className="forget_text forget_text_small">{t("forgot_page_text")}</h2>
-                                    <input type="text" placeholder={t("Email*")} className="form-control" name="Email" value={forgotEmail}
-                                           onChange={(e) => {
-                                               setForgotEmail(e.target.value);
-                                           }}/>
-                                    
-                                    <div className="login_btn_container">
-                                        {/*<button className="login_btn btn btn-new-dark">SIGN IN</button>*/}
-                                        <button className="login_btn btn btn-new-dark" onClick={() => {
-                                            sendResetPasswordRequest();
-                                            setResetPage(false);
-                                        }}>{t("SUBMIT")}</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                </Modal.Body>
-            </Modal>
-            
-            
-            <Modal backdrop="static" keyboard={false}
-                   className={`cart_modal_container cart_agree_container add_to_project_modal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
-                   dialogClassName={`cart_modal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
-                   show={showLogin2}
-                   onHide={() => dispatch({
-                       type: HideLogin2Modal,
-                   })} id="add_to_project_modal">
-                <Modal.Header closeButton>
-                </Modal.Header>
-                <Modal.Body>
-                    <ModalLogin/>
-                </Modal.Body>
-            </Modal>
+                        }
+                    </Modal.Body>
+                </Modal>
+                
+                
+                <Modal backdrop="static" keyboard={false}
+                       className={`cart_modal_container cart_agree_container add_to_project_modal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                       dialogClassName={`cart_modal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                       show={showLogin2}
+                       onHide={() => dispatch({
+                           type: HideLogin2Modal,
+                       })} id="add_to_project_modal">
+                    <Modal.Header closeButton>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <ModalLogin/>
+                    </Modal.Body>
+                </Modal>
+            </div>
         </div>
     
     

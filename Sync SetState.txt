@@ -1,0 +1,39 @@
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+
+function useSetStateCallback(initialState) {
+  const [state, setState] = useState(initialState);
+  const callbackRef = useRef();
+
+  const setStateCallback = useCallback((newState, callback) => {
+    callbackRef.current = callback;
+    setState(newState);
+  }, []);
+
+  useEffect(() => {
+    if (callbackRef.current) {
+      callbackRef.current(state);
+      callbackRef.current = undefined;
+    }
+  }, [state]);
+
+  return [state, setStateCallback];
+}
+
+function ExampleComponent() {
+  const [count, setCount] = useSetStateCallback(0);
+
+  const handleClick = () => {
+    setCount(count + 1, (newCount) => {
+      console.log(`Count is now ${newCount}`);
+    });
+  };
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={handleClick}>Increment Count</button>
+    </div>
+  );
+}
+
+export default ExampleComponent;

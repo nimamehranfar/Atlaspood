@@ -2,48 +2,22 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="200ae4a2-413a-4eda-9bd3-7e6393833ac7" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Images/public/logo_temp_en.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/public/logo_temp_fa.svg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/locales/en/translation.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/en/translation.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/locales/fa/translation.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/fa/translation.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/CustomDropdownMultiWithSearch.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/CustomDropdownMultiWithSearch.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/CustomDropdownWithSearch.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/CustomDropdownWithSearch.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/GetMeasurementArray.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/GetMeasurementArray.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/Header.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/Header.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/ModalLogin.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/ModalLogin.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/PageItems.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/PageItems.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/UserProjects.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/UserProjects.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/dk/help_new_height_inside_3.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/dk/help_new_height_inside_3.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/dk/help_new_width_inside_3.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/dk/help_new_width_inside_3.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/dk/new_CeilingToFloor1_track_full.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/dk/new_CeilingToFloor1_track_full.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/dk/new_CeilingToFloor1_track_full_fa.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/dk/new_CeilingToFloor1_track_full_fa.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/dk/new_CeilingToFloor_noRod.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/dk/new_CeilingToFloor_noRod.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/dk/new_CeilingToFloor_noRod_fa.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/dk/new_CeilingToFloor_noRod_fa.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/dk/new_WindowtoFloor.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/dk/new_WindowtoFloor.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/dk/new_WindowtoFloor_fa.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/dk/new_WindowtoFloor_fa.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/dk/new_ceiling_to_floor_3.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/dk/new_ceiling_to_floor_3.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/dk/new_ceiling_to_floor_3_arc.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/dk/new_ceiling_to_floor_3_arc.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/dk/new_ceiling_to_floor_3_arc_fa.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/dk/new_ceiling_to_floor_3_arc_fa.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/dk/new_ceiling_to_floor_3_fa.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/dk/new_ceiling_to_floor_3_fa.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/dk/new_ceiling_to_window_3.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/dk/new_ceiling_to_window_3.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/dk/new_ceiling_to_window_3_arc.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/dk/new_ceiling_to_window_3_arc.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/dk/new_ceiling_to_window_3_arc_fa.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/dk/new_ceiling_to_window_3_arc_fa.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/dk/new_ceiling_to_window_3_fa.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/dk/new_ceiling_to_window_3_fa.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/dk/window-Inside.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/dk/window-Inside.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/zebra/new_height_inside_3.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/new_height_inside_3.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/zebra/new_width_inside_3.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/zebra/new_width_inside_3.svg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Page Components/DK.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Page Components/DK.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Page Components/DK2.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Page Components/DK2.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Page Components/DualRoller.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Page Components/DualRoller.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Page Components/Roller.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Page Components/Roller.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Page Components/Zebra.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Page Components/Zebra.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Pages/Basket.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/Basket.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Pages/Checkout.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/Checkout.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Pages/Projects.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/Projects.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Pages/RegisterLogin.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/RegisterLogin.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Pages/CustomCurtain.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/CustomCurtain.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -575,7 +549,17 @@
       <workItem from="1679211761111" duration="498000" />
       <workItem from="1679252924892" duration="2932000" />
       <workItem from="1679768829438" duration="7708000" />
-      <workItem from="1679851295559" duration="7121000" />
+      <workItem from="1679851295559" duration="7337000" />
+      <workItem from="1679932253901" duration="3548000" />
+      <workItem from="1679989488542" duration="620000" />
+      <workItem from="1680030008796" duration="3483000" />
+      <workItem from="1680112440241" duration="3458000" />
+      <workItem from="1680206532500" duration="4437000" />
+      <workItem from="1680556786832" duration="5845000" />
+      <workItem from="1680636549634" duration="8124000" />
+      <workItem from="1680708711301" duration="5536000" />
+      <workItem from="1680721179858" duration="594000" />
+      <workItem from="1680804901543" duration="4582000" />
     </task>
     <servers />
   </component>

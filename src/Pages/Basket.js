@@ -405,7 +405,7 @@ function Basket() {
             // copyBagObject(indexOrObj);
             sessionStorage.setItem("cartCopy", JSON.stringify(tempObj));
             setTimeout(() => {
-                navigate("/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[tempObj["SewingModelId"]]["route"] + (SpecialId ? SpecialId : "") + "/Page-ID/" + pageId)
+                navigate("/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[tempObj["SewingModelId"]]["route"] + (SpecialId ? "/"+SpecialId : "") + "/Page-ID/" + pageId)
             }, 200);
             
         } else {
@@ -445,7 +445,7 @@ function Basket() {
             // }
             sessionStorage.setItem("cartCopy", JSON.stringify(tempObj));
             setTimeout(() => {
-                navigate("/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[tempObj["SewingModelId"]]["route"] + (SpecialId ? SpecialId : "") + "/Page-ID/" + pageId)
+                navigate("/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[tempObj["SewingModelId"]]["route"] + (SpecialId ? "/"+SpecialId : "") + "/Page-ID/" + pageId)
             }, 200);
             
         }
@@ -920,7 +920,7 @@ function Basket() {
                                             </div>
                                             <div className="basket_item_desc_button">
                                                 <Link className="btn basket_desc_button"
-                                                      to={"/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[drapery[i]["SewingPreorder"]["SewingModelId"]]["route"] + (obj["SpecialId"] ? obj["SpecialId"] : "") + "/Bag-Projects/" + drapery[i]["SewingPreorderId"] + "/Page-ID/" + obj["PageId"]}>{t("EDIT")}</Link>
+                                                      to={"/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[drapery[i]["SewingPreorder"]["SewingModelId"]]["route"] + (obj["SpecialId"] ? "/"+obj["SpecialId"] : "") + "/Bag-Projects/" + drapery[i]["SewingPreorderId"] + "/Page-ID/" + obj["PageId"]}>{t("EDIT")}</Link>
                                                 <button className="basket_desc_button" onClick={() => copyItem(drapery[i]["SewingPreorder"],obj["PageId"],obj["SpecialId"])}>{t("COPY")}</button>
                                             </div>
                                             {zipcode && zipcode !== "" &&
@@ -1348,7 +1348,7 @@ function Basket() {
                                                 </div>
                                                 <div className="basket_item_desc_button">
                                                     <Link className="btn basket_desc_button"
-                                                          to={"/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[obj["SewingModelId"]]["route"] + (obj["SpecialId"] ? obj["SpecialId"] : "") + "/Bag-Projects/" + index + "/Page-ID/" + obj["PageId"]}>{t("EDIT")}</Link>
+                                                          to={"/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[obj["SewingModelId"]]["route"] + (obj["SpecialId"] ? "/"+obj["SpecialId"] : "") + "/Bag-Projects/" + index + "/Page-ID/" + obj["PageId"]}>{t("EDIT")}</Link>
                                                     <button className="basket_desc_button" onClick={() => copyItem(index,obj["PageId"],obj["SpecialId"])}>{t("COPY")}</button>
                                                 </div>
                                                 {zipcode &&

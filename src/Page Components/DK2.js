@@ -185,6 +185,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
         "width": [],
         "length": [],
         "width3A": [],
+        "Width2B": [],
         "height3C": [],
         "shadeMount": []
     });
@@ -217,7 +218,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
     });
     const [saveProjectCount, setSaveProjectCount] = useState(0);
     
-    const [depSet, setDepSet] = useState(new Set(['1', '2', '3', '4', '5', '61', '62']));
+    const [depSet, setDepSet] = useState(new Set(['1', '2', '3', '4', '61', '62']));
     
     const inputs = useRef({});
     const selectedTitle = useRef({});
@@ -713,6 +714,9 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
         }
         
         Promise.all(promiseArr).then(() => {
+            curtainList.push(
+                <div key={"dk_curtain_end_line"} className="dk_curtain_end_line"/>
+            );
             setDkCurtainList(curtainList);
             // console.log(curtainList)
         });
@@ -854,13 +858,13 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                 {/*                         }/>*/}
                 {/*</div>*/}
                 <div className="steps_header_selected_container">
-                    {/*<div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? stepSelected : null}</div>*/}
+                    <div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? stepSelected : null}</div>
                     
-                    {showLabels &&
-                        <TruncateMarkup lines={1} tokenize="words">
-                            <div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{stepSelected}</div>
-                        </TruncateMarkup>
-                    }
+                    {/*{showLabels &&*/}
+                    {/*    <TruncateMarkup lines={1} tokenize="words">*/}
+                    {/*        <div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{stepSelected}</div>*/}
+                    {/*    </TruncateMarkup>*/}
+                    {/*}*/}
                 </div>
                 {required && stepSelected === "" &&
                     <div className="stepRequired"/>
@@ -1385,7 +1389,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         temp["WindowHeight"] = response.data["WindowHeight"];
                         temp["WidthCart"] = response.data["Width"];
                         temp["HeightCart"] = response.data["Height"];
-                        // if (stepSelectedValue["1"] === "1" && stepSelectedValue["2"] === "2") {
+                        // if (stepSelectedValue["1"] === "1" && step2 === "true") {
                         //     if (temp["Width1"] !== undefined && temp["Width2"] !== undefined && temp["Width3"] !== undefined && temp["Height1"] !== undefined && temp["Height2"] !== undefined && temp["Height3"] !== undefined) {
                         //         // console.log("2");
                         //         getWindowSize(response.data["WindowWidth"], response.data["WindowHeight"]);
@@ -1393,7 +1397,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         //         temp["HeightCart"] = response.data["Height"];
                         //
                         //     }
-                        // } else if (stepSelectedValue["1"] === "2" && stepSelectedValue["2"] === "2") {
+                        // } else if (stepSelectedValue["1"] === "2" && step2 === "true") {
                         //     if (temp["Width3A"] !== undefined && temp["Height3C"] !== undefined && temp["ExtensionRight"] !== undefined && temp["ExtensionLeft"] !== undefined && temp["ShadeMount"] !== undefined) {
                         //         getWindowSize(response.data["WindowWidth"], response.data["WindowHeight"]);
                         //         temp["WidthCart"] = response.data["Width"];
@@ -1420,6 +1424,12 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
         promise2.then(() => {
             if (!pageLoad) {
                 setCartValues(temp);
+                setTimeout(() => {
+                    if (Math.floor(cartValues["WidthCart"] / 11.5) !== Math.floor(temp["WidthCart"] / 11.5)) {
+                        setDkCurtainArr([]);
+                        setStep3("");
+                    }
+                }, 200);
             }
             setCartLoading(false);
         });
@@ -1577,7 +1587,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
     }
     
     function deleteSpecialSelects(InOut) {
-        let temp = selectCustomValues;
+        let temp = JSON.parse(JSON.stringify(selectCustomValues));
         let temp2 = JSON.parse(JSON.stringify(stepSelectedOptions));
         let temp3 = JSON.parse(JSON.stringify(leftRight));
         setWindowSizeBool(false);
@@ -1735,196 +1745,198 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                 setAddingLoading(false);
             }
         } else {
-            // console.log(cartValues,"hi");
-            let userProjects = JSON.parse(JSON.stringify(UserProjects))[`${modelID}`]["data"];
-            let tempArr = [];
-            let temp1 = [];
-            let temp = JSON.parse(JSON.stringify(cartValues));
-            let tempPostObj = {};
-            let tempBagPrice = 0;
-            
-            
-            // tempPostObj["ApiKey"] = window.$apikey;
-            tempPostObj["WindowCount"] = 1;
-            tempPostObj["SewingModelId"] = `${modelID}`;
-            Object.keys(temp).forEach(key => {
-                if (temp[key] !== null || temp[key] !== "") {
-                    let tempObj = userProjects.find(obj => obj["cart"] === key);
-                    // console.log(key,tempObj);
-                    if (tempObj && tempObj["apiLabel"] !== "") {
-                        if (tempObj["apiValue"] === null) {
-                            tempPostObj[tempObj["apiLabel"]] = temp[key];
-                        } else {
-                            tempPostObj[tempObj["apiLabel"]] = tempObj["apiValue"][temp[key]];
-                        }
-                    }
-                }
-            });
-            
-            tempPostObj["SewingOrderDetails"] = [];
-            tempPostObj["SewingOrderDetails"][0] = {};
-            tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
-            tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
-            tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
-            tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
-            tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
-            Object.keys(temp).forEach(key => {
-                if (temp[key] !== null || temp[key] !== "") {
-                    let tempObj = userProjects.find(obj => obj["cart"] === key);
-                    if (tempObj["apiLabel2"] !== undefined) {
-                        if (tempObj["apiValue2"] === null) {
-                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
-                        } else {
-                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
-                        }
-                    }
-                }
-            });
-            tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
-            Object.keys(temp).forEach(key => {
-                if (temp[key] !== null || temp[key] !== "") {
-                    let tempObj = userProjects.find(obj => obj["cart"] === key);
-                    if (tempObj["apiAcc"] !== undefined) {
-                        if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
-                            tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
-                        } else {
-                        
-                        }
-                    }
-                }
-            });
-            tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
-                return el != null;
-            });
-            // console.log(tempPostObj);
-            if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
-                // console.log(JSON.stringify(tempPostObj));
-                axios.post(baseURLPrice, tempPostObj)
-                    .then((response) => {
-                        setBagPrice(response.data["price"]);
-                        tempBagPrice = response.data["price"];
-                        temp["Price"] = response.data["price"];
-                        if (zipcodeChecked && response.data["InstallAmount"]) {
-                            temp["InstallAmount"] = response.data["InstallAmount"];
-                            temp["TransportationAmount"] = response.data["TransportationAmount"];
-                        }
-                        // console.log(response.data);
-                        
-                        let roomNameFa = cartValues["RoomNameFa"];
-                        let roomName = cartValues["RoomNameEn"];
-                        let WindowName = cartValues["WindowName"] === undefined ? "" : cartValues["WindowName"];
-                        Object.keys(cartValues).forEach(key => {
-                            let tempObj = userProjects.find(obj => obj["cart"] === key);
-                            if (tempObj === undefined) {
-                                // window.location.reload();
-                                console.log(key);
+            if (price) {
+                // console.log(cartValues,"hi");
+                let userProjects = JSON.parse(JSON.stringify(UserProjects))[`${modelID}`]["data"];
+                let tempArr = [];
+                let temp1 = [];
+                let temp = JSON.parse(JSON.stringify(cartValues));
+                let tempPostObj = {};
+                let tempBagPrice = 0;
+                
+                
+                // tempPostObj["ApiKey"] = window.$apikey;
+                tempPostObj["WindowCount"] = 1;
+                tempPostObj["SewingModelId"] = `${modelID}`;
+                Object.keys(temp).forEach(key => {
+                    if (temp[key] !== null || temp[key] !== "") {
+                        let tempObj = userProjects.find(obj => obj["cart"] === key);
+                        // console.log(key,tempObj);
+                        if (tempObj && tempObj["apiLabel"] !== "") {
+                            if (tempObj["apiValue"] === null) {
+                                tempPostObj[tempObj["apiLabel"]] = temp[key];
                             } else {
-                                if (key === "WindowHeight" || key === "WindowWidth") {
-                                
-                                } else if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
-                                    let objLabel = "";
-                                    if (key === "ControlType" && cartValues["ControlType"] === "Motorized") {
-                                        objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(cartValues[key].toString())} / ${t(cartValues["MotorType"].toString())}`).toString() : `${t(cartValues[key].toString())} / ${t(cartValues["MotorType"].toString())}`;
-                                    } else if (tempObj["titleValue"] === null || true) {
-                                        if (tempObj["titlePostfix"] === "") {
-                                            objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(cartValues[key].toString())}`).toString() : t(cartValues[key].toString());
-                                        } else {
-                                            objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${cartValues[key]}`).toString() + t(tempObj["titlePostfix"]) : cartValues[key].toString() + t(tempObj["titlePostfix"]);
-                                        }
-                                        // objLabel = cartValues[key].toString() + tempObj["titlePostfix"];
-                                    } else {
-                                        // console.log(tempObj["titleValue"],tempObj["titleValue"][cartValues[key].toString()],cartValues[key]);
-                                        if (tempObj["titleValue"][cartValues[key].toString()] === null) {
+                                tempPostObj[tempObj["apiLabel"]] = tempObj["apiValue"][temp[key]];
+                            }
+                        }
+                    }
+                });
+                
+                tempPostObj["SewingOrderDetails"] = [];
+                tempPostObj["SewingOrderDetails"][0] = {};
+                tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
+                tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
+                tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
+                tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
+                tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
+                Object.keys(temp).forEach(key => {
+                    if (temp[key] !== null || temp[key] !== "") {
+                        let tempObj = userProjects.find(obj => obj["cart"] === key);
+                        if (tempObj["apiLabel2"] !== undefined) {
+                            if (tempObj["apiValue2"] === null) {
+                                tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
+                            } else {
+                                tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                            }
+                        }
+                    }
+                });
+                tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
+                Object.keys(temp).forEach(key => {
+                    if (temp[key] !== null || temp[key] !== "") {
+                        let tempObj = userProjects.find(obj => obj["cart"] === key);
+                        if (tempObj["apiAcc"] !== undefined) {
+                            if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
+                                tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
+                            } else {
+                            
+                            }
+                        }
+                    }
+                });
+                tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
+                    return el != null;
+                });
+                // console.log(tempPostObj);
+                if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
+                    // console.log(JSON.stringify(tempPostObj));
+                    axios.post(baseURLPrice, tempPostObj)
+                        .then((response) => {
+                            setBagPrice(response.data["price"]);
+                            tempBagPrice = response.data["price"];
+                            temp["Price"] = response.data["price"];
+                            if (zipcodeChecked && response.data["InstallAmount"]) {
+                                temp["InstallAmount"] = response.data["InstallAmount"];
+                                temp["TransportationAmount"] = response.data["TransportationAmount"];
+                            }
+                            // console.log(response.data);
+                            
+                            let roomNameFa = cartValues["RoomNameFa"];
+                            let roomName = cartValues["RoomNameEn"];
+                            let WindowName = cartValues["WindowName"] === undefined ? "" : cartValues["WindowName"];
+                            Object.keys(cartValues).forEach(key => {
+                                let tempObj = userProjects.find(obj => obj["cart"] === key);
+                                if (tempObj === undefined) {
+                                    // window.location.reload();
+                                    console.log(key);
+                                } else {
+                                    if (key === "WindowHeight" || key === "WindowWidth") {
+                                    
+                                    } else if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
+                                        let objLabel = "";
+                                        if (key === "ControlType" && cartValues["ControlType"] === "Motorized") {
+                                            objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(cartValues[key].toString())} / ${t(cartValues["MotorType"].toString())}`).toString() : `${t(cartValues[key].toString())} / ${t(cartValues["MotorType"].toString())}`;
+                                        } else if (tempObj["titleValue"] === null || true) {
                                             if (tempObj["titlePostfix"] === "") {
-                                                objLabel = t(cartValues[key].toString());
+                                                objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(cartValues[key].toString())}`).toString() : t(cartValues[key].toString());
                                             } else {
                                                 objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${cartValues[key]}`).toString() + t(tempObj["titlePostfix"]) : cartValues[key].toString() + t(tempObj["titlePostfix"]);
                                             }
+                                            // objLabel = cartValues[key].toString() + tempObj["titlePostfix"];
                                         } else {
-                                            objLabel = t(tempObj["titleValue"][cartValues[key].toString()]);
+                                            // console.log(tempObj["titleValue"],tempObj["titleValue"][cartValues[key].toString()],cartValues[key]);
+                                            if (tempObj["titleValue"][cartValues[key].toString()] === null) {
+                                                if (tempObj["titlePostfix"] === "") {
+                                                    objLabel = t(cartValues[key].toString());
+                                                } else {
+                                                    objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${cartValues[key]}`).toString() + t(tempObj["titlePostfix"]) : cartValues[key].toString() + t(tempObj["titlePostfix"]);
+                                                }
+                                            } else {
+                                                objLabel = t(tempObj["titleValue"][cartValues[key].toString()]);
+                                            }
                                         }
+                                        temp1[tempObj["order"]] =
+                                            <li className="cart_agree_item" key={key}>
+                                                <h1 className="cart_agree_item_title">{t(tempObj["title"])}&nbsp;</h1>
+                                                <h2 className="cart_agree_item_desc">{objLabel}</h2>
+                                            </li>;
                                     }
-                                    temp1[tempObj["order"]] =
-                                        <li className="cart_agree_item" key={key}>
-                                            <h1 className="cart_agree_item_title">{t(tempObj["title"])}&nbsp;</h1>
-                                            <h2 className="cart_agree_item_desc">{objLabel}</h2>
-                                        </li>;
                                 }
-                            }
-                        });
+                            });
+                            
+                            tempArr.push(
+                                <div key={defaultModelName}>
+                                    <h2 className="cart_agree_title">{pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</h2>
+                                    <ul className="cart_agree_items_container">
+                                        <GetMeasurementArray modelId={`${modelID}`} cartValues={cartValues}/>
+                                        <li className="cart_agree_item">
+                                            <h1 className="cart_agree_item_title">{t("Fabric")}</h1>
+                                            <h2 className="cart_agree_item_desc">
+                                                <div className={`dk_curtain_preview_container`}>
+                                                    <Accordion>
+                                                        <Accordion.Item eventKey="0">
+                                                            <ContextAwareToggleViewDetails eventKey="0" textOnHide={t("View Details")} textOnShow={t("Hide Details")}/>
+                                                            <Accordion.Body className="basket_item_title_dropdown dk_curtain_preview_dropdown">
+                                                                <div className="dk_curtain_preview_detail_container">
+                                                                    {/*{dkCurtainPreviewList}*/}
+                                                                    {temp["SodFabrics"].map((item, i) =>
+                                                                        <div key={i}
+                                                                             className="dk_curtain_preview_detail">
+                                                                            <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + " / " + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
+                                                                            <h5>&nbsp;X</h5><h3>{item["Qty"]}</h3>
+                                                                        </div>)}
+                                                                </div>
+                                                            </Accordion.Body>
+                                                        </Accordion.Item>
+                                                    </Accordion>
+                                                </div>
+                                            </h2>
+                                        </li>
+                                        {temp1}
+                                        <li className="cart_agree_item">
+                                            <h1 className="cart_agree_item_title">{pageLanguage === 'fa' ? "نام اتاق" : "Room Label"}&nbsp;</h1>
+                                            <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? roomNameFa + (WindowName === "" ? "" : " / " + WindowName) : roomName + (WindowName === "" ? "" : " / " + WindowName)}</h2>
+                                        </li>
+                                        <li className="cart_agree_item">
+                                            <h1 className="cart_agree_item_title">{t("Price")}&nbsp;</h1>
+                                            <h2 className="cart_agree_item_desc">{GetPrice(tempBagPrice, pageLanguage, t("TOMANS"))}</h2>
+                                        </li>
+                                    </ul>
+                                </div>
+                            );
+                            setCartAgree(tempArr);
+                            modalHandleShow("cart_modal");
+                            setCartValues(temp);
+                            setAddingLoading(false);
+                            
+                        }).catch(err => {
+                        if (err.response.status === 401) {
+                            refreshToken().then((response2) => {
+                                if (response2 !== false) {
+                                    addToCart();
+                                } else {
+                                    setPrice(0);
+                                    setBagPrice(0);
+                                    temp["Price"] = 0;
+                                    setCartValues(temp);
+                                    setAddingLoading(false);
+                                    navigate("/" + pageLanguage + "/User");
+                                }
+                            });
+                        } else {
+                            setPrice(0);
+                            setBagPrice(0);
+                            temp["Price"] = 0;
+                            setCartValues(temp);
+                            setAddingLoading(false);
+                        }
                         
-                        tempArr.push(
-                            <div key={defaultModelName}>
-                                <h2 className="cart_agree_title">{pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</h2>
-                                <ul className="cart_agree_items_container">
-                                    <GetMeasurementArray modelId={`${modelID}`} cartValues={cartValues}/>
-                                    <li className="cart_agree_item">
-                                        <h1 className="cart_agree_item_title">{t("Fabric")}</h1>
-                                        <h2 className="cart_agree_item_desc">
-                                            <div className={`dk_curtain_preview_container`}>
-                                                <Accordion>
-                                                    <Accordion.Item eventKey="0">
-                                                        <ContextAwareToggleViewDetails eventKey="0" textOnHide={t("View Details")} textOnShow={t("Hide Details")}/>
-                                                        <Accordion.Body className="basket_item_title_dropdown dk_curtain_preview_dropdown">
-                                                            <div className="dk_curtain_preview_detail_container">
-                                                                {/*{dkCurtainPreviewList}*/}
-                                                                {temp["SodFabrics"].map((item, i) =>
-                                                                    <div key={i}
-                                                                         className="dk_curtain_preview_detail">
-                                                                        <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + " / " + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
-                                                                        <h5>&nbsp;X</h5><h3>{item["Qty"]}</h3>
-                                                                    </div>)}
-                                                            </div>
-                                                        </Accordion.Body>
-                                                    </Accordion.Item>
-                                                </Accordion>
-                                            </div>
-                                        </h2>
-                                    </li>
-                                    {temp1}
-                                    <li className="cart_agree_item">
-                                        <h1 className="cart_agree_item_title">{pageLanguage === 'fa' ? "نام اتاق" : "Room Label"}&nbsp;</h1>
-                                        <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? roomNameFa + (WindowName === "" ? "" : " / " + WindowName) : roomName + (WindowName === "" ? "" : " / " + WindowName)}</h2>
-                                    </li>
-                                    <li className="cart_agree_item">
-                                        <h1 className="cart_agree_item_title">{t("Price")}&nbsp;</h1>
-                                        <h2 className="cart_agree_item_desc">{GetPrice(tempBagPrice, pageLanguage, t("TOMANS"))}</h2>
-                                    </li>
-                                </ul>
-                            </div>
-                        );
-                        setCartAgree(tempArr);
-                        modalHandleShow("cart_modal");
-                        setCartValues(temp);
-                        setAddingLoading(false);
-                        
-                    }).catch(err => {
-                    if (err.response.status === 401) {
-                        refreshToken().then((response2) => {
-                            if (response2 !== false) {
-                                addToCart();
-                            } else {
-                                setPrice(0);
-                                setBagPrice(0);
-                                temp["Price"] = 0;
-                                setCartValues(temp);
-                                setAddingLoading(false);
-                                navigate("/" + pageLanguage + "/User");
-                            }
-                        });
-                    } else {
-                        setPrice(0);
-                        setBagPrice(0);
-                        temp["Price"] = 0;
-                        setCartValues(temp);
-                        setAddingLoading(false);
-                    }
-                    
-                });
-            } else {
-                setAddingLoading(false);
+                    });
+                } else {
+                    setAddingLoading(false);
+                }
+                // console.log(cartValues);
             }
-            // console.log(cartValues);
         }
         // modalHandleShow("cart_modal");
         // renderCart();
@@ -2969,9 +2981,9 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         setStep1(temp["Mount"]);
                         if (temp["Mount"] === "Inside") {
                             setStep11("true");
-                            let refIndex = inputs.current["11"].getAttribute('ref-num');
-                            tempLabels[refIndex] = inputs.current["11"].getAttribute('text');
-                            tempValue[refIndex] = inputs.current["11"].value;
+                            let refIndex = inputs.current["111"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["111"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["111"].value;
                             depSetTempArr = new Set([...setGetDeps("", "1", depSetTempArr)]);
                         } else if (temp["Mount"] === "Outside") {
                             let refIndex = inputs.current["12"].getAttribute('ref-num');
@@ -2986,9 +2998,9 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                             depSetTempArr = new Set([...setGetDeps((temp["IsWalled"] ? "" : "11,"), "1", depSetTempArr)]);
                         } else {
                             setStep11("true");
-                            let refIndex = inputs.current["13"].getAttribute('ref-num');
-                            tempLabels[refIndex] = inputs.current["13"].getAttribute('text');
-                            tempValue[refIndex] = inputs.current["13"].value;
+                            let refIndex = inputs.current["131"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["131"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["131"].value;
                             depSetTempArr = new Set([...setGetDeps("", "1", depSetTempArr)]);
                         }
                         setStepSelectedLabel(tempLabels);
@@ -3297,10 +3309,10 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                         if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
                                                             tempLabels["2CCeiling"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
                                                         }
-                                                        selectValues["WindowToFloor"] = temp["WindowToFloor"] ? [{value: temp["WindowToFloor"]}] : [];
-                                                        if (temp["WindowToFloor"]) {
-                                                            tempLabels["2DWallFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["WindowToFloor"]}`) + postfixFa : temp["WindowToFloor"] + postfixEn;
-                                                        }
+                                                        // selectValues["WindowToFloor"] = temp["WindowToFloor"] ? [{value: temp["WindowToFloor"]}] : [];
+                                                        // if (temp["WindowToFloor"]) {
+                                                        //     tempLabels["2DWallFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["WindowToFloor"]}`) + postfixFa : temp["WindowToFloor"] + postfixEn;
+                                                        // }
                                                         selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
                                                         if (temp["ShadeMount"] !== undefined) {
                                                             tempLabels["2EWall"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["ShadeMount"]}`) + postfixFa : temp["ShadeMount"] + postfixEn;
@@ -3310,7 +3322,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             tempLabels["2FWall"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
                                                         }
                                                         
-                                                        depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (tempHeight ? "" : "2DWall,") + (temp["ExtensionLeft"] !== undefined ? "" : "2CCeiling1,") + (temp["ExtensionRight"] !== undefined ? "" : "2CCeiling2,") + (temp["WindowToFloor"] !== undefined ? "" : "2DWallFloor,") + (temp["ShadeMount"] !== undefined ? "" : "2EWall,") + (temp["CeilingToFloor"] !== undefined ? "" : "2FWall,"), "2,2A", depSetTempArr)]);
+                                                        depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (tempHeight ? "" : "2DWall,") + (temp["ExtensionLeft"] !== undefined ? "" : "2CCeiling1,") + (temp["ExtensionRight"] !== undefined ? "" : "2CCeiling2,") + (temp["ShadeMount"] !== undefined ? "" : "2EWall,") + (temp["CeilingToFloor"] !== undefined ? "" : "2FWall,"), "2,2A", depSetTempArr)]);
                                                         setSelectCustomValues(selectValues);
                                                         setStepSelectedLabel(tempLabels);
                                                         setStepSelectedValue(tempValue);
@@ -3338,10 +3350,10 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                         if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
                                                             tempLabels["2CCeiling"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
                                                         }
-                                                        selectValues["WindowToFloor"] = temp["WindowToFloor"] ? [{value: temp["WindowToFloor"]}] : [];
-                                                        if (temp["WindowToFloor"]) {
-                                                            tempLabels["2DWallFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["WindowToFloor"]}`) + postfixFa : temp["WindowToFloor"] + postfixEn;
-                                                        }
+                                                        // selectValues["WindowToFloor"] = temp["WindowToFloor"] ? [{value: temp["WindowToFloor"]}] : [];
+                                                        // if (temp["WindowToFloor"]) {
+                                                        //     tempLabels["2DWallFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["WindowToFloor"]}`) + postfixFa : temp["WindowToFloor"] + postfixEn;
+                                                        // }
                                                         selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
                                                         if (temp["ShadeMount"] !== undefined) {
                                                             tempLabels["2EWall"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["ShadeMount"]}`) + postfixFa : temp["ShadeMount"] + postfixEn;
@@ -3351,7 +3363,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             tempLabels["2FWall"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
                                                         }
                                                         
-                                                        depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (tempHeight ? "" : "2DWall,") + (temp["ExtensionLeft"] !== undefined ? "" : "2CCeiling1,") + (temp["ExtensionRight"] !== undefined ? "" : "2CCeiling2,") + (temp["WindowToFloor"] !== undefined ? "" : "2DWallFloor,") + (temp["ShadeMount"] !== undefined ? "" : "2EWall,") + (temp["CeilingToFloor"] !== undefined ? "" : "2FWall,"), "2,2A", depSetTempArr)]);
+                                                        depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (tempHeight ? "" : "2DWall,") + (temp["ExtensionLeft"] !== undefined ? "" : "2CCeiling1,") + (temp["ExtensionRight"] !== undefined ? "" : "2CCeiling2,") + (temp["ShadeMount"] !== undefined ? "" : "2EWall,") + (temp["CeilingToFloor"] !== undefined ? "" : "2FWall,"), "2,2A", depSetTempArr)]);
                                                         setSelectCustomValues(selectValues);
                                                         setStepSelectedLabel(tempLabels);
                                                         setStepSelectedValue(tempValue);
@@ -3363,7 +3375,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                         setStepSelectedValue(tempValue);
                                                         
                                                         let tempWidth = changeLang ? temp["Width2B"] : temp["Width"];
-                                                        // let tempHeight = changeLang ? temp["Height2D"] : temp["Height"];
+                                                        let tempHeight = changeLang ? temp["WindowToFloor"] : temp["Height"];
                                                         // console.log(temp,tempWidth,tempHeight);
                                                         
                                                         selectValues["Width2B"] = tempWidth ? [{value: tempWidth}] : [];
@@ -3375,9 +3387,9 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                         if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
                                                             tempLabels["2CCeiling"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
                                                         }
-                                                        selectValues["WindowToFloor"] = temp["WindowToFloor"] ? [{value: temp["WindowToFloor"]}] : [];
-                                                        if (temp["WindowToFloor"]) {
-                                                            tempLabels["2DWallFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["WindowToFloor"]}`) + postfixFa : temp["WindowToFloor"] + postfixEn;
+                                                        selectValues["WindowToFloor"] = tempHeight ? [{value: tempHeight}] : [];
+                                                        if (tempHeight) {
+                                                            tempLabels["2DWallFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
                                                         }
                                                         selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
                                                         if (temp["ShadeMount"] !== undefined) {
@@ -3388,7 +3400,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             tempLabels["2FWallFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
                                                         }
                                                         
-                                                        depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (temp["ExtensionLeft"] !== undefined ? "" : "2CCeiling1,") + (temp["ExtensionRight"] !== undefined ? "" : "2CCeiling2,") + (temp["WindowToFloor"] !== undefined ? "" : "2DWallFloor,") + (temp["ShadeMount"] !== undefined ? "" : "2EWallFloor,") + (temp["CeilingToFloor"] !== undefined ? "" : "2FWallFloor,"), "2,2A", depSetTempArr)]);
+                                                        depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "2B,") + (temp["ExtensionLeft"] !== undefined ? "" : "2CCeiling1,") + (temp["ExtensionRight"] !== undefined ? "" : "2CCeiling2,") + (tempHeight !== undefined ? "" : "2DWallFloor,") + (temp["ShadeMount"] !== undefined ? "" : "2EWallFloor,") + (temp["CeilingToFloor"] !== undefined ? "" : "2FWallFloor,"), "2,2A", depSetTempArr)]);
                                                         setSelectCustomValues(selectValues);
                                                         setStepSelectedLabel(tempLabels);
                                                         setStepSelectedValue(tempValue);
@@ -3411,17 +3423,17 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                             let refIndex = inputs.current["41"].getAttribute('ref-num');
                             tempLabels[refIndex] = inputs.current["41"].getAttribute('text');
                             tempValue[refIndex] = inputs.current["41"].value;
-                            depSetTempArr = new Set([...setGetDeps("", "4", depSetTempArr)]);
+                            depSetTempArr = new Set([...setGetDeps("", "4,5", depSetTempArr)]);
                         } else if (temp["StackPosition"] === "Right") {
                             let refIndex = inputs.current["42"].getAttribute('ref-num');
                             tempLabels[refIndex] = inputs.current["42"].getAttribute('text');
                             tempValue[refIndex] = inputs.current["42"].value;
-                            depSetTempArr = new Set([...setGetDeps("", "4", depSetTempArr)]);
+                            depSetTempArr = new Set([...setGetDeps("", "4,5", depSetTempArr)]);
                         } else {
                             let refIndex = inputs.current["43"].getAttribute('ref-num');
                             tempLabels[refIndex] = inputs.current["43"].getAttribute('text');
                             tempValue[refIndex] = inputs.current["43"].value;
-                            depSetTempArr = new Set([...setGetDeps("", "4", depSetTempArr)]);
+                            depSetTempArr = new Set([...setGetDeps("5", "4", depSetTempArr)]);
                         }
                         setStepSelectedLabel(tempLabels);
                         setStepSelectedValue(tempValue);
@@ -3594,6 +3606,22 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     filterPrices.filter((id1) => id1 !== filterId),
                 );
             }
+        }
+    }
+    
+    function checkMaxWidth(width, left, right) {
+        if (width.length && left.length && right.length && (+parseInt(width[0].value) + +parseInt(left[0].value) + +parseInt(right[0].value)) > 300) {
+            modalHandleShow("widthLimit");
+            let temp = JSON.parse(JSON.stringify(selectCustomValues));
+            temp.left = [];
+            temp.right = [];
+            setSelectCustomValues(temp);
+            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+            delete tempLabels["2CCeiling"];
+            delete tempLabels["2C"];
+            setStepSelectedLabel(tempLabels);
+            setCart("", "", "ExtensionLeft,ExtensionRight");
+        } else {
         }
     }
     
@@ -3985,6 +4013,10 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
     }, [model]);
     
     useEffect(() => {
+        checkMaxWidth(selectCustomValues.Width2B, selectCustomValues.left, selectCustomValues.right)
+    }, [selectCustomValues]);
+    
+    useEffect(() => {
         if (deleteUploadImageIndex !== -1) {
             if (deleteUploadImageUrl !== "") {
                 deleteUploadedImg(uploadedImagesList, uploadedImagesNamesList, deleteUploadImageUrl, deleteUploadImageIndex);
@@ -4118,7 +4150,8 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                     if (tempObjCount[key]["string"]) {
                                         tempArr.push(
                                             <div key={index}
-                                                 className="dk_curtain_preview_detail"><h2>{tempObjCount[key]["string"]}</h2><h5>&nbsp;X</h5><h3>{tempObjCount[key]["count"]}</h3>
+                                                 className="dk_curtain_preview_detail"><h2>{tempObjCount[key]["string"]}</h2><h5>&nbsp;X</h5>
+                                                <h3>{pageLanguage === 'en' ? tempObjCount[key]["count"] : NumberToPersianWord.convertEnToPe(`${tempObjCount[key]["count"]}`)}</h3>
                                             </div>
                                         );
                                         resolve();
@@ -4183,7 +4216,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                 }
             }
         }
-    }, [JSON.stringify(dkCurtainArr), symmetric]);
+    }, [JSON.stringify(dkCurtainArr), symmetric, pageLanguage]);
     
     useEffect(() => {
         if (curtainChangeId !== -1) {
@@ -4774,7 +4807,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         </div>
                     }
                     {(accordionActiveKey === "3" || accordionActiveKey === "35") &&
-                        <div>
+                        <div className="dk_left_side_curtain">
                             <div className="card_body card-body-dk">
                                 <div className="dk_curtain_container">
                                     <div className="dk_curtain_button_container">
@@ -5032,8 +5065,8 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                                            selectChanged(undefined, "1");
                                                                        }
                                                                    }
-                                                               }} id="111" ref={ref => (inputs.current["111"] = ref)}/>
-                                                        <label htmlFor="111" className="checkbox_label">
+                                                               }} id="131" ref={ref => (inputs.current["131"] = ref)}/>
+                                                        <label htmlFor="131" className="checkbox_label">
                                                             <img className="checkbox_label_img checkmark1 img-fluid"
                                                                  src={require('../Images/public/checkmark1_checkbox.png')}
                                                                  alt=""/>
@@ -5200,7 +5233,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                         
                                         </div>
                                         
-                                        {stepSelectedValue["2"] === "1" &&
+                                        {step2 === "false" &&
                                             <div className="own_measurements_container">
                                                 <div className="own_measurements_width">
                                                     <label className="select_label">{t("Width")}<p className="farsi_cm">{t("select_cm")}</p></label>
@@ -5235,7 +5268,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_WidthLength(selected[0], "2", true, "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.width = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "21");
@@ -5279,7 +5312,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_WidthLength(selected[0], "2", false, "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.length = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "22");
@@ -5296,7 +5329,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                         <NextStep eventKey={measurementsNextStep}>{t("NEXT STEP")}</NextStep>
                                     </div>
                                     
-                                    {(stepSelectedValue["2"] === "1") &&
+                                    {(step2 === "false") &&
                                         <div className="accordion_help">
                                             <div className="help_container">
                                                 <div className="help_column help_left_column">
@@ -5316,7 +5349,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                             </div>
                                         </div>
                                     }
-                                    {(stepSelectedValue["2"] === "2") &&
+                                    {(step2 === "true") &&
                                         <div className="accordion_help">
                                             <div className="help_container">
                                                 <div className="help_column help_left_column">
@@ -5340,7 +5373,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         
                         {/* step 2A */}
                         <Card
-                            className={stepSelectedValue["2"] === "2" && !!((stepSelectedValue["1"] === "3" && step11 === "true") || (step1 === "Outside" && selectedMountOutsideType.length)) ? "" : "noDisplay"}>
+                            className={step2 === "true" && !!((stepSelectedValue["1"] === "3" && step11 === "true") || (step1 === "Outside" && selectedMountOutsideType.length)) ? "" : "noDisplay"}>
                             <Card.Header>
                                 <ContextAwareToggle eventKey="2A" stepNum={t("2A")} stepTitle={t("dk_step2A")} stepRef="2A" type="1" required={requiredStep["2A"]}
                                                     stepSelected={stepSelectedLabel["2A"] === undefined ? "" : stepSelectedLabel["2A"]}/>
@@ -5372,7 +5405,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                                selectChanged(e, "2B,2CCeiling,2D,2E");
                                                            } else {
                                                                setCart("FinishedLengthType", "Sill", "Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
-                                                               setDeps("2B,2CCeiling1,2CCeiling2,2DWallFloor,2DWall,2EWall,2FWall", "2A,2DWallFloor,2FWallFloor");
+                                                               setDeps("2B,2CCeiling1,2CCeiling2,2DWall,2EWall,2FWall", "2A,2DWallFloor,2FWallFloor");
                                                                selectChanged(e, "2B,2CCeiling,2EWallFloor,2DWall,2EWall,2FWall");
                                                            }
                                                     
@@ -5400,7 +5433,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                                selectChanged(e, "2B,2CCeiling,2D,2E");
                                                            } else {
                                                                setCart("FinishedLengthType", "Apron", "Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
-                                                               setDeps("2B,2CCeiling1,2CCeiling2,2DWallFloor,2DWall,2EWall,2FWall", "2A,2EWallFloor,2FWallFloor");
+                                                               setDeps("2B,2CCeiling1,2CCeiling2,2DWall,2EWall,2FWall", "2A,2EWallFloor,2FWallFloor");
                                                                selectChanged(e, "2B,2CCeiling,2EWallFloor,2DWall,2EWall,2FWall");
                                                            }
                                                     
@@ -5456,7 +5489,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         
                         
                         {/* step 2B*/}
-                        {stepSelectedValue["2"] === "2" && stepSelectedValue["2A"] && !!((stepSelectedValue["1"] === "3" && step11 === "true") || (step1 === "Outside" && selectedMountOutsideType.length)) &&
+                        {step2 === "true" && stepSelectedValue["2A"] && !!((stepSelectedValue["1"] === "3" && step11 === "true") || (step1 === "Outside" && selectedMountOutsideType.length)) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2B" stepNum={t("2B")} stepTitle={t("dk_step2B")} stepRef="2B" type="2" required={requiredStep["2B"]}
@@ -5503,14 +5536,14 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged("2B", selected[0], "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.Width2B = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2B");
                                                                     setCart("Width2B", selected[0].value);
                                                                 }
                                                             }}
-                                                            options={SelectOptionRange(30, 360, 1, "cm", "", pageLanguage)}
+                                                            options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
                                                         />
                                                     </div>
                                                 </div>
@@ -5523,7 +5556,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         }
                         
                         {/* step 2C */}
-                        {stepSelectedValue["2"] === "2" && stepSelectedValue["2A"] && ((stepSelectedValue["1"] === "3" && step11 === "true")) &&
+                        {step2 === "true" && stepSelectedValue["2A"] && ((stepSelectedValue["1"] === "3" && step11 === "true")) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2C" stepNum={t("2C")} stepTitle={t("dk_step2CCeiling")} stepRef="2C" type="2" required={requiredStep["2C"]}
@@ -5570,7 +5603,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_LeftRight(selected[0], "2C", true, "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.left = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2C1");
@@ -5614,7 +5647,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_LeftRight(selected[0], "2C", false, "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.right = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2C2");
@@ -5647,7 +5680,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         }
                         
                         {/* step 2CCeiling and wall*/}
-                        {stepSelectedValue["2"] === "2" && stepSelectedValue["2A"] && !!((step1 === "Outside" && selectedMountOutsideType.length)) &&
+                        {step2 === "true" && stepSelectedValue["2A"] && !!((step1 === "Outside" && selectedMountOutsideType.length)) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2C" stepNum={t("2C")} stepTitle={t("dk_step2CCeiling")} stepRef="2CCeiling" type="2"
@@ -5695,7 +5728,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_LeftRight(selected[0], "2CCeiling", true, "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.left = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2CCeiling1");
@@ -5739,7 +5772,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_LeftRight(selected[0], "2CCeiling", false, "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.right = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2CCeiling2");
@@ -5772,7 +5805,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         }
                         
                         {/* step 2D */}
-                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && !!((stepSelectedValue["1"] === "3" && step11 === "true") || (step1 === "Outside" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Ceiling")) &&
+                        {step2 === "true" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && !!((stepSelectedValue["1"] === "3" && step11 === "true") || (step1 === "Outside" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Ceiling")) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2D" stepNum={t("2D")} stepTitle={t("dk_step2D_sill")} stepRef="2D" type="2" required={requiredStep["2D"]}
@@ -5821,7 +5854,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_three(selected[0], "2D", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.CeilingToWindow1 = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2D1");
@@ -5865,7 +5898,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_three(selected[0], "2D", 1, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.CeilingToWindow2 = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2D2");
@@ -5909,7 +5942,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_three(selected[0], "2D", 2, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.CeilingToWindow3 = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2D3");
@@ -5975,7 +6008,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         }
                         
                         {/* step 2E*/}
-                        {/*{stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && !!((stepSelectedValue["1"] === "3" && step11 === "true") || (step1 === "Outside" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Ceiling")) &&*/}
+                        {/*{step2 === "true" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && !!((stepSelectedValue["1"] === "3" && step11 === "true") || (step1 === "Outside" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Ceiling")) &&*/}
                         {/*    <Card>*/}
                         {/*        <Card.Header>*/}
                         {/*            <ContextAwareToggle eventKey="2E" stepNum={t("2E")} stepTitle={t("dk_step2E_sill")} stepRef="2E" type="2" required={requiredStep["2E"]}*/}
@@ -6022,7 +6055,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         {/*                                    onChange={(selected) => {*/}
                         {/*                                        if (selected[0] !== undefined) {*/}
                         {/*                                            optionSelectChanged("2E", selected[0], "cm", "س\u200Cم", pageLanguage);*/}
-                        {/*                                            let temp = selectCustomValues;*/}
+                        {/*                                            let temp = JSON.parse(JSON.stringify(selectCustomValues));*/}
                         {/*                                            temp.CeilingToFloor = selected;*/}
                         {/*                                            setSelectCustomValues(temp);*/}
                         {/*                                            setDeps("", "2E");*/}
@@ -6042,7 +6075,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         {/*}*/}
                         
                         {/* step 2DFloor */}
-                        {stepSelectedValue["2"] === "2" && stepSelectedValue["2A"] === "3" && !!((stepSelectedValue["1"] === "3" && step11 === "true") || (step1 === "Outside" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Ceiling")) &&
+                        {step2 === "true" && stepSelectedValue["2A"] === "3" && !!((stepSelectedValue["1"] === "3" && step11 === "true") || (step1 === "Outside" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Ceiling")) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2D" stepNum={t("2D")} stepTitle={t("dk_step2E")} stepRef="2DFloor" type="2" required={requiredStep["2DFloor"]}
@@ -6091,7 +6124,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_three(selected[0], "2DFloor", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.CeilingToFloor1 = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2DFloor1");
@@ -6135,7 +6168,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_three(selected[0], "2DFloor", 1, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.CeilingToFloor2 = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2DFloor2");
@@ -6179,7 +6212,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_three(selected[0], "2DFloor", 2, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.CeilingToFloor3 = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2DFloor3");
@@ -6211,7 +6244,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         }
                         
                         {/* step 2DWall*/}
-                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && !!((step1 === "Outside" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
+                        {step2 === "true" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && !!((step1 === "Outside" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2D" stepNum={t("2D")} stepTitle={t("dk_step2EWall")} stepRef="2DWall" type="2" required={requiredStep["2DWall"]}
@@ -6258,7 +6291,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged("2DWall", selected[0], "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.Height2D = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2DWall");
@@ -6278,7 +6311,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         }
                         
                         {/* step 2EWall */}
-                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && !!((step1 === "Outside" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
+                        {step2 === "true" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && !!((step1 === "Outside" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2E" stepNum={t("2E")} stepTitle={t("dk_step2FWall")} stepRef="2EWall" type="2" required={requiredStep["2EWall"]}
@@ -6327,7 +6360,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged("2EWall", selected[0], "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.ShadeMount = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2EWall");
@@ -6358,10 +6391,10 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         }
                         
                         {/* step 2FWall*/}
-                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && !!((step1 === "Outside" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
+                        {step2 === "true" && (stepSelectedValue["2A"] === "1" || stepSelectedValue["2A"] === "2") && !!((step1 === "Outside" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
                             <Card>
                                 <Card.Header>
-                                    <ContextAwareToggle eventKey="2F" stepNum={t("2F")} stepTitle={t("dk_step2GWall")} stepRef="2FWall" type="2" required={requiredStep["2FWall"]}
+                                    <ContextAwareToggle eventKey="2F" stepNum={t("2F")} stepTitle={t("dk_step2FWall2")} stepRef="2FWall" type="2" required={requiredStep["2FWall"]}
                                                         stepSelected={stepSelectedLabel["2FWall"] === undefined ? "" : stepSelectedLabel["2FWall"]}/>
                                 </Card.Header>
                                 <Accordion.Collapse eventKey="2F">
@@ -6407,7 +6440,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged("2FWall", selected[0], "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.CeilingToFloor = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2FWall");
@@ -6427,7 +6460,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         }
                         
                         {/* step 2DWallFloor */}
-                        {stepSelectedValue["2"] === "2" && stepSelectedValue["2A"] === "3" && !!((step1 === "Outside" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
+                        {step2 === "true" && stepSelectedValue["2A"] === "3" && !!((step1 === "Outside" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2D" stepNum={t("2D")} stepTitle={t("dk_step2DWall")} stepRef="2DWallFloor" type="2"
@@ -6477,7 +6510,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged("2DWallFloor", selected[0], "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.WindowToFloor = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2DWallFloor");
@@ -6497,7 +6530,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         }
                         
                         {/* step 2EWallFloor */}
-                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "3") && !!((step1 === "Outside" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
+                        {step2 === "true" && (stepSelectedValue["2A"] === "3") && !!((step1 === "Outside" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2E" stepNum={t("2E")} stepTitle={t("dk_step2FWall")} stepRef="2EWallFloor" type="2"
@@ -6547,7 +6580,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged("2EWallFloor", selected[0], "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.ShadeMount = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2EWallFloor");
@@ -6578,10 +6611,10 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         }
                         
                         {/* step 2FWallFloor*/}
-                        {stepSelectedValue["2"] === "2" && (stepSelectedValue["2A"] === "3") && !!((stepSelectedValue["1"] === "2" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
+                        {step2 === "true" && (stepSelectedValue["2A"] === "3") && !!((stepSelectedValue["1"] === "2" && selectedMountOutsideType.length && selectedMountOutsideType[0].value === "Wall")) &&
                             <Card>
                                 <Card.Header>
-                                    <ContextAwareToggle eventKey="2F" stepNum={t("2F")} stepTitle={t("dk_step2GWall")} stepRef="2FWallFloor" type="2"
+                                    <ContextAwareToggle eventKey="2F" stepNum={t("2F")} stepTitle={t("dk_step2FWall2")} stepRef="2FWallFloor" type="2"
                                                         required={requiredStep["2FWallFloor"]}
                                                         stepSelected={stepSelectedLabel["2FWallFloor"] === undefined ? "" : stepSelectedLabel["2FWallFloor"]}/>
                                 </Card.Header>
@@ -6628,7 +6661,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged("2FWallFloor", selected[0], "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.CeilingToFloor = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2FWallFloor");
@@ -6648,7 +6681,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         }
                         
                         {/* step 2A inside */}
-                        {stepSelectedValue["2"] === "2" && stepSelectedValue["1"] === "1" && step11 === "true" &&
+                        {step2 === "true" && stepSelectedValue["1"] === "1" && step11 === "true" &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2A" stepNum={t("2A")} stepTitle={t("zebra_step3AInside")} stepRef="2AIn" type="2" required={requiredStep["2AIn"]}
@@ -6697,7 +6730,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_three(selected[0], "2AIn", 0, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.width1 = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2AIn1");
@@ -6741,7 +6774,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_three(selected[0], "2AIn", 1, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.width2 = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2AIn2");
@@ -6785,7 +6818,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_three(selected[0], "2AIn", 2, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.width3 = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2AIn3");
@@ -6817,7 +6850,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         }
                         
                         {/* step 2B inside */}
-                        {stepSelectedValue["2"] === "2" && stepSelectedValue["1"] === "1" && step11 === "true" &&
+                        {step2 === "true" && stepSelectedValue["1"] === "1" && step11 === "true" &&
                             <Card>
                                 <Card.Header>
                                     <ContextAwareToggle eventKey="2B" stepNum={t("2B")} stepTitle={t("zebra_step3BInside")} stepRef="2BIn" type="2" required={requiredStep["2BIn"]}
@@ -6866,7 +6899,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_three(selected[0], "2BIn", 0, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.height1 = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2BIn1");
@@ -6910,7 +6943,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_three(selected[0], "2BIn", 1, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.height2 = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2BIn2");
@@ -6954,7 +6987,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_three(selected[0], "2BIn", 2, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.height3 = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "2BIn3");
@@ -7329,10 +7362,10 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                             </Accordion.Collapse>
                         </Card>
                         
-                        {/* step 4 */}
+                        {/* step 5 */}
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="4" stepNum={t("4")} stepTitle={t("DK_step4")} stepRef="4" type="1" required={requiredStep["4"]}
+                                <ContextAwareToggle eventKey="4" stepNum={t("5")} stepTitle={t("DK_step4")} stepRef="4" type="1" required={requiredStep["4"]}
                                                     stepSelected={stepSelectedLabel["4"] === undefined ? "" : stepSelectedLabel["4"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="4">
@@ -7344,7 +7377,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                    onChange={e => {
                                                        selectChanged(e, "");
                                                        setStep4("Left");
-                                                       setDeps("", "4");
+                                                       setDeps("", "4,5");
                                                        setCart("StackPosition", "Left");
                                                    }} ref={ref => (inputs.current["41"] = ref)}/>
                                             <label htmlFor="41">{t("Left")}</label>
@@ -7355,7 +7388,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                    onChange={e => {
                                                        selectChanged(e, "");
                                                        setStep4("Right");
-                                                       setDeps("", "4");
+                                                       setDeps("", "4,5");
                                                        setCart("StackPosition", "Right");
                                                    }} ref={ref => (inputs.current["42"] = ref)}/>
                                             <label htmlFor="42">{t("Right")}</label>
@@ -7367,13 +7400,13 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                    onChange={e => {
                                                        selectChanged(e, "");
                                                        setStep4("CenterSplit");
-                                                       setDeps("", "4");
+                                                       setDeps("5", "4");
                                                        setCart("StackPosition", "CenterSplit");
                                                    }} ref={ref => (inputs.current["43"] = ref)}/>
                                             <label htmlFor="43">{t("Center Split")}</label>
                                         </div>
                                         <NextStep
-                                            eventKey="5">{t("NEXT STEP")}</NextStep>
+                                            eventKey={step4 === "CenterSplit" || step4 === "" ? "5" : "6"}>{t("NEXT STEP")}</NextStep>
                                     </div>
                                     <div className="accordion_help">
                                         <div className="help_container">
@@ -7391,10 +7424,10 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                             </Accordion.Collapse>
                         </Card>
                         
-                        {/* step 5 */}
-                        <Card>
+                        {/* step 5A */}
+                        <Card className={step4 === "CenterSplit" ? "" : "noDisplay"}>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="5" stepNum={t("5")} stepTitle={t("DK_step5")} stepRef="5" type="1" required={requiredStep["5"]}
+                                <ContextAwareToggle eventKey="5" stepNum={t("5A")} stepTitle={t("DK_step5")} stepRef="5" type="1" required={requiredStep["5"]}
                                                     stepSelected={stepSelectedLabel["5"] === undefined ? "" : stepSelectedLabel["5"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="5">
@@ -7839,13 +7872,13 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     <p>{t("onlyOneBase")}</p>
                     
                     <br/>
-                    <div className="text_center dk2_btn">
-                        <button className="btn btn-new-dark" onClick={() => {
-                            setDkCurtainArr([]);
-                            modalHandleClose("onlyOneBase");
-                        }}>{t("CHANGE TO A NEW FABRIC")}</button>
-                        <button className="btn btn-new-dark" onClick={() => modalHandleClose("onlyOneBase")}>{t("CONTINUE WITH SAME FABRIC")}</button>
-                    </div>
+                    {/*<div className="text_center dk2_btn">*/}
+                    {/*    <button className="btn btn-new-dark" onClick={() => {*/}
+                    {/*        setDkCurtainArr([]);*/}
+                    {/*        modalHandleClose("onlyOneBase");*/}
+                    {/*    }}>{t("CHANGE TO A NEW FABRIC")}</button>*/}
+                    {/*    <button className="btn btn-new-dark" onClick={() => modalHandleClose("onlyOneBase")}>{t("CONTINUE WITH SAME FABRIC")}</button>*/}
+                    {/*</div>*/}
                 </Modal.Body>
                 {/*<Modal.Footer>*/}
                 {/*    */}
@@ -8331,7 +8364,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     <div className="buttons_section">
                         <button className="btn btn-new-dark" onClick={() => {
                             modalHandleClose("widthDifferent");
-                            let temp = selectCustomValues;
+                            let temp = JSON.parse(JSON.stringify(selectCustomValues));
                             temp.width1 = [];
                             temp.width2 = [];
                             temp.width3 = [];
@@ -8475,7 +8508,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     <div className="buttons_section">
                         <button className="btn btn-new-dark" onClick={() => {
                             modalHandleClose("heightDifferent");
-                            let temp = selectCustomValues;
+                            let temp = JSON.parse(JSON.stringify(selectCustomValues));
                             temp.height1 = [];
                             temp.height2 = [];
                             temp.height3 = [];

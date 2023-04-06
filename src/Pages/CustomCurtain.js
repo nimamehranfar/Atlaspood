@@ -76,7 +76,7 @@ function CustomCurtain() {
                             "prices": queryPricesSelected,
                             "designs": queryDesignsSelected
                         }
-                        parameters=JSON.parse(response.data["Parameters"]);
+                        parameters=JSON.parse(response.data["Parameters"] || "{}");
                         resolve();
                 
                     } else {

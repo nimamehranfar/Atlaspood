@@ -695,13 +695,13 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                 {/*                         }/>*/}
                 {/*</div>*/}
                 <div className="steps_header_selected_container">
-                    {/*<div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? stepSelected : null}</div>*/}
+                    <div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? stepSelected : null}</div>
                     
-                    {showLabels &&
-                        <TruncateMarkup lines={1} tokenize="words">
-                            <div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{stepSelected}</div>
-                        </TruncateMarkup>
-                    }
+                    {/*{showLabels &&*/}
+                    {/*    <TruncateMarkup lines={1} tokenize="words">*/}
+                    {/*        <div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{stepSelected}</div>*/}
+                    {/*    </TruncateMarkup>*/}
+                    {/*}*/}
                 </div>
                 {required && stepSelected === "" &&
                     <div className="stepRequired"/>
@@ -1432,7 +1432,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
     }
     
     function deleteSpecialSelects(InOut) {
-        let temp = selectCustomValues;
+        let temp = JSON.parse(JSON.stringify(selectCustomValues));
         let temp2 = JSON.parse(JSON.stringify(stepSelectedOptions));
         let temp3 = JSON.parse(JSON.stringify(leftRight));
         setWindowSizeBool(false);
@@ -1598,179 +1598,181 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                 setAddingLoading(false);
             }
         } else {
-            // console.log(cartValues,"2");
-            let userProjects = JSON.parse(JSON.stringify(UserProjects))[`${modelID}`]["data"];
-            let tempArr = [];
-            let temp1 = [];
-            let temp = JSON.parse(JSON.stringify(cartValues));
-            let tempPostObj = {};
-            let tempBagPrice = 0;
-            
-            
-            // tempPostObj["ApiKey"] = window.$apikey;
-            tempPostObj["WindowCount"] = 1;
-            tempPostObj["SewingModelId"] = `${modelID}`;
-            Object.keys(temp).forEach(key => {
-                if (temp[key] !== null || temp[key] !== "") {
-                    let tempObj = userProjects.find(obj => obj["cart"] === key);
-                    // console.log(key,tempObj);
-                    if (tempObj && tempObj["apiLabel"] !== "") {
-                        if (tempObj["apiValue"] === null) {
-                            tempPostObj[tempObj["apiLabel"]] = temp[key];
-                        } else {
-                            tempPostObj[tempObj["apiLabel"]] = tempObj["apiValue"][temp[key]];
-                        }
-                    }
-                }
-            });
-            
-            tempPostObj["SewingOrderDetails"] = [];
-            tempPostObj["SewingOrderDetails"][0] = {};
-            tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
-            tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
-            tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
-            tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
-            tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
-            Object.keys(temp).forEach(key => {
-                if (temp[key] !== null || temp[key] !== "") {
-                    let tempObj = userProjects.find(obj => obj["cart"] === key);
-                    if (tempObj["apiLabel2"] !== undefined) {
-                        if (tempObj["apiValue2"] === null) {
-                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
-                        } else {
-                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
-                        }
-                    }
-                }
-            });
-            tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
-            Object.keys(temp).forEach(key => {
-                if (temp[key] !== null || temp[key] !== "") {
-                    let tempObj = userProjects.find(obj => obj["cart"] === key);
-                    if (tempObj["apiAcc"] !== undefined) {
-                        if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
-                            tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
-                        } else {
-                            
-                        }
-                    }
-                }
-            });
-            // tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
-            //     return el != null;
-            // });
-            if (Object.keys(customMotorAcc).length > 0) {
-                tempPostObj["SewingOrderDetails"][0]["Accessories"].push(customMotorAcc);
-            }
-            tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
-                return el != null;
-            });
-            // console.log(tempPostObj);
-            if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
-                // console.log(JSON.stringify(tempPostObj));
-                axios.post(baseURLPrice, tempPostObj)
-                    .then((response) => {
-                        setBagPrice(response.data["price"]);
-                        tempBagPrice = response.data["price"];
-                        temp["Price"] = response.data["price"];
-                        if (zipcodeChecked && response.data["InstallAmount"]) {
-                            temp["InstallAmount"] = response.data["InstallAmount"];
-                            temp["TransportationAmount"] = response.data["TransportationAmount"];
-                        }
-                        // console.log(response.data);
-                        
-                        let roomNameFa = cartValues["RoomNameFa"];
-                        let roomName = cartValues["RoomNameEn"];
-                        let WindowName = cartValues["WindowName"] === undefined ? "" : cartValues["WindowName"];
-                        Object.keys(cartValues).forEach(key => {
-                            let tempObj = userProjects.find(obj => obj["cart"] === key);
-                            if (tempObj === undefined) {
-                                // window.location.reload();
-                                console.log(key);
+            if (price) {
+                // console.log(cartValues,"2");
+                let userProjects = JSON.parse(JSON.stringify(UserProjects))[`${modelID}`]["data"];
+                let tempArr = [];
+                let temp1 = [];
+                let temp = JSON.parse(JSON.stringify(cartValues));
+                let tempPostObj = {};
+                let tempBagPrice = 0;
+                
+                
+                // tempPostObj["ApiKey"] = window.$apikey;
+                tempPostObj["WindowCount"] = 1;
+                tempPostObj["SewingModelId"] = `${modelID}`;
+                Object.keys(temp).forEach(key => {
+                    if (temp[key] !== null || temp[key] !== "") {
+                        let tempObj = userProjects.find(obj => obj["cart"] === key);
+                        // console.log(key,tempObj);
+                        if (tempObj && tempObj["apiLabel"] !== "") {
+                            if (tempObj["apiValue"] === null) {
+                                tempPostObj[tempObj["apiLabel"]] = temp[key];
                             } else {
-                                if (key === "WindowHeight" || key === "WindowWidth") {
+                                tempPostObj[tempObj["apiLabel"]] = tempObj["apiValue"][temp[key]];
+                            }
+                        }
+                    }
+                });
+                
+                tempPostObj["SewingOrderDetails"] = [];
+                tempPostObj["SewingOrderDetails"][0] = {};
+                tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
+                tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
+                tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
+                tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
+                tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
+                Object.keys(temp).forEach(key => {
+                    if (temp[key] !== null || temp[key] !== "") {
+                        let tempObj = userProjects.find(obj => obj["cart"] === key);
+                        if (tempObj["apiLabel2"] !== undefined) {
+                            if (tempObj["apiValue2"] === null) {
+                                tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
+                            } else {
+                                tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                            }
+                        }
+                    }
+                });
+                tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
+                Object.keys(temp).forEach(key => {
+                    if (temp[key] !== null || temp[key] !== "") {
+                        let tempObj = userProjects.find(obj => obj["cart"] === key);
+                        if (tempObj["apiAcc"] !== undefined) {
+                            if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
+                                tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
+                            } else {
+                            
+                            }
+                        }
+                    }
+                });
+                // tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
+                //     return el != null;
+                // });
+                if (Object.keys(customMotorAcc).length > 0) {
+                    tempPostObj["SewingOrderDetails"][0]["Accessories"].push(customMotorAcc);
+                }
+                tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
+                    return el != null;
+                });
+                // console.log(tempPostObj);
+                if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
+                    // console.log(JSON.stringify(tempPostObj));
+                    axios.post(baseURLPrice, tempPostObj)
+                        .then((response) => {
+                            setBagPrice(response.data["price"]);
+                            tempBagPrice = response.data["price"];
+                            temp["Price"] = response.data["price"];
+                            if (zipcodeChecked && response.data["InstallAmount"]) {
+                                temp["InstallAmount"] = response.data["InstallAmount"];
+                                temp["TransportationAmount"] = response.data["TransportationAmount"];
+                            }
+                            // console.log(response.data);
+                            
+                            let roomNameFa = cartValues["RoomNameFa"];
+                            let roomName = cartValues["RoomNameEn"];
+                            let WindowName = cartValues["WindowName"] === undefined ? "" : cartValues["WindowName"];
+                            Object.keys(cartValues).forEach(key => {
+                                let tempObj = userProjects.find(obj => obj["cart"] === key);
+                                if (tempObj === undefined) {
+                                    // window.location.reload();
+                                    console.log(key);
+                                } else {
+                                    if (key === "WindowHeight" || key === "WindowWidth") {
                                     
-                                } else if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
-                                    let objLabel = "";
-                                    if (key === "ControlType" && cartValues["ControlType"] === "Motorized") {
-                                        objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(cartValues[key].toString())} / ${t(cartValues["MotorType"].toString())}`).toString() : `${t(cartValues[key].toString())} / ${t(cartValues["MotorType"].toString())}`;
-                                    } else if (tempObj["titleValue"] === null || true) {
-                                        if (tempObj["titlePostfix"] === "") {
-                                            objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(cartValues[key].toString())}`).toString() : t(cartValues[key].toString());
-                                        } else {
-                                            objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${cartValues[key]}`).toString() + t(tempObj["titlePostfix"]) : cartValues[key].toString() + t(tempObj["titlePostfix"]);
-                                        }
-                                        // objLabel = cartValues[key].toString() + tempObj["titlePostfix"];
-                                    } else {
-                                        // console.log(tempObj["titleValue"],tempObj["titleValue"][cartValues[key].toString()],cartValues[key]);
-                                        if (tempObj["titleValue"][cartValues[key].toString()] === null) {
+                                    } else if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
+                                        let objLabel = "";
+                                        if (key === "ControlType" && cartValues["ControlType"] === "Motorized") {
+                                            objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(cartValues[key].toString())} / ${t(cartValues["MotorType"].toString())}`).toString() : `${t(cartValues[key].toString())} / ${t(cartValues["MotorType"].toString())}`;
+                                        } else if (tempObj["titleValue"] === null || true) {
                                             if (tempObj["titlePostfix"] === "") {
-                                                objLabel = t(cartValues[key].toString());
+                                                objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(cartValues[key].toString())}`).toString() : t(cartValues[key].toString());
                                             } else {
                                                 objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${cartValues[key]}`).toString() + t(tempObj["titlePostfix"]) : cartValues[key].toString() + t(tempObj["titlePostfix"]);
                                             }
+                                            // objLabel = cartValues[key].toString() + tempObj["titlePostfix"];
                                         } else {
-                                            objLabel = t(tempObj["titleValue"][cartValues[key].toString()]);
+                                            // console.log(tempObj["titleValue"],tempObj["titleValue"][cartValues[key].toString()],cartValues[key]);
+                                            if (tempObj["titleValue"][cartValues[key].toString()] === null) {
+                                                if (tempObj["titlePostfix"] === "") {
+                                                    objLabel = t(cartValues[key].toString());
+                                                } else {
+                                                    objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${cartValues[key]}`).toString() + t(tempObj["titlePostfix"]) : cartValues[key].toString() + t(tempObj["titlePostfix"]);
+                                                }
+                                            } else {
+                                                objLabel = t(tempObj["titleValue"][cartValues[key].toString()]);
+                                            }
                                         }
+                                        temp1[tempObj["order"]] =
+                                            <li className="cart_agree_item" key={key}>
+                                                <h1 className="cart_agree_item_title">{t(tempObj["title"])}&nbsp;</h1>
+                                                <h2 className="cart_agree_item_desc">{objLabel}</h2>
+                                            </li>;
                                     }
-                                    temp1[tempObj["order"]] =
-                                        <li className="cart_agree_item" key={key}>
-                                            <h1 className="cart_agree_item_title">{t(tempObj["title"])}&nbsp;</h1>
-                                            <h2 className="cart_agree_item_desc">{objLabel}</h2>
-                                        </li>;
                                 }
-                            }
-                        });
+                            });
+                            
+                            tempArr.push(
+                                <div key={defaultModelName}>
+                                    <h2 className="cart_agree_title">{pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</h2>
+                                    <ul className="cart_agree_items_container">
+                                        <GetMeasurementArray modelId={`${modelID}`} cartValues={cartValues}/>
+                                        {temp1}
+                                        <li className="cart_agree_item">
+                                            <h1 className="cart_agree_item_title">{pageLanguage === 'fa' ? "نام اتاق" : "Room Label"}&nbsp;</h1>
+                                            <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? roomNameFa + (WindowName === "" ? "" : " / " + WindowName) : roomName + (WindowName === "" ? "" : " / " + WindowName)}</h2>
+                                        </li>
+                                        <li className="cart_agree_item">
+                                            <h1 className="cart_agree_item_title">{t("Price")}&nbsp;</h1>
+                                            <h2 className="cart_agree_item_desc">{GetPrice(tempBagPrice, pageLanguage, t("TOMANS"))}</h2>
+                                        </li>
+                                    </ul>
+                                </div>
+                            );
+                            setCartAgree(tempArr);
+                            modalHandleShow("cart_modal");
+                            setCartValues(temp);
+                            setAddingLoading(false);
+                            
+                        }).catch(err => {
+                        if (err.response.status === 401) {
+                            refreshToken().then((response2) => {
+                                if (response2 !== false) {
+                                    addToCart();
+                                } else {
+                                    setPrice(0);
+                                    setBagPrice(0);
+                                    temp["Price"] = 0;
+                                    setCartValues(temp);
+                                    setAddingLoading(false);
+                                    navigate("/" + pageLanguage + "/User");
+                                }
+                            });
+                        } else {
+                            setPrice(0);
+                            setBagPrice(0);
+                            temp["Price"] = 0;
+                            setCartValues(temp);
+                            setAddingLoading(false);
+                        }
                         
-                        tempArr.push(
-                            <div key={defaultModelName}>
-                                <h2 className="cart_agree_title">{pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</h2>
-                                <ul className="cart_agree_items_container">
-                                    <GetMeasurementArray modelId={`${modelID}`} cartValues={cartValues}/>
-                                    {temp1}
-                                    <li className="cart_agree_item">
-                                        <h1 className="cart_agree_item_title">{pageLanguage === 'fa' ? "نام اتاق" : "Room Label"}&nbsp;</h1>
-                                        <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? roomNameFa + (WindowName === "" ? "" : " / " + WindowName) : roomName + (WindowName === "" ? "" : " / " + WindowName)}</h2>
-                                    </li>
-                                    <li className="cart_agree_item">
-                                        <h1 className="cart_agree_item_title">{t("Price")}&nbsp;</h1>
-                                        <h2 className="cart_agree_item_desc">{GetPrice(tempBagPrice, pageLanguage, t("TOMANS"))}</h2>
-                                    </li>
-                                </ul>
-                            </div>
-                        );
-                        setCartAgree(tempArr);
-                        modalHandleShow("cart_modal");
-                        setCartValues(temp);
-                        setAddingLoading(false);
-                        
-                    }).catch(err => {
-                    if (err.response.status === 401) {
-                        refreshToken().then((response2) => {
-                            if (response2 !== false) {
-                                addToCart();
-                            } else {
-                                setPrice(0);
-                                setBagPrice(0);
-                                temp["Price"] = 0;
-                                setCartValues(temp);
-                                setAddingLoading(false);
-                                navigate("/" + pageLanguage + "/User");
-                            }
-                        });
-                    } else {
-                        setPrice(0);
-                        setBagPrice(0);
-                        temp["Price"] = 0;
-                        setCartValues(temp);
-                        setAddingLoading(false);
-                    }
-                    
-                });
-            } else {
-                setAddingLoading(false);
+                    });
+                } else {
+                    setAddingLoading(false);
+                }
+                // console.log(cartValues);
             }
-            // console.log(cartValues);
         }
         // modalHandleShow("cart_modal");
         // renderCart();
@@ -4275,10 +4277,10 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                         <i className="fa fa-search search-icon"/>
                                                     </div>
                                                 </div>
-                                                <div className="filters_show_hide_container" onClick={()=>{
-                                                    if(filtersShow){
+                                                <div className="filters_show_hide_container" onClick={() => {
+                                                    if (filtersShow) {
                                                         setFiltersShow(false);
-                                                    }else{
+                                                    } else {
                                                         setFiltersShow(true);
                                                     }
                                                 }}>
@@ -4290,7 +4292,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                     </span>
                                                 </div>
                                             </div>
-                                            <div className={filtersShow?"filters_container":"filters_container filters_container_hidden"}>
+                                            <div className={filtersShow ? "filters_container" : "filters_container filters_container_hidden"}>
                                                 <div className="filter_container">
                                                     <Dropdown autoClose="outside" title="">
                                                         <Dropdown.Toggle className="dropdown_btn">
@@ -4628,8 +4630,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                            modalHandleShow("noMount");
                                                            setDeps("3", "31,32");
                                                            setCart("", "", "Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,calcMeasurements");
-                                                       }
-                                                       else {
+                                                       } else {
                                                            setStep3("false");
                                                            selectChanged(e, "3AIn,3BIn,3AOut,3BOut,3COut,3DOut,3CArc");
                                                            setMeasurementsNextStep("4");
@@ -4728,7 +4729,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_WidthLength(selected[0], "3", true, "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.width = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "31");
@@ -4772,7 +4773,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_WidthLength(selected[0], "3", false, "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.length = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "32");
@@ -4881,7 +4882,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_three(selected[0], "3AIn", 0, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.width1 = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "3AIn1");
@@ -4925,7 +4926,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_three(selected[0], "3AIn", 1, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.width2 = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "3AIn2");
@@ -4969,7 +4970,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_three(selected[0], "3AIn", 2, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.width3 = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "3AIn3");
@@ -5050,7 +5051,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_three(selected[0], "3BIn", 0, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.height1 = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "3BIn1");
@@ -5094,7 +5095,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_three(selected[0], "3BIn", 1, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.height2 = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "3BIn2");
@@ -5138,7 +5139,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_three(selected[0], "3BIn", 2, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.height3 = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "3BIn3");
@@ -5219,7 +5220,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged("3AOut", selected[0], "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.width3A = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "3AOut");
@@ -5299,7 +5300,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_LeftRight(selected[0], "3BOut", true, "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.left = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "3BOut1");
@@ -5343,7 +5344,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_LeftRight(selected[0], "3BOut", false, "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.right = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "3BOut2");
@@ -5424,7 +5425,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged("3COut", selected[0], "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.height3C = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "3COut");
@@ -5494,7 +5495,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_three(selected[0], "3CArc", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.CeilingToWindow1 = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "3CArc1");
@@ -5538,7 +5539,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_three(selected[0], "3CArc", 1, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.CeilingToWindow2 = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "3CArc2");
@@ -5582,7 +5583,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged_three(selected[0], "3CArc", 2, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.CeilingToWindow3 = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "3CArc3");
@@ -5696,7 +5697,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                             onChange={(selected) => {
                                                                 if (selected[0] !== undefined) {
                                                                     optionSelectChanged("3DOut", selected[0], "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = selectCustomValues;
+                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.shadeMount = selected;
                                                                     setSelectCustomValues(temp);
                                                                     setDeps("", "3DOut");
@@ -5755,7 +5756,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                             <input className="radio" type="radio" value="2" name="step4" checked={step4 === "Motorized"}
                                                    ref-num="4" id="42"
                                                    onChange={e => {
-                                                       selectChanged(e, "41", "4A,4B");
+                                                       selectChanged(e, "41,4A,4B");
                                                        setStep4("Motorized");
                                                        setControlTypeNextStep("5");
                                                        setDeps("41", "4,4A,4B");
@@ -5767,7 +5768,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                         
                                         </div>
                                         {step4 === "Motorized" &&
-                                            <div className={motorErr1?"secondary_options secondary_options_err":"secondary_options"}>
+                                            <div className={motorErr1 ? "secondary_options secondary_options_err" : "secondary_options"}>
                                                 {/*<hr/>*/}
                                                 {/*<p className="no_power_title">{t("Motor_title")}</p>*/}
                                                 <div className="card-body-display-flex">
@@ -5792,28 +5793,29 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                     {/*    <label htmlFor="412">{t("No")}</label>*/}
                                                     {/*</div>*/}
                                                     <div className="width_max checkbox_style">
-                                                        <input type="checkbox" text={t("Motorized")} value="2" name="step41" ref-num="4" checked={step41 === "true"} onChange={(e) => {
-                                                            if (e.target.checked) {
-                                                                selectChanged(e);
-                                                                setStep41("true");
-                                                                setMotorErr1(false);
-                                                                // let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                                // let refIndex = inputs.current["42"].getAttribute('ref-num');
-                                                                // tempLabels[refIndex] = inputs.current["42"].getAttribute('text');
-                                                                // setStepSelectedLabel(tempLabels);
-                                                                setSelectedMotorPosition([]);
-                                                                setSelectedMotorType([]);
-                                                                setDeps("411,412", "41");
-                                                                setCart("hasPower", true, "", "ControlType,MotorChannels", ["Motorized",selectedMotorChannels.map(obj => obj.value)]);
-                                                            } else {
-                                                                selectUncheck(e);
-                                                                setStep41("");
-                                                                // modalHandleShow("noPower");
-                                                                setCustomMotorAcc({});
-                                                                setDeps("41", "411");
-                                                                setCart("", "", "ControlType,hasPower,MotorType,MotorPosition,RemoteName,MotorChannels");
-                                                            }
-                                                        }} id="411" ref={ref => (inputs.current["411"] = ref)}/>
+                                                        <input type="checkbox" text={t("Motorized")} value="2" name="step41" ref-num="4" checked={step41 === "true"}
+                                                               onChange={(e) => {
+                                                                   if (e.target.checked) {
+                                                                       selectChanged(e);
+                                                                       setStep41("true");
+                                                                       setMotorErr1(false);
+                                                                       // let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                                       // let refIndex = inputs.current["42"].getAttribute('ref-num');
+                                                                       // tempLabels[refIndex] = inputs.current["42"].getAttribute('text');
+                                                                       // setStepSelectedLabel(tempLabels);
+                                                                       setSelectedMotorPosition([]);
+                                                                       setSelectedMotorType([]);
+                                                                       setDeps("411,412", "41");
+                                                                       setCart("hasPower", true, "", "ControlType,MotorChannels", ["Motorized", selectedMotorChannels.map(obj => obj.value)]);
+                                                                   } else {
+                                                                       selectUncheck(e);
+                                                                       setStep41("");
+                                                                       // modalHandleShow("noPower");
+                                                                       setCustomMotorAcc({});
+                                                                       setDeps("41", "411");
+                                                                       setCart("", "", "ControlType,hasPower,MotorType,MotorPosition,RemoteName,MotorChannels");
+                                                                   }
+                                                               }} id="411" ref={ref => (inputs.current["411"] = ref)}/>
                                                         <label htmlFor="411" className="checkbox_label">
                                                             <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
                                                                  alt=""/>
@@ -8108,7 +8110,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                     <div className="buttons_section">
                         <button className="btn btn-new-dark" onClick={() => {
                             modalHandleClose("widthDifferent");
-                            let temp = selectCustomValues;
+                            let temp = JSON.parse(JSON.stringify(selectCustomValues));
                             temp.width1 = [];
                             temp.width2 = [];
                             temp.width3 = [];
@@ -8252,7 +8254,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                     <div className="buttons_section">
                         <button className="btn btn-new-dark" onClick={() => {
                             modalHandleClose("heightDifferent");
-                            let temp = selectCustomValues;
+                            let temp = JSON.parse(JSON.stringify(selectCustomValues));
                             temp.height1 = [];
                             temp.height2 = [];
                             temp.height3 = [];

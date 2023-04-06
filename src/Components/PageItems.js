@@ -141,13 +141,14 @@ function PageItems() {
         return tempString;
     }
     
-    function dragOnChange(sourceId, sourceIndex, targetIndex, targetId, key) {
-        let temp = JSON.parse(JSON.stringify(fabricsDragList));
+    function dragOnChange(sourceId, sourceIndex, targetIndex, targetId, tempFabrics, key) {
+        // let temp = JSON.parse(JSON.stringify(fabricsDragList));
+        let temp = JSON.parse(JSON.stringify(tempFabrics));
         let params = JSON.parse(JSON.stringify(parameters));
         // setDragListDesignsList([]);
         // setDragListFabricsList([]);
         setFabricIsLoading(true);
-        
+        // console.log(fabricsDragList);
         const nextState = swap(temp[key], sourceIndex, targetIndex);
         
         for (let j = 0; j < nextState.length; j++) {
@@ -821,7 +822,7 @@ function PageItems() {
                                 PhotoPath = obj["PhotoUrl"];
                         });
                         let ColorEnName = fabricsDragList[key][j]["ColorEnName"];
-                        
+                        // console.log(fabricOrderSelected,FabricId);
                         if (fabricOrderSelected !== -1 && !fabric[fabricOrderSelected]) {
                             tempFabrics[key][fabricOrderSelected] = fabricsDragList[key][j];
                             fabric[fabricOrderSelected] =
@@ -1064,6 +1065,7 @@ function PageItems() {
                                 </div>
                             </GridItem>;
                     }
+                    // console.log(fabric);
                     
                     if (designOrderSelected !== -1 && !fabricList[designOrderSelected]) {
                         fabricList[index] =
@@ -1071,7 +1073,7 @@ function PageItems() {
                                 <div className={`material_traits`}>
                                     <span>{"DESIGN NAME"}: {key}</span>
                                 </div>
-                                <GridContextProvider onChange={(sourceId, sourceIndex, targetIndex, targetId) => dragOnChange(sourceId, sourceIndex, targetIndex, targetId, key)}>
+                                <GridContextProvider onChange={(sourceId, sourceIndex, targetIndex, targetId) => dragOnChange(sourceId, sourceIndex, targetIndex, targetId, tempFabrics, key)}>
                                     <GridDropZone
                                         id="items"
                                         boxesPerRow={4}
@@ -1092,7 +1094,7 @@ function PageItems() {
                                 <div className={`material_traits`}>
                                     <span>{"DESIGN NAME"}: {key}</span>
                                 </div>
-                                <GridContextProvider onChange={(sourceId, sourceIndex, targetIndex, targetId) => dragOnChange(sourceId, sourceIndex, targetIndex, targetId, key)}>
+                                <GridContextProvider onChange={(sourceId, sourceIndex, targetIndex, targetId) => dragOnChange(sourceId, sourceIndex, targetIndex, targetId, tempFabrics, key)}>
                                     <GridDropZone
                                         id="items"
                                         boxesPerRow={4}

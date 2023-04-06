@@ -1442,7 +1442,7 @@
         "titleValue": null,
         "titlePostfix": "",
         "order": 10,
-        "apiLabel": "",
+        "apiLabel": "MetalValanceColor",
         "apiValue": null,
         "lang": [
           "en",
@@ -2436,7 +2436,7 @@
         "titleValue": null,
         "titlePostfix": "",
         "order": 10,
-        "apiLabel": "",
+        "apiLabel": "MetalValanceColor",
         "apiValue": null,
         "lang": [
           "en",
