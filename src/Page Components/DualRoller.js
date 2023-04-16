@@ -1884,6 +1884,14 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                     <h2 className="cart_agree_title">{pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</h2>
                                     <ul className="cart_agree_items_container">
                                         <GetMeasurementArray modelId={`${modelID}`} cartValues={cartValues}/>
+                                        <li className="cart_agree_item">
+                                            <h1 className="cart_agree_item_title">{t("dualRoller_step1")}&nbsp;</h1>
+                                            <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? cartValues["FabricDesignFa"] + " / " + cartValues["FabricColorFa"] : cartValues["FabricDesignEn"] + " / " + cartValues["FabricColorEn"]}</h2>
+                                        </li>
+                                        <li className="cart_agree_item">
+                                            <h1 className="cart_agree_item_title">{t("dualRoller_step2")}&nbsp;</h1>
+                                            <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? cartValues["FabricDesignFa2"] + " / " + cartValues["FabricColorFa2"] : cartValues["FabricDesignEn2"] + " / " + cartValues["FabricColorEn2"]}</h2>
+                                        </li>
                                         {temp1}
                                         <li className="cart_agree_item">
                                             <h1 className="cart_agree_item_title">{pageLanguage === 'fa' ? "نام اتاق" : "Room Label"}&nbsp;</h1>
@@ -2415,7 +2423,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                     }
                 }).then((response) => {
                     setBag(response.data ? response.data : {});
-                    renderFabrics(response.data);
+                    renderFabrics(response.data || {});
                     if (show) {
                         if (response.data["CartDetails"]) {
                             let index = response.data["CartDetails"].findIndex(object => {
@@ -3105,13 +3113,13 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                 }] : []);
                             }
                             if (selectedFrontPosition !== "" && selectedBackPosition !== "") {
-                                tempLabels["4A"] = pageLanguage === "fa" ? `پرده رو: ${t(selectedFrontPosition)}\u00A0\u00A0\u00A0 پرده پشت: ${t(selectedBackPosition)}` : `Front Shade: ${t(selectedFrontPosition)}\u00A0\u00A0\u00A0Back Shade: ${t(selectedBackPosition)}`;
+                                tempLabels["4A"] = pageLanguage === "fa" ? `پرده رو: ${t(selectedFrontPosition)}\u00A0\u00A0\u00A0 پرده پشت: ${t(selectedBackPosition)}` : `Front: ${t(selectedFrontPosition)}\u00A0\u00A0\u00A0Back: ${t(selectedBackPosition)}`;
                                 
                             } else if (selectedFrontPosition !== "") {
-                                tempLabels["4A"] = pageLanguage === "fa" ? `پرده رو: ${t(selectedFrontPosition)}\u00A0\u00A0\u00A0` : `Front Shade: ${t(selectedFrontPosition)}\u00A0\u00A0\u00A0`;
+                                tempLabels["4A"] = pageLanguage === "fa" ? `پرده رو: ${t(selectedFrontPosition)}\u00A0\u00A0\u00A0` : `Front: ${t(selectedFrontPosition)}\u00A0\u00A0\u00A0`;
                                 
                             } else if (selectedBackPosition !== "") {
-                                tempLabels["4A"] = pageLanguage === "fa" ? `\u00A0\u00A0\u00A0 پرده پشت: ${t(selectedBackPosition)}` : `\u00A0\u00A0\u00A0Back Shade: ${t(selectedBackPosition)}`;
+                                tempLabels["4A"] = pageLanguage === "fa" ? `\u00A0\u00A0\u00A0 پرده پشت: ${t(selectedBackPosition)}` : `\u00A0\u00A0\u00A0Back: ${t(selectedBackPosition)}`;
                                 
                             } else {
                                 tempLabels["4A"] = "";
@@ -3946,13 +3954,13 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
         let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
         
         if (selectedFrontPosition !== "" && selectedBackPosition !== "") {
-            tempLabels["4A"] = pageLanguage === "fa" ? `پرده رو: ${t(selectedFrontPosition)}\u00A0\u00A0\u00A0 پرده پشت: ${t(selectedBackPosition)}` : `Front Shade: ${t(selectedFrontPosition)}\u00A0\u00A0\u00A0Back Shade: ${t(selectedBackPosition)}`;
+            tempLabels["4A"] = pageLanguage === "fa" ? `پرده رو: ${t(selectedFrontPosition)}\u00A0\u00A0\u00A0 پرده پشت: ${t(selectedBackPosition)}` : `Front: ${t(selectedFrontPosition)}\u00A0\u00A0\u00A0Back: ${t(selectedBackPosition)}`;
             
         } else if (selectedFrontPosition !== "") {
-            tempLabels["4A"] = pageLanguage === "fa" ? `پرده رو: ${t(selectedFrontPosition)}` : `Front Shade: ${t(selectedFrontPosition)}`;
+            tempLabels["4A"] = pageLanguage === "fa" ? `پرده رو: ${t(selectedFrontPosition)}` : `Front: ${t(selectedFrontPosition)}`;
             
         } else if (selectedBackPosition !== "") {
-            tempLabels["4A"] = pageLanguage === "fa" ? `\u00A0\u00A0\u00A0 پرده پشت: ${t(selectedBackPosition)}` : `\u00A0\u00A0\u00A0Back Shade: ${t(selectedBackPosition)}`;
+            tempLabels["4A"] = pageLanguage === "fa" ? `\u00A0\u00A0\u00A0 پرده پشت: ${t(selectedBackPosition)}` : `\u00A0\u00A0\u00A0Back: ${t(selectedBackPosition)}`;
             
         } else {
             tempLabels["4A"] = "";
@@ -4312,6 +4320,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                         setTimeout(() => {
                             renderFabrics(temp);
                             renderFabrics2(temp);
+                            getRemoteNames();
                         }, 100);
                     });
                 } else {
@@ -7218,7 +7227,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                 
                                                 <div className="radio_group">
                                                     <label className="radio_container">
-                                                        <input className="radio" type="radio" text={t("BracketColor1")} value="1" name="step5C" ref-num="5C" id="5C1"
+                                                        <input className="radio" type="radio" text={t("BracketColor1")} value="1" name="step5C" ref-num="5C" id="5C1" outline="true"
                                                                checked={step5C === "Satin Brass"}
                                                                onChange={e => {
                                                                    selectChanged(e);
@@ -7238,7 +7247,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                             <div className="box33">
                                                 <div className="radio_group">
                                                     <label className="radio_container">
-                                                        <input className="radio" type="radio" text={t("BracketColor2")} value="2" name="step5C" ref-num="5C" id="5C2"
+                                                        <input className="radio" type="radio" text={t("BracketColor2")} value="2" name="step5C" ref-num="5C" id="5C2" outline="true"
                                                                checked={step5C === "Satin Nickel"}
                                                                onChange={e => {
                                                                    selectChanged(e);
@@ -7258,7 +7267,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                             <div className="box33">
                                                 <div className="radio_group">
                                                     <label className="radio_container">
-                                                        <input className="radio" type="radio" text={t("BracketColor3")} value="3" name="step5C" ref-num="5C" id="5C3"
+                                                        <input className="radio" type="radio" text={t("BracketColor3")} value="3" name="step5C" ref-num="5C" id="5C3" outline="true"
                                                                checked={step5C === "Gun Metal"}
                                                                onChange={e => {
                                                                    selectChanged(e);
@@ -7521,7 +7530,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                 
                                                 <div className="radio_group">
                                                     <label className="radio_container">
-                                                        <input className="radio" type="radio" text={t("BracketColor1")} value="1" name="step5BArc" ref-num="5BArc" id="5BArc1"
+                                                        <input className="radio" type="radio" text={t("BracketColor1")} value="1" name="step5BArc" ref-num="5BArc" id="5BArc1" outline="true"
                                                                checked={step5BArc === "Satin Brass"}
                                                                onChange={e => {
                                                                    selectChanged(e);
@@ -7541,7 +7550,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                             <div className="box33">
                                                 <div className="radio_group">
                                                     <label className="radio_container">
-                                                        <input className="radio" type="radio" text={t("BracketColor2")} value="2" name="step5BArc" ref-num="5BArc" id="5BArc2"
+                                                        <input className="radio" type="radio" text={t("BracketColor2")} value="2" name="step5BArc" ref-num="5BArc" id="5BArc2" outline="true"
                                                                checked={step5BArc === "Satin Nickel"}
                                                                onChange={e => {
                                                                    selectChanged(e);
@@ -7561,7 +7570,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                             <div className="box33">
                                                 <div className="radio_group">
                                                     <label className="radio_container">
-                                                        <input className="radio" type="radio" text={t("BracketColor3")} value="3" name="step5BArc" ref-num="5BArc" id="5BArc3"
+                                                        <input className="radio" type="radio" text={t("BracketColor3")} value="3" name="step5BArc" ref-num="5BArc" id="5BArc3" outline="true"
                                                                checked={step5BArc === "Gun Metal"}
                                                                onChange={e => {
                                                                    selectChanged(e);

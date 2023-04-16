@@ -548,9 +548,11 @@ function PageItems() {
                                         }}
                                 >Sort Fabrics
                                 </button>
-                                <button className="clear_input" pageitems_id={i} onClick={(e) => clearField(e, i, "Parameters")}>Clear</button>
                             </div>
                         }
+                        <div>
+                            <button className="btn clear_input" pageitems_id={i} onClick={(e) => clearField(e, i, "Parameters")}>Clear Parameters</button>
+                        </div>
                     </div>
                     
                     <div className="pageItems_small_inputs pageItem_input_clearable">

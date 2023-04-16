@@ -2259,7 +2259,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                     }
                 }).then((response) => {
                     setBag(response.data ? response.data : {});
-                    renderFabrics(response.data);
+                    renderFabrics(response.data || {});
                     if (show) {
                         if (response.data["CartDetails"]) {
                             let index = response.data["CartDetails"].findIndex(object => {
@@ -3985,6 +3985,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                         getHasZipcode();
                         setTimeout(() => {
                             renderFabrics(temp);
+                            getRemoteNames();
                         }, 100);
                     });
                 } else {
@@ -6622,7 +6623,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                 
                                                 <div className="radio_group">
                                                     <label className="radio_container">
-                                                        <input className="radio" type="radio" text={t("BracketColor1")} value="1" name="step5C" ref-num="5C" id="5C1"
+                                                        <input className="radio" type="radio" text={t("BracketColor1")} value="1" name="step5C" ref-num="5C" id="5C1" outline="true"
                                                                checked={step5C === "Satin Brass"}
                                                                onChange={e => {
                                                                    selectChanged(e);
@@ -6642,7 +6643,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                             <div className="box33">
                                                 <div className="radio_group">
                                                     <label className="radio_container">
-                                                        <input className="radio" type="radio" text={t("BracketColor2")} value="2" name="step5C" ref-num="5C" id="5C2"
+                                                        <input className="radio" type="radio" text={t("BracketColor2")} value="2" name="step5C" ref-num="5C" id="5C2" outline="true"
                                                                checked={step5C === "Satin Nickel"}
                                                                onChange={e => {
                                                                    selectChanged(e);
@@ -6662,7 +6663,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                             <div className="box33">
                                                 <div className="radio_group">
                                                     <label className="radio_container">
-                                                        <input className="radio" type="radio" text={t("BracketColor3")} value="3" name="step5C" ref-num="5C" id="5C3"
+                                                        <input className="radio" type="radio" text={t("BracketColor3")} value="3" name="step5C" ref-num="5C" id="5C3" outline="true"
                                                                checked={step5C === "Gun Metal"}
                                                                onChange={e => {
                                                                    selectChanged(e);
@@ -6925,7 +6926,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                 
                                                 <div className="radio_group">
                                                     <label className="radio_container">
-                                                        <input className="radio" type="radio" text={t("BracketColor1")} value="1" name="step5BArc" ref-num="5BArc" id="5BArc1"
+                                                        <input className="radio" type="radio" text={t("BracketColor1")} value="1" name="step5BArc" ref-num="5BArc" id="5BArc1" outline="true"
                                                                checked={step5BArc === "Satin Brass"}
                                                                onChange={e => {
                                                                    selectChanged(e);
@@ -6945,7 +6946,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                             <div className="box33">
                                                 <div className="radio_group">
                                                     <label className="radio_container">
-                                                        <input className="radio" type="radio" text={t("BracketColor2")} value="2" name="step5BArc" ref-num="5BArc" id="5BArc2"
+                                                        <input className="radio" type="radio" text={t("BracketColor2")} value="2" name="step5BArc" ref-num="5BArc" id="5BArc2" outline="true"
                                                                checked={step5BArc === "Satin Nickel"}
                                                                onChange={e => {
                                                                    selectChanged(e);
@@ -6965,7 +6966,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                             <div className="box33">
                                                 <div className="radio_group">
                                                     <label className="radio_container">
-                                                        <input className="radio" type="radio" text={t("BracketColor3")} value="3" name="step5BArc" ref-num="5BArc" id="5BArc3"
+                                                        <input className="radio" type="radio" text={t("BracketColor3")} value="3" name="step5BArc" ref-num="5BArc" id="5BArc3" outline="true"
                                                                checked={step5BArc === "Gun Metal"}
                                                                onChange={e => {
                                                                    selectChanged(e);

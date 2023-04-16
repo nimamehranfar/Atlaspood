@@ -913,6 +913,18 @@ function Basket() {
                                                     </h4>
                                                 </div>
                                             }
+                                            {SewingModelId === "0325" &&
+                                                <div className="basket_item_title_desc">
+                                                    <h3>{t("dualRoller_step1")}&nbsp;</h3>
+                                                    <h4>{pageLanguage === 'fa' ? obj["FabricDesignFa"] + " / " + obj["FabricColorFa"] : obj["FabricDesignEn"] + " / " + obj["FabricColorEn"]}</h4>
+                                                </div>
+                                            }
+                                            {SewingModelId === "0325" &&
+                                                <div className="basket_item_title_desc">
+                                                    <h3>{t("dualRoller_step2")}&nbsp;</h3>
+                                                    <h4>{pageLanguage === 'fa' ? obj["FabricDesignFa2"] + " / " + obj["FabricColorFa2"] : obj["FabricDesignEn2"] + " / " + obj["FabricColorEn2"]}</h4>
+                                                </div>
+                                            }
                                             {desc}
                                             <div className="basket_item_title_desc">
                                                 <h3>{pageLanguage === 'fa' ? "نام اتاق" : "Room Label"}&nbsp;</h3>
@@ -1339,6 +1351,18 @@ function Basket() {
                                                                 </Accordion>
                                                             </div>
                                                         </h4>
+                                                    </div>
+                                                }
+                                                {SewingModelId === "0325" &&
+                                                    <div className="basket_item_title_desc">
+                                                        <h3>{t("dualRoller_step1")}&nbsp;</h3>
+                                                        <h4>{pageLanguage === 'fa' ? obj["FabricDesignFa"] + " / " + obj["FabricColorFa"] : obj["FabricDesignEn"] + " / " + obj["FabricColorEn"]}</h4>
+                                                    </div>
+                                                }
+                                                {SewingModelId === "0325" &&
+                                                    <div className="basket_item_title_desc">
+                                                        <h3>{t("dualRoller_step2")}&nbsp;</h3>
+                                                        <h4>{pageLanguage === 'fa' ? obj["FabricDesignFa2"] + " / " + obj["FabricColorFa2"] : obj["FabricDesignEn2"] + " / " + obj["FabricColorEn2"]}</h4>
                                                     </div>
                                                 }
                                                 {desc}

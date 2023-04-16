@@ -1038,12 +1038,12 @@ function Header() {
         const onScroll = () => {
             // setOffset3(window.pageYOffset);
             // setOffset2(fixedHeader.current.offsetTop);
-            if (fixedHeader.current.offsetTop + 100 < window.pageYOffset) {
+            if (fixedHeader.current.offsetTop + 180 < window.pageYOffset) {
                 setOffset(true);
             } else {
-                if(offset && fixedHeader.current.offsetTop + 64 > window.pageYOffset){
+                // if(offset && fixedHeader.current.offsetTop + 64 < window.pageYOffset){
                     setOffset(false);
-                }
+                // }
             }
         };
         
@@ -1054,7 +1054,7 @@ function Header() {
     }, []);
     
     return (
-        <div className={`header_container padding-clear ${pageLanguage === 'fa' ? "font_farsi" : "font_en"} ${currentPage.level1 === "Checkout" ? "noDisplay" : ""}`}>
+        <div className={`header_container padding-clear ${pageLanguage === 'fa' ? "font_farsi" : "font_en"} ${currentPage.level1 === "Checkout" ? "noDisplay" : ""}`} ref={fixedHeader}>
             <div>
                 <div className={offset ? "fixed_header_top top_header" : "top_header"}>
                     <div className="col-lg-12">
@@ -1071,7 +1071,7 @@ function Header() {
                         </div>
                     </div>
                 </div>
-                <div className={offset ? "fixed_header" : ""} ref={fixedHeader}>
+                <div className={offset ? "fixed_header" : ""}>
                     <div>
                         <div className="mid_header">
                             <div className="col-lg-12">

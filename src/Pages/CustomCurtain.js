@@ -8,6 +8,7 @@ import DK from "../Page Components/DK";
 import DK2 from "../Page Components/DK2";
 import {useSelector} from "react-redux";
 import axios from "axios";
+import Grommet from "../Page Components/Grommet";
 
 const baseURLGet = "https://api.atlaspood.ir/WebsitePageItem/GetById";
 
@@ -100,7 +101,6 @@ function CustomCurtain() {
             }
             else {
                 if (modelID === "0303") {
-                    // console.log(projectId,editCart,localStorage.getItem("edit_project") !== null);
                     setPageModel(<Zebra CatID={catID} ModelID={modelID} SpecialId={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem} QueryString={queryObj}
                                         Parameters={parameters} PageId={websitePageItemId}/>)
                 } else if (modelID === "0324") {
@@ -111,6 +111,9 @@ function CustomCurtain() {
                                              Parameters={parameters} PageId={websitePageItemId}/>)
                 } else if (modelID === "0326") {
                     setPageModel(<DK CatID={catID} ModelID={modelID} SpecialId={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem} QueryString={queryObj}
+                                     Parameters={parameters} PageId={websitePageItemId}/>)
+                } else if (modelID === "0099") {
+                    setPageModel(<Grommet CatID={catID} ModelID={modelID} SpecialId={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem} QueryString={queryObj}
                                      Parameters={parameters} PageId={websitePageItemId}/>)
                 }
             }

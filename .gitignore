@@ -12,6 +12,10 @@
 # production
 /build
 
+# Server side settings
+/win-acme
+/win-acme.v2
+
 # misc
 .DS_Store
 .env.local

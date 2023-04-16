@@ -65,7 +65,13 @@ let tempData={
             []
         
     },
-    
+    "0099": {
+        "pattern":
+            [],
+        "type":
+            []
+        
+    },
 }
 
 async function GetSewingFilters(id, modelId) {

@@ -513,7 +513,10 @@ img, svg, object:not(.popover_camera):not(.intractable) {
     text-align: center;
     font-size: 0.688rem;
     height: 2.438rem;
-    transition: height 0.3s ease-in-out;
+    transition: height 0.6s ease-in-out;
+    -webkit-transition: height 0.6s ease-in-out;
+    -moz-transition: height 0.6s ease-in-out;
+    -o-transition: height 0.6s ease-in-out;
 }
 
 .top_title {
@@ -548,10 +551,10 @@ img, svg, object:not(.popover_camera):not(.intractable) {
     height: 6rem;
     align-content: space-between;
     align-items: center;
-    -webkit-transition: height 0.3s ease-in-out;
-    -moz-transition: height 0.3s ease-in-out;
-    -o-transition: height 0.3s ease-in-out;
-    transition: height 0.3s ease-in-out;
+    -webkit-transition: height 0.6s ease-in-out;
+    -moz-transition: height 0.6s ease-in-out;
+    -o-transition: height 0.6s ease-in-out;
+    transition: height 0.6s ease-in-out;
 }
 
 .mid_header_left {
@@ -2431,11 +2434,11 @@ input[name="fabric"]:checked + .frame_img img, .img-fluid_checked {
     outline: 0.125rem solid #49443e !important;
 }
 
-input[name="step5C"]:checked + .frame_img img, .img-fluid_checked {
+input[name="fabric"]:hover + .frame_img img, .img-fluid_checked {
     outline: 0.125rem solid #49443e !important;
 }
 
-input[name="fabric"]:hover + .frame_img img, .img-fluid_checked {
+input[name="fabric2"]:checked + .frame_img img, .img-fluid_checked {
     outline: 0.125rem solid #49443e !important;
 }
 
@@ -2443,11 +2446,10 @@ input[name="fabric2"]:hover + .frame_img img, .img-fluid_checked {
     outline: 0.125rem solid #49443e !important;
 }
 
-input[name="step5C"]:hover + .frame_img img, .img-fluid_checked {
+input[outline="true"]:hover + .frame_img img, .img-fluid_checked {
     outline: 0.125rem solid #49443e !important;
 }
-
-input[name="step5BArc"]:hover + .frame_img img, .img-fluid_checked {
+input[outline="true"]:checked + .frame_img img, .img-fluid_checked {
     outline: 0.125rem solid #49443e !important;
 }
 
@@ -2540,10 +2542,13 @@ input[name="step5BArc"]:hover + .frame_img img, .img-fluid_checked {
 .zoomImg .imageContainer div {
     cursor: unset !important;
     direction: ltr !important;
+    /*aspect-ratio: 1/1;*/
 }
 
 .imageContainer img {
-    width: inherit;
+    /*width: inherit;*/
+    aspect-ratio: 1/1;
+    /*width: 21.8125rem !important;*/
 }
 
 .hover-zoom:hover {
@@ -2844,7 +2849,7 @@ input[name="step5BArc"]:hover + .frame_img img, .img-fluid_checked {
     text-decoration: none !important;
     display: inline-block;
     float: right;
-    margin-inline-end: 0.95rem;
+    margin-inline-end: 1.01rem;
     margin-bottom: 0.625rem;
     padding: 0.675rem 1.75rem;
     cursor: pointer;

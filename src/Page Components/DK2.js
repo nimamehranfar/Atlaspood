@@ -80,6 +80,8 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
     let navigate = useNavigate();
     const dispatch = useDispatch();
     const [pageLoad, setPageLoad] = useState(undefined);
+    const [pageLoadDK, setPageLoadDK] = useState(undefined);
+    const [motorLoad, setMotorLoad] = useState(false);
     const [models, setModels] = useState([]);
     const [projectData, setProjectData] = useState({});
     const [model, setModel] = useState({});
@@ -112,6 +114,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
     const [defaultModelDescFa, setDefaultModelDescFa] = useState("");
     const [price, setPrice] = useState(0);
     const [bagPrice, setBagPrice] = useState(0);
+    const [fabricQty, setFabricQty] = useState(0);
     const [totalCartPrice, setTotalCartPrice] = useState(0);
     const [freeShipPrice, setFreeShipPrice] = useState(0);
     const [show, setShow] = useState(false);
@@ -252,7 +255,9 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
     const [step2A, setStep2A] = useState("");
     const [step3, setStep3] = useState("");
     const [step4, setStep4] = useState("");
+    const [step4A, setStep4A] = useState("");
     const [step5, setStep5] = useState("");
+    const [step51, setStep51] = useState("");
     const [zipcodeChecked, setZipcodeChecked] = useState("");
     const [zipcode, setZipcode] = useState("");
     const [zipcodeButton, setZipcodeButton] = useState(false);
@@ -265,6 +270,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
     const [step21Err1, setStep21Err1] = useState(false);
     const [step21Err2, setStep21Err2] = useState(false);
     const [step21Err3, setStep21Err3] = useState(false);
+    const [motorErr1, setMotorErr1] = useState(false);
     
     const [savedProjectRoomLabel, setSavedProjectRoomLabel] = useState("");
     const [savedProjectRoomText, setSavedProjectRoomText] = useState("");
@@ -300,6 +306,105 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
     
     const [helpMeasure, setHelpMeasure] = useState("Inside");
     const [helpMeasureLengthType, setHelpMeasureLengthType] = useState("Sill");
+    const [customMotorAcc, setCustomMotorAcc] = useState({});
+    
+    const [MotorType, setMotorType] = useState({
+        "en": [
+            {value: 'Angle Rotation Motor', label: 'Angle Rotation Motor'},
+            {value: 'Open & Close Motor', label: 'Open & Close Motor'},
+            {value: 'Angle Rotation and Open & Close Motor', label: 'Angle Rotation and Open & Close Motor'}
+        ],
+        "fa": [
+            {value: 'Angle Rotation Motor', label: 'موتور سايه روشن'},
+            {value: 'Open & Close Motor', label: 'موتور جمع و باز'},
+            {value: 'Angle Rotation and Open & Close Motor', label: 'موتور سايه روشن و جمع و باز'}
+        ],
+    });
+    
+    useEffect(() => {
+        if (Object.keys(modelAccessories).length > 0) {
+            let tempObj = {
+                "en": [
+                    {
+                        value: 'Angle Rotation Motor',
+                        label: "Angle Rotation Motor (" + GetPrice(modelAccessories["24"]["41"]["Price"], pageLanguage, t("TOMANS")) + ")",
+                        apiAccValue: {
+                            "SewingAccessoryId": 24,
+                            "SewingModelAccessoryId": 0,
+                            "SewingAccessoryValue": "90908101",
+                            "Qty": 1
+                        }
+                    },
+                    {
+                        value: 'Open & Close Motor',
+                        label: "Open & Close Motor (" + GetPrice(modelAccessories["24"]["42"]["Price"], pageLanguage, t("TOMANS")) + ")",
+                        apiAccValue: {
+                            "SewingAccessoryId": 24,
+                            "SewingModelAccessoryId": 0,
+                            "SewingAccessoryValue": "90908102",
+                            "Qty": 1
+                        }
+                    },
+                    {
+                        value: 'Angle Rotation and Open & Close Motor',
+                        label: "Angle Rotation and Open & Close Motor (" + GetPrice(modelAccessories["24"]["43"]["Price"], pageLanguage, t("TOMANS")) + ")",
+                        apiAccValue: {
+                            "SewingAccessoryId": 24,
+                            "SewingModelAccessoryId": 0,
+                            "SewingAccessoryValue": "90908103",
+                            "Qty": 1
+                        }
+                    },
+                ],
+                "fa": [
+                    {
+                        value: 'Angle Rotation Motor',
+                        label: "موتور سايه روشن (" + GetPrice(modelAccessories["24"]["41"]["Price"], pageLanguage, t("TOMANS")) + ")",
+                        apiAccValue: {
+                            "SewingAccessoryId": 24,
+                            "SewingModelAccessoryId": 0,
+                            "SewingAccessoryValue": "90908101",
+                            "Qty": 1
+                        }
+                    },
+                    {
+                        value: 'Open & Close Motor',
+                        label: "موتور جمع و باز (" + GetPrice(modelAccessories["24"]["42"]["Price"], pageLanguage, t("TOMANS")) + ")",
+                        apiAccValue: {
+                            "SewingAccessoryId": 24,
+                            "SewingModelAccessoryId": 0,
+                            "SewingAccessoryValue": "90908102",
+                            "Qty": 1
+                        }
+                    },
+                    {
+                        value: 'Angle Rotation and Open & Close Motor',
+                        label: "موتور سايه روشن و جمع و باز (" + GetPrice(modelAccessories["24"]["43"]["Price"], pageLanguage, t("TOMANS")) + ")",
+                        apiAccValue: {
+                            "SewingAccessoryId": 24,
+                            "SewingModelAccessoryId": 0,
+                            "SewingAccessoryValue": "90908103",
+                            "Qty": 1
+                        }
+                    },
+                ],
+                
+            }
+            setMotorType(tempObj);
+            if (selectedMotorType.length) {
+                setSelectedMotorType(selectedMotorType[0].value ? [{
+                    value: selectedMotorType[0].value,
+                    label: tempObj[pageLanguage].find(opt => opt.value === selectedMotorType[0].value).label
+                }] : []);
+                if (motorLoad) {
+                    setTimeout(() => {
+                        setMotorLoad(false);
+                    }, 500);
+                }
+            }
+            setSelectedMotorMinPrice(Math.min(modelAccessories["24"]["41"]["Price"] || 0, modelAccessories["24"]["42"]["Price"] || 0, modelAccessories["24"]["43"]["Price"] || 0));
+        }
+    }, [JSON.stringify(modelAccessories), pageLanguage]);
     
     const getFabrics = () => {
         axios.get(baseURLFabrics, {
@@ -465,7 +570,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             let DesignName = convertToPersian(fabrics[key][0].DesignName);
             let DesignEnName = fabrics[key][0].DesignEnName;
             let DesignCode = fabrics[key][0]["DesignCode"].toString();
-            let designOrderSelected = params["Designs"] && params["Designs"][DesignCode] && (params["Designs"][DesignCode]["order"] || params["Fabrics"][DesignCode]["order"] === 0) ? params["Designs"][DesignCode]["order"] : -1;
+            let designOrderSelected = params["Designs"] && params["Designs"][DesignCode] && (params["Designs"][DesignCode]["order"] && params["Designs"][DesignCode]["order"] >= 0) ? params["Designs"][DesignCode]["order"] : -1;
             let designTypeSelected = params["Designs"] && params["Designs"][DesignCode] && params["Designs"][DesignCode]["type"] ? params["Designs"][DesignCode]["type"] : "none";
             let designOnlyOneSelected = params["Designs"] && params["Designs"][DesignCode] && params["Designs"][DesignCode]["onlyOne"] ? params["Designs"][DesignCode]["onlyOne"] : false;
             let showMoreCount = designTypeSelected === "Base" ? 4 : 8;
@@ -685,8 +790,22 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
         let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
         let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
         if (DkCurtainArr.filter(el => el).length === count) {
-            tempLabels["3"] = t('Completed');
-            tempValue["3"] = "Completed";
+            let baseFound = baseOneArr.some(r => DkCurtainArr.map(el => el ? el.DesignCode : null).indexOf(r) >= 0);
+            if (baseFound) {
+                tempLabels["3"] = t('Completed');
+                tempValue["3"] = "Completed";
+            } else {
+                tempLabels["3"] = "";
+                tempValue["3"] = "";
+            }
+            let decorFound = decorativeOneArr.some(r => DkCurtainArr.map(el => el ? el.DesignCode : null).indexOf(r) >= 0);
+            if (decorFound) {
+                tempLabels["35"] = t('Completed');
+                tempValue["35"] = "Completed";
+            } else {
+                tempLabels["35"] = "";
+                tempValue["35"] = "";
+            }
             setDkCurtainArrComplete(true);
             setDeps("", "3");
         } else {
@@ -703,11 +822,16 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
         for (let i = 0; i < count; i++) {
             promiseArr[i] = new Promise((resolve, reject) => {
                 let tempColor = DkCurtainArr[i] ? (DkCurtainArr[i]["ColorHtmlCode"] ? DkCurtainArr[i]["ColorHtmlCode"] : "#e2e2e2") : "#e2e2e2";
+                let obj = (DkCurtainArr[i] ? DkCurtainArr[i]["FabricPhotos"] || [] : []).find(o => o.PhotoTypeId === 4702);
+                let tempImg = obj && obj["PhotoUrl"] ? `https://api.atlaspood.ir/${obj["PhotoUrl"]}` : null;
+                let ImgOrColor = !!(DkCurtainArr[i] && !DkCurtainArr[i]["UseColorOnSewingModel"] && tempImg)
                 curtainList.push(
                     <div key={i} className="dk_curtain_inside_part" onClick={() => {
-                        // curtainChanged(i);
                         setCurtainChangeId(i);
-                    }} style={{backgroundColor: tempColor}}/>
+                    }} style={ImgOrColor ? {backgroundImage: `url(${tempImg})`, backgroundPosition: "top center"} : {backgroundColor: tempColor}}>
+                        {/*<div className="dk_curtain_inside_part_top"/>*/}
+                        {/*<div className="dk_curtain_inside_part_bottom"/>*/}
+                    </div>
                 );
                 resolve();
             });
@@ -1362,7 +1486,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
         // console.log(dkCurtainArrComplete,refIndex, cartValue, delRefs, secondRefIndex, secondCartValue);
         let promise2 = new Promise((resolve, reject) => {
             let count = temp["WidthCart"] ? Math.floor(temp["WidthCart"] / 11.5) : 16;
-            if (stepSelectedValue["2"] !== undefined && !pageLoad && refIndex !== "FabricId" && !(refIndex === "CurtainArr" && (temp["CurtainArr"] ? temp["CurtainArr"] : []).filter(el => el).length !== count)) {
+            if (stepSelectedValue["2"] !== undefined && !pageLoad && !(motorLoad && refIndex === "MotorType") && refIndex !== "FabricId" && !(refIndex === "CurtainArr" && (temp["CurtainArr"] ? temp["CurtainArr"] : []).filter(el => el).length !== count)) {
                 if ((temp["CurtainArr"] ? temp["CurtainArr"] : []).filter(el => el).length !== count) {
                     delete tempPostObj["SewingOrderDetails"];
                 }
@@ -1374,6 +1498,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                 axios.post(baseURLPrice, tempPostObj)
                     .then((response) => {
                         setPrice(response.data["price"]);
+                        setFabricQty(response.data["FabricQty"]);
                         
                         if (response.data["price"]) {
                             setInstallPrice(response.data["InstallAmount"] ? response.data["InstallAmount"] : 0);
@@ -1414,6 +1539,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         delete temp["HeightCart"];
                     if (temp["WidthCart"] !== undefined)
                         delete temp["WidthCart"];
+                    setFabricQty(0);
                     resolve();
                     // console.log(err);
                 });
@@ -1524,6 +1650,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                             }
                         } else {
                             setPrice(response.data["price"]);
+                            setFabricQty(response.data["FabricQty"]);
                             
                             // setCart("HeightCart", totalHeight, "", "WidthCart", [totalWidth]);
                             getWindowSize(response.data["WindowWidth"], response.data["WindowHeight"]);
@@ -2423,7 +2550,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     }
                 }).then((response) => {
                     setBag(response.data ? response.data : {});
-                    renderFabrics(response.data);
+                    renderFabrics(response.data || {});
                     if (show) {
                         if (response.data["CartDetails"]) {
                             let index = response.data["CartDetails"].findIndex(object => {
@@ -2897,6 +3024,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
     
     function setProjectDetails(data, editIndex, changeLang) {
         setPageLoad(true);
+        setPageLoadDK(true);
         if (data && Object.keys(data).length !== 0) {
             setProjectData(data);
         }
@@ -2959,6 +3087,8 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     if (temp["WidthCart"] && temp["CurtainArr"].filter(el => el).length === Math.floor(temp["WidthCart"] / 11.5)) {
                         tempLabels["3"] = t('Completed');
                         tempValue["3"] = "Completed";
+                        tempLabels["35"] = t('Completed');
+                        tempValue["35"] = "Completed";
                         setDkCurtainArrComplete(true);
                         depSetTempArr = new Set([...setGetDeps("", "3", depSetTempArr)]);
                         setDkCurtainArr(temp["CurtainArr"]);
@@ -3078,6 +3208,10 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                 if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
                                                     tempLabels["2C"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
                                                 }
+    
+                                                temp["CeilingToWindow1"] = changeLang ? temp["CeilingToWindow1"] : temp["Height"];
+                                                temp["CeilingToWindow2"] = changeLang ? temp["CeilingToWindow2"] : temp["Height2"];
+                                                temp["CeilingToWindow3"] = changeLang ? temp["CeilingToWindow3"] : temp["Height3"];
                                                 selectValues["CeilingToWindow1"] = temp["CeilingToWindow1"] ? [{value: temp["CeilingToWindow1"]}] : [];
                                                 selectValues["CeilingToWindow2"] = temp["CeilingToWindow2"] ? [{value: temp["CeilingToWindow2"]}] : [];
                                                 selectValues["CeilingToWindow3"] = temp["CeilingToWindow3"] ? [{value: temp["CeilingToWindow3"]}] : [];
@@ -3114,6 +3248,10 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                 if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
                                                     tempLabels["2C"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
                                                 }
+    
+                                                temp["CeilingToWindow1"] = changeLang ? temp["CeilingToWindow1"] : temp["Height"];
+                                                temp["CeilingToWindow2"] = changeLang ? temp["CeilingToWindow2"] : temp["Height2"];
+                                                temp["CeilingToWindow3"] = changeLang ? temp["CeilingToWindow3"] : temp["Height3"];
                                                 selectValues["CeilingToWindow1"] = temp["CeilingToWindow1"] ? [{value: temp["CeilingToWindow1"]}] : [];
                                                 selectValues["CeilingToWindow2"] = temp["CeilingToWindow2"] ? [{value: temp["CeilingToWindow2"]}] : [];
                                                 selectValues["CeilingToWindow3"] = temp["CeilingToWindow3"] ? [{value: temp["CeilingToWindow3"]}] : [];
@@ -3150,6 +3288,10 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                 if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
                                                     tempLabels["2C"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
                                                 }
+    
+                                                temp["CeilingToFloor1"] = changeLang ? temp["CeilingToFloor1"] : temp["Height"];
+                                                temp["CeilingToFloor2"] = changeLang ? temp["CeilingToFloor2"] : temp["Height2"];
+                                                temp["CeilingToFloor3"] = changeLang ? temp["CeilingToFloor3"] : temp["Height3"];
                                                 selectValues["CeilingToFloor1"] = temp["CeilingToFloor1"] ? [{value: temp["CeilingToFloor1"]}] : [];
                                                 selectValues["CeilingToFloor2"] = temp["CeilingToFloor2"] ? [{value: temp["CeilingToFloor2"]}] : [];
                                                 selectValues["CeilingToFloor3"] = temp["CeilingToFloor3"] ? [{value: temp["CeilingToFloor3"]}] : [];
@@ -3193,6 +3335,10 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                         if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
                                                             tempLabels["2CCeiling"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
                                                         }
+    
+                                                        temp["CeilingToWindow1"] = changeLang ? temp["CeilingToWindow1"] : temp["Height"];
+                                                        temp["CeilingToWindow2"] = changeLang ? temp["CeilingToWindow2"] : temp["Height2"];
+                                                        temp["CeilingToWindow3"] = changeLang ? temp["CeilingToWindow3"] : temp["Height3"];
                                                         selectValues["CeilingToWindow1"] = temp["CeilingToWindow1"] ? [{value: temp["CeilingToWindow1"]}] : [];
                                                         selectValues["CeilingToWindow2"] = temp["CeilingToWindow2"] ? [{value: temp["CeilingToWindow2"]}] : [];
                                                         selectValues["CeilingToWindow3"] = temp["CeilingToWindow3"] ? [{value: temp["CeilingToWindow3"]}] : [];
@@ -3229,6 +3375,10 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                         if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
                                                             tempLabels["2CCeiling"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
                                                         }
+    
+                                                        temp["CeilingToWindow1"] = changeLang ? temp["CeilingToWindow1"] : temp["Height"];
+                                                        temp["CeilingToWindow2"] = changeLang ? temp["CeilingToWindow2"] : temp["Height2"];
+                                                        temp["CeilingToWindow3"] = changeLang ? temp["CeilingToWindow3"] : temp["Height3"];
                                                         selectValues["CeilingToWindow1"] = temp["CeilingToWindow1"] ? [{value: temp["CeilingToWindow1"]}] : [];
                                                         selectValues["CeilingToWindow2"] = temp["CeilingToWindow2"] ? [{value: temp["CeilingToWindow2"]}] : [];
                                                         selectValues["CeilingToWindow3"] = temp["CeilingToWindow3"] ? [{value: temp["CeilingToWindow3"]}] : [];
@@ -3265,6 +3415,10 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                         if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
                                                             tempLabels["2CCeiling"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
                                                         }
+    
+                                                        temp["CeilingToFloor1"] = changeLang ? temp["CeilingToFloor1"] : temp["Height"];
+                                                        temp["CeilingToFloor2"] = changeLang ? temp["CeilingToFloor2"] : temp["Height2"];
+                                                        temp["CeilingToFloor3"] = changeLang ? temp["CeilingToFloor3"] : temp["Height3"];
                                                         selectValues["CeilingToFloor1"] = temp["CeilingToFloor1"] ? [{value: temp["CeilingToFloor1"]}] : [];
                                                         selectValues["CeilingToFloor2"] = temp["CeilingToFloor2"] ? [{value: temp["CeilingToFloor2"]}] : [];
                                                         selectValues["CeilingToFloor3"] = temp["CeilingToFloor3"] ? [{value: temp["CeilingToFloor3"]}] : [];
@@ -3416,44 +3570,86 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     if (temp["WindowWidth"] && temp["WindowHeight"]) {
                         getWindowSize(temp["WindowWidth"], temp["WindowHeight"]);
                     }
-                    
+    
                     if (temp["StackPosition"]) {
                         setStep4(temp["StackPosition"]);
                         if (temp["StackPosition"] === "Left") {
                             let refIndex = inputs.current["41"].getAttribute('ref-num');
                             tempLabels[refIndex] = inputs.current["41"].getAttribute('text');
                             tempValue[refIndex] = inputs.current["41"].value;
-                            depSetTempArr = new Set([...setGetDeps("", "4,5", depSetTempArr)]);
+                            depSetTempArr = new Set([...setGetDeps("", "4,4A", depSetTempArr)]);
                         } else if (temp["StackPosition"] === "Right") {
                             let refIndex = inputs.current["42"].getAttribute('ref-num');
                             tempLabels[refIndex] = inputs.current["42"].getAttribute('text');
                             tempValue[refIndex] = inputs.current["42"].value;
-                            depSetTempArr = new Set([...setGetDeps("", "4,5", depSetTempArr)]);
+                            depSetTempArr = new Set([...setGetDeps("", "4,4A", depSetTempArr)]);
                         } else {
                             let refIndex = inputs.current["43"].getAttribute('ref-num');
                             tempLabels[refIndex] = inputs.current["43"].getAttribute('text');
                             tempValue[refIndex] = inputs.current["43"].value;
-                            depSetTempArr = new Set([...setGetDeps("5", "4", depSetTempArr)]);
+                            depSetTempArr = new Set([...setGetDeps("4A", "4", depSetTempArr)]);
+                        }
+                        setStepSelectedLabel(tempLabels);
+                        setStepSelectedValue(tempValue);
+                    }
+        
+                    if (temp["ControlPosition"]) {
+                        setStep4A(temp["ControlPosition"]);
+                        if (temp["ControlPosition"] === "Left") {
+                            let refIndex = inputs.current["4A1"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["4A1"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["4A1"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "4A", depSetTempArr)]);
+                        } else {
+                            let refIndex = inputs.current["4A2"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["4A2"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["4A2"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "4A", depSetTempArr)]);
                         }
                         setStepSelectedLabel(tempLabels);
                         setStepSelectedValue(tempValue);
                     }
                     
-                    if (temp["ControlPosition"]) {
-                        setStep5(temp["ControlPosition"]);
-                        if (temp["ControlPosition"] === "Left") {
+                    if (temp["ControlType"]) {
+                        setStep5(temp["ControlType"]);
+                        if (temp["ControlType"] === "Chain & Cord") {
                             let refIndex = inputs.current["51"].getAttribute('ref-num');
                             tempLabels[refIndex] = inputs.current["51"].getAttribute('text');
                             tempValue[refIndex] = inputs.current["51"].value;
+                            
                             depSetTempArr = new Set([...setGetDeps("", "5", depSetTempArr)]);
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
                         } else {
                             let refIndex = inputs.current["52"].getAttribute('ref-num');
                             tempLabels[refIndex] = inputs.current["52"].getAttribute('text');
                             tempValue[refIndex] = inputs.current["52"].value;
-                            depSetTempArr = new Set([...setGetDeps("", "5", depSetTempArr)]);
+                            
+                            depSetTempArr = new Set([...setGetDeps((temp["hasPower"] ? (temp["MotorType"] ? "" : "511,") : "51,"), "5", depSetTempArr)]);
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            if (temp["hasPower"] !== undefined) {
+                                setStep51(temp["hasPower"].toString());
+                                
+                                setTimeout(() => {
+                                    let refIndex = inputs.current["511"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["511"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["511"].value;
+                                    setStepSelectedLabel(tempLabels);
+                                    setStepSelectedValue(tempValue);
+                                    
+                                    if (temp["Accessories"] && temp["Accessories"].length) {
+                                        // setMotorLoad(true);
+                                        setCustomMotorAcc(temp["Accessories"][0]);
+                                    }
+                                    
+                                    setSelectedMotorType(temp["MotorType"] ? [{
+                                        value: temp["MotorType"],
+                                        label: MotorType[pageLanguage].find(opt => opt.value === temp["MotorType"]).label
+                                    }] : []);
+                                }, 200);
+                            }
                         }
-                        setStepSelectedLabel(tempLabels);
-                        setStepSelectedValue(tempValue);
                     }
                     
                     if (temp["RoomNameEn"]) {
@@ -3748,6 +3944,8 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
     };
     const [selectedMotorChannels, setSelectedMotorChannels] = useState([motorChannels[pageLanguage].find(opt => opt.value === '0')]);
     const [selectedMotorPosition, setSelectedMotorPosition] = useState([]);
+    const [selectedMotorType, setSelectedMotorType] = useState([]);
+    const [selectedMotorMinPrice, setSelectedMotorMinPrice] = useState(0);
     
     const colors = {
         "en": [
@@ -4033,23 +4231,42 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
     }, [deleteUploadPdfUrl]);
     
     useEffect(() => {
+        // console.log(Object.keys(model).length !== 0 , cartValues["WidthCart"] !== undefined);
         if (Object.keys(model).length !== 0 && cartValues["WidthCart"] !== undefined) {
             let tempObj = {};
             model["Accessories"].forEach(obj => {
                 let tempObj2 = {};
                 obj["SewingAccessoryDetails"].forEach(el => {
                     tempObj2[el["SewingAccessoryDetailId"]] = JSON.parse(JSON.stringify(el));
-                    tempObj2[el["SewingAccessoryDetailId"]]["Price"] = el["Price"] * cartValues["WidthCart"] / 100;
+                    tempObj2[el["SewingAccessoryDetailId"]]["Price"] = obj["CalcMethodId"] === 5602 ? el["Price"] * cartValues["WidthCart"] / 100 : el["Price"];
                 });
                 tempObj[obj["SewingAccessoryId"]] = tempObj2;
             });
             setModelAccessories(tempObj);
-            setNoWidth(false);
+            // console.log(model["Accessories"]);
+        } else {
+            setModelAccessories({});
+        }
+    }, [JSON.stringify(cartValues)]);
+    
+    useEffect(() => {
+        if (Object.keys(model).length !== 0 && cartValues["WidthCart"] !== undefined) {
+            // let tempObj = {};
+            // model["Accessories"].forEach(obj => {
+            //     let tempObj2 = {};
+            //     obj["SewingAccessoryDetails"].forEach(el => {
+            //         tempObj2[el["SewingAccessoryDetailId"]] = JSON.parse(JSON.stringify(el));
+            //         tempObj2[el["SewingAccessoryDetailId"]]["Price"] = el["Price"] * cartValues["WidthCart"] / 100;
+            //     });
+            //     tempObj[obj["SewingAccessoryId"]] = tempObj2;
+            // });
+            // setModelAccessories(tempObj);
+            // setNoWidth(false);
             
             renderDkCurtains(cartValues["WidthCart"]);
         } else {
-            setModelAccessories({});
-            setNoWidth(true);
+            // setModelAccessories({});
+            // setNoWidth(true);
             renderDkCurtains(184);
         }
     }, [JSON.stringify(cartValues["WidthCart"])]);
@@ -4204,6 +4421,9 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                     setSodFabrics(tempSodFabrics);
                                     setCart("CurtainArr", dkCurtainArr, "", "SodFabrics", [tempSodFabrics]);
                                     // console.log(tempSodFabrics);
+                                    if (pageLoadDK) {
+                                        setPageLoadDK(false);
+                                    }
                                 });
                             });
                             // console.log(curtainList)
@@ -4381,10 +4601,10 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
     // }, [baseMore, decorativeMore]);
     
     useEffect(() => {
-        if (pageLoad === false) {
+        if (pageLoad === false && pageLoadDK === false) {
             setCart("", "");
         }
-    }, [pageLoad]);
+    }, [pageLoad, pageLoadDK]);
     
     useEffect(() => {
         if (modelID !== '' && catID !== '') {
@@ -7388,7 +7608,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                    onChange={e => {
                                                        selectChanged(e, "");
                                                        setStep4("Right");
-                                                       setDeps("", "4,5");
+                                                       setDeps("", "4,4A");
                                                        setCart("StackPosition", "Right");
                                                    }} ref={ref => (inputs.current["42"] = ref)}/>
                                             <label htmlFor="42">{t("Right")}</label>
@@ -7400,13 +7620,13 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                    onChange={e => {
                                                        selectChanged(e, "");
                                                        setStep4("CenterSplit");
-                                                       setDeps("5", "4");
+                                                       setDeps("4A", "4");
                                                        setCart("StackPosition", "CenterSplit");
                                                    }} ref={ref => (inputs.current["43"] = ref)}/>
                                             <label htmlFor="43">{t("Center Split")}</label>
                                         </div>
                                         <NextStep
-                                            eventKey={step4 === "CenterSplit" || step4 === "" ? "5" : "6"}>{t("NEXT STEP")}</NextStep>
+                                            eventKey={step4 === "CenterSplit" || step4 === "" ? "4A" : "5"}>{t("NEXT STEP")}</NextStep>
                                     </div>
                                     <div className="accordion_help">
                                         <div className="help_container">
@@ -7427,35 +7647,35 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         {/* step 5A */}
                         <Card className={step4 === "CenterSplit" ? "" : "noDisplay"}>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="5" stepNum={t("5A")} stepTitle={t("DK_step5")} stepRef="5" type="1" required={requiredStep["5"]}
-                                                    stepSelected={stepSelectedLabel["5"] === undefined ? "" : stepSelectedLabel["5"]}/>
+                                <ContextAwareToggle eventKey="4A" stepNum={t("5A")} stepTitle={t("DK_step5")} stepRef="4A" type="1" required={requiredStep["4A"]}
+                                                    stepSelected={stepSelectedLabel["4A"] === undefined ? "" : stepSelectedLabel["4A"]}/>
                             </Card.Header>
-                            <Accordion.Collapse eventKey="5">
+                            <Accordion.Collapse eventKey="4A">
                                 <Card.Body>
                                     <div className="card_body card_body_radio special_farsi_card_body">
                                         <div className="box50 radio_style radio_middle">
                                             <img src={require('../Images/drapery/dk/controlposition_left.svg').default} className="img-fluid" alt=""/>
-                                            <input className="radio" type="radio" text={t("Left")} value="1" name="step5" ref-num="5" id="51" checked={step5 === "Left"}
+                                            <input className="radio" type="radio" text={t("Left")} value="1" name="step4A" ref-num="4A" id="4A1" checked={step4A === "Left"}
                                                    onChange={e => {
                                                        selectChanged(e, "");
-                                                       setStep5("Left");
-                                                       setDeps("", "5");
+                                                       setStep4A("Left");
+                                                       setDeps("", "4A");
                                                        setCart("ControlPosition", "Left");
-                                                   }} ref={ref => (inputs.current["51"] = ref)}/>
-                                            <label htmlFor="51">{t("Left")}</label>
+                                                   }} ref={ref => (inputs.current["4A1"] = ref)}/>
+                                            <label htmlFor="4A1">{t("Left")}</label>
                                         </div>
                                         <div className="box50 radio_style radio_middle">
                                             <img src={require('../Images/drapery/dk/controlposition_right.svg').default} className="img-fluid" alt=""/>
-                                            <input className="radio" type="radio" text={t("Right")} value="5" name="step5" ref-num="5" id="52" checked={step5 === "Right"}
+                                            <input className="radio" type="radio" text={t("Right")} value="2" name="step4A" ref-num="4A" id="4A2" checked={step4A === "Right"}
                                                    onChange={e => {
                                                        selectChanged(e, "");
-                                                       setStep5("Right");
-                                                       setDeps("", "5");
+                                                       setStep4A("Right");
+                                                       setDeps("", "4A");
                                                        setCart("ControlPosition", "Right");
-                                                   }} ref={ref => (inputs.current["52"] = ref)}/>
-                                            <label htmlFor="52">{t("Right")}</label>
+                                                   }} ref={ref => (inputs.current["4A2"] = ref)}/>
+                                            <label htmlFor="4A2">{t("Right")}</label>
                                         </div>
-                                        <NextStep eventKey="6">{t("NEXT STEP")}</NextStep>
+                                        <NextStep eventKey="5">{t("NEXT STEP")}</NextStep>
                                     </div>
                                     <div className="accordion_help">
                                         <div className="help_container">
@@ -7469,6 +7689,196 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                             </div>
                                         </div>
                                     </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
+                        {/* step 6 */}
+                        <Card>
+                            <Card.Header>
+                                <ContextAwareToggle eventKey="5" stepNum={t("6")} stepTitle={t("zebra_step4")} stepRef="5" type="1" required={requiredStep["5"]}
+                                                    stepSelected={stepSelectedLabel["5"] === undefined ? "" : stepSelectedLabel["5"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="5">
+                                <Card.Body>
+                                    <div className="card_body card_body_radio">
+                                        <div className="box50 radio_style">
+                                            <input className="radio" type="radio" text={t("Chain & Cord")} value="1" name="step5" ref-num="5" id="51"
+                                                   checked={step5 === "Chain & Cord"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep5("Chain & Cord");
+                                                       setStep51("false");
+                                                       setMotorErr1(false);
+                                                       setDeps("", "5,51");
+                                                       setCart("ControlType", "Chain & Cord", "hasPower,MotorType");
+                                                       setCustomMotorAcc({});
+                                                   }} ref={ref => (inputs.current["51"] = ref)}/>
+                                            <label htmlFor="51">{t("Chain & Cord")}</label>
+                                        </div>
+                                        <div className="box50 radio_style">
+                                            <input className="radio" type="radio" value="2" name="step5" checked={step5 === "Motorized"}
+                                                   ref-num="5" id="52"
+                                                   onChange={e => {
+                                                       selectChanged(e, "51");
+                                                       setStep5("Motorized");
+                                                       setDeps("51", "5");
+                                                   }} ref={ref => (inputs.current["52"] = ref)}/>
+                                            <label htmlFor="52">{t("Motorized")}<br/><p
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 || selectedMotorMinPrice > 0 ? t("Starts at ") + GetPrice(selectedMotorMinPrice, pageLanguage, t("TOMANS")) : t("Surcharge Applies")}</p>
+                                            </label>
+                                        </div>
+                                        <div className={step5 === "Motorized" ? (motorErr1 ? "secondary_options secondary_options_err" : "secondary_options") : "noDisplay"}>
+                                            <div className="card-body-display-flex">
+                                                <div className="width_max checkbox_style">
+                                                    <input type="checkbox" text={t("Motorized")} value="2" name="step51" ref-num="5" checked={step51 === "true"}
+                                                           onChange={(e) => {
+                                                               if (e.target.checked) {
+                                                                   selectChanged(e);
+                                                                   setStep51("true");
+                                                                   setMotorErr1(false);
+                                                                   setDeps("511", "51");
+                                                                   setCart("hasPower", true, "", "ControlType", ["Motorized"]);
+                                                               } else {
+                                                                   selectUncheck(e);
+                                                                   setStep51("");
+                                                                   setCustomMotorAcc({});
+                                                                   setDeps("51", "511");
+                                                                   setCart("", "", "ControlType,hasPower,MotorType");
+                                                               }
+                                                           }} id="511" ref={ref => (inputs.current["511"] = ref)}/>
+                                                    <label htmlFor="511" className="checkbox_label">
+                                                        <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
+                                                             alt=""/>
+                                                    </label>
+                                                    <span className="checkbox_text">
+                                                        {t("dk_Motor_title")}
+                                                    </span>
+                                                </div>
+                                            
+                                            </div>
+                                        </div>
+                                        {motorErr1 &&
+                                            <div className="input_not_valid">{t("motorErr1")}</div>
+                                        }
+                                        <div
+                                            className={step51 === "true" && step5 === "Motorized" ? "motorized_options same_row_selection" : "motorized_options same_row_selection noDisplay"}>
+                                            <div className="motorized_option_left">
+                                                <p>{t("Motor Type")}</p>
+                                                &nbsp;
+                                                <span onClick={() => modalHandleShow("learnMore1")}>{t("(Learn More)")}</span>
+                                            </div>
+                                            <div className="motorized_option_right">
+                                                <div className="select_container">
+                                                    <Select
+                                                        className="select"
+                                                        placeholder={t("Please Select")}
+                                                        portal={document.body}
+                                                        dropdownPosition="bottom"
+                                                        dropdownHandle={false}
+                                                        dropdownGap={0}
+                                                        values={selectedMotorType}
+                                                        onDropdownOpen={() => {
+                                                            let temp1 = window.scrollY;
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            setTimeout(() => {
+                                                                let temp2 = window.scrollY;
+                                                                if (temp2 === temp1)
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                            }, 100);
+                                                        }}
+                                                        dropdownRenderer={
+                                                            ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
+                                                        }
+                                                        contentRenderer={
+                                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                        }
+                                                        // optionRenderer={
+                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                        // }
+                                                        onChange={(selected) => {
+                                                            // if (selected[0] && cartValues["WidthCart"] && cartValues["HeightCart"]) {
+                                                            if (selected[0]) {
+                                                                // console.log(MotorType);
+                                                                setDeps("", "511");
+                                                                setSelectedMotorType(selected);
+                                                                if (selected[0]["apiAccValue"]) {
+                                                                    setCustomMotorAcc(selected[0]["apiAccValue"]);
+                                                                    setCart("MotorType", selected[0].value, undefined, undefined, undefined, selected[0]["apiAccValue"]);
+                                                                } else {
+                                                                    setCart("MotorType", selected[0].value);
+                                                                }
+                                                            }
+                                                        }}
+                                                        options={MotorType[pageLanguage]}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <NextStep eventKey={step5 === "Motorized" && step51 !== "true" ? "5" : "6"} onClick={() => {
+                                            if (step5 === "Motorized" && step51 !== "true") {
+                                                setMotorErr1(true);
+                                            }
+                                        }}>{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                    
+                                    {/*{(step5 === undefined) &&*/}
+                                    {/*    <div className="accordion_help">*/}
+                                    {/*        <div className="help_container">*/}
+                                    {/*            <div className="help_column help_left_column">*/}
+                                    {/*                <p className="help_column_header">{t("step4_help_1")}</p>*/}
+                                    {/*                <ul className="help_column_list">*/}
+                                    {/*                    <li>{t("step4_help_2")}</li>*/}
+                                    {/*                    <li>{t("step4_help_3")}</li>*/}
+                                    {/*                </ul>*/}
+                                    {/*            </div>*/}
+                                    {/*            <div className="help_column help_right_column">*/}
+                                    {/*                <p className="help_column_header">{t("step4_help_4")}</p>*/}
+                                    {/*                <ul className="help_column_list">*/}
+                                    {/*                    /!*<li>{t("step4_help_5")}</li>*!/*/}
+                                    {/*                    <li className="no_listStyle">*/}
+                                    {/*                    <span className="popover_indicator">*/}
+                                    {/*                        {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}*/}
+                                    {/*                                              children={<object className="popover_camera" type="image/svg+xml"*/}
+                                    {/*                                                                data={require('../Images/public/camera.svg').default}/>}*/}
+                                    {/*                                              component={*/}
+                                    {/*                                                  <div className="clearfix">*/}
+                                    {/*                                                      <div className="popover_image clearfix">*/}
+                                    {/*                                                          <img*/}
+                                    {/*                                                              src={popoverImages["step41"] === undefined ? require('../Images/drapery/zebra/motorized_control_type1.png.jpg') : popoverImages["step41"]}*/}
+                                    {/*                                                              className="img-fluid" alt=""/>*/}
+                                    {/*                                                      </div>*/}
+                                    {/*                                                      <div className="popover_footer">*/}
+                                    {/*                                                          <span className="popover_footer_title">{t("step4_popover_1")}</span>*/}
+                                    {/*                                                          <span className="popover_thumbnails">*/}
+                                    {/*                                                              <div>*/}
+                                    {/*                                                                  <img src={require('../Images/drapery/zebra/motorized_control_type1.png.jpg')}*/}
+                                    {/*                                                                       text="step41"*/}
+                                    {/*                                                                       onMouseEnter={(e) => popoverThumbnailHover(e)}*/}
+                                    {/*                                                                       className="popover_thumbnail_img img-fluid"*/}
+                                    {/*                                                                       alt=""/>*/}
+                                    {/*                                                              </div>*/}
+                                    {/*                                                              /!*<div>*!/*/}
+                                    {/*                                                              /!*    <img src={require('../Images/drapery/zebra/motorized_control_type2.png')}*!/*/}
+                                    {/*                                                              /!*         text="step41"*!/*/}
+                                    {/*                                                              /!*         onMouseEnter={(e) => popoverThumbnailHover(e)}*!/*/}
+                                    {/*                                                              /!*         className="popover_thumbnail_img img-fluid"*!/*/}
+                                    {/*                                                              /!*         alt=""/>*!/*/}
+                                    {/*                                                              /!*</div>*!/*/}
+                                    {/*                                                          </span>*/}
+                                    {/*                                                      </div>*/}
+                                    {/*                                                  </div>*/}
+                                    {/*                                              }/>*/}
+                                    {/*                        }*/}
+                                    {/*                    </span>{t("step4_help_5")}</li>*/}
+                                    {/*                    /!*<li>{t("step4_help_5.5")}</li>*!/*/}
+                                    {/*                    <li>{t("step4_help_6")}</li>*/}
+                                    {/*                </ul>*/}
+                                    {/*            </div>*/}
+                                    {/*        </div>*/}
+                                    {/*    </div>*/}
+                                    {/*}*/}
                                 </Card.Body>
                             </Accordion.Collapse>
                         </Card>
@@ -7863,6 +8273,20 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             </Modal>
             
             <Modal dialogClassName={`learnMore_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                   show={modals["widthLimit"] === undefined ? false : modals["widthLimit"]}
+                   onHide={() => modalHandleClose("widthLimit")}>
+                <Modal.Header closeButton>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>{t("widthLimit")}</p>
+                    <br/>
+                    <div className="text_center">
+                        <button className="btn btn-new-dark" onClick={() => modalHandleClose("widthLimit")}>{t("CONTINUE")}</button>
+                    </div>
+                </Modal.Body>
+            </Modal>
+            
+            <Modal dialogClassName={`learnMore_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["onlyOneBase"] === undefined ? false : modals["onlyOneBase"]}
                    onHide={() => modalHandleClose(" onlyOneBase")}>
                 <Modal.Header closeButton>
@@ -7944,11 +8368,11 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                 {/*<p className="measurementsHelp_modal_img_title">{t("Inside Mount")}</p>*/}
                                 <span>
                                     <object className="measurementsHelp_modal_img" type="image/svg+xml"
-                                            data={pageLanguage === 'fa' ? require('../Images/drapery/dk/help_new_height_inside_3_fa.svg').default : require('../Images/drapery/dk/help_new_height_inside_3.svg').default}/>
+                                            data={pageLanguage === 'fa' ? require('../Images/drapery/dk/help_new_width_inside_3_fa.svg').default : require('../Images/drapery/dk/help_new_width_inside_3.svg').default}/>
                                 </span>
                                 <span>
                                     <object className="measurementsHelp_modal_img" type="image/svg+xml"
-                                            data={pageLanguage === 'fa' ? require('../Images/drapery/dk/help_new_width_inside_3_fa.svg').default : require('../Images/drapery/dk/help_new_width_inside_3.svg').default}/>
+                                            data={pageLanguage === 'fa' ? require('../Images/drapery/dk/help_new_height_inside_3_fa.svg').default : require('../Images/drapery/dk/help_new_height_inside_3.svg').default}/>
                                 </span>
                             </div>
                             <div className="accordion_help measurementsHelp_modal_help_section">

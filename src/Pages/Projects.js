@@ -290,6 +290,18 @@ function Projects() {
                                             </h4>
                                         </div>
                                     }
+                                    {SewingModelId === "0325" &&
+                                        <div className="basket_item_title_desc">
+                                            <h3>{t("dualRoller_step1")}&nbsp;</h3>
+                                            <h4>{pageLanguage === 'fa' ? userProjects[i]["PreorderText"]["FabricDesignFa"] + " / " + userProjects[i]["PreorderText"]["FabricColorFa"] : userProjects[i]["PreorderText"]["FabricDesignEn"] + " / " + userProjects[i]["PreorderText"]["FabricColorEn"]}</h4>
+                                        </div>
+                                    }
+                                    {SewingModelId === "0325" &&
+                                        <div className="basket_item_title_desc">
+                                            <h3>{t("dualRoller_step2")}&nbsp;</h3>
+                                            <h4>{pageLanguage === 'fa' ? userProjects[i]["PreorderText"]["FabricDesignFa2"] + " / " + userProjects[i]["PreorderText"]["FabricColorFa2"] : userProjects[i]["PreorderText"]["FabricDesignEn2"] + " / " + userProjects[i]["PreorderText"]["FabricColorEn2"]}</h4>
+                                        </div>
+                                    }
                                     {tempArr}
                                     <div className="basket_item_title_desc">
                                         <h3>{pageLanguage === 'fa' ? "نام اتاق" : "Room Label"}&nbsp;</h3>

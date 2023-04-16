@@ -545,7 +545,7 @@ function GetMeasurementArray({modelId, cartValues}) {
                                     </div>
                                     <div className="cart_agree_measurement_row_section">
                                         <h1 className="cart_agree_item_title">{t("Height 2")}</h1>
-                                        <h2 className="cart_agree_item_desc">{NumToFa(cartValues["CeilingToWindow2"])}</h2>
+                                        <h2 className="cart_agree_item_desc">{NumToFa(cartValues["CeilingToWindow2"] ? cartValues["CeilingToWindow2"] : cartValues["Height2"])}</h2>
                                     </div>
                                     <div className="cart_agree_measurement_row_section">
                                         <h1 className="cart_agree_item_title cart_agree_measurement_row_operator"/>
@@ -553,7 +553,7 @@ function GetMeasurementArray({modelId, cartValues}) {
                                     </div>
                                     <div className="cart_agree_measurement_row_section">
                                         <h1 className="cart_agree_item_title">{t("Height 3")}</h1>
-                                        <h2 className="cart_agree_item_desc">{NumToFa(cartValues["CeilingToWindow3"])}</h2>
+                                        <h2 className="cart_agree_item_desc">{NumToFa(cartValues["CeilingToWindow3"] ? cartValues["CeilingToWindow3"] : cartValues["Height3"])}</h2>
                                     </div>
                                     <div className="cart_agree_measurement_row_section">
                                         <h1 className="cart_agree_item_title cart_agree_measurement_row_operator">:</h1>
@@ -612,7 +612,7 @@ function GetMeasurementArray({modelId, cartValues}) {
                                     </div>
                                     <div className="cart_agree_measurement_row_section">
                                         <h1 className="cart_agree_item_title">{t("Height 2")}</h1>
-                                        <h2 className="cart_agree_item_desc">{NumToFa(cartValues["CeilingToWindow2"])}</h2>
+                                        <h2 className="cart_agree_item_desc">{NumToFa(cartValues["CeilingToWindow2"] ? cartValues["CeilingToWindow2"] : cartValues["Height2"])}</h2>
                                     </div>
                                     <div className="cart_agree_measurement_row_section">
                                         <h1 className="cart_agree_item_title cart_agree_measurement_row_operator"/>
@@ -620,7 +620,7 @@ function GetMeasurementArray({modelId, cartValues}) {
                                     </div>
                                     <div className="cart_agree_measurement_row_section">
                                         <h1 className="cart_agree_item_title">{t("Height 3")}</h1>
-                                        <h2 className="cart_agree_item_desc">{NumToFa(cartValues["CeilingToWindow3"])}</h2>
+                                        <h2 className="cart_agree_item_desc">{NumToFa(cartValues["CeilingToWindow3"] ? cartValues["CeilingToWindow3"] : cartValues["Height3"])}</h2>
                                     </div>
                                     <div className="cart_agree_measurement_row_section">
                                         <h1 className="cart_agree_item_title cart_agree_measurement_row_operator">:</h1>
@@ -679,7 +679,7 @@ function GetMeasurementArray({modelId, cartValues}) {
                                     </div>
                                     <div className="cart_agree_measurement_row_section">
                                         <h1 className="cart_agree_item_title">{t("Height 2")}</h1>
-                                        <h2 className="cart_agree_item_desc">{NumToFa(cartValues["CeilingToFloor2"])}</h2>
+                                        <h2 className="cart_agree_item_desc">{NumToFa(cartValues["CeilingToWindow2"] ? cartValues["CeilingToWindow2"] : cartValues["Height2"])}</h2>
                                     </div>
                                     <div className="cart_agree_measurement_row_section">
                                         <h1 className="cart_agree_item_title cart_agree_measurement_row_operator"/>
@@ -687,7 +687,7 @@ function GetMeasurementArray({modelId, cartValues}) {
                                     </div>
                                     <div className="cart_agree_measurement_row_section">
                                         <h1 className="cart_agree_item_title">{t("Height 3")}</h1>
-                                        <h2 className="cart_agree_item_desc">{NumToFa(cartValues["CeilingToFloor3"])}</h2>
+                                        <h2 className="cart_agree_item_desc">{NumToFa(cartValues["CeilingToWindow3"] ? cartValues["CeilingToWindow3"] : cartValues["Height3"])}</h2>
                                     </div>
                                     <div className="cart_agree_measurement_row_section">
                                         <h1 className="cart_agree_item_title cart_agree_measurement_row_operator">:</h1>
