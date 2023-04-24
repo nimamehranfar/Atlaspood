@@ -34,6 +34,11 @@ function convertToPersian(string_farsi= "") {
         tempString = tempString.replace("ي", "ی");
         tempString = tempString.replace("ي", "ی");
         tempString = tempString.replace("ي", "ی");
+        tempString = tempString.replace("ي", "ی");
+        tempString = tempString.replace("ي", "ی");
+        tempString = tempString.replace("ي", "ی");
+        tempString = tempString.replace("ي", "ی");
+        tempString = tempString.replace("ي", "ی");
         tempString = tempString.replace('ك', 'ک');
         return tempString;
     } else

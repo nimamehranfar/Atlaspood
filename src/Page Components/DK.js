@@ -341,7 +341,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                     },
                     {
                         value: 'Open & Close Motor',
-                        label: "Open & Close Motor (" + GetPrice(modelAccessories["24"]["42"]["Price"], pageLanguage, t("TOMANS")) + ")",
+                        label: "Open & Close Motor  (" + GetPrice(modelAccessories["24"]["42"]["Price"], pageLanguage, t("TOMANS")) + ")",
                         apiAccValue: {
                             "SewingAccessoryId": 24,
                             "SewingModelAccessoryId": 0,
@@ -351,7 +351,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                     },
                     {
                         value: 'Angle Rotation and Open & Close Motor',
-                        label: "Angle Rotation and Open & Close Motor (" + GetPrice(modelAccessories["24"]["43"]["Price"], pageLanguage, t("TOMANS")) + ")",
+                        label: "Angle Rotation and\nOpen & Close Motor  (" + GetPrice(modelAccessories["24"]["43"]["Price"], pageLanguage, t("TOMANS")) + ")",
                         apiAccValue: {
                             "SewingAccessoryId": 24,
                             "SewingModelAccessoryId": 0,
@@ -3743,6 +3743,10 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
             temp.left = [];
             temp.right = [];
             setSelectCustomValues(temp);
+            setLeftRight({
+                "left": "",
+                "right": ""
+            });
             let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
             delete tempLabels["2CCeiling"];
             delete tempLabels["2C"];
@@ -7417,7 +7421,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                             </div>
                                         </div>
                                         {motorErr1 &&
-                                            <div className="input_not_valid">{t("motorErr1")}</div>
+                                            <div className="input_not_valid">{t("dk_motorErr1")}</div>
                                         }
                                         <div
                                             className={step51 === "true" && step5 === "Motorized" ? "motorized_options same_row_selection" : "motorized_options same_row_selection noDisplay"}>
@@ -7462,9 +7466,9 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                                 setSelectedMotorType(selected);
                                                                 if (selected[0]["apiAccValue"]) {
                                                                     setCustomMotorAcc(selected[0]["apiAccValue"]);
-                                                                    setCart("MotorType", selected[0].value,"", "MotorPosition,ControlPosition", ["Left,Left,Left"], selected[0]["apiAccValue"]);
+                                                                    setCart("MotorType", selected[0].value, undefined, undefined, undefined, selected[0]["apiAccValue"]);
                                                                 } else {
-                                                                    setCart("MotorType", selected[0].value,"", "MotorPosition,ControlPosition", ["Left,Left,Left"]);
+                                                                    setCart("MotorType", selected[0].value);
                                                                 }
                                                             }
                                                         }}
@@ -8548,13 +8552,25 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                             temp.height1 = [];
                             temp.height2 = [];
                             temp.height3 = [];
+                            temp.CeilingToWindow1 = [];
+                            temp.CeilingToWindow2 = [];
+                            temp.CeilingToWindow3 = [];
+                            temp.CeilingToFloor1 = [];
+                            temp.CeilingToFloor2 = [];
+                            temp.CeilingToFloor3 = [];
                             setSelectCustomValues(temp);
                             let temp2 = JSON.parse(JSON.stringify(stepSelectedOptions));
                             temp2.labels["3BIn"] = [];
                             temp2.values["3BIn"] = [];
+                            temp2.labels["2D"] = [];
+                            temp2.values["2D"] = [];
+                            temp2.labels["2DFloor"] = [];
+                            temp2.values["2DFloor"] = [];
                             setStepSelectedOptions(temp2);
                             let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
                             delete tempLabels["3BIn"];
+                            delete tempLabels["2D"];
+                            delete tempLabels["2DFloor"];
                             setStepSelectedLabel(tempLabels);
                         }}>{t("CHANGE MEASUREMENTS")}
                         </button>

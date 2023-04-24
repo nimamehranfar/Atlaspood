@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="135.477" height="167" viewBox="0 0 135.477 167">
+  <defs>
+    <style>
+      .cls-1, .cls-3 {
+        fill: none;
+      }
+
+      .cls-2 {
+        fill: #fff;
+        stroke: #454545;
+        stroke-width: 1.1px;
+      }
+
+      .cls-3 {
+        stroke: #606060;
+        stroke-width: 2px;
+      }
+
+      .cls-4 {
+        fill: #606060;
+      }
+
+      .cls-5 {
+        stroke: none;
+      }
+    </style>
+  </defs>
+  <g id="Group_27" data-name="Group 27" transform="translate(-777.522 -279)">
+    <rect id="Rectangle_51" data-name="Rectangle 51" class="cls-1" width="135" height="166.602" transform="translate(777.625 279.398)"/>
+    <g id="Rectangle_4" data-name="Rectangle 4" class="cls-2" transform="translate(797.42 300.651)">
+      <rect class="cls-5" width="95.067" height="131.563"/>
+      <rect class="cls-1" x="0.55" y="0.55" width="93.967" height="130.463"/>
+    </g>
+    <g id="Rectangle_5" data-name="Rectangle 5" class="cls-2" transform="translate(805.711 308.942)">
+      <rect class="cls-5" width="78.485" height="114.982"/>
+      <rect class="cls-1" x="0.55" y="0.55" width="77.385" height="113.882"/>
+    </g>
+    <g id="Group_25" data-name="Group 25" transform="translate(777.522 279)">
+      <rect id="Rectangle_41" data-name="Rectangle 41" class="cls-1" width="135" height="167" transform="translate(0.477 0)"/>
+      <line id="Line_1" data-name="Line 1" class="cls-3" x2="127.124" transform="translate(3.869 3.982)"/>
+      <circle id="Ellipse_1" data-name="Ellipse 1" class="cls-4" cx="3.869" cy="3.869" r="3.869" transform="translate(127.124 0.113)"/>
+      <circle id="Ellipse_2" data-name="Ellipse 2" class="cls-4" cx="3.869" cy="3.869" r="3.869" transform="translate(0 0.113)"/>
+    </g>
+  </g>
+</svg>

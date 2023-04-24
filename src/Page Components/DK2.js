@@ -337,7 +337,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     },
                     {
                         value: 'Open & Close Motor',
-                        label: "Open & Close Motor (" + GetPrice(modelAccessories["24"]["42"]["Price"], pageLanguage, t("TOMANS")) + ")",
+                        label: "Open & Close Motor  (" + GetPrice(modelAccessories["24"]["42"]["Price"], pageLanguage, t("TOMANS")) + ")",
                         apiAccValue: {
                             "SewingAccessoryId": 24,
                             "SewingModelAccessoryId": 0,
@@ -347,7 +347,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     },
                     {
                         value: 'Angle Rotation and Open & Close Motor',
-                        label: "Angle Rotation and Open & Close Motor (" + GetPrice(modelAccessories["24"]["43"]["Price"], pageLanguage, t("TOMANS")) + ")",
+                        label: "Angle Rotation and\nOpen & Close Motor  (" + GetPrice(modelAccessories["24"]["43"]["Price"], pageLanguage, t("TOMANS")) + ")",
                         apiAccValue: {
                             "SewingAccessoryId": 24,
                             "SewingModelAccessoryId": 0,
@@ -3812,6 +3812,10 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             temp.left = [];
             temp.right = [];
             setSelectCustomValues(temp);
+            setLeftRight({
+                "left": "",
+                "right": ""
+            });
             let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
             delete tempLabels["2CCeiling"];
             delete tempLabels["2C"];
@@ -5707,7 +5711,6 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                             </Accordion.Collapse>
                         </Card>
                         
-                        
                         {/* step 2B*/}
                         {step2 === "true" && stepSelectedValue["2A"] && !!((stepSelectedValue["1"] === "3" && step11 === "true") || (step1 === "Outside" && selectedMountOutsideType.length)) &&
                             <Card>
@@ -7391,20 +7394,6 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                             {/*</div>*/}
                                             {/*{fabricsList2}*/}
                                         </div>
-                                        <Modal dialogClassName="zoomModal" show={show} onHide={() => handleClose()}>
-                                            <Modal.Header closeButton>
-                                                {zoomModalHeader}
-                                            </Modal.Header>
-                                            <Modal.Body>{zoomModalBody}</Modal.Body>
-                                            <Modal.Footer>
-                                                <button className={`swatchButton ${hasSwatchId ? "activeSwatch" : ""} ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
-                                                        current-state={hasSwatchId ? "1" : "0"}
-                                                        onClick={(e) => {
-                                                            fabricSwatch(e, swatchId, swatchDetailId, swatchPhotoPath);
-                                                        }}
-                                                        disabled={swatchId === -1}>{hasSwatchId ? t("SWATCH IN CART") : t("ORDER SWATCH")}</button>
-                                            </Modal.Footer>
-                                        </Modal>
                                         <NextStep eventKey="35">{t("NEXT STEP")}</NextStep>
                                     </div>
                                 </Card.Body>
@@ -7562,20 +7551,6 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                             {/*</div>*/}
                                             {fabricsList2}
                                         </div>
-                                        <Modal dialogClassName="zoomModal" show={false} onHide={() => handleClose()}>
-                                            <Modal.Header closeButton>
-                                                {zoomModalHeader}
-                                            </Modal.Header>
-                                            <Modal.Body>{zoomModalBody}</Modal.Body>
-                                            <Modal.Footer>
-                                                <button className={`swatchButton ${hasSwatchId ? "activeSwatch" : ""} ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
-                                                        current-state={hasSwatchId ? "1" : "0"}
-                                                        onClick={(e) => {
-                                                            fabricSwatch(e, swatchId, swatchDetailId, swatchPhotoPath);
-                                                        }}
-                                                        disabled={swatchId === -1}>{hasSwatchId ? t("SWATCH IN CART") : t("ORDER SWATCH")}</button>
-                                            </Modal.Footer>
-                                        </Modal>
                                         <NextStep eventKey="4">{t("NEXT STEP")}</NextStep>
                                     </div>
                                 </Card.Body>
@@ -7759,7 +7734,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                             </div>
                                         </div>
                                         {motorErr1 &&
-                                            <div className="input_not_valid">{t("motorErr1")}</div>
+                                            <div className="input_not_valid">{t("dk_motorErr1")}</div>
                                         }
                                         <div
                                             className={step51 === "true" && step5 === "Motorized" ? "motorized_options same_row_selection" : "motorized_options same_row_selection noDisplay"}>
@@ -8211,6 +8186,21 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                 {/*<Modal.Footer>*/}
                 {/*    */}
                 {/*</Modal.Footer>*/}
+            </Modal>
+    
+            <Modal dialogClassName="zoomModal" show={show} onHide={() => handleClose()}>
+                <Modal.Header closeButton>
+                    {zoomModalHeader}
+                </Modal.Header>
+                <Modal.Body>{zoomModalBody}</Modal.Body>
+                <Modal.Footer>
+                    <button className={`swatchButton ${hasSwatchId ? "activeSwatch" : ""} ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                            current-state={hasSwatchId ? "1" : "0"}
+                            onClick={(e) => {
+                                fabricSwatch(e, swatchId, swatchDetailId, swatchPhotoPath);
+                            }}
+                            disabled={swatchId === -1}>{hasSwatchId ? t("SWATCH IN CART") : t("ORDER SWATCH")}</button>
+                </Modal.Footer>
             </Modal>
             
             <Modal dialogClassName={`noInsideUnderstand_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
@@ -8936,13 +8926,25 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                             temp.height1 = [];
                             temp.height2 = [];
                             temp.height3 = [];
+                            temp.CeilingToWindow1 = [];
+                            temp.CeilingToWindow2 = [];
+                            temp.CeilingToWindow3 = [];
+                            temp.CeilingToFloor1 = [];
+                            temp.CeilingToFloor2 = [];
+                            temp.CeilingToFloor3 = [];
                             setSelectCustomValues(temp);
                             let temp2 = JSON.parse(JSON.stringify(stepSelectedOptions));
                             temp2.labels["3BIn"] = [];
                             temp2.values["3BIn"] = [];
+                            temp2.labels["2D"] = [];
+                            temp2.values["2D"] = [];
+                            temp2.labels["2DFloor"] = [];
+                            temp2.values["2DFloor"] = [];
                             setStepSelectedOptions(temp2);
                             let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
                             delete tempLabels["3BIn"];
+                            delete tempLabels["2D"];
+                            delete tempLabels["2DFloor"];
                             setStepSelectedLabel(tempLabels);
                         }}>{t("CHANGE MEASUREMENTS")}
                         </button>

@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="238.261" height="198.398" viewBox="0 0 238.261 198.398">
+  <defs>
+    <style>
+	
+	@font-face {
+	font-family: "proximanova-nova";
+
+	src: url('https://doopsalta2.com/Fonts/proxima-nova-three.woff2') format('woff2'),
+		url('https://doopsalta2.com/Fonts/proxima-nova-three.woff') format('woff'),
+		url('https://doopsalta2.com/Fonts/proxima-nova-three.otf') format('opentype');
+	font-style: normal;
+	}
+
+      .cls-1, .cls-2, .cls-6, .cls-7, .cls-8, .cls-9 {
+        fill: none;
+      }
+
+      .cls-2, .cls-7, .cls-8, .cls-9 {
+        stroke: #606060;
+      }
+
+      .cls-2 {
+        stroke-width: 2px;
+      }
+
+      .cls-3 {
+        fill: #fff;
+        stroke: #454545;
+        stroke-width: 1.1px;
+      }
+
+      .cls-10, .cls-4 {
+        fill: #606060;
+      }
+
+      .cls-5 {
+        fill: #707070;
+        stroke: rgba(0,0,0,0.5);
+        font-size: 11px;
+        font-family:'proximanova-nova',sans-serif;
+        font-weight: 200;
+      }
+
+      .cls-6 {
+        stroke: #707070;
+        stroke-width: 1.5px;
+      }
+
+      .cls-8 {
+        stroke-width: 0.8px;
+      }
+
+      .cls-9 {
+        stroke-width: 1.2px;
+      }
+
+      .cls-11, .cls-12 {
+        stroke: none;
+      }
+
+      .cls-12 {
+        fill: #606060;
+      }
+    </style>
+  </defs>
+  <g id="Group_33" data-name="Group 33" transform="translate(-19.514 3.602)">
+    <rect id="Rectangle_41" data-name="Rectangle 41" class="cls-1" width="179" height="151" transform="translate(19.514 -3.602)"/>
+    <line id="Line_1" data-name="Line 1" class="cls-2" x2="122" transform="translate(76.037 0.296)"/>
+    <g id="Rectangle_4" data-name="Rectangle 4" class="cls-3" transform="translate(89.503 15.835)">
+      <rect class="cls-11" width="95.067" height="131.563"/>
+      <rect class="cls-1" x="0.55" y="0.55" width="93.967" height="130.463"/>
+    </g>
+    <g id="Rectangle_5" data-name="Rectangle 5" class="cls-3" transform="translate(97.794 24.126)">
+      <rect class="cls-11" width="78.485" height="114.982"/>
+      <rect class="cls-1" x="0.55" y="0.55" width="77.385" height="113.882"/>
+    </g>
+    <circle id="Ellipse_1" data-name="Ellipse 1" class="cls-4" cx="3.5" cy="3.5" r="3.5" transform="translate(195.014 -3.204)"/>
+    <circle id="Ellipse_2" data-name="Ellipse 2" class="cls-4" cx="3.5" cy="3.5" r="3.5" transform="translate(72.537 -3.204)"/>
+    <text id="FLOOR" class="cls-5" transform="translate(218.775 189.796)"><tspan x="0" y="0">FLOOR</tspan></text>
+    <line id="Line_43" data-name="Line 43" class="cls-6" x2="155" transform="translate(59.536 185.296)"/>
+    <g id="Group_35" data-name="Group 35" transform="translate(99.536 -47.99) rotate(90)">
+      <line id="Line_5" data-name="Line 5" class="cls-7" y1="18.591" transform="translate(47.99 3)"/>
+      <line id="Line_6" data-name="Line 6" class="cls-8" y1="18.591" transform="translate(194.95 3)"/>
+      <line id="Line_7" data-name="Line 7" class="cls-9" x2="141.691" transform="translate(50.581 17.31)"/>
+      <g id="Polygon_1" data-name="Polygon 1" class="cls-10" transform="translate(194.136 14.338) rotate(90)">
+        <path class="cls-11" d="M 5.587347507476807 6.740784168243408 L 0.6095922589302063 6.740784168243408 L 3.098469972610474 1.004879474639893 L 5.587347507476807 6.740784168243408 Z"/>
+        <path class="cls-12" d="M 3.098469972610474 2.009778022766113 L 1.219194412231445 6.340784072875977 L 4.977745532989502 6.340784072875977 L 3.098469972610474 2.009778022766113 M 3.098469972610474 3.814697265625e-06 L 6.196939945220947 7.14078426361084 L 0 7.14078426361084 L 3.098469972610474 3.814697265625e-06 Z"/>
+      </g>
+      <g id="Polygon_2" data-name="Polygon 2" class="cls-10" transform="translate(48.84 20.535) rotate(-90)">
+        <path class="cls-11" d="M 5.587347507476807 6.740784168243408 L 0.6095922589302063 6.740784168243408 L 3.098469972610474 1.004879474639893 L 5.587347507476807 6.740784168243408 Z"/>
+        <path class="cls-12" d="M 3.098469972610474 2.009778022766113 L 1.219194412231445 6.340784072875977 L 4.977745532989502 6.340784072875977 L 3.098469972610474 2.009778022766113 M 3.098469972610474 3.814697265625e-06 L 6.196939945220947 7.14078426361084 L 0 7.14078426361084 L 3.098469972610474 3.814697265625e-06 Z"/>
+      </g>
+    </g>
+  </g>
+</svg>
