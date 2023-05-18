@@ -42,7 +42,7 @@ import AddProjectToCart from "../Components/AddProjectToCart";
 import GetMeasurementArray from "../Components/GetMeasurementArray";
 import GetSewingFilters from "../Components/GetSewingFilters";
 import TruncateMarkup from "react-truncate-markup";
-import {Capitalize, CapitalizeAllWords, Uppercase} from "../Components/TextTransform";
+import {Capitalize, CapitalizeAllWords, NumToFa, Uppercase} from "../Components/TextTransform";
 import {DebounceInput} from "react-debounce-input";
 import {convertToPersian} from "../Components/TextTransform";
 import GetBasketZipcode from "../Components/GetBasketZipcode";
@@ -1039,12 +1039,12 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                     let tempMin = temp.values[refIndex][temp.values[refIndex].indexOf(Math.min(...temp.values[refIndex]))];
                     tempLabels[refIndex] = pageLang === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
                 } else {
-                    let tempMax = temp.values[refIndex][temp.values[refIndex].indexOf(Math.max(...temp.values[refIndex]))];
+                    let tempMax = temp.values[refIndex][temp.values[refIndex].indexOf(Math.min(...temp.values[refIndex]))];
                     tempLabels[refIndex] = pageLang === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + postfixFa : tempMax + postfixEn;
                 }
                 setStepSelectedLabel(tempLabels);
                 let minValue = Math.min(...temp.values[refIndex]);
-                let maxValue = Math.max(...temp.values[refIndex]);
+                let maxValue = Math.min(...temp.values[refIndex]);
                 if (maxValue - minValue >= 2) {
                     modalHandleShow(modalRef);
                 }
@@ -1942,7 +1942,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                                         <div key={i}
                                                                              className="dk_curtain_preview_detail">
                                                                             <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + " / " + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
-                                                                            <h5>&nbsp;X</h5><h3>{item["Qty"]}</h3>
+                                                                            <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"],pageLanguage)}</h3>
                                                                         </div>)}
                                                                 </div>
                                                             </Accordion.Body>
@@ -2112,7 +2112,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                                             <div key={i}
                                                                                  className="dk_curtain_preview_detail">
                                                                                 <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + "/" + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
-                                                                                <h5>&nbsp;X</h5><h3>{item["Qty"]}</h3>
+                                                                                <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"],pageLanguage)}</h3>
                                                                             </div>)}
                                                                     </div>
                                                                 </Accordion.Body>
@@ -2376,7 +2376,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                                                 <div key={i}
                                                                                      className="dk_curtain_preview_detail">
                                                                                     <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + "/" + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
-                                                                                    <h5>&nbsp;X</h5><h3>{item["Qty"]}</h3>
+                                                                                    <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"],pageLanguage)}</h3>
                                                                                 </div>)}
                                                                         </div>
                                                                     </Accordion.Body>
@@ -3105,7 +3105,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                         tempLabels["2AIn"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
                                     }
                                     if (tempHeight && temp["Height2"] && temp["Height3"]) {
-                                        let tempMax = Math.max(tempHeight, temp["Height2"], temp["Height3"]);
+                                        let tempMax = Math.min(tempHeight, temp["Height2"], temp["Height3"]);
                                         tempLabels["2BIn"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + postfixFa : tempMax + postfixEn;
                                     }
                                     
@@ -4029,7 +4029,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
 //                             temp.labels[objKey] = [];
 //                         if (temp.values[objKey] === undefined)
 //                             temp.values[objKey] = [];
-//                         let tempMax = temp.values[objKey][temp.values[objKey].indexOf(Math.max(...temp.values[objKey]))];
+//                         let tempMax = temp.values[objKey][temp.values[objKey].indexOf(Math.min(...temp.values[objKey]))];
 //                         tempLabels[objKey] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + "س\u200Cم" : tempMax + "cm";
 //
 //                     } else if (objKey === "3BOut") {

@@ -474,8 +474,8 @@ button[disabled], .btn[disabled]{
 }
 
 .width_max{
-    width: max-content;
-    width: -moz-max-content;
+    width: max-content !important;
+    width: -moz-max-content !important;
 }
 
 .radio {
@@ -2053,6 +2053,7 @@ span.model_info_price_off {
 .steps_header_num_container {
     width: 10%;
     text-align: center;
+    flex-shrink: 0;
 }
 
 .steps_header_title_container {
@@ -2065,6 +2066,7 @@ span.model_info_price_off {
     width: 55%;
     text-align: end;
     position: relative;
+    flex-shrink: 0;
 }
 
 .steps_header_num {
@@ -2194,7 +2196,7 @@ span.model_info_price_off {
     padding-inline-end: 0.8125rem;
     padding-inline-start: 0.8125rem;
     margin-top: 1.1rem;
-    max-height: 26.5rem;
+    max-height: 27.5rem;
     overflow-y: scroll;
 }
 
@@ -2454,8 +2456,13 @@ input[name="fabric2"]:hover + .frame_img img, .img-fluid_checked {
 input[outline="true"]:hover + .frame_img img, .img-fluid_checked {
     outline: 0.125rem solid #49443e !important;
 }
+
 input[outline="true"]:checked + .frame_img img, .img-fluid_checked {
     outline: 0.125rem solid #49443e !important;
+}
+
+input[outline="true"]:checked + .radio_group_name_container{
+    border: 0.125rem solid #49443e !important;
 }
 
 .font_farsi .swatchButton {
@@ -2730,10 +2737,10 @@ input[outline="true"]:checked + .frame_img img, .img-fluid_checked {
 .filters_container .dropdown-menu {
     margin-top: 1rem !important;
     inset: unset !important;
-    left: 0.3rem !important;
+    left: 0.27rem !important;
     top: 0 !important;
     border-radius: 0 !important;
-    width: 32.3rem;
+    width: 33.75rem;
     padding: 0.625rem 0.9375rem;
     background-color: #f8f8f7;
     transform: translate3d(0.5rem, 1.625rem, 0rem) !important;
@@ -3030,9 +3037,10 @@ input[outline="true"]:checked + .frame_img img, .img-fluid_checked {
 .popover_footer div:hover {
     border: 0.0625rem solid #49443e;
     margin: 0 -0.0625rem -0.0625rem;
-    max-height: 2.90625rem;
+    max-height: 2.9375rem;
     max-width: 2.9375rem;
     margin-inline-start: 0.25rem;
+    aspect-ratio: 1/1;
 }
 
 .popover {
@@ -3465,9 +3473,41 @@ body .react-dropdown-select-dropdown {
     margin: 0 auto;
 }
 
+.own_measurements_container .select_label{
+    min-height: 1.25rem;
+}
+
+.own_measurements_container.grommet_own_measurements_container .own_measurements_labels {
+    width: 20%;
+    margin: 0 auto;
+}
+
+.own_measurements_container.grommet_own_measurements_container .own_measurements_width {
+    width: 40%;
+    margin: 0 auto;
+}
+
+.own_measurements_container.grommet_own_measurements_container .own_measurements_Length {
+    width: 40%;
+    margin: 0 auto;
+}
+
 .select_label {
     font-size: 0.95rem;
     margin: 0 auto 0.3125rem;
+}
+
+.own_measurements_container.grommet_own_measurements_container >div > .select_container:first-of-type{
+    margin-bottom: 1rem;
+}
+
+.own_measurements_container .own_measurements_labels .select_container{
+    margin-inline-start: 0;
+}
+
+.own_measurements_container .own_measurements_labels .select_label{
+    padding-inline-start: 27%;
+    text-align: initial;
 }
 
 .measurementsHelp_modal_img_section {
@@ -3783,7 +3823,7 @@ body .react-dropdown-select-dropdown {
     padding-top: 1rem;
 }
 
-.warning_modal .modal-body p {
+.warning_modal .modal-body p, .warning_modal2 .modal-body p {
     line-height: 2rem;
     text-align: initial;
     font-size: 1.125rem;
@@ -3801,13 +3841,13 @@ body .react-dropdown-select-dropdown {
     align-items: center;
 }
 
-.warning_modal .modal-body .btn {
+.warning_modal .modal-body .btn, .warning_modal2 .modal-body .btn {
     width: 16.4375rem;
     height: 2.375rem;
     padding: unset;
 }
 
-.warning_modal .buttons_section {
+.warning_modal .buttons_section, .warning_modal2 .buttons_section {
     display: flex;
     justify-content: space-evenly;
     width: 90%;
@@ -9039,9 +9079,16 @@ height: 11.1875rem;
 
 .grommet_fabrics_list_container{
     max-height: 29.5rem;
-    border-top: 0.0625rem solid rgba(0, 0, 0, .2);
-    padding-top: 2rem;
-    margin-top: 2rem;
+    /*border-top: 0.0625rem solid rgba(0, 0, 0, .2);*/
+    /*padding-top: 2rem;*/
+    margin-top: 0;
+    width: 100%;
+    min-height: 5rem;
+}
+
+.grommet_fabrics_list_container .fabrics_list_container{
+    min-height: 5rem;
+    margin-top: 0;
 }
 
 .card-body-fabric_grommet {
@@ -9052,4 +9099,239 @@ height: 11.1875rem;
     font-weight: 500;
     text-align: center;
     list-style: none;
+}
+
+.cat_models_list_selection{
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    align-items: flex-start;
+    margin: 3rem 0;
+}
+
+.cat_models_list_selection > li {
+    /*height: 33.75rem;*/
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    padding: 0;
+    /*margin: 2.8rem 0;*/
+    width: 25%;
+}
+
+.cat_models_list_selection > li.model_color_1 {
+    background: #ebe9e5;
+}
+
+.cat_models_list_selection > li.model_color_2 {
+    background: #fafafa;
+}
+
+.cat_models_list_selection .model_image_container {
+    width: 100%;
+    max-width: 100%;
+}
+
+.cat_models_list_selection .model_item_info_container {
+    width: 100%;
+    max-width: 100%;
+}
+
+.cat_models_list_selection .model_info_container {
+    width: 100%;
+    max-width: 100%;
+}
+
+.cat_models_list_selection .model_item_info_description_section {
+    margin: 1rem auto;
+}
+
+.grommet_fabrics_list_container hr{
+    display: block!important;
+}
+
+.card-body .card_body.card_body_radio_small_img .radio_style img{
+    width: 5rem;
+    height: max-content;
+}
+
+.card_body.card_body_info{
+    padding-top: 0;
+}
+
+.card_body_info_header{
+    padding: 1rem 1rem 0.5rem;
+}
+
+.card_body_info_body{
+    padding: 0.5rem 1rem 2rem;
+}
+
+.card_body_info_header_title{
+    text-align: initial;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.card_body_info_text{
+    text-align: initial;
+    font-size: 0.875rem;
+}
+
+.radio_recommended_text{
+    display: none;
+    position: absolute;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+    text-align: center;
+    top: -2.25rem;
+    padding: 0.35rem;
+    background: #ececec;
+    width: max-content;
+    line-height: 0.8rem;
+    font-size: 0.75rem;
+    white-space: pre-line;
+}
+
+.radio_recommended_text::before {
+    bottom: -5px;
+    border-width: 0.5rem 0.5rem 0 0.5rem;
+    border-color: #ececec transparent transparent transparent;
+    position: absolute;
+    display: block;
+    content: "";
+    border-style: solid;
+    left: calc(50% - 0.5rem);
+}
+
+.radio_recommended{
+    position: relative;
+}
+
+.radio_recommended .radio_recommended_text{
+    display: inline-block;
+}
+
+.card_body_panel_type{
+    padding-top: 3rem;
+}
+
+.card_body_hardware{
+    max-height: 50rem;
+}
+
+.card_body_hardware>.box33{
+    width: 33%;
+}
+
+.card_body_hardware .radio_group{
+    width: 95%;
+    margin: 0 auto;
+}
+
+.card_body_hardware>.box33 .radio_group_name_container{
+    width: 100%;
+    border: 0.125rem solid #aaa;
+}
+
+.card_body_hardware>.box33 .radio_group_name_container{
+    width: 100%;
+    border: 0.125rem solid #aaa;
+}
+
+.card_body_hardware>.box33 .radio_group_name_container h1{
+    height: 2rem;
+    /* line-height: 1rem; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card_body_hardware>.box33 .radio_group_name_container:hover{
+    width: 100%;
+    border: 0.125rem solid #49443e;
+}
+
+.card_body_hardware>.box33 .fabric_name_container h1{
+    font-size: 0.875rem;
+    margin: 0.375rem 0.125rem;
+    width: 100%;
+    white-space: pre-line;
+    max-height: 2rem;
+    flex: 1 1;
+}
+
+.card_body_Rod{
+    width: 100%;
+    border-top: 0.0625rem solid rgba(0, 0, 0, .2);
+    /*border-bottom: 0.0625rem solid rgba(0, 0, 0, .2);*/
+    margin: 1rem 0 0;
+    padding: 1rem 0;
+}
+
+.card_body_Rod_color{
+    width: 100%;
+    border-top: 0.0625rem solid rgba(0, 0, 0, .2);
+    border-bottom: 0.0625rem solid rgba(0, 0, 0, .2);
+    margin: 1rem 0;
+    padding: 1rem 0;
+}
+
+.card_body_rod_mount{
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.card_body .same_row_selection{
+    padding: 1rem 1rem 0;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    border-top: 0.0625rem solid rgba(0, 0, 0, .2);
+}
+
+.card_body .same_row_selection_left {
+    width: 50%;
+    font-size: 0.95rem;
+    vertical-align: middle;
+    text-align: initial;
+    margin-top: 0.9rem;
+    margin-bottom: 0.9rem;
+}
+
+.font_farsi .card_body .same_row_selection_left p {
+    font-family: "iransans", sans-serif;
+}
+
+.card_body .same_row_selection_left p {
+    text-align: initial;
+    letter-spacing: 0.055625rem;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.card_body .same_row_selection_left span {
+    color: #49443e;
+    font-size: 0.875rem;
+    display: inline-block;
+    font-weight: 400;
+    cursor: pointer;
+}
+
+.card_body .same_row_selection_right {
+    width: 50%;
+}
+
+.card_body .same_row_selection_right .select_container {
+    width: 100%;
+}
+
+.card_body_Rod>.radio_style img{
+    width: 8rem;
+    aspect-ratio: 1/1;
 }

@@ -41,7 +41,7 @@ import ModalLogin from "../Components/ModalLogin";
 import AddProjectToCart from "../Components/AddProjectToCart";
 import GetMeasurementArray from "../Components/GetMeasurementArray";
 import GetSewingFilters from "../Components/GetSewingFilters";
-import {Capitalize, CapitalizeAllWords, convertToPersian} from "../Components/TextTransform";
+import {Capitalize, CapitalizeAllWords, NumToFa, convertToPersian} from "../Components/TextTransform";
 import {DebounceInput} from "react-debounce-input";
 import GetBasketZipcode from "../Components/GetBasketZipcode";
 import {rooms} from "../Components/Static_Labels";
@@ -976,12 +976,12 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                     let tempMin = temp.values[refIndex][temp.values[refIndex].indexOf(Math.min(...temp.values[refIndex]))];
                     tempLabels[refIndex] = pageLang === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
                 } else {
-                    let tempMax = temp.values[refIndex][temp.values[refIndex].indexOf(Math.max(...temp.values[refIndex]))];
+                    let tempMax = temp.values[refIndex][temp.values[refIndex].indexOf(Math.min(...temp.values[refIndex]))];
                     tempLabels[refIndex] = pageLang === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + postfixFa : tempMax + postfixEn;
                 }
                 setStepSelectedLabel(tempLabels);
                 let minValue = Math.min(...temp.values[refIndex]);
-                let maxValue = Math.max(...temp.values[refIndex]);
+                let maxValue = Math.min(...temp.values[refIndex]);
                 if (maxValue - minValue >= 2) {
                     modalHandleShow(modalRef);
                 }
@@ -1314,7 +1314,14 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
         tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
         tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
         tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
-        
+    
+        tempPostObj["SewingOrderDetails"][1] = {};
+        tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2301;
+        tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `0002`;
+        tempPostObj["SewingOrderDetails"][1]["IsLowWrinkle"] = true;
+        tempPostObj["SewingOrderDetails"][1]["IsCoverAll"] = true;
+        tempPostObj["SewingOrderDetails"][1]["IsAltogether"] = true;
+    
         Object.keys(temp).forEach(key => {
             if (temp[key] !== null || temp[key] !== "") {
                 let tempObj = userProjects.find(obj => obj["cart"] === key);
@@ -1325,6 +1332,13 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                             tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
                         } else {
                             tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                        }
+                    }
+                    else if(tempObj["apiLabel3"] !== undefined) {
+                        if (tempObj["apiValue3"] === null) {
+                            tempPostObj["SewingOrderDetails"][1][tempObj["apiLabel3"]] = temp[key];
+                        } else {
+                            tempPostObj["SewingOrderDetails"][1][tempObj["apiLabel3"]] = tempObj["apiValue3"][temp[key]];
                         }
                     }
                 }
@@ -1465,15 +1479,33 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
             tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
             tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
             tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
-            
+    
+    
+            tempPostObj["SewingOrderDetails"][1] = {};
+            tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2301;
+            tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `0002`;
+            tempPostObj["SewingOrderDetails"][1]["IsLowWrinkle"] = true;
+            tempPostObj["SewingOrderDetails"][1]["IsCoverAll"] = true;
+            tempPostObj["SewingOrderDetails"][1]["IsAltogether"] = true;
+    
             Object.keys(temp).forEach(key => {
                 if (temp[key] !== null || temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
-                    if (tempObj["apiLabel2"] !== undefined) {
-                        if (tempObj["apiValue2"] === null) {
-                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
-                        } else {
-                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                    // console.log(key,userProjects.find(obj => obj["cart"] === key));
+                    if (tempObj) {
+                        if (tempObj["apiLabel2"] !== undefined) {
+                            if (tempObj["apiValue2"] === null) {
+                                tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
+                            } else {
+                                tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                            }
+                        }
+                        else if(tempObj["apiLabel3"] !== undefined) {
+                            if (tempObj["apiValue3"] === null) {
+                                tempPostObj["SewingOrderDetails"][1][tempObj["apiLabel3"]] = temp[key];
+                            } else {
+                                tempPostObj["SewingOrderDetails"][1][tempObj["apiLabel3"]] = tempObj["apiValue3"][temp[key]];
+                            }
                         }
                     }
                 }
@@ -1788,14 +1820,32 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                 tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
                 tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
                 tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
+    
+                tempPostObj["SewingOrderDetails"][1] = {};
+                tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2301;
+                tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `0002`;
+                tempPostObj["SewingOrderDetails"][1]["IsLowWrinkle"] = true;
+                tempPostObj["SewingOrderDetails"][1]["IsCoverAll"] = true;
+                tempPostObj["SewingOrderDetails"][1]["IsAltogether"] = true;
+    
                 Object.keys(temp).forEach(key => {
                     if (temp[key] !== null || temp[key] !== "") {
                         let tempObj = userProjects.find(obj => obj["cart"] === key);
-                        if (tempObj["apiLabel2"] !== undefined) {
-                            if (tempObj["apiValue2"] === null) {
-                                tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
-                            } else {
-                                tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                        // console.log(key,userProjects.find(obj => obj["cart"] === key));
+                        if (tempObj) {
+                            if (tempObj["apiLabel2"] !== undefined) {
+                                if (tempObj["apiValue2"] === null) {
+                                    tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
+                                } else {
+                                    tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                                }
+                            }
+                            else if(tempObj["apiLabel3"] !== undefined) {
+                                if (tempObj["apiValue3"] === null) {
+                                    tempPostObj["SewingOrderDetails"][1][tempObj["apiLabel3"]] = temp[key];
+                                } else {
+                                    tempPostObj["SewingOrderDetails"][1][tempObj["apiLabel3"]] = tempObj["apiValue3"][temp[key]];
+                                }
                             }
                         }
                     }
@@ -2053,7 +2103,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                             <div key={i}
                                                                                  className="dk_curtain_preview_detail">
                                                                                 <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + "/" + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
-                                                                                <h5>&nbsp;X</h5><h3>{item["Qty"]}</h3>
+                                                                                <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"],pageLanguage)}</h3>
                                                                             </div>)}
                                                                     </div>
                                                                 </Accordion.Body>
@@ -2226,14 +2276,32 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                         tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
                                         tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
                                         tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
+    
+                                        tempPostObj["SewingOrderDetails"][1] = {};
+                                        tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2301;
+                                        tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `0002`;
+                                        tempPostObj["SewingOrderDetails"][1]["IsLowWrinkle"] = true;
+                                        tempPostObj["SewingOrderDetails"][1]["IsCoverAll"] = true;
+                                        tempPostObj["SewingOrderDetails"][1]["IsAltogether"] = true;
+    
                                         Object.keys(temp).forEach(key => {
                                             if (temp[key] !== null || temp[key] !== "") {
                                                 let tempObj = userProjects.find(obj => obj["cart"] === key);
-                                                if (tempObj["apiLabel2"] !== undefined) {
-                                                    if (tempObj["apiValue2"] === null) {
-                                                        tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
-                                                    } else {
-                                                        tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                                                // console.log(key,userProjects.find(obj => obj["cart"] === key));
+                                                if (tempObj) {
+                                                    if (tempObj["apiLabel2"] !== undefined) {
+                                                        if (tempObj["apiValue2"] === null) {
+                                                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
+                                                        } else {
+                                                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                                                        }
+                                                    }
+                                                    else if(tempObj["apiLabel3"] !== undefined) {
+                                                        if (tempObj["apiValue3"] === null) {
+                                                            tempPostObj["SewingOrderDetails"][1][tempObj["apiLabel3"]] = temp[key];
+                                                        } else {
+                                                            tempPostObj["SewingOrderDetails"][1][tempObj["apiLabel3"]] = tempObj["apiValue3"][temp[key]];
+                                                        }
                                                     }
                                                 }
                                             }
@@ -2317,7 +2385,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                                 <div key={i}
                                                                                      className="dk_curtain_preview_detail">
                                                                                     <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + "/" + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
-                                                                                    <h5>&nbsp;X</h5><h3>{item["Qty"]}</h3>
+                                                                                    <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"],pageLanguage)}</h3>
                                                                                 </div>)}
                                                                         </div>
                                                                     </Accordion.Body>
@@ -3013,7 +3081,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                         tempLabels["3AIn"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
                                     }
                                     if (tempHeight && temp["Height2"] && temp["Height3"]) {
-                                        let tempMax = Math.max(tempHeight, temp["Height2"], temp["Height3"]);
+                                        let tempMax = Math.min(tempHeight, temp["Height2"], temp["Height3"]);
                                         tempLabels["3BIn"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + postfixFa : tempMax + postfixEn;
                                     }
                                     
@@ -3068,7 +3136,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                     selectValues["CeilingToWindow2"] = tempHeight2 ? [{value: tempHeight2}] : [];
                                     selectValues["CeilingToWindow3"] = tempHeight3 ? [{value: tempHeight3}] : [];
                                     if (tempHeight && tempHeight2 && tempHeight3) {
-                                        let tempMax = Math.max(tempHeight, tempHeight2, tempHeight3);
+                                        let tempMax = Math.min(tempHeight, tempHeight2, tempHeight3);
                                         tempLabels["3CArc"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + postfixFa : tempMax + postfixEn;
                                     }
                                     
@@ -4007,7 +4075,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
     //                             temp.labels[objKey] = [];
     //                         if (temp.values[objKey] === undefined)
     //                             temp.values[objKey] = [];
-    //                         let tempMax = temp.values[objKey][temp.values[objKey].indexOf(Math.max(...temp.values[objKey]))];
+    //                         let tempMax = temp.values[objKey][temp.values[objKey].indexOf(Math.min(...temp.values[objKey]))];
     //                         tempLabels[objKey] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + "س\u200Cم" : tempMax + "cm";
     //
     //                     } else if (objKey === "3BOut") {
@@ -7274,13 +7342,13 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                    setStep5C("Gun Metal");
                                                                    setDeps("", "5C");
                                                                    setCart("BracketColor", "Gun Metal");
-                                                               }} ref={ref => (inputs.current["5C2"] = ref)}/>
+                                                               }} ref={ref => (inputs.current["5C3"] = ref)}/>
                                                         <div className="frame_img">
                                                             <img src={require('../Images/drapery/roller/GunMetal.jpg')} className="img-fluid bracket_color_img" alt=""/>
                                                         </div>
                                                     </label>
                                                     <div className="radio_group_name_container">
-                                                        <h1>{t("BracketColor2")}</h1>
+                                                        <h1>{t("BracketColor3")}</h1>
                                                     </div>
                                                 </div>
                                             </div>
@@ -7583,7 +7651,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                         </div>
                                                     </label>
                                                     <div className="radio_group_name_container">
-                                                        <h1>{t("BracketColor2")}</h1>
+                                                        <h1>{t("BracketColor3")}</h1>
                                                     </div>
                                                 </div>
                                             </div>

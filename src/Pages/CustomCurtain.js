@@ -9,6 +9,8 @@ import DK2 from "../Page Components/DK2";
 import {useSelector} from "react-redux";
 import axios from "axios";
 import Grommet from "../Page Components/Grommet";
+import Grommet2 from "../Page Components/Grommet2";
+import Grommet3 from "../Page Components/Grommet3";
 
 const baseURLGet = "https://api.atlaspood.ir/WebsitePageItem/GetById";
 
@@ -97,6 +99,20 @@ function CustomCurtain() {
                 if (modelID === "0326" && specialID==="1") {
                     setPageModel(<DK2 CatID={catID} ModelID={modelID} SpecialId={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem} QueryString={queryObj}
                                      Parameters={parameters} PageId={websitePageItemId}/>)
+                } else if(modelID === "0099"){
+                    if(specialID==="Drapery&Sheers") {
+                        setPageModel(<Grommet CatID={catID} ModelID={modelID} SpecialId={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem}
+                                              QueryString={queryObj}
+                                              Parameters={parameters} PageId={websitePageItemId}/>)
+                    }else if(specialID==="DraperyOnly") {
+                        setPageModel(<Grommet2 CatID={catID} ModelID={modelID} SpecialId={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem}
+                                              QueryString={queryObj}
+                                              Parameters={parameters} PageId={websitePageItemId}/>)
+                    }else if(specialID==="SheersOnly") {
+                        setPageModel(<Grommet3 CatID={catID} ModelID={modelID} SpecialId={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem}
+                                              QueryString={queryObj}
+                                              Parameters={parameters} PageId={websitePageItemId}/>)
+                    }
                 }
             }
             else {

@@ -838,7 +838,7 @@ function Checkout() {
                                             <div key={i}
                                                  className="dk_curtain_preview_detail">
                                                 <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + " / " + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
-                                                <h5>&nbsp;X</h5><h3>{item["Qty"]}</h3>
+                                                <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"],pageLanguage)}</h3>
                                             </div>)}
                                         </h4>
                                     </div>
@@ -1110,6 +1110,20 @@ function Checkout() {
                             });
                             
                             Promise.all(promiseArr2).then(() => {
+                                if (obj1["SewingModelId"] === "0326") {
+                                    desc = [
+                                        <div className="basket_item_title_desc" key={"fabric/color"}>
+                                            <h3>{t("Fabric/Color")}&nbsp;</h3>
+                                            <h4>{obj1["SodFabrics"].map((item, i) =>
+                                                <div key={i}
+                                                     className="dk_curtain_preview_detail">
+                                                    <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + " / " + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
+                                                    <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"],pageLanguage)}</h3>
+                                                </div>)}
+                                            </h4>
+                                        </div>
+                                        , ...desc];
+                                }
                                 temp[tempDrapery.length-index-1] =
                                     <li className="checkout_item_container" key={index}>
                                         <div className="checkout_item_image_container">

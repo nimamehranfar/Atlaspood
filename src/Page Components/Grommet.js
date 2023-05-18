@@ -42,7 +42,7 @@ import AddProjectToCart from "../Components/AddProjectToCart";
 import GetMeasurementArray from "../Components/GetMeasurementArray";
 import GetSewingFilters from "../Components/GetSewingFilters";
 import TruncateMarkup from "react-truncate-markup";
-import {Capitalize, CapitalizeAllWords, convertToPersian, Uppercase} from "../Components/TextTransform";
+import {Capitalize, CapitalizeAllWords, convertToPersian, NumToFa, Uppercase} from "../Components/TextTransform";
 import {DebounceInput} from "react-debounce-input";
 import GetBasketZipcode from "../Components/GetBasketZipcode";
 import {rooms} from "../Components/Static_Labels";
@@ -53,6 +53,7 @@ const baseURLPageItem = "https://api.atlaspood.ir/WebsitePageItem/GetById";
 const baseURLModel = "https://api.atlaspood.ir/SewingModel/GetById";
 const baseURLFabrics = "https://api.atlaspood.ir/Sewing/GetModelFabric";
 const baseURLWindowSize = "https://api.atlaspood.ir/Sewing/GetWindowSize";
+const baseURLGetRail = "https://api.atlaspood.ir/Sewing/GetModelRail";
 const baseURLPrice = "https://api.atlaspood.ir/Sewing/GetSewingOrderPrice";
 const baseURLZipCode = "https://api.atlaspood.ir/Sewing/HasInstall";
 const baseURLFreeShipping = "https://api.atlaspood.ir/WebsiteSetting/GetFreeShippingAmount";
@@ -97,6 +98,17 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
     const [fabrics2, setFabrics2] = useState({});
     const [fabricsList, setFabricsList] = useState([]);
     const [fabricsList2, setFabricsList2] = useState([]);
+    const [sheers, setSheers] = useState({});
+    const [sheers2, setSheers2] = useState({});
+    const [rails, setRails] = useState([]);
+    const [tracks, setTracks] = useState([]);
+    const [railsList, setRailsList] = useState([]);
+    const [railsList2, setRailsList2] = useState([]);
+    const [railsList3, setRailsList3] = useState([]);
+    const [railsList4, setRailsList4] = useState([]);
+    const [tracksList, setTracksList] = useState([]);
+    const [sheersList, setSheersList] = useState([]);
+    const [sheersList2, setSheersList2] = useState([]);
     const [defaultFabricPhoto, setDefaultFabricPhoto] = useState(null);
     const [defaultModelName, setDefaultModelName] = useState("");
     const [defaultModelNameFa, setDefaultModelNameFa] = useState("");
@@ -139,6 +151,24 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         selectedPhoto: ""
     });
     const [fabricSelected2, setFabricSelected2] = useState({
+        selectedFabricId: 0,
+        selectedTextEn: "",
+        selectedTextFa: "",
+        selectedColorEn: "",
+        selectedColorFa: "",
+        selectedHasTrim: false,
+        selectedPhoto: ""
+    });
+    const [sheersSelected, setSheersSelected] = useState({
+        selectedFabricId: 0,
+        selectedTextEn: "",
+        selectedTextFa: "",
+        selectedColorEn: "",
+        selectedColorFa: "",
+        selectedHasTrim: false,
+        selectedPhoto: ""
+    });
+    const [sheersSelected2, setSheersSelected2] = useState({
         selectedFabricId: 0,
         selectedTextEn: "",
         selectedTextFa: "",
@@ -217,7 +247,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
     });
     const [saveProjectCount, setSaveProjectCount] = useState(0);
     
-    const [depSet, setDepSet] = useState(new Set(['1', '2', '3', '4', '5', '61', '62']));
+    const [depSet, setDepSet] = useState(new Set(['1', '2', '3', '4', '5', '6', '7', '8', '101', '102']));
     
     const inputs = useRef({});
     const selectedTitle = useRef({});
@@ -249,6 +279,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
     const [step2, setStep2] = useState("");
     const [step2A, setStep2A] = useState("");
     const [step2B, setStep2B] = useState("");
+    const [step2B1, setStep2B1] = useState("");
     const [step3, setStep3] = useState("");
     const [step31, setStep31] = useState("");
     const [step3A, setStep3A] = useState("");
@@ -259,6 +290,23 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
     const [step4B, setStep4B] = useState("");
     const [step5, setStep5] = useState("");
     const [step6, setStep6] = useState("");
+    const [step7, setStep7] = useState("");
+    const [step8, setStep8] = useState("");
+    const [step81, setStep81] = useState("");
+    const [step83, setStep83] = useState("");
+    const [step84, setStep84] = useState("");
+    const [step8A, setStep8A] = useState("");
+    const [step8A1, setStep8A1] = useState("");
+    const [step8A3, setStep8A3] = useState("");
+    const [step8A4, setStep8A4] = useState("");
+    const [step8B, setStep8B] = useState("");
+    const [step8B1, setStep8B1] = useState("");
+    const [step8B3, setStep8B3] = useState("");
+    const [step8B4, setStep8B4] = useState("");
+    const [step8C, setStep8C] = useState("");
+    const [step8C1, setStep8C1] = useState("");
+    const [step8C3, setStep8C3] = useState("");
+    const [step8C4, setStep8C4] = useState("");
     const [zipcodeChecked, setZipcodeChecked] = useState("");
     const [zipcode, setZipcode] = useState("");
     const [zipcodeButton, setZipcodeButton] = useState(false);
@@ -318,6 +366,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 modelId: modelID
             }
         }).then((response) => {
+            getSheersFabrics("10010301,10010302");
             let tempFabrics = {};
             let tempFabrics2 = {};
             response.data.forEach(obj => {
@@ -342,6 +391,64 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
             setTimeout(() => {
                 setIsClearAll(false);
             }, 1000);
+        });
+    };
+    
+    function getSheersFabrics(groupId) {
+        axios.get(baseURLFabrics, {
+            params: {
+                modelId: modelID
+            }
+        }).then((response) => {
+            let tempFabrics = {};
+            let tempFabrics2 = {};
+            response.data.forEach(obj => {
+                obj["ShowMore"] = false;
+                if (obj["FabricGroupId"] === "10010301") {
+                    if (tempFabrics[obj["DesignEnName"]] === "" || tempFabrics[obj["DesignEnName"]] === undefined || tempFabrics[obj["DesignEnName"]] === null || tempFabrics[obj["DesignEnName"]] === [])
+                        tempFabrics[obj["DesignEnName"]] = [];
+                    tempFabrics[obj["DesignEnName"]].push(obj);
+                } else if (obj["FabricGroupId"] === "10010302") {
+                    if (tempFabrics2[obj["DesignEnName"]] === "" || tempFabrics2[obj["DesignEnName"]] === undefined || tempFabrics2[obj["DesignEnName"]] === null || tempFabrics2[obj["DesignEnName"]] === [])
+                        tempFabrics2[obj["DesignEnName"]] = [];
+                    tempFabrics2[obj["DesignEnName"]].push(obj);
+                }
+            });
+            setSheers(tempFabrics);
+            setSheers2(tempFabrics2);
+            setTimeout(() => {
+                setIsClearAll(false);
+            }, 1000);
+        }).catch(err => {
+            console.log(err);
+            setTimeout(() => {
+                setIsClearAll(false);
+            }, 1000);
+        });
+    };
+    
+    function getRails() {
+        axios.get(baseURLGetRail, {
+            params: {
+                modelId: modelID
+            }
+        }).then((response) => {
+            let temp = [];
+            let temp2 = [];
+            let temp3 = [];
+            response.data.forEach(obj => {
+                if (obj["RailCategoryId"] === 5303) {
+                    temp.push(obj);
+                } else if (obj["RailCategoryId"] === 5301) {
+                    temp2.push(obj);
+                } else {
+                
+                }
+            });
+            setRails(temp);
+            setTracks(temp2);
+        }).catch(err => {
+            console.log(err);
         });
     };
     
@@ -425,6 +532,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                         return qs.stringify(params, {arrayFormat: 'repeat'})
                     }
                 }).then((response) => {
+                    getSheersFabrics("10010301,10010302");
                     let tempFabrics = {};
                     let tempFabrics2 = {};
                     response.data.forEach(obj => {
@@ -734,6 +842,343 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         // console.log(fabricList)
     }
     
+    function renderSheers(bag) {
+        const fabricList = [];
+        let count = 0;
+        let cartObj = {};
+        let temp = [];
+        
+        let pageLanguage1 = location.pathname.split('').slice(1, 3).join('');
+        if (Object.keys(bag).length > 0) {
+            if (isLoggedIn) {
+            
+            } else {
+                cartObj = JSON.parse(localStorage.getItem("cart"));
+                temp = cartObj["swatches"];
+            }
+        }
+        
+        Object.keys(sheers).forEach((key, index) => {
+            let fabrics = sheers;
+            let DesignName = convertToPersian(fabrics[key][0].DesignName);
+            let DesignEnName = fabrics[key][0].DesignEnName;
+            
+            const fabric = [];
+            for (let j = 0; j < fabrics[key].length; j++) {
+                let FabricId = fabrics[key][j].FabricId;
+                // console.log(fabrics,key);
+                let PhotoPath = "";
+                fabrics[key][j].FabricPhotos.forEach(obj => {
+                    if (obj.PhotoTypeId === 4702)
+                        PhotoPath = obj.PhotoUrl;
+                });
+                
+                let FabricOnModelPhotoUrl = fabrics[key][j].FabricOnModelPhotoUrl;
+                let HasTrim = fabrics[key][j].HasTrim;
+                let DesignCode = fabrics[key][j].DesignCode;
+                let DesignRaportLength = fabrics[key][j].DesignRaportLength;
+                let DesignRaportWidth = fabrics[key][j].DesignRaportWidth;
+                let PolyesterPercent = fabrics[key][j].PolyesterPercent;
+                let ViscosePercent = fabrics[key][j].ViscosePercent;
+                let NylonPercent = fabrics[key][j].NylonPercent;
+                let ColorName = convertToPersian(fabrics[key][j].ColorName);
+                let ColorEnName = fabrics[key][j].ColorEnName;
+                let SwatchId = fabrics[key][j].SwatchId ? fabrics[key][j].SwatchId : -1;
+                let HasSwatchId = false;
+                let swatchDetailId = undefined;
+                let index = -1;
+                if (isLoggedIn) {
+                    if (bag["CartDetails"]) {
+                        let index = bag["CartDetails"].findIndex(object => {
+                            return object["ProductId"] === SwatchId;
+                        });
+                        // console.log(index);
+                        if (index !== -1) {
+                            HasSwatchId = true;
+                            swatchDetailId = bag["CartDetails"][index]["CartDetailId"];
+                        }
+                    }
+                } else {
+                    if (temp.length > 0) {
+                        index = temp.findIndex(object => {
+                            return object["SwatchId"] === SwatchId;
+                        });
+                        if (index !== -1) {
+                            HasSwatchId = true;
+                        }
+                    }
+                }
+                // console.log(HasSwatchId);
+                // console.log(pageLanguage1,location.pathname);
+                
+                fabric.push(
+                    <div className={`radio_group ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key + j}>
+                        <label data-tip={`${pageLanguage1 === 'en' ? DesignEnName : DesignName}: ${pageLanguage1 === 'en' ? ColorEnName : ColorName}`}
+                               data-for={"fabric" + key + j} className={`radio_container ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}
+                               data-img={`https://www.doopsalta.com/upload/${PhotoPath}`}>
+                            {/*<ReactTooltip id={"fabric" + key + j} place="top" type="light" effect="float"/>*/}
+                            <input className="radio" type="radio" ref-num="2" default-fabric-photo={FabricOnModelPhotoUrl}
+                                   onChange={e => {
+                                       // console.log("hi1");
+                                       let temp = JSON.parse(JSON.stringify(sheersSelected));
+                                       temp.selectedFabricId = FabricId;
+                                       temp.selectedTextEn = DesignEnName;
+                                       temp.selectedTextFa = DesignName;
+                                       temp.selectedColorEn = ColorEnName;
+                                       temp.selectedColorFa = ColorName;
+                                       temp.selectedHasTrim = HasTrim;
+                                       temp.selectedPhoto = FabricOnModelPhotoUrl;
+                                       setSheersSelected(temp);
+                                       // fabricClicked(e, HasTrim);
+                                       // selectChanged(e);
+                                       // setCart("FabricId", FabricId);
+                                       // setDeps("", "1");
+                                   }} name="fabric"
+                                   model-id={modelID} value={FabricId} text-en={DesignEnName} text-fa={DesignName} checked={`${FabricId}` === step2B1}
+                                   ref={ref => (inputs.current[`1${FabricId}`] = ref)}/>
+                            <div className="frame_img">
+                                <img className={`img-fluid ${`${FabricId}` === step2B1 ? "img-fluid_checked" : ""}`} src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
+                            </div>
+                        </label>
+                        <div className={`fabric_name_container ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
+                            <h1>{pageLanguage1 === 'en' ? ColorEnName : ColorName}</h1>
+                            <span onClick={() => {
+                                handleShow(fabrics[key][j], swatchDetailId);
+                                setHasSwatchId(HasSwatchId);
+                            }}><i className="fa fa-search" aria-hidden="true"/></span>
+                        </div>
+                        <button className={`swatchButton ${HasSwatchId ? "activeSwatch" : ""} ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}
+                                current-state={HasSwatchId ? "1" : "0"}
+                                onClick={(e) => {
+                                    fabricSwatch(e, SwatchId, swatchDetailId, PhotoPath);
+                                }} disabled={SwatchId === -1}>{HasSwatchId ? (pageLanguage1 === 'en' ? "SWATCH IN CART" : "نمونه در سبد") : (pageLanguage1 === 'en' ? "ORDER" +
+                            " SWATCH" : "سفارش نمونه")}</button>
+                    </div>
+                );
+                
+            }
+            
+            fabricList.push(
+                <div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key}>
+                    <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
+                        <hr/>
+                        <span>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</span>
+                    </div>
+                    {fabric}
+                </div>
+            );
+            
+        });
+        setSheersList(fabricList);
+        // console.log(fabricList)
+    }
+    
+    function renderSheers2(bag) {
+        const fabricList = [];
+        let count = 0;
+        let cartObj = {};
+        let temp = [];
+        let pageLanguage1 = location.pathname.split('').slice(1, 3).join('');
+        if (Object.keys(bag).length > 0) {
+            if (isLoggedIn) {
+            
+            } else {
+                cartObj = JSON.parse(localStorage.getItem("cart"));
+                temp = cartObj["swatches"];
+            }
+        }
+        
+        Object.keys(sheers2).forEach((key, index) => {
+            let fabrics = sheers2;
+            let DesignName = convertToPersian(fabrics[key][0].DesignName);
+            let DesignEnName = fabrics[key][0].DesignEnName;
+            
+            const fabric = [];
+            for (let j = 0; j < fabrics[key].length; j++) {
+                let FabricId = fabrics[key][j].FabricId;
+                // console.log(fabrics,key);
+                let PhotoPath = "";
+                fabrics[key][j].FabricPhotos.forEach(obj => {
+                    if (obj.PhotoTypeId === 4702)
+                        PhotoPath = obj.PhotoUrl;
+                });
+                
+                let FabricOnModelPhotoUrl = fabrics[key][j].FabricOnModelPhotoUrl;
+                let HasTrim = fabrics[key][j].HasTrim;
+                let DesignCode = fabrics[key][j].DesignCode;
+                let DesignRaportLength = fabrics[key][j].DesignRaportLength;
+                let DesignRaportWidth = fabrics[key][j].DesignRaportWidth;
+                let PolyesterPercent = fabrics[key][j].PolyesterPercent;
+                let ViscosePercent = fabrics[key][j].ViscosePercent;
+                let NylonPercent = fabrics[key][j].NylonPercent;
+                let ColorName = convertToPersian(fabrics[key][j].ColorName);
+                let ColorEnName = fabrics[key][j].ColorEnName;
+                let SwatchId = fabrics[key][j].SwatchId ? fabrics[key][j].SwatchId : -1;
+                let HasSwatchId = false;
+                let swatchDetailId = undefined;
+                let index = -1;
+                if (isLoggedIn) {
+                    if (bag["CartDetails"]) {
+                        let index = bag["CartDetails"].findIndex(object => {
+                            return object["ProductId"] === SwatchId;
+                        });
+                        // console.log(index);
+                        if (index !== -1) {
+                            HasSwatchId = true;
+                            swatchDetailId = bag["CartDetails"][index]["CartDetailId"];
+                        }
+                    }
+                } else {
+                    if (temp.length > 0) {
+                        index = temp.findIndex(object => {
+                            return object["SwatchId"] === SwatchId;
+                        });
+                        if (index !== -1) {
+                            HasSwatchId = true;
+                        }
+                    }
+                }
+                // console.log(HasSwatchId);
+                // console.log(step15 === `${FabricId}`, step15, `${FabricId}`, FabricId);
+                
+                fabric.push(
+                    <div className={`radio_group ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key + j}>
+                        <label data-tip={`${pageLanguage1 === 'en' ? DesignEnName : DesignName}: ${pageLanguage1 === 'en' ? ColorEnName : ColorName}`}
+                               data-for={"fabric" + key + j} className={`radio_container ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}
+                               data-img={`https://www.doopsalta.com/upload/${PhotoPath}`}>
+                            {/*<ReactTooltip id={"fabric" + key + j} place="top" type="light" effect="float"/>*/}
+                            <input className="radio" type="radio" ref-num="3" default-fabric-photo={FabricOnModelPhotoUrl}
+                                   onChange={e => {
+                                       // console.log("hi1");
+                                       let temp = JSON.parse(JSON.stringify(sheersSelected2));
+                                       temp.selectedFabricId = FabricId;
+                                       temp.selectedTextEn = DesignEnName;
+                                       temp.selectedTextFa = DesignName;
+                                       temp.selectedColorEn = ColorEnName;
+                                       temp.selectedColorFa = ColorName;
+                                       temp.selectedHasTrim = HasTrim;
+                                       temp.selectedPhoto = FabricOnModelPhotoUrl;
+                                       setSheersSelected2(temp);
+                                       // fabricClicked(e, HasTrim);
+                                       // selectChanged(e);
+                                       // setCart("FabricId", FabricId);
+                                       // setDeps("", "15");
+                                   }} name="fabric2"
+                                   model-id={modelID} value={FabricId} text-en={DesignEnName} text-fa={DesignName} checked={`${FabricId}` === step2B1}
+                                   ref={ref => (inputs.current[`15${FabricId}`] = ref)}/>
+                            <div className="frame_img">
+                                <img className={`img-fluid ${`${FabricId}` === step2B1 ? "img-fluid_checked" : ""}`} src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
+                            </div>
+                        </label>
+                        <div className={`fabric_name_container ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
+                            <h1>{pageLanguage1 === 'en' ? ColorEnName : ColorName}</h1>
+                            <span onClick={() => {
+                                handleShow(fabrics[key][j], swatchDetailId);
+                                setHasSwatchId(HasSwatchId);
+                            }}><i className="fa fa-search" aria-hidden="true"/></span>
+                        </div>
+                        <button className={`swatchButton ${HasSwatchId ? "activeSwatch" : ""} ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}
+                                current-state={HasSwatchId ? "1" : "0"}
+                                onClick={(e) => {
+                                    fabricSwatch(e, SwatchId, swatchDetailId, PhotoPath);
+                                }} disabled={SwatchId === -1}>{HasSwatchId ? (pageLanguage1 === 'en' ? "SWATCH IN CART" : "نمونه در سبد") : (pageLanguage1 === 'en' ? "ORDER" +
+                            " SWATCH" : "سفارش نمونه")}</button>
+                    </div>
+                );
+                
+            }
+            
+            fabricList.push(
+                <div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key}>
+                    <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
+                        <hr/>
+                        <span>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</span>
+                    </div>
+                    {fabric}
+                </div>
+            );
+            
+        });
+        setSheersList2(fabricList);
+        // console.log(fabricList)
+    }
+    
+    function renderRails() {
+        const railList = [];
+        const railList2 = [];
+        const railList3 = [];
+        const railList4 = [];
+        let pageLanguage1 = location.pathname.split('').slice(1, 3).join('');
+        
+        rails.forEach((obj, index) => {
+            let DesignName = convertToPersian(obj["DesignName"]);
+            let DesignEnName = obj["DesignENName"];
+            let RailId = obj["RailId"];
+            let PhotoPath = obj["PhotoPath"];
+            
+            railList.push(
+                <div className="box33 radio_style" key={index}>
+                    <img
+                        src={`https://api.atlaspood.ir/${PhotoPath}`} className="img-fluid height_auto" alt=""/>
+                    <input className="radio" type="radio" text={pageLanguage1 === 'fa' ? DesignName : DesignEnName} value={index} name="step81" ref-num={"81"} id={"81" + index}
+                           checked={step81 === `${RailId}`}
+                           onChange={e => {
+                               setStep81(`${RailId}`);
+                           }} ref={ref => (inputs.current["81" + index] = ref)}/>
+                    <label htmlFor={"81" + index}>{pageLanguage1 === 'fa' ? DesignName : DesignEnName}</label>
+                </div>
+            );
+            
+            railList2.push(
+                <div className="box33 radio_style" key={index}>
+                    <img
+                        src={`https://api.atlaspood.ir/${PhotoPath}`} className="img-fluid height_auto" alt=""/>
+                    <input className="radio" type="radio" text={pageLanguage1 === 'fa' ? DesignName : DesignEnName} value={index} name="step8A" ref-num={"8A"} id={"8A" + index}
+                           checked={step8A1 === `${RailId}`}
+                           onChange={e => {
+                               setStep8A1(`${RailId}`);
+                           }} ref={ref => (inputs.current["8A" + index] = ref)}/>
+                    <label htmlFor={"8A" + index}>{pageLanguage1 === 'fa' ? DesignName : DesignEnName}</label>
+                </div>
+            );
+            
+            railList3.push(
+                <div className="box33 radio_style" key={index}>
+                    <img
+                        src={`https://api.atlaspood.ir/${PhotoPath}`} className="img-fluid height_auto" alt=""/>
+                    <input className="radio" type="radio" text={pageLanguage1 === 'fa' ? DesignName : DesignEnName} value={index} name="step8B" ref-num={"8B"} id={"8B" + index}
+                           checked={step8B1 === `${RailId}`}
+                           onChange={e => {
+                               setStep8B1(`${RailId}`);
+                           }} ref={ref => (inputs.current["8B" + index] = ref)}/>
+                    <label htmlFor={"8B" + index}>{pageLanguage1 === 'fa' ? DesignName : DesignEnName}</label>
+                </div>
+            );
+            
+            railList4.push(
+                <div className="box33 radio_style" key={index}>
+                    <img
+                        src={`https://api.atlaspood.ir/${PhotoPath}`} className="img-fluid height_auto" alt=""/>
+                    <input className="radio" type="radio" text={pageLanguage1 === 'fa' ? DesignName : DesignEnName} value={index} name="step8C" ref-num={"8C"} id={"8C" + index}
+                           checked={step8C1 === `${RailId}`}
+                           onChange={e => {
+                               setStep8C1(`${RailId}`);
+                           }} ref={ref => (inputs.current["8C" + index] = ref)}/>
+                    <label htmlFor={"8C" + index}>{pageLanguage1 === 'fa' ? DesignName : DesignEnName}</label>
+                </div>
+            );
+            
+        });
+        setRailsList(railList);
+        setRailsList2(railList2);
+        setRailsList3(railList3);
+        setRailsList4(railList4);
+    }
+    
+    function renderTracks() {
+    
+    }
+    
     function handleClose() {
         setShow(false);
     }
@@ -1002,12 +1447,12 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     let tempMin = temp.values[refIndex][temp.values[refIndex].indexOf(Math.min(...temp.values[refIndex]))];
                     tempLabels[refIndex] = pageLang === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
                 } else {
-                    let tempMax = temp.values[refIndex][temp.values[refIndex].indexOf(Math.max(...temp.values[refIndex]))];
+                    let tempMax = temp.values[refIndex][temp.values[refIndex].indexOf(Math.min(...temp.values[refIndex]))];
                     tempLabels[refIndex] = pageLang === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + postfixFa : tempMax + postfixEn;
                 }
                 setStepSelectedLabel(tempLabels);
                 let minValue = Math.min(...temp.values[refIndex]);
-                let maxValue = Math.max(...temp.values[refIndex]);
+                let maxValue = Math.min(...temp.values[refIndex]);
                 if (maxValue - minValue >= 2) {
                     modalHandleShow(modalRef);
                 }
@@ -1284,7 +1729,11 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
     }
     
     function setCart(refIndex, cartValue, delRefs, secondRefIndex, secondCartValue, customAcc) {
-        let temp = JSON.parse(JSON.stringify(cartValues));
+        let temp = {
+            ...JSON.parse(JSON.stringify(cartValues)), ...{
+                "IsWalled": "Ceiling"
+            }
+        };
         temp[refIndex] = cartValue;
         if (delRefs !== undefined) {
             let tempArr = delRefs.split(',');
@@ -1340,21 +1789,35 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
         tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
         
+        for (let i = 1; i < 3; i++) {
+            tempPostObj["SewingOrderDetails"][i] = {};
+            tempPostObj["SewingOrderDetails"][i]["CurtainPartId"] = 2301;
+            tempPostObj["SewingOrderDetails"][i]["SewingModelId"] = `0002`;
+            tempPostObj["SewingOrderDetails"][i]["IsLowWrinkle"] = true;
+            tempPostObj["SewingOrderDetails"][i]["IsCoverAll"] = true;
+            tempPostObj["SewingOrderDetails"][i]["IsAltogether"] = true;
+        }
+        
         Object.keys(temp).forEach(key => {
             if (temp[key] !== null || temp[key] !== "") {
                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                 // console.log(key,userProjects.find(obj => obj["cart"] === key));
                 if (tempObj) {
-                    if (tempObj["apiLabel2"] !== undefined) {
-                        if (tempObj["apiValue2"] === null) {
-                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
-                        } else {
-                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                    for (let i = 0; i < 3; i++) {
+                        let j = +i + +2;
+                        if (tempObj["apiLabel" + j] !== undefined) {
+                            if (tempObj["apiValue" + j] === null) {
+                                tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = temp[key];
+                                // console.log(i,tempObj["cart"],tempPostObj["SewingOrderDetails"],tempPostObj["SewingOrderDetails"][i]);
+                            } else {
+                                tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = tempObj["apiValue" + j][temp[key]];
+                            }
                         }
                     }
                 }
             }
         });
+        // console.log(tempPostObj["SewingOrderDetails"]);
         tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
         Object.keys(temp).forEach(key => {
             if (temp[key] !== null || temp[key] !== "") {
@@ -1381,8 +1844,10 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         
         let promise2 = new Promise((resolve, reject) => {
             if (stepSelectedValue["3"] !== undefined && !pageLoad && !(motorLoad && refIndex === "MotorType") && refIndex !== "ZipCode") {
-                if (tempPostObj["SewingOrderDetails"][0]["FabricId"] === undefined) {
-                    delete tempPostObj["SewingOrderDetails"];
+                for (let i = 0; i < 3; i++) {
+                    if (tempPostObj["SewingOrderDetails"] && tempPostObj["SewingOrderDetails"][i] && tempPostObj["SewingOrderDetails"][i]["FabricId"] === undefined) {
+                        tempPostObj["SewingOrderDetails"].splice(i, 1);
+                    }
                 }
                 if (zipcode && zipcode !== "") {
                     tempPostObj["ZipCode"] = zipcode;
@@ -1485,14 +1950,30 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
             tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
             tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
             
+            tempPostObj["SewingOrderDetails"][1] = {};
+            tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2301;
+            tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `0002`;
+            tempPostObj["SewingOrderDetails"][1]["IsLowWrinkle"] = true;
+            tempPostObj["SewingOrderDetails"][1]["IsCoverAll"] = true;
+            tempPostObj["SewingOrderDetails"][1]["IsAltogether"] = true;
+            
             Object.keys(temp).forEach(key => {
                 if (temp[key] !== null || temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
-                    if (tempObj["apiLabel2"] !== undefined) {
-                        if (tempObj["apiValue2"] === null) {
-                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
-                        } else {
-                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                    // console.log(key,userProjects.find(obj => obj["cart"] === key));
+                    if (tempObj) {
+                        if (tempObj["apiLabel2"] !== undefined) {
+                            if (tempObj["apiValue2"] === null) {
+                                tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
+                            } else {
+                                tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                            }
+                        } else if (tempObj["apiLabel3"] !== undefined) {
+                            if (tempObj["apiValue3"] === null) {
+                                tempPostObj["SewingOrderDetails"][1][tempObj["apiLabel3"]] = temp[key];
+                            } else {
+                                tempPostObj["SewingOrderDetails"][1][tempObj["apiLabel3"]] = tempObj["apiValue3"][temp[key]];
+                            }
                         }
                     }
                 }
@@ -1804,14 +2285,31 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
                 tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
                 tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
+                
+                tempPostObj["SewingOrderDetails"][1] = {};
+                tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2301;
+                tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `0002`;
+                tempPostObj["SewingOrderDetails"][1]["IsLowWrinkle"] = true;
+                tempPostObj["SewingOrderDetails"][1]["IsCoverAll"] = true;
+                tempPostObj["SewingOrderDetails"][1]["IsAltogether"] = true;
+                
                 Object.keys(temp).forEach(key => {
                     if (temp[key] !== null || temp[key] !== "") {
                         let tempObj = userProjects.find(obj => obj["cart"] === key);
-                        if (tempObj["apiLabel2"] !== undefined) {
-                            if (tempObj["apiValue2"] === null) {
-                                tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
-                            } else {
-                                tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                        // console.log(key,userProjects.find(obj => obj["cart"] === key));
+                        if (tempObj) {
+                            if (tempObj["apiLabel2"] !== undefined) {
+                                if (tempObj["apiValue2"] === null) {
+                                    tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
+                                } else {
+                                    tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                                }
+                            } else if (tempObj["apiLabel3"] !== undefined) {
+                                if (tempObj["apiValue3"] === null) {
+                                    tempPostObj["SewingOrderDetails"][1][tempObj["apiLabel3"]] = temp[key];
+                                } else {
+                                    tempPostObj["SewingOrderDetails"][1][tempObj["apiLabel3"]] = tempObj["apiValue3"][temp[key]];
+                                }
                             }
                         }
                     }
@@ -2060,7 +2558,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                                             <div key={i}
                                                                                  className="dk_curtain_preview_detail">
                                                                                 <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + "/" + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
-                                                                                <h5>&nbsp;X</h5><h3>{item["Qty"]}</h3>
+                                                                                <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"], pageLanguage)}</h3>
                                                                             </div>)}
                                                                     </div>
                                                                 </Accordion.Body>
@@ -2233,14 +2731,31 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
                                         tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
                                         tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
+                                        
+                                        tempPostObj["SewingOrderDetails"][1] = {};
+                                        tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2301;
+                                        tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `0002`;
+                                        tempPostObj["SewingOrderDetails"][1]["IsLowWrinkle"] = true;
+                                        tempPostObj["SewingOrderDetails"][1]["IsCoverAll"] = true;
+                                        tempPostObj["SewingOrderDetails"][1]["IsAltogether"] = true;
+                                        
                                         Object.keys(temp).forEach(key => {
                                             if (temp[key] !== null || temp[key] !== "") {
                                                 let tempObj = userProjects.find(obj => obj["cart"] === key);
-                                                if (tempObj["apiLabel2"] !== undefined) {
-                                                    if (tempObj["apiValue2"] === null) {
-                                                        tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
-                                                    } else {
-                                                        tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                                                // console.log(key,userProjects.find(obj => obj["cart"] === key));
+                                                if (tempObj) {
+                                                    if (tempObj["apiLabel2"] !== undefined) {
+                                                        if (tempObj["apiValue2"] === null) {
+                                                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
+                                                        } else {
+                                                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                                                        }
+                                                    } else if (tempObj["apiLabel3"] !== undefined) {
+                                                        if (tempObj["apiValue3"] === null) {
+                                                            tempPostObj["SewingOrderDetails"][1][tempObj["apiLabel3"]] = temp[key];
+                                                        } else {
+                                                            tempPostObj["SewingOrderDetails"][1][tempObj["apiLabel3"]] = tempObj["apiValue3"][temp[key]];
+                                                        }
                                                     }
                                                 }
                                             }
@@ -2324,7 +2839,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                                                 <div key={i}
                                                                                      className="dk_curtain_preview_detail">
                                                                                     <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + "/" + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
-                                                                                    <h5>&nbsp;X</h5><h3>{item["Qty"]}</h3>
+                                                                                    <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"], pageLanguage)}</h3>
                                                                                 </div>)}
                                                                         </div>
                                                                     </Accordion.Body>
@@ -2892,6 +3407,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
             setCartValues(temp);
             
             let tempFabric = {};
+            let tempFabric2 = {};
             let promise2 = new Promise((resolve, reject) => {
                 if (temp["FabricId"]) {
                     axios.get(baseURLFabrics, {
@@ -2902,6 +3418,9 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                         response.data.forEach(obj => {
                             if (obj["FabricId"] === temp["FabricId"]) {
                                 tempFabric = obj;
+                            }
+                            if (obj["FabricId"] === temp["FabricId2"]) {
+                                tempFabric2 = obj;
                             }
                         });
                         resolve();
@@ -2914,20 +3433,37 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 }
             });
             promise2.then(() => {
-                if (tempFabric !== {}) {
-                    let temp1 = JSON.parse(JSON.stringify(fabricSelected));
-                    temp1.selectedFabricId = tempFabric.FabricId;
-                    temp1.selectedTextEn = tempFabric.DesignEnName;
-                    temp1.selectedTextFa = tempFabric.DesignName;
-                    temp1.selectedColorEn = tempFabric.ColorEnName;
-                    temp1.selectedColorFa = tempFabric.ColorName;
-                    temp1.selectedHasTrim = tempFabric.HasTrim;
-                    temp1.selectedPhoto = tempFabric.FabricOnModelPhotoUrl;
-                    setFabricSelected(temp1);
-                    // fabricClicked(tempFabric["FabricOnModelPhotoUrl"], tempFabric["HasTrim"]);
-                    tempLabels["2"] = location.pathname.split('').slice(1, 3).join('') === "fa" ? tempFabric["DesignName"] + "/" + tempFabric["ColorName"] : tempFabric["DesignEnName"] + "/" + tempFabric["ColorEnName"];
-                    tempValue["2"] = temp["FabricId"];
-                    depSetTempArr = new Set([...setGetDeps("", "2", depSetTempArr)]);
+                if (Object.keys(tempFabric).length > 0 || Object.keys(tempFabric2).length > 0) {
+                    if (Object.keys(tempFabric).length > 0) {
+                        let temp1 = JSON.parse(JSON.stringify(fabricSelected));
+                        temp1.selectedFabricId = tempFabric.FabricId;
+                        temp1.selectedTextEn = tempFabric.DesignEnName;
+                        temp1.selectedTextFa = tempFabric.DesignName;
+                        temp1.selectedColorEn = tempFabric.ColorEnName;
+                        temp1.selectedColorFa = tempFabric.ColorName;
+                        temp1.selectedHasTrim = tempFabric.HasTrim;
+                        temp1.selectedPhoto = tempFabric.FabricOnModelPhotoUrl;
+                        setFabricSelected(temp1);
+                        // fabricClicked(tempFabric["FabricOnModelPhotoUrl"], tempFabric["HasTrim"]);
+                        tempLabels["1"] = location.pathname.split('').slice(1, 3).join('') === "fa" ? tempFabric["DesignName"] + "/" + tempFabric["ColorName"] : tempFabric["DesignEnName"] + "/" + tempFabric["ColorEnName"];
+                        tempValue["1"] = temp["FabricId"];
+                        depSetTempArr = new Set([...setGetDeps("", "1", depSetTempArr)]);
+                    }
+                    if (Object.keys(tempFabric2).length > 0) {
+                        let temp1 = JSON.parse(JSON.stringify(fabricSelected2));
+                        temp1.selectedFabricId = tempFabric2.FabricId;
+                        temp1.selectedTextEn = tempFabric2.DesignEnName;
+                        temp1.selectedTextFa = tempFabric2.DesignName;
+                        temp1.selectedColorEn = tempFabric2.ColorEnName;
+                        temp1.selectedColorFa = tempFabric2.ColorName;
+                        temp1.selectedHasTrim = tempFabric2.HasTrim;
+                        temp1.selectedPhoto = tempFabric2.FabricOnModelPhotoUrl;
+                        setFabricSelected2(temp1);
+                        // fabricClicked(tempFabric["FabricOnModelPhotoUrl"], tempFabric["HasTrim"]);
+                        tempLabels["2"] = location.pathname.split('').slice(1, 3).join('') === "fa" ? tempFabric2["DesignName"] + "/" + tempFabric2["ColorName"] : tempFabric2["DesignEnName"] + "/" + tempFabric2["ColorEnName"];
+                        tempValue["2"] = temp["FabricId2"];
+                        depSetTempArr = new Set([...setGetDeps("", "2", depSetTempArr)]);
+                    }
                     // console.log(depSetTempArr);
                     // setStep1(temp["FabricId"]);
                     setStepSelectedLabel(tempLabels);
@@ -2936,11 +3472,352 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 }
             }).catch(() => {
                     // console.log(temp);
+                    if (temp["SheerHeaderStyle"]) {
+                        setStep2A(temp["SheerHeaderStyle"]);
+                        if (temp["SheerHeaderStyle"] === "Grommet") {
+                            let refIndex = inputs.current["2A1"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["2A1"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["2A1"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "2", depSetTempArr)]);
+                        } else if (temp["SheerHeaderStyle"] === "Inverted Box Pleat") {
+                            let refIndex = inputs.current["2A2"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["2A2"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["2A2"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "2", depSetTempArr)]);
+                        } else if (temp["SheerHeaderStyle"] === "Pencil Pleat") {
+                            let refIndex = inputs.current["2A3"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["2A3"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["2A3"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "2", depSetTempArr)]);
+                        } else {
+                            let refIndex = inputs.current["2A4"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["2A4"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["2A4"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "2A", depSetTempArr)]);
+                        }
+                        setStepSelectedLabel(tempLabels);
+                        setStepSelectedValue(tempValue);
+                    }
+                    
+                    if (temp["PrivacyLayer"]) {
+                        setStep2B(temp["PrivacyLayer"]);
+                        if (temp["PrivacyLayer"] === "None") {
+                            let refIndex = inputs.current["2B1"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["2B1"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["2B1"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "2B,2B1", depSetTempArr)]);
+                        } else if (temp["PrivacyLayer"] === "Semi Sheer") {
+                            let refIndex = inputs.current["2B2"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["2B2"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["2B2"].value;
+                            depSetTempArr = new Set([...setGetDeps("2B1", "2B", depSetTempArr)]);
+                        } else {
+                            let refIndex = inputs.current["2B3"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["2B3"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["2B3"].value;
+                            depSetTempArr = new Set([...setGetDeps("2B1", "2B", depSetTempArr)]);
+                        }
+                        setStepSelectedLabel(tempLabels);
+                        setStepSelectedValue(tempValue);
+                    }
+                    
+                    if (temp["calcMeasurements"] !== undefined) {
+                        setStep3(temp["calcMeasurements"].toString());
+                        if (!temp["calcMeasurements"]) {
+                            let refIndex = inputs.current["31"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["31"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["31"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            
+                            selectValues["width"] = temp["Width"] ? [{value: temp["Width"]}] : [];
+                            selectValues["length"] = temp["Height"] ? [{value: temp["Height"]}] : [];
+                            depSetTempArr = new Set([...setGetDeps((temp["Width"] ? "" : "311,") + (temp["Height"] ? "" : "312,"), "3", depSetTempArr)]);
+                            setSelectCustomValues(selectValues);
+                        } else {
+                            let refIndex = inputs.current["32"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["32"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["32"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            
+                            if (temp["hasRod"] !== undefined) {
+                                setStep31(temp["hasRod"].toString());
+                                if (!temp["hasRod"]) {
+                                    if (temp["FinishedLengthType"]) {
+                                        setTimeout(() => {
+                                            setStep3A(temp["FinishedLengthType"].toString());
+                                            if (temp["FinishedLengthType"] === "Sill" || temp["FinishedLengthType"] === "Apron") {
+                                                if (temp["FinishedLengthType"] === "Sill") {
+                                                    let refIndex = inputs.current["3A1"].getAttribute('ref-num');
+                                                    tempLabels[refIndex] = inputs.current["3A1"].getAttribute('text');
+                                                    tempValue[refIndex] = inputs.current["3A1"].value;
+                                                } else {
+                                                    let refIndex = inputs.current["3A11"].getAttribute('ref-num');
+                                                    tempLabels[refIndex] = inputs.current["3A11"].getAttribute('text');
+                                                    tempValue[refIndex] = inputs.current["3A11"].value;
+                                                    setStep3A1("true");
+                                                }
+                                                
+                                                let tempWidth = changeLang ? temp["Width3B"] : temp["Width"];
+                                                let tempHeight = changeLang ? temp["Height3D"] : temp["Height"];
+                                                
+                                                selectValues["Width3B"] = tempWidth ? [{value: tempWidth}] : [];
+                                                if (tempWidth) {
+                                                    tempLabels["3B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                }
+                                                
+                                                selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
+                                                selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                                if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
+                                                    tempLabels["3C"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
+                                                }
+                                                
+                                                selectValues["Height3D"] = tempHeight ? [{value: tempHeight}] : [];
+                                                if (tempHeight) {
+                                                    tempLabels["3D"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
+                                                }
+                                                
+                                                selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
+                                                if (temp["ShadeMount"] !== undefined) {
+                                                    tempLabels["3E"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["ShadeMount"]}`) + postfixFa : temp["ShadeMount"] + postfixEn;
+                                                }
+                                                
+                                                selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
+                                                if (temp["CeilingToFloor"] !== undefined) {
+                                                    tempLabels["3F"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
+                                                }
+                                                
+                                                depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "3B,") + (temp["ExtensionLeft"] !== undefined ? "" : "3C1,") + (temp["ExtensionRight"] !== undefined ? "" : "3C1,") + (tempHeight !== undefined ? "" : "3D,") + (temp["ShadeMount"] !== undefined ? "" : "3E,") + (temp["CeilingToFloor"] !== undefined ? "" : "3F,"), "31,3A,3A1", depSetTempArr)]);
+                                                setSelectCustomValues(selectValues);
+                                                setStepSelectedLabel(tempLabels);
+                                                setStepSelectedValue(tempValue);
+                                                
+                                            } else {
+                                                if (temp["FinishedLengthType"] === "Floor") {
+                                                    let refIndex = inputs.current["3A3"].getAttribute('ref-num');
+                                                    tempLabels[refIndex] = inputs.current["3A3"].getAttribute('text');
+                                                    tempValue[refIndex] = inputs.current["3A3"].value;
+                                                } else {
+                                                    let refIndex = inputs.current["3A4"].getAttribute('ref-num');
+                                                    tempLabels[refIndex] = inputs.current["3A4"].getAttribute('text');
+                                                    tempValue[refIndex] = inputs.current["3A4"].value;
+                                                }
+                                                
+                                                let tempWidth = changeLang ? temp["Width3B"] : temp["Width"];
+                                                let tempHeight = changeLang ? temp["WindowToFloor"] : temp["Height"];
+                                                
+                                                selectValues["Width3B"] = tempWidth ? [{value: tempWidth}] : [];
+                                                if (tempWidth) {
+                                                    tempLabels["3B"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                }
+                                                
+                                                selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
+                                                selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                                if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
+                                                    tempLabels["3C"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
+                                                }
+                                                
+                                                selectValues["WindowToFloor"] = tempHeight ? [{value: tempHeight}] : [];
+                                                if (tempHeight) {
+                                                    tempLabels["3DFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
+                                                }
+                                                
+                                                selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
+                                                if (temp["ShadeMount"] !== undefined) {
+                                                    tempLabels["3E"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["ShadeMount"]}`) + postfixFa : temp["ShadeMount"] + postfixEn;
+                                                }
+                                                
+                                                selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
+                                                if (temp["CeilingToFloor"] !== undefined) {
+                                                    tempLabels["3F"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
+                                                }
+                                                
+                                                depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "3B,") + (temp["ExtensionLeft"] !== undefined ? "" : "3C1,") + (temp["ExtensionRight"] !== undefined ? "" : "3C1,") + (tempHeight !== undefined ? "" : "3DFloor,") + (temp["ShadeMount"] !== undefined ? "" : "3E,") + (temp["CeilingToFloor"] !== undefined ? "" : "3F,"), "31,3A,3A1", depSetTempArr)]);
+                                                setSelectCustomValues(selectValues);
+                                                setStepSelectedLabel(tempLabels);
+                                                setStepSelectedValue(tempValue);
+                                                
+                                            }
+                                        }, 200);
+                                    }
+                                } else {
+                                    if (temp["FinishedLengthType"]) {
+                                        setTimeout(() => {
+                                            setStep3A(temp["FinishedLengthType"].toString());
+                                            if (temp["FinishedLengthType"] === "Sill" || temp["FinishedLengthType"] === "Apron") {
+                                                if (temp["FinishedLengthType"] === "Sill") {
+                                                    let refIndex = inputs.current["3A1"].getAttribute('ref-num');
+                                                    tempLabels[refIndex] = inputs.current["3A1"].getAttribute('text');
+                                                    tempValue[refIndex] = inputs.current["3A1"].value;
+                                                } else {
+                                                    let refIndex = inputs.current["3A11"].getAttribute('ref-num');
+                                                    tempLabels[refIndex] = inputs.current["3A11"].getAttribute('text');
+                                                    tempValue[refIndex] = inputs.current["3A11"].value;
+                                                    setStep3A1("true");
+                                                }
+                                                
+                                                let tempWidth = changeLang ? temp["Width3C"] : temp["Width"];
+                                                let tempHeight = changeLang ? temp["RodToBottom"] : temp["Height"];
+                                                
+                                                selectValues["RodWidth"] = temp["RodWidth"] ? [{value: temp["RodWidth"]}] : [];
+                                                if (temp["RodWidth"] !== undefined) {
+                                                    tempLabels["3BRod"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["RodWidth"]}`) + postfixFa : temp["RodWidth"] + postfixEn;
+                                                }
+                                                
+                                                selectValues["Width3C"] = tempWidth ? [{value: tempWidth}] : [];
+                                                if (tempWidth) {
+                                                    tempLabels["3CRod"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                }
+                                                
+                                                selectValues["RodToBottom"] = tempHeight ? [{value: tempHeight}] : [];
+                                                if (tempHeight) {
+                                                    tempLabels["3DRod"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
+                                                }
+                                                
+                                                selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
+                                                if (temp["CeilingToFloor"] !== undefined) {
+                                                    tempLabels["3ERod"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
+                                                }
+                                                
+                                                depSetTempArr = new Set([...setGetDeps((temp["RodWidth"] !== undefined ? "" : "3BRod,") + (tempWidth ? "" : "3CRod,") + (tempHeight !== undefined ? "" : "3DRod,") + (temp["CeilingToFloor"] !== undefined ? "" : "3ERod,"), "31,3A,3A1", depSetTempArr)]);
+                                                setSelectCustomValues(selectValues);
+                                                setStepSelectedLabel(tempLabels);
+                                                setStepSelectedValue(tempValue);
+                                                
+                                            } else {
+                                                if (temp["FinishedLengthType"] === "Floor") {
+                                                    let refIndex = inputs.current["3A3"].getAttribute('ref-num');
+                                                    tempLabels[refIndex] = inputs.current["3A3"].getAttribute('text');
+                                                    tempValue[refIndex] = inputs.current["3A3"].value;
+                                                } else {
+                                                    let refIndex = inputs.current["3A4"].getAttribute('ref-num');
+                                                    tempLabels[refIndex] = inputs.current["3A4"].getAttribute('text');
+                                                    tempValue[refIndex] = inputs.current["3A4"].value;
+                                                }
+                                                
+                                                let tempWidth = changeLang ? temp["Width3C"] : temp["Width"];
+                                                let tempHeight = changeLang ? temp["RodToFloor"] : temp["Height"];
+                                                
+                                                selectValues["RodWidth"] = temp["RodWidth"] ? [{value: temp["RodWidth"]}] : [];
+                                                if (temp["RodWidth"] !== undefined) {
+                                                    tempLabels["3BRod"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["RodWidth"]}`) + postfixFa : temp["RodWidth"] + postfixEn;
+                                                }
+                                                
+                                                selectValues["Width3C"] = tempWidth ? [{value: tempWidth}] : [];
+                                                if (tempWidth) {
+                                                    tempLabels["3CRod"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                }
+                                                
+                                                selectValues["RodToFloor"] = tempHeight ? [{value: tempHeight}] : [];
+                                                if (tempHeight) {
+                                                    tempLabels["3DRodFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
+                                                }
+                                                
+                                                selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
+                                                if (temp["CeilingToFloor"] !== undefined) {
+                                                    tempLabels["3ERod"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
+                                                }
+                                                
+                                                depSetTempArr = new Set([...setGetDeps((temp["RodWidth"] !== undefined ? "" : "3BRod,") + (tempWidth ? "" : "3CRod,") + (tempHeight !== undefined ? "" : "3DRodFloor,") + (temp["CeilingToFloor"] !== undefined ? "" : "3ERod,"), "31,3A,3A1", depSetTempArr)]);
+                                                setSelectCustomValues(selectValues);
+                                                setStepSelectedLabel(tempLabels);
+                                                setStepSelectedValue(tempValue);
+                                                
+                                            }
+                                        }, 200);
+                                    }
+                                    
+                                }
+                            }
+                        }
+                    }
+                    if (temp["WindowWidth"] && temp["WindowHeight"]) {
+                        getWindowSize(temp["WindowWidth"], temp["WindowHeight"]);
+                    }
+                    
+                    if (temp["Lining"]) {
+                        setStep4(temp["Lining"]);
+                        if (temp["Lining"] === "Standard Lining") {
+                            let refIndex = inputs.current["41"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["41"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["41"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "4", depSetTempArr)]);
+                        } else {
+                            let refIndex = inputs.current["42"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["42"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["42"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "4", depSetTempArr)]);
+                        }
+                        setStepSelectedLabel(tempLabels);
+                        setStepSelectedValue(tempValue);
+                    }
+                    
+                    if (temp["PanelCoverage"]) {
+                        setStep5(temp["PanelCoverage"]);
+                        if (temp["PanelCoverage"] === "Full") {
+                            let refIndex = inputs.current["51"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["51"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["51"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "5", depSetTempArr)]);
+                        } else {
+                            let refIndex = inputs.current["52"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["52"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["52"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "5", depSetTempArr)]);
+                        }
+                        setStepSelectedLabel(tempLabels);
+                        setStepSelectedValue(tempValue);
+                    }
+                    
+                    if (temp["PanelType"]) {
+                        setStep6(temp["PanelType"]);
+                        if (temp["PanelType"] === "Single Panel, Left") {
+                            let refIndex = inputs.current["61"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["61"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["61"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
+                        } else if (temp["PanelType"] === "Single Panel, Right") {
+                            let refIndex = inputs.current["62"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["62"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["62"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
+                        } else {
+                            let refIndex = inputs.current["63"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["63"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["63"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
+                        }
+                        setStepSelectedLabel(tempLabels);
+                        setStepSelectedValue(tempValue);
+                    }
+                    
+                    if (temp["GrommetFinish"]) {
+                        setStep7(temp["GrommetFinish"]);
+                        if (temp["GrommetFinish"] === "Satin Brass") {
+                            let refIndex = inputs.current["71"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["71"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["71"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "7", depSetTempArr)]);
+                        } else if (temp["GrommetFinish"] === "Satin Nickel") {
+                            let refIndex = inputs.current["72"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["72"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["72"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "7", depSetTempArr)]);
+                        } else {
+                            let refIndex = inputs.current["73"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["73"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["73"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "7", depSetTempArr)]);
+                        }
+                        setStepSelectedLabel(tempLabels);
+                        setStepSelectedValue(tempValue);
+                    }
                     
                     if (temp["RoomNameEn"]) {
                         setSavedProjectRoomLabel(temp["RoomNameEn"]);
                         
-                        depSetTempArr = new Set([...setGetDeps("", "61", depSetTempArr)]);
+                        depSetTempArr = new Set([...setGetDeps("", "101", depSetTempArr)]);
                         setSelectedRoomLabel(temp["RoomNameEn"] ? [{
                             value: temp["RoomNameEn"],
                             label: rooms[pageLanguage].find(opt => opt.value === temp["RoomNameEn"]).label
@@ -2949,15 +3826,15 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                         tempSelect.value = temp["RoomNameEn"];
                         setRoomLabelSelect(tempSelect);
                         if (temp["WindowName"] === undefined || (temp["WindowName"] && temp["WindowName"] === "")) {
-                            tempLabels["6"] = tempSelect.label;
+                            tempLabels["10"] = tempSelect.label;
                         } else if (temp["WindowName"]) {
-                            tempLabels["6"] = tempSelect.label + " - " + temp["WindowName"];
+                            tempLabels["10"] = tempSelect.label + " - " + temp["WindowName"];
                         }
                         setStepSelectedLabel(tempLabels);
                     }
                     if (temp["WindowName"] && temp["WindowName"] !== "") {
                         setSavedProjectRoomText(temp["WindowName"]);
-                        depSetTempArr = new Set([...setGetDeps("", "62", depSetTempArr)]);
+                        depSetTempArr = new Set([...setGetDeps("", "102", depSetTempArr)]);
                         setRoomLabelText(temp["WindowName"]);
                     }
                     
@@ -3138,6 +4015,20 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         "fa": [
             {value: 'Standard', label: 'استاندارد'},
             {value: 'Smart', label: 'هوشمند'}
+        ],
+        
+    });
+    
+    const [batonOptions, setBatonOptions] = useState({
+        "en": [
+            {value: 'None', label: 'None'},
+            {value: 'Baton 30cm', label: 'Baton 30cm'},
+            {value: 'Baton 40cm', label: 'Baton 40cm'}
+        ],
+        "fa": [
+            {value: 'None', label: 'None'},
+            {value: 'Baton 30cm', label: 'Baton 30cm'},
+            {value: 'Baton 40cm', label: 'Baton 40cm'}
         ],
         
     });
@@ -3326,6 +4217,10 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
     const [selectedRemoteName, setSelectedRemoteName] = useState([]);
     const [selectedMotorType, setSelectedMotorType] = useState([]);
     const [selectedMotorMinPrice, setSelectedMotorMinPrice] = useState(0);
+    const [selectedBaton, setSelectedBaton] = useState([]);
+    const [selectedBatonA, setSelectedBatonA] = useState([]);
+    const [selectedBatonB, setSelectedBatonB] = useState([]);
+    const [selectedBatonC, setSelectedBatonC] = useState([]);
     
     const colors = {
         "en": [
@@ -3408,6 +4303,13 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
     };
     
     useEffect(() => {
+        setStep6("");
+        setDeps("6", "");
+        setCart("", "", "PanelType");
+        selectChanged(undefined, "6");
+    }, [cartValues["WidthCart"]]);
+    
+    useEffect(() => {
         if (fabricSelected.selectedFabricId && fabricSelected.selectedFabricId !== 0) {
             fabricClicked(fabricSelected.selectedPhoto, fabricSelected.selectedHasTrim);
             let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
@@ -3442,16 +4344,22 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
     }, [fabricSelected2]);
     
     useEffect(() => {
-        getCart().then((temp) => {
-            if (Object.keys(fabrics).length) {
-                setTimeout(() => {
-                    renderFabrics(temp);
-                }, 100);
-            } else {
-                setFabricsList([]);
-            }
-        });
-    }, [step2]);
+        if (sheersSelected.selectedFabricId && sheersSelected.selectedFabricId !== 0) {
+            // setCart("SheersId2", `${sheersSelected.selectedFabricId}`, "", "FabricDesignFa2,FabricDesignEn2,FabricColorEn2,FabricColorFa2,PhotoUrl2", [sheersSelected.selectedTextFa, sheersSelected.selectedTextEn, sheersSelected.selectedColorEn, sheersSelected.selectedColorFa, fabricSelected2.selectedPhoto]);
+            setCart("SheersId1", `${sheersSelected.selectedFabricId}`);
+            setDeps("", "2B1");
+            setStep2B1(sheersSelected.selectedFabricId.toString());
+        }
+    }, [sheersSelected]);
+    
+    useEffect(() => {
+        if (sheersSelected2.selectedFabricId && sheersSelected2.selectedFabricId !== 0) {
+            // setCart("SheersId2", `${sheersSelected2.selectedFabricId}`, "", "FabricDesignFa2,FabricDesignEn2,FabricColorEn2,FabricColorFa2,PhotoUrl2", [sheersSelected2.selectedTextFa, sheersSelected2.selectedTextEn, sheersSelected2.selectedColorEn, sheersSelected2.selectedColorFa, fabricSelected2.selectedPhoto]);
+            setCart("SheersId2", `${sheersSelected2.selectedFabricId}`);
+            setDeps("", "2B1");
+            setStep2B1(sheersSelected2.selectedFabricId.toString());
+        }
+    }, [sheersSelected2]);
     
     useEffect(() => {
         getCart().then((temp) => {
@@ -3463,7 +4371,74 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 setFabricsList([]);
             }
         });
-    }, [step3]);
+    }, [step1]);
+    
+    useEffect(() => {
+        getCart().then((temp) => {
+            if (Object.keys(fabrics).length) {
+                setTimeout(() => {
+                    renderFabrics2(temp);
+                }, 100);
+            } else {
+                setFabricsList2([]);
+            }
+        });
+    }, [step2]);
+    
+    useEffect(() => {
+        getCart().then((temp) => {
+            if (Object.keys(fabrics).length) {
+                setTimeout(() => {
+                    renderSheers(temp);
+                    renderSheers2(temp);
+                }, 100);
+            } else {
+                setSheersList([]);
+                setSheersList2([]);
+            }
+        });
+    }, [step2B1]);
+    
+    useEffect(() => {
+        if (pageLanguage !== '') {
+            if (Object.keys(rails).length) {
+                renderRails();
+                renderTracks();
+            } else {
+                setRailsList([]);
+                setTracksList([]);
+            }
+        }
+    }, [step81, step8A1, step8B1, step8C1]);
+    
+    useEffect(() => {
+        if (step81 !== "") {
+            setCart("RailId", step81);
+            setDeps("81", "");
+        }
+    }, [step81]);
+    
+    useEffect(() => {
+        if (step8A1 !== "") {
+            setCart("RailIdA", step8A1);
+            setDeps("8A1", "");
+        }
+    }, [step8A1]);
+    
+    useEffect(() => {
+        if (step8B1 !== "") {
+            setCart("RailIdB", step8B1);
+            setDeps("8B1", "");
+        }
+    }, [step8B1]);
+    
+    useEffect(() => {
+        if (step8C1 !== "") {
+            setCart("RailIdC", step8C1);
+            setDeps("8C1", "");
+        }
+    }, [step8C1]);
+    
     // useEffect(() => {
     //     if (firstRender === false) {
     //         const tempLang = location.pathname.split('');
@@ -3503,7 +4478,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
     //                             temp.labels[objKey] = [];
     //                         if (temp.values[objKey] === undefined)
     //                             temp.values[objKey] = [];
-    //                         let tempMax = temp.values[objKey][temp.values[objKey].indexOf(Math.max(...temp.values[objKey]))];
+    //                         let tempMax = temp.values[objKey][temp.values[objKey].indexOf(Math.min(...temp.values[objKey]))];
     //                         tempLabels[objKey] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + "س\u200Cم" : tempMax + "cm";
     //
     //                     } else if (objKey === "3BOut") {
@@ -3693,60 +4668,6 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         setPageLanguage(tempLang.slice(1, 3).join(''));
     }
     
-    function getRemoteNames() {
-        if (isLoggedIn) {
-            axios.get(baseURLGetRemoteNames, {
-                headers: authHeader()
-            }).then((response) => {
-                let tempArr = [];
-                response.data.forEach(el => {
-                    tempArr.push({
-                        value: el,
-                        label: el
-                    });
-                });
-                tempArr.push({
-                    value: "addNewRemoteName",
-                    label: t("Add New Remote")
-                });
-                setRemoteNames(tempArr);
-            }).catch(err => {
-                if (err.response.status === 401) {
-                    refreshToken().then((response2) => {
-                        if (response2 !== false) {
-                            getRemoteNames();
-                        } else {
-                            setRemoteNames([]);
-                        }
-                    });
-                } else {
-                    setRemoteNames([]);
-                }
-            });
-        } else {
-            if (Object.keys(bag).length > 0 && bag["drapery"] !== undefined) {
-                let tempArr = bag["drapery"].map((obj, index) => {
-                    if (obj["PreorderText"] && obj["PreorderText"]["RemoteName"] && obj["PreorderText"]["SewingModelId"] === modelID) {
-                        return {
-                            value: obj["PreorderText"]["RemoteName"],
-                            label: obj["PreorderText"]["RemoteName"]
-                        }
-                    } else {
-                        return null;
-                    }
-                }).filter(n => n).filter((v, i, a) => a.findIndex(v2 => (v2.id === v.id)) === i);
-                tempArr.push({
-                    value: "addNewRemoteName",
-                    label: t("Add New Remote")
-                });
-                // console.log(tempArr);
-                setRemoteNames(tempArr);
-            } else {
-                setRemoteNames([]);
-            }
-        }
-    }
-    
     function getHasZipcode() {
         GetBasketZipcode(isLoggedIn).then((temp) => {
             if (temp === 401) {
@@ -3817,7 +4738,6 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                         setTimeout(() => {
                             renderFabrics(temp);
                             renderFabrics2(temp);
-                            getRemoteNames();
                         }, 100);
                     });
                 } else {
@@ -3842,6 +4762,38 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
             }
         });
     }, [fabrics, fabrics2, cartChanged, isLoggedIn, location.pathname]);
+    
+    useEffect(() => {
+        setLang().then(() => {
+            if (pageLanguage !== '') {
+                if (Object.keys(sheers).length) {
+                    getCart().then((temp) => {
+                        setTimeout(() => {
+                            renderSheers(temp);
+                            renderSheers2(temp);
+                        }, 100);
+                    });
+                } else {
+                    setSheersList([]);
+                    setSheersList2([]);
+                }
+            }
+        });
+    }, [sheers, sheers2, cartChanged, isLoggedIn, location.pathname]);
+    
+    useEffect(() => {
+        setLang().then(() => {
+            if (pageLanguage !== '') {
+                if (Object.keys(rails).length) {
+                    renderRails();
+                    renderTracks();
+                } else {
+                    setRailsList([]);
+                    setTracksList([]);
+                }
+            }
+        });
+    }, [rails, tracks, cartChanged, isLoggedIn, location.pathname]);
     
     useEffect(() => {
         if (firstRender.current) {
@@ -3877,7 +4829,8 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         // setFabrics([]);
         // setFabricsList([]);
         if (pageLanguage !== '') {
-            setSelectedMotorChannels([motorChannels[pageLanguage].find(opt => opt.value === '0')]);
+            // setSelectedMotorChannels([motorChannels[pageLanguage].find(opt => opt.value === '0')]);
+            getRails();
         }
         GetSewingFilters(1, `${modelID}`).then((temp) => {
             setSewingColors(temp[location.pathname.split('').slice(1, 3).join('')].map((obj, index) => (
@@ -4426,7 +5379,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         <div className="fabrics_list_container">
                                             {fabricsList2}
                                         </div>
-                                        <NextStep eventKey={step2 !== "" ? "2A":"3"}>{t("NEXT STEP")}</NextStep>
+                                        <NextStep eventKey={step2 !== "" ? "2A" : "3"}>{t("NEXT STEP")}</NextStep>
                                     </div>
                                 </Card.Body>
                             </Accordion.Collapse>
@@ -4440,126 +5393,253 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                             </Card.Header>
                             <Accordion.Collapse eventKey="2A">
                                 <Card.Body>
-                                    <div className="card_body card_body_radio card_body_radio_camera">
-                                        <div className="box33 radio_style">
-                                            {/*<img src={require('../Images/drapery/dk/window-Inside.svg').default} className="img-fluid" alt=""/>*/}
+                                    {/*<div className="card_body card_body_radio bracket_color">*/}
+                                    {/*    <div className="box25">*/}
+                                    {/*        <div className="radio_group">*/}
+                                    {/*            <label className="radio_container">*/}
+                                    {/*                <input className="radio" type="radio" text={t("Grommet")} value="1" name="step2A" ref-num="2A" id="2A1" outline="true"*/}
+                                    {/*                       checked={step2A === "Grommet"}*/}
+                                    {/*                       onChange={e => {*/}
+                                    {/*                           selectChanged(e);*/}
+                                    {/*                           setStep2A("Grommet");*/}
+                                    {/*                           setDeps("", "2A");*/}
+                                    {/*                           setCart("HeaderStyle", "Grommet");*/}
+                                    {/*                       }} ref={ref => (inputs.current["2A1"] = ref)}/>*/}
+                                    {/*                <div className="frame_img">*/}
+                                    {/*                    <img src={require('../Images/drapery/grommet/eyelet.svg').default} className="img-fluid bracket_color_img" alt=""/>*/}
+                                    {/*                </div>*/}
+                                    {/*            </label>*/}
+                                    {/*            <div className="radio_group_name_container">*/}
+                                    {/*                <h1>{t("Grommet")}</h1>*/}
+                                    {/*            </div>*/}
+                                    {/*        </div>*/}
+                                    {/*    </div>*/}
+                                    {/*    <div className="box25">*/}
+                                    {/*        <div className="radio_group">*/}
+                                    {/*            <label className="radio_container">*/}
+                                    {/*                <input className="radio" type="radio" text={t("Inverted Box Pleat")} value="2" name="step2A" ref-num="2A" id="2A2"*/}
+                                    {/*                       outline="true"*/}
+                                    {/*                       checked={step2A === "Inverted Box Pleat"}*/}
+                                    {/*                       onChange={e => {*/}
+                                    {/*                           selectChanged(e);*/}
+                                    {/*                           setStep2A("Inverted Box Pleat");*/}
+                                    {/*                           setDeps("", "2A");*/}
+                                    {/*                           setCart("HeaderStyle", "Inverted Box Pleat");*/}
+                                    {/*                       }} ref={ref => (inputs.current["2A2"] = ref)}/>*/}
+                                    {/*                <div className="frame_img">*/}
+                                    {/*                    <img src={require('../Images/drapery/grommet/triplePinchPleat.svg').default} className="img-fluid bracket_color_img"*/}
+                                    {/*                         alt=""/>*/}
+                                    {/*                </div>*/}
+                                    {/*            </label>*/}
+                                    {/*            <div className="radio_group_name_container">*/}
+                                    {/*                <h1>{t("Inverted Box Pleat")}</h1>*/}
+                                    {/*            </div>*/}
+                                    {/*        </div>*/}
+                                    {/*    </div>*/}
+                                    {/*    <div className="box25">*/}
+                                    {/*        <div className="radio_group">*/}
+                                    {/*            <label className="radio_container">*/}
+                                    {/*                <input className="radio" type="radio" text={t("Pencil Pleat")} value="3" name="step2A" ref-num="2A" id="2A3" outline="true"*/}
+                                    {/*                       checked={step2A === "Pencil Pleat"}*/}
+                                    {/*                       onChange={e => {*/}
+                                    {/*                           selectChanged(e);*/}
+                                    {/*                           setStep2A("Pencil Pleat");*/}
+                                    {/*                           setDeps("", "2A");*/}
+                                    {/*                           setCart("HeaderStyle", "Pencil Pleat");*/}
+                                    {/*                       }} ref={ref => (inputs.current["2A3"] = ref)}/>*/}
+                                    {/*                <div className="frame_img">*/}
+                                    {/*                    <img src={require('../Images/drapery/grommet/pencilPleat.svg').default} className="img-fluid bracket_color_img" alt=""/>*/}
+                                    {/*                </div>*/}
+                                    {/*            </label>*/}
+                                    {/*            <div className="radio_group_name_container">*/}
+                                    {/*                <h1>{t("Pencil Pleat")}</h1>*/}
+                                    {/*            </div>*/}
+                                    {/*        </div>*/}
+                                    {/*    </div>*/}
+                                    {/*    <div className="box25">*/}
+                                    {/*        <div className="radio_group">*/}
+                                    {/*            <label className="radio_container">*/}
+                                    {/*                <input className="radio" type="radio" text={t("Rod Pocket")} value="4" name="step2A" ref-num="2A" id="2A4" outline="true"*/}
+                                    {/*                       checked={step2A === "Rod Pocket"}*/}
+                                    {/*                       onChange={e => {*/}
+                                    {/*                           selectChanged(e);*/}
+                                    {/*                           setStep2A("Rod Pocket");*/}
+                                    {/*                           setDeps("", "2A");*/}
+                                    {/*                           setCart("HeaderStyle", "Rod Pocket");*/}
+                                    {/*                       }} ref={ref => (inputs.current["2A4"] = ref)}/>*/}
+                                    {/*                <div className="frame_img">*/}
+                                    {/*                    <img src={require('../Images/drapery/grommet/doublePinchPleat.svg').default} className="img-fluid bracket_color_img"*/}
+                                    {/*                         alt=""/>*/}
+                                    {/*                </div>*/}
+                                    {/*            </label>*/}
+                                    {/*            <div className="radio_group_name_container">*/}
+                                    {/*                <h1>{t("Rod Pocket")}</h1>*/}
+                                    {/*            </div>*/}
+                                    {/*        </div>*/}
+                                    {/*    </div>*/}
+                                    {/*    <NextStep eventKey="2B">{t("NEXT STEP")}</NextStep>*/}
+                                    {/*</div>*/}
+                                    <div className="card_body card_body_radio card_body_radio_camera card_body_radio_small_img">
+                                        <div className="box25 radio_style">
+                                            <img src={require('../Images/drapery/grommet/eyelet.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("Grommet")} value="1" name="step2A" ref-num="2A" id="2A1"
                                                    checked={step2A === "Grommet"}
                                                    onChange={e => {
                                                        setStep2A("Grommet");
                                                        setDeps("", "2A");
-                                                       setCart("HeaderStyle", "Grommet");
+                                                       setCart("SheerHeaderStyle", "Grommet");
                                                        selectChanged(e);
                                                 
                                                    }} ref={ref => (inputs.current["2A1"] = ref)}/>
-                                            <label htmlFor="2A1">{t("Grommet")}
-                                                <span className="popover_indicator">
-                                                    {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
-                                                                          children={<object className="popover_camera" type="image/svg+xml"
-                                                                                            data={require('../Images/public/camera.svg').default}/>}
-                                                                          component={
-                                                                              <div className="clearfix">
-                                                                                  <div className="popover_image clearfix">
-                                                                                      <img
-                                                                                          src={popoverImages["step2a1"] === undefined ? require('../Images/drapery/grommet/pencilpleat.png') : popoverImages["step2a1"]}
-                                                                                          className="img-fluid" alt=""/>
-                                                                                  </div>
-                                                                                  <div className="popover_footer">
-                                                                                      <span className="popover_footer_title">{t("dk_step_help_camera_title")}</span>
-                                                                                      <span className="popover_thumbnails">
-                                                                                          <div>
-                                                                                              <img src={require('../Images/drapery/grommet/pencilpleat.png')}
-                                                                                                   text="step2a1"
-                                                                                                   onMouseEnter={(e) => popoverThumbnailHover(e)}
-                                                                                                   className="popover_thumbnail_img img-fluid"
-                                                                                                   alt=""/>
-                                                                                          </div>
-                                                                                      </span>
-                                                                                  </div>
-                                                                              </div>
-                                                                          }/>
-                                                    }
-                                                </span>
+                                            <label htmlFor="2A1">{t("HeaderStyle1")}
+                                                {/*<span className="popover_indicator">*/}
+                                                {/*    {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}*/}
+                                                {/*                          children={<object className="popover_camera" type="image/svg+xml"*/}
+                                                {/*                                            data={require('../Images/public/camera.svg').default}/>}*/}
+                                                {/*                          component={*/}
+                                                {/*                              <div className="clearfix">*/}
+                                                {/*                                  <div className="popover_image clearfix">*/}
+                                                {/*                                      <img*/}
+                                                {/*                                          src={popoverImages["step2a1"] === undefined ? require('../Images/drapery/grommet/pencilpleat.png') : popoverImages["step2a1"]}*/}
+                                                {/*                                          className="img-fluid" alt=""/>*/}
+                                                {/*                                  </div>*/}
+                                                {/*                                  <div className="popover_footer">*/}
+                                                {/*                                      <span className="popover_footer_title">{t("dk_step_help_camera_title")}</span>*/}
+                                                {/*                                      <span className="popover_thumbnails">*/}
+                                                {/*                                          <div>*/}
+                                                {/*                                              <img src={require('../Images/drapery/grommet/pencilpleat.png')}*/}
+                                                {/*                                                   text="step2a1"*/}
+                                                {/*                                                   onMouseEnter={(e) => popoverThumbnailHover(e)}*/}
+                                                {/*                                                   className="popover_thumbnail_img img-fluid"*/}
+                                                {/*                                                   alt=""/>*/}
+                                                {/*                                          </div>*/}
+                                                {/*                                      </span>*/}
+                                                {/*                                  </div>*/}
+                                                {/*                              </div>*/}
+                                                {/*                          }/>*/}
+                                                {/*    }*/}
+                                                {/*</span>*/}
                                             </label>
                                         </div>
-                                        <div className="box33 radio_style">
-                                            {/*<img src={require('../Images/drapery/dk/window-Outside.svg').default} className="img-fluid" alt=""/>*/}
+                                        <div className="box25 radio_style">
+                                            <img src={require('../Images/drapery/grommet/triplePinchPleat.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("Inverted Box Pleat")} value="2" name="step2A" ref-num="2A" id="2A2"
                                                    checked={step2A === "Inverted Box Pleat"}
                                                    onChange={e => {
                                                        setStep2A("Inverted Box Pleat");
                                                        setDeps("", "2A");
-                                                       setCart("HeaderStyle", "Inverted Box Pleat");
+                                                       setCart("SheerHeaderStyle", "Inverted Box Pleat");
                                                        selectChanged(e);
                                                    }} ref={ref => (inputs.current["2A2"] = ref)}/>
-                                            <label htmlFor="2A2">{t("Inverted Box Pleat")}
-                                                <span className="popover_indicator">
-                                                    {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
-                                                                          children={<object className="popover_camera" type="image/svg+xml"
-                                                                                            data={require('../Images/public/camera.svg').default}/>}
-                                                                          component={
-                                                                              <div className="clearfix">
-                                                                                  <div className="popover_image clearfix">
-                                                                                      <img
-                                                                                          src={popoverImages["step2a1"] === undefined ? require('../Images/drapery/grommet/invertedboxpleat.png') : popoverImages["step2a1"]}
-                                                                                          className="img-fluid" alt=""/>
-                                                                                  </div>
-                                                                                  <div className="popover_footer">
-                                                                                      <span className="popover_footer_title">{t("dk_step_help_camera_title")}</span>
-                                                                                      <span className="popover_thumbnails">
-                                                                                          <div>
-                                                                                              <img src={require('../Images/drapery/grommet/invertedboxpleat.png')}
-                                                                                                   text="step2a1"
-                                                                                                   onMouseEnter={(e) => popoverThumbnailHover(e)}
-                                                                                                   className="popover_thumbnail_img img-fluid"
-                                                                                                   alt=""/>
-                                                                                          </div>
-                                                                                      </span>
-                                                                                  </div>
-                                                                              </div>
-                                                                          }/>
-                                                    }
-                                                </span>
+                                            <label htmlFor="2A2">{t("HeaderStyle2")}
+                                                {/*<span className="popover_indicator">*/}
+                                                {/*    {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}*/}
+                                                {/*                          children={<object className="popover_camera" type="image/svg+xml"*/}
+                                                {/*                                            data={require('../Images/public/camera.svg').default}/>}*/}
+                                                {/*                          component={*/}
+                                                {/*                              <div className="clearfix">*/}
+                                                {/*                                  <div className="popover_image clearfix">*/}
+                                                {/*                                      <img*/}
+                                                {/*                                          src={popoverImages["step2a3"] === undefined ? require('../Images/drapery/grommet/invertedboxpleat.png') : popoverImages["step2a1"]}*/}
+                                                {/*                                          className="img-fluid" alt=""/>*/}
+                                                {/*                                  </div>*/}
+                                                {/*                                  <div className="popover_footer">*/}
+                                                {/*                                      <span className="popover_footer_title">{t("dk_step_help_camera_title")}</span>*/}
+                                                {/*                                      <span className="popover_thumbnails">*/}
+                                                {/*                                          <div>*/}
+                                                {/*                                              <img src={require('../Images/drapery/grommet/invertedboxpleat.png')}*/}
+                                                {/*                                                   text="step2a3"*/}
+                                                {/*                                                   onMouseEnter={(e) => popoverThumbnailHover(e)}*/}
+                                                {/*                                                   className="popover_thumbnail_img img-fluid"*/}
+                                                {/*                                                   alt=""/>*/}
+                                                {/*                                          </div>*/}
+                                                {/*                                      </span>*/}
+                                                {/*                                  </div>*/}
+                                                {/*                              </div>*/}
+                                                {/*                          }/>*/}
+                                                {/*    }*/}
+                                                {/*</span>*/}
                                             </label>
                                         </div>
-                                        <div className="box33 radio_style">
-                                            {/*<img src={require('../Images/drapery/dk/window-Arc.svg').default} className="img-fluid" alt=""/>*/}
+                                        <div className="box25 radio_style">
+                                            <img src={require('../Images/drapery/grommet/pencilPleat.svg').default} className="img-fluid" alt=""/>
                                             <input className="radio" type="radio" text={t("Pencil Pleat")} value="3" name="step2A" ref-num="2A" id="2A3"
                                                    checked={step2A === "Pencil Pleat"}
                                                    onChange={e => {
                                                        setStep2A("Pencil Pleat");
                                                        setDeps("", "2A");
-                                                       setCart("HeaderStyle", "Pencil Pleat");
+                                                       setCart("SheerHeaderStyle", "Pencil Pleat");
                                                        selectChanged(e);
                                                    }} ref={ref => (inputs.current["2A3"] = ref)}/>
-                                            <label htmlFor="2A3">{t("Pencil Pleat")}
-                                                <span className="popover_indicator">
-                                                    {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
-                                                                          children={<object className="popover_camera" type="image/svg+xml"
-                                                                                            data={require('../Images/public/camera.svg').default}/>}
-                                                                          component={
-                                                                              <div className="clearfix">
-                                                                                  <div className="popover_image clearfix">
-                                                                                      <img
-                                                                                          src={popoverImages["step2a1"] === undefined ? require('../Images/drapery/grommet/pencilpleat.png') : popoverImages["step2a1"]}
-                                                                                          className="img-fluid" alt=""/>
-                                                                                  </div>
-                                                                                  <div className="popover_footer">
-                                                                                      <span className="popover_footer_title">{t("dk_step_help_camera_title")}</span>
-                                                                                      <span className="popover_thumbnails">
-                                                                                          <div>
-                                                                                              <img src={require('../Images/drapery/grommet/pencilpleat.png')}
-                                                                                                   text="step2a1"
-                                                                                                   onMouseEnter={(e) => popoverThumbnailHover(e)}
-                                                                                                   className="popover_thumbnail_img img-fluid"
-                                                                                                   alt=""/>
-                                                                                          </div>
-                                                                                      </span>
-                                                                                  </div>
-                                                                              </div>
-                                                                          }/>
-                                                    }
-                                                </span>
+                                            <label htmlFor="2A3">{t("HeaderStyle3")}
+                                                {/*<span className="popover_indicator">*/}
+                                                {/*    {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}*/}
+                                                {/*                          children={<object className="popover_camera" type="image/svg+xml"*/}
+                                                {/*                                            data={require('../Images/public/camera.svg').default}/>}*/}
+                                                {/*                          component={*/}
+                                                {/*                              <div className="clearfix">*/}
+                                                {/*                                  <div className="popover_image clearfix">*/}
+                                                {/*                                      <img*/}
+                                                {/*                                          src={popoverImages["step2a2"] === undefined ? require('../Images/drapery/grommet/pencilpleat.png') : popoverImages["step2a1"]}*/}
+                                                {/*                                          className="img-fluid" alt=""/>*/}
+                                                {/*                                  </div>*/}
+                                                {/*                                  <div className="popover_footer">*/}
+                                                {/*                                      <span className="popover_footer_title">{t("dk_step_help_camera_title")}</span>*/}
+                                                {/*                                      <span className="popover_thumbnails">*/}
+                                                {/*                                          <div>*/}
+                                                {/*                                              <img src={require('../Images/drapery/grommet/pencilpleat.png')}*/}
+                                                {/*                                                   text="step2a2"*/}
+                                                {/*                                                   onMouseEnter={(e) => popoverThumbnailHover(e)}*/}
+                                                {/*                                                   className="popover_thumbnail_img img-fluid"*/}
+                                                {/*                                                   alt=""/>*/}
+                                                {/*                                                   alt=""/>*/}
+                                                {/*                                          </div>*/}
+                                                {/*                                      </span>*/}
+                                                {/*                                  </div>*/}
+                                                {/*                              </div>*/}
+                                                {/*                          }/>*/}
+                                                {/*    }*/}
+                                                {/*</span>*/}
+                                            </label>
+                                        </div>
+                                        <div className="box25 radio_style">
+                                            <img src={require('../Images/drapery/grommet/doublePinchPleat.svg').default} className="img-fluid" alt=""/>
+                                            <input className="radio" type="radio" text={t("Rod Pocket")} value="4" name="step2A" ref-num="2A" id="2A4"
+                                                   checked={step2A === "Rod Pocket"}
+                                                   onChange={e => {
+                                                       setStep2A("Rod Pocket");
+                                                       setDeps("", "2A");
+                                                       setCart("SheerHeaderStyle", "Rod Pocket");
+                                                       selectChanged(e);
+                                                   }} ref={ref => (inputs.current["2A4"] = ref)}/>
+                                            <label htmlFor="2A4">{t("HeaderStyle4")}
+                                                {/*<span className="popover_indicator">*/}
+                                                {/*    {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}*/}
+                                                {/*                          children={<object className="popover_camera" type="image/svg+xml"*/}
+                                                {/*                                            data={require('../Images/public/camera.svg').default}/>}*/}
+                                                {/*                          component={*/}
+                                                {/*                              <div className="clearfix">*/}
+                                                {/*                                  <div className="popover_image clearfix">*/}
+                                                {/*                                      <img*/}
+                                                {/*                                          src={popoverImages["step2a4"] === undefined ? require('../Images/drapery/grommet/pencilpleat.png') : popoverImages["step2a1"]}*/}
+                                                {/*                                          className="img-fluid" alt=""/>*/}
+                                                {/*                                  </div>*/}
+                                                {/*                                  <div className="popover_footer">*/}
+                                                {/*                                      <span className="popover_footer_title">{t("dk_step_help_camera_title")}</span>*/}
+                                                {/*                                      <span className="popover_thumbnails">*/}
+                                                {/*                                          <div>*/}
+                                                {/*                                              <img src={require('../Images/drapery/grommet/pencilpleat.png')}*/}
+                                                {/*                                                   text="step2a4"*/}
+                                                {/*                                                   onMouseEnter={(e) => popoverThumbnailHover(e)}*/}
+                                                {/*                                                   className="popover_thumbnail_img img-fluid"*/}
+                                                {/*                                                   alt=""/>*/}
+                                                {/*                                          </div>*/}
+                                                {/*                                      </span>*/}
+                                                {/*                                  </div>*/}
+                                                {/*                              </div>*/}
+                                                {/*                          }/>*/}
+                                                {/*    }*/}
+                                                {/*</span>*/}
                                             </label>
                                         </div>
                                         
@@ -4584,7 +5664,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    checked={step2B === "None"}
                                                    onChange={e => {
                                                        setStep2B("None");
-                                                       setDeps("", "2B");
+                                                       setDeps("", "2B,2B1");
                                                        setCart("PrivacyLayer", "None");
                                                        selectChanged(e);
                                                 
@@ -4593,19 +5673,38 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         </div>
                                         <div className="box33 radio_style">
                                             {/*<img src={require('../Images/drapery/dk/window-Outside.svg').default} className="img-fluid" alt=""/>*/}
-                                            <input className="radio" type="radio" text={t("Light Filtering Curtain")} value="2" name="step2B" ref-num="2B" id="2B2"
-                                                   checked={step2B === "Light Filtering Curtain"}
+                                            <input className="radio" type="radio" text={t("Semi Sheer")} value="2" name="step2B" ref-num="2B" id="2B2"
+                                                   checked={step2B === "Semi Sheer"}
                                                    onChange={e => {
-                                                       setStep2B("Light Filtering Curtain");
-                                                       setDeps("", "2B");
-                                                       setCart("PrivacyLayer", "Light Filtering Curtain");
+                                                       setStep2B("Semi Sheer");
+                                                       setDeps("2B1", "2B");
+                                                       setCart("PrivacyLayer", "Semi Sheer");
                                                        selectChanged(e);
                                                    }} ref={ref => (inputs.current["2B2"] = ref)}/>
-                                            <label htmlFor="2B2">{t("Light Filtering Curtain")}</label>
+                                            <label htmlFor="2B2">{t("Semi Sheer")}</label>
+                                        </div>
+                                        <div className="box33 radio_style">
+                                            {/*<img src={require('../Images/drapery/dk/window-Outside.svg').default} className="img-fluid" alt=""/>*/}
+                                            <input className="radio" type="radio" text={t("Opaque")} value="3" name="step2B" ref-num="2B" id="2B3"
+                                                   checked={step2B === "Opaque"}
+                                                   onChange={e => {
+                                                       setStep2B("Opaque");
+                                                       setDeps("2B1", "2B");
+                                                       setCart("PrivacyLayer", "Opaque");
+                                                       selectChanged(e);
+                                                   }} ref={ref => (inputs.current["2B3"] = ref)}/>
+                                            <label htmlFor="2B3">{t("Opaque")}</label>
                                         </div>
                                         
-                                        <div className={step2B === "Light Filtering Curtain" ? "fabrics_list_container grommet_fabrics_list_container" : "noDisplay"}>
-                                            {fabricsList2}
+                                        <div className={step2B === "Semi Sheer" ? "fabrics_list_container grommet_fabrics_list_container" : "noDisplay"}>
+                                            <div className="fabrics_list_container">
+                                                {sheersList}
+                                            </div>
+                                        </div>
+                                        <div className={step2B === "Opaque" ? "fabrics_list_container grommet_fabrics_list_container" : "noDisplay"}>
+                                            <div className="fabrics_list_container">
+                                                {sheersList2}
+                                            </div>
                                         </div>
                                         <NextStep eventKey="3">{t("NEXT STEP")}</NextStep>
                                     </div>
@@ -4628,11 +5727,13 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    checked={step3 === "false"}
                                                    onChange={e => {
                                                        setStep3("false");
-                                                       selectChanged(e, "3AIn,3BIn,3AOut,3BOut,3COut,3DOut,3CArc");
+                                                       setStep31("");
+                                                       setStep6("");
+                                                       selectChanged(e, "3A,3B,3C,3D,3DFloor,3E,3F,3BRod,3CRod,3DRod,3DRodFloor,3ERod");
                                                        setMeasurementsNextStep("4");
-                                                       setDeps("31,32", "3,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3,3AOut,3BOut1,3BOut2,3COut,3DOut,3CArc1,3CArc2,3CArc3");
+                                                       setDeps("311,312", "3,31,3A,3A1,3B,3C1,3C2,3D,3DFloor,3E,3F,3BRod,3CRod,3DRod,3DRodFloor,3ERod");
                                                        deleteSpecialSelects();
-                                                       setCart("calcMeasurements", false, "WidthCart,HeightCart,Width1,Width2,Width3,Height1,Height2,Height3,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                       setCart("calcMeasurements", false, "WidthCart,HeightCart,hasRod,FinishedLengthType,Width3B,ExtensionLeft,ExtensionRight,ShadeMount,Height3D,WindowToFloor,CeilingToFloor,RodWidth,Width3C,RodToBottom,RodToFloor");
                                                    }} ref={ref => (inputs.current["31"] = ref)}/>
                                             <label htmlFor="31">{t("I have my own measurements.")}</label>
                                         </div>
@@ -4641,14 +5742,14 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    ref-num="3" id="32" ref={ref => (inputs.current["32"] = ref)}
                                                    onChange={e => {
                                                        setStep3("true");
+                                                       setStep31("");
+                                                       setStep6("");
                                                        deleteSpecialSelects();
                                                        selectChanged(e);
-                                                       setMeasurementsNextStep("3A");
-                                                       setDeps("3AOut,3BOut1,3BOut2,3COut,3DOut", "3,3AIn1,3BIn1,3AIn2,3BIn2,3AIn3,3BIn3,31,32,3CArc1,3CArc2,3CArc3");
-                                                       setCart("calcMeasurements", true, "Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width1,Width2,Width3,Height1,Height2,Height3,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                       setDeps("31", "3,311,312");
+                                                       setCart("calcMeasurements", true, "Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight");
                                                    }}/>
                                             <label htmlFor="32">{t("Calculate my measurements.")}</label>
-                                        
                                         </div>
                                         
                                         {step3 === "false" &&
@@ -4689,7 +5790,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                                     let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.width = selected;
                                                                     setSelectCustomValues(temp);
-                                                                    setDeps("", "31");
+                                                                    setDeps("", "311");
                                                                     setCart("Width", selected[0].value);
                                                                 }
                                                             }}
@@ -4733,7 +5834,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                                     let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                                     temp.length = selected;
                                                                     setSelectCustomValues(temp);
-                                                                    setDeps("", "32");
+                                                                    setDeps("", "312");
                                                                     setCart("Height", selected[0].value);
                                                                 }
                                                             }}
@@ -4743,6 +5844,190 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                 </div>
                                             </div>
                                         }
+                                        
+                                        {/*{step3 === "false" &&*/}
+                                        {/*    <div className="own_measurements_container grommet_own_measurements_container">*/}
+                                        {/*        <div className="own_measurements_labels">*/}
+                                        {/*            <label className="select_label"/>*/}
+                                        {/*            <div className="select_container">*/}
+                                        {/*                <h6 className="select_label">Drapery</h6>*/}
+                                        {/*            </div>*/}
+                                        {/*            <div className="select_container">*/}
+                                        {/*                <h6 className="select_label">Sheer</h6>*/}
+                                        {/*            </div>*/}
+                                        {/*        </div>*/}
+                                        {/*        <div className="own_measurements_width">*/}
+                                        {/*            <label className="select_label">{t("Width")}<p className="farsi_cm">{t("select_cm")}</p></label>*/}
+                                        {/*            <div className="select_container select_container_num">*/}
+                                        {/*                <Select*/}
+                                        {/*                    className="select"*/}
+                                        {/*                    placeholder={t("Please Select")}*/}
+                                        {/*                    portal={document.body}*/}
+                                        {/*                    dropdownPosition="bottom"*/}
+                                        {/*                    dropdownHandle={false}*/}
+                                        {/*                    dropdownGap={0}*/}
+                                        {/*                    values={selectCustomValues.width}*/}
+                                        {/*                    onDropdownOpen={() => {*/}
+                                        {/*                        let temp1 = window.scrollY;*/}
+                                        {/*                        window.scrollTo(window.scrollX, window.scrollY + 1);*/}
+                                        {/*                        setTimeout(() => {*/}
+                                        {/*                            let temp2 = window.scrollY;*/}
+                                        {/*                            if (temp2 === temp1)*/}
+                                        {/*                                window.scrollTo(window.scrollX, window.scrollY - 1);*/}
+                                        {/*                        }, 100);*/}
+                                        {/*                    }}*/}
+                                        {/*                    dropdownRenderer={*/}
+                                        {/*                        ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>*/}
+                                        {/*                    }*/}
+                                        {/*                    contentRenderer={*/}
+                                        {/*                        ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"*/}
+                                        {/*                                                                       postfixFa=""/>*/}
+                                        {/*                    }*/}
+                                        {/*                    // optionRenderer={*/}
+                                        {/*                    //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>*/}
+                                        {/*                    // }*/}
+                                        {/*                    onChange={(selected) => {*/}
+                                        {/*                        if (selected[0] !== undefined) {*/}
+                                        {/*                            optionSelectChanged_WidthLength(selected[0], "3", true, "cm", "س\u200Cم", pageLanguage);*/}
+                                        {/*                            let temp = JSON.parse(JSON.stringify(selectCustomValues));*/}
+                                        {/*                            temp.width = selected;*/}
+                                        {/*                            setSelectCustomValues(temp);*/}
+                                        {/*                            setDeps("", "311");*/}
+                                        {/*                            setCart("Width", selected[0].value);*/}
+                                        {/*                        }*/}
+                                        {/*                    }}*/}
+                                        {/*                    options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}*/}
+                                        {/*                />*/}
+                                        {/*            </div>*/}
+                                        {/*            <div className="select_container select_container_num">*/}
+                                        {/*                <Select*/}
+                                        {/*                    className="select"*/}
+                                        {/*                    placeholder={t("Please Select")}*/}
+                                        {/*                    portal={document.body}*/}
+                                        {/*                    dropdownPosition="bottom"*/}
+                                        {/*                    dropdownHandle={false}*/}
+                                        {/*                    dropdownGap={0}*/}
+                                        {/*                    values={selectCustomValues.width2}*/}
+                                        {/*                    onDropdownOpen={() => {*/}
+                                        {/*                        let temp1 = window.scrollY;*/}
+                                        {/*                        window.scrollTo(window.scrollX, window.scrollY + 1);*/}
+                                        {/*                        setTimeout(() => {*/}
+                                        {/*                            let temp2 = window.scrollY;*/}
+                                        {/*                            if (temp2 === temp1)*/}
+                                        {/*                                window.scrollTo(window.scrollX, window.scrollY - 1);*/}
+                                        {/*                        }, 100);*/}
+                                        {/*                    }}*/}
+                                        {/*                    dropdownRenderer={*/}
+                                        {/*                        ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>*/}
+                                        {/*                    }*/}
+                                        {/*                    contentRenderer={*/}
+                                        {/*                        ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"*/}
+                                        {/*                                                                       postfixFa=""/>*/}
+                                        {/*                    }*/}
+                                        {/*                    // optionRenderer={*/}
+                                        {/*                    //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>*/}
+                                        {/*                    // }*/}
+                                        {/*                    onChange={(selected) => {*/}
+                                        {/*                        if (selected[0] !== undefined) {*/}
+                                        {/*                            optionSelectChanged_WidthLength(selected[0], "3", true, "cm", "س\u200Cم", pageLanguage);*/}
+                                        {/*                            let temp = JSON.parse(JSON.stringify(selectCustomValues));*/}
+                                        {/*                            temp.width = selected;*/}
+                                        {/*                            setSelectCustomValues(temp);*/}
+                                        {/*                            setDeps("", "321");*/}
+                                        {/*                            setCart("Width2", selected[0].value);*/}
+                                        {/*                        }*/}
+                                        {/*                    }}*/}
+                                        {/*                    options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}*/}
+                                        {/*                />*/}
+                                        {/*            </div>*/}
+                                        {/*        </div>*/}
+                                        {/*        <div className="own_measurements_Length">*/}
+                                        {/*            <label className="select_label">{t("Length_step3")}<p className="farsi_cm">{t("select_cm")}</p></label>*/}
+                                        {/*            <div className="select_container select_container_num">*/}
+                                        {/*                <Select*/}
+                                        {/*                    className="select"*/}
+                                        {/*                    placeholder={t("Please Select")}*/}
+                                        {/*                    portal={document.body}*/}
+                                        {/*                    dropdownPosition="bottom"*/}
+                                        {/*                    dropdownHandle={false}*/}
+                                        {/*                    dropdownGap={0}*/}
+                                        {/*                    values={selectCustomValues.length}*/}
+                                        {/*                    onDropdownOpen={() => {*/}
+                                        {/*                        let temp1 = window.scrollY;*/}
+                                        {/*                        window.scrollTo(window.scrollX, window.scrollY + 1);*/}
+                                        {/*                        setTimeout(() => {*/}
+                                        {/*                            let temp2 = window.scrollY;*/}
+                                        {/*                            if (temp2 === temp1)*/}
+                                        {/*                                window.scrollTo(window.scrollX, window.scrollY - 1);*/}
+                                        {/*                        }, 100);*/}
+                                        {/*                    }}*/}
+                                        {/*                    dropdownRenderer={*/}
+                                        {/*                        ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>*/}
+                                        {/*                    }*/}
+                                        {/*                    contentRenderer={*/}
+                                        {/*                        ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"*/}
+                                        {/*                                                                       postfixFa=""/>*/}
+                                        {/*                    }*/}
+                                        {/*                    // optionRenderer={*/}
+                                        {/*                    //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>*/}
+                                        {/*                    // }*/}
+                                        {/*                    onChange={(selected) => {*/}
+                                        {/*                        if (selected[0] !== undefined) {*/}
+                                        {/*                            optionSelectChanged_WidthLength(selected[0], "3", false, "cm", "س\u200Cم", pageLanguage);*/}
+                                        {/*                            let temp = JSON.parse(JSON.stringify(selectCustomValues));*/}
+                                        {/*                            temp.length = selected;*/}
+                                        {/*                            setSelectCustomValues(temp);*/}
+                                        {/*                            setDeps("", "312");*/}
+                                        {/*                            setCart("Height", selected[0].value);*/}
+                                        {/*                        }*/}
+                                        {/*                    }}*/}
+                                        {/*                    options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}*/}
+                                        {/*                />*/}
+                                        {/*            </div>*/}
+                                        {/*            <div className="select_container select_container_num">*/}
+                                        {/*                <Select*/}
+                                        {/*                    className="select"*/}
+                                        {/*                    placeholder={t("Please Select")}*/}
+                                        {/*                    portal={document.body}*/}
+                                        {/*                    dropdownPosition="bottom"*/}
+                                        {/*                    dropdownHandle={false}*/}
+                                        {/*                    dropdownGap={0}*/}
+                                        {/*                    values={selectCustomValues.length2}*/}
+                                        {/*                    onDropdownOpen={() => {*/}
+                                        {/*                        let temp1 = window.scrollY;*/}
+                                        {/*                        window.scrollTo(window.scrollX, window.scrollY + 1);*/}
+                                        {/*                        setTimeout(() => {*/}
+                                        {/*                            let temp2 = window.scrollY;*/}
+                                        {/*                            if (temp2 === temp1)*/}
+                                        {/*                                window.scrollTo(window.scrollX, window.scrollY - 1);*/}
+                                        {/*                        }, 100);*/}
+                                        {/*                    }}*/}
+                                        {/*                    dropdownRenderer={*/}
+                                        {/*                        ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>*/}
+                                        {/*                    }*/}
+                                        {/*                    contentRenderer={*/}
+                                        {/*                        ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"*/}
+                                        {/*                                                                       postfixFa=""/>*/}
+                                        {/*                    }*/}
+                                        {/*                    // optionRenderer={*/}
+                                        {/*                    //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>*/}
+                                        {/*                    // }*/}
+                                        {/*                    onChange={(selected) => {*/}
+                                        {/*                        if (selected[0] !== undefined) {*/}
+                                        {/*                            optionSelectChanged_WidthLength(selected[0], "3", false, "cm", "س\u200Cم", pageLanguage);*/}
+                                        {/*                            let temp = JSON.parse(JSON.stringify(selectCustomValues));*/}
+                                        {/*                            temp.length = selected;*/}
+                                        {/*                            setSelectCustomValues(temp);*/}
+                                        {/*                            setDeps("", "322");*/}
+                                        {/*                            setCart("Height2", selected[0].value);*/}
+                                        {/*                        }*/}
+                                        {/*                    }}*/}
+                                        {/*                    options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}*/}
+                                        {/*                />*/}
+                                        {/*            </div>*/}
+                                        {/*        </div>*/}
+                                        {/*    </div>*/}
+                                        {/*}*/}
                                         
                                         <div className={step3 === "true" ? "card_body card_body_radio card_body_grommet_measurements" : "noDisplay"}>
                                             <div className="box100">
@@ -4755,8 +6040,12 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                 <input className="radio" type="radio" value="1" name="step31" ref-num="31" id="311" checked={step31 === "true"}
                                                        onChange={e => {
                                                            setStep31("true");
-                                                           setDeps("", "311");
-                                                           setCart("hasRod", true);
+                                                           setStep3A("");
+                                                           deleteSpecialSelects();
+                                                           selectChanged(e, "3A,3B,3C,3D,3DFloor,3E,3F,3BRod,3CRod,3DRod,3DRodFloor,3ERod");
+                                                           setDeps("3A", "31,3B,3C1,3C2,3D,3DFloor,3E,3F");
+                                                           setCart("hasRod", true, "FinishedLengthType,Width3B,ExtensionLeft,ExtensionRight,ShadeMount,Height3D,WindowToFloor,CeilingToFloor,RodWidth,Width3C,RodToBottom,RodToFloor");
+                                                           setMeasurementsNextStep("3A");
                                                        }} ref={ref => (inputs.current["311"] = ref)}/>
                                                 <label htmlFor="311">{t("grommet_has_rod")}</label>
                                             </div>
@@ -4767,8 +6056,12 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                 <input className="radio" type="radio" value="2" name="step31" ref-num="31" id="312" checked={step31 === "false"}
                                                        onChange={e => {
                                                            setStep31("false");
-                                                           setDeps("", "312");
-                                                           setCart("hasRod", false);
+                                                           setStep3A("");
+                                                           deleteSpecialSelects();
+                                                           selectChanged(e, "3A,3B,3C,3D,3DFloor,3E,3F,3BRod,3CRod,3DRod,3DRodFloor,3ERod");
+                                                           setDeps("3A", "31,3BRod,3CRod,3DRod,3DRodFloor,3ERod");
+                                                           setCart("hasRod", false, "FinishedLengthType,Width3B,ExtensionLeft,ExtensionRight,ShadeMount,Height3D,WindowToFloor,CeilingToFloor,RodWidth,Width3C,RodToBottom,RodToFloor");
+                                                           setMeasurementsNextStep("3A");
                                                        }} ref={ref => (inputs.current["312"] = ref)}/>
                                                 <label htmlFor="312">{t("grommet_no_rod")}</label>
                                             </div>
@@ -4833,11 +6126,13 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setStep3A("Sill");
                                                        deleteSpecialSelects();
                                                        if (step31 === "true") {
-                                                           setCart("FinishedLengthType", "Sill", "Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
-                                                           setDeps("2B,2C1,2C2,2D1,2D2,2D3", "3A,2DFloor1,2DFloor2,2DFloor3");
-                                                           selectChanged(e, "2B,2C,2D,2E");
+                                                           setCart("FinishedLengthType", "Sill", "RodToFloor,Width3B,ExtensionLeft,ExtensionRight,Height3D,WindowToFloor,ShadeMount,CeilingToFloor");
+                                                           setDeps("3BRod,3CRod,3DRod,3ERod", "3A,3A1,3DRodFloor,3B,3C1,3C2,3D,3DFloor,3E,3F");
+                                                           selectChanged(e, "3DRodFloor,3B,3C,3D,3DFloor,3E,3F");
                                                        } else {
-                                                    
+                                                           setCart("FinishedLengthType", "Sill", "WindowToFloor,RodWidth,Width3C,RodToBottom,RodToFloor,CeilingToFloor");
+                                                           setDeps("3B,3C1,3C2,3D,3E,3F", "3A,3A1,3DFloor,3BRod,3CRod,3DRod,3DRodFloor,3ERod");
+                                                           selectChanged(e, "3DFloor,3BRod,3CRod,3DRod,3DRodFloor,3ERod");
                                                        }
                                                 
                                                    }} ref={ref => (inputs.current["3A1"] = ref)}/>
@@ -4851,12 +6146,15 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    onChange={e => {
                                                        setStep3A("Apron");
                                                        deleteSpecialSelects();
+                                                       setStep3A1("");
                                                        if (step31 === "true") {
-                                                           setCart("FinishedLengthType", "Apron", "Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
-                                                           setDeps("2B,2C1,2C2,2D1,2D2,2D3", "3A,2DFloor1,2DFloor2,2DFloor3");
-                                                           selectChanged(e, "2B,2C,2D,2E");
+                                                           setCart("FinishedLengthType", "Apron", "RodToFloor,Width3B,ExtensionLeft,ExtensionRight,Height3D,WindowToFloor,ShadeMount,CeilingToFloor");
+                                                           setDeps("3A1,3BRod,3CRod,3DRod,3ERod", "3A,3DRodFloor,3B,3C1,3C2,3D,3DFloor,3E,3F");
+                                                           selectChanged(e, "3DRodFloor,3B,3C,3D,3DFloor,3E,3F");
                                                        } else {
-                                                    
+                                                           setCart("FinishedLengthType", "Apron", "WindowToFloor,RodWidth,Width3C,RodToBottom,RodToFloor,CeilingToFloor");
+                                                           setDeps("3A1,3B,3C1,3C2,3D,3E,3F", "3A,3DFloor,3BRod,3CRod,3DRod,3DRodFloor,3ERod");
+                                                           selectChanged(e, "3DFloor,3BRod,3CRod,3DRod,3DRodFloor,3ERod");
                                                        }
                                                    }} ref={ref => (inputs.current["3A2"] = ref)}/>
                                             <label htmlFor="3A2">{t("Apron")}</label>
@@ -4870,10 +6168,13 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setStep3A("Floor");
                                                        deleteSpecialSelects();
                                                        if (step31 === "true") {
-                                                           setCart("FinishedLengthType", "Floor", "Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
-                                                           setDeps("2B,2C1,2C2,2DFloor1,2DFloor2,2DFloor3", "3A,2D1,2D2,2D3,2E");
-                                                           selectChanged(e, "2B,2C,2DFloor");
+                                                           setCart("FinishedLengthType", "Floor", "RodToBottom,Width3B,ExtensionLeft,ExtensionRight,Height3D,WindowToFloor,ShadeMount,CeilingToFloor");
+                                                           setDeps("3BRod,3CRod,3DRodFloor,3ERod", "3A,3A1,3DRod,3B,3C1,3C2,3D,3DFloor,3E,3F");
+                                                           selectChanged(e, "3DRod,3B,3C,3D,3DFloor,3E,3F");
                                                        } else {
+                                                           setCart("FinishedLengthType", "Floor", "Height3D,RodWidth,Width3C,RodToBottom,RodToFloor,CeilingToFloor");
+                                                           setDeps("3B,3C1,3C2,3DFloor,3E,3F", "3A,3A1,3D,3BRod,3CRod,3DRod,3DRodFloor,3ERod");
+                                                           selectChanged(e, "3D,3BRod,3CRod,3DRod,3DRodFloor,3ERod");
                                                        }
                                                    }} ref={ref => (inputs.current["3A3"] = ref)}/>
                                             <label htmlFor="3A3">{t("Floor")}</label>
@@ -4888,10 +6189,13 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setStep3A("Slight Puddle");
                                                        deleteSpecialSelects();
                                                        if (step31 === "true") {
-                                                           setCart("FinishedLengthType", "Slight Puddle", "Width1,Width2,Width3,Height1,Height2,Height3,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
-                                                           setDeps("2B,2C1,2C2,2DFloor1,2DFloor2,2DFloor3", "3A,2D1,2D2,2D3,2E");
-                                                           selectChanged(e, "2B,2C,2DFloor");
+                                                           setCart("FinishedLengthType", "Slight Puddle", "RodToBottom,Width3B,ExtensionLeft,ExtensionRight,Height3D,WindowToFloor,ShadeMount,CeilingToFloor");
+                                                           setDeps("3BRod,3CRod,3DRodFloor,3ERod", "3A,3A1,3DRod,3B,3C1,3C2,3D,3DFloor,3E,3F");
+                                                           selectChanged(e, "3DRod,3B,3C,3D,3DFloor,3E,3F");
                                                        } else {
+                                                           setCart("FinishedLengthType", "Slight Puddle", "Height3D,RodWidth,Width3C,RodToBottom,RodToFloor,CeilingToFloor");
+                                                           setDeps("3B,3C1,3C2,3DFloor,3E,3F", "3A,3A1,3D,3BRod,3CRod,3DRod,3DRodFloor,3ERod");
+                                                           selectChanged(e, "3D,3BRod,3CRod,3DRod,3DRodFloor,3ERod");
                                                        }
                                                    }} ref={ref => (inputs.current["3A4"] = ref)}/>
                                             <label htmlFor="3A4">{t("Slight Puddle")}</label>
@@ -4900,17 +6204,20 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         <div className={step3A === "Apron" ? (step3AErr1 ? "secondary_options secondary_options_err" : "secondary_options") : "noDisplay"}>
                                             <div className="card-body-display-flex">
                                                 <div className="checkbox_style checkbox_style_step2">
-                                                    <input type="checkbox" text={t("Apron")} value="1" name="step11" ref-num="1" checked={step3A1 === "true"}
+                                                    <input type="checkbox" text={t("Apron")} value="3" name="step3A1" ref-num="3A" checked={step3A1 === "true"}
                                                            onChange={(e) => {
                                                                if (e.target.checked) {
                                                                    selectChanged(e);
+                                                                   setDeps("", "3A1");
                                                                    setStep3A1("true");
                                                                    setStep3AErr1(false);
                                                                } else {
-                                                                   setStep3A1("");
+                                                                   setStep3A1("false");
+                                                                   setDeps("3A1", "");
+                                                                   selectChanged(undefined, "3A");
                                                                }
-                                                           }} id="111" ref={ref => (inputs.current["111"] = ref)}/>
-                                                    <label htmlFor="111" className="checkbox_label">
+                                                           }} id="3A11" ref={ref => (inputs.current["3A11"] = ref)}/>
+                                                    <label htmlFor="3A11" className="checkbox_label">
                                                         <img className="checkbox_label_img checkmark1 img-fluid"
                                                              src={require('../Images/public/checkmark1_checkbox.png')}
                                                              alt=""/>
@@ -5124,7 +6431,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             <div className="help_column help_left_column">
                                                 <p className="help_column_header"/>
                                                 <ul className="help_column_list">
-                                                    <li className="no_listStyle single_line_height">{t("dk_step3C_out_help_1")}
+                                                    <li className="no_listStyle single_line_height">{t("grommet_step3C_help_1")}
                                                     </li>
                                                 </ul>
                                             </div>
@@ -5338,7 +6645,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             <div className="help_column help_left_column">
                                                 <p className="help_column_header"/>
                                                 <ul className="help_column_list">
-                                                    <li className="no_listStyle single_line_height">{t("dk_step2F_help_1")}
+                                                    <li className="no_listStyle single_line_height">{t("grommet_step3E_help_1")}
                                                     </li>
                                                 </ul>
                                             </div>
@@ -5612,7 +6919,76 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                 </Card.Body>
                             </Accordion.Collapse>
                         </Card>
-    
+                        
+                        {/* step 3DRodFloor*/}
+                        <Card
+                            className={step3 === "true" && step31 === "true" && (step3A === "Floor" || step3A === "Slight Puddle") ? "" : "noDisplay"}>
+                            <Card.Header>
+                                <ContextAwareToggle eventKey="3D" stepNum={t("3D")} stepTitle={t("grommet_step3DRodFloor")} stepRef="3DRodFloor" type="2"
+                                                    required={requiredStep["3DRodFloor"]}
+                                                    stepSelected={stepSelectedLabel["3DRodFloor"] === undefined ? "" : stepSelectedLabel["3DRodFloor"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="3D">
+                                <Card.Body>
+                                    <div className="card_body">
+                                        <div className="box100">
+                                            <p className="step_selection_title">{t("grommet_step3DRodFloor_title")}</p>
+                                            <img
+                                                src={pageLanguage === 'fa' ? require('../Images/drapery/grommet/RodtoFloor.svg').default : require('../Images/drapery/grommet/RodtoFloor.svg').default}
+                                                className="img-fluid just_frame" alt=""/>
+                                        </div>
+                                        <div className="box100 Three_selection_container">
+                                            <div className="box100">
+                                                <label className="select_label">{t("Height")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                <div className="select_container select_container_num">
+                                                    <Select
+                                                        className="select"
+                                                        placeholder={t("Please Select")}
+                                                        portal={document.body}
+                                                        dropdownPosition="bottom"
+                                                        dropdownHandle={false}
+                                                        dropdownGap={0}
+                                                        onDropdownOpen={() => {
+                                                            let temp1 = window.scrollY;
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            setTimeout(() => {
+                                                                let temp2 = window.scrollY;
+                                                                if (temp2 === temp1)
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                            }, 100);
+                                                        }}
+                                                        values={selectCustomValues.RodToFloor}
+                                                        dropdownRenderer={
+                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                        }
+                                                        contentRenderer={
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                           postfixFa=""/>
+                                                        }
+                                                        // optionRenderer={
+                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                        // }
+                                                        onChange={(selected) => {
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged("3DRodFloor", selected[0], "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
+                                                                temp.RodToFloor = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3DRodFloor");
+                                                                setCart("RodToFloor", selected[0].value);
+                                                            }
+                                                        }}
+                                                        options={SelectOptionRange(30, 500, 1, "cm", "", pageLanguage)}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <NextStep eventKey="3E">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
                         {/* step 3ERod */}
                         <Card
                             className={step3 === "true" && step31 === "true" && step3A !== "" ? "" : "noDisplay"}>
@@ -5626,7 +7002,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         <div className="box100">
                                             <p className="step_selection_title">{t("dk_step2GWall_title")}</p>
                                             <img
-                                                src={pageLanguage === 'fa' ? require('../Images/drapery/grommet/RodtoFloor.svg').default : require('../Images/drapery/grommet/RodtoFloor.svg').default}
+                                                src={pageLanguage === 'fa' ? require('../Images/drapery/grommet/CeilingToFloor.svg').default : require('../Images/drapery/grommet/CeilingToFloor.svg').default}
                                                 className="img-fluid frame_with_top2" alt=""/>
                                         </div>
                                         <div className="box100 Three_selection_container">
@@ -5649,7 +7025,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                                     window.scrollTo(window.scrollX, window.scrollY - 1);
                                                             }, 100);
                                                         }}
-                                                        values={selectCustomValues.CeilingToFloor}
+                                                        values={selectCustomValues.CeilingToFloor1}
                                                         dropdownRenderer={
                                                             ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                         }
@@ -5664,13 +7040,13 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                             if (selected[0] !== undefined) {
                                                                 optionSelectChanged("3ERod", selected[0], "cm", "س\u200Cم", pageLanguage);
                                                                 let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                temp.CeilingToFloor = selected;
+                                                                temp.CeilingToFloor1 = selected;
                                                                 setSelectCustomValues(temp);
                                                                 setDeps("", "3ERod");
                                                                 setCart("CeilingToFloor", selected[0].value);
                                                             }
                                                         }}
-                                                        options={SelectOptionRange(10, 50, 1, "cm", "", pageLanguage)}
+                                                        options={SelectOptionRange(100, 500, 1, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -5682,7 +7058,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             <div className="help_column help_left_column">
                                                 <p className="help_column_header"/>
                                                 <ul className="help_column_list">
-                                                    <li className="no_listStyle single_line_height">{t("dk_step2F_help_1")}
+                                                    <li className="no_listStyle single_line_height">{t("grommet_step3E_help_1")}
                                                     </li>
                                                 </ul>
                                             </div>
@@ -5691,7 +7067,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                 </Card.Body>
                             </Accordion.Collapse>
                         </Card>
-    
+                        
                         {/* step 4 */}
                         <Card>
                             <Card.Header>
@@ -5733,6 +7109,80 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         
                                         <NextStep eventKey="5">{t("NEXT STEP")}</NextStep>
                                     </div>
+                                    <div className="accordion_help">
+                                        <div className="help_container">
+                                            <div className="help_column help_left_column">
+                                                <p className="help_column_header">{t("grommet_lining_help_1")}</p>
+                                                <ul className="help_column_list">
+                                                    <li className="no_listStyle">
+                                                        <span className="popover_indicator">
+                                                            {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
+                                                                                  children={<object className="popover_camera" type="image/svg+xml"
+                                                                                                    data={require('../Images/public/camera.svg').default}/>}
+                                                                                  component={
+                                                                                      <div className="clearfix">
+                                                                                          <div className="popover_image clearfix">
+                                                                                              <img
+                                                                                                  src={popoverImages["step41"] === undefined ? require('../Images/drapery/grommet/standard_lining.jpg') : popoverImages["step41"]}
+                                                                                                  className="img-fluid" alt=""/>
+                                                                                          </div>
+                                                                                          <div className="popover_footer">
+                                                                                              <span className="popover_footer_title">{t("grommet_lining_help_1")}</span>
+                                                                                              <span className="popover_thumbnails">
+                                                                                                  <div>
+                                                                                                      <img src={require('../Images/drapery/grommet/standard_lining.jpg')}
+                                                                                                           text="step41"
+                                                                                                           onMouseEnter={(e) => popoverThumbnailHover(e)}
+                                                                                                           className="popover_thumbnail_img img-fluid"
+                                                                                                           alt=""/>
+                                                                                                  </div>
+                                                                                              </span>
+                                                                                          </div>
+                                                                                      </div>
+                                                                                  }/>
+                                                            }
+                                                        </span>{t("grommet_lining_help_2")}</li>
+                                                    <li>{t("grommet_lining_help_3")}</li>
+                                                    <li>{t("grommet_lining_help_4")}</li>
+                                                </ul>
+                                            </div>
+                                            <div className="help_column help_right_column">
+                                                <p className="help_column_header">{t("grommet_lining_help_5")}</p>
+                                                <ul className="help_column_list">
+                                                    <li className="no_listStyle">
+                                                        <span className="popover_indicator">
+                                                            {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
+                                                                                  children={<object className="popover_camera" type="image/svg+xml"
+                                                                                                    data={require('../Images/public/camera.svg').default}/>}
+                                                                                  component={
+                                                                                      <div className="clearfix">
+                                                                                          <div className="popover_image clearfix">
+                                                                                              <img
+                                                                                                  src={popoverImages["step42"] === undefined ? require('../Images/drapery/grommet/privacy_lining.jpg') : popoverImages["step42"]}
+                                                                                                  className="img-fluid" alt=""/>
+                                                                                          </div>
+                                                                                          <div className="popover_footer">
+                                                                                              <span className="popover_footer_title">{t("grommet_lining_help_5")}</span>
+                                                                                              <span className="popover_thumbnails">
+                                                                                                  <div>
+                                                                                                      <img src={require('../Images/drapery/grommet/privacy_lining.jpg')}
+                                                                                                           text="step42"
+                                                                                                           onMouseEnter={(e) => popoverThumbnailHover(e)}
+                                                                                                           className="popover_thumbnail_img img-fluid"
+                                                                                                           alt=""/>
+                                                                                                  </div>
+                                                                                              </span>
+                                                                                          </div>
+                                                                                      </div>
+                                                                                  }/>
+                                                            }
+                                                        </span>{t("grommet_lining_help_6")}</li>
+                                                    <li>{t("grommet_lining_help_7")}</li>
+                                                    <li>{t("grommet_lining_help_8")}</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </Card.Body>
                             </Accordion.Collapse>
                         </Card>
@@ -5747,8 +7197,20 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                 <Card.Body>
                                     <div className="card_body card_body_radio tall_img_card_body">
                                         <div className="box50 radio_style">
+                                            {/*<img src={require('../Images/drapery/dk/window-Outside.svg').default} className="img-fluid" alt=""/>*/}
+                                            <input className="radio" type="radio" text={t("Full")} value="1" name="step5" ref-num="5" id="51"
+                                                   checked={step5 === "Full"}
+                                                   onChange={e => {
+                                                       setStep5("Full");
+                                                       setDeps("", "5");
+                                                       setCart("PanelCoverage", "Full");
+                                                       selectChanged(e);
+                                                   }} ref={ref => (inputs.current["51"] = ref)}/>
+                                            <label htmlFor="51">{t("Full")}</label>
+                                        </div>
+                                        <div className="box50 radio_style">
                                             {/*<img src={require('../Images/drapery/dk/window-Inside.svg').default} className="img-fluid" alt=""/>*/}
-                                            <input className="radio" type="radio" text={t("Decorative")} value="1" name="step5" ref-num="5" id="51"
+                                            <input className="radio" type="radio" text={t("Decorative")} value="2" name="step5" ref-num="5" id="52"
                                                    checked={step5 === "Decorative"}
                                                    onChange={e => {
                                                        setStep5("Decorative");
@@ -5756,23 +7218,28 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setCart("PanelCoverage", "Decorative");
                                                        selectChanged(e);
                                                 
-                                                   }} ref={ref => (inputs.current["51"] = ref)}/>
-                                            <label htmlFor="51">{t("Decorative")}</label>
-                                        </div>
-                                        <div className="box50 radio_style">
-                                            {/*<img src={require('../Images/drapery/dk/window-Outside.svg').default} className="img-fluid" alt=""/>*/}
-                                            <input className="radio" type="radio" text={t("Full")} value="2" name="step5" ref-num="5" id="52"
-                                                   checked={step5 === "Full"}
-                                                   onChange={e => {
-                                                       setStep5("Full");
-                                                       setDeps("", "5");
-                                                       setCart("PanelCoverage", "Full");
-                                                       selectChanged(e);
                                                    }} ref={ref => (inputs.current["52"] = ref)}/>
-                                            <label htmlFor="52">{t("Full")}</label>
+                                            <label htmlFor="52">{t("Decorative")}</label>
                                         </div>
                                         
                                         <NextStep eventKey="6">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                    <div className="accordion_help">
+                                        <div className="help_container">
+                                            <div className="help_column help_left_column">
+                                                <p className="help_column_header">{t("grommet_panel_help_3")}</p>
+                                                <ul className="help_column_list">
+                                                    <li>{t("grommet_panel_help_4")}</li>
+                                                </ul>
+                                            </div>
+                                            <div className="help_column help_right_column">
+                                                <p className="help_column_header">{t("grommet_panel_help_1")}</p>
+                                                <ul className="help_column_list">
+                                                    <li>{t("grommet_panel_help_2.5")}</li>
+                                                    <li>{t("grommet_panel_help_2")}</li>
+                                                </ul>
+                                            </div>
+                                        </div>
                                     </div>
                                 </Card.Body>
                             </Accordion.Collapse>
@@ -5781,10 +7248,1147 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                         {/* step 6 */}
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="6" stepNum={t("6")} stepTitle={t("zebra_step6")} stepRef="6" type="2" required={requiredStep["6"]}
+                                <ContextAwareToggle eventKey="6" stepNum={t("6")} stepTitle={t("grommet_step6")} stepRef="6" type="1" required={requiredStep["6"]}
                                                     stepSelected={stepSelectedLabel["6"] === undefined ? "" : stepSelectedLabel["6"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="6">
+                                <Card.Body>
+                                    <div className={!cartValues["WidthCart"] || step5 === "" ? "card_body card_body_info" : "noDisplay"}>
+                                        <div className="card_body_info_header">
+                                            <h1 className="card_body_info_header_title">{t("more_info")}</h1>
+                                        </div>
+                                        <hr/>
+                                        <div className="card_body_info_body">
+                                            <p className="card_body_info_text">{!cartValues["WidthCart"] && step5 === "" ? t("panel_type_text1") : (!cartValues["WidthCart"] && step5 !== "" ? t("panel_type_text2") : t("panel_type_text3"))}</p>
+                                        </div>
+                                        <NextStep eventKey="7">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                    <div className={cartValues["WidthCart"] && step5 !== "" ? "card_body card_body_radio card_body_panel_type" : "noDisplay"}>
+                                        <div className={parseInt(cartValues["WidthCart"]) < 320 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"}>
+                                            <img
+                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_left.svg').default : require('../Images/drapery/grommet/panel_type_left.svg').default}
+                                                className="img-fluid height_auto" alt=""/>
+                                            <input className="radio" type="radio" text={t("Single Panel, Left")} value="1" name="step6" ref-num="6" id="61"
+                                                   checked={step6 === "Single Panel, Left"}
+                                                   onChange={e => {
+                                                       setStep6("Single Panel, Left");
+                                                       setDeps("", "6");
+                                                       setCart("PanelType", "Single Panel, Left");
+                                                       selectChanged(e);
+                                                       if (step5 === "Full" && parseInt(cartValues["WidthCart"]) >= 180) {
+                                                           modalHandleShow("panelTypeWarning");
+                                                       }
+                                                   }} ref={ref => (inputs.current["61"] = ref)}/>
+                                            <label htmlFor="61">{t("Single Panel, Left")}</label>
+                                        </div>
+                                        <div className={parseInt(cartValues["WidthCart"]) < 320 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"}>
+                                            <img
+                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_right.svg').default : require('../Images/drapery/grommet/panel_type_right.svg').default}
+                                                className="img-fluid height_auto" alt=""/>
+                                            <input className="radio" type="radio" text={t("Single Panel, Right")} value="2" name="step6" ref-num="6" id="62"
+                                                   checked={step6 === "Single Panel, Right"}
+                                                   onChange={e => {
+                                                       setStep6("Single Panel, Right");
+                                                       setDeps("", "6");
+                                                       setCart("PanelType", "Single Panel, Right");
+                                                       selectChanged(e);
+                                                       if (step5 === "Full" && parseInt(cartValues["WidthCart"]) >= 180) {
+                                                           modalHandleShow("panelTypeWarning");
+                                                       }
+                                                   }} ref={ref => (inputs.current["62"] = ref)}/>
+                                            <label htmlFor="62">{t("Single Panel, Right")}</label>
+                                        </div>
+                                        <div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) >= 180 ? (parseInt(cartValues["WidthCart"]) > 320 ? "box33" +
+                                            " radio_style" : "box33 radio_style radio_recommended") : "box33 radio_style") : "box33 radio_style"}>
+                                            <img
+                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_both.svg').default : require('../Images/drapery/grommet/panel_type_both.svg').default}
+                                                className="img-fluid height_auto" alt=""/>
+                                            <input className="radio" type="radio" text={t("Pair, Split Draw")} value="3" name="step6" ref-num="6" id="63"
+                                                   checked={step6 === "Pair, Split Draw"}
+                                                   onChange={e => {
+                                                       setStep6("Pair, Split Draw");
+                                                       setDeps("", "6");
+                                                       setCart("PanelType", "Pair, Split Draw");
+                                                       selectChanged(e);
+                                                       if (step5 === "Full" && parseInt(cartValues["WidthCart"]) >= 320) {
+                                                           modalHandleShow("panelTypeWarning");
+                                                       }
+                                                   }} ref={ref => (inputs.current["63"] = ref)}/>
+                                            <label htmlFor="63">{t("Pair, Split Draw")}</label>
+                                            <div className="radio_recommended_text">{t("RECOMMENDED FOUR YOUR MEASUREMENTS")}</div>
+                                        </div>
+                                        <div
+                                            className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) >= 320 ? "box33 radio_style radio_recommended" : "noDisplay") : "noDisplay"}>
+                                            <img
+                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_four.svg').default : require('../Images/drapery/grommet/panel_type_four.svg').default}
+                                                className="img-fluid height_auto width_max" alt=""/>
+                                            <input className="radio" type="radio" text={t("Four Panel, Split Draw")} value="4" name="step6" ref-num="6" id="64"
+                                                   checked={step6 === "Four Panel, Split Draw"}
+                                                   onChange={e => {
+                                                       setStep6("Four Panel, Split Draw");
+                                                       setDeps("", "6");
+                                                       setCart("PanelType", "Four Panel, Split Draw");
+                                                       selectChanged(e);
+                                                   }} ref={ref => (inputs.current["64"] = ref)}/>
+                                            <label htmlFor="64">{t("Four Panel, Split Draw")}</label>
+                                            <div className="radio_recommended_text">{t("RECOMMENDED FOUR YOUR MEASUREMENTS")}</div>
+                                        </div>
+                                        <NextStep eventKey="7">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                    {cartValues["WidthCart"] && step5 !== "" &&
+                                        <div className="accordion_help">
+                                            <div className="help_container">
+                                                <div className="help_column help_left_column">
+                                                    <p className="help_column_header">{t("grommet_panel_type_help_1")}</p>
+                                                    <ul className="help_column_list">
+                                                        <li className="no_listStyle">
+                                                            <span className="popover_indicator">
+                                                                {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
+                                                                                      children={<object className="popover_camera" type="image/svg+xml"
+                                                                                                        data={require('../Images/public/camera.svg').default}/>}
+                                                                                      component={
+                                                                                          <div className="clearfix">
+                                                                                              <div className="popover_image clearfix">
+                                                                                                  <img
+                                                                                                      src={popoverImages["step61"] === undefined ? require('../Images/drapery/grommet/single_panel.jpg') : popoverImages["step61"]}
+                                                                                                      className="img-fluid" alt=""/>
+                                                                                              </div>
+                                                                                              <div className="popover_footer">
+                                                                                                  <span className="popover_footer_title">{t("grommet_panel_type_help_1")}</span>
+                                                                                                  <span className="popover_thumbnails">
+                                                                                                      <div>
+                                                                                                          <img src={require('../Images/drapery/grommet/single_panel.jpg')}
+                                                                                                               text="step61"
+                                                                                                               onMouseEnter={(e) => popoverThumbnailHover(e)}
+                                                                                                               className="popover_thumbnail_img img-fluid"
+                                                                                                               alt=""/>
+                                                                                                      </div>
+                                                                                                  </span>
+                                                                                              </div>
+                                                                                          </div>
+                                                                                      }/>
+                                                                }
+                                                            </span>{t("grommet_panel_type_help_2")}</li>
+                                                        <li>{t("grommet_panel_type_help_3")}</li>
+                                                    </ul>
+                                                </div>
+                                                <div className="help_column help_right_column">
+                                                    <p className="help_column_header">{t("grommet_panel_type_help_4")}</p>
+                                                    <ul className="help_column_list">
+                                                        <li className="no_listStyle">
+                                                            <span className="popover_indicator">
+                                                                {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
+                                                                                      children={<object className="popover_camera" type="image/svg+xml"
+                                                                                                        data={require('../Images/public/camera.svg').default}/>}
+                                                                                      component={
+                                                                                          <div className="clearfix">
+                                                                                              <div className="popover_image clearfix">
+                                                                                                  <img
+                                                                                                      src={popoverImages["step52"] === undefined ? require('../Images/drapery/grommet/pair_panel.jpg') : popoverImages["step52"]}
+                                                                                                      className="img-fluid" alt=""/>
+                                                                                              </div>
+                                                                                              <div className="popover_footer">
+                                                                                                  <span className="popover_footer_title">{t("grommet_panel_type_help_6")}</span>
+                                                                                                  <span className="popover_thumbnails">
+                                                                                                      <div>
+                                                                                                          <img src={require('../Images/drapery/grommet/pair_panel.jpg')}
+                                                                                                               text="step52"
+                                                                                                               onMouseEnter={(e) => popoverThumbnailHover(e)}
+                                                                                                               className="popover_thumbnail_img img-fluid"
+                                                                                                               alt=""/>
+                                                                                                      </div>
+                                                                                                  </span>
+                                                                                              </div>
+                                                                                          </div>
+                                                                                      }/>
+                                                                }
+                                                            </span>{t("grommet_panel_type_help_6")}</li>
+                                                        <li>{t("grommet_panel_type_help_7")}</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
+                        {/* step 7 */}
+                        <Card>
+                            <Card.Header>
+                                <ContextAwareToggle eventKey="7" stepNum={t("7")} stepTitle={t("grommet_step7")} stepRef="7" type="1" required={requiredStep["7"]}
+                                                    stepSelected={stepSelectedLabel["7"] === undefined ? "" : stepSelectedLabel["7"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="7">
+                                <Card.Body>
+                                    <div className="card_body card_body_radio bracket_color">
+                                        <div className="box33">
+                                            <div className="radio_group">
+                                                <label className="radio_container">
+                                                    <input className="radio" type="radio" text={t("BracketColor1")} value="1" name="step7" ref-num="7" id="71" outline="true"
+                                                           checked={step7 === "Satin Brass"}
+                                                           onChange={e => {
+                                                               selectChanged(e);
+                                                               setStep7("Satin Brass");
+                                                               setDeps("", "7");
+                                                               setCart("GrommetFinish", "Satin Brass");
+                                                           }} ref={ref => (inputs.current["71"] = ref)}/>
+                                                    <div className="frame_img">
+                                                        <img src={require('../Images/drapery/roller/SatinBrass.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                                                    </div>
+                                                </label>
+                                                <div className="radio_group_name_container">
+                                                    <h1>{t("BracketColor1")}</h1>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="box33">
+                                            <div className="radio_group">
+                                                <label className="radio_container">
+                                                    <input className="radio" type="radio" text={t("BracketColor2")} value="2" name="step7" ref-num="7" id="72" outline="true"
+                                                           checked={step7 === "Satin Nickel"}
+                                                           onChange={e => {
+                                                               selectChanged(e);
+                                                               setStep7("Satin Nickel");
+                                                               setDeps("", "7");
+                                                               setCart("GrommetFinish", "Satin Nickel");
+                                                           }} ref={ref => (inputs.current["72"] = ref)}/>
+                                                    <div className="frame_img">
+                                                        <img src={require('../Images/drapery/roller/SatinNickel.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                                                    </div>
+                                                </label>
+                                                <div className="radio_group_name_container">
+                                                    <h1>{t("BracketColor2")}</h1>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="box33">
+                                            <div className="radio_group">
+                                                <label className="radio_container">
+                                                    <input className="radio" type="radio" text={t("BracketColor3")} value="3" name="step7" ref-num="7" id="73" outline="true"
+                                                           checked={step7 === "Gun Metal"}
+                                                           onChange={e => {
+                                                               selectChanged(e);
+                                                               setStep7("Gun Metal");
+                                                               setDeps("", "7");
+                                                               setCart("GrommetFinish", "Gun Metal");
+                                                           }} ref={ref => (inputs.current["73"] = ref)}/>
+                                                    <div className="frame_img">
+                                                        <img src={require('../Images/drapery/roller/GunMetal.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                                                    </div>
+                                                </label>
+                                                <div className="radio_group_name_container">
+                                                    <h1>{t("BracketColor3")}</h1>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <NextStep eventKey="8">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                    <div className="accordion_help">
+                                        <div className="help_container">
+                                            <div className="help_column help_left_column">
+                                                <p className="help_column_header"/>
+                                                <ul className="help_column_list">
+                                                    <li className="no_listStyle">
+                                                        <span className="popover_indicator">
+                                                            {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
+                                                                                  children={<object className="popover_camera" type="image/svg+xml"
+                                                                                                    data={require('../Images/public/camera.svg').default}/>}
+                                                                                  component={
+                                                                                      <div className="clearfix">
+                                                                                          <div className="popover_image clearfix">
+                                                                                              <img
+                                                                                                  src={popoverImages["step7"] === undefined ? require('../Images/drapery/grommet/gold_ring.jpg') : popoverImages["step7"]}
+                                                                                                  className="img-fluid" alt=""/>
+                                                                                          </div>
+                                                                                          <div className="popover_footer">
+                                                                                              <span
+                                                                                                  className="popover_footer_title">{t("GrommetFinish_help_camera")}</span>
+                                                                                              <span className="popover_thumbnails">
+                                                                                                  <div>
+                                                                                                      <img src={require('../Images/drapery/grommet/gold_ring.jpg')}
+                                                                                                           text="step7"
+                                                                                                           onMouseEnter={(e) => popoverThumbnailHover(e)}
+                                                                                                           className="popover_thumbnail_img img-fluid"
+                                                                                                           alt=""/>
+                                                                                                  </div>
+                                                                                                  <div>
+                                                                                                      <img src={require('../Images/drapery/grommet/white_ring.jpg')}
+                                                                                                           text="step7"
+                                                                                                           onMouseEnter={(e) => popoverThumbnailHover(e)}
+                                                                                                           className="popover_thumbnail_img img-fluid"
+                                                                                                           alt=""/>
+                                                                                                  </div>
+                                                                                                  <div>
+                                                                                                      <img src={require('../Images/drapery/grommet/black_ring.jpg')}
+                                                                                                           text="step7"
+                                                                                                           onMouseEnter={(e) => popoverThumbnailHover(e)}
+                                                                                                           className="popover_thumbnail_img img-fluid"
+                                                                                                           alt=""/>
+                                                                                                  </div>
+                                                                                              </span>
+                                                                                          </div>
+                                                                                      </div>
+                                                                                  }/>
+                                                            }
+                                                        </span>{t("GrommetFinish_help1")}
+                                                    </li>
+                                                    <li><b>{t("Note:&nbsp;")}</b>{t("GrommetFinish_help2")}</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
+                        {/* step 8 */}
+                        <Card>
+                            <Card.Header>
+                                <ContextAwareToggle eventKey="8" stepNum={t("8")} stepTitle={t("grommet_step8")} stepRef="8" type="1" required={requiredStep["8"]}
+                                                    stepSelected={stepSelectedLabel["8"] === undefined ? "" : stepSelectedLabel["8"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="8">
+                                <Card.Body>
+                                    <div className="card_body card_body_radio card_body_hardware">
+                                        <div className="box33">
+                                            <div className="radio_group">
+                                                <label className="radio_container">
+                                                    <input className="radio" type="radio" text={t("hardware1")} value="1" name="step8" ref-num="8" id="81" outline="true"
+                                                           checked={step8 === "None"}
+                                                           onChange={e => {
+                                                               setStep81("");
+                                                               setStep83("");
+                                                               setStep84("");
+                                                               setSelectedBaton([]);
+                                                               selectChanged(e);
+                                                               setStep8("None");
+                                                               setDeps("", "8,81,82,83,84,8A,8A1,8A2,8A3,8A4,8B,8B1,8B2,8B3,8B4,8C,8C1,8C2,8C3,8C4");
+                                                               setCart("Hardware", "None","RailId,BatonOption,RodColor,Mount,RailIdA,BatonOptionA,RodColorA,MountA,RailIdB,BatonOptionB,RodColorB,MountB,RailIdC,BatonOptionC,RodColorC,MountC");
+                                                           }} ref={ref => (inputs.current["81"] = ref)}/>
+                                                    <div className="radio_group_name_container">
+                                                        <h1>{t("hardware1")}</h1>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div className="box33">
+                                            <div className="radio_group">
+                                                <label className="radio_container">
+                                                    <input className="radio" type="radio" text={t("hardware2")} value="2" name="step8" ref-num="8" id="82" outline="true"
+                                                           checked={step8 === "Same Style Hardware For All Curtains"}
+                                                           onChange={e => {
+                                                               selectChanged(e);
+                                                               setStep8("Same Style Hardware For All Curtains");
+                                                               setDeps("81,82,83,84", "8,8A,8A1,8A2,8A3,8A4,8B,8B1,8B2,8B3,8B4,8C,8C1,8C2,8C3,8C4");
+                                                               setCart("Hardware", "Same Style Hardware For All Curtains","RailIdA,BatonOptionA,RodColorA,MountA,RailIdB,BatonOptionB,RodColorB,MountB,RailIdC,BatonOptionC,RodColorC,MountC");
+                                                           }} ref={ref => (inputs.current["82"] = ref)}/>
+                                                    <div className="radio_group_name_container">
+                                                        <h1>{t("hardware2")}</h1>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div className="box33">
+                                            <div className="radio_group">
+                                                <label className="radio_container">
+                                                    <input className="radio" type="radio" text={t("hardware3")} value="3" name="step8" ref-num="8" id="83" outline="true"
+                                                           checked={step8 === "Customize Style Hardware For All Curtains"}
+                                                           onChange={e => {
+                                                               setStep81("");
+                                                               setStep83("");
+                                                               setStep84("");
+                                                               setSelectedBaton([]);
+                                                               if (step2A !== "" && step2B !== "") {
+                                                                   selectChanged(e);
+                                                                   setStep8("Customize Style Hardware For All Curtains");
+                                                                   setDeps("8A,8B,8C", "8,81,82,83,84");
+                                                                   setCart("Hardware", "Customize Style Hardware For All Curtains","RailId,BatonOption,RodColor,Mount");
+                                                               } else {
+                                                                   setStep8("");
+                                                                   selectUncheck(e);
+                                                                   modalHandleShow("noPrivacyLayer");
+                                                                   setDeps("8", "81,82,83,84,8A,8A1,8A2,8A3,8A4,8B,8B1,8B2,8B3,8B4,8C,8C1,8C2,8C3,8C4");
+                                                                   setCart("", "", "Hardware","RailId,BatonOption,RodColor,Mount,RailIdA,BatonOptionA,RodColorA,MountA,RailIdB,BatonOptionB,RodColorB,MountB,RailIdC,BatonOptionC,RodColorC,MountC");
+                                                               }
+                                                           }} ref={ref => (inputs.current["82"] = ref)}/>
+                                                    <div className="radio_group_name_container">
+                                                        <h1>{t("hardware3")}</h1>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                        
+                                        {/* step 8 Questions */}
+                                        <div className={step8 === "Same Style Hardware For All Curtains" ? "card_body card_body_radio card_body_Rod" : "noDisplay"}>
+                                            {railsList}
+                                        </div>
+                                        <div className={step8 === "Same Style Hardware For All Curtains" && step81 !== "" ? "same_row_selection" : "noDisplay"}>
+                                            <div className="same_row_selection_left">
+                                                <p>{t("Baton Option")}</p>
+                                                &nbsp;
+                                                <span onClick={() => modalHandleShow("learnMore_baton")}>{t("(Learn More)")}</span>
+                                            </div>
+                                            <div className="same_row_selection_right">
+                                                <div className="select_container">
+                                                    <Select
+                                                        className="select"
+                                                        placeholder={t("Please Select")}
+                                                        portal={document.body}
+                                                        dropdownPosition="bottom"
+                                                        dropdownHandle={false}
+                                                        dropdownGap={0}
+                                                        values={selectedBaton}
+                                                        onDropdownOpen={() => {
+                                                            let temp1 = window.scrollY;
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            setTimeout(() => {
+                                                                let temp2 = window.scrollY;
+                                                                if (temp2 === temp1)
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                            }, 100);
+                                                        }}
+                                                        dropdownRenderer={
+                                                            ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
+                                                        }
+                                                        contentRenderer={
+                                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                        }
+                                                        // optionRenderer={
+                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                        // }
+                                                        onChange={(selected) => {
+                                                            if (selected[0]) {
+                                                                setDeps("", "82");
+                                                                setSelectedBaton(selected);
+                                                                setCart("BatonOption", selected[0].value);
+                                                            }
+                                                        }}
+                                                        options={batonOptions[pageLanguage]}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div
+                                            className={step8 === "Same Style Hardware For All Curtains" && step81 !== "" ? "card_body card_body_radio card_body_Rod_color bracket_color" : "noDisplay"}>
+                                            <div className="box100">
+                                                <p className="step_selection_title">{t("step8_rod_finish_title")}</p>
+                                            </div>
+                                            <div className="box33">
+                                                <div className="radio_group">
+                                                    <label className="radio_container">
+                                                        <input className="radio" type="radio" text={t("BracketColor1")} value="1" name="step83" ref-num="83" id="831" outline="true"
+                                                               checked={step83 === "Satin Brass"}
+                                                               onChange={e => {
+                                                                   selectChanged(e);
+                                                                   setStep83("Satin Brass");
+                                                                   setDeps("", "83");
+                                                                   setCart("RodColor", "Satin Brass");
+                                                               }} ref={ref => (inputs.current["831"] = ref)}/>
+                                                        <div className="frame_img">
+                                                            <img src={require('../Images/drapery/roller/SatinBrass.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                                                        </div>
+                                                    </label>
+                                                    <div className="radio_group_name_container">
+                                                        <h1>{t("BracketColor1")}</h1>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="box33">
+                                                <div className="radio_group">
+                                                    <label className="radio_container">
+                                                        <input className="radio" type="radio" text={t("BracketColor2")} value="2" name="step83" ref-num="83" id="832" outline="true"
+                                                               checked={step83 === "Satin Nickel"}
+                                                               onChange={e => {
+                                                                   selectChanged(e);
+                                                                   setStep83("Satin Nickel");
+                                                                   setDeps("", "83");
+                                                                   setCart("RodColor", "Satin Nickel");
+                                                               }} ref={ref => (inputs.current["832"] = ref)}/>
+                                                        <div className="frame_img">
+                                                            <img src={require('../Images/drapery/roller/SatinNickel.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                                                        </div>
+                                                    </label>
+                                                    <div className="radio_group_name_container">
+                                                        <h1>{t("BracketColor2")}</h1>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="box33">
+                                                <div className="radio_group">
+                                                    <label className="radio_container">
+                                                        <input className="radio" type="radio" text={t("BracketColor3")} value="3" name="step83" ref-num="83" id="833" outline="true"
+                                                               checked={step83 === "Gun Metal"}
+                                                               onChange={e => {
+                                                                   selectChanged(e);
+                                                                   setStep83("Gun Metal");
+                                                                   setDeps("", "83");
+                                                                   setCart("RodColor", "Gun Metal");
+                                                               }} ref={ref => (inputs.current["833"] = ref)}/>
+                                                        <div className="frame_img">
+                                                            <img src={require('../Images/drapery/roller/GunMetal.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                                                        </div>
+                                                    </label>
+                                                    <div className="radio_group_name_container">
+                                                        <h1>{t("BracketColor3")}</h1>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div
+                                            className={step8 === "Same Style Hardware For All Curtains" && step81 !== "" ? "card_body card_body_radio card_body_rod_mount" : "noDisplay"}>
+                                            <div className="box100">
+                                                <p className="step_selection_title">{t("step8_rod_mount_title")}</p>
+                                            </div>
+                                            <div className="box50 radio_style">
+                                                <input className="radio" type="radio" text={t("Wall")} value="1" name="step84" ref-num="84" id="841"
+                                                       checked={step84 === "Wall"}
+                                                       onChange={e => {
+                                                           setStep84("Wall");
+                                                           setDeps("", "84");
+                                                           setCart("Mount", "Wall");
+                                                           selectChanged(e);
+                                                       }} ref={ref => (inputs.current["841"] = ref)}/>
+                                                <label htmlFor="841">{t("Wall")}</label>
+                                            </div>
+                                            <div className="box50 radio_style">
+                                                <input className="radio" type="radio" text={t("Ceiling")} value="2" name="step84" ref-num="84" id="842"
+                                                       checked={step84 === "Ceiling"}
+                                                       onChange={e => {
+                                                           setStep84("Ceiling");
+                                                           setDeps("", "84");
+                                                           setCart("Mount", "Ceiling");
+                                                           selectChanged(e);
+                                                    
+                                                       }} ref={ref => (inputs.current["842"] = ref)}/>
+                                                <label htmlFor="842">{t("Ceiling")}</label>
+                                            </div>
+                                        </div>
+                                        
+                                        <NextStep eventKey="9">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
+                        {/* step 8A */}
+                        <Card className={step8 === "Customize Style Hardware For All Curtains" ? "" : "noDisplay"}>
+                            <Card.Header>
+                                <ContextAwareToggle eventKey="8A" stepNum={t("8A")} stepTitle={t("grommet_step8A")} stepRef="8A" type="1" required={requiredStep["8A"]}
+                                                    stepSelected={stepSelectedLabel["8A"] === undefined ? "" : stepSelectedLabel["8A"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="8A">
+                                <Card.Body>
+                                    <div className="card_body card_body_radio card_body_hardware">
+                                        <div className="box50 radio_style">
+                                            <input className="radio" type="radio" text={t("None")} value="1" name="step8A" ref-num="8A" id="8A1"
+                                                   checked={step8A === "None"}
+                                                   onChange={e => {
+                                                       setStep8A1("");
+                                                       setStep8A3("");
+                                                       setStep8A4("");
+                                                       setSelectedBatonA([]);
+                                                       setStep8A("None");
+                                                       setDeps("", "8A,8A1,8A2,8A3,8A4");
+                                                       setCart("DraperyHardware", "None","RailIdA,BatonOptionA,RodColorA,MountA");
+                                                       selectChanged(e);
+                                                   }} ref={ref => (inputs.current["8A1"] = ref)}/>
+                                            <label htmlFor="8A1">{t("None")}</label>
+                                        </div>
+                                        <div className="box50 radio_style">
+                                            <input className="radio" type="radio" text={t("Rod")} value="2" name="step8A" ref-num="8A" id="8A2"
+                                                   checked={step8A === "Rod"}
+                                                   onChange={e => {
+                                                       setStep8A("Rod");
+                                                       setDeps("8A1,8A2,8A3,8A4", "8A");
+                                                       setCart("DraperyHardware", "Rod");
+                                                       selectChanged(e);
+                                                   }} ref={ref => (inputs.current["8A2"] = ref)}/>
+                                            <label htmlFor="8A2">{t("Rod")}</label>
+                                        </div>
+                                        
+                                        {/* step 8 Questions */}
+                                        <div className={step8A !== "None" && step8A !== "" ? "card_body card_body_radio card_body_Rod" : "noDisplay"}>
+                                            {railsList2}
+                                        </div>
+                                        <div className={step8A !== "None" && step8A !== "" && step8A1 !== "" ? "same_row_selection" : "noDisplay"}>
+                                            <div className="same_row_selection_left">
+                                                <p>{t("Baton Option")}</p>
+                                                &nbsp;
+                                                <span onClick={() => modalHandleShow("learnMore_baton")}>{t("(Learn More)")}</span>
+                                            </div>
+                                            <div className="same_row_selection_right">
+                                                <div className="select_container">
+                                                    <Select
+                                                        className="select"
+                                                        placeholder={t("Please Select")}
+                                                        portal={document.body}
+                                                        dropdownPosition="bottom"
+                                                        dropdownHandle={false}
+                                                        dropdownGap={0}
+                                                        values={selectedBatonA}
+                                                        onDropdownOpen={() => {
+                                                            let temp1 = window.scrollY;
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            setTimeout(() => {
+                                                                let temp2 = window.scrollY;
+                                                                if (temp2 === temp1)
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                            }, 100);
+                                                        }}
+                                                        dropdownRenderer={
+                                                            ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
+                                                        }
+                                                        contentRenderer={
+                                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                        }
+                                                        // optionRenderer={
+                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                        // }
+                                                        onChange={(selected) => {
+                                                            if (selected[0]) {
+                                                                setDeps("", "8A2");
+                                                                setSelectedBatonA(selected);
+                                                                setCart("BatonOptionA", selected[0].value);
+                                                            }
+                                                        }}
+                                                        options={batonOptions[pageLanguage]}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div
+                                            className={step8A !== "None" && step8A !== "" && step8A1 !== "" ? "card_body card_body_radio card_body_Rod_color bracket_color" : "noDisplay"}>
+                                            <div className="box100">
+                                                <p className="step_selection_title">{t("step8_rod_finish_title")}</p>
+                                            </div>
+                                            <div className="box33">
+                                                <div className="radio_group">
+                                                    <label className="radio_container">
+                                                        <input className="radio" type="radio" text={t("BracketColor1")} value="1" name="step8A3" ref-num="8A3" id="8A31" outline="true"
+                                                               checked={step8A3 === "Satin Brass"}
+                                                               onChange={e => {
+                                                                   selectChanged(e);
+                                                                   setStep8A3("Satin Brass");
+                                                                   setDeps("", "8A3");
+                                                                   setCart("RodColorA", "Satin Brass");
+                                                               }} ref={ref => (inputs.current["8A31"] = ref)}/>
+                                                        <div className="frame_img">
+                                                            <img src={require('../Images/drapery/roller/SatinBrass.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                                                        </div>
+                                                    </label>
+                                                    <div className="radio_group_name_container">
+                                                        <h1>{t("BracketColor1")}</h1>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="box33">
+                                                <div className="radio_group">
+                                                    <label className="radio_container">
+                                                        <input className="radio" type="radio" text={t("BracketColor2")} value="2" name="step8A3" ref-num="8A3" id="8A32" outline="true"
+                                                               checked={step8A3 === "Satin Nickel"}
+                                                               onChange={e => {
+                                                                   selectChanged(e);
+                                                                   setStep8A3("Satin Nickel");
+                                                                   setDeps("", "8A3");
+                                                                   setCart("RodColorA", "Satin Nickel");
+                                                               }} ref={ref => (inputs.current["8A32"] = ref)}/>
+                                                        <div className="frame_img">
+                                                            <img src={require('../Images/drapery/roller/SatinNickel.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                                                        </div>
+                                                    </label>
+                                                    <div className="radio_group_name_container">
+                                                        <h1>{t("BracketColor2")}</h1>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="box33">
+                                                <div className="radio_group">
+                                                    <label className="radio_container">
+                                                        <input className="radio" type="radio" text={t("BracketColor3")} value="3" name="step8A3" ref-num="8A3" id="8A33" outline="true"
+                                                               checked={step8A3 === "Gun Metal"}
+                                                               onChange={e => {
+                                                                   selectChanged(e);
+                                                                   setStep8A3("Gun Metal");
+                                                                   setDeps("", "8A3");
+                                                                   setCart("RodColorA", "Gun Metal");
+                                                               }} ref={ref => (inputs.current["8A33"] = ref)}/>
+                                                        <div className="frame_img">
+                                                            <img src={require('../Images/drapery/roller/GunMetal.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                                                        </div>
+                                                    </label>
+                                                    <div className="radio_group_name_container">
+                                                        <h1>{t("BracketColor3")}</h1>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className={step8A !== "None" && step8A !== "" && step8A1 !== "" ? "card_body card_body_radio card_body_rod_mount" : "noDisplay"}>
+                                            <div className="box100">
+                                                <p className="step_selection_title">{t("step8_rod_mount_title")}</p>
+                                            </div>
+                                            <div className="box50 radio_style">
+                                                <input className="radio" type="radio" text={t("Wall")} value="1" name="step8A4" ref-num="8A4" id="8A41"
+                                                       checked={step8A4 === "Wall"}
+                                                       onChange={e => {
+                                                           setStep8A4("Wall");
+                                                           setDeps("", "8A4");
+                                                           setCart("MountA", "Wall");
+                                                           selectChanged(e);
+                                                       }} ref={ref => (inputs.current["8A41"] = ref)}/>
+                                                <label htmlFor="8A41">{t("Wall")}</label>
+                                            </div>
+                                            <div className="box50 radio_style">
+                                                <input className="radio" type="radio" text={t("Ceiling")} value="2" name="step8A4" ref-num="8A4" id="8A42"
+                                                       checked={step8A4 === "Ceiling"}
+                                                       onChange={e => {
+                                                           setStep8A4("Ceiling");
+                                                           setDeps("", "8A4");
+                                                           setCart("MountA", "Ceiling");
+                                                           selectChanged(e);
+                                                    
+                                                       }} ref={ref => (inputs.current["8A42"] = ref)}/>
+                                                <label htmlFor="8A42">{t("Ceiling")}</label>
+                                            </div>
+                                        </div>
+                                        <NextStep eventKey="8B">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
+                        {/* step 8B */}
+                        <Card className={step8 === "Customize Style Hardware For All Curtains" ? "" : "noDisplay"}>
+                            <Card.Header>
+                                <ContextAwareToggle eventKey="8B" stepNum={t("8B")} stepTitle={t("grommet_step8B")} stepRef="8B" type="1" required={requiredStep["8B"]}
+                                                    stepSelected={stepSelectedLabel["8B"] === undefined ? "" : stepSelectedLabel["8B"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="8B">
+                                <Card.Body>
+                                    <div className="card_body card_body_radio card_body_hardware">
+                                        <div className="box33 radio_style">
+                                            <input className="radio" type="radio" text={t("None")} value="1" name="step8B" ref-num="8B" id="8B1"
+                                                   checked={step8B === "None"}
+                                                   onChange={e => {
+                                                       setStep8B1("");
+                                                       setStep8B3("");
+                                                       setStep8B4("");
+                                                       setSelectedBatonB([]);
+                                                       setStep8B("None");
+                                                       setDeps("", "8B,8B1,8B2,8B3,8B4");
+                                                       setCart("SheerHardware", "None","RailIdB,BatonOptionB,RodColorB,MountB");
+                                                       selectChanged(e);
+                                                   }} ref={ref => (inputs.current["8B1"] = ref)}/>
+                                            <label htmlFor="8B1">{t("None")}</label>
+                                        </div>
+                                        <div className={step2A === "Grommet" ? "box33 radio_style" : "noDisplay"}>
+                                            <input className="radio" type="radio" text={t("Track")} value="2" name="step8B" ref-num="8B" id="8B2"
+                                                   checked={step8B === "Track"}
+                                                   onChange={e => {
+                                                       setStep8B1("");
+                                                       setStep8B3("");
+                                                       setStep8B4("");
+                                                       setSelectedBatonB([]);
+                                                       setStep8B("Track");
+                                                       setDeps("8B1,8B2,8B3,8B4", "8B");
+                                                       setCart("SheerHardware", "Track","RailIdB,BatonOptionB,RodColorB,MountB");
+                                                       selectChanged(e);
+                                                   }} ref={ref => (inputs.current["8B2"] = ref)}/>
+                                            <label htmlFor="8B2">{t("Track")}</label>
+                                        </div>
+                                        <div className="box33 radio_style">
+                                            <input className="radio" type="radio" text={t("Rod")} value="3" name="step8B" ref-num="8B" id="8B3"
+                                                   checked={step8B === "Rod"}
+                                                   onChange={e => {
+                                                       setStep8B1("");
+                                                       setStep8B3("");
+                                                       setStep8B4("");
+                                                       setSelectedBatonB([]);
+                                                       setStep8B("Rod");
+                                                       setDeps("8B1,8B2,8B3,8B4", "8B");
+                                                       setCart("SheerHardware", "Rod","RailIdB,BatonOptionB,RodColorB,MountB");
+                                                       selectChanged(e);
+                                                   }} ref={ref => (inputs.current["8B3"] = ref)}/>
+                                            <label htmlFor="8B3">{t("Rod")}</label>
+                                        </div>
+                                        
+                                        {/* step 8 Questions */}
+                                        <div className={step8B !== "None" && step8B !== "" ? "card_body card_body_radio card_body_Rod" : "noDisplay"}>
+                                            {railsList3}
+                                        </div>
+                                        <div className={step8B !== "None" && step8B !== "" ? "same_row_selection" : "noDisplay"}>
+                                            <div className="same_row_selection_left">
+                                                <p>{t("Baton Option")}</p>
+                                                &nbsp;
+                                                <span onClick={() => modalHandleShow("learnMore_baton")}>{t("(Learn More)")}</span>
+                                            </div>
+                                            <div className="same_row_selection_right">
+                                                <div className="select_container">
+                                                    <Select
+                                                        className="select"
+                                                        placeholder={t("Please Select")}
+                                                        portal={document.body}
+                                                        dropdownPosition="bottom"
+                                                        dropdownHandle={false}
+                                                        dropdownGap={0}
+                                                        values={selectedBatonB}
+                                                        onDropdownOpen={() => {
+                                                            let temp1 = window.scrollY;
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            setTimeout(() => {
+                                                                let temp2 = window.scrollY;
+                                                                if (temp2 === temp1)
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                            }, 100);
+                                                        }}
+                                                        dropdownRenderer={
+                                                            ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
+                                                        }
+                                                        contentRenderer={
+                                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                        }
+                                                        // optionRenderer={
+                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                        // }
+                                                        onChange={(selected) => {
+                                                            if (selected[0]) {
+                                                                setDeps("", "8B2");
+                                                                setSelectedBatonB(selected);
+                                                                setCart("BatonOptionB", selected[0].value);
+                                                            }
+                                                        }}
+                                                        options={batonOptions[pageLanguage]}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className={step8B !== "None" && step8B !== "" ? "card_body card_body_radio card_body_Rod_color bracket_color" : "noDisplay"}>
+                                            <div className="box100">
+                                                <p className="step_selection_title">{t("step8_rod_finish_title")}</p>
+                                            </div>
+                                            <div className="box33">
+                                                <div className="radio_group">
+                                                    <label className="radio_container">
+                                                        <input className="radio" type="radio" text={t("BracketColor1")} value="1" name="step8B3" ref-num="8B3" id="8B31" outline="true"
+                                                               checked={step8B3 === "Satin Brass"}
+                                                               onChange={e => {
+                                                                   selectChanged(e);
+                                                                   setStep8B3("Satin Brass");
+                                                                   setDeps("", "8B3");
+                                                                   setCart("RodColorB", "Satin Brass");
+                                                               }} ref={ref => (inputs.current["8A31"] = ref)}/>
+                                                        <div className="frame_img">
+                                                            <img src={require('../Images/drapery/roller/SatinBrass.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                                                        </div>
+                                                    </label>
+                                                    <div className="radio_group_name_container">
+                                                        <h1>{t("BracketColor1")}</h1>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="box33">
+                                                <div className="radio_group">
+                                                    <label className="radio_container">
+                                                        <input className="radio" type="radio" text={t("BracketColor2")} value="2" name="step8B3" ref-num="8B3" id="8B32" outline="true"
+                                                               checked={step8B3 === "Satin Nickel"}
+                                                               onChange={e => {
+                                                                   selectChanged(e);
+                                                                   setStep8B3("Satin Nickel");
+                                                                   setDeps("", "8B3");
+                                                                   setCart("RodColorB", "Satin Nickel");
+                                                               }} ref={ref => (inputs.current["8B32"] = ref)}/>
+                                                        <div className="frame_img">
+                                                            <img src={require('../Images/drapery/roller/SatinNickel.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                                                        </div>
+                                                    </label>
+                                                    <div className="radio_group_name_container">
+                                                        <h1>{t("BracketColor2")}</h1>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="box33">
+                                                <div className="radio_group">
+                                                    <label className="radio_container">
+                                                        <input className="radio" type="radio" text={t("BracketColor3")} value="3" name="step8B3" ref-num="8B3" id="8B33" outline="true"
+                                                               checked={step8B3 === "Gun Metal"}
+                                                               onChange={e => {
+                                                                   selectChanged(e);
+                                                                   setStep8B3("Gun Metal");
+                                                                   setDeps("", "8B3");
+                                                                   setCart("RodColorB", "Gun Metal");
+                                                               }} ref={ref => (inputs.current["8B33"] = ref)}/>
+                                                        <div className="frame_img">
+                                                            <img src={require('../Images/drapery/roller/GunMetal.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                                                        </div>
+                                                    </label>
+                                                    <div className="radio_group_name_container">
+                                                        <h1>{t("BracketColor3")}</h1>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className={step8B !== "None" && step8B !== "" ? "card_body card_body_radio card_body_rod_mount" : "noDisplay"}>
+                                            <div className="box100">
+                                                <p className="step_selection_title">{t("step8_rod_mount_title")}</p>
+                                            </div>
+                                            <div className="box50 radio_style">
+                                                <input className="radio" type="radio" text={t("Wall")} value="1" name="step8B4" ref-num="8B4" id="8B41"
+                                                       checked={step8B4 === "Wall"}
+                                                       onChange={e => {
+                                                           setStep8B4("Wall");
+                                                           setDeps("", "8B4");
+                                                           setCart("MountB", "Wall");
+                                                           selectChanged(e);
+                                                       }} ref={ref => (inputs.current["8B41"] = ref)}/>
+                                                <label htmlFor="8B41">{t("Wall")}</label>
+                                            </div>
+                                            <div className="box50 radio_style">
+                                                <input className="radio" type="radio" text={t("Ceiling")} value="2" name="step8B4" ref-num="8B4" id="8B42"
+                                                       checked={step8B4 === "Ceiling"}
+                                                       onChange={e => {
+                                                           setStep8B4("Ceiling");
+                                                           setDeps("", "8B4");
+                                                           setCart("MountB", "Ceiling");
+                                                           selectChanged(e);
+                                                    
+                                                       }} ref={ref => (inputs.current["8B42"] = ref)}/>
+                                                <label htmlFor="8B42">{t("Ceiling")}</label>
+                                            </div>
+                                        </div>
+                                        <NextStep eventKey="8C">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
+                        {/* step 8C */}
+                        <Card className={step8 === "Customize Style Hardware For All Curtains" && step2B !== "None" ? "" : "noDisplay"}>
+                            <Card.Header>
+                                <ContextAwareToggle eventKey="8C" stepNum={t("8C")} stepTitle={t("grommet_step8C")} stepRef="8C" type="1" required={requiredStep["8C"]}
+                                                    stepSelected={stepSelectedLabel["8C"] === undefined ? "" : stepSelectedLabel["8C"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="8C">
+                                <Card.Body>
+                                    <div className="card_body card_body_radio card_body_hardware">
+                                        <div className="box33 radio_style">
+                                            <input className="radio" type="radio" text={t("None")} value="1" name="step8C" ref-num="8C" id="8C1"
+                                                   checked={step8C === "None"}
+                                                   onChange={e => {
+                                                       setStep8C1("");
+                                                       setStep8C3("");
+                                                       setStep8C4("");
+                                                       setSelectedBatonC([]);
+                                                       setStep8C("None");
+                                                       setDeps("", "8C,8C1,8C2,8C3,8C4");
+                                                       setCart("PrivacyLayerHardware", "None","RailIdC,BatonOptionC,RodColorC,MountC");
+                                                       selectChanged(e);
+                                                   }} ref={ref => (inputs.current["8C1"] = ref)}/>
+                                            <label htmlFor="8C1">{t("None")}</label>
+                                        </div>
+                                        <div className={step2A === "Grommet" ? "box33 radio_style" : "noDisplay"}>
+                                            <input className="radio" type="radio" text={t("Track")} value="2" name="step8C" ref-num="8C" id="8C2"
+                                                   checked={step8C === "Track"}
+                                                   onChange={e => {
+                                                       setStep8C1("");
+                                                       setStep8C3("");
+                                                       setStep8C4("");
+                                                       setSelectedBatonC([]);
+                                                       setStep8C("Track");
+                                                       setDeps("8C1,8C2,8C3,8C4", "8C");
+                                                       setCart("PrivacyLayerHardware", "Track","RailIdC,BatonOptionC,RodColorC,MountC");
+                                                       selectChanged(e);
+                                                   }} ref={ref => (inputs.current["8C2"] = ref)}/>
+                                            <label htmlFor="8C2">{t("Track")}</label>
+                                        </div>
+                                        <div className="box33 radio_style">
+                                            <input className="radio" type="radio" text={t("Rod")} value="3" name="step8C" ref-num="8C" id="8C3"
+                                                   checked={step8C === "Rod"}
+                                                   onChange={e => {
+                                                       setStep8C1("");
+                                                       setStep8C3("");
+                                                       setStep8C4("");
+                                                       setSelectedBatonC([]);
+                                                       setStep8C("Rod");
+                                                       setDeps("8C1,8C2,8C3,8C4", "8C");
+                                                       setCart("PrivacyLayerHardware", "Rod","RailIdC,BatonOptionC,RodColorC,MountC");
+                                                       selectChanged(e);
+                                                   }} ref={ref => (inputs.current["8C3"] = ref)}/>
+                                            <label htmlFor="8C3">{t("Rod")}</label>
+                                        </div>
+                                        
+                                        {/* step 8 Questions */}
+                                        <div className={step8C !== "None" && step8C !== "" ? "card_body card_body_radio card_body_Rod" : "noDisplay"}>
+                                            {railsList4}
+                                        </div>
+                                        <div className={step8C !== "None" && step8C !== "" ? "same_row_selection" : "noDisplay"}>
+                                            <div className="same_row_selection_left">
+                                                <p>{t("Baton Option")}</p>
+                                                &nbsp;
+                                                <span onClick={() => modalHandleShow("learnMore_baton")}>{t("(Learn More)")}</span>
+                                            </div>
+                                            <div className="same_row_selection_right">
+                                                <div className="select_container">
+                                                    <Select
+                                                        className="select"
+                                                        placeholder={t("Please Select")}
+                                                        portal={document.body}
+                                                        dropdownPosition="bottom"
+                                                        dropdownHandle={false}
+                                                        dropdownGap={0}
+                                                        values={selectedBatonC}
+                                                        onDropdownOpen={() => {
+                                                            let temp1 = window.scrollY;
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            setTimeout(() => {
+                                                                let temp2 = window.scrollY;
+                                                                if (temp2 === temp1)
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                            }, 100);
+                                                        }}
+                                                        dropdownRenderer={
+                                                            ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
+                                                        }
+                                                        contentRenderer={
+                                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                        }
+                                                        // optionRenderer={
+                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                        // }
+                                                        onChange={(selected) => {
+                                                            if (selected[0]) {
+                                                                setDeps("", "8C2");
+                                                                setSelectedBatonC(selected);
+                                                                setCart("BatonOptionC", selected[0].value);
+                                                            }
+                                                        }}
+                                                        options={batonOptions[pageLanguage]}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className={step8C !== "None" && step8C !== "" ? "card_body card_body_radio card_body_Rod_color bracket_color" : "noDisplay"}>
+                                            <div className="box100">
+                                                <p className="step_selection_title">{t("step8_rod_finish_title")}</p>
+                                            </div>
+                                            <div className="box33">
+                                                <div className="radio_group">
+                                                    <label className="radio_container">
+                                                        <input className="radio" type="radio" text={t("BracketColor1")} value="1" name="step8C3" ref-num="8C3" id="8C31" outline="true"
+                                                               checked={step8C3 === "Satin Brass"}
+                                                               onChange={e => {
+                                                                   selectChanged(e);
+                                                                   setStep8C3("Satin Brass");
+                                                                   setDeps("", "8C3");
+                                                                   setCart("RodColorC", "Satin Brass");
+                                                               }} ref={ref => (inputs.current["8C31"] = ref)}/>
+                                                        <div className="frame_img">
+                                                            <img src={require('../Images/drapery/roller/SatinBrass.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                                                        </div>
+                                                    </label>
+                                                    <div className="radio_group_name_container">
+                                                        <h1>{t("BracketColor1")}</h1>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="box33">
+                                                <div className="radio_group">
+                                                    <label className="radio_container">
+                                                        <input className="radio" type="radio" text={t("BracketColor2")} value="2" name="step8C3" ref-num="8C3" id="8C32" outline="true"
+                                                               checked={step8C3 === "Satin Nickel"}
+                                                               onChange={e => {
+                                                                   selectChanged(e);
+                                                                   setStep8C3("Satin Nickel");
+                                                                   setDeps("", "8C3");
+                                                                   setCart("RodColorC", "Satin Nickel");
+                                                               }} ref={ref => (inputs.current["8C32"] = ref)}/>
+                                                        <div className="frame_img">
+                                                            <img src={require('../Images/drapery/roller/SatinNickel.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                                                        </div>
+                                                    </label>
+                                                    <div className="radio_group_name_container">
+                                                        <h1>{t("BracketColor2")}</h1>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="box33">
+                                                <div className="radio_group">
+                                                    <label className="radio_container">
+                                                        <input className="radio" type="radio" text={t("BracketColor3")} value="3" name="step8C3" ref-num="8C3" id="8C33" outline="true"
+                                                               checked={step8C3 === "Gun Metal"}
+                                                               onChange={e => {
+                                                                   selectChanged(e);
+                                                                   setStep8C3("Gun Metal");
+                                                                   setDeps("", "8C3");
+                                                                   setCart("RodColorC", "Gun Metal");
+                                                               }} ref={ref => (inputs.current["8C33"] = ref)}/>
+                                                        <div className="frame_img">
+                                                            <img src={require('../Images/drapery/roller/GunMetal.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                                                        </div>
+                                                    </label>
+                                                    <div className="radio_group_name_container">
+                                                        <h1>{t("BracketColor3")}</h1>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className={step8C !== "None" && step8C !== "" ? "card_body card_body_radio card_body_rod_mount" : "noDisplay"}>
+                                            <div className="box100">
+                                                <p className="step_selection_title">{t("step8_rod_mount_title")}</p>
+                                            </div>
+                                            <div className="box50 radio_style">
+                                                <input className="radio" type="radio" text={t("Wall")} value="1" name="step8C4" ref-num="8C4" id="8C41"
+                                                       checked={step8C4 === "Wall"}
+                                                       onChange={e => {
+                                                           setStep8C4("Wall");
+                                                           setDeps("", "8C4");
+                                                           setCart("MountC", "Wall");
+                                                           selectChanged(e);
+                                                       }} ref={ref => (inputs.current["8C41"] = ref)}/>
+                                                <label htmlFor="8C41">{t("Wall")}</label>
+                                            </div>
+                                            <div className="box50 radio_style">
+                                                <input className="radio" type="radio" text={t("Ceiling")} value="2" name="step8C4" ref-num="8C4" id="8C42"
+                                                       checked={step8C4 === "Ceiling"}
+                                                       onChange={e => {
+                                                           setStep8C4("Ceiling");
+                                                           setDeps("", "8C4");
+                                                           setCart("MountC", "Ceiling");
+                                                           selectChanged(e);
+                                                    
+                                                       }} ref={ref => (inputs.current["8C42"] = ref)}/>
+                                                <label htmlFor="8C42">{t("Ceiling")}</label>
+                                            </div>
+                                        </div>
+                                        <NextStep eventKey="9">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
+                        {/* step 9 */}
+                        <Card>
+                            <Card.Header>
+                                <ContextAwareToggle eventKey="9" stepNum={t("9")} stepTitle={t("grommet_step9")} stepRef="9" type="1" required={requiredStep["9"]}
+                                                    stepSelected={stepSelectedLabel["9"] === undefined ? "" : stepSelectedLabel["9"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="9">
+                                <Card.Body>
+                                    <div className="card_body card_body_radio">
+                                        
+                                        <NextStep eventKey="10">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
+                        {/* step 10 */}
+                        <Card>
+                            <Card.Header>
+                                <ContextAwareToggle eventKey="10" stepNum={t("10")} stepTitle={t("zebra_step6")} stepRef="10" type="2" required={requiredStep["10"]}
+                                                    stepSelected={stepSelectedLabel["10"] === undefined ? "" : stepSelectedLabel["10"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="10">
                                 <Card.Body>
                                     <div className="card_body card_body_radio">
                                         <div className="box100 upload_section">
@@ -5893,8 +8497,8 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                         // }
                                                         onChange={(selected) => {
                                                             if (selected[0] !== undefined) {
-                                                                setDeps("", "61");
-                                                                roomLabelChanged(selected[0], "6", false);
+                                                                setDeps("", "101");
+                                                                roomLabelChanged(selected[0], "10", false);
                                                                 setSelectedRoomLabel(selected);
                                                                 // setCart("RoomNameEn", selected[0].value);
                                                                 setCart("RoomNameFa", rooms["fa"].find(opt => opt.value === selected[0].value).label, "", "RoomNameEn", [selected[0].value]);
@@ -5911,16 +8515,16 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                                value={roomLabelText}
                                                                onChange={(e) => {
                                                                    if (e.target.value === "")
-                                                                       setDeps("62", "");
+                                                                       setDeps("102", "");
                                                                    else
-                                                                       setDeps("", "62");
-                                                                   roomLabelChanged(e.target.value, "6", true);
+                                                                       setDeps("", "102");
+                                                                   roomLabelChanged(e.target.value, "10", true);
                                                                    setRoomLabelText(e.target.value);
                                                                    setCart("WindowName", e.target.value);
                                                                }}/>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="7">{t("NEXT STEP")}</NextStep>
+                                        <NextStep eventKey="11">{t("NEXT STEP")}</NextStep>
                                     </div>
                                     <div className=" accordion_help">
                                         <div className=" help_container">
@@ -5942,14 +8546,14 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                             </Accordion.Collapse>
                         </Card>
                         
-                        {/* step 7 */}
+                        {/* step 11 */}
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="7" stepNum={t("7")} stepTitle={t("zebra_step7")} stepTitle2={t("(Optional)")} stepRef="7" type="2"
-                                                    required={requiredStep["7"]}
-                                                    stepSelected={stepSelectedLabel["7"] === undefined ? "" : stepSelectedLabel["7"]}/>
+                                <ContextAwareToggle eventKey="11" stepNum={t("11")} stepTitle={t("zebra_step7")} stepTitle2={t("(Optional)")} stepRef="11" type="2"
+                                                    required={requiredStep["11"]}
+                                                    stepSelected={stepSelectedLabel["11"] === undefined ? "" : stepSelectedLabel["11"]}/>
                             </Card.Header>
-                            <Accordion.Collapse eventKey="7">
+                            <Accordion.Collapse eventKey="11">
                                 <Card.Body>
                                     <div className="card_body card_body_zipcode">
                                         <div className="zipcode_bag_section">
@@ -6110,6 +8714,36 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 {/*</Modal.Footer>*/}
             </Modal>
             
+            <Modal dialogClassName={`warning_modal2 bigSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                   show={modals["panelTypeWarning"] === undefined ? false : modals["panelTypeWarning"]}
+                   onHide={() => modalHandleClose(" panelTypeWarning")}>
+                <Modal.Header closeButton>
+                    {/*<Modal.Title>Modal heading</Modal.Title>*/}
+                </Modal.Header>
+                <Modal.Body>
+                    <p>{t("panelTypeWarning")}</p>
+                    
+                    <br/>
+                    <div className="buttons_section">
+                        <button className="btn btn-new-dark" onClick={() => {
+                            modalHandleClose("widthDifferent");
+                            setStep6("");
+                            setDeps("6", "");
+                            setCart("", "", "PanelType");
+                            selectChanged(undefined, "6");
+                        }}>{t("CHANGE MEASUREMENTS")}
+                        </button>
+                        <button className="btn white_btn" onClick={() => {
+                            modalHandleClose("panelTypeWarning");
+                        }}>{t("I AGREE, CONTINUE ANYWAY")}
+                        </button>
+                    </div>
+                </Modal.Body>
+                {/*<Modal.Footer>*/}
+                {/*    */}
+                {/*</Modal.Footer>*/}
+            </Modal>
+            
             <Modal dialogClassName={`noInsideUnderstand_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["noInsideUnderstand"] === undefined ? false : modals["noInsideUnderstand"]}
                    onHide={() => modalHandleClose(" noInsideUnderstand")}>
@@ -6145,17 +8779,17 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
             </Modal>
             
             <Modal dialogClassName={`noMount_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
-                   show={modals["noMount"] === undefined ? false : modals["noMount"]}
-                   onHide={() => modalHandleClose(" noMount")}>
+                   show={modals["noPrivacyLayer"] === undefined ? false : modals["noPrivacyLayer"]}
+                   onHide={() => modalHandleClose(" noPrivacyLayer")}>
                 <Modal.Header closeButton>
                     {/*<Modal.Title>Modal heading</Modal.Title>*/}
                 </Modal.Header>
                 <Modal.Body>
-                    <p>{t("modal_select_mount")}</p>
+                    <p>{t("modal_select_PrivacyLayer")}</p>
                     
                     <br/>
                     <div className=" text_center">
-                        <button className=" btn btn-new-dark" onClick={() => modalHandleClose(" noMount")}>{t("CONTINUE")}</button>
+                        <button className=" btn btn-new-dark" onClick={() => modalHandleClose(" noPrivacyLayer")}>{t("CONTINUE")}</button>
                     </div>
                 </Modal.Body>
                 {/*<Modal.Footer>*/}
@@ -6302,7 +8936,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             <li>{t("grommet_modal_help_5")}</li>
                                         </ul>
                                     </div>
-        
+                                    
                                     <div className="help_column help_right_column">
                                         <p className="help_column_header">{t("TO DETERMINE PANEL WIDTH")}</p>
                                         <ul className="help_column_list">

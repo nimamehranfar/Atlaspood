@@ -29,6 +29,7 @@ import {refreshToken} from "./Services/auth.service";
 import {CLEAR_REGISTER, LOGIN, LOGOUT, REGISTER} from "./Actions/types";
 import jwt from "jwt-decode";
 import PageItems from "./Components/PageItems";
+import CurtainSelection from "./Pages/CurtainSelection";
 
 
 function App({t}) {
@@ -132,6 +133,7 @@ function App({t}) {
                         <Route path="/en" element={<HeaderFooter/>}>
                             <Route path="" element={<Home/>}/>
                             <Route path="Curtain/:catID" element={<Curtain/>}/>
+                            <Route path="Curtain/:catID/Selection" element={<CurtainSelection/>}/>
                             <Route path="Product/:catID" element={<Product/>}/>
                             <Route path="Basket" element={<Basket/>}/>
                             <Route path="Basket/:swatchOnly" element={<Basket/>}/>
@@ -149,6 +151,7 @@ function App({t}) {
                         <Route path="/fa" element={<HeaderFooter/>}>
                             <Route path="" element={<Home/>}/>
                             <Route path="Curtain/:catID" element={<Curtain/>}/>
+                            <Route path="Curtain/:catID/Selection" element={<CurtainSelection/>}/>
                             <Route path="Product/:catID" element={<Product/>}/>
                             <Route path="Basket" element={<Basket/>}/>
                             <Route path="Basket/:swatchOnly" element={<Basket/>}/>

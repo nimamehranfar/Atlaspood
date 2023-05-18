@@ -41,7 +41,7 @@ import AddProjectToCart from "../Components/AddProjectToCart";
 import GetMeasurementArray from "../Components/GetMeasurementArray";
 import GetSewingFilters from "../Components/GetSewingFilters";
 import TruncateMarkup from "react-truncate-markup";
-import {Capitalize, CapitalizeAllWords, convertToPersian} from "../Components/TextTransform";
+import {Capitalize, CapitalizeAllWords, NumToFa, convertToPersian} from "../Components/TextTransform";
 import {DebounceInput} from "react-debounce-input";
 import GetBasketZipcode from "../Components/GetBasketZipcode";
 import {rooms} from "../Components/Static_Labels";
@@ -820,12 +820,12 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                     let tempMin = temp.values[refIndex][temp.values[refIndex].indexOf(Math.min(...temp.values[refIndex]))];
                     tempLabels[refIndex] = pageLang === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
                 } else {
-                    let tempMax = temp.values[refIndex][temp.values[refIndex].indexOf(Math.max(...temp.values[refIndex]))];
+                    let tempMax = temp.values[refIndex][temp.values[refIndex].indexOf(Math.min(...temp.values[refIndex]))];
                     tempLabels[refIndex] = pageLang === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + postfixFa : tempMax + postfixEn;
                 }
                 setStepSelectedLabel(tempLabels);
                 let minValue = Math.min(...temp.values[refIndex]);
-                let maxValue = Math.max(...temp.values[refIndex]);
+                let maxValue = Math.min(...temp.values[refIndex]);
                 if (maxValue - minValue >= 2) {
                     modalHandleShow(modalRef);
                 }
@@ -1889,7 +1889,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                                             <div key={i}
                                                                                  className="dk_curtain_preview_detail">
                                                                                 <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + "/" + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
-                                                                                <h5>&nbsp;X</h5><h3>{item["Qty"]}</h3>
+                                                                                <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"],pageLanguage)}</h3>
                                                                             </div>)}
                                                                     </div>
                                                                 </Accordion.Body>
@@ -2153,7 +2153,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                                                 <div key={i}
                                                                                      className="dk_curtain_preview_detail">
                                                                                     <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + "/" + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
-                                                                                    <h5>&nbsp;X</h5><h3>{item["Qty"]}</h3>
+                                                                                    <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"],pageLanguage)}</h3>
                                                                                 </div>)}
                                                                         </div>
                                                                     </Accordion.Body>
@@ -2828,7 +2828,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                         tempLabels["3AIn"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
                                     }
                                     if (tempHeight && temp["Height2"] && temp["Height3"]) {
-                                        let tempMax = Math.max(tempHeight, temp["Height2"], temp["Height3"]);
+                                        let tempMax = Math.min(tempHeight, temp["Height2"], temp["Height3"]);
                                         tempLabels["3BIn"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + postfixFa : tempMax + postfixEn;
                                     }
                                     
@@ -2883,7 +2883,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                     selectValues["CeilingToWindow2"] = tempHeight2 ? [{value: tempHeight2}] : [];
                                     selectValues["CeilingToWindow3"] = tempHeight3 ? [{value: tempHeight3}] : [];
                                     if (tempHeight && tempHeight2 && tempHeight3) {
-                                        let tempMax = Math.max(tempHeight, tempHeight2, tempHeight3);
+                                        let tempMax = Math.min(tempHeight, tempHeight2, tempHeight3);
                                         tempLabels["3CArc"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + postfixFa : tempMax + postfixEn;
                                     }
                                     
@@ -3674,7 +3674,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
     //                             temp.labels[objKey] = [];
     //                         if (temp.values[objKey] === undefined)
     //                             temp.values[objKey] = [];
-    //                         let tempMax = temp.values[objKey][temp.values[objKey].indexOf(Math.max(...temp.values[objKey]))];
+    //                         let tempMax = temp.values[objKey][temp.values[objKey].indexOf(Math.min(...temp.values[objKey]))];
     //                         tempLabels[objKey] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + "س\u200Cم" : tempMax + "cm";
     //
     //                     } else if (objKey === "3BOut") {
@@ -6670,13 +6670,13 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                                    setStep5C("Gun Metal");
                                                                    setDeps("", "5C");
                                                                    setCart("BracketColor", "Gun Metal");
-                                                               }} ref={ref => (inputs.current["5C2"] = ref)}/>
+                                                               }} ref={ref => (inputs.current["5C3"] = ref)}/>
                                                         <div className="frame_img">
                                                             <img src={require('../Images/drapery/roller/GunMetal.jpg')} className="img-fluid bracket_color_img" alt=""/>
                                                         </div>
                                                     </label>
                                                     <div className="radio_group_name_container">
-                                                        <h1>{t("BracketColor2")}</h1>
+                                                        <h1>{t("BracketColor3")}</h1>
                                                     </div>
                                                 </div>
                                             </div>
@@ -6979,7 +6979,7 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                         </div>
                                                     </label>
                                                     <div className="radio_group_name_container">
-                                                        <h1>{t("BracketColor2")}</h1>
+                                                        <h1>{t("BracketColor3")}</h1>
                                                     </div>
                                                 </div>
                                             </div>

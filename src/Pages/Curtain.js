@@ -5,7 +5,7 @@ import {useTranslation} from "react-i18next";
 import parse, {domToReact} from 'html-react-parser';
 import Breadcrumb from 'react-bootstrap/Breadcrumb';
 import GetPrice from "../Components/GetPrice";
-import {convertToPersian} from "../Components/TextTransform";
+import {convertToPersian, NumToFa} from "../Components/TextTransform";
 
 const baseURLCats = "https://api.atlaspood.ir/WebsitePage/GetDetailByName";
 
@@ -132,9 +132,16 @@ function Curtain() {
             
             modelLists.push(
                 <li key={"model" + i} model_id={i} className={`${i % 2 === 0 ? "model_color_1" : "model_color_2"}`}>
-                    <Link to={"/" + pageLanguage + "/Curtain/" + catID + "/" + SewingModelId} className={`model_image_container`} onClick={()=>sessionStorage.clear()}>
-                        <img src={PhotoUrl === null ? `${process.env.PUBLIC_URL}/no_image.svg` : `https://api.atlaspood.ir${PhotoUrl}`} className="img-fluid" alt=""/>
-                    </Link>
+                    {SewingModelId === "0099" &&
+                        <Link to={"/" + pageLanguage + "/Curtain/" + catID + "/Selection"} className={`model_image_container`} onClick={() => sessionStorage.clear()}>
+                            <img src={PhotoUrl === null ? `${process.env.PUBLIC_URL}/no_image.svg` : `https://api.atlaspood.ir${PhotoUrl}`} className="img-fluid" alt=""/>
+                        </Link>
+                    }
+                    {SewingModelId !== "0099" &&
+                        <Link to={"/" + pageLanguage + "/Curtain/" + catID + "/" + SewingModelId} className={`model_image_container`} onClick={() => sessionStorage.clear()}>
+                            <img src={PhotoUrl === null ? `${process.env.PUBLIC_URL}/no_image.svg` : `https://api.atlaspood.ir${PhotoUrl}`} className="img-fluid" alt=""/>
+                        </Link>
+                    }
                     <div className={`model_info_container`}>
                         {/*<div className={`model_info_price_title`}>*/}
                         {/*    <Link to={"/" + pageLanguage + "/Curtain/" + catID + "/" + SewingModelId}*/}
@@ -177,9 +184,16 @@ function Curtain() {
                             <div className={`model_item_info_description_section`}>
                                 {pageLanguage === 'en' ? parse(ENDescription, options) : parse(convertToPersian(Description), options)}
                             </div>
-                            <Link to={"/" + pageLanguage + "/Curtain/" + catID + "/" + SewingModelId + "/Page-ID/" + WebsitePageItemId} className="btn_normal model_item_btn_normal"
-                                  onClick={() => sessionStorage.clear()}>{t("Start" +
-                                " Customizing")}</Link>
+                            {SewingModelId==="0099" &&
+                                <Link to={"/" + pageLanguage + "/Curtain/" + catID + "/Selection"} className="btn_normal model_item_btn_normal"
+                                      onClick={() => sessionStorage.clear()}>{t("Start" +
+                                    " Customizing")}</Link>
+                            }
+                            {SewingModelId!=="0099" &&
+                                <Link to={"/" + pageLanguage + "/Curtain/" + catID + "/" + SewingModelId + "/Page-ID/" + WebsitePageItemId} className="btn_normal model_item_btn_normal"
+                                      onClick={() => sessionStorage.clear()}>{t("Start" +
+                                    " Customizing")}</Link>
+                            }
                             
                         </div>
                     </div>

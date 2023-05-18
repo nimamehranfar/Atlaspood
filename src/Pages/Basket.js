@@ -22,7 +22,7 @@ import Dropdown from "react-bootstrap/Dropdown";
 import {convertToPersian} from "../Components/TextTransform";
 import {Accordion, AccordionContext, useAccordionButton} from "react-bootstrap";
 import PopoverStickOnClick from "../Components/PopoverStickOnClick";
-import {CapitalizeAllWords} from "../Components/TextTransform";
+import { NumToFa,CapitalizeAllWords} from "../Components/TextTransform";
 import SaveUserProject from "../Components/SaveUserProject";
 
 const baseURLPrice = "https://api.atlaspood.ir/Sewing/GetSewingOrderPrice";

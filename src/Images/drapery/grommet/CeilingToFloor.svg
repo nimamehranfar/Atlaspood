@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256.59" height="246.5" viewBox="0 0 256.59 246.5">
+	<defs>
+    <style>
+	
+	
+	@font-face {
+	font-family: "proximanova-nova";
+
+	src: url('https://doopsalta2.com/Fonts/proxima-nova-three.woff2') format('woff2'),
+		url('https://doopsalta2.com/Fonts/proxima-nova-three.woff') format('woff'),
+		url('https://doopsalta2.com/Fonts/proxima-nova-three.otf') format('opentype');
+	font-style: normal;
+	}
+	</style>
+	</defs>
+  <g id="Group_34" data-name="Group 34" transform="translate(-722.035 -244.898)">
+    <rect id="Rectangle_51" data-name="Rectangle 51" width="256.59" height="244.5" transform="translate(722.035 245.898)" fill="none"/>
+    <text id="FLOOR" transform="translate(926.625 486.398)" fill="#707070" stroke="rgba(0,0,0,0.5)" stroke-width="1" font-size="11" font-family='proximanova-nova,sans-serif' font-weight="200"><tspan x="0" y="0">FLOOR</tspan></text>
+    <text id="CEILING" transform="translate(926.625 256.898)" fill="#707070" stroke="rgba(0,0,0,0.5)" stroke-width="1" font-size="11" font-family='proximanova-nova,sans-serif' font-weight="200"><tspan x="0" y="0">CEILING</tspan></text>
+    <line id="Line_4" data-name="Line 4" x2="180" transform="translate(744.297 482.398)" fill="none" stroke="#707070" stroke-width="1.5"/>
+    <line id="Line_47" data-name="Line 47" x2="180" transform="translate(744.297 253.398)" fill="none" stroke="#707070" stroke-width="1.5"/>
+    <g id="Rectangle_4" data-name="Rectangle 4" transform="translate(797.42 300.651)" fill="#fff" stroke="#454545" stroke-width="1.1">
+      <rect width="95.067" height="131.563" stroke="none"/>
+      <rect x="0.55" y="0.55" width="93.967" height="130.463" fill="none"/>
+    </g>
+    <g id="Rectangle_5" data-name="Rectangle 5" transform="translate(805.711 308.942)" fill="#fff" stroke="#454545" stroke-width="1.1">
+      <rect width="78.485" height="114.982" stroke="none"/>
+      <rect x="0.55" y="0.55" width="77.385" height="113.882" fill="none"/>
+    </g>
+    <g id="Group_31" data-name="Group 31" transform="translate(776.625 205.408) rotate(90)">
+      <line id="Line_5" data-name="Line 5" y1="18.591" transform="translate(47.99 3)" fill="none" stroke="#606060" stroke-width="1"/>
+      <line id="Line_6" data-name="Line 6" y1="18.591" transform="translate(276.99 3)" fill="none" stroke="#606060" stroke-width="0.8"/>
+      <line id="Line_7" data-name="Line 7" x2="223.732" transform="translate(50.581 17.31)" fill="none" stroke="#606060" stroke-width="1.2"/>
+      <g id="Polygon_1" data-name="Polygon 1" transform="translate(276.176 14.061) rotate(90)" fill="#606060">
+        <path d="M 5.890729427337646 7.099999904632568 L 0.6092706918716431 7.099999904632568 L 3.25 1.006009221076965 L 5.890729427337646 7.099999904632568 Z" stroke="none"/>
+        <path d="M 3.25 2.012028694152832 L 1.218545436859131 6.699999809265137 L 5.281454086303711 6.699999809265137 L 3.25 2.012028694152832 M 3.25 0 L 6.5 7.5 L 0 7.5 L 3.25 0 Z" stroke="none" fill="#606060"/>
+      </g>
+      <g id="Polygon_2" data-name="Polygon 2" transform="translate(48.84 20.56) rotate(-90)" fill="#606060">
+        <path d="M 5.890729427337646 7.099999904632568 L 0.6092706918716431 7.099999904632568 L 3.25 1.006009221076965 L 5.890729427337646 7.099999904632568 Z" stroke="none"/>
+        <path d="M 3.25 2.012028694152832 L 1.218545436859131 6.699999809265137 L 5.281454086303711 6.699999809265137 L 3.25 2.012028694152832 M 3.25 0 L 6.5 7.5 L 0 7.5 L 3.25 0 Z" stroke="none" fill="#606060"/>
+      </g>
+    </g>
+    <line id="Line_44" data-name="Line 44" x2="110" transform="translate(789.363 283.898)" fill="none" stroke="#606060" stroke-width="2"/>
+    <circle id="Ellipse_15" data-name="Ellipse 15" cx="3.5" cy="3.5" r="3.5" transform="translate(898.863 280.398)" fill="#606060"/>
+    <circle id="Ellipse_16" data-name="Ellipse 16" cx="3.5" cy="3.5" r="3.5" transform="translate(783.863 280.398)" fill="#606060"/>
+  </g>
+</svg>

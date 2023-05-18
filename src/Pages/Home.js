@@ -5,7 +5,7 @@ import Carousel from "react-bootstrap/Carousel";
 import {useTranslation} from "react-i18next";
 import {useLocation} from "react-router-dom";
 import axios from "axios";
-import {convertToPersian} from "../Components/TextTransform";
+import { NumToFa,convertToPersian} from "../Components/TextTransform";
 
 const baseURLGet = "https://api.atlaspood.ir/WebsiteSetting/GetSlider?apiKey=477f46c6-4a17-4163-83cc-29908d";
 

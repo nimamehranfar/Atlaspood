@@ -32,7 +32,7 @@ import AddProjectToCart from "../Components/AddProjectToCart";
 import GetMeasurementArray from "../Components/GetMeasurementArray";
 import GetSewingFilters from "../Components/GetSewingFilters";
 import TruncateMarkup from "react-truncate-markup";
-import {Capitalize, CapitalizeAllWords, Uppercase} from "../Components/TextTransform";
+import {Capitalize, CapitalizeAllWords, NumToFa, Uppercase} from "../Components/TextTransform";
 import {DebounceInput} from "react-debounce-input";
 import {convertToPersian} from "../Components/TextTransform";
 import GetBasketZipcode from "../Components/GetBasketZipcode";
@@ -1107,12 +1107,12 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     let tempMin = temp.values[refIndex][temp.values[refIndex].indexOf(Math.min(...temp.values[refIndex]))];
                     tempLabels[refIndex] = pageLang === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
                 } else {
-                    let tempMax = temp.values[refIndex][temp.values[refIndex].indexOf(Math.max(...temp.values[refIndex]))];
+                    let tempMax = temp.values[refIndex][temp.values[refIndex].indexOf(Math.min(...temp.values[refIndex]))];
                     tempLabels[refIndex] = pageLang === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + postfixFa : tempMax + postfixEn;
                 }
                 setStepSelectedLabel(tempLabels);
                 let minValue = Math.min(...temp.values[refIndex]);
-                let maxValue = Math.max(...temp.values[refIndex]);
+                let maxValue = Math.min(...temp.values[refIndex]);
                 if (maxValue - minValue >= 2) {
                     modalHandleShow(modalRef);
                 }
@@ -2010,7 +2010,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                                         <div key={i}
                                                                              className="dk_curtain_preview_detail">
                                                                             <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + " / " + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
-                                                                            <h5>&nbsp;X</h5><h3>{item["Qty"]}</h3>
+                                                                            <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"],pageLanguage)}</h3>
                                                                         </div>)}
                                                                 </div>
                                                             </Accordion.Body>
@@ -2180,7 +2180,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                                             <div key={i}
                                                                                  className="dk_curtain_preview_detail">
                                                                                 <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + "/" + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
-                                                                                <h5>&nbsp;X</h5><h3>{item["Qty"]}</h3>
+                                                                                <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"],pageLanguage)}</h3>
                                                                             </div>)}
                                                                     </div>
                                                                 </Accordion.Body>
@@ -2444,7 +2444,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                                                 <div key={i}
                                                                                      className="dk_curtain_preview_detail">
                                                                                     <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + "/" + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
-                                                                                    <h5>&nbsp;X</h5><h3>{item["Qty"]}</h3>
+                                                                                    <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"],pageLanguage)}</h3>
                                                                                 </div>)}
                                                                         </div>
                                                                     </Accordion.Body>
@@ -3175,7 +3175,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                         tempLabels["2AIn"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
                                     }
                                     if (tempHeight && temp["Height2"] && temp["Height3"]) {
-                                        let tempMax = Math.max(tempHeight, temp["Height2"], temp["Height3"]);
+                                        let tempMax = Math.min(tempHeight, temp["Height2"], temp["Height3"]);
                                         tempLabels["2BIn"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + postfixFa : tempMax + postfixEn;
                                     }
                                     
@@ -3570,7 +3570,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     if (temp["WindowWidth"] && temp["WindowHeight"]) {
                         getWindowSize(temp["WindowWidth"], temp["WindowHeight"]);
                     }
-    
+                    
                     if (temp["StackPosition"]) {
                         setStep4(temp["StackPosition"]);
                         if (temp["StackPosition"] === "Left") {
@@ -4099,7 +4099,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
 //                             temp.labels[objKey] = [];
 //                         if (temp.values[objKey] === undefined)
 //                             temp.values[objKey] = [];
-//                         let tempMax = temp.values[objKey][temp.values[objKey].indexOf(Math.max(...temp.values[objKey]))];
+//                         let tempMax = temp.values[objKey][temp.values[objKey].indexOf(Math.min(...temp.values[objKey]))];
 //                         tempLabels[objKey] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + "س\u200Cم" : tempMax + "cm";
 //
 //                     } else if (objKey === "3BOut") {
@@ -7403,7 +7403,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         {/* step 4 */}
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="35" stepNum={t("4")} stepTitle={t("dk_decor_fabric_step_title")} stepRef="35" type="1" required={requiredStep["35"]}
+                                <ContextAwareToggle eventKey="35" stepNum={t("4")} stepTitle={(pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa): defaultModelName)+t("dk_decor_fabric_step_title")} stepRef="35" type="1" required={requiredStep["35"]}
                                                     stepSelected={stepSelectedLabel["35"] === undefined ? "" : stepSelectedLabel["35"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="35">

@@ -1715,8 +1715,8 @@
         "order": -1,
         "apiLabel": "FabricId2",
         "apiValue": null,
-        "apiLabel2": "FabricId2",
-        "apiValue2": null,
+        "apiLabel3": "FabricId",
+        "apiValue3": null,
         "lang": [
           "en",
           "fa"
@@ -3608,6 +3608,51 @@
         ]
       },
       {
+        "cart": "FabricId2",
+        "title": "FabricId2",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "FabricId2",
+        "apiValue": null,
+        "apiLabel3": "FabricId",
+        "apiValue3": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "SheersId1",
+        "title": "SheersId1",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "SheersId1",
+        "apiValue": null,
+        "apiLabel4": "FabricId",
+        "apiValue4": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "SheersId2",
+        "title": "SheersId2",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "SheersId2",
+        "apiValue": null,
+        "apiLabel4": "FabricId",
+        "apiValue4": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
         "cart": "PageId",
         "title": "PageId",
         "titleValue": null,
@@ -3615,6 +3660,21 @@
         "order": -1,
         "apiLabel": "PageId",
         "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "SpecialId",
+        "title": "SpecialId",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "SpecialId",
+        "apiValue": null,
+        "apiLabel2": "SpecialId",
+        "apiValue2": null,
         "lang": [
           "en",
           "fa"
@@ -3654,21 +3714,6 @@
         "order": -1,
         "apiLabel": "TransportationAmount",
         "apiValue": null,
-        "lang": [
-          "en",
-          "fa"
-        ]
-      },
-      {
-        "cart": "SpecialId",
-        "title": "SpecialId",
-        "titleValue": null,
-        "titlePostfix": "",
-        "order": -1,
-        "apiLabel": "SpecialId",
-        "apiValue": null,
-        "apiLabel2": "SpecialId",
-        "apiValue2": null,
         "lang": [
           "en",
           "fa"
@@ -3775,42 +3820,74 @@
         ]
       },
       {
-        "cart": "Mount",
-        "title": "Mount Position",
-        "titleValue": {
-          "4801": "Inside",
-          "4802": "Outside",
-          "4803": "HiddenMoulding"
-        },
+        "cart": "FabricDesignFa2",
+        "title": "Fabric",
+        "titleValue": null,
         "titlePostfix": "",
-        "order": 0,
-        "apiLabel": "MountPositionId",
-        "apiValue": {
-          "Inside": 4801,
-          "Outside": 4802,
-          "HiddenMoulding": 4803
-        },
+        "order": -1,
+        "apiLabel": "FabricDesignFa2",
+        "apiValue": null,
         "lang": [
-          "en",
           "fa"
         ]
       },
       {
-        "cart": "IsWalled",
-        "title": "Mount Outside Position",
-        "titleValue": {
-          "true": "Wall",
-          "false": "Ceiling"
-        },
+        "cart": "FabricDesignEn2",
+        "title": "Fabric",
+        "titleValue": null,
         "titlePostfix": "",
-        "order": 1,
-        "apiLabel": "IsWalled",
-        "apiValue": {
-          "Wall": true,
-          "Ceiling": false
-        },
+        "order": -1,
+        "apiLabel": "FabricDesignEn2",
+        "apiValue": null,
         "lang": [
-          "en",
+          "en"
+        ]
+      },
+      {
+        "cart": "FabricColorEn2",
+        "title": "Color",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "FabricColorEn2",
+        "apiValue": null,
+        "lang": [
+          "en"
+        ]
+      },
+      {
+        "cart": "FabricColorFa2",
+        "title": "Color",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "FabricColorFa2",
+        "apiValue": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "SheerHeaderStyle",
+        "title": "Sheer Header Style",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 3,
+        "apiLabel": "SheerHeaderStyle",
+        "apiValue": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "PrivacyLayer",
+        "title": "Privacy Layer",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 4,
+        "apiLabel": "PrivacyLayer",
+        "apiValue": null,
+        "lang": [
           "fa"
         ]
       },
@@ -3875,7 +3952,7 @@
         "title": "Width",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": 3,
+        "order": 5,
         "apiLabel": "WindowWidth",
         "apiValue": null,
         "measurements": true,
@@ -3889,7 +3966,7 @@
         "title": "Height",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": 4,
+        "order": 6,
         "apiLabel": "WindowHeight",
         "apiValue": null,
         "measurements": true,
@@ -3983,20 +4060,36 @@
         ]
       },
       {
+        "cart": "hasRod",
+        "title": "hasRod",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "RodInstalled",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
         "cart": "FinishedLengthType",
         "title": "Finished Length Type",
         "titleValue": {
           "5401": "Sill",
           "5402": "Apron",
-          "5403": "Floor"
+          "5403": "Floor",
+          "5404": "Slight Puddle"
         },
         "titlePostfix": "",
-        "order": 4,
+        "order": -1,
         "apiLabel": "FinishedLengthType",
         "apiValue": {
           "Sill": 5401,
           "Apron": 5402,
-          "Floor": 5403
+          "Floor": 5403,
+          "Slight Puddle": 5404
         },
         "measurements": true,
         "lang": [
@@ -4005,7 +4098,7 @@
         ]
       },
       {
-        "cart": "Width2B",
+        "cart": "Width3B",
         "title": "",
         "titleValue": null,
         "titlePostfix": "cm",
@@ -4019,7 +4112,21 @@
         ]
       },
       {
-        "cart": "Height2D",
+        "cart": "Width3C",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Width1",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Height3D",
         "title": "",
         "titleValue": null,
         "titlePostfix": "cm",
@@ -4061,40 +4168,12 @@
         ]
       },
       {
-        "cart": "CeilingToWindow1",
+        "cart": "WindowToFloor",
         "title": "",
         "titleValue": null,
         "titlePostfix": "cm",
         "order": -1,
         "apiLabel": "Height1",
-        "apiValue": null,
-        "measurements": true,
-        "lang": [
-          "en",
-          "fa"
-        ]
-      },
-      {
-        "cart": "CeilingToWindow2",
-        "title": "",
-        "titleValue": null,
-        "titlePostfix": "cm",
-        "order": -1,
-        "apiLabel": "Height2",
-        "apiValue": null,
-        "measurements": true,
-        "lang": [
-          "en",
-          "fa"
-        ]
-      },
-      {
-        "cart": "CeilingToWindow3",
-        "title": "",
-        "titleValue": null,
-        "titlePostfix": "cm",
-        "order": -1,
-        "apiLabel": "Height3",
         "apiValue": null,
         "measurements": true,
         "lang": [
@@ -4117,62 +4196,6 @@
         ]
       },
       {
-        "cart": "CeilingToFloor1",
-        "title": "",
-        "titleValue": null,
-        "titlePostfix": "cm",
-        "order": -1,
-        "apiLabel": "Height1",
-        "apiValue": null,
-        "measurements": true,
-        "lang": [
-          "en",
-          "fa"
-        ]
-      },
-      {
-        "cart": "CeilingToFloor2",
-        "title": "",
-        "titleValue": null,
-        "titlePostfix": "cm",
-        "order": -1,
-        "apiLabel": "Height2",
-        "apiValue": null,
-        "measurements": true,
-        "lang": [
-          "en",
-          "fa"
-        ]
-      },
-      {
-        "cart": "CeilingToFloor3",
-        "title": "",
-        "titleValue": null,
-        "titlePostfix": "cm",
-        "order": -1,
-        "apiLabel": "Height3",
-        "apiValue": null,
-        "measurements": true,
-        "lang": [
-          "en",
-          "fa"
-        ]
-      },
-      {
-        "cart": "WindowToFloor",
-        "title": "",
-        "titleValue": null,
-        "titlePostfix": "cm",
-        "order": -1,
-        "apiLabel": "Height1",
-        "apiValue": null,
-        "measurements": true,
-        "lang": [
-          "en",
-          "fa"
-        ]
-      },
-      {
         "cart": "ShadeMount",
         "title": "",
         "titleValue": null,
@@ -4187,88 +4210,328 @@
         ]
       },
       {
-        "cart": "StackPosition",
-        "title": "Stack Position",
+        "cart": "RodWidth",
+        "title": "",
         "titleValue": null,
-        "titlePostfix": "",
-        "order": 5,
-        "apiLabel": "StackPosition",
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "RodLength",
         "apiValue": null,
+        "measurements": true,
         "lang": [
           "en",
           "fa"
         ]
       },
       {
-        "cart": "ControlPosition",
-        "title": "Control Position",
+        "cart": "RodToBottom",
+        "title": "",
         "titleValue": null,
-        "titlePostfix": "",
-        "order": 6,
-        "apiLabel": "ControlPosition",
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Height1",
         "apiValue": null,
+        "measurements": true,
         "lang": [
           "en",
           "fa"
         ]
       },
       {
-        "cart": "ControlType",
-        "title": "Control Type",
+        "cart": "RodToFloor",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Height1",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Lining",
+        "title": "",
         "titleValue": null,
         "titlePostfix": "",
         "order": 7,
-        "apiLabel": "ControlType",
+        "apiLabel": "Lining",
         "apiValue": null,
         "lang": [
-          "en",
           "fa"
         ]
       },
       {
-        "cart": "hasPower",
+        "cart": "PanelCoverage",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 8,
+        "apiLabel": "PanelCoverage",
+        "apiValue": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "PanelType",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 9,
+        "apiLabel": "PanelType",
+        "apiValue": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "GrommetFinish",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 10,
+        "apiLabel": "GrommetFinish",
+        "apiValue": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "Hardware",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 11,
+        "apiLabel": "Hardware",
+        "apiValue": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "RailId",
         "title": "",
         "titleValue": null,
         "titlePostfix": "",
         "order": -1,
-        "apiLabel": "hasPower",
+        "apiLabel": "RailId",
         "apiValue": null,
+        "apiLabel2": "RailId",
+        "apiValue2": null,
         "lang": [
-          "en",
           "fa"
         ]
       },
       {
-        "cart": "MotorType",
-        "title": "Motor Type",
+        "cart": "BatonOption",
+        "title": "",
         "titleValue": null,
         "titlePostfix": "",
         "order": -1,
-        "apiLabel": "MotorType",
+        "apiLabel": "BatonOption",
         "apiValue": null,
-        "apiAcc": true,
-        "apiAccValue": {
-          "Angle Rotation Motor": {
-            "SewingAccessoryId": 24,
-            "SewingModelAccessoryId": 0,
-            "SewingAccessoryValue": "90908101",
-            "Qty": 1
-          },
-          "Open & Close Motor": {
-            "SewingAccessoryId": 24,
-            "SewingModelAccessoryId": 0,
-            "SewingAccessoryValue": "90908102",
-            "Qty": 1
-          },
-          "Angle Rotation and Open & Close Motor": {
-            "SewingAccessoryId": 24,
-            "SewingModelAccessoryId": 0,
-            "SewingAccessoryValue": "90908103",
-            "Qty": 1
-          }
-        },
+        "apiLabel2": "BatonOption",
+        "apiValue2": null,
         "lang": [
-          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "RodColor",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "RodColor",
+        "apiValue": null,
+        "apiLabel2": "RodColor",
+        "apiValue2": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "Mount",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "Mount",
+        "apiValue": null,
+        "apiLabel2": "Mount",
+        "apiValue2": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "RailIdA",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "RailIdA",
+        "apiValue": null,
+        "apiLabel2": "RailIdA",
+        "apiValue2": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "BatonOptionA",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "BatonOptionA",
+        "apiValue": null,
+        "apiLabel2": "BatonOptionA",
+        "apiValue2": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "RodColorA",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "RodColorA",
+        "apiValue": null,
+        "apiLabel2": "RodColorA",
+        "apiValue2": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "MountA",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "MountA",
+        "apiValue": null,
+        "apiLabel2": "MountA",
+        "apiValue2": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "RailIdB",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "RailIdB",
+        "apiValue": null,
+        "apiLabel3": "RailIdB",
+        "apiValue3": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "BatonOptionB",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "BatonOptionB",
+        "apiValue": null,
+        "apiLabel3": "BatonOptionB",
+        "apiValue3": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "RodColorB",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "RodColorB",
+        "apiValue": null,
+        "apiLabel3": "RodColorB",
+        "apiValue3": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "MountB",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "MountB",
+        "apiValue": null,
+        "apiLabel3": "MountB",
+        "apiValue3": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "RailIdC",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "RailIdC",
+        "apiValue": null,
+        "apiLabel4": "RailIdC",
+        "apiValue4": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "BatonOptionC",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "BatonOptionC",
+        "apiValue": null,
+        "apiLabel4": "BatonOptionC",
+        "apiValue4": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "RodColorC",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "RodColorC",
+        "apiValue": null,
+        "apiLabel4": "RodColorC",
+        "apiValue4": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "MountC",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "MountC",
+        "apiValue": null,
+        "apiLabel4": "MountC",
+        "apiValue4": null,
+        "lang": [
           "fa"
         ]
       },
@@ -4277,7 +4540,7 @@
         "title": "",
         "titleValue": null,
         "titlePostfix": "",
-        "order": 8,
+        "order": 16,
         "apiLabel": "RoomNameFa",
         "apiValue": null,
         "lang": [
@@ -4289,7 +4552,7 @@
         "title": "",
         "titleValue": null,
         "titlePostfix": "",
-        "order": 8,
+        "order": 16,
         "apiLabel": "RoomNameEn",
         "apiValue": null,
         "lang": [
@@ -4440,6 +4703,46 @@
         ]
       },
       {
+        "cart": "Mount",
+        "title": "Mount Position",
+        "titleValue": {
+          "4801": "Inside",
+          "4802": "Outside",
+          "4803": "HiddenMoulding"
+        },
+        "titlePostfix": "",
+        "order": 2,
+        "apiLabel": "MountPositionId",
+        "apiValue": {
+          "Inside": 4801,
+          "Outside": 4802,
+          "HiddenMoulding": 4803
+        },
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "IsWalled",
+        "title": "Mount Outside Position",
+        "titleValue": {
+          "true": "Wall",
+          "false": "Ceiling"
+        },
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "IsWalled",
+        "apiValue": {
+          "Wall": true,
+          "Ceiling": false
+        },
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
         "cart": "",
         "title": "",
         "titleValue": null,
@@ -4453,7 +4756,7 @@
         ]
       }
     ],
-    "route": "/Curtain/DK/0326"
+    "route": "/Curtain/Dual-Roller-Shades/0325"
   },
   "0302": {}
 }

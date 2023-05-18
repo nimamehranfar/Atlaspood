@@ -20,7 +20,7 @@ import Select from "react-dropdown-select";
 import CustomDropdownWithSearch from "../Components/CustomDropdownWithSearch";
 import CustomControl from "../Components/CustomControl";
 import CustomControlFiles from "../Components/CustomControlFiles";
-import {convertToPersian} from "../Components/TextTransform";
+import {convertToPersian, NumToFa} from "../Components/TextTransform";
 import {Accordion, AccordionContext, useAccordionButton} from "react-bootstrap";
 import {CapitalizeAllWords} from "../Components/TextTransform";
 import GetMeasurementArray from "../Components/GetMeasurementArray";
@@ -907,7 +907,7 @@ function Projects() {
                                                                         <div key={i}
                                                                              className="dk_curtain_preview_detail">
                                                                             <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + "/" + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
-                                                                            <h5>&nbsp;X</h5><h3>{item["Qty"]}</h3>
+                                                                            <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"],pageLanguage)}</h3>
                                                                         </div>)}
                                                                 </div>
                                                             </Accordion.Body>
