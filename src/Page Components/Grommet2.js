@@ -1640,24 +1640,29 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
             temp.length = [];
             setSelectCustomValues(temp);
         } else {
-            temp.width1 = [];
-            temp.width2 = [];
-            temp.width3 = [];
-            temp.height1 = [];
-            temp.height2 = [];
-            temp.height3 = [];
-            temp.width3A = [];
-            temp.height3C = [];
-            temp.left = [];
-            temp.right = [];
-            temp.shadeMount = [];
-            setSelectCustomValues(temp);
+            let promiseArr = [];
+            Object.keys(temp).forEach((objKey,index) => {
+                promiseArr[index] = new Promise((resolve, reject) => {
+                    temp[objKey]=[]
+                    resolve();
+                });
+            })
+            Promise.all(promiseArr).then(() => {
+                setSelectCustomValues(temp);
+            });
             
-            temp2.labels["3AIn"] = [];
-            temp2.values["3AIn"] = [];
-            temp2.labels["3BIn"] = [];
-            temp2.values["3BIn"] = [];
-            setStepSelectedOptions(temp2);
+            let promiseArr2 = [];
+            Object.keys(temp2["labels"]).forEach((objKey,index) => {
+                promiseArr2[index] = new Promise((resolve, reject) => {
+                    temp2["labels"][objKey]=[];
+                    if(temp2["values"][objKey])
+                        temp2["values"][objKey]=[];
+                    resolve();
+                });
+            })
+            Promise.all(promiseArr2).then(() => {
+                setStepSelectedOptions(temp2);
+            });
             
             temp3.left = "";
             temp3.right = "";

@@ -5893,7 +5893,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                 <Card.Body>
                                     <div className="card_body">
                                         <div className="box100">
-                                            <p className="step_selection_title">{t("arc_step2D_title")}</p>
+                                            <p className="step_selection_title">{step1 === "Outside"?t("dk_step2D_title"):t("arc_step2D_title")}</p>
                                             <img
                                                 src={stepSelectedValue["1"] === "3" ? pageLanguage === 'fa' ? require('../Images/drapery/dk/new_ceiling_to_window_3_arc_fa.svg').default : require('../Images/drapery/dk/new_ceiling_to_window_3_arc.svg').default : pageLanguage === 'fa' ? require('../Images/drapery/dk/new_ceiling_to_window_3_fa.svg').default : require('../Images/drapery/dk/new_ceiling_to_window_3.svg').default}
                                                 className="img-fluid tall_curtain_image" alt=""/>
@@ -6162,7 +6162,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                 <Card.Body>
                                     <div className="card_body">
                                         <div className="box100">
-                                            <p className="step_selection_title">{t("arc_step2E_title")}</p>
+                                            <p className="step_selection_title">{step1 === "Outside"?t("dk_step2E_title"):t("arc_step2E_title")}</p>
                                             <img
                                                 src={stepSelectedValue["1"] === "3" ? pageLanguage === 'fa' ? require('../Images/drapery/dk/new_ceiling_to_floor_3_arc_fa.svg').default : require('../Images/drapery/dk/new_ceiling_to_floor_3_arc.svg').default : pageLanguage === 'fa' ? require('../Images/drapery/dk/new_ceiling_to_floor_3_fa.svg').default : require('../Images/drapery/dk/new_ceiling_to_floor_3.svg').default}
                                                 className="img-fluid tall_curtain_image" alt=""/>

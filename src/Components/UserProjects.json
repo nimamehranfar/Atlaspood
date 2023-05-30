@@ -3892,6 +3892,28 @@
         ]
       },
       {
+        "cart": "CurtainPosition",
+        "title": "Curtain Position",
+        "titleValue": {
+          "4901": "Standard",
+          "4902": "Wall to Wall",
+          "4904": "Left Corner Window",
+          "4903": "Right Corner Window"
+        },
+        "titlePostfix": "",
+        "order": 8,
+        "apiLabel": "CurtainPositionId",
+        "apiValue": {
+          "Standard": 4901,
+          "Wall to Wall": 4902,
+          "Left Corner Window": 4904,
+          "Right Corner Window": 4903
+        },
+        "lang": [
+          "fa"
+        ]
+      },
+      {
         "cart": "Width",
         "title": "Width",
         "titleValue": null,
@@ -4098,20 +4120,6 @@
         ]
       },
       {
-        "cart": "Width3B",
-        "title": "",
-        "titleValue": null,
-        "titlePostfix": "cm",
-        "order": -1,
-        "apiLabel": "Width1",
-        "apiValue": null,
-        "measurements": true,
-        "lang": [
-          "en",
-          "fa"
-        ]
-      },
-      {
         "cart": "Width3C",
         "title": "",
         "titleValue": null,
@@ -4126,7 +4134,7 @@
         ]
       },
       {
-        "cart": "Height3D",
+        "cart": "Height3E",
         "title": "",
         "titleValue": null,
         "titlePostfix": "cm",
@@ -4188,6 +4196,90 @@
         "titlePostfix": "cm",
         "order": -1,
         "apiLabel": "HeightOfCeilingToFloor",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "CeilingToFloor1",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Height1",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "CeilingToFloor2",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Height2",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "CeilingToFloor3",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Height3",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "CeilingToWindow1",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Height1",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "CeilingToWindow2",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Height2",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "CeilingToWindow3",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Height3",
         "apiValue": null,
         "measurements": true,
         "lang": [
@@ -4356,12 +4448,18 @@
       {
         "cart": "Mount",
         "title": "",
-        "titleValue": null,
+        "titleValue": {
+          "true": "Wall",
+          "false": "Ceiling"
+        },
         "titlePostfix": "",
         "order": -1,
-        "apiLabel": "Mount",
-        "apiValue": null,
-        "apiLabel2": "Mount",
+        "apiLabel": "IsWalled",
+        "apiValue": {
+          "Wall": true,
+          "Ceiling": false
+        },
+        "apiLabel2": "IsWalled",
         "apiValue2": null,
         "lang": [
           "fa"
@@ -4697,46 +4795,6 @@
         "order": -1,
         "apiLabel": "Accessories",
         "apiValue": null,
-        "lang": [
-          "en",
-          "fa"
-        ]
-      },
-      {
-        "cart": "Mount",
-        "title": "Mount Position",
-        "titleValue": {
-          "4801": "Inside",
-          "4802": "Outside",
-          "4803": "HiddenMoulding"
-        },
-        "titlePostfix": "",
-        "order": 2,
-        "apiLabel": "MountPositionId",
-        "apiValue": {
-          "Inside": 4801,
-          "Outside": 4802,
-          "HiddenMoulding": 4803
-        },
-        "lang": [
-          "en",
-          "fa"
-        ]
-      },
-      {
-        "cart": "IsWalled",
-        "title": "Mount Outside Position",
-        "titleValue": {
-          "true": "Wall",
-          "false": "Ceiling"
-        },
-        "titlePostfix": "",
-        "order": -1,
-        "apiLabel": "IsWalled",
-        "apiValue": {
-          "Wall": true,
-          "Ceiling": false
-        },
         "lang": [
           "en",
           "fa"
