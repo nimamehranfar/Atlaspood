@@ -110,8 +110,7 @@ function Projects() {
                         setUserProjectsRender([<h1 key={1} className="no_project">You don't have any saved project yet.</h1>]);
                     }
                 });
-            }
-            else{
+            } else {
                 setFirstBasket(false);
                 setUserProjectsRender([<h1 key={1} className="no_project">You don't have any saved project yet.</h1>]);
             }
@@ -152,8 +151,8 @@ function Projects() {
                     let firstMeasurements = true;
                     let promiseArr = [];
                     
-                    projectDataObj["data"].sort(function(a, b) {
-                        return b["CartDetailId"] - a["CartDetailId"]  ||  b["SewingPreorderId"] - a["SewingPreorderId"];
+                    projectDataObj["data"].sort(function (a, b) {
+                        return b["CartDetailId"] - a["CartDetailId"] || b["SewingPreorderId"] - a["SewingPreorderId"];
                     }).forEach((tempObj, index) => {
                         promiseArr[index] = new Promise((resolve, reject) => {
                             if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
@@ -166,8 +165,7 @@ function Projects() {
                                                 <h4>{t("Almost Complete")}</h4>
                                             </div>;
                                         resolve();
-                                    }
-                                    else{
+                                    } else {
                                         resolve();
                                     }
                                 } else if (userProjects[i]["PreorderText"][tempObj["apiLabel"]] === undefined) {
@@ -176,7 +174,7 @@ function Projects() {
                                     if (firstMeasurements) {
                                         firstMeasurements = false;
                                         GetUserProjectData(userProjects[i], true).then((temp) => {
-                                            console.log(temp,tempObj["order"]);
+                                            console.log(temp, tempObj["order"]);
                                             tempArr[tempObj["order"]] =
                                                 <div className="basket_item_title_desc" key={index}>
                                                     <h3>{t("Measurements")}&nbsp;</h3>
@@ -649,33 +647,70 @@ function Projects() {
                 }
             });
             tempPostObj["SewingOrderDetails"] = [];
-            tempPostObj["SewingOrderDetails"][0] = {};
+            for (let i = 0; i < 3; i++) {
+                tempPostObj["SewingOrderDetails"][i] = {};
+                tempPostObj["SewingOrderDetails"][i]["IsLowWrinkle"] = true;
+                tempPostObj["SewingOrderDetails"][i]["IsCoverAll"] = true;
+                tempPostObj["SewingOrderDetails"][i]["IsAltogether"] = true;
+            }
+            
+            
             tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
             tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = tempPostObj["SewingModelId"];
-            tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
-            tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
-            tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
+            
+            tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2302;
+            tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `0002`;
+            
+            tempPostObj["SewingOrderDetails"][2]["CurtainPartId"] = 2301;
+            tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
+            
             Object.keys(temp).forEach(key => {
                 if (temp[key] !== null || temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
-                    if (tempObj["apiLabel2"] !== undefined) {
-                        if (tempObj["apiValue2"] === null) {
-                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
-                        } else {
-                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                    // console.log(key,userProjects.find(obj => obj["cart"] === key));
+                    if (tempObj) {
+                        for (let i = 0; i < 3; i++) {
+                            let j = +i + +2;
+                            if (tempObj["apiLabel" + j] !== undefined) {
+                                if (tempObj["apiValue" + j] === null) {
+                                    tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = temp[key];
+                                    // console.log(i,tempObj["cart"],tempPostObj["SewingOrderDetails"],tempPostObj["SewingOrderDetails"][i]);
+                                } else {
+                                    tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = tempObj["apiValue" + j][temp[key]];
+                                }
+                            }
                         }
                     }
                 }
             });
+            // console.log(tempPostObj["SewingOrderDetails"]);
             tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
+            tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
+            tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
             Object.keys(temp).forEach(key => {
                 if (temp[key] !== null || temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
-                    if (tempObj["apiAcc"] !== undefined) {
-                        if (tempObj["apiAcc"] === true) {
-                            tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
-                        } else {
-                        
+                    if (tempObj) {
+                        if (tempObj["apiAcc"] !== undefined) {
+                            if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
+                                tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
+                            } else {
+                            
+                            }
+                        }
+                        if (tempObj["apiAcc2"] !== undefined) {
+                            if (tempObj["apiAcc2"] === true && tempObj["apiAccValue2"][temp[key]]) {
+                                tempPostObj["SewingOrderDetails"][1]["Accessories"].push(tempObj["apiAccValue2"][temp[key]]);
+                            } else {
+                            
+                            }
+                        }
+                        if (tempObj["apiAcc3"] !== undefined) {
+                            if (tempObj["apiAcc3"] === true && tempObj["apiAccValue3"][temp[key]]) {
+                                tempPostObj["SewingOrderDetails"][2]["Accessories"].push(tempObj["apiAccValue3"][temp[key]]);
+                            } else {
+                            
+                            }
                         }
                     }
                 }
@@ -687,8 +722,15 @@ function Projects() {
                 return el != null;
             });
             // console.log(tempPostObj);
-            
-            // console.log(tempPostObj,tempPostObj["SewingOrderDetails"][0]["FabricId"]);
+    
+    
+            tempPostObj["SewingModelId"] = tempPostObj["SewingOrderDetails"][0]["SewingModelId"];
+            // console.log(tempPostObj);
+            for (let i = tempPostObj["SewingOrderDetails"].length - 1; i >= 0; i--) {
+                if (tempPostObj["SewingOrderDetails"] && tempPostObj["SewingOrderDetails"][i] && tempPostObj["SewingOrderDetails"][i]["FabricId"] === undefined) {
+                    tempPostObj["SewingOrderDetails"].splice(i, 1);
+                }
+            }
             if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
                 // console.log(JSON.stringify(tempPostObj));
                 axios.post(baseURLPrice, tempPostObj)
@@ -711,10 +753,10 @@ function Projects() {
                                 console.log(key);
                             } else {
                                 if (key === "WindowHeight" || key === "WindowWidth") {
-        
+                                
                                 } else if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
                                     let objLabel = "";
-                                    if(key === "ControlType" && cartValues["ControlType"]==="Motorized"){
+                                    if (key === "ControlType" && cartValues["ControlType"] === "Motorized") {
                                         objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(cartValues[key].toString())} / ${t(cartValues["MotorType"].toString())}`).toString() : `${t(cartValues[key].toString())} / ${t(cartValues["MotorType"].toString())}`;
                                     } else if (tempObj["titleValue"] === null || true) {
                                         if (tempObj["titlePostfix"] === "") {
@@ -812,7 +854,7 @@ function Projects() {
                 } else if (temp2) {
                     setCartAgreeDescription(false);
                     renderCart(temp2);
-    
+                    
                     dispatch({
                         type: CartUpdatedTrue,
                         payload: {mainCart: temp2}
@@ -833,7 +875,7 @@ function Projects() {
     
     function renderCart(customPageCart) {
         let cartObjects = {};
-        console.log(customPageCart,customPageCart !== undefined);
+        console.log(customPageCart, customPageCart !== undefined);
         let promise2 = new Promise((resolve, reject) => {
             if (customPageCart !== undefined) {
                 cartObjects = customPageCart;
@@ -877,9 +919,9 @@ function Projects() {
             
             let promise1 = new Promise((resolve, reject) => {
                 if (draperies.length) {
-                    draperies.sort(function(a, b) {
-                            return b["CartDetailId"] - a["CartDetailId"]  ||  b["SewingPreorderId"] - a["SewingPreorderId"];
-                        }).forEach((tempObj,i)=>{
+                    draperies.sort(function (a, b) {
+                        return b["CartDetailId"] - a["CartDetailId"] || b["SewingPreorderId"] - a["SewingPreorderId"];
+                    }).forEach((tempObj, i) => {
                         let obj = draperies[i]["SewingPreorder"]["PreorderText"];
                         let sodFabrics = obj["SodFabrics"] ? obj["SodFabrics"] : [];
                         let roomName = (obj["WindowName"] === undefined || obj["WindowName"] === "") ? "" : " / " + obj["WindowName"];
@@ -907,7 +949,7 @@ function Projects() {
                                                                         <div key={i}
                                                                              className="dk_curtain_preview_detail">
                                                                             <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + "/" + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
-                                                                            <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"],pageLanguage)}</h3>
+                                                                            <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"], pageLanguage)}</h3>
                                                                         </div>)}
                                                                 </div>
                                                             </Accordion.Body>
@@ -1174,9 +1216,9 @@ function Projects() {
     useEffect(() => {
         if (userProjects.length) {
             renderUserProjects();
-        } else if(!firstBasket) {
+        } else if (!firstBasket) {
             setUserProjectsRender([<h1 key={1} className="no_project">You don't have any saved project yet.</h1>]);
-        }else{
+        } else {
         
         }
     }, [userProjects]);
@@ -1242,7 +1284,7 @@ function Projects() {
                             {cartItems}
                         </ul>
                     }
-        
+                    
                     {!cartStateAgree &&
                         <h1 className="cart_agree_title1">{t("REVIEW ORDER")}</h1>
                     }

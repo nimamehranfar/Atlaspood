@@ -27,6 +27,7 @@ const baseURLPost = "https://api.atlaspood.ir/WebsitePageItem/Edit";
 const baseURLAdd = "https://api.atlaspood.ir/WebsitePageItem/Add";
 const baseURLDeletePageItem = "https://api.atlaspood.ir/WebsitePageItem/Delete";
 const baseURLFabrics = "https://api.atlaspood.ir/Sewing/GetModelFabric";
+const baseURLModel = "https://api.atlaspood.ir/SewingModel/GetById";
 
 const baseURLFilterColor = "https://api.atlaspood.ir/Color/GetBaseColors";
 const baseURLFilterPattern = "https://api.atlaspood.ir/BaseType/GetDesignPattern";
@@ -62,10 +63,13 @@ function PageItems() {
     const [parameters, setParameters] = React.useState(undefined);
     const [refIndex, setRefIndex] = React.useState(-1);
     const [fabricsDragList, setFabricsDragList] = React.useState({});
+    const [AccColorsDragList, setAccColorsDragList] = React.useState({});
     const [designOrderList, setDesignOrderList] = React.useState({});
     const [dragListFabricsList, setDragListFabricsList] = React.useState([]);
     const [dragListDesignsList, setDragListDesignsList] = React.useState([]);
-    const [isDesignDrag, setIsDesignDrag] = React.useState(false);
+    const [dragListAccessoryList, setDragListAccessoryList] = React.useState([]);
+    const [dragListAccessoryColorsList, setDragListAccessoryColorsList] = React.useState([]);
+    const [isDesignDrag, setIsDesignDrag] = React.useState(0);
     const [newPageItem, setNewPageItem] = React.useState({
         "Title": "",
         "EnTitle": "",
@@ -189,6 +193,59 @@ function PageItems() {
                 params["Designs"] = {};
                 params["Designs"][nextState[j]] = {};
                 params["Designs"][nextState[j]]["order"] = j;
+            }
+        }
+        setParameters(params);
+    }
+    
+    function dragOnChange2(sourceId, sourceIndex, targetIndex, targetId, tempFabrics, key) {
+        // let temp = JSON.parse(JSON.stringify(fabricsDragList));
+        let temp = JSON.parse(JSON.stringify(tempFabrics));
+        let params = JSON.parse(JSON.stringify(parameters));
+        // setDragListDesignsList([]);
+        // setDragListFabricsList([]);
+        setFabricIsLoading(true);
+        // console.log(temp,key);
+        const nextState = swap(temp[key], sourceIndex, targetIndex);
+        
+        for (let j = 0; j < nextState.length; j++) {
+            if (params["AccColors"]) {
+                if (params["AccColors"][nextState[j]["DetailId"]]) {
+                    params["AccColors"][nextState[j]["DetailId"]]["order"] = j;
+                } else {
+                    params["AccColors"][nextState[j]["DetailId"]] = {};
+                    params["AccColors"][nextState[j]["DetailId"]]["order"] = j;
+                }
+            } else {
+                params["AccColors"] = {};
+                params["AccColors"][nextState[j]["DetailId"]] = {};
+                params["AccColors"][nextState[j]["DetailId"]]["order"] = j;
+            }
+        }
+        setParameters(params);
+    }
+    
+    function dragOnChangeDesigns2(sourceId, sourceIndex, targetIndex, targetId, designOrders) {
+        let temp = JSON.parse(JSON.stringify(designOrders));
+        let params = JSON.parse(JSON.stringify(parameters));
+        setFabricIsLoading(true);
+    
+        console.log(temp);
+        const nextState = swap(temp, sourceIndex, targetIndex);
+        //
+        // console.log(nextState);
+        for (let j = 0; j < nextState.length; j++) {
+            if (params["AccDesigns"]) {
+                if (params["AccDesigns"][nextState[j]]) {
+                    params["AccDesigns"][nextState[j]]["order"] = j;
+                } else {
+                    params["AccDesigns"][nextState[j]] = {};
+                    params["AccDesigns"][nextState[j]]["order"] = j;
+                }
+            } else {
+                params["AccDesigns"] = {};
+                params["AccDesigns"][nextState[j]] = {};
+                params["AccDesigns"][nextState[j]]["order"] = j;
             }
         }
         setParameters(params);
@@ -340,12 +397,14 @@ function PageItems() {
             
             let ModelDesigns = pageItems[i].ModelDesigns ? pageItems[i].ModelDesigns : [];
             let Fabrics = pageItems[i].Fabrics ? pageItems[i].Fabrics : {};
+            let AccDesigns = pageItems[i].AccDesigns ? pageItems[i].AccDesigns : {};
+            let AccColors = pageItems[i].AccColors ? pageItems[i].AccColors : {};
             
             let Parameters = pageItems[i].Parameters ? pageItems[i].Parameters : "{}";
             
             let QueryString = pageItems[i].QueryString ? pageItems[i].QueryString : "";
             if (i === 0) {
-                // console.log(Fabrics);
+                // console.log(AccColors);
             }
             
             let paramColorsArr = QueryString.split('colors=');
@@ -520,7 +579,7 @@ function PageItems() {
                         >Delete Page Item
                         </button>
                         
-                        {Object.keys(Fabrics).length > 0 &&
+                        {(Object.keys(Fabrics).length > 0 || Object.keys(AccColors).length > 0) &&
                             <div>
                                 <button className="btn btn-primary mt-4 mb-2" pageitems_id={i}
                                         ref={sortFabric}
@@ -536,8 +595,10 @@ function PageItems() {
                                                 //     newFabrics[key]={"value":fillteredFabrics[key],"order":-1}
                                                 // });
                                                 setFabricsDragList(fillteredFabrics);
+                                                setAccColorsDragList(AccColors);
                                             } else {
                                                 setFabricsDragList(Fabrics);
+                                                setAccColorsDragList(AccColors);
                                             }
                                             setParameters(JSON.parse(Parameters === undefined || Parameters === null || Parameters === "undefined" || Parameters === "null" || Parameters === "" ? "{}" : Parameters))
                                             setRefIndex(i);
@@ -546,7 +607,7 @@ function PageItems() {
                                             //     renderFabrics(i, "Parameters", Fabrics, Parameters);
                                             // }
                                         }}
-                                >Sort Fabrics
+                                >Sort
                                 </button>
                             </div>
                         }
@@ -782,11 +843,158 @@ function PageItems() {
     
     useEffect(() => {
         setTimeout(() => {
+            console.log(parameters);
             const fabricList = [];
             const designList = [];
+            const AccList = [];
+            const AccColorList = [];
             const tempDesignOrderList=[];
+            const tempAccDesignOrderList=[];
             let promiseArr = [];
+            let promiseArr2 = [];
             let tempFabrics = JSON.parse(JSON.stringify(fabricsDragList));
+            let tempColors = JSON.parse(JSON.stringify(AccColorsDragList));
+    
+    
+            Object.keys(AccColorsDragList).forEach((key, index) => {
+                promiseArr2[index] = new Promise((resolve, reject) => {
+                    // console.log(AccColorsDragList);
+                    let DesignCode = AccColorsDragList[key][0]["DesignCode"].toString();
+                    let designOrderSelected = parameters["AccDesigns"] && parameters["AccDesigns"][DesignCode] && parameters["AccDesigns"][DesignCode]["order"] ? parameters["AccDesigns"][DesignCode]["order"] : -1;
+    
+                    const fabric = [];
+                    tempColors[key] = [];
+                    let promiseArr3 = [];
+                    AccColorsDragList[key].forEach((obj, index2) => {
+                        promiseArr3[index2] = new Promise((resolve, reject) => {
+                            let DetailId = obj["DetailId"];
+                            // let tempColor = obj["ColorHtmlCode"] !== "" ? obj["ColorHtmlCode"] : "#e2e2e2";
+                            let ColorENName = obj["ColorENName"];
+                            let fabricOrderSelected = parameters["AccColors"] && parameters["AccColors"][DetailId] && parameters["AccColors"][DetailId]["order"] ? parameters["AccColors"][DetailId]["order"] : -1;
+                            let PhotoPath = "";
+                            let photoArr = obj["Photos"] || [];
+                            photoArr.forEach(obj => {
+                                if (obj["PhotoTypeId"] === 4702)
+                                    PhotoPath = obj["PhotoUrl"];
+                            });
+                            if (fabricOrderSelected !== -1 && !fabric[fabricOrderSelected]) {
+                                tempColors[key][fabricOrderSelected] = obj;
+                                fabric[fabricOrderSelected] =
+                                    <GridItem key={index2} className="drag_grid">
+                                        <div
+                                            style={{
+                                                width: "90%",
+                                                height: "100%"
+                                            }}
+                                            className="radio_group"
+                                        >
+                                            <label>
+                                                <div className="frame_img">
+                                                    <img className={`img-fluid`} src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
+                                                </div>
+                                            </label>
+                                            <div className={`fabric_name_container`}>
+                                                <h1>{ColorENName}</h1>
+                                            </div>
+                                        </div>
+                                    </GridItem>;
+                            } else {
+                                let index = fabric.findIndex(Object.is.bind(null, undefined));
+                                let pushIndex = index === -1 ? fabric.length : index;
+                                tempColors[key][pushIndex] = obj;
+                                fabric[pushIndex] =
+                                    <GridItem key={index2} className="drag_grid">
+                                        <div
+                                            style={{
+                                                width: "90%",
+                                                height: "100%"
+                                            }}
+                                            className="radio_group"
+                                        >
+                                            <label>
+                                                <div className="frame_img">
+                                                    <img className={`img-fluid`} src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
+                                                </div>
+                                            </label>
+                                            <div className={`fabric_name_container`}>
+                                                <h1>{ColorENName}</h1>
+                                            </div>
+                                        </div>
+                                    </GridItem>;
+                            }
+                            resolve();
+                        })
+                    });
+                    Promise.all(promiseArr3).then(() => {
+                        tempColors[key].filter(n => n);
+                        if (designOrderSelected !== -1 && !AccList[designOrderSelected]) {
+                            if (AccColorsDragList && AccColorsDragList[key] && AccColorsDragList[key][0] && AccColorsDragList[key][0]["DesignCode"]) {
+                                tempAccDesignOrderList[designOrderSelected] = AccColorsDragList[key][0]["DesignCode"];
+                            }
+                            AccList[designOrderSelected] =
+                                <GridItem key={index} className="drag_grid">
+                                    <div className={`material_detail`} key={"fabric" + key}>
+                                        <span>{"DESIGN NAME"}: {key}</span>
+                                    </div>
+                                </GridItem>;
+                        } else {
+                            let index = AccList.findIndex(Object.is.bind(null, undefined));
+                            let pushIndex = index === -1 ? AccList.length : index;
+                            if (AccColorsDragList && AccColorsDragList[key] && AccColorsDragList[key][0] && AccColorsDragList[key][0]["DesignCode"]) {
+                                tempAccDesignOrderList[pushIndex] = AccColorsDragList[key][0]["DesignCode"];
+                            }
+                            AccList[pushIndex] =
+                                <GridItem key={pushIndex} className="drag_grid">
+                                    <div className={`material_detail`} key={"fabric" + key}>
+                                        <span>{"DESIGN NAME"}: {key}</span>
+                                    </div>
+                                </GridItem>;
+                        }
+                        if (designOrderSelected !== -1 && !AccColorList[designOrderSelected]) {
+                            AccColorList[index] =
+                                <div className={`material_detail`} key={"fabric" + key}>
+                                    <div className={`material_traits`}>
+                                        <span>{"DESIGN NAME"}: {key}</span>
+                                    </div>
+                                    <GridContextProvider onChange={(sourceId, sourceIndex, targetIndex, targetId) => dragOnChange2(sourceId, sourceIndex, targetIndex, targetId, tempColors, key)}>
+                                        <GridDropZone
+                                            id="Accitems"
+                                            boxesPerRow={4}
+                                            rowHeight={155}
+                                            style={{height: "312px"}}
+                                            className="drag_grid_container"
+                                        >
+                                            {fabric.filter(n => n)}
+                                        </GridDropZone>
+                                    </GridContextProvider>
+                                </div>;
+                            resolve();
+                        } else {
+                            let index = AccColorList.findIndex(Object.is.bind(null, undefined));
+                            let pushIndex = index === -1 ? AccColorList.length : index;
+                            AccColorList[pushIndex] =
+                                <div className={`material_detail`} key={"fabric" + key}>
+                                    <div className={`material_traits`}>
+                                        <span>{"DESIGN NAME"}: {key}</span>
+                                    </div>
+                                    <GridContextProvider onChange={(sourceId, sourceIndex, targetIndex, targetId) => dragOnChange2(sourceId, sourceIndex, targetIndex, targetId, tempColors, key)}>
+                                        <GridDropZone
+                                            id="Accitems"
+                                            boxesPerRow={4}
+                                            rowHeight={155}
+                                            style={{height: "312px"}}
+                                            className="drag_grid_container"
+                                        >
+                                            {fabric.filter(n => n)}
+                                        </GridDropZone>
+                                    </GridContextProvider>
+                                </div>;
+                            resolve();
+                        }
+                    })
+                    
+                })
+            });
             
             Object.keys(fabricsDragList).forEach((key, index) => {
                 promiseArr[index] = new Promise((resolve, reject) => {
@@ -809,7 +1017,6 @@ function PageItems() {
                             label: DesignOne.find(opt => opt.value === "none")["label"]
                         }]
                     ;
-                    console.log(parameters);
                     
                     const fabric = [];
                     tempFabrics[key] = [];
@@ -1113,8 +1320,7 @@ function PageItems() {
                 })
             });
             
-            Promise.all(promiseArr).then(() => {
-                
+            Promise.all(promiseArr,promiseArr2).then(() => {
                 setDragListDesignsList(
                     [<GridContextProvider onChange={(sourceId, sourceIndex, targetIndex, targetId) => dragOnChangeDesigns(sourceId, sourceIndex, targetIndex, targetId, tempDesignOrderList)}>
                         <GridDropZone
@@ -1128,12 +1334,30 @@ function PageItems() {
                         </GridDropZone>
                     </GridContextProvider>]
                 );
-                setDragListFabricsList(fabricList.filter(n => n));
-                setFabricsDragList(tempFabrics);
-                setFabricIsLoading(false);
-                setDesignOrderList(tempDesignOrderList);
+                setDragListAccessoryColorsList(
+                    [<GridContextProvider onChange={(sourceId, sourceIndex, targetIndex, targetId) => dragOnChangeDesigns2(sourceId, sourceIndex, targetIndex, targetId, tempAccDesignOrderList)}>
+                        <GridDropZone
+                            id="AccDesigns"
+                            boxesPerRow={1}
+                            rowHeight={40}
+                            style={{height: "400px"}}
+                            className="drag_grid_container design_drag_grid_container"
+                        >
+                            {AccList.filter(n => n)}
+                        </GridDropZone>
+                    </GridContextProvider>]
+                );
                 
-                // console.log(tempDesignOrderList);
+                setDragListFabricsList(fabricList.filter(n => n));
+                setDragListAccessoryList(AccColorList.filter(n => n));
+                
+                setFabricsDragList(tempFabrics);
+                setAccColorsDragList(tempColors);
+                setFabricIsLoading(false);
+                // setDesignOrderList(tempDesignOrderList);
+                // setDesignOrderList(tempAccDesignOrderList);
+                
+                // console.log(AccList);
             });
             
             
@@ -1476,7 +1700,53 @@ function PageItems() {
                 tempFabrics[obj["DesignEnName"]].push(obj);
             });
             tempPageItems[refIndex]["Fabrics"] = tempFabrics;
-            setPageItems(tempPageItems);
+            
+            axios.get(baseURLModel, {
+                params: {
+                    id: modelID
+                }
+            }).then((response) => {
+                let model = response.data || {};
+                if (Object.keys(model["Accessories"]).length > 0) {
+                    let tempObj = model["Accessories"].find(obj => obj["SewingAccessoryId"] === 26);
+                    let promiseArr = [];
+                    let tempArr=[];
+                    let tempFabrics = {};
+                    tempObj["SewingAccessoryDetails"].forEach((obj, index) => {
+                        promiseArr[index] = new Promise((resolve, reject) => {
+                            if (obj["DetailId"] === "0000011") {
+                                obj["DesignENName"] = "Matching Tieback";
+                                obj["DesignName"] = "دوخت کمر پرده";
+                            }
+                            obj["SewingModelAccessoryId"] = tempObj["SewingModelAccessoryId"];
+    
+                            if (!obj["DesignCode"] || obj["DesignCode"] === "") {
+                                obj["DesignCode"]=index.toString();
+                            }
+                            if (obj["DesignENName"] && obj["DesignCode"]) {
+                                tempArr.push({value: obj["DesignCode"].toString(), label: obj["DesignENName"]});
+                            }
+                            if (tempFabrics[obj["DesignENName"]] === "" || tempFabrics[obj["DesignENName"]] === undefined || tempFabrics[obj["DesignENName"]] === null || tempFabrics[obj["DesignENName"]] === [])
+                                tempFabrics[obj["DesignENName"]] = [];
+                            tempFabrics[obj["DesignENName"]].push(obj);
+                            resolve();
+                        });
+                    });
+                    Promise.all(promiseArr).then(() => {
+                        tempArr = [...new Set(tempArr.map(obj => JSON.stringify(obj)))].map(obj => JSON.parse(obj))
+                        tempPageItems[refIndex]["AccDesigns"] = tempArr;
+                        tempPageItems[refIndex]["AccColors"] = tempFabrics;
+                        setPageItems(tempPageItems);
+                        // console.log(tempArr,tempFabrics,tempPageItems);
+                    });
+                } else {
+                    tempPageItems[refIndex]["AccDesigns"] = [];
+                    tempPageItems[refIndex]["AccColors"] = {};
+                    setPageItems(tempPageItems);
+                }
+            }).catch(err => {
+                console.log(err);
+            });
         }).catch(err => {
             console.log(err);
         });
@@ -2043,7 +2313,7 @@ function PageItems() {
                     <Modal.Body>
                         <div className="card_body card-body-fabric">
                             <div className={fabricIsLoading ? "is_loading fabrics_list_container" : "fabrics_list_container"}>
-                                {isDesignDrag === false && dragListFabricsList
+                                {isDesignDrag === 0 && dragListFabricsList
                                     //     Object.keys(fabricsDragList).map((key, index) => {
                                     //     return (
                                     //         <div className={`material_detail`} key={"fabric" + key}>
@@ -2091,7 +2361,7 @@ function PageItems() {
                                     //     );
                                     // })
                                 }
-                                {isDesignDrag === true && dragListDesignsList
+                                {isDesignDrag === 1 && dragListDesignsList
                                     // <GridContextProvider onChange={(sourceId,sourceIndex,targetIndex,targetId)=>dragOnChangeDesigns(sourceId,sourceIndex,targetIndex,targetId)}>
                                     //     <GridDropZone
                                     //         id="designs"
@@ -2112,15 +2382,23 @@ function PageItems() {
                                     //     </GridDropZone>
                                     // </GridContextProvider>
                                 }
+                                {isDesignDrag === 2 && dragListAccessoryList}
+                                {isDesignDrag === 3 && dragListAccessoryColorsList}
                             </div>
                             <div className="pageItem_fabrics_btn_container">
                                 <div className="help_options_container">
                                     <ul className="help_options help_options_lengthType">
-                                        <li className={`help_option_lengthType_item ${isDesignDrag === false ? "help_option_lengthType_item_on" : ""}`}
-                                            onClick={() => setIsDesignDrag(false)}>Fabrics
+                                        <li className={`help_option_lengthType_item ${isDesignDrag === 0 ? "help_option_lengthType_item_on" : ""}`}
+                                            onClick={() => setIsDesignDrag(0)}>Fabrics
                                         </li>
-                                        <li className={`help_option_lengthType_item ${isDesignDrag === true ? "help_option_lengthType_item_on" : ""}`}
-                                            onClick={() => setIsDesignDrag(true)}>Designs
+                                        <li className={`help_option_lengthType_item ${isDesignDrag === 1 ? "help_option_lengthType_item_on" : ""}`}
+                                            onClick={() => setIsDesignDrag(1)}>Designs
+                                        </li>
+                                        <li className={`help_option_lengthType_item ${isDesignDrag === 2 ? "help_option_lengthType_item_on" : ""}`}
+                                            onClick={() => setIsDesignDrag(2)}>Accessory Colors
+                                        </li>
+                                        <li className={`help_option_lengthType_item ${isDesignDrag === 3 ? "help_option_lengthType_item_on" : ""}`}
+                                            onClick={() => setIsDesignDrag(3)}>Accessories
                                         </li>
                                     </ul>
                                 </div>

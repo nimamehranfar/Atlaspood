@@ -292,7 +292,7 @@ function Checkout() {
     function checkDiscount() {
         let discountText = JSON.parse(JSON.stringify(discount));
         
-        if(isLoggedIn) {
+        if (isLoggedIn) {
             axios.post(baseURLAddDiscount, {}, {
                 params: {
                     code: discountText
@@ -301,7 +301,7 @@ function Checkout() {
             }).then((response) => {
                 setDiscount("");
                 setDiscountErr("");
-    
+                
                 setCart(response.data ? response.data : {});
             }).catch(err => {
                 if (err.response.status === 401) {
@@ -315,9 +315,8 @@ function Checkout() {
                     setDiscountErr(err.response.data.toString());
                 }
             });
-        }
-        else{
-            let postObj={
+        } else {
+            let postObj = {
                 "CartId": 0,
                 "UserId": 0,
                 "TotalAmount": 0,
@@ -330,12 +329,12 @@ function Checkout() {
             }
             if (localStorage.getItem("cart") !== null) {
                 let cartObj = JSON.parse(localStorage.getItem("cart"));
-                let draperies = cartObj["drapery"] ||[];
-                if(draperies.length){
+                let draperies = cartObj["drapery"] || [];
+                if (draperies.length) {
                     let promiseArr = [];
                     Object.keys(draperies).forEach((key, index) => {
                         promiseArr[index] = new Promise((resolve, reject) => {
-                            postObj["CartDetails"][index]={
+                            postObj["CartDetails"][index] = {
                                 "CartDetailId": index,
                                 "CartId": 0,
                                 "TypeId": 6403,
@@ -354,32 +353,32 @@ function Checkout() {
                                 "ProductColorName": null,
                                 "ProductColorId": null,
                                 "UnitPrice": draperies[index]["Price"],
-                                "Amount": draperies[index]["Price"]*draperies[index]["Count"],
-                                "PayableAmount": draperies[index]["Price"]*draperies[index]["Count"],
+                                "Amount": draperies[index]["Price"] * draperies[index]["Count"],
+                                "PayableAmount": draperies[index]["Price"] * draperies[index]["Count"],
                                 "SewingPreorder": {
                                     "SewingPreorderId": index,
                                     "IsCompleted": true,
                                     ...draperies[index]
                                 }
                             };
-                            postObj["TotalAmount"]+=draperies[index]["Price"]*draperies[index]["Count"];
-                            if(draperies[index]["ZipCode"] && draperies[index]["ZipCode"]!==""){
-                                postObj["InstallAmount"]+=draperies[index]["InstallAmount"]||0;
-                                if(postObj["InstallAmount"]===0){
-                                    postObj["TransportationAmount"]=draperies[index]["TransportationAmount"]||0;
+                            postObj["TotalAmount"] += draperies[index]["Price"] * draperies[index]["Count"];
+                            if (draperies[index]["ZipCode"] && draperies[index]["ZipCode"] !== "") {
+                                postObj["InstallAmount"] += draperies[index]["InstallAmount"] || 0;
+                                if (postObj["InstallAmount"] === 0) {
+                                    postObj["TransportationAmount"] = draperies[index]["TransportationAmount"] || 0;
                                 }
                             }
                             resolve();
                         })
                     });
                     Promise.all(promiseArr).then(() => {
-                        postObj["PayableAmount"]=postObj["TotalAmount"]+postObj["InstallAmount"]+postObj["TransportationAmount"];
+                        postObj["PayableAmount"] = postObj["TotalAmount"] + postObj["InstallAmount"] + postObj["TransportationAmount"];
                         axios.post(baseURLAddDiscountGuest, postObj, {
                             params: {
                                 code: discountText
                             }
                         }).then((response) => {
-    
+                            
                             setTotalSaving(response.data["TotalDiscount"]);
                             setDiscounts(response.data["DiscountCodes"]);
                             setDiscount("");
@@ -389,15 +388,15 @@ function Checkout() {
                                 let cartObj = JSON.parse(localStorage.getItem("cart"));
                                 let temp = cartObj["drapery"];
                                 let promiseArr = [];
-    
+                                
                                 response.data["CartDetails"].forEach((tempObj, index) => {
                                     promiseArr[index] = new Promise((resolve, reject) => {
-                                        temp[tempObj["CartDetailId"]]["Discount"]=tempObj["Discount"];
-                                        temp[tempObj["CartDetailId"]]["PreorderText"]["Discount"]=tempObj["Discount"];
+                                        temp[tempObj["CartDetailId"]]["Discount"] = tempObj["Discount"];
+                                        temp[tempObj["CartDetailId"]]["PreorderText"]["Discount"] = tempObj["Discount"];
                                         resolve();
                                     })
                                 })
-        
+                                
                                 Promise.all(promiseArr).then(() => {
                                     cartObj["drapery"] = temp;
                                     localStorage.setItem('cart', JSON.stringify(cartObj));
@@ -754,9 +753,9 @@ function Checkout() {
             let temp = [];
             let tempNoShip = true;
             let promise2 = new Promise((resolve, reject) => {
-                drapery.sort(function(a, b) {
-                    return b["CartDetailId"] - a["CartDetailId"]  ||  b["SewingPreorderId"] - a["SewingPreorderId"];
-                }).forEach((tempObj,i)=>{
+                drapery.sort(function (a, b) {
+                    return b["CartDetailId"] - a["CartDetailId"] || b["SewingPreorderId"] - a["SewingPreorderId"];
+                }).forEach((tempObj, i) => {
                     let projectDataObj = projectData[drapery[i]["SewingPreorder"]["SewingModelId"]];
                     let desc = [];
                     let projectId = drapery[i]["SewingPreorderId"];
@@ -838,7 +837,7 @@ function Checkout() {
                                             <div key={i}
                                                  className="dk_curtain_preview_detail">
                                                 <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + " / " + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
-                                                <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"],pageLanguage)}</h3>
+                                                <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"], pageLanguage)}</h3>
                                             </div>)}
                                         </h4>
                                     </div>
@@ -856,7 +855,7 @@ function Checkout() {
                                             <h1 className="checkout_item_name">{pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</h1>
                                             <div className="checkout_item_price_section">
                                                 <span
-                                                    className={`checkout_item_price ${hasDiscount ? "checkout_item_price_with_discount" : ""}`}>{GetPrice(hasDiscount? drapery[i]["Amount"]:obj["Price"], pageLanguage, t("TOMANS"))}</span>
+                                                    className={`checkout_item_price ${hasDiscount ? "checkout_item_price_with_discount" : ""}`}>{GetPrice(hasDiscount ? drapery[i]["Amount"] : obj["Price"], pageLanguage, t("TOMANS"))}</span>
                                                 {hasDiscount &&
                                                     <span className="checkout_item_price">{GetPrice(drapery[i]["PayableAmount"], pageLanguage, t("TOMANS"))}</span>}
                                             </div>
@@ -948,33 +947,70 @@ function Checkout() {
                             });
                             
                             tempPostObj["SewingOrderDetails"] = [];
-                            tempPostObj["SewingOrderDetails"][0] = {};
+                            for (let i = 0; i < 3; i++) {
+                                tempPostObj["SewingOrderDetails"][i] = {};
+                                tempPostObj["SewingOrderDetails"][i]["IsLowWrinkle"] = true;
+                                tempPostObj["SewingOrderDetails"][i]["IsCoverAll"] = true;
+                                tempPostObj["SewingOrderDetails"][i]["IsAltogether"] = true;
+                            }
+                            
+                            
                             tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
                             tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = obj["SewingModelId"];
-                            tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
-                            tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
-                            tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
+                            
+                            tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2302;
+                            tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `0002`;
+                            
+                            tempPostObj["SewingOrderDetails"][2]["CurtainPartId"] = 2301;
+                            tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
+                            
                             Object.keys(temp).forEach(key => {
                                 if (temp[key] !== null || temp[key] !== "") {
                                     let tempObj = userProjects.find(obj => obj["cart"] === key);
-                                    if (tempObj["apiLabel2"] !== undefined) {
-                                        if (tempObj["apiValue2"] === null) {
-                                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
-                                        } else {
-                                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                                    // console.log(key,userProjects.find(obj => obj["cart"] === key));
+                                    if (tempObj) {
+                                        for (let i = 0; i < 3; i++) {
+                                            let j = +i + +2;
+                                            if (tempObj["apiLabel" + j] !== undefined) {
+                                                if (tempObj["apiValue" + j] === null) {
+                                                    tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = temp[key];
+                                                    // console.log(i,tempObj["cart"],tempPostObj["SewingOrderDetails"],tempPostObj["SewingOrderDetails"][i]);
+                                                } else {
+                                                    tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = tempObj["apiValue" + j][temp[key]];
+                                                }
+                                            }
                                         }
                                     }
                                 }
                             });
+                            // console.log(tempPostObj["SewingOrderDetails"]);
                             tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
+                            tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
+                            tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
                             Object.keys(temp).forEach(key => {
                                 if (temp[key] !== null || temp[key] !== "") {
                                     let tempObj = userProjects.find(obj => obj["cart"] === key);
-                                    if (tempObj["apiAcc"] !== undefined) {
-                                        if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
-                                            tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
-                                        } else {
-                                        
+                                    if (tempObj) {
+                                        if (tempObj["apiAcc"] !== undefined) {
+                                            if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
+                                                tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
+                                            } else {
+                                            
+                                            }
+                                        }
+                                        if (tempObj["apiAcc2"] !== undefined) {
+                                            if (tempObj["apiAcc2"] === true && tempObj["apiAccValue2"][temp[key]]) {
+                                                tempPostObj["SewingOrderDetails"][1]["Accessories"].push(tempObj["apiAccValue2"][temp[key]]);
+                                            } else {
+                                            
+                                            }
+                                        }
+                                        if (tempObj["apiAcc3"] !== undefined) {
+                                            if (tempObj["apiAcc3"] === true && tempObj["apiAccValue3"][temp[key]]) {
+                                                tempPostObj["SewingOrderDetails"][2]["Accessories"].push(tempObj["apiAccValue3"][temp[key]]);
+                                            } else {
+                                            
+                                            }
                                         }
                                     }
                                 }
@@ -994,7 +1030,12 @@ function Checkout() {
                             // delete tempPostObj["SewingOrderDetails"][0]["SewingModelId"];
                             // delete tempPostObj["SewingModelId"];
                             tempPostObj["SewingModelId"] = tempPostObj["SewingOrderDetails"][0]["SewingModelId"];
-                            
+                            // console.log(tempPostObj);
+                            for (let i = tempPostObj["SewingOrderDetails"].length - 1; i >= 0; i--) {
+                                if (tempPostObj["SewingOrderDetails"] && tempPostObj["SewingOrderDetails"][i] && tempPostObj["SewingOrderDetails"][i]["FabricId"] === undefined) {
+                                    tempPostObj["SewingOrderDetails"].splice(i, 1);
+                                }
+                            }
                             if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
                                 axios.post(baseURLPrice, tempPostObj).then((response) => {
                                     resolve(response);
@@ -1042,7 +1083,7 @@ function Checkout() {
                             let photoUrl = obj["PhotoUrl"];
                             let SewingModelId = obj["SewingModelId"];
                             let zipcode = obj["ZipCode"];
-                            let hasDiscount = obj1["Discount"] > 0 && discountList.length>0;
+                            let hasDiscount = obj1["Discount"] > 0 && discountList.length > 0;
                             let desc = [];
                             obj["Price"] = values[index].data["price"] / obj1["WindowCount"];
                             obj1["Price"] = values[index].data["price"] / obj1["WindowCount"];
@@ -1064,13 +1105,13 @@ function Checkout() {
                                         delArr.push(index);
                                         resolve();
                                     }
-                                    // else if (tempObj["apiLabel"] === "WidthCart") {
-                                    //     desc[tempObj["order"]] =
-                                    //         <div className="basket_item_title_desc" key={index}>
-                                    //             <h3>{t("DIMENSIONS")}&nbsp;</h3>
-                                    //             <h4>{NumToFa((obj["WidthCart"]) + t("Zebra Measurements W") + " \u00d7 " + obj["HeightCart"] + t("Zebra Measurements H") + t("basket Measurements cm"),pageLanguage)}</h4>
-                                    //         </div>;
-                                    //     resolve();
+                                        // else if (tempObj["apiLabel"] === "WidthCart") {
+                                        //     desc[tempObj["order"]] =
+                                        //         <div className="basket_item_title_desc" key={index}>
+                                        //             <h3>{t("DIMENSIONS")}&nbsp;</h3>
+                                        //             <h4>{NumToFa((obj["WidthCart"]) + t("Zebra Measurements W") + " \u00d7 " + obj["HeightCart"] + t("Zebra Measurements H") + t("basket Measurements cm"),pageLanguage)}</h4>
+                                        //         </div>;
+                                        //     resolve();
                                     // }
                                     else {
                                         if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
@@ -1118,13 +1159,13 @@ function Checkout() {
                                                 <div key={i}
                                                      className="dk_curtain_preview_detail">
                                                     <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + " / " + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
-                                                    <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"],pageLanguage)}</h3>
+                                                    <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"], pageLanguage)}</h3>
                                                 </div>)}
                                             </h4>
                                         </div>
                                         , ...desc];
                                 }
-                                temp[tempDrapery.length-index-1] =
+                                temp[tempDrapery.length - index - 1] =
                                     <li className="checkout_item_container" key={index}>
                                         <div className="checkout_item_image_container">
                                             <img src={`https://api.atlaspood.ir/${photoUrl}`} alt="" className="checkout_item_img"/>
@@ -1136,7 +1177,7 @@ function Checkout() {
                                                 <div className="checkout_item_price_section">
                                                     <span className={`checkout_item_price ${hasDiscount ? "checkout_item_price_with_discount" : ""}`}>{GetPrice(obj1["Price"] * obj1["Count"], pageLanguage, t("TOMANS"))}</span>
                                                     {hasDiscount &&
-                                                        <span className="checkout_item_price">{GetPrice((obj1["Price"] * obj1["Count"])-obj["Discount"], pageLanguage, t("TOMANS"))}</span>}
+                                                        <span className="checkout_item_price">{GetPrice((obj1["Price"] * obj1["Count"]) - obj["Discount"], pageLanguage, t("TOMANS"))}</span>}
                                                 </div>
                                             </div>
                                             {/*<PopoverStickOnHover classNames="basket_view_detail_popover"*/}
@@ -1381,7 +1422,7 @@ function Checkout() {
                                     </div>
                                 }
                             </div>
-    
+                            
                             <div className="checkout_left_info_shipping_address">
                                 <div className="checkout_left_info_flex checkout_left_info_flex_title">
                                     <div className="checkout_left_info_flex_left">
@@ -1836,7 +1877,7 @@ function Checkout() {
                                     <button className="checkout_right_discount_apply" disabled={discount === ""} onClick={() => checkDiscount()}>{t("Apply")}</button>
                                 </div>
                             </div>
-                            {discountErr && discountErr!=="" &&
+                            {discountErr && discountErr !== "" &&
                                 <div className="discount_err_container">
                                     <h2>{discountErr}</h2>
                                 </div>

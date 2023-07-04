@@ -718,7 +718,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     <div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key}>
                         <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
                             <hr/>
-                            <span>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</span>
+                            <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(100000, pageLanguage1, pageLanguage1 === "en" ?"Tomans":"تومان")}</p></span>
                         </div>
                         {fabric}
                     </div>;
@@ -738,7 +738,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     <div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key}>
                         <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
                             <hr/>
-                            <span>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</span>
+                            <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(100000, pageLanguage1, pageLanguage1 === "en" ?"Tomans":"تومان")}</p></span>
                         </div>
                         {fabric}
                     </div>;
@@ -1441,29 +1441,46 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
         });
         
         tempPostObj["SewingOrderDetails"] = [];
-        tempPostObj["SewingOrderDetails"][0] = {};
+        for (let i = 0; i < 3; i++) {
+            tempPostObj["SewingOrderDetails"][i] = {};
+            tempPostObj["SewingOrderDetails"][i]["IsLowWrinkle"] = true;
+            tempPostObj["SewingOrderDetails"][i]["IsCoverAll"] = true;
+            tempPostObj["SewingOrderDetails"][i]["IsAltogether"] = true;
+        }
+        
+        
         tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
         tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
-        tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
-        tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
-        tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
+        
+        tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2302;
+        tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `0002`;
+        
+        tempPostObj["SewingOrderDetails"][2]["CurtainPartId"] = 2301;
+        tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
         
         Object.keys(temp).forEach(key => {
             if (temp[key] !== null || temp[key] !== "") {
                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                 // console.log(key,userProjects.find(obj => obj["cart"] === key));
                 if (tempObj) {
-                    if (tempObj["apiLabel2"] !== undefined) {
-                        if (tempObj["apiValue2"] === null) {
-                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
-                        } else {
-                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                    for (let i = 0; i < 3; i++) {
+                        let j = +i + +2;
+                        if (tempObj["apiLabel" + j] !== undefined) {
+                            if (tempObj["apiValue" + j] === null) {
+                                tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = temp[key];
+                                // console.log(i,tempObj["cart"],tempPostObj["SewingOrderDetails"],tempPostObj["SewingOrderDetails"][i]);
+                            } else {
+                                tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = tempObj["apiValue" + j][temp[key]];
+                            }
                         }
                     }
                 }
             }
         });
+        // console.log(tempPostObj["SewingOrderDetails"]);
         tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
+        tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
+        tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
         Object.keys(temp).forEach(key => {
             if (temp[key] !== null || temp[key] !== "") {
                 let tempObj = userProjects.find(obj => obj["cart"] === key);
@@ -1471,6 +1488,20 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     if (tempObj["apiAcc"] !== undefined) {
                         if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
                             tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
+                        } else {
+                        
+                        }
+                    }
+                    if (tempObj["apiAcc2"] !== undefined) {
+                        if (tempObj["apiAcc2"] === true && tempObj["apiAccValue2"][temp[key]]) {
+                            tempPostObj["SewingOrderDetails"][1]["Accessories"].push(tempObj["apiAccValue2"][temp[key]]);
+                        } else {
+                        
+                        }
+                    }
+                    if (tempObj["apiAcc3"] !== undefined) {
+                        if (tempObj["apiAcc3"] === true && tempObj["apiAccValue3"][temp[key]]) {
+                            tempPostObj["SewingOrderDetails"][2]["Accessories"].push(tempObj["apiAccValue3"][temp[key]]);
                         } else {
                         
                         }
@@ -1487,6 +1518,11 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
         let promise2 = new Promise((resolve, reject) => {
             let count = temp["WidthCart"] ? Math.floor(temp["WidthCart"] / 11.5) : 16;
             if (stepSelectedValue["2"] !== undefined && !pageLoad && !(motorLoad && refIndex === "MotorType") && refIndex !== "FabricId" && !(refIndex === "CurtainArr" && (temp["CurtainArr"] ? temp["CurtainArr"] : []).filter(el => el).length !== count)) {
+                for (let i = tempPostObj["SewingOrderDetails"].length - 1; i >= 0; i--) {
+                    if (tempPostObj["SewingOrderDetails"] && tempPostObj["SewingOrderDetails"][i] && tempPostObj["SewingOrderDetails"][i]["FabricId"] === undefined) {
+                        tempPostObj["SewingOrderDetails"].splice(i, 1);
+                    }
+                }
                 if ((temp["CurtainArr"] ? temp["CurtainArr"] : []).filter(el => el).length !== count) {
                     delete tempPostObj["SewingOrderDetails"];
                 }
@@ -1589,34 +1625,70 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             });
             
             tempPostObj["SewingOrderDetails"] = [];
-            tempPostObj["SewingOrderDetails"][0] = {};
+            for (let i = 0; i < 3; i++) {
+                tempPostObj["SewingOrderDetails"][i] = {};
+                tempPostObj["SewingOrderDetails"][i]["IsLowWrinkle"] = true;
+                tempPostObj["SewingOrderDetails"][i]["IsCoverAll"] = true;
+                tempPostObj["SewingOrderDetails"][i]["IsAltogether"] = true;
+            }
+            
+            
             tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
             tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
-            tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
-            tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
-            tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
+            
+            tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2302;
+            tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `0002`;
+            
+            tempPostObj["SewingOrderDetails"][2]["CurtainPartId"] = 2301;
+            tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
             
             Object.keys(temp).forEach(key => {
                 if (temp[key] !== null || temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
-                    if (tempObj["apiLabel2"] !== undefined) {
-                        if (tempObj["apiValue2"] === null) {
-                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
-                        } else {
-                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                    // console.log(key,userProjects.find(obj => obj["cart"] === key));
+                    if (tempObj) {
+                        for (let i = 0; i < 3; i++) {
+                            let j = +i + +2;
+                            if (tempObj["apiLabel" + j] !== undefined) {
+                                if (tempObj["apiValue" + j] === null) {
+                                    tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = temp[key];
+                                    // console.log(i,tempObj["cart"],tempPostObj["SewingOrderDetails"],tempPostObj["SewingOrderDetails"][i]);
+                                } else {
+                                    tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = tempObj["apiValue" + j][temp[key]];
+                                }
+                            }
                         }
                     }
                 }
             });
+            // console.log(tempPostObj["SewingOrderDetails"]);
             tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
+            tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
+            tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
             Object.keys(temp).forEach(key => {
                 if (temp[key] !== null || temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
-                    if (tempObj["apiAcc"] !== undefined) {
-                        if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
-                            tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
-                        } else {
-                        
+                    if (tempObj) {
+                        if (tempObj["apiAcc"] !== undefined) {
+                            if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
+                                tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
+                            } else {
+                            
+                            }
+                        }
+                        if (tempObj["apiAcc2"] !== undefined) {
+                            if (tempObj["apiAcc2"] === true && tempObj["apiAccValue2"][temp[key]]) {
+                                tempPostObj["SewingOrderDetails"][1]["Accessories"].push(tempObj["apiAccValue2"][temp[key]]);
+                            } else {
+                            
+                            }
+                        }
+                        if (tempObj["apiAcc3"] !== undefined) {
+                            if (tempObj["apiAcc3"] === true && tempObj["apiAccValue3"][temp[key]]) {
+                                tempPostObj["SewingOrderDetails"][2]["Accessories"].push(tempObj["apiAccValue3"][temp[key]]);
+                            } else {
+                            
+                            }
                         }
                     }
                 }
@@ -1628,6 +1700,11 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             // tempPostObj["SewingOrderDetails"][0]["SodFabrics"] = JSON.parse(JSON.stringify(sodFabrics));
             
             if (stepSelectedValue["2"] !== undefined) {
+                for (let i = tempPostObj["SewingOrderDetails"].length - 1; i >= 0; i--) {
+                    if (tempPostObj["SewingOrderDetails"] && tempPostObj["SewingOrderDetails"][i] && tempPostObj["SewingOrderDetails"][i]["FabricId"] === undefined) {
+                        tempPostObj["SewingOrderDetails"].splice(i, 1);
+                    }
+                }
                 if (!dkCurtainArrComplete) {
                     delete tempPostObj["SewingOrderDetails"];
                 }
@@ -1900,33 +1977,70 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                 });
                 
                 tempPostObj["SewingOrderDetails"] = [];
-                tempPostObj["SewingOrderDetails"][0] = {};
+                for (let i = 0; i < 3; i++) {
+                    tempPostObj["SewingOrderDetails"][i] = {};
+                    tempPostObj["SewingOrderDetails"][i]["IsLowWrinkle"] = true;
+                    tempPostObj["SewingOrderDetails"][i]["IsCoverAll"] = true;
+                    tempPostObj["SewingOrderDetails"][i]["IsAltogether"] = true;
+                }
+                
+                
                 tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
                 tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
-                tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
-                tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
-                tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
+                
+                tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2302;
+                tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `0002`;
+                
+                tempPostObj["SewingOrderDetails"][2]["CurtainPartId"] = 2301;
+                tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
+                
                 Object.keys(temp).forEach(key => {
                     if (temp[key] !== null || temp[key] !== "") {
                         let tempObj = userProjects.find(obj => obj["cart"] === key);
-                        if (tempObj["apiLabel2"] !== undefined) {
-                            if (tempObj["apiValue2"] === null) {
-                                tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
-                            } else {
-                                tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                        // console.log(key,userProjects.find(obj => obj["cart"] === key));
+                        if (tempObj) {
+                            for (let i = 0; i < 3; i++) {
+                                let j = +i + +2;
+                                if (tempObj["apiLabel" + j] !== undefined) {
+                                    if (tempObj["apiValue" + j] === null) {
+                                        tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = temp[key];
+                                        // console.log(i,tempObj["cart"],tempPostObj["SewingOrderDetails"],tempPostObj["SewingOrderDetails"][i]);
+                                    } else {
+                                        tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = tempObj["apiValue" + j][temp[key]];
+                                    }
+                                }
                             }
                         }
                     }
                 });
+                // console.log(tempPostObj["SewingOrderDetails"]);
                 tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
+                tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
+                tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
                 Object.keys(temp).forEach(key => {
                     if (temp[key] !== null || temp[key] !== "") {
                         let tempObj = userProjects.find(obj => obj["cart"] === key);
-                        if (tempObj["apiAcc"] !== undefined) {
-                            if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
-                                tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
-                            } else {
-                            
+                        if (tempObj) {
+                            if (tempObj["apiAcc"] !== undefined) {
+                                if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
+                                    tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
+                                } else {
+                                
+                                }
+                            }
+                            if (tempObj["apiAcc2"] !== undefined) {
+                                if (tempObj["apiAcc2"] === true && tempObj["apiAccValue2"][temp[key]]) {
+                                    tempPostObj["SewingOrderDetails"][1]["Accessories"].push(tempObj["apiAccValue2"][temp[key]]);
+                                } else {
+                                
+                                }
+                            }
+                            if (tempObj["apiAcc3"] !== undefined) {
+                                if (tempObj["apiAcc3"] === true && tempObj["apiAccValue3"][temp[key]]) {
+                                    tempPostObj["SewingOrderDetails"][2]["Accessories"].push(tempObj["apiAccValue3"][temp[key]]);
+                                } else {
+                                
+                                }
                             }
                         }
                     }
@@ -1935,7 +2049,12 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     return el != null;
                 });
                 // console.log(tempPostObj);
-                if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
+                    for (let i = tempPostObj["SewingOrderDetails"].length - 1; i >= 0; i--) {
+                        if (tempPostObj["SewingOrderDetails"] && tempPostObj["SewingOrderDetails"][i] && tempPostObj["SewingOrderDetails"][i]["FabricId"] === undefined) {
+                            tempPostObj["SewingOrderDetails"].splice(i, 1);
+                        }
+                    }
+                    if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
                     // console.log(JSON.stringify(tempPostObj));
                     axios.post(baseURLPrice, tempPostObj)
                         .then((response) => {
@@ -2010,7 +2129,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                                         <div key={i}
                                                                              className="dk_curtain_preview_detail">
                                                                             <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + " / " + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
-                                                                            <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"],pageLanguage)}</h3>
+                                                                            <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"], pageLanguage)}</h3>
                                                                         </div>)}
                                                                 </div>
                                                             </Accordion.Body>
@@ -2180,7 +2299,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                                             <div key={i}
                                                                                  className="dk_curtain_preview_detail">
                                                                                 <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + "/" + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
-                                                                                <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"],pageLanguage)}</h3>
+                                                                                <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"], pageLanguage)}</h3>
                                                                             </div>)}
                                                                     </div>
                                                                 </Accordion.Body>
@@ -2331,7 +2450,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                     // let temp = obj["PreorderText"];
                                     GetUserProjectData(obj).then((temp) => {
                                         tempPostObj["WindowCount"] = 1;
-                                        tempPostObj["SewingModelId"] = `${modelID}`;
+                                        tempPostObj["SewingModelId"] = obj["PreorderText"]["SewingModelId"];
                                         Object.keys(temp).forEach(key => {
                                             if (temp[key] !== null || temp[key] !== "") {
                                                 let tempObj = userProjects.find(obj => obj["cart"] === key);
@@ -2347,33 +2466,70 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                         });
                                         
                                         tempPostObj["SewingOrderDetails"] = [];
-                                        tempPostObj["SewingOrderDetails"][0] = {};
+                                        for (let i = 0; i < 3; i++) {
+                                            tempPostObj["SewingOrderDetails"][i] = {};
+                                            tempPostObj["SewingOrderDetails"][i]["IsLowWrinkle"] = true;
+                                            tempPostObj["SewingOrderDetails"][i]["IsCoverAll"] = true;
+                                            tempPostObj["SewingOrderDetails"][i]["IsAltogether"] = true;
+                                        }
+                                        
+                                        
                                         tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
-                                        tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
-                                        tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
-                                        tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
-                                        tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
+                                        tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = tempPostObj["SewingModelId"];
+                                        
+                                        tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2302;
+                                        tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `0002`;
+                                        
+                                        tempPostObj["SewingOrderDetails"][2]["CurtainPartId"] = 2301;
+                                        tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
+                                        
                                         Object.keys(temp).forEach(key => {
                                             if (temp[key] !== null || temp[key] !== "") {
                                                 let tempObj = userProjects.find(obj => obj["cart"] === key);
-                                                if (tempObj["apiLabel2"] !== undefined) {
-                                                    if (tempObj["apiValue2"] === null) {
-                                                        tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
-                                                    } else {
-                                                        tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                                                // console.log(key,userProjects.find(obj => obj["cart"] === key));
+                                                if (tempObj) {
+                                                    for (let i = 0; i < 3; i++) {
+                                                        let j = +i + +2;
+                                                        if (tempObj["apiLabel" + j] !== undefined) {
+                                                            if (tempObj["apiValue" + j] === null) {
+                                                                tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = temp[key];
+                                                                // console.log(i,tempObj["cart"],tempPostObj["SewingOrderDetails"],tempPostObj["SewingOrderDetails"][i]);
+                                                            } else {
+                                                                tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = tempObj["apiValue" + j][temp[key]];
+                                                            }
+                                                        }
                                                     }
                                                 }
                                             }
                                         });
+                                        // console.log(tempPostObj["SewingOrderDetails"]);
                                         tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
+                                        tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
+                                        tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
                                         Object.keys(temp).forEach(key => {
                                             if (temp[key] !== null || temp[key] !== "") {
                                                 let tempObj = userProjects.find(obj => obj["cart"] === key);
-                                                if (tempObj["apiAcc"] !== undefined) {
-                                                    if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
-                                                        tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
-                                                    } else {
-                                                    
+                                                if (tempObj) {
+                                                    if (tempObj["apiAcc"] !== undefined) {
+                                                        if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
+                                                            tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
+                                                        } else {
+                                                        
+                                                        }
+                                                    }
+                                                    if (tempObj["apiAcc2"] !== undefined) {
+                                                        if (tempObj["apiAcc2"] === true && tempObj["apiAccValue2"][temp[key]]) {
+                                                            tempPostObj["SewingOrderDetails"][1]["Accessories"].push(tempObj["apiAccValue2"][temp[key]]);
+                                                        } else {
+                                                        
+                                                        }
+                                                    }
+                                                    if (tempObj["apiAcc3"] !== undefined) {
+                                                        if (tempObj["apiAcc3"] === true && tempObj["apiAccValue3"][temp[key]]) {
+                                                            tempPostObj["SewingOrderDetails"][2]["Accessories"].push(tempObj["apiAccValue3"][temp[key]]);
+                                                        } else {
+                                                        
+                                                        }
                                                     }
                                                 }
                                             }
@@ -2393,7 +2549,12 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                         // delete tempPostObj["SewingOrderDetails"][0]["SewingModelId"];
                                         // delete tempPostObj["SewingModelId"];
                                         tempPostObj["SewingModelId"] = tempPostObj["SewingOrderDetails"][0]["SewingModelId"];
-                                        
+                                        // console.log(tempPostObj);
+                                        for (let i = tempPostObj["SewingOrderDetails"].length - 1; i >= 0; i--) {
+                                            if (tempPostObj["SewingOrderDetails"] && tempPostObj["SewingOrderDetails"][i] && tempPostObj["SewingOrderDetails"][i]["FabricId"] === undefined) {
+                                                tempPostObj["SewingOrderDetails"].splice(i, 1);
+                                            }
+                                        }
                                         if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
                                             axios.post(baseURLPrice, tempPostObj).then((response) => {
                                                 resolve(response);
@@ -2444,7 +2605,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                                                 <div key={i}
                                                                                      className="dk_curtain_preview_detail">
                                                                                     <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + "/" + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
-                                                                                    <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"],pageLanguage)}</h3>
+                                                                                    <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"], pageLanguage)}</h3>
                                                                                 </div>)}
                                                                         </div>
                                                                     </Accordion.Body>
@@ -3208,7 +3369,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                 if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
                                                     tempLabels["2C"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
                                                 }
-    
+                                                
                                                 temp["CeilingToWindow1"] = changeLang ? temp["CeilingToWindow1"] : temp["Height"];
                                                 temp["CeilingToWindow2"] = changeLang ? temp["CeilingToWindow2"] : temp["Height2"];
                                                 temp["CeilingToWindow3"] = changeLang ? temp["CeilingToWindow3"] : temp["Height3"];
@@ -3248,7 +3409,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                 if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
                                                     tempLabels["2C"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
                                                 }
-    
+                                                
                                                 temp["CeilingToWindow1"] = changeLang ? temp["CeilingToWindow1"] : temp["Height"];
                                                 temp["CeilingToWindow2"] = changeLang ? temp["CeilingToWindow2"] : temp["Height2"];
                                                 temp["CeilingToWindow3"] = changeLang ? temp["CeilingToWindow3"] : temp["Height3"];
@@ -3288,7 +3449,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                 if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
                                                     tempLabels["2C"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
                                                 }
-    
+                                                
                                                 temp["CeilingToFloor1"] = changeLang ? temp["CeilingToFloor1"] : temp["Height"];
                                                 temp["CeilingToFloor2"] = changeLang ? temp["CeilingToFloor2"] : temp["Height2"];
                                                 temp["CeilingToFloor3"] = changeLang ? temp["CeilingToFloor3"] : temp["Height3"];
@@ -3335,7 +3496,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                         if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
                                                             tempLabels["2CCeiling"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
                                                         }
-    
+                                                        
                                                         temp["CeilingToWindow1"] = changeLang ? temp["CeilingToWindow1"] : temp["Height"];
                                                         temp["CeilingToWindow2"] = changeLang ? temp["CeilingToWindow2"] : temp["Height2"];
                                                         temp["CeilingToWindow3"] = changeLang ? temp["CeilingToWindow3"] : temp["Height3"];
@@ -3375,7 +3536,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                         if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
                                                             tempLabels["2CCeiling"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
                                                         }
-    
+                                                        
                                                         temp["CeilingToWindow1"] = changeLang ? temp["CeilingToWindow1"] : temp["Height"];
                                                         temp["CeilingToWindow2"] = changeLang ? temp["CeilingToWindow2"] : temp["Height2"];
                                                         temp["CeilingToWindow3"] = changeLang ? temp["CeilingToWindow3"] : temp["Height3"];
@@ -3415,7 +3576,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                         if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
                                                             tempLabels["2CCeiling"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
                                                         }
-    
+                                                        
                                                         temp["CeilingToFloor1"] = changeLang ? temp["CeilingToFloor1"] : temp["Height"];
                                                         temp["CeilingToFloor2"] = changeLang ? temp["CeilingToFloor2"] : temp["Height2"];
                                                         temp["CeilingToFloor3"] = changeLang ? temp["CeilingToFloor3"] : temp["Height3"];
@@ -3592,7 +3753,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         setStepSelectedLabel(tempLabels);
                         setStepSelectedValue(tempValue);
                     }
-        
+                    
                     if (temp["ControlPosition"]) {
                         setStep4A(temp["ControlPosition"]);
                         if (temp["ControlPosition"] === "Left") {
@@ -4060,92 +4221,92 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             }
         });
     }, [step3]);
-// useEffect(() => {
-//     if (firstRender === false) {
-//         const tempLang = location.pathname.split('');
-//         pageLanguage = tempLang.slice(1, 3).join('');
-//         setShowLabels(false);
-//         Object.keys(inputs.current).forEach(refObj => {
-//             if (inputs.current[refObj] !== null) {
-//                 if (inputs.current[refObj].checked) {
-//                     inputs.current[refObj].click();
-//                 }
-//             }
-//         });
-//         setTimeout(() => {
-//             let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-//             let tempObj = {};
-//             tempObj["3AOut"] = selectCustomValues.width3A[0];
-//             tempObj["3BOut"] = selectCustomValues.left[0];
-//             tempObj["3COut"] = selectCustomValues.height3C[0];
-//             tempObj["3DOut"] = selectCustomValues.shadeMount[0];
-//             tempObj["3AIn"] = selectCustomValues.width1[0];
-//             tempObj["3BIn"] = selectCustomValues.height1[0];
-//             tempObj["3"] = selectCustomValues.width[0];
-//
-//             Object.keys(tempObj).forEach(objKey => {
-//                 if (tempObj[objKey] !== undefined) {
-//                     if (objKey === "3AIn") {
-//                         let temp = JSON.parse(JSON.stringify(stepSelectedOptions));
-//                         if (temp.labels[objKey] === undefined)
-//                             temp.labels[objKey] = [];
-//                         if (temp.values[objKey] === undefined)
-//                             temp.values[objKey] = [];
-//                         let tempMin = temp.values[objKey][temp.values[objKey].indexOf(Math.min(...temp.values[objKey]))];
-//                         tempLabels[objKey] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + "س\u200Cم" : tempMin + "cm";
-//                     } else if (objKey === "3BIn") {
-//                         let temp = JSON.parse(JSON.stringify(stepSelectedOptions));
-//                         if (temp.labels[objKey] === undefined)
-//                             temp.labels[objKey] = [];
-//                         if (temp.values[objKey] === undefined)
-//                             temp.values[objKey] = [];
-//                         let tempMax = temp.values[objKey][temp.values[objKey].indexOf(Math.min(...temp.values[objKey]))];
-//                         tempLabels[objKey] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + "س\u200Cم" : tempMax + "cm";
-//
-//                     } else if (objKey === "3BOut") {
-//                         let temp = JSON.parse(JSON.stringify(leftRight));
-//
-//                         if (temp.right !== "" && temp.left !== "") {
-//                             tempLabels[objKey] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp.right}`) + "س\u200Cم"}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp.left}`) + "س\u200Cم"}` : `Left: ${temp.left + "cm"}\u00A0\u00A0\u00A0Right: ${temp.right + "cm"}`;
-//                         }
-//                     } else if (objKey === "3") {
-//                         let temp = JSON.parse(JSON.stringify(widthLength));
-//
-//                         if (temp.length !== "" && temp.width !== "") {
-//                             tempLabels[objKey] = pageLanguage === "fa" ? `ارتفاع:  ${NumberToPersianWord.convertEnToPe(`${temp.length}`) + "س\u200Cم"}\u00A0\u00A0\u00A0عرض: ${NumberToPersianWord.convertEnToPe(`${temp.width}`) + "س\u200Cم"}` : `Left: ${temp.width + "cm"}\u00A0\u00A0\u00A0Right: ${temp.length + "cm"}`;
-//                         }
-//                     } else {
-//                         tempLabels[objKey] = pageLanguage === "fa" ? `${NumberToPersianWord.convertEnToPe(`${tempObj[objKey].value}`) + "س\u200Cم"}` : `${tempObj[objKey].value + "cm"}`;
-//                     }
-//                 }
-//             });
-//
-//             setTimeout(() => {
-//                 setStepSelectedLabel(tempLabels);
-//             }, 100);
-//
-//
-//             // temp.width1 = [];
-//             // temp.width2 = [];
-//             // temp.width3 = [];
-//             // temp.height1 = [];
-//             // temp.height2 = [];
-//             // temp.left = [];
-//             // temp.right = [];
-//             // temp.width = [];
-//             // temp.length = [];
-//             // temp.width3A = [];
-//             // temp.height3C = [];
-//             // temp.shadeMount = [];
-//
-//             setTimeout(() => {
-//                 setShowLabels(true);
-//             }, 1000);
-//         }, 5000);
-//     } else {
-//         setFirstRender(false);
-//     }
-// }, [location.pathname]);
+    // useEffect(() => {
+    //     if (firstRender === false) {
+    //         const tempLang = location.pathname.split('');
+    //         pageLanguage = tempLang.slice(1, 3).join('');
+    //         setShowLabels(false);
+    //         Object.keys(inputs.current).forEach(refObj => {
+    //             if (inputs.current[refObj] !== null) {
+    //                 if (inputs.current[refObj].checked) {
+    //                     inputs.current[refObj].click();
+    //                 }
+    //             }
+    //         });
+    //         setTimeout(() => {
+    //             let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+    //             let tempObj = {};
+    //             tempObj["3AOut"] = selectCustomValues.width3A[0];
+    //             tempObj["3BOut"] = selectCustomValues.left[0];
+    //             tempObj["3COut"] = selectCustomValues.height3C[0];
+    //             tempObj["3DOut"] = selectCustomValues.shadeMount[0];
+    //             tempObj["3AIn"] = selectCustomValues.width1[0];
+    //             tempObj["3BIn"] = selectCustomValues.height1[0];
+    //             tempObj["3"] = selectCustomValues.width[0];
+    //
+    //             Object.keys(tempObj).forEach(objKey => {
+    //                 if (tempObj[objKey] !== undefined) {
+    //                     if (objKey === "3AIn") {
+    //                         let temp = JSON.parse(JSON.stringify(stepSelectedOptions));
+    //                         if (temp.labels[objKey] === undefined)
+    //                             temp.labels[objKey] = [];
+    //                         if (temp.values[objKey] === undefined)
+    //                             temp.values[objKey] = [];
+    //                         let tempMin = temp.values[objKey][temp.values[objKey].indexOf(Math.min(...temp.values[objKey]))];
+    //                         tempLabels[objKey] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + "س\u200Cم" : tempMin + "cm";
+    //                     } else if (objKey === "3BIn") {
+    //                         let temp = JSON.parse(JSON.stringify(stepSelectedOptions));
+    //                         if (temp.labels[objKey] === undefined)
+    //                             temp.labels[objKey] = [];
+    //                         if (temp.values[objKey] === undefined)
+    //                             temp.values[objKey] = [];
+    //                         let tempMax = temp.values[objKey][temp.values[objKey].indexOf(Math.min(...temp.values[objKey]))];
+    //                         tempLabels[objKey] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + "س\u200Cم" : tempMax + "cm";
+    //
+    //                     } else if (objKey === "3BOut") {
+    //                         let temp = JSON.parse(JSON.stringify(leftRight));
+    //
+    //                         if (temp.right !== "" && temp.left !== "") {
+    //                             tempLabels[objKey] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp.right}`) + "س\u200Cم"}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp.left}`) + "س\u200Cم"}` : `Left: ${temp.left + "cm"}\u00A0\u00A0\u00A0Right: ${temp.right + "cm"}`;
+    //                         }
+    //                     } else if (objKey === "3") {
+    //                         let temp = JSON.parse(JSON.stringify(widthLength));
+    //
+    //                         if (temp.length !== "" && temp.width !== "") {
+    //                             tempLabels[objKey] = pageLanguage === "fa" ? `ارتفاع:  ${NumberToPersianWord.convertEnToPe(`${temp.length}`) + "س\u200Cم"}\u00A0\u00A0\u00A0عرض: ${NumberToPersianWord.convertEnToPe(`${temp.width}`) + "س\u200Cم"}` : `Left: ${temp.width + "cm"}\u00A0\u00A0\u00A0Right: ${temp.length + "cm"}`;
+    //                         }
+    //                     } else {
+    //                         tempLabels[objKey] = pageLanguage === "fa" ? `${NumberToPersianWord.convertEnToPe(`${tempObj[objKey].value}`) + "س\u200Cم"}` : `${tempObj[objKey].value + "cm"}`;
+    //                     }
+    //                 }
+    //             });
+    //
+    //             setTimeout(() => {
+    //                 setStepSelectedLabel(tempLabels);
+    //             }, 100);
+    //
+    //
+    //             // temp.width1 = [];
+    //             // temp.width2 = [];
+    //             // temp.width3 = [];
+    //             // temp.height1 = [];
+    //             // temp.height2 = [];
+    //             // temp.left = [];
+    //             // temp.right = [];
+    //             // temp.width = [];
+    //             // temp.length = [];
+    //             // temp.width3A = [];
+    //             // temp.height3C = [];
+    //             // temp.shadeMount = [];
+    //
+    //             setTimeout(() => {
+    //                 setShowLabels(true);
+    //             }, 1000);
+    //         }, 5000);
+    //     } else {
+    //         setFirstRender(false);
+    //     }
+    // }, [location.pathname]);
     
     useEffect(() => {
         // console.log("hi2");
@@ -6038,7 +6199,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                     <Card.Body>
                                         <div className="card_body">
                                             <div className="box100">
-                                                <p className="step_selection_title">{step1 === "Outside"?t("dk_step2D_title"):t("arc_step2D_title")}</p>
+                                                <p className="step_selection_title">{step1 === "Outside" ? t("dk_step2D_title") : t("arc_step2D_title")}</p>
                                                 <img
                                                     src={stepSelectedValue["1"] === "3" ? pageLanguage === 'fa' ? require('../Images/drapery/dk/new_ceiling_to_window_3_arc_fa.svg').default : require('../Images/drapery/dk/new_ceiling_to_window_3_arc.svg').default : pageLanguage === 'fa' ? require('../Images/drapery/dk/new_ceiling_to_window_3_fa.svg').default : require('../Images/drapery/dk/new_ceiling_to_window_3.svg').default}
                                                     className="img-fluid tall_curtain_image" alt=""/>
@@ -6308,7 +6469,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                     <Card.Body>
                                         <div className="card_body">
                                             <div className="box100">
-                                                <p className="step_selection_title">{step1 === "Outside"?t("dk_step2E_title"):t("arc_step2E_title")}</p>
+                                                <p className="step_selection_title">{step1 === "Outside" ? t("dk_step2E_title") : t("arc_step2E_title")}</p>
                                                 <img
                                                     src={stepSelectedValue["1"] === "3" ? pageLanguage === 'fa' ? require('../Images/drapery/dk/new_ceiling_to_floor_3_arc_fa.svg').default : require('../Images/drapery/dk/new_ceiling_to_floor_3_arc.svg').default : pageLanguage === 'fa' ? require('../Images/drapery/dk/new_ceiling_to_floor_3_fa.svg').default : require('../Images/drapery/dk/new_ceiling_to_floor_3.svg').default}
                                                     className="img-fluid tall_curtain_image" alt=""/>
@@ -7403,7 +7564,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                         {/* step 4 */}
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="35" stepNum={t("4")} stepTitle={pageLanguage === 'fa' ? t("dk_decor_fabric_step_title")+convertToPersian(defaultModelNameFa): defaultModelName+t("dk_decor_fabric_step_title")} stepRef="35" type="1" required={requiredStep["35"]}
+                                <ContextAwareToggle eventKey="35" stepNum={t("4")} stepTitle={pageLanguage === 'fa' ? t("dk_decor_fabric_step_title") + convertToPersian(defaultModelNameFa) : defaultModelName + t("dk_decor_fabric_step_title")} stepRef="35" type="1" required={requiredStep["35"]}
                                                     stepSelected={stepSelectedLabel["35"] === undefined ? "" : stepSelectedLabel["35"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="35">
@@ -8187,7 +8348,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                 {/*    */}
                 {/*</Modal.Footer>*/}
             </Modal>
-    
+            
             <Modal dialogClassName="zoomModal" show={show} onHide={() => handleClose()}>
                 <Modal.Header closeButton>
                     {zoomModalHeader}

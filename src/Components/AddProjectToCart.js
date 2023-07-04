@@ -14,7 +14,7 @@ const baseURLEditProject = "https://api.atlaspood.ir/SewingPreorder/Edit";
 const baseURLGetCart = "https://api.atlaspood.ir/cart/GetAll";
 
 
-async function AddProjectToCart(cartValues, SewingModelId, price, ModelNameEn, ModelNameFa, Files, cartProjectIndex, editIndex, navigate, isLoggedIn, customMotorAcc, returnObj) {
+async function AddProjectToCart(cartValues, SewingModelId, price, ModelNameEn, ModelNameFa, Files, cartProjectIndex, editIndex, navigate, isLoggedIn, customAcc, returnObj) {
     return await new Promise((resolve, reject) => {
         let customPageCart = {};
         let userProjects = JSON.parse(JSON.stringify(UserProjects))[SewingModelId]["data"];
@@ -71,8 +71,11 @@ async function AddProjectToCart(cartValues, SewingModelId, price, ModelNameEn, M
                 }
             }
         });
-        if (customMotorAcc && Object.keys(customMotorAcc).length > 0) {
-            tempPostObj["Accessories"].push(customMotorAcc);
+        if (customAcc!==undefined && Array.isArray(customAcc) && customAcc.length > 0) {
+            tempPostObj["Accessories"].push(...customAcc);
+        }
+        else if(customAcc!==undefined && Object.keys(customAcc).length > 0){
+            tempPostObj["Accessories"].push(customAcc);
         }
         tempPostObj["Accessories"]=tempPostObj["Accessories"].filter(n => n);
         
@@ -118,7 +121,6 @@ async function AddProjectToCart(cartValues, SewingModelId, price, ModelNameEn, M
             });
         }
     
-        // console.log(tempPostObj,customMotorAcc);
         if(returnObj){
             resolve(tempPostObj);
         }

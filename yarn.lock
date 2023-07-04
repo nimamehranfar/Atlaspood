@@ -1210,7 +1210,7 @@
     "@emotion/weak-memoize" "^0.2.5"
     "stylis" "4.0.13"
 
-"@emotion/core@^10.0.27", "@emotion/core@^10.0.28":
+"@emotion/core@^10.0.10", "@emotion/core@^10.0.27", "@emotion/core@^10.0.28":
   "integrity" "sha512-447aUEjPIm0MnE6QYIaFz9VQOHSXf4Iu6EWOIqq11EAPqinkSZmfymPTmlOE3QjLv846lH4JVZBUOtwGbuQoww=="
   "resolved" "https://registry.npmjs.org/@emotion/core/-/core-10.3.1.tgz"
   "version" "10.3.1"
@@ -12514,6 +12514,13 @@
     "prop-types" "^15.6.0"
     "react-transition-group" "^4.3.0"
 
+"react-simple-tooltip@^2.6.3":
+  "integrity" "sha512-ZZ6ObVewXW4+wabAoMlDezyX/auJAdCYBf7wMhZ7lc/5z6RV/AHS/xW2brUkdMoLAFY0jYUTIJGS41doncIgVw=="
+  "resolved" "https://registry.npmjs.org/react-simple-tooltip/-/react-simple-tooltip-2.6.3.tgz"
+  "version" "2.6.3"
+  dependencies:
+    "@emotion/core" "^10.0.10"
+
 "react-sortable-tree-patch-react-17@2.9.0":
   "integrity" "sha512-Ngtdbf78OfjqCxLj7+N+K4zM9d1mQ/tfnUsOfICFDzNa5JHg6AjixAj69ijvz0ykEiA9lYop+0Fm4KCOqCdlKA=="
   "resolved" "https://registry.npmjs.org/react-sortable-tree-patch-react-17/-/react-sortable-tree-patch-react-17-2.9.0.tgz"
@@ -12615,7 +12622,7 @@
     "@virtuoso.dev/react-urx" "^0.2.12"
     "@virtuoso.dev/urx" "^0.2.12"
 
-"react@*", "react@^0.14 || ^15.0.0-rc || ^15.0 || ^16.0.0 || ^16.0", "react@^0.14 || ^15.0.0-rc || ^15.0 || ^16.0.0 || ^16.0 || ^17.0.0 || ^17.0", "react@^0.14.9 || ^15.3.0 || ^16.0.0", "react@^15.0.0 || ^16.0.0", "react@^15.3.0 || ^16.0.0-alpha", "react@^15.3.0 || 16 || 17 || 18", "react@^16.0.0 || ^17.0.0 || ^18.0.0", "react@^16.8 || ^17.0 || ^18.0", "react@^16.8.0 || ^17", "react@^16.8.0 || ^17.0.0", "react@^16.8.0 || ^17.0.0 || ^18.0.0", "react@^16.8.0 || ^17.0.0-rc.1", "react@^16.8.3 || ^17 || ^18", "react@^16.8.5 || ^17.0.0 || ^18.0.0", "react@^16.8.6", "react@^17.0.0", "react@^17.0.0 || ^16.8", "react@^17.0.1", "react@^17.0.1 || ^16.7.0", "react@^17.0.2", "react@>= 16", "react@>= 16.14", "react@>= 16.3.0", "react@>= 16.8.0", "react@>= 16.9.0", "react@>=0.14.0", "react@>=15.0.0", "react@>=16", "react@>=16.0.0", "react@>=16.14.0", "react@>=16.3", "react@>=16.3.0", "react@>=16.6.0", "react@>=16.8", "react@>=16.8.0", "react@>=16.x", "react@>=17.0.2", "react@0.14 || 15 || 16 || 17", "react@17.0.2":
+"react@*", "react@^0.14 || ^15.0.0-rc || ^15.0 || ^16.0.0 || ^16.0", "react@^0.14 || ^15.0.0-rc || ^15.0 || ^16.0.0 || ^16.0 || ^17.0.0 || ^17.0", "react@^0.14.9 || ^15.3.0 || ^16.0.0", "react@^15.0.0 || ^16.0.0", "react@^15.0.0 || ^16.0.0 || ^17.0.0", "react@^15.3.0 || ^16.0.0-alpha", "react@^15.3.0 || 16 || 17 || 18", "react@^16.0.0 || ^17.0.0 || ^18.0.0", "react@^16.8 || ^17.0 || ^18.0", "react@^16.8.0 || ^17", "react@^16.8.0 || ^17.0.0", "react@^16.8.0 || ^17.0.0 || ^18.0.0", "react@^16.8.0 || ^17.0.0-rc.1", "react@^16.8.3 || ^17 || ^18", "react@^16.8.5 || ^17.0.0 || ^18.0.0", "react@^16.8.6", "react@^17.0.0", "react@^17.0.0 || ^16.8", "react@^17.0.1", "react@^17.0.1 || ^16.7.0", "react@^17.0.2", "react@>= 16", "react@>= 16.14", "react@>= 16.3.0", "react@>= 16.8.0", "react@>= 16.9.0", "react@>=0.14.0", "react@>=15.0.0", "react@>=16", "react@>=16.0.0", "react@>=16.14.0", "react@>=16.3", "react@>=16.3.0", "react@>=16.6.0", "react@>=16.8", "react@>=16.8.0", "react@>=16.x", "react@>=17.0.2", "react@0.14 || 15 || 16 || 17", "react@17.0.2":
   "integrity" "sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA=="
   "resolved" "https://registry.npmjs.org/react/-/react-17.0.2.tgz"
   "version" "17.0.2"

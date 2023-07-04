@@ -1715,8 +1715,8 @@
         "order": -1,
         "apiLabel": "FabricId2",
         "apiValue": null,
-        "apiLabel3": "FabricId",
-        "apiValue3": null,
+        "apiLabel2": "LiningId",
+        "apiValue2": null,
         "lang": [
           "en",
           "fa"
@@ -3759,6 +3759,19 @@
         ]
       },
       {
+        "cart": "SheersPhotoUrl",
+        "title": "SheersPhotoUrl",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "SheersPhotoUrl",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
         "cart": "calcMeasurements",
         "title": "calcMeasurements",
         "titleValue": null,
@@ -3868,14 +3881,63 @@
         ]
       },
       {
+        "cart": "SheersDesignFa",
+        "title": "Fabric",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "SheersDesignFa",
+        "apiValue": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "SheersDesignEn",
+        "title": "Fabric",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "SheersDesignEn",
+        "apiValue": null,
+        "lang": [
+          "en"
+        ]
+      },
+      {
+        "cart": "SheersColorEn",
+        "title": "Color",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "SheersColorEn",
+        "apiValue": null,
+        "lang": [
+          "en"
+        ]
+      },
+      {
+        "cart": "SheersColorFa",
+        "title": "Color",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "SheersColorFa",
+        "apiValue": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
         "cart": "SheerHeaderStyle",
         "title": "Sheer Header Style",
         "titleValue": null,
         "titlePostfix": "",
-        "order": 3,
+        "order": 6,
         "apiLabel": "SheerHeaderStyle",
         "apiValue": null,
         "lang": [
+          "en",
           "fa"
         ]
       },
@@ -3884,10 +3946,24 @@
         "title": "Privacy Layer",
         "titleValue": null,
         "titlePostfix": "",
-        "order": 4,
+        "order": -1,
         "apiLabel": "PrivacyLayer",
         "apiValue": null,
         "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "PrivacyLayerHeaderStyle",
+        "title": "Privacy Layer Header Style",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 8,
+        "apiLabel": "PrivacyLayerHeaderStyle",
+        "apiValue": null,
+        "lang": [
+          "en",
           "fa"
         ]
       },
@@ -3901,7 +3977,7 @@
           "4903": "Right Corner Window"
         },
         "titlePostfix": "",
-        "order": 8,
+        "order": 9,
         "apiLabel": "CurtainPositionId",
         "apiValue": {
           "Standard": 4901,
@@ -3909,6 +3985,27 @@
           "Left Corner Window": 4904,
           "Right Corner Window": 4903
         },
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Mount",
+        "title": "Mount",
+        "titleValue": {
+          "true": "Wall",
+          "false": "Ceiling"
+        },
+        "titlePostfix": "",
+        "order": 10,
+        "apiLabel": "IsWalled",
+        "apiValue": {
+          "Wall": true,
+          "Ceiling": false
+        },
+        "apiLabel2": "IsWalled",
+        "apiValue2": null,
         "lang": [
           "fa"
         ]
@@ -3923,6 +4020,7 @@
         "apiValue": null,
         "measurements": true,
         "lang": [
+          "en",
           "en",
           "fa"
         ]
@@ -3974,7 +4072,7 @@
         "title": "Width",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": 5,
+        "order": 11,
         "apiLabel": "WindowWidth",
         "apiValue": null,
         "measurements": true,
@@ -3988,7 +4086,7 @@
         "title": "Height",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": 6,
+        "order": 12,
         "apiLabel": "WindowHeight",
         "apiValue": null,
         "measurements": true,
@@ -4083,10 +4181,10 @@
       },
       {
         "cart": "hasRod",
-        "title": "hasRod",
+        "title": "has Rod",
         "titleValue": null,
         "titlePostfix": "cm",
-        "order": -1,
+        "order": 13,
         "apiLabel": "RodInstalled",
         "apiValue": null,
         "measurements": true,
@@ -4105,7 +4203,7 @@
           "5404": "Slight Puddle"
         },
         "titlePostfix": "",
-        "order": -1,
+        "order": 14,
         "apiLabel": "FinishedLengthType",
         "apiValue": {
           "Sill": 5401,
@@ -4307,7 +4405,7 @@
         "titleValue": null,
         "titlePostfix": "cm",
         "order": -1,
-        "apiLabel": "RodLength",
+        "apiLabel": "Width1",
         "apiValue": null,
         "measurements": true,
         "lang": [
@@ -4345,62 +4443,133 @@
       },
       {
         "cart": "Lining",
-        "title": "",
+        "title": "Lining",
         "titleValue": null,
         "titlePostfix": "",
-        "order": 7,
+        "order": 15,
         "apiLabel": "Lining",
         "apiValue": null,
+        "apiLabel2": "LiningId",
+        "apiValue2": {
+          "Standard Lining": null,
+          "Privacy Lining": 90909101
+        },
         "lang": [
+          "en",
           "fa"
         ]
       },
       {
         "cart": "PanelCoverage",
-        "title": "",
+        "title": "Panel Coverage",
         "titleValue": null,
         "titlePostfix": "",
-        "order": 8,
+        "order": 16,
         "apiLabel": "PanelCoverage",
         "apiValue": null,
         "lang": [
+          "en",
           "fa"
         ]
       },
       {
         "cart": "PanelType",
-        "title": "",
+        "title": "Panel Type",
         "titleValue": null,
         "titlePostfix": "",
-        "order": 9,
+        "order": 17,
         "apiLabel": "PanelType",
         "apiValue": null,
         "lang": [
+          "en",
           "fa"
         ]
       },
       {
         "cart": "GrommetFinish",
+        "title": "Grommet Finish",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 18,
+        "apiLabel": "GrommetFinish",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "Hardware",
+        "title": "Hardware",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 19,
+        "apiLabel": "Hardware",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "RailDesign",
+        "title": "Rail Design",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "RailDesign",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "RailDesignFa",
         "title": "",
         "titleValue": null,
         "titlePostfix": "",
-        "order": 10,
-        "apiLabel": "GrommetFinish",
+        "order": -1,
+        "apiLabel": "RailDesignFa",
         "apiValue": null,
         "lang": [
           "fa"
         ]
       },
       {
-        "cart": "Hardware",
+        "cart": "RailDesignEn",
         "title": "",
         "titleValue": null,
         "titlePostfix": "",
-        "order": 11,
-        "apiLabel": "Hardware",
+        "order": -1,
+        "apiLabel": "RailDesignEn",
+        "apiValue": null,
+        "lang": [
+          "en"
+        ]
+      },
+      {
+        "cart": "RailColorFa",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "RailColorFa",
         "apiValue": null,
         "lang": [
           "fa"
+        ]
+      },
+      {
+        "cart": "RailColorEn",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "RailColorEn",
+        "apiValue": null,
+        "lang": [
+          "en"
         ]
       },
       {
@@ -4413,13 +4582,18 @@
         "apiValue": null,
         "apiLabel2": "RailId",
         "apiValue2": null,
+        "apiLabel3": "RailId",
+        "apiValue3": null,
+        "apiLabel4": "RailId",
+        "apiValue4": null,
         "lang": [
+          "en",
           "fa"
         ]
       },
       {
         "cart": "BatonOption",
-        "title": "",
+        "title": "Baton Option",
         "titleValue": null,
         "titlePostfix": "",
         "order": -1,
@@ -4427,42 +4601,164 @@
         "apiValue": null,
         "apiLabel2": "BatonOption",
         "apiValue2": null,
+        "apiAcc": true,
+        "apiAccValue": {
+          "None": null,
+          "Baton 30cm": {
+            "SewingAccessoryId": 27,
+            "SewingModelAccessoryId": 24,
+            "SewingAccessoryValue": "90908201",
+            "Qty": 1
+          },
+          "Baton 45cm": {
+            "SewingAccessoryId": 27,
+            "SewingModelAccessoryId": 24,
+            "SewingAccessoryValue": "90908202",
+            "Qty": 1
+          },
+          "Cord": {
+            "SewingAccessoryId": 27,
+            "SewingModelAccessoryId": 24,
+            "SewingAccessoryValue": "90908203",
+            "Qty": 1
+          }
+        },
+        "apiAcc2": true,
+        "apiAccValue2": {
+          "None": null,
+          "Baton 30cm": {
+            "SewingAccessoryId": 27,
+            "SewingModelAccessoryId": 24,
+            "SewingAccessoryValue": "90908201",
+            "Qty": 1
+          },
+          "Baton 45cm": {
+            "SewingAccessoryId": 27,
+            "SewingModelAccessoryId": 24,
+            "SewingAccessoryValue": "90908202",
+            "Qty": 1
+          },
+          "Cord": {
+            "SewingAccessoryId": 27,
+            "SewingModelAccessoryId": 24,
+            "SewingAccessoryValue": "90908203",
+            "Qty": 1
+          }
+        },
+        "apiAcc3": true,
+        "apiAccValue3": {
+          "None": null,
+          "Baton 30cm": {
+            "SewingAccessoryId": 27,
+            "SewingModelAccessoryId": 24,
+            "SewingAccessoryValue": "90908201",
+            "Qty": 1
+          },
+          "Baton 45cm": {
+            "SewingAccessoryId": 27,
+            "SewingModelAccessoryId": 24,
+            "SewingAccessoryValue": "90908202",
+            "Qty": 1
+          },
+          "Cord": {
+            "SewingAccessoryId": 27,
+            "SewingModelAccessoryId": 24,
+            "SewingAccessoryValue": "90908203",
+            "Qty": 1
+          }
+        },
         "lang": [
+          "en",
           "fa"
         ]
       },
       {
-        "cart": "RodColor",
+        "cart": "Mount8",
+        "title": "Mount",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "Mount8",
+        "apiValue": null,
+        "apiLabel2": "Mount8",
+        "apiValue2": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "DraperyHardware",
+        "title": "Drapery Hardware",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 19,
+        "apiLabel": "DraperyHardware",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "RailDesignA",
+        "title": "Rail DesignA",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "RailDesignA",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "RailDesignFaA",
         "title": "",
         "titleValue": null,
         "titlePostfix": "",
         "order": -1,
-        "apiLabel": "RodColor",
+        "apiLabel": "RailDesignFaA",
         "apiValue": null,
-        "apiLabel2": "RodColor",
-        "apiValue2": null,
         "lang": [
           "fa"
         ]
       },
       {
-        "cart": "Mount",
+        "cart": "RailDesignEnA",
         "title": "",
-        "titleValue": {
-          "true": "Wall",
-          "false": "Ceiling"
-        },
+        "titleValue": null,
         "titlePostfix": "",
         "order": -1,
-        "apiLabel": "IsWalled",
-        "apiValue": {
-          "Wall": true,
-          "Ceiling": false
-        },
-        "apiLabel2": "IsWalled",
-        "apiValue2": null,
+        "apiLabel": "RailDesignEnA",
+        "apiValue": null,
+        "lang": [
+          "en"
+        ]
+      },
+      {
+        "cart": "RailColorFaA",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "RailColorFaA",
+        "apiValue": null,
         "lang": [
           "fa"
+        ]
+      },
+      {
+        "cart": "RailColorEnA",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "RailColorEnA",
+        "apiValue": null,
+        "lang": [
+          "en"
         ]
       },
       {
@@ -4476,12 +4772,13 @@
         "apiLabel2": "RailIdA",
         "apiValue2": null,
         "lang": [
+          "en",
           "fa"
         ]
       },
       {
         "cart": "BatonOptionA",
-        "title": "",
+        "title": "Baton Option",
         "titleValue": null,
         "titlePostfix": "",
         "order": -1,
@@ -4489,27 +4786,36 @@
         "apiValue": null,
         "apiLabel2": "BatonOptionA",
         "apiValue2": null,
+        "apiAcc": true,
+        "apiAccValue": {
+          "None": null,
+          "Baton 30cm": {
+            "SewingAccessoryId": 27,
+            "SewingModelAccessoryId": 24,
+            "SewingAccessoryValue": "90908201",
+            "Qty": 1
+          },
+          "Baton 45cm": {
+            "SewingAccessoryId": 27,
+            "SewingModelAccessoryId": 24,
+            "SewingAccessoryValue": "90908202",
+            "Qty": 1
+          },
+          "Cord": {
+            "SewingAccessoryId": 27,
+            "SewingModelAccessoryId": 24,
+            "SewingAccessoryValue": "90908203",
+            "Qty": 1
+          }
+        },
         "lang": [
-          "fa"
-        ]
-      },
-      {
-        "cart": "RodColorA",
-        "title": "",
-        "titleValue": null,
-        "titlePostfix": "",
-        "order": -1,
-        "apiLabel": "RodColorA",
-        "apiValue": null,
-        "apiLabel2": "RodColorA",
-        "apiValue2": null,
-        "lang": [
+          "en",
           "fa"
         ]
       },
       {
         "cart": "MountA",
-        "title": "",
+        "title": "Mount",
         "titleValue": null,
         "titlePostfix": "",
         "order": -1,
@@ -4518,7 +4824,82 @@
         "apiLabel2": "MountA",
         "apiValue2": null,
         "lang": [
+          "en",
           "fa"
+        ]
+      },
+      {
+        "cart": "SheerHardware",
+        "title": "Sheer Hardware",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 20,
+        "apiLabel": "SheerHardware",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "RailDesignB",
+        "title": "Rail Design",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "RailDesignB",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "RailDesignFaB",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "RailDesignFaB",
+        "apiValue": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "RailDesignEnB",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "RailDesignEnB",
+        "apiValue": null,
+        "lang": [
+          "en"
+        ]
+      },
+      {
+        "cart": "RailColorFaB",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "RailColorFaB",
+        "apiValue": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "RailColorEnB",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "RailColorEnB",
+        "apiValue": null,
+        "lang": [
+          "en"
         ]
       },
       {
@@ -4532,12 +4913,13 @@
         "apiLabel3": "RailIdB",
         "apiValue3": null,
         "lang": [
+          "en",
           "fa"
         ]
       },
       {
         "cart": "BatonOptionB",
-        "title": "",
+        "title": "Baton Option",
         "titleValue": null,
         "titlePostfix": "",
         "order": -1,
@@ -4545,27 +4927,36 @@
         "apiValue": null,
         "apiLabel3": "BatonOptionB",
         "apiValue3": null,
+        "apiAcc2": true,
+        "apiAccValue2": {
+          "None": null,
+          "Baton 30cm": {
+            "SewingAccessoryId": 27,
+            "SewingModelAccessoryId": 24,
+            "SewingAccessoryValue": "90908201",
+            "Qty": 1
+          },
+          "Baton 45cm": {
+            "SewingAccessoryId": 27,
+            "SewingModelAccessoryId": 24,
+            "SewingAccessoryValue": "90908202",
+            "Qty": 1
+          },
+          "Cord": {
+            "SewingAccessoryId": 27,
+            "SewingModelAccessoryId": 24,
+            "SewingAccessoryValue": "90908203",
+            "Qty": 1
+          }
+        },
         "lang": [
-          "fa"
-        ]
-      },
-      {
-        "cart": "RodColorB",
-        "title": "",
-        "titleValue": null,
-        "titlePostfix": "",
-        "order": -1,
-        "apiLabel": "RodColorB",
-        "apiValue": null,
-        "apiLabel3": "RodColorB",
-        "apiValue3": null,
-        "lang": [
+          "en",
           "fa"
         ]
       },
       {
         "cart": "MountB",
-        "title": "",
+        "title": "Mount",
         "titleValue": null,
         "titlePostfix": "",
         "order": -1,
@@ -4574,7 +4965,82 @@
         "apiLabel3": "MountB",
         "apiValue3": null,
         "lang": [
+          "en",
           "fa"
+        ]
+      },
+      {
+        "cart": "PrivacyLayerHardware",
+        "title": "Privacy Layer Hardware",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 21,
+        "apiLabel": "PrivacyLayerHardware",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "RailDesignC",
+        "title": "Rail Design",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "RailDesignC",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "RailDesignFaC",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "RailDesignFaC",
+        "apiValue": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "RailDesignEnC",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "RailDesignEnC",
+        "apiValue": null,
+        "lang": [
+          "en"
+        ]
+      },
+      {
+        "cart": "RailColorFaC",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "RailColorFaC",
+        "apiValue": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "RailColorEnC",
+        "title": "",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "RailColorEnC",
+        "apiValue": null,
+        "lang": [
+          "en"
         ]
       },
       {
@@ -4588,12 +5054,13 @@
         "apiLabel4": "RailIdC",
         "apiValue4": null,
         "lang": [
+          "en",
           "fa"
         ]
       },
       {
         "cart": "BatonOptionC",
-        "title": "",
+        "title": "Baton Option",
         "titleValue": null,
         "titlePostfix": "",
         "order": -1,
@@ -4601,27 +5068,36 @@
         "apiValue": null,
         "apiLabel4": "BatonOptionC",
         "apiValue4": null,
+        "apiAcc3": true,
+        "apiAccValue3": {
+          "None": null,
+          "Baton 30cm": {
+            "SewingAccessoryId": 27,
+            "SewingModelAccessoryId": 24,
+            "SewingAccessoryValue": "90908201",
+            "Qty": 1
+          },
+          "Baton 45cm": {
+            "SewingAccessoryId": 27,
+            "SewingModelAccessoryId": 24,
+            "SewingAccessoryValue": "90908202",
+            "Qty": 1
+          },
+          "Cord": {
+            "SewingAccessoryId": 27,
+            "SewingModelAccessoryId": 24,
+            "SewingAccessoryValue": "90908203",
+            "Qty": 1
+          }
+        },
         "lang": [
-          "fa"
-        ]
-      },
-      {
-        "cart": "RodColorC",
-        "title": "",
-        "titleValue": null,
-        "titlePostfix": "",
-        "order": -1,
-        "apiLabel": "RodColorC",
-        "apiValue": null,
-        "apiLabel4": "RodColorC",
-        "apiValue4": null,
-        "lang": [
+          "en",
           "fa"
         ]
       },
       {
         "cart": "MountC",
-        "title": "",
+        "title": "Mount",
         "titleValue": null,
         "titlePostfix": "",
         "order": -1,
@@ -4630,6 +5106,7 @@
         "apiLabel4": "MountC",
         "apiValue4": null,
         "lang": [
+          "en",
           "fa"
         ]
       },
@@ -4638,7 +5115,7 @@
         "title": "",
         "titleValue": null,
         "titlePostfix": "",
-        "order": 16,
+        "order": 34,
         "apiLabel": "RoomNameFa",
         "apiValue": null,
         "lang": [
@@ -4650,7 +5127,7 @@
         "title": "",
         "titleValue": null,
         "titlePostfix": "",
-        "order": 16,
+        "order": 35,
         "apiLabel": "RoomNameEn",
         "apiValue": null,
         "lang": [
@@ -4814,7 +5291,7 @@
         ]
       }
     ],
-    "route": "/Curtain/Dual-Roller-Shades/0325"
+    "route": "/Curtain/Dual-Roller-Shades/0099"
   },
   "0302": {}
 }

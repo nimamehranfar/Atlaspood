@@ -22,7 +22,7 @@ import Dropdown from "react-bootstrap/Dropdown";
 import {convertToPersian} from "../Components/TextTransform";
 import {Accordion, AccordionContext, useAccordionButton} from "react-bootstrap";
 import PopoverStickOnClick from "../Components/PopoverStickOnClick";
-import { NumToFa,CapitalizeAllWords} from "../Components/TextTransform";
+import {NumToFa, CapitalizeAllWords} from "../Components/TextTransform";
 import SaveUserProject from "../Components/SaveUserProject";
 
 const baseURLPrice = "https://api.atlaspood.ir/Sewing/GetSewingOrderPrice";
@@ -318,7 +318,7 @@ function Basket() {
         if (draperyRef.current[refIndex]) {
             draperyRef.current[refIndex].classList.add("is_loading");
         }
-        axios.post(baseURLDeleteBasketProject + "/" + refIndex, {},{
+        axios.post(baseURLDeleteBasketProject + "/" + refIndex, {}, {
             headers: authHeader()
         }).then((response) => {
             if (draperyRef.current[refIndex]) {
@@ -383,7 +383,7 @@ function Basket() {
         }
     }
     
-    function copyItem(indexOrObj,pageId,SpecialId) {
+    function copyItem(indexOrObj, pageId, SpecialId) {
         if (isLoggedIn) {
             let tempObj = JSON.parse(JSON.stringify(indexOrObj));
             delete tempObj["SewingPreorderId"];
@@ -405,7 +405,7 @@ function Basket() {
             // copyBagObject(indexOrObj);
             sessionStorage.setItem("cartCopy", JSON.stringify(tempObj));
             setTimeout(() => {
-                navigate("/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[tempObj["SewingModelId"]]["route"] + (SpecialId ? "/"+SpecialId : "") + "/Page-ID/" + pageId)
+                navigate("/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[tempObj["SewingModelId"]]["route"] + (SpecialId ? "/" + SpecialId : "") + "/Page-ID/" + pageId)
             }, 200);
             
         } else {
@@ -418,7 +418,7 @@ function Basket() {
             delete tempObj["RoomNameFa"];
             tempObj["Count"] = 1;
             tempObj["WindowCount"] = 1;
-    
+            
             delete tempObj["PreorderText"]["IsCompleted"];
             delete tempObj["PreorderText"]["WindowName"];
             delete tempObj["PreorderText"]["WindowDescription"];
@@ -445,7 +445,7 @@ function Basket() {
             // }
             sessionStorage.setItem("cartCopy", JSON.stringify(tempObj));
             setTimeout(() => {
-                navigate("/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[tempObj["SewingModelId"]]["route"] + (SpecialId ? "/"+SpecialId : "") + "/Page-ID/" + pageId)
+                navigate("/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[tempObj["SewingModelId"]]["route"] + (SpecialId ? "/" + SpecialId : "") + "/Page-ID/" + pageId)
             }, 200);
             
         }
@@ -604,8 +604,8 @@ function Basket() {
                 zipCode: zipcodeAll
             }
         }).then((response) => {
-            if(response.data) {
-                if(isLoggedIn) {
+            if (response.data) {
+                if (isLoggedIn) {
                     axios.get(baseURLChangeZipcode + "/" + zipcodeId, {
                         params: {
                             zipCode: zipcodeAll
@@ -632,23 +632,22 @@ function Basket() {
                             setHasInstall(null);
                         }
                     });
-                }
-                else{
+                } else {
                     if (localStorage.getItem("cart") !== null) {
                         let cartObj = JSON.parse(localStorage.getItem("cart"));
                         let temp = cartObj["drapery"];
                         let promiseArr = [];
-    
+                        
                         temp.forEach((tempObj, index) => {
                             promiseArr[index] = new Promise((resolve, reject) => {
-                                if(tempObj["ZipCode"]!=="") {
+                                if (tempObj["ZipCode"] !== "") {
                                     tempObj["ZipCode"] = zipcodeAll;
                                     tempObj["PreorderText"]["ZipCode"] = zipcodeAll;
                                 }
                                 resolve();
                             })
                         })
-    
+                        
                         Promise.all(promiseArr).then(() => {
                             cartObj["drapery"] = temp;
                             localStorage.setItem('cart', JSON.stringify(cartObj));
@@ -661,8 +660,7 @@ function Basket() {
                         setCartChanged(cartChanged + 1);
                     }
                 }
-            }
-            else{
+            } else {
                 setHasInstall(response.data);
             }
         }).catch(err => {
@@ -672,7 +670,7 @@ function Basket() {
         
     }
     
-    function getCart(){
+    function getCart() {
         if (isLoggedIn) {
             axios.get(baseURLGetCart, {
                 headers: authHeader()
@@ -707,7 +705,7 @@ function Basket() {
         });
     }
     
-    function renderDraperies(){
+    function renderDraperies() {
         if (isLoggedIn) {
             if (drapery.length) {
                 let tempFiles = JSON.parse(JSON.stringify(files));
@@ -715,9 +713,9 @@ function Basket() {
                 let temp = [];
                 let tempNoShip = true;
                 let promise2 = new Promise((resolve, reject) => {
-                    drapery.sort(function(a, b) {
-                        return b["CartDetailId"] - a["CartDetailId"]  ||  b["SewingPreorderId"] - a["SewingPreorderId"];
-                    }).forEach((tempObj,i)=>{
+                    drapery.sort(function (a, b) {
+                        return b["CartDetailId"] - a["CartDetailId"] || b["SewingPreorderId"] - a["SewingPreorderId"];
+                    }).forEach((tempObj, i) => {
                         let projectDataObj = projectData[drapery[i]["SewingPreorder"]["SewingModelId"]];
                         let desc = [];
                         let projectId = drapery[i]["SewingPreorderId"];
@@ -932,20 +930,20 @@ function Basket() {
                                             </div>
                                             <div className="basket_item_desc_button">
                                                 <Link className="btn basket_desc_button"
-                                                      to={"/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[drapery[i]["SewingPreorder"]["SewingModelId"]]["route"] + (obj["SpecialId"] ? "/"+obj["SpecialId"] : "") + "/Bag-Projects/" + drapery[i]["SewingPreorderId"] + "/Page-ID/" + obj["PageId"]}>{t("EDIT")}</Link>
-                                                <button className="basket_desc_button" onClick={() => copyItem(drapery[i]["SewingPreorder"],obj["PageId"],obj["SpecialId"])}>{t("COPY")}</button>
+                                                      to={"/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[drapery[i]["SewingPreorder"]["SewingModelId"]]["route"] + (obj["SpecialId"] ? "/" + obj["SpecialId"] : "") + "/Bag-Projects/" + drapery[i]["SewingPreorderId"] + "/Page-ID/" + obj["PageId"]}>{t("EDIT")}</Link>
+                                                <button className="basket_desc_button" onClick={() => copyItem(drapery[i]["SewingPreorder"], obj["PageId"], obj["SpecialId"])}>{t("COPY")}</button>
                                             </div>
                                             {zipcode && zipcode !== "" &&
                                                 <div className="basket_zipcode_container">
                                                     <div className="basket_zipcode_left">
                                                         <h1 className="basket_zipcode_title">{t("basket_zipcode_text1")}</h1>
-                                                        {(zipcodeId===-1 || zipcodeId!==drapery[i]["SewingPreorderId"]) &&
+                                                        {(zipcodeId === -1 || zipcodeId !== drapery[i]["SewingPreorderId"]) &&
                                                             <div className="basket_zipcode_change_container">
                                                                 <h2 className="basket_zipcode_title2">{t("basket_zipcode_text3")}{pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${zipcode}`) : zipcode}&nbsp;|&nbsp;</h2>
-                                                                <h2 className="basket_zipcode_title3 text_underline" onClick={()=>setZipcodeId(drapery[i]["SewingPreorderId"])}>{t("Change")}</h2>
+                                                                <h2 className="basket_zipcode_title3 text_underline" onClick={() => setZipcodeId(drapery[i]["SewingPreorderId"])}>{t("Change")}</h2>
                                                             </div>
                                                         }
-                                                        {zipcodeId===drapery[i]["SewingPreorderId"] &&
+                                                        {zipcodeId === drapery[i]["SewingPreorderId"] &&
                                                             <div className="basket_zipcode_change_input_container">
                                                                 <input className="zipcode_input form-control" type="text" name="zipcode_input" defaultValue={zipcodeAll}
                                                                        placeholder={t("Enter Zip Code")} onChange={(e) => {
@@ -959,7 +957,7 @@ function Basket() {
                                                                 </button>
                                                             </div>
                                                         }
-                                                        {zipcodeId===drapery[i]["SewingPreorderId"] && hasInstall===false &&
+                                                        {zipcodeId === drapery[i]["SewingPreorderId"] && hasInstall === false &&
                                                             <h3 className="basket_zipcode_err">{t("basket_zipcode_err")}</h3>
                                                         }
                                                         <button className="basket_zipcode_btn text_underline"
@@ -1118,33 +1116,70 @@ function Basket() {
                                 });
                                 
                                 tempPostObj["SewingOrderDetails"] = [];
-                                tempPostObj["SewingOrderDetails"][0] = {};
+                                for (let i = 0; i < 3; i++) {
+                                    tempPostObj["SewingOrderDetails"][i] = {};
+                                    tempPostObj["SewingOrderDetails"][i]["IsLowWrinkle"] = true;
+                                    tempPostObj["SewingOrderDetails"][i]["IsCoverAll"] = true;
+                                    tempPostObj["SewingOrderDetails"][i]["IsAltogether"] = true;
+                                }
+                                
+                                
                                 tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
                                 tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = obj["SewingModelId"];
-                                tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
-                                tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
-                                tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
+                                
+                                tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2302;
+                                tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `0002`;
+                                
+                                tempPostObj["SewingOrderDetails"][2]["CurtainPartId"] = 2301;
+                                tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
+                                
                                 Object.keys(temp).forEach(key => {
                                     if (temp[key] !== null || temp[key] !== "") {
                                         let tempObj = userProjects.find(obj => obj["cart"] === key);
-                                        if (tempObj["apiLabel2"] !== undefined) {
-                                            if (tempObj["apiValue2"] === null) {
-                                                tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
-                                            } else {
-                                                tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                                        // console.log(key,userProjects.find(obj => obj["cart"] === key));
+                                        if (tempObj) {
+                                            for (let i = 0; i < 3; i++) {
+                                                let j = +i + +2;
+                                                if (tempObj["apiLabel" + j] !== undefined) {
+                                                    if (tempObj["apiValue" + j] === null) {
+                                                        tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = temp[key];
+                                                        // console.log(i,tempObj["cart"],tempPostObj["SewingOrderDetails"],tempPostObj["SewingOrderDetails"][i]);
+                                                    } else {
+                                                        tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = tempObj["apiValue" + j][temp[key]];
+                                                    }
+                                                }
                                             }
                                         }
                                     }
                                 });
+                                // console.log(tempPostObj["SewingOrderDetails"]);
                                 tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
+                                tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
+                                tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
                                 Object.keys(temp).forEach(key => {
                                     if (temp[key] !== null || temp[key] !== "") {
                                         let tempObj = userProjects.find(obj => obj["cart"] === key);
-                                        if (tempObj["apiAcc"] !== undefined) {
-                                            if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
-                                                tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
-                                            } else {
-                                            
+                                        if (tempObj) {
+                                            if (tempObj["apiAcc"] !== undefined) {
+                                                if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
+                                                    tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
+                                                } else {
+                                                
+                                                }
+                                            }
+                                            if (tempObj["apiAcc2"] !== undefined) {
+                                                if (tempObj["apiAcc2"] === true && tempObj["apiAccValue2"][temp[key]]) {
+                                                    tempPostObj["SewingOrderDetails"][1]["Accessories"].push(tempObj["apiAccValue2"][temp[key]]);
+                                                } else {
+                                                
+                                                }
+                                            }
+                                            if (tempObj["apiAcc3"] !== undefined) {
+                                                if (tempObj["apiAcc3"] === true && tempObj["apiAccValue3"][temp[key]]) {
+                                                    tempPostObj["SewingOrderDetails"][2]["Accessories"].push(tempObj["apiAccValue3"][temp[key]]);
+                                                } else {
+                                                
+                                                }
                                             }
                                         }
                                     }
@@ -1164,7 +1199,12 @@ function Basket() {
                                 // delete tempPostObj["SewingOrderDetails"][0]["SewingModelId"];
                                 // delete tempPostObj["SewingModelId"];
                                 tempPostObj["SewingModelId"] = tempPostObj["SewingOrderDetails"][0]["SewingModelId"];
-                                
+                                // console.log(tempPostObj);
+                                for (let i = tempPostObj["SewingOrderDetails"].length - 1; i >= 0; i--) {
+                                    if (tempPostObj["SewingOrderDetails"] && tempPostObj["SewingOrderDetails"][i] && tempPostObj["SewingOrderDetails"][i]["FabricId"] === undefined) {
+                                        tempPostObj["SewingOrderDetails"].splice(i, 1);
+                                    }
+                                }
                                 if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
                                     axios.post(baseURLPrice, tempPostObj).then((response) => {
                                         resolve(response);
@@ -1320,7 +1360,7 @@ function Basket() {
                             });
                             
                             Promise.all(promiseArr2).then(() => {
-                                temp[tempDrapery.length-index-1] =
+                                temp[tempDrapery.length - index - 1] =
                                     <li className="drapery_basket_item" key={index} ref={ref => (draperyRef.current[index] = ref)}>
                                         <span className="basket_item_title">
                                             <div className="basket_item_image_container">
@@ -1372,20 +1412,20 @@ function Basket() {
                                                 </div>
                                                 <div className="basket_item_desc_button">
                                                     <Link className="btn basket_desc_button"
-                                                          to={"/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[obj["SewingModelId"]]["route"] + (obj["SpecialId"] ? "/"+obj["SpecialId"] : "") + "/Bag-Projects/" + index + "/Page-ID/" + obj["PageId"]}>{t("EDIT")}</Link>
-                                                    <button className="basket_desc_button" onClick={() => copyItem(index,obj["PageId"],obj["SpecialId"])}>{t("COPY")}</button>
+                                                          to={"/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[obj["SewingModelId"]]["route"] + (obj["SpecialId"] ? "/" + obj["SpecialId"] : "") + "/Bag-Projects/" + index + "/Page-ID/" + obj["PageId"]}>{t("EDIT")}</Link>
+                                                    <button className="basket_desc_button" onClick={() => copyItem(index, obj["PageId"], obj["SpecialId"])}>{t("COPY")}</button>
                                                 </div>
                                                 {zipcode &&
                                                     <div className="basket_zipcode_container">
                                                         <div className="basket_zipcode_left">
                                                             <h1 className="basket_zipcode_title">{t("basket_zipcode_text1")}</h1>
-                                                            {(zipcodeId===-1 || zipcodeId!==index) &&
+                                                            {(zipcodeId === -1 || zipcodeId !== index) &&
                                                                 <div className="basket_zipcode_change_container">
                                                                     <h2 className="basket_zipcode_title2">{t("basket_zipcode_text3")}{zipcode}&nbsp;|&nbsp;</h2>
-                                                                    <h2 className="basket_zipcode_title3 text_underline" onClick={()=>setZipcodeId(index)}>{t("Change")}</h2>
+                                                                    <h2 className="basket_zipcode_title3 text_underline" onClick={() => setZipcodeId(index)}>{t("Change")}</h2>
                                                                 </div>
                                                             }
-                                                            {zipcodeId===index &&
+                                                            {zipcodeId === index &&
                                                                 <div className="basket_zipcode_change_input_container">
                                                                     <input className="zipcode_input form-control" type="text" name="zipcode_input" defaultValue={zipcodeAll}
                                                                            placeholder={t("Enter Zip Code")} onChange={(e) => {
@@ -1399,7 +1439,7 @@ function Basket() {
                                                                     </button>
                                                                 </div>
                                                             }
-                                                            {zipcodeId===index && hasInstall===false &&
+                                                            {zipcodeId === index && hasInstall === false &&
                                                                 <h3 className="basket_zipcode_err">{t("basket_zipcode_err")}</h3>
                                                             }
                                                             <button className="basket_zipcode_btn text_underline" onClick={() => removeZipcode(index)}>{t("Remove")}</button>
@@ -1603,8 +1643,7 @@ function Basket() {
         }
         if (firstRender.current) {
             firstRender.current = false;
-        }
-        else {
+        } else {
             dispatch({
                 type: CartUpdatedTrue,
                 payload: {mainCart: cart}
@@ -1618,23 +1657,23 @@ function Basket() {
     }, [drapery]);
     
     useEffect(() => {
-        if(zipcodeId!==-1) {
+        if (zipcodeId !== -1) {
             renderDraperies();
         }
     }, [zipcodeId]);
     
     useEffect(() => {
-        if(zipcodeButton) {
+        if (zipcodeButton) {
             // console.log(zipcodeAll);
             setZipcodeButton(false);
-            if(zipcodeAll!=="" && zipcodeId!==-1){
+            if (zipcodeAll !== "" && zipcodeId !== -1) {
                 changeZipcode();
             }
         }
     }, [zipcodeButton]);
     
     useEffect(() => {
-        if(hasInstall===false) {
+        if (hasInstall === false) {
             renderDraperies();
             setHasInstall(null);
         }

@@ -448,7 +448,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
         let pageLanguage1 = location.pathname.split('').slice(1, 3).join('');
         if (Object.keys(bag).length > 0) {
             if (isLoggedIn) {
-            
+                
             } else {
                 cartObj = JSON.parse(localStorage.getItem("cart"));
                 temp = cartObj["swatches"];
@@ -558,7 +558,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                 <div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key}>
                     <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
                         <hr/>
-                        <span>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</span>
+                        <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(100000, pageLanguage1, pageLanguage1 === "en" ?"Tomans":"تومان")}</p></span>
                     </div>
                     {fabric}
                 </div>
@@ -1168,29 +1168,46 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
         });
         
         tempPostObj["SewingOrderDetails"] = [];
-        tempPostObj["SewingOrderDetails"][0] = {};
+        for (let i = 0; i < 3; i++) {
+            tempPostObj["SewingOrderDetails"][i] = {};
+            tempPostObj["SewingOrderDetails"][i]["IsLowWrinkle"] = true;
+            tempPostObj["SewingOrderDetails"][i]["IsCoverAll"] = true;
+            tempPostObj["SewingOrderDetails"][i]["IsAltogether"] = true;
+        }
+        
+        
         tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
         tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
-        tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
-        tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
-        tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
+        
+        tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2302;
+        tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `0002`;
+        
+        tempPostObj["SewingOrderDetails"][2]["CurtainPartId"] = 2301;
+        tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
         
         Object.keys(temp).forEach(key => {
             if (temp[key] !== null || temp[key] !== "") {
                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                 // console.log(key,userProjects.find(obj => obj["cart"] === key));
                 if (tempObj) {
-                    if (tempObj["apiLabel2"] !== undefined) {
-                        if (tempObj["apiValue2"] === null) {
-                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
-                        } else {
-                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                    for (let i = 0; i < 3; i++) {
+                        let j = +i + +2;
+                        if (tempObj["apiLabel" + j] !== undefined) {
+                            if (tempObj["apiValue" + j] === null) {
+                                tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = temp[key];
+                                // console.log(i,tempObj["cart"],tempPostObj["SewingOrderDetails"],tempPostObj["SewingOrderDetails"][i]);
+                            } else {
+                                tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = tempObj["apiValue" + j][temp[key]];
+                            }
                         }
                     }
                 }
             }
         });
+        // console.log(tempPostObj["SewingOrderDetails"]);
         tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
+        tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
+        tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
         Object.keys(temp).forEach(key => {
             if (temp[key] !== null || temp[key] !== "") {
                 let tempObj = userProjects.find(obj => obj["cart"] === key);
@@ -1199,7 +1216,21 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                         if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
                             tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
                         } else {
-                        
+                            
+                        }
+                    }
+                    if (tempObj["apiAcc2"] !== undefined) {
+                        if (tempObj["apiAcc2"] === true && tempObj["apiAccValue2"][temp[key]]) {
+                            tempPostObj["SewingOrderDetails"][1]["Accessories"].push(tempObj["apiAccValue2"][temp[key]]);
+                        } else {
+                            
+                        }
+                    }
+                    if (tempObj["apiAcc3"] !== undefined) {
+                        if (tempObj["apiAcc3"] === true && tempObj["apiAccValue3"][temp[key]]) {
+                            tempPostObj["SewingOrderDetails"][2]["Accessories"].push(tempObj["apiAccValue3"][temp[key]]);
+                        } else {
+                            
                         }
                     }
                 }
@@ -1216,8 +1247,11 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
         
         let promise2 = new Promise((resolve, reject) => {
             if (stepSelectedValue["3"] !== undefined && !pageLoad && !(motorLoad && refIndex === "MotorType") && refIndex !== "ZipCode") {
-                if (tempPostObj["SewingOrderDetails"][0]["FabricId"] === undefined) {
-                    delete tempPostObj["SewingOrderDetails"];
+                
+                for (let i = tempPostObj["SewingOrderDetails"].length - 1; i >= 0; i--) {
+                    if (tempPostObj["SewingOrderDetails"] && tempPostObj["SewingOrderDetails"][i] && tempPostObj["SewingOrderDetails"][i]["FabricId"] === undefined) {
+                        tempPostObj["SewingOrderDetails"].splice(i, 1);
+                    }
                 }
                 if (zipcode && zipcode !== "") {
                     tempPostObj["ZipCode"] = zipcode;
@@ -1313,34 +1347,70 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
             });
             
             tempPostObj["SewingOrderDetails"] = [];
-            tempPostObj["SewingOrderDetails"][0] = {};
+            for (let i = 0; i < 3; i++) {
+                tempPostObj["SewingOrderDetails"][i] = {};
+                tempPostObj["SewingOrderDetails"][i]["IsLowWrinkle"] = true;
+                tempPostObj["SewingOrderDetails"][i]["IsCoverAll"] = true;
+                tempPostObj["SewingOrderDetails"][i]["IsAltogether"] = true;
+            }
+            
+            
             tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
             tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
-            tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
-            tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
-            tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
+            
+            tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2302;
+            tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `0002`;
+            
+            tempPostObj["SewingOrderDetails"][2]["CurtainPartId"] = 2301;
+            tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
             
             Object.keys(temp).forEach(key => {
                 if (temp[key] !== null || temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
-                    if (tempObj["apiLabel2"] !== undefined) {
-                        if (tempObj["apiValue2"] === null) {
-                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
-                        } else {
-                            tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                    // console.log(key,userProjects.find(obj => obj["cart"] === key));
+                    if (tempObj) {
+                        for (let i = 0; i < 3; i++) {
+                            let j = +i + +2;
+                            if (tempObj["apiLabel" + j] !== undefined) {
+                                if (tempObj["apiValue" + j] === null) {
+                                    tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = temp[key];
+                                    // console.log(i,tempObj["cart"],tempPostObj["SewingOrderDetails"],tempPostObj["SewingOrderDetails"][i]);
+                                } else {
+                                    tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = tempObj["apiValue" + j][temp[key]];
+                                }
+                            }
                         }
                     }
                 }
             });
+            // console.log(tempPostObj["SewingOrderDetails"]);
             tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
+            tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
+            tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
             Object.keys(temp).forEach(key => {
                 if (temp[key] !== null || temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
-                    if (tempObj["apiAcc"] !== undefined) {
-                        if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
-                            tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
-                        } else {
-                        
+                    if (tempObj) {
+                        if (tempObj["apiAcc"] !== undefined) {
+                            if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
+                                tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
+                            } else {
+                                
+                            }
+                        }
+                        if (tempObj["apiAcc2"] !== undefined) {
+                            if (tempObj["apiAcc2"] === true && tempObj["apiAccValue2"][temp[key]]) {
+                                tempPostObj["SewingOrderDetails"][1]["Accessories"].push(tempObj["apiAccValue2"][temp[key]]);
+                            } else {
+                                
+                            }
+                        }
+                        if (tempObj["apiAcc3"] !== undefined) {
+                            if (tempObj["apiAcc3"] === true && tempObj["apiAccValue3"][temp[key]]) {
+                                tempPostObj["SewingOrderDetails"][2]["Accessories"].push(tempObj["apiAccValue3"][temp[key]]);
+                            } else {
+                                
+                            }
                         }
                     }
                 }
@@ -1353,8 +1423,11 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
             });
             
             if (stepSelectedValue["3"] !== undefined) {
-                if (tempPostObj["SewingOrderDetails"][0]["FabricId"] === undefined) {
-                    delete tempPostObj["SewingOrderDetails"];
+                
+                for (let i = tempPostObj["SewingOrderDetails"].length - 1; i >= 0; i--) {
+                    if (tempPostObj["SewingOrderDetails"] && tempPostObj["SewingOrderDetails"][i] && tempPostObj["SewingOrderDetails"][i]["FabricId"] === undefined) {
+                        tempPostObj["SewingOrderDetails"].splice(i, 1);
+                    }
                 }
                 // if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined && stepSelectedValue["2"] !== undefined && stepSelectedValue["3"] !== undefined) {
                 // console.log(JSON.stringify(tempPostObj));
@@ -1475,9 +1548,9 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
             setSelectCustomValues(temp);
         } else {
             let promiseArr = [];
-            Object.keys(temp).forEach((objKey,index) => {
+            Object.keys(temp).forEach((objKey, index) => {
                 promiseArr[index] = new Promise((resolve, reject) => {
-                    temp[objKey]=[]
+                    temp[objKey] = []
                     resolve();
                 });
             })
@@ -1486,11 +1559,11 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
             });
             
             let promiseArr2 = [];
-            Object.keys(temp2["labels"]).forEach((objKey,index) => {
+            Object.keys(temp2["labels"]).forEach((objKey, index) => {
                 promiseArr2[index] = new Promise((resolve, reject) => {
-                    temp2["labels"][objKey]=[];
-                    if(temp2["values"][objKey])
-                        temp2["values"][objKey]=[];
+                    temp2["labels"][objKey] = [];
+                    if (temp2["values"][objKey])
+                        temp2["values"][objKey] = [];
                     resolve();
                 });
             })
@@ -1638,33 +1711,70 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                 });
                 
                 tempPostObj["SewingOrderDetails"] = [];
-                tempPostObj["SewingOrderDetails"][0] = {};
+                for (let i = 0; i < 3; i++) {
+                    tempPostObj["SewingOrderDetails"][i] = {};
+                    tempPostObj["SewingOrderDetails"][i]["IsLowWrinkle"] = true;
+                    tempPostObj["SewingOrderDetails"][i]["IsCoverAll"] = true;
+                    tempPostObj["SewingOrderDetails"][i]["IsAltogether"] = true;
+                }
+                
+                
                 tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
                 tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
-                tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
-                tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
-                tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
+                
+                tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2302;
+                tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `0002`;
+                
+                tempPostObj["SewingOrderDetails"][2]["CurtainPartId"] = 2301;
+                tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
+                
                 Object.keys(temp).forEach(key => {
                     if (temp[key] !== null || temp[key] !== "") {
                         let tempObj = userProjects.find(obj => obj["cart"] === key);
-                        if (tempObj["apiLabel2"] !== undefined) {
-                            if (tempObj["apiValue2"] === null) {
-                                tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
-                            } else {
-                                tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                        // console.log(key,userProjects.find(obj => obj["cart"] === key));
+                        if (tempObj) {
+                            for (let i = 0; i < 3; i++) {
+                                let j = +i + +2;
+                                if (tempObj["apiLabel" + j] !== undefined) {
+                                    if (tempObj["apiValue" + j] === null) {
+                                        tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = temp[key];
+                                        // console.log(i,tempObj["cart"],tempPostObj["SewingOrderDetails"],tempPostObj["SewingOrderDetails"][i]);
+                                    } else {
+                                        tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = tempObj["apiValue" + j][temp[key]];
+                                    }
+                                }
                             }
                         }
                     }
                 });
+                // console.log(tempPostObj["SewingOrderDetails"]);
                 tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
+                tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
+                tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
                 Object.keys(temp).forEach(key => {
                     if (temp[key] !== null || temp[key] !== "") {
                         let tempObj = userProjects.find(obj => obj["cart"] === key);
-                        if (tempObj["apiAcc"] !== undefined) {
-                            if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
-                                tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
-                            } else {
-                            
+                        if (tempObj) {
+                            if (tempObj["apiAcc"] !== undefined) {
+                                if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
+                                    tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
+                                } else {
+                                    
+                                }
+                            }
+                            if (tempObj["apiAcc2"] !== undefined) {
+                                if (tempObj["apiAcc2"] === true && tempObj["apiAccValue2"][temp[key]]) {
+                                    tempPostObj["SewingOrderDetails"][1]["Accessories"].push(tempObj["apiAccValue2"][temp[key]]);
+                                } else {
+                                    
+                                }
+                            }
+                            if (tempObj["apiAcc3"] !== undefined) {
+                                if (tempObj["apiAcc3"] === true && tempObj["apiAccValue3"][temp[key]]) {
+                                    tempPostObj["SewingOrderDetails"][2]["Accessories"].push(tempObj["apiAccValue3"][temp[key]]);
+                                } else {
+                                    
+                                }
                             }
                         }
                     }
@@ -1676,6 +1786,11 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                     return el != null;
                 });
                 // console.log(tempPostObj);
+                for (let i = tempPostObj["SewingOrderDetails"].length - 1; i >= 0; i--) {
+                    if (tempPostObj["SewingOrderDetails"] && tempPostObj["SewingOrderDetails"][i] && tempPostObj["SewingOrderDetails"][i]["FabricId"] === undefined) {
+                        tempPostObj["SewingOrderDetails"].splice(i, 1);
+                    }
+                }
                 if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
                     // console.log(JSON.stringify(tempPostObj));
                     axios.post(baseURLPrice, tempPostObj)
@@ -1700,7 +1815,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                     console.log(key);
                                 } else {
                                     if (key === "WindowHeight" || key === "WindowWidth") {
-                                    
+                                        
                                     } else if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
                                         let objLabel = "";
                                         if (key === "ControlType" && cartValues["ControlType"] === "Motorized") {
@@ -1900,7 +2015,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                                                             <div key={i}
                                                                                  className="dk_curtain_preview_detail">
                                                                                 <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + "/" + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
-                                                                                <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"],pageLanguage)}</h3>
+                                                                                <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"], pageLanguage)}</h3>
                                                                             </div>)}
                                                                     </div>
                                                                 </Accordion.Body>
@@ -2051,7 +2166,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                     // let temp = obj["PreorderText"];
                                     GetUserProjectData(obj).then((temp) => {
                                         tempPostObj["WindowCount"] = 1;
-                                        tempPostObj["SewingModelId"] = `${modelID}`;
+                                        tempPostObj["SewingModelId"] = obj["PreorderText"]["SewingModelId"];
                                         Object.keys(temp).forEach(key => {
                                             if (temp[key] !== null || temp[key] !== "") {
                                                 let tempObj = userProjects.find(obj => obj["cart"] === key);
@@ -2067,33 +2182,70 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                         });
                                         
                                         tempPostObj["SewingOrderDetails"] = [];
-                                        tempPostObj["SewingOrderDetails"][0] = {};
+                                        for (let i = 0; i < 3; i++) {
+                                            tempPostObj["SewingOrderDetails"][i] = {};
+                                            tempPostObj["SewingOrderDetails"][i]["IsLowWrinkle"] = true;
+                                            tempPostObj["SewingOrderDetails"][i]["IsCoverAll"] = true;
+                                            tempPostObj["SewingOrderDetails"][i]["IsAltogether"] = true;
+                                        }
+                                        
+                                        
                                         tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
-                                        tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
-                                        tempPostObj["SewingOrderDetails"][0]["IsLowWrinkle"] = true;
-                                        tempPostObj["SewingOrderDetails"][0]["IsCoverAll"] = true;
-                                        tempPostObj["SewingOrderDetails"][0]["IsAltogether"] = true;
+                                        tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = tempPostObj["SewingModelId"];
+                                        
+                                        tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2302;
+                                        tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `0002`;
+                                        
+                                        tempPostObj["SewingOrderDetails"][2]["CurtainPartId"] = 2301;
+                                        tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
+                                        
                                         Object.keys(temp).forEach(key => {
                                             if (temp[key] !== null || temp[key] !== "") {
                                                 let tempObj = userProjects.find(obj => obj["cart"] === key);
-                                                if (tempObj["apiLabel2"] !== undefined) {
-                                                    if (tempObj["apiValue2"] === null) {
-                                                        tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = temp[key];
-                                                    } else {
-                                                        tempPostObj["SewingOrderDetails"][0][tempObj["apiLabel2"]] = tempObj["apiValue2"][temp[key]];
+                                                // console.log(key,userProjects.find(obj => obj["cart"] === key));
+                                                if (tempObj) {
+                                                    for (let i = 0; i < 3; i++) {
+                                                        let j = +i + +2;
+                                                        if (tempObj["apiLabel" + j] !== undefined) {
+                                                            if (tempObj["apiValue" + j] === null) {
+                                                                tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = temp[key];
+                                                                // console.log(i,tempObj["cart"],tempPostObj["SewingOrderDetails"],tempPostObj["SewingOrderDetails"][i]);
+                                                            } else {
+                                                                tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = tempObj["apiValue" + j][temp[key]];
+                                                            }
+                                                        }
                                                     }
                                                 }
                                             }
                                         });
+                                        // console.log(tempPostObj["SewingOrderDetails"]);
                                         tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
+                                        tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
+                                        tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
                                         Object.keys(temp).forEach(key => {
                                             if (temp[key] !== null || temp[key] !== "") {
                                                 let tempObj = userProjects.find(obj => obj["cart"] === key);
-                                                if (tempObj["apiAcc"] !== undefined) {
-                                                    if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
-                                                        tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
-                                                    } else {
-                                                    
+                                                if (tempObj) {
+                                                    if (tempObj["apiAcc"] !== undefined) {
+                                                        if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
+                                                            tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
+                                                        } else {
+                                                            
+                                                        }
+                                                    }
+                                                    if (tempObj["apiAcc2"] !== undefined) {
+                                                        if (tempObj["apiAcc2"] === true && tempObj["apiAccValue2"][temp[key]]) {
+                                                            tempPostObj["SewingOrderDetails"][1]["Accessories"].push(tempObj["apiAccValue2"][temp[key]]);
+                                                        } else {
+                                                            
+                                                        }
+                                                    }
+                                                    if (tempObj["apiAcc3"] !== undefined) {
+                                                        if (tempObj["apiAcc3"] === true && tempObj["apiAccValue3"][temp[key]]) {
+                                                            tempPostObj["SewingOrderDetails"][2]["Accessories"].push(tempObj["apiAccValue3"][temp[key]]);
+                                                        } else {
+                                                            
+                                                        }
                                                     }
                                                 }
                                             }
@@ -2113,7 +2265,12 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                         // delete tempPostObj["SewingOrderDetails"][0]["SewingModelId"];
                                         // delete tempPostObj["SewingModelId"];
                                         tempPostObj["SewingModelId"] = tempPostObj["SewingOrderDetails"][0]["SewingModelId"];
-                                        
+                                        // console.log(tempPostObj);
+                                        for (let i = tempPostObj["SewingOrderDetails"].length - 1; i >= 0; i--) {
+                                            if (tempPostObj["SewingOrderDetails"] && tempPostObj["SewingOrderDetails"][i] && tempPostObj["SewingOrderDetails"][i]["FabricId"] === undefined) {
+                                                tempPostObj["SewingOrderDetails"].splice(i, 1);
+                                            }
+                                        }
                                         if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
                                             axios.post(baseURLPrice, tempPostObj).then((response) => {
                                                 resolve(response);
@@ -2164,7 +2321,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                                                                 <div key={i}
                                                                                      className="dk_curtain_preview_detail">
                                                                                     <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + "/" + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
-                                                                                    <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"],pageLanguage)}</h3>
+                                                                                    <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"], pageLanguage)}</h3>
                                                                                 </div>)}
                                                                         </div>
                                                                     </Accordion.Body>
@@ -3329,8 +3486,8 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
             // if (stepSelectedValue["41"] === "1" && stepSelectedValue["4"] === "2") {
             //     setDeps("411", "");
             // }
+            console.log(modelAccessories, tempStandardPrice, tempSmartPrice);
         }
-        // console.log(Object.keys(modelAccessories).length > 0, cartValues["WidthCart"], cartValues["HeightCart"]);
     }, [cartValues["WidthCart"], cartValues["HeightCart"], JSON.stringify(modelAccessories), fabricQty]);
     
     const MotorPosition = {
@@ -3712,7 +3869,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                 tempObj[obj["SewingAccessoryId"]] = tempObj2;
             });
             setModelAccessories(tempObj);
-            // console.log(model["Accessories"]);
+            // console.log(tempObj);
         } else {
             setModelAccessories({});
         }
@@ -3939,7 +4096,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
         // setFabrics([]);
         // setFabricsList([]);
         if (pageLanguage !== '') {
-            setSelectedMotorChannels([motorChannels[pageLanguage].find(opt => opt.value === '0')]);
+            // setSelectedMotorChannels([motorChannels[pageLanguage].find(opt => opt.value === '0')]);
         }
         GetSewingFilters(1, `${modelID}`).then((temp) => {
             setSewingColors(temp[location.pathname.split('').slice(1, 3).join('')].map((obj, index) => (

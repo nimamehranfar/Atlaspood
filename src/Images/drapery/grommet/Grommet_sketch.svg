@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 18.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="80px" height="80px" viewBox="0 0 80 80" enable-background="new 0 0 80 80" xml:space="preserve">
+<rect y="-0.1" fill="none" stroke="#717070" stroke-width="1.0046" stroke-miterlimit="10" enable-background="new    " width="80" height="80.2"/>
+<g>
+	<defs>
+		<rect id="SVGID_11_" x="10" y="10" width="60" height="60"/>
+	</defs>
+	<clipPath id="SVGID_2_">
+		<use xlink:href="#SVGID_11_"  overflow="visible"/>
+	</clipPath>
+	<g clip-path="url(#SVGID_2_)">
+		<path fill="#C6C6C6" stroke="#717070" stroke-width="0.3326" stroke-miterlimit="10" enable-background="new    " d="M71.4,13.8
+			V97H8V15.3c0,0,8.2-4.4,11.4-4.1c3.2,0.3,8.2,2.6,8.2,2.6s4,3.2,8.3,2.7c4.3-0.5,12.7-4,13.6-4.4c0.9-0.3,5.2-2.2,9.7,1.3"/>
+		<path fill="#D2D2D3" enable-background="new    " d="M27.6,13.8c0,0-1.8-0.8-4.6-2.2c-2.8-1.4-5.6,0-5.6,0V97h10.2V13.8z"/>
+		<rect x="46.9" y="33.1" fill="#9EA2A6" width="12.9" height="63.9"/>
+		<path fill="#D2D2D3" enable-background="new    " d="M59.9,13.8c0,0-4.3-2.2-6.9-2.6c-2.6-0.4-6,2.6-6,2.6V97h12.9V13.8z"/>
+		<path fill="none" stroke="#717070" stroke-width="1.5092" stroke-miterlimit="10" enable-background="new    " d="M8,14.5
+			c0,0,4.9-1.3,9.1-2.9s9.3,1.2,9.3,1.2s4.1,3.1,9.5,3.7c5.6,0.6,10.2-2.6,10.2-2.6s3.9-2.3,6.9-2.7c3.6-0.4,5.9,2.7,7.2,2.6
+			c1.3,0,11.9,0,11.9,0"/>
+		<rect x="27.6" y="25.9" fill="#717070" enable-background="new    " width="19.3" height="7.2"/>
+		<rect x="4.8" y="25.9" fill="#717070" enable-background="new    " width="12.6" height="7.2"/>
+		<rect x="59.9" y="25.9" fill="#717070" enable-background="new    " width="18.9" height="7.2"/>
+		<path fill="none" stroke="#EDEDED" stroke-miterlimit="10" d="M11.8,33c0,1.4,1.3,3.5,2.5,3.4c1.9-0.2,3.1-2.9,3.1-6.6
+			s-1.4-6.6-3.1-6.6c-1.1,0-2.1,1.7-2.3,2.6"/>
+		<path fill="none" stroke="#EDEDED" stroke-width="1.0061" stroke-miterlimit="10" d="M41.3,33c0,1.4,1.3,3.5,2.5,3.4
+			c1.9-0.2,3.1-2.9,3.1-6.6s-1.4-6.6-3.1-6.6c-1.1,0-2.1,1.7-2.3,2.6"/>
+		<path fill="none" stroke="#EDEDED" stroke-width="1.0061" stroke-miterlimit="10" d="M33.2,33c0,1.4-1.3,3.5-2.5,3.4
+			c-1.9-0.2-3.1-2.9-3.1-6.6s1.4-6.6,3.1-6.6c1.1,0,2.1,1.7,2.3,2.6"/>
+		<path fill="none" stroke="#EDEDED" stroke-width="1.0061" stroke-miterlimit="10" d="M65.1,33c0,1.4-1.3,3.5-2.5,3.4
+			c-1.9-0.2-3.1-2.9-3.1-6.6s1.4-6.6,3.1-6.6c1.1,0,2.1,1.7,2.3,2.6"/>
+	</g>
+</g>
+</svg>

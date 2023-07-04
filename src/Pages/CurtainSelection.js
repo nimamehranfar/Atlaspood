@@ -69,6 +69,7 @@ function CurtainSelection() {
             let ModelName = convertToPersian(models[i].Title);
             let ModelENName = models[i].EnTitle;
             let PhotoUrl = models[i].ImageUrl;
+            let pageLanguage = location.pathname.split('').slice(1, 3).join('');
             
             if (SewingModelId === "0099") {
                 modelLists[0] =

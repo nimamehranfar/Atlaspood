@@ -49,6 +49,7 @@
     "react-router-dom": "^6.2.1",
     "react-scripts": "^5.0.1",
     "react-select": "^5.2.2",
+    "react-simple-tooltip": "^2.6.3",
     "react-sortable-tree-patch-react-17": "2.9.0",
     "react-spinners": "^0.13.7",
     "react-tiny-dnd": "^1.2.3",
