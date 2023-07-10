@@ -2,42 +2,26 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="200ae4a2-413a-4eda-9bd3-7e6393833ac7" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Components/OverlayContainer.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/grommet/Grommet_sketch.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/grommet/Inverted_sketch.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/grommet/MatchingTieback.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/grommet/length type-01.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/grommet/length type-02.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/grommet/length type-03.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/grommet/length type-04.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/grommet/length type-05.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/grommet/length type-06.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/grommet/length type-07.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/grommet/length type-08.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/NM.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/NM.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/locales/en/translation.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/en/translation.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/locales/fa/translation.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/fa/translation.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/AddProjectToCart.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/AddProjectToCart.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/PageItems.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/PageItems.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Components/GetMeasurementArray.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/GetMeasurementArray.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Components/UserProjects.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/UserProjects.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/grommet/pencilPleat.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/grommet/pencilPleat.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Page Components/DK.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Page Components/DK.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Page Components/DK2.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Page Components/DK2.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Page Components/DualRoller.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Page Components/DualRoller.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Images/drapery/grommet/length type-01.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/grommet/length type-01.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Images/drapery/grommet/length type-02.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/grommet/length type-02.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Images/drapery/grommet/length type-03.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/grommet/length type-03.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Images/drapery/grommet/length type-04.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/grommet/length type-04.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Images/drapery/grommet/length type-05.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/grommet/length type-05.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Images/drapery/grommet/length type-06.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/grommet/length type-06.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Images/drapery/grommet/length type-07.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/grommet/length type-07.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Images/drapery/grommet/length type-08.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/grommet/length type-08.svg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Page Components/Grommet.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Page Components/Grommet.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Page Components/Grommet2.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Page Components/Grommet2.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Page Components/Grommet3.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Page Components/Grommet3.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Page Components/Roller.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Page Components/Roller.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Page Components/Zebra.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Page Components/Zebra.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Pages/Basket.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/Basket.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Pages/Checkout.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/Checkout.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Pages/CurtainSelection.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/CurtainSelection.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Pages/Projects.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Pages/Projects.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -667,6 +651,12 @@
       <workItem from="1688324703204" duration="4392000" />
       <workItem from="1688398324724" duration="6521000" />
       <workItem from="1688457180063" duration="9851000" />
+      <workItem from="1688594845250" duration="3174000" />
+      <workItem from="1688621527117" duration="364000" />
+      <workItem from="1688671569620" duration="5482000" />
+      <workItem from="1688837479450" duration="6323000" />
+      <workItem from="1688912450768" duration="10411000" />
+      <workItem from="1689017036013" duration="4921000" />
     </task>
     <servers />
   </component>

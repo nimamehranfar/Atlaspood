@@ -9760,3 +9760,20 @@ height: 11.1875rem;
     display: inline;
     font-size: 1.5rem;
 }
+
+.step_title_extended_list_item{
+    list-style: none;
+    display: flex;
+    margin-inline-start: 0.5rem;
+    margin-bottom: 0.3rem;
+}
+
+.header_tooltip .step_title_extended_list_item:last-child{
+    margin-bottom: 0;
+}
+
+.step_title_extended_list_item>span{
+    width: 50%;
+    text-align: initial;
+    font-size: 0.875rem;
+}

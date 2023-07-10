@@ -839,6 +839,14 @@ function Basket() {
                                             let apiValue = obj[tempObj["apiLabel"]] === null ? "null" : obj[tempObj["apiLabel"]].toString();
                                             if (tempObj["apiLabel"] === "ControlType" && obj["ControlType"] === "Motorized") {
                                                 objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(obj[tempObj["apiLabel"]].toString())} / ${t(obj["MotorType"].toString())}`).toString() : `${t(obj[tempObj["apiLabel"]].toString())} / ${t(obj["MotorType"].toString())}`;
+                                            } else if (SewingModelId === "0399" &&tempObj["apiLabel"] === "Hardware" && obj["Hardware"] === "Same Hardware For All Curtains") {
+                                                objLabel = t(obj[tempObj["apiLabel"]].toString()) + " / " + (pageLanguage === "fa" ?obj["RailDesignFa"].toString():obj["RailDesignEn"].toString()) + " / " + (pageLanguage === "fa" ?obj["RailColorFa"].toString():obj["RailColorEn"].toString()) + " / " + t(obj["BatonOption"].toString());
+                                            } else if (SewingModelId === "0399" &&tempObj["apiLabel"] === "DraperyHardware" && obj["DraperyHardware"] !== "None") {
+                                                objLabel = t(obj[tempObj["apiLabel"]].toString()) + " / " + (pageLanguage === "fa" ?obj["RailDesignFaA"].toString():obj["RailDesignEnA"].toString()) + " / " + (pageLanguage === "fa" ?obj["RailColorFaA"].toString():obj["RailColorEnA"].toString()) + " / " + t(obj["BatonOptionA"].toString());
+                                            } else if (SewingModelId === "0399" &&tempObj["apiLabel"] === "SheerHardware" && obj["SheerHardware"] !== "None") {
+                                                objLabel = t(obj[tempObj["apiLabel"]].toString()) + " / " + (pageLanguage === "fa" ?obj["RailDesignFaB"].toString():obj["RailDesignEnB"].toString()) + " / " + (pageLanguage === "fa" ?obj["RailColorFaB"].toString():obj["RailColorEnB"].toString()) + " / " + t(obj["BatonOptionB"].toString());
+                                            } else if (SewingModelId === "0399" &&tempObj["apiLabel"] === "PrivacyLayerHardware" && obj["PrivacyLayerHardware"] !== "None") {
+                                                objLabel = t(obj[tempObj["apiLabel"]].toString()) + " / " + (pageLanguage === "fa" ?obj["RailDesignFaC"].toString():obj["RailDesignEnC"].toString()) + " / " + (pageLanguage === "fa" ?obj["RailColorFaC"].toString():obj["RailColorEnC"].toString()) + " / " + t(obj["BatonOptionC"].toString());
                                             } else if (tempObj["titleValue"] === null) {
                                                 if (tempObj["titlePostfix"] === "") {
                                                     objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(apiValue)}`).toString() : t(apiValue);
@@ -922,6 +930,22 @@ function Basket() {
                                                     <h3>{t("dualRoller_step2")}&nbsp;</h3>
                                                     <h4>{pageLanguage === 'fa' ? obj["FabricDesignFa2"] + " / " + obj["FabricColorFa2"] : obj["FabricDesignEn2"] + " / " + obj["FabricColorEn2"]}</h4>
                                                 </div>
+                                            }
+                                            {SewingModelId === "0399" &&
+                                                <>
+                                                    <li className="cart_agree_item">
+                                                        <h1 className="cart_agree_item_title">{t("grommet_step1")}&nbsp;</h1>
+                                                        <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? obj["FabricDesignFa"] + " / " + obj["FabricColorFa"] : obj["FabricDesignEn"] + " / " + obj["FabricColorEn"]}</h2>
+                                                    </li>
+                                                    <li className="cart_agree_item">
+                                                        <h1 className="cart_agree_item_title">{t("grommet_step2")}&nbsp;</h1>
+                                                        <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? obj["FabricDesignFa2"] + " / " + obj["FabricColorFa2"] : obj["FabricDesignEn2"] + " / " + obj["FabricColorEn2"]}</h2>
+                                                    </li>
+                                                    <li className="cart_agree_item">
+                                                        <h1 className="cart_agree_item_title">{t("grommet_step2B_color")}&nbsp;</h1>
+                                                        <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? obj["PrivacyLayer"] + " / " + (obj["SheersColorFa"] || "") : obj["PrivacyLayer"] + " / " + (obj["SheersColorEn"] || "")}</h2>
+                                                    </li>
+                                                </>
                                             }
                                             {desc}
                                             <div className="basket_item_title_desc">
@@ -1329,6 +1353,14 @@ function Basket() {
                                             let apiValue = obj[tempObj["apiLabel"]] === null ? "null" : obj[tempObj["apiLabel"]].toString();
                                             if (tempObj["apiLabel"] === "ControlType" && obj["ControlType"] === "Motorized") {
                                                 objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(obj[key].toString())} / ${t(obj["MotorType"].toString())}`).toString() : `${t(obj[key].toString())} / ${t(obj["MotorType"].toString())}`;
+                                            } else if (SewingModelId === "0399" &&key === "Hardware" && obj["Hardware"] === "Same Hardware For All Curtains") {
+                                                objLabel = t(obj[key].toString()) + " / " + (pageLanguage === "fa" ?obj["RailDesignFa"].toString():obj["RailDesignEn"].toString()) + " / " + (pageLanguage === "fa" ?obj["RailColorFa"].toString():obj["RailColorEn"].toString()) + " / " + t(obj["BatonOption"].toString());
+                                            } else if (SewingModelId === "0399" &&key === "DraperyHardware" && obj["DraperyHardware"] !== "None") {
+                                                objLabel = t(obj[key].toString()) + " / " + (pageLanguage === "fa" ?obj["RailDesignFaA"].toString():obj["RailDesignEnA"].toString()) + " / " + (pageLanguage === "fa" ?obj["RailColorFaA"].toString():obj["RailColorEnA"].toString()) + " / " + t(obj["BatonOptionA"].toString());
+                                            } else if (SewingModelId === "0399" &&key === "SheerHardware" && obj["SheerHardware"] !== "None") {
+                                                objLabel = t(obj[key].toString()) + " / " + (pageLanguage === "fa" ?obj["RailDesignFaB"].toString():obj["RailDesignEnB"].toString()) + " / " + (pageLanguage === "fa" ?obj["RailColorFaB"].toString():obj["RailColorEnB"].toString()) + " / " + t(obj["BatonOptionB"].toString());
+                                            } else if (SewingModelId === "0399" &&key === "PrivacyLayerHardware" && obj["PrivacyLayerHardware"] !== "None") {
+                                                objLabel = t(obj[key].toString()) + " / " + (pageLanguage === "fa" ?obj["RailDesignFaC"].toString():obj["RailDesignEnC"].toString()) + " / " + (pageLanguage === "fa" ?obj["RailColorFaC"].toString():obj["RailColorEnC"].toString()) + " / " + t(obj["BatonOptionC"].toString());
                                             } else if (tempObj["titleValue"] === null) {
                                                 if (tempObj["titlePostfix"] === "") {
                                                     objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(apiValue.toString())}`).toString() : t(apiValue.toString());
@@ -1404,6 +1436,22 @@ function Basket() {
                                                         <h3>{t("dualRoller_step2")}&nbsp;</h3>
                                                         <h4>{pageLanguage === 'fa' ? obj["FabricDesignFa2"] + " / " + obj["FabricColorFa2"] : obj["FabricDesignEn2"] + " / " + obj["FabricColorEn2"]}</h4>
                                                     </div>
+                                                }
+                                                {SewingModelId === "0399" &&
+                                                    <>
+                                                        <li className="cart_agree_item">
+                                                            <h1 className="cart_agree_item_title">{t("grommet_step1")}&nbsp;</h1>
+                                                            <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? obj["FabricDesignFa"] + " / " + obj["FabricColorFa"] : obj["FabricDesignEn"] + " / " + obj["FabricColorEn"]}</h2>
+                                                        </li>
+                                                        <li className="cart_agree_item">
+                                                            <h1 className="cart_agree_item_title">{t("grommet_step2")}&nbsp;</h1>
+                                                            <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? obj["FabricDesignFa2"] + " / " + obj["FabricColorFa2"] : obj["FabricDesignEn2"] + " / " + obj["FabricColorEn2"]}</h2>
+                                                        </li>
+                                                        <li className="cart_agree_item">
+                                                            <h1 className="cart_agree_item_title">{t("grommet_step2B_color")}&nbsp;</h1>
+                                                            <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? obj["PrivacyLayer"] + " / " + (obj["SheersColorFa"] || "") : obj["PrivacyLayer"] + " / " + (obj["SheersColorEn"] || "")}</h2>
+                                                        </li>
+                                                    </>
                                                 }
                                                 {desc}
                                                 <div className="basket_item_title_desc">

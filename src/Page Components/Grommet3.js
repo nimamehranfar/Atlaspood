@@ -90,6 +90,8 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
     let navigate = useNavigate();
     const dispatch = useDispatch();
     const [pageLoad, setPageLoad] = useState(undefined);
+    const [rodsLoad, setRodsLoad] = useState(undefined);
+    const [rodsLoad2, setRodsLoad2] = useState(undefined);
     const [motorLoad, setMotorLoad] = useState(false);
     const [models, setModels] = useState([]);
     const [projectData, setProjectData] = useState({});
@@ -103,12 +105,16 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
     const [sheers, setSheers] = useState({});
     const [sheers2, setSheers2] = useState({});
     const [sheersModelId, setSheersModelId] = useState("");
+    const [sheersModelId2, setSheersModelId2] = useState("");
     const [rails, setRails] = useState([]);
     const [rails2, setRails2] = useState([]);
+    const [rails3, setRails3] = useState([]);
     const [rods, setRods] = useState({});
     const [tracks, setTracks] = useState({});
     const [rods2, setRods2] = useState({});
+    const [rods3, setRods3] = useState({});
     const [tracks2, setTracks2] = useState({});
+    const [tracks3, setTracks3] = useState({});
     const [rodsList, setRodsList] = useState([]);
     const [rodsList2, setRodsList2] = useState([]);
     const [rodsList3, setRodsList3] = useState([]);
@@ -193,6 +199,13 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
     const [hasTrim, setHasTrim] = useState(false);
     const [showLabels, setShowLabels] = useState(true);
     const [headerTruncated, setHeaderTruncated] = useState([]);
+    const [extendedTitle, setExtendedTitle] = useState({
+        "8":[],
+        "8A":[],
+        "8B":[],
+        "8C":[],
+        "9":[]
+    });
     const [detailsShow, setDetailsShow] = useState(false);
     const [filtersShow, setFiltersShow] = useState(false);
     const [windowSize, setWindowSize] = useState("");
@@ -304,11 +317,11 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
     const [step82, setStep82] = useState("");
     const [step83, setStep83] = useState("");
     const [step84, setStep84] = useState("");
-    const [step8A, setStep8A] = useState("");
-    const [step8A1, setStep8A1] = useState("");
-    const [step8A2, setStep8A2] = useState("");
-    const [step8A3, setStep8A3] = useState("");
-    const [step8A4, setStep8A4] = useState("");
+    // const [step8A, setStep8A] = useState("");
+    // const [step8A1, setStep8A1] = useState("");
+    // const [step8A2, setStep8A2] = useState("");
+    // const [step8A3, setStep8A3] = useState("");
+    // const [step8A4, setStep8A4] = useState("");
     const [step8B, setStep8B] = useState("");
     const [step8B1, setStep8B1] = useState("");
     const [step8B2, setStep8B2] = useState("");
@@ -480,10 +493,13 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
         }).catch(err => {
             console.log(err);
             setRails([]);
+            if(rodsLoad){
+                setRodsLoad(false);
+            }
         });
     }
     
-    function getSheersRails(modelID, width) {
+    function getSheersRails(modelID, width, isPrivacy) {
         let params = {};
         params["modelId"] = modelID;
         if (width) {
@@ -508,12 +524,25 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                     
                 }
             });
-            setRods2(temp);
-            setTracks2(temp2);
-            setRails2(response.data || []);
+            if (isPrivacy) {
+                setRods3(temp);
+                setTracks3(temp2);
+                setRails3(response.data || []);
+            } else {
+                setRods2(temp);
+                setTracks2(temp2);
+                setRails2(response.data || []);
+            }
         }).catch(err => {
             console.log(err);
-            setRails2([]);
+            if (isPrivacy) {
+                setRails3([]);
+            } else {
+                setRails2([]);
+            }
+            if(rodsLoad2){
+                setRodsLoad2(false);
+            }
         });
     }
     
@@ -1030,6 +1059,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
         const tempList = [];
         let pageLanguage1 = location.pathname.split('').slice(1, 3).join('');
         let temp2 = JSON.parse(JSON.stringify(customAccActive));
+        let params = parameters === undefined || parameters === null || parameters === "undefined" || parameters === "null" || parameters === "" ? "{}" : JSON.parse(JSON.stringify(parameters));
         
         let promiseArr = [];
         Object.keys(stepAccessories).forEach((key, index) => {
@@ -1055,7 +1085,19 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                             PhotoPath = obj["PhotoUrl"];
                                     });
                             }
-                            temp.push(
+                            let fabricOrderSelected = params["AccColors"] && params["AccColors"][DetailId] && (params["AccColors"][DetailId]["order"] || params["AccColors"][DetailId]["order"] === 0) ? params["AccColors"][DetailId]["order"] : -1;
+                            
+                            let pushIndex = 0;
+                            if (fabricOrderSelected !== -1 && !temp[fabricOrderSelected]) {
+                                pushIndex = fabricOrderSelected;
+                            } else if (fabricOrderSelected !== -1 && temp[fabricOrderSelected]) {
+                                temp[temp.length] = JSON.parse(JSON.stringify(temp[fabricOrderSelected]));
+                                pushIndex = fabricOrderSelected;
+                            } else {
+                                pushIndex = temp.length;
+                            }
+                            
+                            temp[pushIndex] =
                                 <li className={colorSelected ? "Accessories_List_item_colors_list_item colorSelected" : "Accessories_List_item_colors_list_item"} key={index}
                                     onClick={() => setAccessoriesDesign({
                                         "isPlus": undefined,
@@ -1074,7 +1116,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                           </div>
                                                       }/>
                                 </li>
-                            );
+                            ;
                             resolve();
                         });
                     }
@@ -1082,115 +1124,74 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                 
                 Promise.all(promiseArr2).then(() => {
                     let obj = stepAccessories[key][0];
-                    if (obj["DetailId"] === "0000011") {
-                        let DesignENName = obj["DesignENName"];
-                        let DesignName = obj["DesignName"];
-                        let DetailId = temp2[key] ? temp2[key]["SewingAccessoryValue"] : obj["DetailId"];
-                        let Price = obj["Price"];
-                        
-                        tempList.unshift(
-                            <li className="Accessories_List_item" key={index}>
-                                <div className="Accessories_List_item_image">
-                                    <img src={require('../Images/drapery/grommet/MatchingTieback.jpg')} className="img-fluid" alt=""/>
-                                </div>
-                                <div className="Accessories_List_item_desc">
-                                    <h1 className="Accessories_List_item_title">{pageLanguage1 === 'en' ? DesignENName : DesignName}</h1>
-                                    <h2 className="Accessories_List_item_price">{GetPrice(Price, pageLanguage1, t("TOMANS"))}</h2>
-                                    <div className="Accessories_List_item_colors">
-                                        <ul className="Accessories_List_item_colors_list">
-                                            {temp}
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div className="Accessories_List_item_qty">
-                                    <div className="qty_numbers">
-                                        <button type="text" className="qty_minus" onClick={() => setAccessoriesDesign({
-                                            "isPlus": false,
-                                            "SewingAccessoryValue": undefined,
-                                            "SewingAccessoryId": undefined,
-                                            "SewingModelAccessoryId": undefined,
-                                            "DesignCode": key,
-                                            "qty": undefined
-                                        })}><img src={require('../Images/public/minus.svg').default} alt="" className="qty_math_icon"/></button>
-                                        <input type="text" className="qty_num"
-                                               value={getAccValue(customAcc, "SewingAccessoryValue", DetailId, pageLanguage)}
-                                               onChange={(e) => setAccessoriesDesign({
-                                                   "isPlus": undefined,
-                                                   "SewingAccessoryValue": undefined,
-                                                   "SewingAccessoryId": undefined,
-                                                   "SewingModelAccessoryId": undefined,
-                                                   "DesignCode": key,
-                                                   "qty": e.target.value
-                                               })}
-                                               readOnly/>
-                                        <button type="text" className="qty_plus" onClick={() => setAccessoriesDesign({
-                                            "isPlus": true,
-                                            "SewingAccessoryValue": undefined,
-                                            "SewingAccessoryId": undefined,
-                                            "SewingModelAccessoryId": undefined,
-                                            "DesignCode": key,
-                                            "qty": undefined
-                                        })}><img src={require('../Images/public/plus.svg').default} alt="" className="qty_math_icon"/></button>
-                                    </div>
-                                </div>
-                            </li>
-                        );
-                        resolve();
+                    let DesignCode = key;
+                    let DesignENName = obj["DesignENName"];
+                    let DesignName = obj["DesignName"];
+                    let DetailId = temp2[key] ? temp2[key]["SewingAccessoryValue"] : obj["DetailId"];
+                    let Price = obj["Price"];
+                    
+                    let designOrderSelected = params["Designs"] && params["Designs"][DesignCode] && (params["Designs"][DesignCode]["order"] && params["Designs"][DesignCode]["order"] >= 0) ? params["Designs"][DesignCode]["order"] : -1;
+                    
+                    let pushIndex = 0;
+                    if (designOrderSelected !== -1 && !tempList[designOrderSelected]) {
+                        pushIndex = designOrderSelected;
+                    } else if (designOrderSelected !== -1 && tempList[designOrderSelected]) {
+                        tempList[tempList.length] = JSON.parse(JSON.stringify(tempList[designOrderSelected]));
+                        pushIndex = designOrderSelected;
                     } else {
-                        let DesignENName = obj["DesignENName"];
-                        let DesignName = obj["DesignName"];
-                        let DetailId = temp2[key] ? temp2[key]["SewingAccessoryValue"] : obj["DetailId"];
-                        let Price = obj["Price"];
-                        
-                        tempList.push(
-                            <li className="Accessories_List_item" key={index}>
-                                <div className="Accessories_List_item_image">
-                                    <img src={`https://api.atlaspood.ir/${PhotoPath}`} className="img-fluid" alt=""/>
-                                </div>
-                                <div className="Accessories_List_item_desc">
-                                    <h1 className="Accessories_List_item_title">{pageLanguage1 === 'en' ? DesignENName : DesignName}</h1>
-                                    <h2 className="Accessories_List_item_price">{GetPrice(Price, pageLanguage1, t("TOMANS"))}</h2>
-                                    <div className="Accessories_List_item_colors">
-                                        <ul className="Accessories_List_item_colors_list">
-                                            {temp}
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div className="Accessories_List_item_qty">
-                                    <div className="qty_numbers">
-                                        <button type="text" className="qty_minus" onClick={() => setAccessoriesDesign({
-                                            "isPlus": false,
-                                            "SewingAccessoryValue": undefined,
-                                            "SewingAccessoryId": undefined,
-                                            "SewingModelAccessoryId": undefined,
-                                            "DesignCode": key,
-                                            "qty": undefined
-                                        })}><img src={require('../Images/public/minus.svg').default} alt="" className="qty_math_icon"/></button>
-                                        <input type="text" className="qty_num"
-                                               value={getAccValue(customAcc, "SewingAccessoryValue", DetailId, pageLanguage)}
-                                               onChange={(e) => setAccessoriesDesign({
-                                                   "isPlus": undefined,
-                                                   "SewingAccessoryValue": undefined,
-                                                   "SewingAccessoryId": undefined,
-                                                   "SewingModelAccessoryId": undefined,
-                                                   "DesignCode": key,
-                                                   "qty": e.target.value
-                                               })}
-                                               readOnly/>
-                                        <button type="text" className="qty_plus" onClick={() => setAccessoriesDesign({
-                                            "isPlus": true,
-                                            "SewingAccessoryValue": undefined,
-                                            "SewingAccessoryId": undefined,
-                                            "SewingModelAccessoryId": undefined,
-                                            "DesignCode": key,
-                                            "qty": undefined
-                                        })}><img src={require('../Images/public/plus.svg').default} alt="" className="qty_math_icon"/></button>
-                                    </div>
-                                </div>
-                            </li>
-                        );
-                        resolve();
+                        let index = tempList.findIndex(Object.is.bind(null, undefined));
+                        pushIndex = index === -1 ? tempList.length : index;
                     }
+                    
+                    tempList[pushIndex] =
+                        <li className="Accessories_List_item" key={index}>
+                            <div className="Accessories_List_item_image">
+                                <img src={`https://api.atlaspood.ir/${PhotoPath}`} className="img-fluid" alt=""/>
+                            </div>
+                            <div className="Accessories_List_item_desc">
+                                <h1 className="Accessories_List_item_title">{pageLanguage1 === 'en' ? DesignENName : DesignName}</h1>
+                                <h2 className="Accessories_List_item_price">{GetPrice(Price, pageLanguage1, t("TOMANS"))}</h2>
+                                <div className="Accessories_List_item_colors">
+                                    <ul className="Accessories_List_item_colors_list">
+                                        {temp}
+                                    </ul>
+                                </div>
+                            </div>
+                            <div className="Accessories_List_item_qty">
+                                <div className="qty_numbers">
+                                    <button type="text" className="qty_minus" onClick={() => setAccessoriesDesign({
+                                        "isPlus": false,
+                                        "SewingAccessoryValue": undefined,
+                                        "SewingAccessoryId": undefined,
+                                        "SewingModelAccessoryId": undefined,
+                                        "DesignCode": key,
+                                        "qty": undefined
+                                    })}><img src={require('../Images/public/minus.svg').default} alt="" className="qty_math_icon"/></button>
+                                    <input type="text" className="qty_num"
+                                           value={getAccValue(customAcc, "SewingAccessoryValue", DetailId, pageLanguage)}
+                                           onChange={(e) => setAccessoriesDesign({
+                                               "isPlus": undefined,
+                                               "SewingAccessoryValue": undefined,
+                                               "SewingAccessoryId": undefined,
+                                               "SewingModelAccessoryId": undefined,
+                                               "DesignCode": key,
+                                               "qty": e.target.value
+                                           })}
+                                           readOnly/>
+                                    <button type="text" className="qty_plus" onClick={() => setAccessoriesDesign({
+                                        "isPlus": true,
+                                        "SewingAccessoryValue": undefined,
+                                        "SewingAccessoryId": undefined,
+                                        "SewingModelAccessoryId": undefined,
+                                        "DesignCode": key,
+                                        "qty": undefined
+                                    })}><img src={require('../Images/public/plus.svg').default} alt="" className="qty_math_icon"/></button>
+                                </div>
+                            </div>
+                        </li>
+                    ;
+                    resolve();
+                    
                 });
             });
         });
@@ -1518,7 +1519,8 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                 {/*</div>*/}
                 <div className="steps_header_selected_container">
                     <div className="steps_header_selected" onMouseEnter={() => {
-                        if (selectedTitle.current[stepNum].clientWidth < selectedTitle.current[stepNum].scrollWidth) {
+                        // if (selectedTitle.current[stepNum].clientWidth < selectedTitle.current[stepNum].scrollWidth || (stepRef in extendedTitle && extendedTitle[stepRef].length > 1)) {
+                        if (stepRef in extendedTitle && extendedTitle[stepRef].length > 1) {
                             let temp = JSON.parse(JSON.stringify(headerTruncated))
                             temp[stepNum] = true;
                             setHeaderTruncated(temp);
@@ -1527,8 +1529,8 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         let temp = JSON.parse(JSON.stringify(headerTruncated))
                         temp[stepNum] = false;
                         setHeaderTruncated(temp);
-                    }} ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? stepSelected : null}</div>
-                    {headerTruncated[stepNum] && <div className="header_tooltip">{stepSelected}</div>}
+                    }} ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? (stepRef in extendedTitle && extendedTitle[stepRef].length > 0 ? (extendedTitle[stepRef][0]) : stepSelected) : null}{showLabels && stepRef in extendedTitle && extendedTitle[stepRef].length > 1 ? <h5> ...</h5> : ""}</div>
+                    {headerTruncated[stepNum] && <div className="header_tooltip">{stepRef in extendedTitle ? (stepRef==="8" ||stepRef==="8A" ||stepRef==="8B" ||stepRef==="8C" ? extendedTitle[stepRef].slice(1).filter(n => n):extendedTitle[stepRef].slice(1).filter(n => n).join(', \n')) : stepSelected}</div>}
                     {/*{showLabels &&*/}
                     {/*    <TruncateMarkup lines={1} tokenize="words">*/}
                     {/*        <div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{stepSelected}</div>*/}
@@ -1898,21 +1900,21 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
         setStep82("");
         setStep83("");
         setStep84("");
-        setStep8A("");
-        setStep8A1("");
-        setStep8A2("");
-        setStep8A3("");
-        setStep8A4("");
+        // setStep8A("");
+        // setStep8A1("");
+        // setStep8A2("");
+        // setStep8A3("");
+        // setStep8A4("");
         setStep8B("");
         setStep8B1("");
         setStep8B2("");
         setStep8B3("");
-        setStep8B4("");
+        // setStep8B4("");
         setStep8C("");
         setStep8C1("");
         setStep8C2("");
         setStep8C3("");
-        setStep8C4("");
+        // setStep8C4("");
         setHardwareNextStep("9");
     }
     
@@ -2730,7 +2732,8 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                 setAddingLoading(false);
                                 
                             }).catch(err => {
-                            if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                                 refreshToken().then((response2) => {
                                     if (response2 !== false) {
                                         addToCart();
@@ -3725,6 +3728,8 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
     
     function setProjectDetails(data, editIndex, changeLang) {
         setPageLoad(true);
+        setRodsLoad(true);
+        setRodsLoad2(true);
         if (data && Object.keys(data).length !== 0) {
             setProjectData(data);
         }
@@ -4623,6 +4628,8 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                 getRails(parseInt(cartValues["WidthCart"]));
                 if (sheersModelId !== "")
                     getSheersRails(sheersModelId, parseInt(cartValues["WidthCart"]));
+                if (sheersModelId2 !== "")
+                    getSheersRails(sheersModelId2, parseInt(cartValues["WidthCart"]), true);
             }
         }
     }, [cartValues["WidthCart"]]);
@@ -4723,7 +4730,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                 setTracksList([]);
             }
         }
-    }, [step81, step8A1, step8B1, step8C1]);
+    }, [step81, step8B1, step8C1]);
     
     function showRodsColor(railObject, stepNum) {
         let pageLanguage = location.pathname.split('').slice(1, 3).join('');
@@ -4864,9 +4871,10 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
     
     useEffect(() => {
         if (step81 !== "") {
-            setCart("", "", "RailId");
             setDeps("82", "81");
             setStep82("");
+            setStep83("");
+            setStep84("");
             
             let railObject = {};
             railObject = rails.filter(obj => {
@@ -4874,17 +4882,22 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
             })[0] || railObject;
             
             if (railObject["DesignENName"]) {
-                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                tempLabels["8"] = pageLanguage === "fa" ? railObject["DesignName"] : railObject["DesignENName"];
-                setStepSelectedLabel(tempLabels);
+                // let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                // tempLabels["8"] = pageLanguage === "fa" ? railObject["DesignName"] : railObject["DesignENName"];
+                // setStepSelectedLabel(tempLabels);
+                
+                let tempExtended = extendedTitle;
+                tempExtended["8"][1]= <li key="1" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Design")}</span><span className="step_title_extended_list_item_text">{pageLanguage === "fa" ? convertToPersian(railObject["DesignName"]) : railObject["DesignENName"]}</span></li>;
+                tempExtended["8"].splice(2, 3);
+                setExtendedTitle(tempExtended);
             }
+            setCart("RailDesign", step81, "RailId,RailColorFa,RailColorEn", "RailDesignFa,RailDesignEn", [railObject["DesignName"], railObject["DesignENName"]]);
             showRodsColor(railObject, "82");
         }
     }, [step81]);
     
     useEffect(() => {
-        if (step81 !== "") {
-            setCart("RailId", step82);
+        if (step82 !== "") {
             setDeps("", "82");
             
             let railObject = {};
@@ -4898,39 +4911,47 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
             })[0] || railObject2;
             
             if (railObject["DesignENName"] && railObject2["ColorName"] && railObject2["ColorEnName"]) {
-                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                tempLabels["8"] = pageLanguage === "fa" ? convertToPersian(railObject["DesignName"]) + " / " + convertToPersian(railObject2["ColorName"]) : railObject["DesignENName"] + " / " + railObject2["ColorEnName"];
-                setStepSelectedLabel(tempLabels);
+                // let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                // tempLabels["8"] = pageLanguage === "fa" ? convertToPersian(railObject["DesignName"]) + " / " + convertToPersian(railObject2["ColorName"]) : railObject["DesignENName"] + " / " + railObject2["ColorEnName"];
+                // setStepSelectedLabel(tempLabels);
+                let tempExtended = extendedTitle;
+                tempExtended["8"][2]= <li key="2" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Color")}</span><span className="step_title_extended_list_item_text">{pageLanguage === "fa" ? convertToPersian(railObject2["ColorName"]) : railObject2["ColorEnName"]}</span></li>;
+                setExtendedTitle(tempExtended);
             }
-            
+            setCart("RailId", step82, "", "RailColorFa,RailColorEn", [railObject2["ColorName"], railObject2["ColorEnName"]]);
             showRodsColor(railObject, "82");
         }
     }, [step82]);
     
     useEffect(() => {
         if (step8B1 !== "") {
-            // setCart("RailIdB", step8B1);
-            // setDeps("8B2", "8B1");
+            setDeps("8B2", "8B1");
             
             let railObject = {};
-            railObject = rails.filter(obj => {
+            railObject = rails2.filter(obj => {
                 return obj["RailId"] === step8B1
             })[0] || railObject;
             
             if (railObject["DesignENName"]) {
-                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                tempLabels["8B"] = pageLanguage === "fa" ? railObject["DesignName"] : railObject["DesignENName"];
-                setStepSelectedLabel(tempLabels);
+                // let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                // tempLabels["8B"] = pageLanguage === "fa" ? railObject["DesignName"] : railObject["DesignENName"];
+                // setStepSelectedLabel(tempLabels);
+                // tempExtended["8B"][0]= <li key="1" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Design")}</span><span className="step_title_extended_list_item_text">{pageLanguage === "fa" ? convertToPersian(railObject["DesignName"]) : railObject["DesignENName"]}</span></li>;
+                let tempExtended = extendedTitle;
+                tempExtended["8B"][0] = pageLanguage === "fa" ? convertToPersian(railObject["DesignName"]) : railObject["DesignENName"];
+                tempExtended["8B"].splice(1, 3);
+                setExtendedTitle(tempExtended);
             }
             
             if (railObject["RailCategoryId"] === 5302) {
                 setIs8BMotor(true);
-                setDeps((step8C5 !== "true" ? ",8B5" : ""), "8B1,8B2,8B3,8B4");
+                setDeps((step8C5 !== "true" ? ",8B5" : ""), "8B1,8B2,8B3");
+                setCart("RailDesignB", step8B1, "RailIdB,RailColorFaB,RailColorEnB", "RailDesignFaB,RailDesignEnB", [railObject["DesignName"], railObject["DesignENName"]]);
             } else {
                 setIs8BMotor(false);
                 setStep8B5("");
-                setCart("", "", "hasPower,MotorPosition,RemoteName,MotorChannels");
-                setDeps("8B2,8B3,8B4", "8B1,8B5,8B51");
+                setCart("RailDesignB", step8B1, "RailIdB,RailColorFaB,RailColorEnB", "RailDesignFaB,RailDesignEnB", [railObject["DesignName"], railObject["DesignENName"]]);
+                setDeps("8B2,8B3", "8B1,8B5,8B51");
                 showRodsColor(railObject, "8B2");
             }
         } else {
@@ -4941,50 +4962,60 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
     }, [step8B1]);
     
     useEffect(() => {
-        if (step8B1 !== "") {
-            setCart("RailId", step8B2);
+        if (step8B2 !== "") {
             setDeps("", "8B2");
             
             let railObject = {};
-            railObject = rails.filter(obj => {
+            railObject = rails2.filter(obj => {
                 return obj["RailId"] === step8B1
             })[0] || railObject;
             
             let railObject2 = {};
-            railObject2 = rails.filter(obj => {
+            railObject2 = rails2.filter(obj => {
                 return obj["RailId"] === step8B2
             })[0] || railObject2;
             
             if (railObject["DesignENName"] && railObject2["ColorName"] && railObject2["ColorEnName"]) {
-                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                tempLabels["8B"] = pageLanguage === "fa" ? convertToPersian(railObject["DesignName"]) + " / " + convertToPersian(railObject2["ColorName"]) : railObject["DesignENName"] + " / " + railObject2["ColorEnName"];
-                setStepSelectedLabel(tempLabels);
+                // let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                // tempLabels["8B"] = pageLanguage === "fa" ? convertToPersian(railObject["DesignName"]) + " / " + convertToPersian(railObject2["ColorName"]) : railObject["DesignENName"] + " / " + railObject2["ColorEnName"];
+                // setStepSelectedLabel(tempLabels);
+                let tempExtended = extendedTitle;
+                tempExtended["8B"][1]= <li key="2" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Color")}</span><span className="step_title_extended_list_item_text">{pageLanguage === "fa" ? convertToPersian(railObject2["ColorName"]) : railObject2["ColorEnName"]}</span></li>;
+                setExtendedTitle(tempExtended);
             }
+            setCart("RailIdB", step8B2, "", "RailColorFaB,RailColorEnB", [railObject2["ColorName"], railObject2["ColorEnName"]]);
             showRodsColor(railObject, "8B2");
         }
     }, [step8B2]);
     
     useEffect(() => {
         if (step8C1 !== "") {
+            setDeps("8C2", "8C1");
             
             let railObject = {};
-            railObject = rails2.filter(obj => {
+            railObject = rails3.filter(obj => {
                 return obj["RailId"] === step8C1
             })[0] || railObject;
             
             if (railObject["DesignENName"]) {
-                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                tempLabels["8C"] = pageLanguage === "fa" ? railObject["DesignName"] : railObject["DesignENName"];
-                setStepSelectedLabel(tempLabels);
+                // let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                // tempLabels["8C"] = pageLanguage === "fa" ? railObject["DesignName"] : railObject["DesignENName"];
+                // setStepSelectedLabel(tempLabels);
+                // tempExtended["8C"][0]= <li key="1" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Design")}</span><span className="step_title_extended_list_item_text">{pageLanguage === "fa" ? convertToPersian(railObject["DesignName"]) : railObject["DesignENName"]}</span></li>;
+                let tempExtended = extendedTitle;
+                tempExtended["8C"][0] = pageLanguage === "fa" ? convertToPersian(railObject["DesignName"]) : railObject["DesignENName"];
+                tempExtended["8C"].splice(1, 3);
+                setExtendedTitle(tempExtended);
             }
             
             if (railObject["RailCategoryId"] === 5302) {
                 setIs8CMotor(true);
+                setCart("RailDesignC", step8C1,"RailIdC,RailColorFaC,RailColorEnC", "RailDesignFaC,RailDesignEnC", [railObject["DesignName"], railObject["DesignENName"]]);
                 setDeps((step8C5 !== "true" ? ",8C5" : ""), "8C1,8C2,8C3");
             } else {
                 setIs8CMotor(false);
                 setStep8C5("");
-                setCart("", "", "hasPower,MotorPosition,RemoteName,MotorChannels");
+                setCart("RailDesignC", step8C1,"RailIdC,RailColorFaC,RailColorEnC", "RailDesignFaC,RailDesignEnC,hasPower,MotorPosition,RemoteName,MotorChannels", [railObject["DesignName"], railObject["DesignENName"]]);
                 setDeps("8C2,8C3", "8C1,8C5,8C51");
                 showRodsColor(railObject, "8C2");
             }
@@ -4996,26 +5027,28 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
     }, [step8C1]);
     
     useEffect(() => {
-        if (step8C1 !== "") {
-            setCart("RailId", step8C2);
+        if (step8C2 !== "") {
             setDeps("", "8C2");
             
             let railObject = {};
-            railObject = rails2.filter(obj => {
+            railObject = rails3.filter(obj => {
                 return obj["RailId"] === step8C1
             })[0] || railObject;
             
             let railObject2 = {};
-            railObject2 = rails2.filter(obj => {
+            railObject2 = rails3.filter(obj => {
                 return obj["RailId"] === step8C2
             })[0] || railObject2;
             
             if (railObject["DesignENName"] && railObject2["ColorName"] && railObject2["ColorEnName"]) {
-                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                tempLabels["8C"] = pageLanguage === "fa" ? convertToPersian(railObject["DesignName"]) + " / " + convertToPersian(railObject2["ColorName"]) : railObject["DesignENName"] + " / " + railObject2["ColorEnName"];
-                setStepSelectedLabel(tempLabels);
+                // let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                // tempLabels["8C"] = pageLanguage === "fa" ? convertToPersian(railObject["DesignName"]) + " / " + convertToPersian(railObject2["ColorName"]) : railObject["DesignENName"] + " / " + railObject2["ColorEnName"];
+                // setStepSelectedLabel(tempLabels);
+                let tempExtended = extendedTitle;
+                tempExtended["8C"][1]= <li key="2" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Color")}</span><span className="step_title_extended_list_item_text">{pageLanguage === "fa" ? convertToPersian(railObject2["ColorName"]) : railObject2["ColorEnName"]}</span></li>;
+                setExtendedTitle(tempExtended);
             }
-            
+            setCart("RailIdC", step8C2, "", "RailColorFaC,RailColorEnC", [railObject2["ColorName"], railObject2["ColorEnName"]]);
             showRodsColor(railObject, "8C2");
         }
     }, [step8C2]);
@@ -5169,7 +5202,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                 let DesignENName = stepAccessories[found][found2]["DesignENName"];
                                 let DesignName = stepAccessories[found][found2]["DesignName"];
                                 let qty = obj["Qty"];
-                                tempText.push(`${pageLanguage === "en" ? DesignENName : DesignName} X${qty}`);
+                                tempText.push(`${pageLanguage === "en" ? DesignENName : DesignName} ${pageLanguage === "en" ?`x${qty}`:NumberToPersianWord.convertEnToPe(`${qty}x`)}`);
                                 resolve();
                             } else {
                                 resolve();
@@ -5180,14 +5213,23 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                     }, 100);
                 });
             });
-            
+    
             Promise.all(promiseArr).then(() => {
                 tempLabels["9"] = tempText.join(', \n');
+                // setAccTitle(tempText);
+        
+                let tempExtended = extendedTitle;
+                tempExtended["9"]=tempText;
+                setExtendedTitle(tempExtended);
                 setStepSelectedLabel(tempLabels);
             });
         } else {
             let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
             tempLabels["9"] = "";
+    
+            let tempExtended = extendedTitle;
+            tempExtended["9"]=[];
+            setExtendedTitle(tempExtended);
             setStepSelectedLabel(tempLabels);
         }
     }, [customAcc, pageLanguage]);
@@ -5435,15 +5477,17 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
     }, [model, JSON.stringify(cartValues)]);
     
     useEffect(() => {
-        if (pageLoad === false) {
-            if (cartValues["WidthCart"] && parseInt(cartValues["WidthCart"]) > 0) {
-                getRails(parseInt(cartValues["WidthCart"]));
-                if (sheersModelId !== "")
-                    getSheersRails(sheersModelId, parseInt(cartValues["WidthCart"]));
-            }
+        if (!pageLoad && !rodsLoad && !rodsLoad2) {
+            // if (cartValues["WidthCart"] && parseInt(cartValues["WidthCart"]) > 0) {
+            //     getRails(parseInt(cartValues["WidthCart"]));
+            //     if (sheersModelId !== "")
+            //         getSheersRails(sheersModelId, parseInt(cartValues["WidthCart"]));
+            //     if (sheersModelId2 !== "")
+            //         getSheersRails(sheersModelId2, parseInt(cartValues["WidthCart"]), true);
+            // }
             setCart("", "");
         }
-    }, [pageLoad]);
+    }, [pageLoad, rodsLoad, rodsLoad2]);
     
     useEffect(() => {
         if (modelID !== '' && catID !== '') {
@@ -5657,8 +5701,14 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                     setRodsList4([]);
                 }
             }
+            if(rodsLoad){
+                setRodsLoad(false);
+            }
+            if(rodsLoad2){
+                setRodsLoad2(false);
+            }
         });
-    }, [rods, rods2, isLoggedIn, location.pathname]);
+    }, [rods, rods2, rods3, isLoggedIn, location.pathname]);
     
     useEffect(() => {
         setLang().then(() => {
@@ -5671,7 +5721,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                 }
             }
         });
-    }, [tracks, tracks2, isLoggedIn, location.pathname]);
+    }, [tracks, tracks2, tracks3, isLoggedIn, location.pathname]);
     
     useEffect(() => {
         if (sheersModelId !== "") {
@@ -5685,6 +5735,19 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
             setTracks2([])
         }
     }, [sheersModelId, location.pathname]);
+    
+    useEffect(() => {
+        if (sheersModelId2 !== "") {
+            if (cartValues["WidthCart"] && parseInt(cartValues["WidthCart"]) > 0) {
+                getSheersRails(sheersModelId2, parseInt(cartValues["WidthCart"]), true);
+            } else {
+                getSheersRails(sheersModelId2, undefined, true);
+            }
+        } else {
+            setRods2([]);
+            setTracks2([])
+        }
+    }, [sheersModelId2, location.pathname]);
     
     useEffect(() => {
         if (firstRender.current) {
@@ -6158,7 +6221,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                        setStep2B("None");
                                                        setStep2B1("");
                                                        setStep2A("");
-                                                       if (step8 === "Customize Style Hardware For All Curtains") {
+                                                       if (step8 === "Customize Hardware For Per Curtains") {
                                                            clearHardwareSteps();
                                                            // if (step31 !== "false") {
                                                            //     selectChanged(e, "8,8A,8B,8C");
@@ -6187,7 +6250,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                    onChange={e => {
                                                        setStep2B("Semi Sheer");
                                                        setStep2B1("");
-                                                       if (step8 === "Customize Style Hardware For All Curtains") {
+                                                       if (step8 === "Customize Hardware For Per Curtains") {
                                                            clearHardwareSteps();
                                                            // if (step31 !== "false") {
                                                            //     selectChanged(e, "8,8A,8B,8C");
@@ -6216,7 +6279,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                    onChange={e => {
                                                        setStep2B("Opaque");
                                                        setStep2B1("");
-                                                       if (step8 === "Customize Style Hardware For All Curtains") {
+                                                       if (step8 === "Customize Hardware For Per Curtains") {
                                                            clearHardwareSteps();
                                                            // if (step31 !== "false") {
                                                            //     selectChanged(e, "8,8A,8B,8C");
@@ -6269,7 +6332,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                             <input className="radio" type="radio" text={t("Grommet")} value="1" name="step2A" ref-num="2A" id="2A1"
                                                    checked={step2A === "Grommet"}
                                                    onChange={e => {
-                                                       if ((step2A === "Inverted Box Pleat" || step2A === "Pencil Pleat") && step8 === "Customize Style Hardware For All Curtains") {
+                                                       if ((step2A === "Inverted Box Pleat" || step2A === "Pencil Pleat") && step8 === "Customize Hardware For Per Curtains") {
                                                            modalHandleShow("SheerHeaderStyleWarning");
                                                            setSheerHeaderStyleTemp({
                                                                stepValue: "Grommet",
@@ -6293,7 +6356,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                             <input className="radio" type="radio" text={t("Inverted Box Pleat")} value="2" name="step2A" ref-num="2A" id="2A2"
                                                    checked={step2A === "Inverted Box Pleat"}
                                                    onChange={e => {
-                                                       if ((step2A === "Grommet" || step2A === "Rod Pocket") && step8 === "Customize Style Hardware For All Curtains") {
+                                                       if ((step2A === "Grommet" || step2A === "Rod Pocket") && step8 === "Customize Hardware For Per Curtains") {
                                                            modalHandleShow("SheerHeaderStyleWarning");
                                                            setSheerHeaderStyleTemp({
                                                                stepValue: "Inverted Box Pleat",
@@ -6317,7 +6380,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                             <input className="radio" type="radio" text={t("Pencil Pleat")} value="3" name="step2A" ref-num="2A" id="2A3"
                                                    checked={step2A === "Pencil Pleat"}
                                                    onChange={e => {
-                                                       if ((step2A === "Grommet" || step2A === "Rod Pocket") && step8 === "Customize Style Hardware For All Curtains") {
+                                                       if ((step2A === "Grommet" || step2A === "Rod Pocket") && step8 === "Customize Hardware For Per Curtains") {
                                                            modalHandleShow("SheerHeaderStyleWarning");
                                                            setSheerHeaderStyleTemp({
                                                                stepValue: "Pencil Pleat",
@@ -8779,6 +8842,11 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                        setStep82("");
                                                        setStep83("");
                                                        setStep84("");
+                                                       setStep8B("");
+                                                       setStep8C("");
+                                                       let tempExtended = extendedTitle;
+                                                       tempExtended["8"]=[t("None")];
+                                                       setExtendedTitle(tempExtended);
                                                        selectChanged(e);
                                                        setStep8("None");
                                                        setHardwareNextStep("9");
@@ -8789,60 +8857,71 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                         </div>
                                         <div className="box33 radio_style">
                                             <input className="radio" type="radio" text={t("hardware2")} value="2" name="step8" ref-num="8" id="82" outline="true"
-                                                   checked={step8 === "Same Style Hardware For All Curtains"}
+                                                   checked={step8 === "Same Hardware For All Curtains"}
                                                    onChange={e => {
+                                                       setStep8B("");
+                                                       setStep8C("");
+                                                       let tempExtended = extendedTitle;
                                                        if (step3 === "" || (step3 === "true" && step31 === "")) {
+                                                           setHardwareNextStep("9");
+                                                           setStep8("");
+                                                           tempExtended["8"]=[];
                                                            selectUncheck(e);
                                                            modalHandleShow("noMeasurements");
-                                                           setStep8("");
-                                                           setHardwareNextStep("9");
                                                            setDeps("8", "81,82,83,84,8A,8A1,8A2,8A3,8A4,8B,8B1,8B2,8B3,8B4,8C,8C1,8C2,8C3");
                                                            setCart("", "", "Hardware,RailIdA,BatonOptionA,RodColorA,MountA,RailIdB,BatonOptionB,RodColorB,MountB,RailIdC,BatonOptionC,RodColorC,MountC,hasPower,MotorPosition,RemoteName,MotorChannels");
                                                        } else {
                                                            selectChanged(e);
-                                                           setStep8("Same Style Hardware For All Curtains");
+                                                           setStep8("Same Hardware For All Curtains");
+                                                           tempExtended["8"]=[t("hardware2")];
                                                            setHardwareNextStep("9");
                                                            if (step31 === "false") {
                                                                setDeps("81,82,83", "8,84,8A,8A1,8A2,8A3,8A4,8B,8B1,8B2,8B3,8C,8C1,8C2,8C3");
                                                            } else {
                                                                setDeps("81,82,83,84", "8,8A,8A1,8A2,8A3,8A4,8B,8B1,8B2,8B3,8C,8C1,8C2,8C3");
                                                            }
-                                                           setCart("Hardware", "Same Style Hardware For All Curtains", "RailIdA,BatonOptionA,RodColorA,MountA,RailIdB,BatonOptionB,RodColorB,MountB,RailIdC,BatonOptionC,RodColorC,MountC,hasPower,MotorPosition,RemoteName,MotorChannels");
+                                                           setCart("Hardware", "Same Hardware For All Curtains", "RailIdA,BatonOptionA,RodColorA,MountA,RailIdB,BatonOptionB,RodColorB,MountB,RailIdC,BatonOptionC,RodColorC,MountC,hasPower,MotorPosition,RemoteName,MotorChannels");
                                                        }
+                                                       setExtendedTitle(tempExtended);
                                                    }} ref={ref => (inputs.current["82"] = ref)}/>
                                             <label htmlFor="82">{t("hardware2")}</label>
                                         </div>
                                         <div className={step2B !== "None" ? "box33 radio_style" : "noDisplay"}>
                                             <input className="radio" type="radio" text={t("hardware3")} value="3" name="step8" ref-num="8" id="83" outline="true"
-                                                   checked={step8 === "Customize Style Hardware For All Curtains"}
+                                                   checked={step8 === "Customize Hardware For Per Curtains"}
                                                    onChange={e => {
                                                        setStep81("");
                                                        setStep82("");
                                                        setStep83("");
                                                        setStep84("");
+                                                       setStep8B("");
+                                                       setStep8C("");
+                                                       let tempExtended = extendedTitle;
                                                        if (step2A === "" || step2B === "" || (step2B !== "None" && step2B1 === "")) {
                                                            setHardwareNextStep("9");
                                                            setStep8("");
+                                                           tempExtended["8"]=[];
                                                            selectUncheck(e);
                                                            modalHandleShow("noPrivacyLayer");
                                                            setDeps("8", "81,82,83,84,8A,8A1,8A2,8A3,8A4,8B,8B1,8B2,8B3,8B4,8C,8C1,8C2,8C3");
                                                            setCart("", "", "Hardware,RailId,BatonOption,RodColor,Mount8,RailIdA,BatonOptionA,RodColorA,MountA,RailIdB,BatonOptionB,RodColorB,MountB,RailIdC,BatonOptionC,RodColorC,MountC,hasPower,MotorPosition,RemoteName,MotorChannels");
                                                        } else {
-                                                           setHardwareNextStep("8B");
+                                                           setHardwareNextStep("8A");
                                                            selectChanged(e);
-                                                           setStep8("Customize Style Hardware For All Curtains");
+                                                           setStep8("Customize Hardware For Per Curtains");
+                                                           tempExtended["8"]=[t("hardware3")];
                                                            setDeps("8B,8C", "8,81,82,83,84");
-                                                           setCart("Hardware", "Customize Style Hardware For All Curtains", "RailId,BatonOption,RodColor,Mount");
+                                                           setCart("Hardware", "Customize Hardware For Per Curtains", "RailId,BatonOption,RodColor,Mount");
                                                        }
                                                    }} ref={ref => (inputs.current["83"] = ref)}/>
                                             <label htmlFor="83">{t("hardware3")}</label>
                                         </div>
                                         
                                         {/* step 8 Questions */}
-                                        <div className={step8 === "Same Style Hardware For All Curtains" ? "card_body card_body_radio card_body_Rod" : "noDisplay"}>
+                                        <div className={step8 === "Same Hardware For All Curtains" ? "card_body card_body_radio card_body_Rod" : "noDisplay"}>
                                             {rodsList}
                                         </div>
-                                        <div className={step8 === "Same Style Hardware For All Curtains" && step81 !== "" ? "card_body card_body_radio card_body_Rod_color" : "noDisplay"}>
+                                        <div className={step8 === "Same Hardware For All Curtains" && step81 !== "" ? "card_body card_body_radio card_body_Rod_color" : "noDisplay"}>
                                             <div className="box100">
                                                 <p className="step_selection_title">{t("step8_rod_finish_title")}</p>
                                             </div>
@@ -8938,7 +9017,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                             {/*    </div>*/}
                                             {/*</div>*/}
                                         </div>
-                                        {/*<div className={step8 === "Same Style Hardware For All Curtains" && step81 !== "" ? "same_row_selection" : "noDisplay"}>*/}
+                                        {/*<div className={step8 === "Same Hardware For All Curtains" && step81 !== "" ? "same_row_selection" : "noDisplay"}>*/}
                                         {/*    <div className="same_row_selection_left">*/}
                                         {/*        <p>{t("Baton Option")}</p>*/}
                                         {/*        &nbsp;*/}
@@ -8985,7 +9064,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                         {/*    </div>*/}
                                         {/*</div>*/}
                                         <div
-                                            className={step8 === "Same Style Hardware For All Curtains" && step81 !== "" ? "card_body card_body_radio card_body_baton" : "noDisplay"}>
+                                            className={step8 === "Same Hardware For All Curtains" && step81 !== "" ? "card_body card_body_radio card_body_baton" : "noDisplay"}>
                                             <div className="box100">
                                                 <p className="step_selection_title">{t("Baton Option")}</p>
                                             </div>
@@ -8993,41 +9072,48 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                 <input className="radio" type="radio" text={t("None")} value="1" name="step83" ref-num="83" id="831"
                                                        checked={step83 === "None"}
                                                        onChange={e => {
-                                                           setStep83("None");
-                                                           setDeps("", "83");
-                                                           setCart("BatonOption", "None");
-                                                           selectChanged(e);
-                                                       }} ref={ref => (inputs.current["831"] = ref)}/>
+                                                       setStep83("None");
+                                                       setDeps("", "83");
+                                                       setCart("BatonOption", "None");
+                                                       selectChanged(e);
+                                                       let tempExtended = extendedTitle;
+                                                       tempExtended["8"][3]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("None")}</span></li>;
+                                                       setExtendedTitle(tempExtended);
+                                                   }} ref={ref => (inputs.current["831"] = ref)}/>
                                                 <label htmlFor="831">{t("None")}</label>
                                             </div>
                                             <div className="box33 radio_style">
                                                 <input className="radio" type="radio" text={t("Baton 30cm")} value="2" name="step83" ref-num="83" id="832"
                                                        checked={step83 === "Baton 30cm"}
                                                        onChange={e => {
-                                                           setStep83("Baton 30cm");
-                                                           setDeps("", "83");
-                                                           setCart("BatonOption", "Baton 30cm");
-                                                           selectChanged(e);
-                                                    
-                                                       }} ref={ref => (inputs.current["832"] = ref)}/>
+                                                       setStep83("Baton 30cm");
+                                                       setDeps("", "83");
+                                                       setCart("BatonOption", "Baton 30cm");
+                                                       selectChanged(e);
+                                                       let tempExtended = extendedTitle;
+                                                       tempExtended["8"][3]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 30cm")}</span></li>;
+                                                       setExtendedTitle(tempExtended);
+                                                   }} ref={ref => (inputs.current["832"] = ref)}/>
                                                 <label htmlFor="832">{t("Baton 30cm")}</label>
                                             </div>
                                             <div className="box33 radio_style">
                                                 <input className="radio" type="radio" text={t("Baton 45cm")} value="3" name="step83" ref-num="83" id="833"
                                                        checked={step83 === "Baton 45cm"}
                                                        onChange={e => {
-                                                           setStep83("Baton 45cm");
-                                                           setDeps("", "83");
-                                                           setCart("BatonOption", "Baton 45cm");
-                                                           selectChanged(e);
-                                                    
-                                                       }} ref={ref => (inputs.current["833"] = ref)}/>
+                                                       setStep83("Baton 45cm");
+                                                       setDeps("", "83");
+                                                       setCart("BatonOption", "Baton 45cm");
+                                                       selectChanged(e);
+                                                       let tempExtended = extendedTitle;
+                                                       tempExtended["8"][3]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 45cm")}</span></li>;
+                                                       setExtendedTitle(tempExtended);
+                                                   }} ref={ref => (inputs.current["833"] = ref)}/>
                                                 <label htmlFor="833">{t("Baton 45cm")}</label>
                                             </div>
                                         </div>
                                         
                                         <div
-                                            className={step8 === "Same Style Hardware For All Curtains" && step81 !== "" && step31 !== "false" ? "card_body" + " card_body_radio card_body_rod_mount" : "noDisplay"}>
+                                            className={step8 === "Same Hardware For All Curtains" && step81 !== "" && step31 !== "false" ? "card_body" + " card_body_radio card_body_rod_mount" : "noDisplay"}>
                                             <div className="box100">
                                                 <p className="step_selection_title">{t("step8_rod_mount_title")}</p>
                                             </div>
@@ -9039,6 +9125,9 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                            setDeps("", "84");
                                                            setCart("Mount8", "Wall");
                                                            selectChanged(e);
+                                                           let tempExtended = extendedTitle;
+                                                           tempExtended["8"][4]= <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Wall")}</span></li>;
+                                                           setExtendedTitle(tempExtended);
                                                        }} ref={ref => (inputs.current["841"] = ref)}/>
                                                 <label htmlFor="841">{t("Wall")}</label>
                                             </div>
@@ -9050,7 +9139,9 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                            setDeps("", "84");
                                                            setCart("Mount8", "Ceiling");
                                                            selectChanged(e);
-                                                    
+                                                           let tempExtended = extendedTitle;
+                                                           tempExtended["8"][4]= <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Ceiling")}</span></li>;
+                                                           setExtendedTitle(tempExtended);
                                                        }} ref={ref => (inputs.current["842"] = ref)}/>
                                                 <label htmlFor="842">{t("Ceiling")}</label>
                                             </div>
@@ -9062,7 +9153,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                             </Accordion.Collapse>
                         </Card>
                         {/* step 7A */}
-                        <Card className={step8 === "Customize Style Hardware For All Curtains" ? "" : "noDisplay"}>
+                        <Card className={step8 === "Customize Hardware For Per Curtains" ? "" : "noDisplay"}>
                             <Card.Header>
                                 <ContextAwareToggle eventKey="8B" stepNum={t("7A")} stepTitle={t("grommet_step8B")} stepRef="8B" type="1" required={requiredStep["8B"]}
                                                     stepSelected={stepSelectedLabel["8B"] === undefined ? "" : stepSelectedLabel["8B"]}/>
@@ -9077,8 +9168,11 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                        setStep8B1("");
                                                        setStep8B2("");
                                                        setStep8B3("");
-                                                       setStep8B4("");
+                                                       // setStep8B4("");
                                                        setStep8B("None");
+                                                       let tempExtended = extendedTitle;
+                                                       tempExtended["8B"]=[t("None")];
+                                                       setExtendedTitle(tempExtended);
                                                        setDeps("", "8B,8B1,8B2,8B3,8B4");
                                                        setCart("SheerHardware", "None", "RailIdB,BatonOptionB,RodColorB,MountB");
                                                        selectChanged(e);
@@ -9104,14 +9198,17 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                             <input className="radio" type="radio" text={t("Rod")} value="3" name="step8B" ref-num="8B" id="8B3"
                                                    checked={step8B === "Rod"}
                                                    onChange={e => {
+                                                       let tempExtended = extendedTitle;
                                                        if (step3 === "" || (step3 === "true" && step31 === "")) {
                                                            selectUncheck(e);
                                                            modalHandleShow("noMeasurements");
                                                            setStep8B("");
+                                                           tempExtended["8B"]=[];
                                                            setDeps("8B", "8B1,8B2,8B3,8B4");
                                                            setCart("", "", "SheerHardware,RailIdB,BatonOptionB,RodColorB,MountB");
                                                        } else {
                                                            setStep8B("Rod");
+                                                           tempExtended["8B"]=[t("Rod")];
                                                            if (step31 === "false") {
                                                                setDeps("8B1,8B2,8B3", "8B,8B4");
                                                            } else {
@@ -9120,6 +9217,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                            setCart("SheerHardware", "Rod", "RailIdB,BatonOptionB,RodColorB,MountB");
                                                            selectChanged(e);
                                                        }
+                                                       setExtendedTitle(tempExtended);
                                                    }} ref={ref => (inputs.current["8B3"] = ref)}/>
                                             <label htmlFor="8B3">{t("Rod")}</label>
                                         </div>
@@ -9131,7 +9229,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                         <div
                                             className={step8B !== "None" && step8B !== "" && step8B1 !== "" && !is8BMotor ? "card_body card_body_radio card_body_Rod_color bracket_color" : "noDisplay"}>
                                             <div className="box100">
-                                                <p className="step_selection_title">{step8B === "Rod" ?t("step8_rod_finish_title"):t("step8_rod_finish_title_track")}</p>
+                                                <p className="step_selection_title">{step8B === "Rod" ? t("step8_rod_finish_title") : t("step8_rod_finish_title_track")}</p>
                                             </div>
                                             {rodsColorList3}
                                         </div>
@@ -9192,8 +9290,11 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                        onChange={e => {
                                                            setStep8B3("None");
                                                            setDeps("", "8B3");
-                                                           setCart("BatonOption", "None");
+                                                           setCart("BatonOptionB", "None");
                                                            selectChanged(e);
+                                                           let tempExtended = extendedTitle;
+                                                           tempExtended["8B"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("None")}</span></li>;
+                                                           setExtendedTitle(tempExtended);
                                                        }} ref={ref => (inputs.current["8B31"] = ref)}/>
                                                 <label htmlFor="8B31">{t("None")}</label>
                                             </div>
@@ -9203,11 +9304,15 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                        onChange={e => {
                                                            setStep8B3("Baton 30cm");
                                                            setDeps("", "8B3");
-                                                           setCart("BatonOption", "Baton 30cm");
+                                                           setCart("BatonOptionB", "Baton 30cm");
                                                            selectChanged(e);
-                                                    
+                                                           let tempExtended = extendedTitle;
+                                                           tempExtended["8B"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 30cm")}</span></li>;
+                                                           setExtendedTitle(tempExtended);
                                                        }} ref={ref => (inputs.current["8B32"] = ref)}/>
-                                                <label htmlFor="8B32">{t("Baton 30cm")}</label>
+                                                <label htmlFor="8B32">{t("Baton 30cm")}<br/><p
+                                                    className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add ") : t("Surcharge Applies")}{(modelAccessories["27"] ? (modelAccessories["27"]["58"] ? GetPrice(modelAccessories["27"]["58"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
+                                                </label>
                                             </div>
                                             <div className="box33 radio_style">
                                                 <input className="radio" type="radio" text={t("Baton 45cm")} value="3" name="step8B3" ref-num="8B3" id="8B33"
@@ -9215,11 +9320,15 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                        onChange={e => {
                                                            setStep8B3("Baton 45cm");
                                                            setDeps("", "8B3");
-                                                           setCart("BatonOption", "Baton 45cm");
+                                                           setCart("BatonOptionB", "Baton 45cm");
                                                            selectChanged(e);
-                                                    
+                                                           let tempExtended = extendedTitle;
+                                                           tempExtended["8B"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 45cm")}</span></li>;
+                                                           setExtendedTitle(tempExtended);
                                                        }} ref={ref => (inputs.current["8B33"] = ref)}/>
-                                                <label htmlFor="8B33">{t("Baton 45cm")}</label>
+                                                <label htmlFor="8B33">{t("Baton 45cm")}<br/><p
+                                                    className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add ") : t("Surcharge Applies")}{(modelAccessories["27"] ? (modelAccessories["27"]["59"] ? GetPrice(modelAccessories["27"]["59"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
+                                                </label>
                                             </div>
                                             <div className={step8B === "Track" ? "box33 radio_style" : "noDisplay"}>
                                                 <input className="radio" type="radio" text={t("Cord")} value="4" name="step8B3" ref-num="8B3" id="8B34"
@@ -9227,44 +9336,48 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                        onChange={e => {
                                                            setStep8B3("Cord");
                                                            setDeps("", "8B3");
-                                                           setCart("BatonOption", "Cord");
+                                                           setCart("BatonOptionB", "Cord");
                                                            selectChanged(e);
-                                                    
+                                                           let tempExtended = extendedTitle;
+                                                           tempExtended["8B"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Cord")}</span></li>;
+                                                           setExtendedTitle(tempExtended);
                                                        }} ref={ref => (inputs.current["8B34"] = ref)}/>
-                                                <label htmlFor="8B34">{t("Cord")}</label>
+                                                <label htmlFor="8B34">{t("Cord")}<br/><p
+                                                    className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add ") : t("Surcharge Applies")}{(modelAccessories["27"] ? (modelAccessories["27"]["60"] ? GetPrice(modelAccessories["27"]["60"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
+                                                </label>
                                             </div>
                                         </div>
-                                        <div
-                                            className={step8B !== "None" && step8B !== "" && step8B1 !== "" && step31 !== "false" && !is8BMotor ? "card_body card_body_radio card_body_rod_mount" : "noDisplay"}>
-                                            <div className="box100">
-                                                <p className="step_selection_title">{t("step8_rod_mount_title")}</p>
-                                            </div>
-                                            <div className="box33 radio_style">
-                                                <input className="radio" type="radio" text={t("Wall")} value="1" name="step8B4" ref-num="8B4" id="8B41"
-                                                       checked={step8B4 === "Wall"}
-                                                       onChange={e => {
-                                                           setStep8B4("Wall");
-                                                           setDeps("", "8B4");
-                                                           setCart("MountB", "Wall");
-                                                           selectChanged(e);
-                                                       }} ref={ref => (inputs.current["8B41"] = ref)}/>
-                                                <label htmlFor="8B41">{t("Wall")}</label>
-                                            </div>
-                                            <div className="box33 radio_style">
-                                                <input className="radio" type="radio" text={t("Ceiling")} value="2" name="step8B4" ref-num="8B4" id="8B42"
-                                                       checked={step8B4 === "Ceiling"}
-                                                       onChange={e => {
-                                                           setStep8B4("Ceiling");
-                                                           setDeps("", "8B4");
-                                                           setCart("MountB", "Ceiling");
-                                                           selectChanged(e);
-                                                    
-                                                       }} ref={ref => (inputs.current["8B42"] = ref)}/>
-                                                <label htmlFor="8B42">{t("Ceiling")}</label>
-                                            </div>
-                                            <div className="box33 radio_style"/>
-                                            <div className={step8B === "Track" ? "box33 radio_style" : "noDisplay"}/>
-                                        </div>
+                                        {/*<div*/}
+                                        {/*    className={step8B !== "None" && step8B !== "" && step8B1 !== "" && step31 !== "false" && !is8BMotor ? "card_body card_body_radio card_body_rod_mount" : "noDisplay"}>*/}
+                                        {/*    <div className="box100">*/}
+                                        {/*        <p className="step_selection_title">{t("step8_rod_mount_title")}</p>*/}
+                                        {/*    </div>*/}
+                                        {/*    <div className="box33 radio_style">*/}
+                                        {/*        <input className="radio" type="radio" text={t("Wall")} value="1" name="step8B4" ref-num="8B4" id="8B41"*/}
+                                        {/*               checked={step8B4 === "Wall"}*/}
+                                        {/*               onChange={e => {*/}
+                                        {/*                   setStep8B4("Wall");*/}
+                                        {/*                   setDeps("", "8B4");*/}
+                                        {/*                   setCart("MountB", "Wall");*/}
+                                        {/*                   selectChanged(e);*/}
+                                        {/*               }} ref={ref => (inputs.current["8B41"] = ref)}/>*/}
+                                        {/*        <label htmlFor="8B41">{t("Wall")}</label>*/}
+                                        {/*    </div>*/}
+                                        {/*    <div className="box33 radio_style">*/}
+                                        {/*        <input className="radio" type="radio" text={t("Ceiling")} value="2" name="step8B4" ref-num="8B4" id="8B42"*/}
+                                        {/*               checked={step8B4 === "Ceiling"}*/}
+                                        {/*               onChange={e => {*/}
+                                        {/*                   setStep8B4("Ceiling");*/}
+                                        {/*                   setDeps("", "8B4");*/}
+                                        {/*                   setCart("MountB", "Ceiling");*/}
+                                        {/*                   selectChanged(e);*/}
+                                        {/*            */}
+                                        {/*               }} ref={ref => (inputs.current["8B42"] = ref)}/>*/}
+                                        {/*        <label htmlFor="8B42">{t("Ceiling")}</label>*/}
+                                        {/*    </div>*/}
+                                        {/*    <div className="box33 radio_style"/>*/}
+                                        {/*    <div className={step8B === "Track" ? "box33 radio_style" : "noDisplay"}/>*/}
+                                        {/*</div>*/}
                                         <div className={is8BMotor ? "tracks_motorized_section" : "noDisplay"}>
                                             <div className={motorErr1 ? "secondary_options secondary_options_err" : "secondary_options"}>
                                                 <div className="card-body-display-flex">
@@ -9456,7 +9569,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                             // }
                                                             onChange={(selected) => {
                                                                 // setDeps("", "412");
-                                                                if(selectedMotorChannels.length && !pageLoad) {
+                                                                if (selectedMotorChannels.length && !pageLoad && !rodsLoad && !rodsLoad2) {
                                                                     setCart("MotorChannels", selected.map(obj => obj.value));
                                                                     setSelectedMotorChannels(selected);
                                                                 }
@@ -9474,7 +9587,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         </Card>
                         
                         {/* step 7B */}
-                        <Card className={step8 === "Customize Style Hardware For All Curtains" && step2B !== "None" ? "" : "noDisplay"}>
+                        <Card className={step8 === "Customize Hardware For Per Curtains" && step2B !== "None" ? "" : "noDisplay"}>
                             <Card.Header>
                                 <ContextAwareToggle eventKey="8C" stepNum={t("7B")} stepTitle={t("grommet_step8C")} stepRef="8C" type="1" required={requiredStep["8C"]}
                                                     stepSelected={stepSelectedLabel["8C"] === undefined ? "" : stepSelectedLabel["8C"]}/>
@@ -9489,8 +9602,11 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                        setStep8C1("");
                                                        setStep8C2("");
                                                        setStep8C3("");
-                                                       setStep8C4("");
+                                                       // setStep8C4("");
                                                        setStep8C("None");
+                                                       let tempExtended = extendedTitle;
+                                                       tempExtended["8C"]=[t("None")];
+                                                       setExtendedTitle(tempExtended);
                                                        setDeps("", "8C,8C1,8C2,8C3");
                                                        setCart("PrivacyLayerHardware", "None", "RailIdC,BatonOptionC,RodColorC,MountC");
                                                        selectChanged(e);
@@ -9504,8 +9620,11 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                        setStep8C1("");
                                                        setStep8C2("");
                                                        setStep8C3("");
-                                                       setStep8C4("");
+                                                       // setStep8C4("");
                                                        setStep8C("Track");
+                                                       let tempExtended = extendedTitle;
+                                                       tempExtended["8C"]=[t("Track")];
+                                                       setExtendedTitle(tempExtended);
                                                        setDeps("8C1,8C2,8C3", "8C");
                                                        setCart("PrivacyLayerHardware", "Track", "RailIdC,BatonOptionC,RodColorC,MountC");
                                                        selectChanged(e);
@@ -9519,8 +9638,11 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                        setStep8C1("");
                                                        setStep8C2("");
                                                        setStep8C3("");
-                                                       setStep8C4("");
+                                                       // setStep8C4("");
                                                        setStep8C("Rod");
+                                                       let tempExtended = extendedTitle;
+                                                       tempExtended["8C"]=[t("Rod")];
+                                                       setExtendedTitle(tempExtended);
                                                        setDeps("8C1,8C2,8C3", "8C");
                                                        setCart("PrivacyLayerHardware", "Rod", "RailIdC,BatonOptionC,RodColorC,MountC");
                                                        selectChanged(e);
@@ -9535,7 +9657,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                         <div
                                             className={step8C !== "None" && step8C !== "" && step8C1 !== "" && !is8CMotor ? "card_body card_body_radio card_body_Rod_color bracket_color" : "noDisplay"}>
                                             <div className="box100">
-                                                <p className="step_selection_title">{step8C === "Rod" ?t("step8_rod_finish_title"):t("step8_rod_finish_title_track")}</p>
+                                                <p className="step_selection_title">{step8C === "Rod" ? t("step8_rod_finish_title") : t("step8_rod_finish_title_track")}</p>
                                             </div>
                                             {rodsColorList4}
                                         </div>
@@ -9596,8 +9718,11 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                        onChange={e => {
                                                            setStep8C3("None");
                                                            setDeps("", "8C3");
-                                                           setCart("BatonOption", "None");
+                                                           setCart("BatonOptionC", "None");
                                                            selectChanged(e);
+                                                           let tempExtended = extendedTitle;
+                                                           tempExtended["8C"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("None")}</span></li>;
+                                                           setExtendedTitle(tempExtended);
                                                        }} ref={ref => (inputs.current["8C31"] = ref)}/>
                                                 <label htmlFor="8C31">{t("None")}</label>
                                             </div>
@@ -9607,11 +9732,15 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                        onChange={e => {
                                                            setStep8C3("Baton 30cm");
                                                            setDeps("", "8C3");
-                                                           setCart("BatonOption", "Baton 30cm");
+                                                           setCart("BatonOptionC", "Baton 30cm");
                                                            selectChanged(e);
-                                                    
+                                                           let tempExtended = extendedTitle;
+                                                           tempExtended["8C"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 30cm")}</span></li>;
+                                                           setExtendedTitle(tempExtended);
                                                        }} ref={ref => (inputs.current["8C32"] = ref)}/>
-                                                <label htmlFor="8C32">{t("Baton 30cm")}</label>
+                                                <label htmlFor="8C32">{t("Baton 30cm")}<br/><p
+                                                    className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add ") : t("Surcharge Applies")}{(modelAccessories["27"] ? (modelAccessories["27"]["58"] ? GetPrice(modelAccessories["27"]["58"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
+                                                </label>
                                             </div>
                                             <div className="box33 radio_style">
                                                 <input className="radio" type="radio" text={t("Baton 45cm")} value="3" name="step8C3" ref-num="8C3" id="8C33"
@@ -9619,11 +9748,15 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                        onChange={e => {
                                                            setStep8C3("Baton 45cm");
                                                            setDeps("", "8C3");
-                                                           setCart("BatonOption", "Baton 45cm");
+                                                           setCart("BatonOptionC", "Baton 45cm");
                                                            selectChanged(e);
-                                                    
+                                                           let tempExtended = extendedTitle;
+                                                           tempExtended["8C"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 45cm")}</span></li>;
+                                                           setExtendedTitle(tempExtended);
                                                        }} ref={ref => (inputs.current["8C33"] = ref)}/>
-                                                <label htmlFor="8C33">{t("Baton 45cm")}</label>
+                                                <label htmlFor="8C33">{t("Baton 45cm")}<br/><p
+                                                    className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add ") : t("Surcharge Applies")}{(modelAccessories["27"] ? (modelAccessories["27"]["59"] ? GetPrice(modelAccessories["27"]["59"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
+                                                </label>
                                             </div>
                                             <div className={step8C === "Track" ? "box33 radio_style" : "noDisplay"}>
                                                 <input className="radio" type="radio" text={t("Cord")} value="4" name="step8C3" ref-num="8C3" id="8C34"
@@ -9631,11 +9764,15 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                        onChange={e => {
                                                            setStep8C3("Cord");
                                                            setDeps("", "8C3");
-                                                           setCart("BatonOption", "Cord");
+                                                           setCart("BatonOptionC", "Cord");
                                                            selectChanged(e);
-                                                    
+                                                           let tempExtended = extendedTitle;
+                                                           tempExtended["8C"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Cord")}</span></li>;
+                                                           setExtendedTitle(tempExtended);
                                                        }} ref={ref => (inputs.current["8C34"] = ref)}/>
-                                                <label htmlFor="8C34">{t("Cord")}</label>
+                                                <label htmlFor="8C34">{t("Cord")}<br/><p
+                                                    className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add ") : t("Surcharge Applies")}{(modelAccessories["27"] ? (modelAccessories["27"]["60"] ? GetPrice(modelAccessories["27"]["60"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
+                                                </label>
                                             </div>
                                         </div>
                                         {/*<div*/}
@@ -9860,7 +9997,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                             // }
                                                             onChange={(selected) => {
                                                                 // setDeps("", "412");
-                                                                if(selectedMotorChannels.length && !pageLoad) {
+                                                                if (selectedMotorChannels.length && !pageLoad && !rodsLoad && !rodsLoad2) {
                                                                     setCart("MotorChannels", selected.map(obj => obj.value));
                                                                     setSelectedMotorChannels(selected);
                                                                 }

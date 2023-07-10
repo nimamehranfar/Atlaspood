@@ -132,6 +132,7 @@ function CurtainSelection() {
     }
     
     useEffect(() => {
+        setModelList([]);
         const tempLang = location.pathname.split('');
         setPageLanguage(tempLang.slice(1, 3).join(''));
     }, [location.pathname]);
@@ -144,10 +145,11 @@ function CurtainSelection() {
     
     useEffect(() => {
         if (pageLanguage !== '') {
-            getCats();
+            setTimeout(() => {
+                getCats();
+            }, 300);
         }
-        
-    }, [pageLanguage, location.pathname]);
+    }, [pageLanguage]);
     
     return (
         <div className={`Drapery_page_container ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}>

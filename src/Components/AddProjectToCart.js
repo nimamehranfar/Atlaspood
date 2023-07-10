@@ -137,7 +137,8 @@ async function AddProjectToCart(cartValues, SewingModelId, price, ModelNameEn, M
                             // console.log(response.data ? response.data : {});
                             resolve(response.data ? response.data : {})
                         }).catch(err => {
-                            if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                                 refreshToken().then((response2) => {
                                     if (response2 !== false) {
                                         resolve(401);

@@ -5096,15 +5096,52 @@
         ]
       },
       {
-        "cart": "MountC",
-        "title": "Mount",
+        "cart": "hasPower",
+        "title": "",
         "titleValue": null,
         "titlePostfix": "",
-        "order": -1,
-        "apiLabel": "MountC",
+        "order": 29,
+        "apiLabel": "hasPower",
         "apiValue": null,
-        "apiLabel4": "MountC",
-        "apiValue4": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "MotorPosition",
+        "title": "Motor Position",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 30,
+        "apiLabel": "MotorPosition",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "RemoteName",
+        "title": "Remote Name",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 31,
+        "apiLabel": "RemoteName",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "MotorChannels",
+        "title": "Motor Channels",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 32,
+        "apiLabel": "MotorChannels",
+        "apiValue": null,
         "lang": [
           "en",
           "fa"

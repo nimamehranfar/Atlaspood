@@ -90,6 +90,8 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
     let navigate = useNavigate();
     const dispatch = useDispatch();
     const [pageLoad, setPageLoad] = useState(undefined);
+    const [rodsLoad, setRodsLoad] = useState(undefined);
+    // const [rodsLoad2, setRodsLoad2] = useState(undefined);
     const [motorLoad, setMotorLoad] = useState(false);
     const [models, setModels] = useState([]);
     const [projectData, setProjectData] = useState({});
@@ -167,6 +169,13 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
     const [hasTrim, setHasTrim] = useState(false);
     const [showLabels, setShowLabels] = useState(true);
     const [headerTruncated, setHeaderTruncated] = useState([]);
+    const [extendedTitle, setExtendedTitle] = useState({
+        "8":[],
+        "8A":[],
+        "8B":[],
+        "8C":[],
+        "9":[]
+    });
     const [detailsShow, setDetailsShow] = useState(false);
     const [filtersShow, setFiltersShow] = useState(false);
     const [windowSize, setWindowSize] = useState("");
@@ -407,6 +416,9 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
         }).catch(err => {
             console.log(err);
             setRails([]);
+            if(rodsLoad){
+                setRodsLoad(false);
+            }
         });
     }
     
@@ -673,6 +685,7 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
         const tempList = [];
         let pageLanguage1 = location.pathname.split('').slice(1, 3).join('');
         let temp2 = JSON.parse(JSON.stringify(customAccActive));
+        let params = parameters === undefined || parameters === null || parameters === "undefined" || parameters === "null" || parameters === "" ? "{}" : JSON.parse(JSON.stringify(parameters));
         
         let promiseArr = [];
         Object.keys(stepAccessories).forEach((key, index) => {
@@ -698,7 +711,19 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                             PhotoPath = obj["PhotoUrl"];
                                     });
                             }
-                            temp.push(
+                            let fabricOrderSelected = params["AccColors"] && params["AccColors"][DetailId] && (params["AccColors"][DetailId]["order"] || params["AccColors"][DetailId]["order"] === 0) ? params["AccColors"][DetailId]["order"] : -1;
+                            
+                            let pushIndex = 0;
+                            if (fabricOrderSelected !== -1 && !temp[fabricOrderSelected]) {
+                                pushIndex = fabricOrderSelected;
+                            } else if (fabricOrderSelected !== -1 && temp[fabricOrderSelected]) {
+                                temp[temp.length] = JSON.parse(JSON.stringify(temp[fabricOrderSelected]));
+                                pushIndex = fabricOrderSelected;
+                            } else {
+                                pushIndex = temp.length;
+                            }
+                            
+                            temp[pushIndex] =
                                 <li className={colorSelected ? "Accessories_List_item_colors_list_item colorSelected" : "Accessories_List_item_colors_list_item"} key={index}
                                     onClick={() => setAccessoriesDesign({
                                         "isPlus": undefined,
@@ -717,7 +742,7 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                           </div>
                                                       }/>
                                 </li>
-                            );
+                            ;
                             resolve();
                         });
                     }
@@ -725,115 +750,74 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                 
                 Promise.all(promiseArr2).then(() => {
                     let obj = stepAccessories[key][0];
-                    if (obj["DetailId"] === "0000011") {
-                        let DesignENName = obj["DesignENName"];
-                        let DesignName = obj["DesignName"];
-                        let DetailId = temp2[key] ? temp2[key]["SewingAccessoryValue"] : obj["DetailId"];
-                        let Price = obj["Price"];
-                        
-                        tempList.unshift(
-                            <li className="Accessories_List_item" key={index}>
-                                <div className="Accessories_List_item_image">
-                                    <img src={require('../Images/drapery/grommet/MatchingTieback.jpg')} className="img-fluid" alt=""/>
-                                </div>
-                                <div className="Accessories_List_item_desc">
-                                    <h1 className="Accessories_List_item_title">{pageLanguage1 === 'en' ? DesignENName : DesignName}</h1>
-                                    <h2 className="Accessories_List_item_price">{GetPrice(Price, pageLanguage1, t("TOMANS"))}</h2>
-                                    <div className="Accessories_List_item_colors">
-                                        <ul className="Accessories_List_item_colors_list">
-                                            {temp}
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div className="Accessories_List_item_qty">
-                                    <div className="qty_numbers">
-                                        <button type="text" className="qty_minus" onClick={() => setAccessoriesDesign({
-                                            "isPlus": false,
-                                            "SewingAccessoryValue": undefined,
-                                            "SewingAccessoryId": undefined,
-                                            "SewingModelAccessoryId": undefined,
-                                            "DesignCode": key,
-                                            "qty": undefined
-                                        })}><img src={require('../Images/public/minus.svg').default} alt="" className="qty_math_icon"/></button>
-                                        <input type="text" className="qty_num"
-                                               value={getAccValue(customAcc, "SewingAccessoryValue", DetailId, pageLanguage)}
-                                               onChange={(e) => setAccessoriesDesign({
-                                                   "isPlus": undefined,
-                                                   "SewingAccessoryValue": undefined,
-                                                   "SewingAccessoryId": undefined,
-                                                   "SewingModelAccessoryId": undefined,
-                                                   "DesignCode": key,
-                                                   "qty": e.target.value
-                                               })}
-                                               readOnly/>
-                                        <button type="text" className="qty_plus" onClick={() => setAccessoriesDesign({
-                                            "isPlus": true,
-                                            "SewingAccessoryValue": undefined,
-                                            "SewingAccessoryId": undefined,
-                                            "SewingModelAccessoryId": undefined,
-                                            "DesignCode": key,
-                                            "qty": undefined
-                                        })}><img src={require('../Images/public/plus.svg').default} alt="" className="qty_math_icon"/></button>
-                                    </div>
-                                </div>
-                            </li>
-                        );
-                        resolve();
+                    let DesignCode = key;
+                    let DesignENName = obj["DesignENName"];
+                    let DesignName = obj["DesignName"];
+                    let DetailId = temp2[key] ? temp2[key]["SewingAccessoryValue"] : obj["DetailId"];
+                    let Price = obj["Price"];
+                    
+                    let designOrderSelected = params["Designs"] && params["Designs"][DesignCode] && (params["Designs"][DesignCode]["order"] && params["Designs"][DesignCode]["order"] >= 0) ? params["Designs"][DesignCode]["order"] : -1;
+                    
+                    let pushIndex = 0;
+                    if (designOrderSelected !== -1 && !tempList[designOrderSelected]) {
+                        pushIndex = designOrderSelected;
+                    } else if (designOrderSelected !== -1 && tempList[designOrderSelected]) {
+                        tempList[tempList.length] = JSON.parse(JSON.stringify(tempList[designOrderSelected]));
+                        pushIndex = designOrderSelected;
                     } else {
-                        let DesignENName = obj["DesignENName"];
-                        let DesignName = obj["DesignName"];
-                        let DetailId = temp2[key] ? temp2[key]["SewingAccessoryValue"] : obj["DetailId"];
-                        let Price = obj["Price"];
-                        
-                        tempList.push(
-                            <li className="Accessories_List_item" key={index}>
-                                <div className="Accessories_List_item_image">
-                                    <img src={`https://api.atlaspood.ir/${PhotoPath}`} className="img-fluid" alt=""/>
-                                </div>
-                                <div className="Accessories_List_item_desc">
-                                    <h1 className="Accessories_List_item_title">{pageLanguage1 === 'en' ? DesignENName : DesignName}</h1>
-                                    <h2 className="Accessories_List_item_price">{GetPrice(Price, pageLanguage1, t("TOMANS"))}</h2>
-                                    <div className="Accessories_List_item_colors">
-                                        <ul className="Accessories_List_item_colors_list">
-                                            {temp}
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div className="Accessories_List_item_qty">
-                                    <div className="qty_numbers">
-                                        <button type="text" className="qty_minus" onClick={() => setAccessoriesDesign({
-                                            "isPlus": false,
-                                            "SewingAccessoryValue": undefined,
-                                            "SewingAccessoryId": undefined,
-                                            "SewingModelAccessoryId": undefined,
-                                            "DesignCode": key,
-                                            "qty": undefined
-                                        })}><img src={require('../Images/public/minus.svg').default} alt="" className="qty_math_icon"/></button>
-                                        <input type="text" className="qty_num"
-                                               value={getAccValue(customAcc, "SewingAccessoryValue", DetailId, pageLanguage)}
-                                               onChange={(e) => setAccessoriesDesign({
-                                                   "isPlus": undefined,
-                                                   "SewingAccessoryValue": undefined,
-                                                   "SewingAccessoryId": undefined,
-                                                   "SewingModelAccessoryId": undefined,
-                                                   "DesignCode": key,
-                                                   "qty": e.target.value
-                                               })}
-                                               readOnly/>
-                                        <button type="text" className="qty_plus" onClick={() => setAccessoriesDesign({
-                                            "isPlus": true,
-                                            "SewingAccessoryValue": undefined,
-                                            "SewingAccessoryId": undefined,
-                                            "SewingModelAccessoryId": undefined,
-                                            "DesignCode": key,
-                                            "qty": undefined
-                                        })}><img src={require('../Images/public/plus.svg').default} alt="" className="qty_math_icon"/></button>
-                                    </div>
-                                </div>
-                            </li>
-                        );
-                        resolve();
+                        let index = tempList.findIndex(Object.is.bind(null, undefined));
+                        pushIndex = index === -1 ? tempList.length : index;
                     }
+                    
+                    tempList[pushIndex] =
+                        <li className="Accessories_List_item" key={index}>
+                            <div className="Accessories_List_item_image">
+                                <img src={`https://api.atlaspood.ir/${PhotoPath}`} className="img-fluid" alt=""/>
+                            </div>
+                            <div className="Accessories_List_item_desc">
+                                <h1 className="Accessories_List_item_title">{pageLanguage1 === 'en' ? DesignENName : DesignName}</h1>
+                                <h2 className="Accessories_List_item_price">{GetPrice(Price, pageLanguage1, t("TOMANS"))}</h2>
+                                <div className="Accessories_List_item_colors">
+                                    <ul className="Accessories_List_item_colors_list">
+                                        {temp}
+                                    </ul>
+                                </div>
+                            </div>
+                            <div className="Accessories_List_item_qty">
+                                <div className="qty_numbers">
+                                    <button type="text" className="qty_minus" onClick={() => setAccessoriesDesign({
+                                        "isPlus": false,
+                                        "SewingAccessoryValue": undefined,
+                                        "SewingAccessoryId": undefined,
+                                        "SewingModelAccessoryId": undefined,
+                                        "DesignCode": key,
+                                        "qty": undefined
+                                    })}><img src={require('../Images/public/minus.svg').default} alt="" className="qty_math_icon"/></button>
+                                    <input type="text" className="qty_num"
+                                           value={getAccValue(customAcc, "SewingAccessoryValue", DetailId, pageLanguage)}
+                                           onChange={(e) => setAccessoriesDesign({
+                                               "isPlus": undefined,
+                                               "SewingAccessoryValue": undefined,
+                                               "SewingAccessoryId": undefined,
+                                               "SewingModelAccessoryId": undefined,
+                                               "DesignCode": key,
+                                               "qty": e.target.value
+                                           })}
+                                           readOnly/>
+                                    <button type="text" className="qty_plus" onClick={() => setAccessoriesDesign({
+                                        "isPlus": true,
+                                        "SewingAccessoryValue": undefined,
+                                        "SewingAccessoryId": undefined,
+                                        "SewingModelAccessoryId": undefined,
+                                        "DesignCode": key,
+                                        "qty": undefined
+                                    })}><img src={require('../Images/public/plus.svg').default} alt="" className="qty_math_icon"/></button>
+                                </div>
+                            </div>
+                        </li>
+                    ;
+                    resolve();
+                    
                 });
             });
         });
@@ -1042,7 +1026,8 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                 {/*</div>*/}
                 <div className="steps_header_selected_container">
                     <div className="steps_header_selected" onMouseEnter={() => {
-                        if (selectedTitle.current[stepNum].clientWidth < selectedTitle.current[stepNum].scrollWidth) {
+                        // if (selectedTitle.current[stepNum].clientWidth < selectedTitle.current[stepNum].scrollWidth || (stepRef in extendedTitle && extendedTitle[stepRef].length > 1)) {
+                        if (stepRef in extendedTitle && extendedTitle[stepRef].length > 1) {
                             let temp = JSON.parse(JSON.stringify(headerTruncated))
                             temp[stepNum] = true;
                             setHeaderTruncated(temp);
@@ -1051,8 +1036,8 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         let temp = JSON.parse(JSON.stringify(headerTruncated))
                         temp[stepNum] = false;
                         setHeaderTruncated(temp);
-                    }} ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? stepSelected : null}</div>
-                    {headerTruncated[stepNum] && <div className="header_tooltip">{stepSelected}</div>}
+                    }} ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? (stepRef in extendedTitle && extendedTitle[stepRef].length > 0 ? (extendedTitle[stepRef][0]) : stepSelected) : null}{showLabels && stepRef in extendedTitle && extendedTitle[stepRef].length > 1 ? <h5> ...</h5> : ""}</div>
+                    {headerTruncated[stepNum] && <div className="header_tooltip">{stepRef in extendedTitle ? (stepRef==="8" ||stepRef==="8A" ||stepRef==="8B" ||stepRef==="8C" ? extendedTitle[stepRef].slice(1).filter(n => n):extendedTitle[stepRef].slice(1).filter(n => n).join(', \n')) : stepSelected}</div>}
                     {/*{showLabels &&*/}
                     {/*    <TruncateMarkup lines={1} tokenize="words">*/}
                     {/*        <div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{stepSelected}</div>*/}
@@ -2253,7 +2238,8 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                 setAddingLoading(false);
                                 
                             }).catch(err => {
-                            if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                                 refreshToken().then((response2) => {
                                     if (response2 !== false) {
                                         addToCart();
@@ -3248,6 +3234,8 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
     
     function setProjectDetails(data, editIndex, changeLang) {
         setPageLoad(true);
+        setRodsLoad(true);
+        // setRodsLoad2(true);
         if (data && Object.keys(data).length !== 0) {
             setProjectData(data);
         }
@@ -4281,9 +4269,10 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
             })[0] || railObject;
             
             if (railObject["DesignENName"]) {
-                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                tempLabels["8"] = pageLanguage === "fa" ? railObject["DesignName"] : railObject["DesignENName"];
-                setStepSelectedLabel(tempLabels);
+                let tempExtended = extendedTitle;
+                tempExtended["8"][1]= <li key="1" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Design")}</span><span className="step_title_extended_list_item_text">{pageLanguage === "fa" ? convertToPersian(railObject["DesignName"]) : railObject["DesignENName"]}</span></li>;
+                tempExtended["8"].splice(2, 3);
+                setExtendedTitle(tempExtended);
             }
             showRodsColor(railObject, "82");
         }
@@ -4305,9 +4294,9 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
             })[0] || railObject2;
             
             if (railObject["DesignENName"] && railObject2["ColorName"] && railObject2["ColorEnName"]) {
-                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                tempLabels["8"] = pageLanguage === "fa" ? convertToPersian(railObject["DesignName"]) + " / " + convertToPersian(railObject2["ColorName"]) : railObject["DesignENName"] + " / " + railObject2["ColorEnName"];
-                setStepSelectedLabel(tempLabels);
+                let tempExtended = extendedTitle;
+                tempExtended["8"][2]= <li key="2" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Color")}</span><span className="step_title_extended_list_item_text">{pageLanguage === "fa" ? convertToPersian(railObject2["ColorName"]) : railObject2["ColorEnName"]}</span></li>;
+                setExtendedTitle(tempExtended);
             }
             
             showRodsColor(railObject, "82");
@@ -4463,7 +4452,7 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                 let DesignENName = stepAccessories[found][found2]["DesignENName"];
                                 let DesignName = stepAccessories[found][found2]["DesignName"];
                                 let qty = obj["Qty"];
-                                tempText.push(`${pageLanguage === "en" ? DesignENName : DesignName} X${qty}`);
+                                tempText.push(`${pageLanguage === "en" ? DesignENName : DesignName} ${pageLanguage === "en" ?`x${qty}`:NumberToPersianWord.convertEnToPe(`${qty}x`)}`);
                                 resolve();
                             } else {
                                 resolve();
@@ -4474,14 +4463,23 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                     }, 100);
                 });
             });
-            
+    
             Promise.all(promiseArr).then(() => {
                 tempLabels["9"] = tempText.join(', \n');
+                // setAccTitle(tempText);
+        
+                let tempExtended = extendedTitle;
+                tempExtended["9"]=tempText;
+                setExtendedTitle(tempExtended);
                 setStepSelectedLabel(tempLabels);
             });
         } else {
             let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
             tempLabels["9"] = "";
+    
+            let tempExtended = extendedTitle;
+            tempExtended["9"]=[];
+            setExtendedTitle(tempExtended);
             setStepSelectedLabel(tempLabels);
         }
     }, [customAcc, pageLanguage]);
@@ -4927,6 +4925,9 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                 } else {
                     setRodsList([]);
                 }
+            }
+            if(rodsLoad){
+                setRodsLoad(false);
             }
         });
     }, [rods, isLoggedIn, location.pathname]);
@@ -7970,6 +7971,9 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                        setStep82("");
                                                        setStep83("");
                                                        setStep84("");
+                                                       let tempExtended = extendedTitle;
+                                                       tempExtended["8"]=[t("None")];
+                                                       setExtendedTitle(tempExtended);
                                                        selectChanged(e);
                                                        setStep8("None");
                                                        setHardwareNextStep("9");
@@ -7982,16 +7986,19 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                             <input className="radio" type="radio" text={t("hardware2_drapery")} value="2" name="step8" ref-num="8" id="82" outline="true"
                                                    checked={step8 === "Rod"}
                                                    onChange={e => {
+                                                       let tempExtended = extendedTitle;
                                                        if (step3 === "" || (step3 === "true" && step31 === "")) {
+                                                           setHardwareNextStep("9");
+                                                           setStep8("");
+                                                           tempExtended["8"]=[];
                                                            selectUncheck(e);
                                                            modalHandleShow("noMeasurements");
-                                                           setStep8("");
-                                                           setHardwareNextStep("9");
                                                            setDeps("8", "81,82,83,84,8A,8A1,8A2,8A3,8A4,8B,8B1,8B2,8B3,8B4,8C,8C1,8C2,8C3,8C4");
                                                            setCart("", "", "Hardware,RailIdA,BatonOptionA,RodColorA,MountA,RailIdB,BatonOptionB,RodColorB,MountB,RailIdC,BatonOptionC,RodColorC,MountC,hasPower,MotorPosition,RemoteName,MotorChannels");
                                                        } else {
                                                            selectChanged(e);
                                                            setStep8("Rod");
+                                                           tempExtended["8"]=[t("hardware2_drapery")];
                                                            setHardwareNextStep("9");
                                                            if (step31 === "false") {
                                                                setDeps("81,82,83", "8,84,8A,8A1,8A2,8A3,8A4,8B,8B1,8B2,8B3,8B4,8C,8C1,8C2,8C3,8C4");
@@ -8001,12 +8008,13 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                            setDeps("81,82,83,84", "8,8A,8A1,8A2,8A3,8A4,8B,8B1,8B2,8B3,8B4,8C,8C1,8C2,8C3,8C4");
                                                            setCart("Hardware", "Rod", "RailIdA,BatonOptionA,RodColorA,MountA,RailIdB,BatonOptionB,RodColorB,MountB,RailIdC,BatonOptionC,RodColorC,MountC,hasPower,MotorPosition,RemoteName,MotorChannels");
                                                        }
+                                                       setExtendedTitle(tempExtended);
                                                    }} ref={ref => (inputs.current["82"] = ref)}/>
                                             <label htmlFor="82">{t("hardware2_drapery")}</label>
                                         </div>
                                         {/*<div className="box33 radio_style">*/}
                                         {/*    <input className="radio" type="radio" text={t("hardware3")} value="3" name="step8" ref-num="8" id="83" outline="true"*/}
-                                        {/*           checked={step8 === "Customize Style Hardware For All Curtains"}*/}
+                                        {/*           checked={step8 === "Customize Hardware For Per Curtains"}*/}
                                         {/*           onChange={e => {*/}
                                         {/*               setStep81("");*/}
                                         {/*               setStep82("");*/}
@@ -8021,9 +8029,9 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                         {/*                   setCart("", "", "Hardware,RailId,BatonOption,RodColor,Mount,RailIdA,BatonOptionA,RodColorA,MountA,RailIdB,BatonOptionB,RodColorB,MountB,RailIdC,BatonOptionC,RodColorC,MountC,hasPower,MotorPosition,RemoteName,MotorChannels");*/}
                                         {/*               } else {*/}
                                         {/*                   selectChanged(e);*/}
-                                        {/*                   setStep8("Customize Style Hardware For All Curtains");*/}
+                                        {/*                   setStep8("Customize Hardware For Per Curtains");*/}
                                         {/*                   setDeps("8A,8B,8C", "8,81,82,83,84");*/}
-                                        {/*                   setCart("Hardware", "Customize Style Hardware For All Curtains", "RailId,BatonOption,RodColor,Mount");*/}
+                                        {/*                   setCart("Hardware", "Customize Hardware For Per Curtains", "RailId,BatonOption,RodColor,Mount");*/}
                                         {/*               }*/}
                                         {/*           }} ref={ref => (inputs.current["83"] = ref)}/>*/}
                                         {/*    <label htmlFor="83">{t("hardware3")}</label>*/}
@@ -8048,35 +8056,42 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                 <input className="radio" type="radio" text={t("None")} value="1" name="step83" ref-num="83" id="831"
                                                        checked={step83 === "None"}
                                                        onChange={e => {
-                                                           setStep83("None");
-                                                           setDeps("", "83");
-                                                           setCart("BatonOption", "None");
-                                                           selectChanged(e);
-                                                       }} ref={ref => (inputs.current["831"] = ref)}/>
+                                                       setStep83("None");
+                                                       setDeps("", "83");
+                                                       setCart("BatonOption", "None");
+                                                       selectChanged(e);
+                                                       let tempExtended = extendedTitle;
+                                                       tempExtended["8"][3]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("None")}</span></li>;
+                                                       setExtendedTitle(tempExtended);
+                                                   }} ref={ref => (inputs.current["831"] = ref)}/>
                                                 <label htmlFor="831">{t("None")}</label>
                                             </div>
                                             <div className="box33 radio_style">
                                                 <input className="radio" type="radio" text={t("Baton 30cm")} value="2" name="step83" ref-num="83" id="832"
                                                        checked={step83 === "Baton 30cm"}
                                                        onChange={e => {
-                                                           setStep83("Baton 30cm");
-                                                           setDeps("", "83");
-                                                           setCart("BatonOption", "Baton 30cm");
-                                                           selectChanged(e);
-                                                    
-                                                       }} ref={ref => (inputs.current["832"] = ref)}/>
+                                                       setStep83("Baton 30cm");
+                                                       setDeps("", "83");
+                                                       setCart("BatonOption", "Baton 30cm");
+                                                       selectChanged(e);
+                                                       let tempExtended = extendedTitle;
+                                                       tempExtended["8"][3]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 30cm")}</span></li>;
+                                                       setExtendedTitle(tempExtended);
+                                                   }} ref={ref => (inputs.current["832"] = ref)}/>
                                                 <label htmlFor="832">{t("Baton 30cm")}</label>
                                             </div>
                                             <div className="box33 radio_style">
                                                 <input className="radio" type="radio" text={t("Baton 45cm")} value="3" name="step83" ref-num="83" id="833"
                                                        checked={step83 === "Baton 45cm"}
                                                        onChange={e => {
-                                                           setStep83("Baton 45cm");
-                                                           setDeps("", "83");
-                                                           setCart("BatonOption", "Baton 45cm");
-                                                           selectChanged(e);
-                                                    
-                                                       }} ref={ref => (inputs.current["833"] = ref)}/>
+                                                       setStep83("Baton 45cm");
+                                                       setDeps("", "83");
+                                                       setCart("BatonOption", "Baton 45cm");
+                                                       selectChanged(e);
+                                                       let tempExtended = extendedTitle;
+                                                       tempExtended["8"][3]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 45cm")}</span></li>;
+                                                       setExtendedTitle(tempExtended);
+                                                   }} ref={ref => (inputs.current["833"] = ref)}/>
                                                 <label htmlFor="833">{t("Baton 45cm")}</label>
                                             </div>
                                         </div>
@@ -8090,23 +8105,28 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                 <input className="radio" type="radio" text={t("Wall")} value="1" name="step84" ref-num="84" id="841"
                                                        checked={step84 === "Wall"}
                                                        onChange={e => {
-                                                           setStep84("Wall");
-                                                           setDeps("", "84");
-                                                           setCart("Mount", "Wall");
-                                                           selectChanged(e);
-                                                       }} ref={ref => (inputs.current["841"] = ref)}/>
+                                                       setStep84("Wall");
+                                                       setDeps("", "84");
+                                                       setCart("Mount8", "Wall");
+                                                       selectChanged(e);
+                                                       let tempExtended = extendedTitle;
+                                                       tempExtended["8"][4]= <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Wall")}</span></li>;
+                                                       setExtendedTitle(tempExtended);
+                                                   }} ref={ref => (inputs.current["841"] = ref)}/>
                                                 <label htmlFor="841">{t("Wall")}</label>
                                             </div>
                                             <div className="box33 radio_style">
                                                 <input className="radio" type="radio" text={t("Ceiling")} value="2" name="step84" ref-num="84" id="842"
                                                        checked={step84 === "Ceiling"}
                                                        onChange={e => {
-                                                           setStep84("Ceiling");
-                                                           setDeps("", "84");
-                                                           setCart("Mount", "Ceiling");
-                                                           selectChanged(e);
-                                                    
-                                                       }} ref={ref => (inputs.current["842"] = ref)}/>
+                                                       setStep84("Ceiling");
+                                                       setDeps("", "84");
+                                                       setCart("Mount8", "Ceiling");
+                                                       selectChanged(e);
+                                                       let tempExtended = extendedTitle;
+                                                       tempExtended["8"][4]= <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Ceiling")}</span></li>;
+                                                       setExtendedTitle(tempExtended);
+                                                   }} ref={ref => (inputs.current["842"] = ref)}/>
                                                 <label htmlFor="842">{t("Ceiling")}</label>
                                             </div>
                                             <div className="box33 radio_style"/>
