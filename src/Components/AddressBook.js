@@ -155,7 +155,8 @@ function AddressBook() {
         }).then((response) => {
             setUserAddress(response.data);
         }).catch(err => {
-            if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         getUserAddress();
@@ -571,7 +572,8 @@ function AddressBook() {
                 clearAddressFields();
             })
             .catch(err => {
-                if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                     refreshToken().then((response2) => {
                         if (response2 !== false) {
                             addUserAddress();
@@ -595,7 +597,8 @@ function AddressBook() {
         }).then((response) => {
             getUserAddress();
         }).catch(err => {
-            if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         deleteUserAddress(refIndex);
@@ -629,7 +632,8 @@ function AddressBook() {
                 clearAddressFields();
             })
             .catch(err => {
-                if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                     refreshToken().then((response2) => {
                         if (response2 !== false) {
                             editUserAddress();

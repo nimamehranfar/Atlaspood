@@ -77,7 +77,7 @@ async function GetUserProjectData(projectObj, isLoggedIn, editIndex,changeLang) 
                         temp["Accessories"]=projectObj["PreorderText"]["Accessories"] || [];
                         // console.log(temp["Accessories"]);
                         Object.keys(temp).forEach((key,j) => {
-                            if (temp[key] !== null || temp[key] !== "") {
+                            if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                                 if (tempObj) {
                                     if (tempObj["apiAcc"] !== undefined) {

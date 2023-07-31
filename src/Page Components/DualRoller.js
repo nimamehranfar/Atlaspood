@@ -90,6 +90,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
     const dispatch = useDispatch();
     const [pageLoad, setPageLoad] = useState(undefined);
     const [motorLoad, setMotorLoad] = useState(false);
+    const [motorLoad2, setMotorLoad2] = useState(false);
     const [models, setModels] = useState([]);
     const [projectData, setProjectData] = useState({});
     const [model, setModel] = useState({});
@@ -233,6 +234,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
         "prices": []
     });
     const steps = useRef([]);
+    const stepHeaders = useRef([]);
     const draperyRef = useRef([]);
     
     const [filterChanged, setFilterChanged] = useState({
@@ -564,7 +566,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                 <div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key}>
                     <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
                         <hr/>
-                        <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(100000, pageLanguage1, pageLanguage1 === "en" ?"Tomans":"تومان")}</p></span>
+                        <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(100000, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")}</p></span>
                     </div>
                     {fabric}
                 </div>
@@ -694,7 +696,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                 <div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key}>
                     <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
                         <hr/>
-                        <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(100000, pageLanguage1, pageLanguage1 === "en" ?"Tomans":"تومان")}</p></span>
+                        <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(100000, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")}</p></span>
                     </div>
                     {fabric}
                 </div>
@@ -818,9 +820,8 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
         }
         
         return (
-            <div
-                className={`w-100 h-100 steps_header ${isCurrentEventKey ? 'steps_header_active' : ''}`}
-                onClick={decoratedOnClick}>
+            <div className={`w-100 h-100 steps_header ${isCurrentEventKey ? 'steps_header_active' : ''}`}
+                onClick={decoratedOnClick} ref={ref => (stepHeaders.current[stepRef] = ref)}>
                 <div className="steps_header_num_container">
                     <div className="steps_header_num">{stepNum}</div>
                 </div>
@@ -888,15 +889,16 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
         );
     }
     
-    function NextStep({children, eventKey, callback, onClick}) {
+    function NextStep({children, eventKey, callback, onClick, currentStep}) {
         const decoratedOnClick = useAccordionButton(
             eventKey,
             () => {
                 callback && callback(eventKey);
                 setAccordionActiveKey(eventKey);
-                // setTimeout(() => {
-                //     window.scrollTo(window.scrollX, window.scrollY + 1);
-                // }, 500);
+                setTimeout(() => {
+                    if (currentStep && stepHeaders.current[currentStep] !== undefined)
+                        stepHeaders.current[currentStep].scrollIntoView();
+                }, 500);
             },
         );
         return (
@@ -981,7 +983,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                 }
                 setStepSelectedLabel(tempLabels);
                 let minValue = Math.min(...temp.values[refIndex]);
-                let maxValue = Math.min(...temp.values[refIndex]);
+                let maxValue = Math.max(...temp.values[refIndex]);
                 if (maxValue - minValue >= 2) {
                     modalHandleShow(modalRef);
                 }
@@ -1215,7 +1217,8 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
             .then(() => {
                 renderCart();
             }).catch(err => {
-            if (err.response.status === 401) {
+            console.log(err);
+            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         editBasketProject(projectObj);
@@ -1242,7 +1245,8 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
             }
             renderCart();
         }).catch(err => {
-            if (err.response.status === 401) {
+            console.log(err);
+            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         deleteBasketProject(refIndex);
@@ -1290,7 +1294,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
         let userProjects = JSON.parse(JSON.stringify(UserProjects))[`${modelID}`]["data"];
         
         Object.keys(temp).forEach(key => {
-            if (temp[key] !== null || temp[key] !== "") {
+            if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                 if (tempObj === undefined) {
                     // console.log(key);
@@ -1320,13 +1324,13 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
         tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
         
         tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2302;
-        tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `0002`;
+        tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `${modelID}`;
         
         tempPostObj["SewingOrderDetails"][2]["CurtainPartId"] = 2301;
         tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
         
         Object.keys(temp).forEach(key => {
-            if (temp[key] !== null || temp[key] !== "") {
+            if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                 // console.log(key,userProjects.find(obj => obj["cart"] === key));
                 if (tempObj) {
@@ -1349,28 +1353,34 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
         tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
         tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
         Object.keys(temp).forEach(key => {
-            if (temp[key] !== null || temp[key] !== "") {
+            if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                 if (tempObj) {
                     if (tempObj["apiAcc"] !== undefined) {
                         if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
                             tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
-                        } else {
-                            
+                        } else if (tempObj["apiAcc"] === "value") {
+                            let pushObj = tempObj["apiAccValue"] || {};
+                            pushObj["SewingAccessoryValue"] = temp[key].toString();
+                            tempPostObj["SewingOrderDetails"][0]["Accessories"].push(pushObj);
                         }
                     }
                     if (tempObj["apiAcc2"] !== undefined) {
                         if (tempObj["apiAcc2"] === true && tempObj["apiAccValue2"][temp[key]]) {
                             tempPostObj["SewingOrderDetails"][1]["Accessories"].push(tempObj["apiAccValue2"][temp[key]]);
-                        } else {
-                            
+                        } else if (tempObj["apiAcc"] === "value") {
+                            let pushObj = tempObj["apiAccValue2"] || {};
+                            pushObj["SewingAccessoryValue"] = temp[key].toString();
+                            tempPostObj["SewingOrderDetails"][1]["Accessories"].push(pushObj);
                         }
                     }
                     if (tempObj["apiAcc3"] !== undefined) {
                         if (tempObj["apiAcc3"] === true && tempObj["apiAccValue3"][temp[key]]) {
                             tempPostObj["SewingOrderDetails"][2]["Accessories"].push(tempObj["apiAccValue3"][temp[key]]);
-                        } else {
-                            
+                        } else if (tempObj["apiAcc"] === "value") {
+                            let pushObj = tempObj["apiAccValue3"] || {};
+                            pushObj["SewingAccessoryValue"] = temp[key].toString();
+                            tempPostObj["SewingOrderDetails"][2]["Accessories"].push(pushObj);
                         }
                     }
                 }
@@ -1390,7 +1400,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
         
         
         let promise2 = new Promise((resolve, reject) => {
-            if (stepSelectedValue["3"] !== undefined && !pageLoad && !(motorLoad && refIndex === "MotorType") && refIndex !== "ZipCode") {
+            if (step3 !== "" && !pageLoad && !(motorLoad && refIndex === "MotorType") && refIndex !== "ZipCode") {
                 
                 for (let i = tempPostObj["SewingOrderDetails"].length - 1; i >= 0; i--) {
                     if (tempPostObj["SewingOrderDetails"] && tempPostObj["SewingOrderDetails"][i] && tempPostObj["SewingOrderDetails"][i]["FabricId"] === undefined) {
@@ -1415,7 +1425,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                         // console.log("1");
                         
                         // setCart("HeightCart", totalHeight, "", "WidthCart", [totalWidth]);
-                        if (step2 === "Inside" && stepSelectedValue["3"] === "2") {
+                        if (step2 === "Inside" && step3 === "true") {
                             if (temp["Width1"] !== undefined && temp["Width2"] !== undefined && temp["Width3"] !== undefined && temp["Height1"] !== undefined && temp["Height2"] !== undefined && temp["Height3"] !== undefined) {
                                 // console.log("2");
                                 getWindowSize(response.data["WindowWidth"], response.data["WindowHeight"]);
@@ -1425,7 +1435,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                 temp["HeightCart"] = response.data["Height"];
                                 
                             }
-                        } else if (step2 === "Outside" && stepSelectedValue["3"] === "2") {
+                        } else if (step2 === "Outside" && step3 === "true") {
                             if (temp["Width3A"] !== undefined && temp["Height3C"] !== undefined && temp["ExtensionRight"] !== undefined && temp["ExtensionLeft"] !== undefined && temp["ShadeMount"] !== undefined) {
                                 getWindowSize(response.data["WindowWidth"], response.data["WindowHeight"]);
                                 temp["WindowWidth"] = response.data["WindowWidth"];
@@ -1476,7 +1486,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
             let userProjects = JSON.parse(JSON.stringify(UserProjects))[`${modelID}`]["data"];
             
             Object.keys(temp).forEach(key => {
-                if (temp[key] !== null || temp[key] !== "") {
+                if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
                     if (tempObj === undefined) {
                         window.location.reload();
@@ -1505,13 +1515,13 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
             tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
             
             tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2302;
-            tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `0002`;
+            tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `${modelID}`;
             
             tempPostObj["SewingOrderDetails"][2]["CurtainPartId"] = 2301;
             tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
             
             Object.keys(temp).forEach(key => {
-                if (temp[key] !== null || temp[key] !== "") {
+                if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
                     // console.log(key,userProjects.find(obj => obj["cart"] === key));
                     if (tempObj) {
@@ -1534,7 +1544,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
             tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
             tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
             Object.keys(temp).forEach(key => {
-                if (temp[key] !== null || temp[key] !== "") {
+                if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
                     if (tempObj) {
                         if (tempObj["apiAcc"] !== undefined) {
@@ -1571,7 +1581,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                 return el != null;
             });
             
-            if (stepSelectedValue["3"] !== undefined) {
+            if (step3 !== "") {
                 
                 for (let i = tempPostObj["SewingOrderDetails"].length - 1; i >= 0; i--) {
                     if (tempPostObj["SewingOrderDetails"] && tempPostObj["SewingOrderDetails"][i] && tempPostObj["SewingOrderDetails"][i]["FabricId"] === undefined) {
@@ -1768,300 +1778,311 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
     
     function addToCart() {
         let tempDepSet = [...depSet];
+        console.log(tempDepSet);
         let tempNewSet = new Set();
         let tempErr = [];
-        tempDepSet.forEach(dependency => {
-            tempNewSet.add(dependency.split('')[0]);
-            // tempNewSet.add(dependency);
+        let promiseArr = [];
+        tempDepSet.forEach((dependency, index) => {
+            promiseArr[index] = new Promise((resolve, reject) => {
+                if (dependency.split('')[1] === '0') {
+                    tempNewSet.add(dependency.slice(0, 3));
+                } else {
+                    tempNewSet.add(dependency.split('')[0]);
+                }
+                // tempNewSet.add(dependency);
+                resolve();
+            });
         });
         
-        if (tempNewSet.size > 0) {
-            setAddingLoading(false);
-            let temp = JSON.parse(JSON.stringify(requiredStep));
-            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-            [...tempNewSet].sort(function (a, b) {
-                return a - b
-            }).forEach((dependency, index) => {
-                while (steps.current[dependency] === undefined) {
-                    dependency = dependency.slice(0, -1);
-                    if (dependency === "")
-                        break;
-                }
-                if (steps.current[dependency] !== undefined) {
-                    let type = steps.current[dependency].getAttribute("type-of-step") === "1" ? (pageLanguage === 'fa' ? " را مشخص کنید" : "SPECIFY ") : (pageLanguage === 'fa' ? " را انتخاب کنید" : "SELECT ");
-                    tempErr.push(
-                        <li key={index}>
-                            {pageLanguage === 'fa' ? "شما باید " + steps.current[dependency].getAttribute("cart-custom-text") + type : "YOU MUST " + type + steps.current[dependency].getAttribute("cart-custom-text")}
-                        </li>
-                    );
-                }
-            });
-            
-            tempNewSet = new Set();
-            
-            tempDepSet.forEach(dependency => {
-                // tempNewSet.add(dependency.split('')[0]);
-                tempNewSet.add(dependency);
-                // console.log(dependency)
-            });
-            [...tempNewSet].sort(function (a, b) {
-                return a - b
-            }).forEach((dependency, index) => {
-                while (steps.current[dependency] === undefined) {
-                    dependency = dependency.slice(0, -1);
-                    if (dependency === "")
-                        break;
-                }
-                if (steps.current[dependency] !== undefined) {
-                    temp[dependency] = true;
-                    delete tempLabels[dependency];
-                }
-            });
-            
-            setTimeout(() => {
-                setRequiredStep(temp);
-            }, 1000);
-            setStepSelectedLabel(tempLabels);
-            setAddCartErr(tempErr);
-            modalHandleShow("addToCartErr");
-        } else if (cartValues["HeightCart"] === undefined || cartValues["WidthCart"] === undefined) {
-            // console.log(cartValues);
-            if (measureWindowSize()) {
-                addToCart();
-            } else {
+        Promise.all(promiseArr).then(() => {
+            if (tempNewSet.size > 0) {
                 setAddingLoading(false);
-            }
-        } else {
-            if (price) {
-                // console.log(cartValues,"hi");
-                let userProjects = JSON.parse(JSON.stringify(UserProjects))[`${modelID}`]["data"];
-                let tempArr = [];
-                let temp1 = [];
-                let temp = JSON.parse(JSON.stringify(cartValues));
-                let tempPostObj = {};
-                let tempBagPrice = 0;
-                
-                
-                // tempPostObj["ApiKey"] = window.$apikey;
-                tempPostObj["WindowCount"] = 1;
-                tempPostObj["SewingModelId"] = `${modelID}`;
-                Object.keys(temp).forEach(key => {
-                    if (temp[key] !== null || temp[key] !== "") {
-                        let tempObj = userProjects.find(obj => obj["cart"] === key);
-                        // console.log(key, tempObj);
-                        if (tempObj && tempObj["apiLabel"] !== "") {
-                            if (tempObj["apiValue"] === null) {
-                                tempPostObj[tempObj["apiLabel"]] = temp[key];
-                            } else {
-                                tempPostObj[tempObj["apiLabel"]] = tempObj["apiValue"][temp[key]];
-                            }
-                        }
+                let temp = JSON.parse(JSON.stringify(requiredStep));
+                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                [...tempNewSet].sort(function (a, b) {
+                    return a - b
+                }).forEach((dependency, index) => {
+                    while (steps.current[dependency] === undefined) {
+                        dependency = dependency.slice(0, -1);
+                        if (dependency === "")
+                            break;
+                    }
+                    if (steps.current[dependency] !== undefined && steps.current[dependency] !== null) {
+                        let type = steps.current[dependency].getAttribute("type-of-step") === "1" ? (pageLanguage === 'fa' ? " را مشخص کنید" : "SPECIFY ") : (pageLanguage === 'fa' ? " را انتخاب کنید" : "SELECT ");
+                        tempErr.push(
+                            <li key={index}>
+                                {pageLanguage === 'fa' ? "شما باید " + steps.current[dependency].getAttribute("cart-custom-text") + type : "YOU MUST " + type + steps.current[dependency].getAttribute("cart-custom-text")}
+                            </li>
+                        );
                     }
                 });
                 
-                tempPostObj["SewingOrderDetails"] = [];
-                for (let i = 0; i < 3; i++) {
-                    tempPostObj["SewingOrderDetails"][i] = {};
-                    tempPostObj["SewingOrderDetails"][i]["IsLowWrinkle"] = true;
-                    tempPostObj["SewingOrderDetails"][i]["IsCoverAll"] = true;
-                    tempPostObj["SewingOrderDetails"][i]["IsAltogether"] = true;
-                }
+                tempNewSet = new Set();
                 
-                
-                tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
-                tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
-                
-                tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2302;
-                tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `0002`;
-                
-                tempPostObj["SewingOrderDetails"][2]["CurtainPartId"] = 2301;
-                tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
-                
-                Object.keys(temp).forEach(key => {
-                    if (temp[key] !== null || temp[key] !== "") {
-                        let tempObj = userProjects.find(obj => obj["cart"] === key);
-                        // console.log(key,userProjects.find(obj => obj["cart"] === key));
-                        if (tempObj) {
-                            for (let i = 0; i < 3; i++) {
-                                let j = +i + +2;
-                                if (tempObj["apiLabel" + j] !== undefined) {
-                                    if (tempObj["apiValue" + j] === null) {
-                                        tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = temp[key];
-                                        // console.log(i,tempObj["cart"],tempPostObj["SewingOrderDetails"],tempPostObj["SewingOrderDetails"][i]);
-                                    } else {
-                                        tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = tempObj["apiValue" + j][temp[key]];
-                                    }
-                                }
-                            }
-                        }
+                tempDepSet.forEach(dependency => {
+                    // tempNewSet.add(dependency.split('')[0]);
+                    tempNewSet.add(dependency);
+                    // console.log(dependency)
+                });
+                [...tempNewSet].sort(function (a, b) {
+                    return a - b
+                }).forEach((dependency, index) => {
+                    while (steps.current[dependency] === undefined) {
+                        dependency = dependency.slice(0, -1);
+                        if (dependency === "")
+                            break;
+                    }
+                    if (steps.current[dependency] !== undefined && steps.current[dependency] !== null) {
+                        temp[dependency] = true;
+                        delete tempLabels[dependency];
                     }
                 });
-                // console.log(tempPostObj["SewingOrderDetails"]);
-                tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
-                tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
-                tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
-                Object.keys(temp).forEach(key => {
-                    if (temp[key] !== null || temp[key] !== "") {
-                        let tempObj = userProjects.find(obj => obj["cart"] === key);
-                        if (tempObj) {
-                            if (tempObj["apiAcc"] !== undefined) {
-                                if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
-                                    tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
-                                } else {
-                                    
-                                }
-                            }
-                            if (tempObj["apiAcc2"] !== undefined) {
-                                if (tempObj["apiAcc2"] === true && tempObj["apiAccValue2"][temp[key]]) {
-                                    tempPostObj["SewingOrderDetails"][1]["Accessories"].push(tempObj["apiAccValue2"][temp[key]]);
-                                } else {
-                                    
-                                }
-                            }
-                            if (tempObj["apiAcc3"] !== undefined) {
-                                if (tempObj["apiAcc3"] === true && tempObj["apiAccValue3"][temp[key]]) {
-                                    tempPostObj["SewingOrderDetails"][2]["Accessories"].push(tempObj["apiAccValue3"][temp[key]]);
-                                } else {
-                                    
-                                }
-                            }
-                        }
-                    }
-                });
-                // tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
-                //     return el != null;
-                // });
-                if (Object.keys(customMotorAcc).length > 0) {
-                    tempPostObj["SewingOrderDetails"][0]["Accessories"].push(customMotorAcc);
-                }
-                tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
-                    return el != null;
-                });
-                // console.log(tempPostObj);
-                for (let i = tempPostObj["SewingOrderDetails"].length - 1; i >= 0; i--) {
-                    if (tempPostObj["SewingOrderDetails"] && tempPostObj["SewingOrderDetails"][i] && tempPostObj["SewingOrderDetails"][i]["FabricId"] === undefined) {
-                        tempPostObj["SewingOrderDetails"].splice(i, 1);
-                    }
-                }
-                if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
-                    // console.log(JSON.stringify(tempPostObj));
-                    axios.post(baseURLPrice, tempPostObj)
-                        .then((response) => {
-                            setBagPrice(response.data["price"]);
-                            tempBagPrice = response.data["price"];
-                            temp["Price"] = response.data["price"];
-                            if (zipcodeChecked && response.data["InstallAmount"]) {
-                                temp["InstallAmount"] = response.data["InstallAmount"];
-                                temp["TransportationAmount"] = response.data["TransportationAmount"];
-                            }
-                            // console.log(response.data);
-                            
-                            let roomNameFa = cartValues["RoomNameFa"];
-                            let roomName = cartValues["RoomNameEn"];
-                            let WindowName = cartValues["WindowName"] === undefined ? "" : cartValues["WindowName"];
-                            Object.keys(cartValues).forEach(key => {
-                                let tempObj = userProjects.find(obj => obj["cart"] === key);
-                                if (tempObj === undefined) {
-                                    // window.location.reload();
-                                    console.log(key);
-                                } else {
-                                    if (key === "WindowHeight" || key === "WindowWidth") {
-                                        
-                                    } else if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
-                                        let objLabel = "";
-                                        if (key === "ControlType" && cartValues["ControlType"] === "Motorized") {
-                                            objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(cartValues[key].toString())} / ${t(cartValues["MotorType"].toString())}`).toString() : `${t(cartValues[key].toString())} / ${t(cartValues["MotorType"].toString())}`;
-                                        } else if (tempObj["titleValue"] === null || true) {
-                                            if (tempObj["titlePostfix"] === "") {
-                                                objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(cartValues[key].toString())}`).toString() : t(cartValues[key].toString());
-                                            } else {
-                                                objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${cartValues[key]}`).toString() + t(tempObj["titlePostfix"]) : cartValues[key].toString() + t(tempObj["titlePostfix"]);
-                                            }
-                                            // objLabel = cartValues[key].toString() + tempObj["titlePostfix"];
-                                        } else {
-                                            // console.log(tempObj["titleValue"],tempObj["titleValue"][cartValues[key].toString()],cartValues[key]);
-                                            if (tempObj["titleValue"][cartValues[key].toString()] === null) {
-                                                if (tempObj["titlePostfix"] === "") {
-                                                    objLabel = t(cartValues[key].toString());
-                                                } else {
-                                                    objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${cartValues[key]}`).toString() + t(tempObj["titlePostfix"]) : cartValues[key].toString() + t(tempObj["titlePostfix"]);
-                                                }
-                                            } else {
-                                                objLabel = t(tempObj["titleValue"][cartValues[key].toString()]);
-                                            }
-                                        }
-                                        temp1[tempObj["order"]] =
-                                            <li className="cart_agree_item" key={key}>
-                                                <h1 className="cart_agree_item_title">{t(tempObj["title"])}&nbsp;</h1>
-                                                <h2 className="cart_agree_item_desc">{objLabel}</h2>
-                                            </li>;
-                                    }
-                                }
-                            });
-                            
-                            tempArr.push(
-                                <div key={defaultModelName}>
-                                    <h2 className="cart_agree_title">{pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</h2>
-                                    <ul className="cart_agree_items_container">
-                                        <GetMeasurementArray modelId={`${modelID}`} cartValues={cartValues}/>
-                                        <li className="cart_agree_item">
-                                            <h1 className="cart_agree_item_title">{t("dualRoller_step1")}&nbsp;</h1>
-                                            <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? cartValues["FabricDesignFa"] + " / " + cartValues["FabricColorFa"] : cartValues["FabricDesignEn"] + " / " + cartValues["FabricColorEn"]}</h2>
-                                        </li>
-                                        <li className="cart_agree_item">
-                                            <h1 className="cart_agree_item_title">{t("dualRoller_step2")}&nbsp;</h1>
-                                            <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? cartValues["FabricDesignFa2"] + " / " + cartValues["FabricColorFa2"] : cartValues["FabricDesignEn2"] + " / " + cartValues["FabricColorEn2"]}</h2>
-                                        </li>
-                                        {temp1}
-                                        <li className="cart_agree_item">
-                                            <h1 className="cart_agree_item_title">{pageLanguage === 'fa' ? "نام اتاق" : "Room Label"}&nbsp;</h1>
-                                            <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? roomNameFa + (WindowName === "" ? "" : " / " + WindowName) : roomName + (WindowName === "" ? "" : " / " + WindowName)}</h2>
-                                        </li>
-                                        <li className="cart_agree_item">
-                                            <h1 className="cart_agree_item_title">{t("Price")}&nbsp;</h1>
-                                            <h2 className="cart_agree_item_desc">{GetPrice(tempBagPrice, pageLanguage, t("TOMANS"))}</h2>
-                                        </li>
-                                    </ul>
-                                </div>
-                            );
-                            setCartAgree(tempArr);
-                            modalHandleShow("cart_modal");
-                            setCartValues(temp);
-                            setAddingLoading(false);
-                            
-                        }).catch(err => {
-                        if (err.response.status === 401) {
-                            refreshToken().then((response2) => {
-                                if (response2 !== false) {
-                                    addToCart();
-                                } else {
-                                    setPrice(0);
-                                    setBagPrice(0);
-                                    temp["Price"] = 0;
-                                    setCartValues(temp);
-                                    setAddingLoading(false);
-                                    navigate("/" + pageLanguage + "/User");
-                                }
-                            });
-                        } else {
-                            setPrice(0);
-                            setBagPrice(0);
-                            temp["Price"] = 0;
-                            setCartValues(temp);
-                            setAddingLoading(false);
-                        }
-                        
-                    });
+                
+                setTimeout(() => {
+                    setRequiredStep(temp);
+                }, 1000);
+                setStepSelectedLabel(tempLabels);
+                setAddCartErr(tempErr);
+                modalHandleShow("addToCartErr");
+            } else if (cartValues["HeightCart"] === undefined || cartValues["WidthCart"] === undefined) {
+                // console.log(cartValues);
+                if (measureWindowSize()) {
+                    addToCart();
                 } else {
                     setAddingLoading(false);
                 }
-                // console.log(cartValues);
+            } else {
+                if (price) {
+                    // console.log(cartValues,"hi");
+                    let userProjects = JSON.parse(JSON.stringify(UserProjects))[`${modelID}`]["data"];
+                    let tempArr = [];
+                    let temp1 = [];
+                    let temp = JSON.parse(JSON.stringify(cartValues));
+                    let tempPostObj = {};
+                    let tempBagPrice = 0;
+                    
+                    
+                    // tempPostObj["ApiKey"] = window.$apikey;
+                    tempPostObj["WindowCount"] = 1;
+                    tempPostObj["SewingModelId"] = `${modelID}`;
+                    Object.keys(temp).forEach(key => {
+                        if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
+                            let tempObj = userProjects.find(obj => obj["cart"] === key);
+                            // console.log(key, tempObj);
+                            if (tempObj && tempObj["apiLabel"] !== "") {
+                                if (tempObj["apiValue"] === null) {
+                                    tempPostObj[tempObj["apiLabel"]] = temp[key];
+                                } else {
+                                    tempPostObj[tempObj["apiLabel"]] = tempObj["apiValue"][temp[key]];
+                                }
+                            }
+                        }
+                    });
+                    
+                    tempPostObj["SewingOrderDetails"] = [];
+                    for (let i = 0; i < 3; i++) {
+                        tempPostObj["SewingOrderDetails"][i] = {};
+                        tempPostObj["SewingOrderDetails"][i]["IsLowWrinkle"] = true;
+                        tempPostObj["SewingOrderDetails"][i]["IsCoverAll"] = true;
+                        tempPostObj["SewingOrderDetails"][i]["IsAltogether"] = true;
+                    }
+                    
+                    
+                    tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
+                    tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
+                    
+                    tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2302;
+                    tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `${modelID}`;
+                    
+                    tempPostObj["SewingOrderDetails"][2]["CurtainPartId"] = 2301;
+                    tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
+                    
+                    Object.keys(temp).forEach(key => {
+                        if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
+                            let tempObj = userProjects.find(obj => obj["cart"] === key);
+                            // console.log(key,userProjects.find(obj => obj["cart"] === key));
+                            if (tempObj) {
+                                for (let i = 0; i < 3; i++) {
+                                    let j = +i + +2;
+                                    if (tempObj["apiLabel" + j] !== undefined) {
+                                        if (tempObj["apiValue" + j] === null) {
+                                            tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = temp[key];
+                                            // console.log(i,tempObj["cart"],tempPostObj["SewingOrderDetails"],tempPostObj["SewingOrderDetails"][i]);
+                                        } else {
+                                            tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = tempObj["apiValue" + j][temp[key]];
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    // console.log(tempPostObj["SewingOrderDetails"]);
+                    tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
+                    tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
+                    tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
+                    Object.keys(temp).forEach(key => {
+                        if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
+                            let tempObj = userProjects.find(obj => obj["cart"] === key);
+                            if (tempObj) {
+                                if (tempObj["apiAcc"] !== undefined) {
+                                    if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
+                                        tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
+                                    } else {
+                                    
+                                    }
+                                }
+                                if (tempObj["apiAcc2"] !== undefined) {
+                                    if (tempObj["apiAcc2"] === true && tempObj["apiAccValue2"][temp[key]]) {
+                                        tempPostObj["SewingOrderDetails"][1]["Accessories"].push(tempObj["apiAccValue2"][temp[key]]);
+                                    } else {
+                                    
+                                    }
+                                }
+                                if (tempObj["apiAcc3"] !== undefined) {
+                                    if (tempObj["apiAcc3"] === true && tempObj["apiAccValue3"][temp[key]]) {
+                                        tempPostObj["SewingOrderDetails"][2]["Accessories"].push(tempObj["apiAccValue3"][temp[key]]);
+                                    } else {
+                                    
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    // tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
+                    //     return el != null;
+                    // });
+                    if (Object.keys(customMotorAcc).length > 0) {
+                        tempPostObj["SewingOrderDetails"][0]["Accessories"].push(customMotorAcc);
+                    }
+                    tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
+                        return el != null;
+                    });
+                    // console.log(tempPostObj);
+                    for (let i = tempPostObj["SewingOrderDetails"].length - 1; i >= 0; i--) {
+                        if (tempPostObj["SewingOrderDetails"] && tempPostObj["SewingOrderDetails"][i] && tempPostObj["SewingOrderDetails"][i]["FabricId"] === undefined) {
+                            tempPostObj["SewingOrderDetails"].splice(i, 1);
+                        }
+                    }
+                    if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
+                        // console.log(JSON.stringify(tempPostObj));
+                        axios.post(baseURLPrice, tempPostObj)
+                            .then((response) => {
+                                setBagPrice(response.data["price"]);
+                                tempBagPrice = response.data["price"];
+                                temp["Price"] = response.data["price"];
+                                if (zipcodeChecked && response.data["InstallAmount"]) {
+                                    temp["InstallAmount"] = response.data["InstallAmount"];
+                                    temp["TransportationAmount"] = response.data["TransportationAmount"];
+                                }
+                                // console.log(response.data);
+                                
+                                let roomNameFa = cartValues["RoomNameFa"];
+                                let roomName = cartValues["RoomNameEn"];
+                                let WindowName = cartValues["WindowName"] === undefined ? "" : cartValues["WindowName"];
+                                Object.keys(cartValues).forEach(key => {
+                                    let tempObj = userProjects.find(obj => obj["cart"] === key);
+                                    if (tempObj === undefined) {
+                                        // window.location.reload();
+                                        console.log(key);
+                                    } else {
+                                        if (key === "WindowHeight" || key === "WindowWidth") {
+                                        
+                                        } else if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
+                                            let objLabel = "";
+                                            if (key === "ControlType" && cartValues["ControlType"] === "Motorized") {
+                                                objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(cartValues[key].toString())} / ${t(cartValues["MotorType"].toString())}`).toString() : `${t(cartValues[key].toString())} / ${t(cartValues["MotorType"].toString())}`;
+                                            } else if (tempObj["titleValue"] === null || true) {
+                                                if (tempObj["titlePostfix"] === "") {
+                                                    objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(cartValues[key].toString())}`).toString() : t(cartValues[key].toString());
+                                                } else {
+                                                    objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${cartValues[key]}`).toString() + t(tempObj["titlePostfix"]) : cartValues[key].toString() + t(tempObj["titlePostfix"]);
+                                                }
+                                                // objLabel = cartValues[key].toString() + tempObj["titlePostfix"];
+                                            } else {
+                                                // console.log(tempObj["titleValue"],tempObj["titleValue"][cartValues[key].toString()],cartValues[key]);
+                                                if (tempObj["titleValue"][cartValues[key].toString()] === null) {
+                                                    if (tempObj["titlePostfix"] === "") {
+                                                        objLabel = t(cartValues[key].toString());
+                                                    } else {
+                                                        objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${cartValues[key]}`).toString() + t(tempObj["titlePostfix"]) : cartValues[key].toString() + t(tempObj["titlePostfix"]);
+                                                    }
+                                                } else {
+                                                    objLabel = t(tempObj["titleValue"][cartValues[key].toString()]);
+                                                }
+                                            }
+                                            temp1[tempObj["order"]] =
+                                                <li className="cart_agree_item" key={key}>
+                                                    <h1 className="cart_agree_item_title">{t(tempObj["title"])}&nbsp;</h1>
+                                                    <h2 className="cart_agree_item_desc">{objLabel}</h2>
+                                                </li>;
+                                        }
+                                    }
+                                });
+                                
+                                tempArr.push(
+                                    <div key={defaultModelName}>
+                                        <h2 className="cart_agree_title">{pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</h2>
+                                        <ul className="cart_agree_items_container">
+                                            <GetMeasurementArray modelId={`${modelID}`} cartValues={cartValues}/>
+                                            <li className="cart_agree_item">
+                                                <h1 className="cart_agree_item_title">{t("dualRoller_step1")}&nbsp;</h1>
+                                                <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? cartValues["FabricDesignFa"] + " / " + cartValues["FabricColorFa"] : cartValues["FabricDesignEn"] + " / " + cartValues["FabricColorEn"]}</h2>
+                                            </li>
+                                            <li className="cart_agree_item">
+                                                <h1 className="cart_agree_item_title">{t("dualRoller_step2")}&nbsp;</h1>
+                                                <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? cartValues["FabricDesignFa2"] + " / " + cartValues["FabricColorFa2"] : cartValues["FabricDesignEn2"] + " / " + cartValues["FabricColorEn2"]}</h2>
+                                            </li>
+                                            {temp1}
+                                            <li className="cart_agree_item">
+                                                <h1 className="cart_agree_item_title">{pageLanguage === 'fa' ? "نام اتاق" : "Room Label"}&nbsp;</h1>
+                                                <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? roomNameFa + (WindowName === "" ? "" : " / " + WindowName) : roomName + (WindowName === "" ? "" : " / " + WindowName)}</h2>
+                                            </li>
+                                            <li className="cart_agree_item">
+                                                <h1 className="cart_agree_item_title">{t("Price")}&nbsp;</h1>
+                                                <h2 className="cart_agree_item_desc">{GetPrice(tempBagPrice, pageLanguage, t("TOMANS"))}</h2>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                );
+                                setCartAgree(tempArr);
+                                modalHandleShow("cart_modal");
+                                setCartValues(temp);
+                                setAddingLoading(false);
+                                
+                            }).catch(err => {
+                            console.log(err);
+                            if (err.response && err.response.status === 401) {
+                                refreshToken().then((response2) => {
+                                    if (response2 !== false) {
+                                        addToCart();
+                                    } else {
+                                        setPrice(0);
+                                        setBagPrice(0);
+                                        temp["Price"] = 0;
+                                        setCartValues(temp);
+                                        setAddingLoading(false);
+                                        navigate("/" + pageLanguage + "/User");
+                                    }
+                                });
+                            } else {
+                                setPrice(0);
+                                setBagPrice(0);
+                                temp["Price"] = 0;
+                                setCartValues(temp);
+                                setAddingLoading(false);
+                            }
+                            
+                        });
+                    } else {
+                        setAddingLoading(false);
+                    }
+                    // console.log(cartValues);
+                }
             }
-        }
-        // modalHandleShow("cart_modal");
-        // renderCart();
-        // setCartStateAgree(true);
-        
+            // modalHandleShow("cart_modal");
+            // renderCart();
+            // setCartStateAgree(true);
+        });
     }
     
     function addToCart_agreed() {
@@ -2101,7 +2122,8 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                         cartObjects = response.data ? response.data : {};
                         resolve();
                     }).catch(err => {
-                        if (err.response.status === 401) {
+                        console.log(err);
+                        if (err.response && err.response.status === 401) {
                             refreshToken().then((response2) => {
                                 if (response2 !== false) {
                                     renderCart(customPageCart);
@@ -2326,7 +2348,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                         tempPostObj["WindowCount"] = 1;
                                         tempPostObj["SewingModelId"] = obj["PreorderText"]["SewingModelId"];
                                         Object.keys(temp).forEach(key => {
-                                            if (temp[key] !== null || temp[key] !== "") {
+                                            if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                                                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                                                 // console.log(key,tempObj);
                                                 if (tempObj && tempObj["apiLabel"] !== "") {
@@ -2352,13 +2374,13 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                         tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = tempPostObj["SewingModelId"];
                                         
                                         tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2302;
-                                        tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `0002`;
+                                        tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = tempPostObj["SewingModelId"];
                                         
                                         tempPostObj["SewingOrderDetails"][2]["CurtainPartId"] = 2301;
                                         tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
                                         
                                         Object.keys(temp).forEach(key => {
-                                            if (temp[key] !== null || temp[key] !== "") {
+                                            if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                                                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                                                 // console.log(key,userProjects.find(obj => obj["cart"] === key));
                                                 if (tempObj) {
@@ -2381,7 +2403,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                         tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
                                         tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
                                         Object.keys(temp).forEach(key => {
-                                            if (temp[key] !== null || temp[key] !== "") {
+                                            if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                                                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                                                 if (tempObj) {
                                                     if (tempObj["apiAcc"] !== undefined) {
@@ -2597,7 +2619,8 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                         }
                     }
                 }).catch(err => {
-                    if (err.response.status === 401) {
+                    console.log(err);
+                    if (err.response && err.response.status === 401) {
                         refreshToken().then((response2) => {
                             if (response2 !== false) {
                                 fabricSwatch(e, SwatchId, SwatchDetailId);
@@ -2615,7 +2638,8 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                     }).then((response) => {
                         setCartChanged(cartChanged + 1);
                     }).catch(err => {
-                        if (err.response.status === 401) {
+                        console.log(err);
+                        if (err.response && err.response.status === 401) {
                             refreshToken().then((response2) => {
                                 if (response2 !== false) {
                                     fabricSwatch(e, SwatchId, SwatchDetailId);
@@ -2746,7 +2770,8 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                     modalHandleClose("uploadPdf");
                     setDetailsShow(false);
                 }).catch(err => {
-                if (err.response.status === 401) {
+                console.log(err);
+                if (err.response && err.response.status === 401) {
                     refreshToken().then((response2) => {
                         if (response2 !== false) {
                             submitUploadedFile(PDFOrImg);
@@ -2789,7 +2814,8 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                     modalHandleClose(" uploadImg");
                     setDetailsShow(false);
                 }).catch(err => {
-                if (err.response.status === 401) {
+                console.log(err);
+                if (err.response && err.response.status === 401) {
                     refreshToken().then((response2) => {
                         if (response2 !== false) {
                             submitUploadedFile(PDFOrImg);
@@ -2918,7 +2944,8 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                 }).then((response) => {
                     resolve();
                 }).catch(err => {
-                    if (err.response.status === 401) {
+                    console.log(err);
+                    if (err.response && err.response.status === 401) {
                         refreshToken().then((response2) => {
                             if (response2 !== false) {
                                 deleteUploadedImg(uploadedImagesList1, uploadedImagesNamesList1, fileUrl, index);
@@ -2966,7 +2993,8 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                 }).then((response) => {
                     resolve();
                 }).catch(err => {
-                    if (err.response.status === 401) {
+                    console.log(err);
+                    if (err.response && err.response.status === 401) {
                         refreshToken().then((response2) => {
                             if (response2 !== false) {
                                 deleteUploadedPdf(uploadedPdfsNamesList1, fileUrl, index);
@@ -3009,7 +3037,8 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
         }).then((response) => {
             setProjectDetails(response.data, basketId);
         }).catch(err => {
-            if (err.response.status === 401) {
+            console.log(err);
+            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         getProjectDetail();
@@ -3117,9 +3146,9 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                         setStep2(temp["Mount"]);
                         if (temp["Mount"] === "Inside") {
                             setStep21("true");
-                            let refIndex = inputs.current["21"].getAttribute('ref-num');
-                            tempLabels[refIndex] = inputs.current["21"].getAttribute('text');
-                            tempValue[refIndex] = inputs.current["21"].value;
+                            let refIndex = inputs.current["211"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["211"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["211"].value;
                             depSetTempArr = new Set([...setGetDeps("", "2", depSetTempArr)]);
                         } else if (temp["Mount"] === "Outside") {
                             let refIndex = inputs.current["22"].getAttribute('ref-num');
@@ -3128,9 +3157,9 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                             depSetTempArr = new Set([...setGetDeps("", "2", depSetTempArr)]);
                         } else {
                             setStep21("true");
-                            let refIndex = inputs.current["23"].getAttribute('ref-num');
-                            tempLabels[refIndex] = inputs.current["23"].getAttribute('text');
-                            tempValue[refIndex] = inputs.current["23"].value;
+                            let refIndex = inputs.current["213"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["213"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["213"].value;
                             depSetTempArr = new Set([...setGetDeps("", "2", depSetTempArr)]);
                         }
                         setStepSelectedLabel(tempLabels);
@@ -3367,7 +3396,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                     value: temp["MetalValanceColor"],
                                     label: optionsMetalValance[pageLanguage].find(opt => opt.value === temp["MetalValanceColor"]).label
                                 }] : []);
-                                depSetTempArr = new Set([...setGetDeps((temp["MetalValanceColor"] ? "" : "53,"), "5", depSetTempArr)]);
+                                depSetTempArr = new Set([...setGetDeps((temp["MetalValanceColor"] ? "" : "53,"), "5,5Arc", depSetTempArr)]);
                             } else if (temp["Headrail"] === "MetalValanceFabricInsert") {
                                 let refIndex = inputs.current["54"].getAttribute('ref-num');
                                 tempLabels[refIndex] = inputs.current["54"].getAttribute('text') + (temp["MetalValanceColor"] ? "/" + temp["MetalValanceColor"] : "");
@@ -3378,21 +3407,21 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                     value: temp["MetalValanceColor"],
                                     label: optionsMetalValance[pageLanguage].find(opt => opt.value === temp["MetalValanceColor"]).label
                                 }] : []);
-                                depSetTempArr = new Set([...setGetDeps((temp["MetalValanceColor"] ? "" : "54,"), "5", depSetTempArr)]);
+                                depSetTempArr = new Set([...setGetDeps((temp["MetalValanceColor"] ? "" : "54,"), "5,5Arc", depSetTempArr)]);
                             } else if (temp["Headrail"] === "Upholstered") {
                                 let refIndex = inputs.current["52"].getAttribute('ref-num');
                                 tempLabels[refIndex] = inputs.current["52"].getAttribute('text');
                                 tempValue[refIndex] = inputs.current["52"].value;
                                 setStepSelectedLabel(tempLabels);
                                 setStepSelectedValue(tempValue);
-                                depSetTempArr = new Set([...setGetDeps("", "5", depSetTempArr)]);
+                                depSetTempArr = new Set([...setGetDeps("", "5,5Arc", depSetTempArr)]);
                             } else {
                                 let refIndex = inputs.current["51"].getAttribute('ref-num');
                                 tempLabels[refIndex] = inputs.current["51"].getAttribute('text');
                                 tempValue[refIndex] = inputs.current["51"].value;
                                 setStepSelectedLabel(tempLabels);
                                 setStepSelectedValue(tempValue);
-                                depSetTempArr = new Set([...setGetDeps((temp["RollType"] ? "" : "5A,") + (temp["BracketType"] ? "" : "5B,") + (temp["BracketColor"] ? "" : "5C,"), "5", depSetTempArr)]);
+                                depSetTempArr = new Set([...setGetDeps((temp["RollType"] ? "" : "5A,") + (temp["BracketType"] ? "" : "5B,") + (temp["BracketColor"] ? "" : "5C,"), "5,5Arc", depSetTempArr)]);
                                 
                                 setTimeout(() => {
                                     if (temp["RollType"]) {
@@ -3472,14 +3501,14 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                     tempValue[refIndex] = inputs.current["5Arc1"].value;
                                     setStepSelectedLabel(tempLabels);
                                     setStepSelectedValue(tempValue);
-                                    depSetTempArr = new Set([...setGetDeps("", "5Arc", depSetTempArr)]);
+                                    depSetTempArr = new Set([...setGetDeps("", "5,5Arc", depSetTempArr)]);
                                 } else {
                                     let refIndex = inputs.current["5Arc2"].getAttribute('ref-num');
                                     tempLabels[refIndex] = inputs.current["5Arc2"].getAttribute('text');
                                     tempValue[refIndex] = inputs.current["5Arc2"].value;
                                     setStepSelectedLabel(tempLabels);
                                     setStepSelectedValue(tempValue);
-                                    depSetTempArr = new Set([...setGetDeps("", "5Arc", depSetTempArr)]);
+                                    depSetTempArr = new Set([...setGetDeps("", "5,5Arc", depSetTempArr)]);
                                 }
                             }
                             
@@ -3869,6 +3898,9 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
             setMotorType(tempObj);
             // console.log(tempObj);
             if (selectedMotorType.length) {
+                if (!motorLoad2) {
+                    setMotorLoad2(true);
+                }
                 setSelectedMotorType(selectedMotorType[0].value ? [{
                     value: selectedMotorType[0].value,
                     label: tempObj[pageLanguage].find(opt => opt.value === selectedMotorType[0].value).label
@@ -4376,7 +4408,8 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                 });
                 setRemoteNames(tempArr);
             }).catch(err => {
-                if (err.response.status === 401) {
+                console.log(err);
+                if (err.response && err.response.status === 401) {
                     refreshToken().then((response2) => {
                         if (response2 !== false) {
                             getRemoteNames();
@@ -4446,7 +4479,8 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                     setBag(response.data ? response.data : {});
                     resolve(response.data ? response.data : {});
                 }).catch(err => {
-                    if (err.response.status === 401) {
+                    console.log(err);
+                    if (err.response && err.response.status === 401) {
                         refreshToken().then((response2) => {
                             if (response2 !== false) {
                                 setCartChanged(cartChanged + 1);
@@ -4886,7 +4920,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                         disabled={swatchId === -1}>{hasSwatchId ? t("SWATCH IN CART") : t("ORDER SWATCH")}</button>
                                             </Modal.Footer>
                                         </Modal>
-                                        <NextStep eventKey="15">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="1" eventKey="15">{t("NEXT STEP")}</NextStep>
                                     </div>
                                 </Card.Body>
                             </Accordion.Collapse>
@@ -5040,7 +5074,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                         disabled={swatchId === -1}>{hasSwatchId ? t("SWATCH IN CART") : t("ORDER SWATCH")}</button>
                                             </Modal.Footer>
                                         </Modal>
-                                        <NextStep eventKey="2">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="1" eventKey="2">{t("NEXT STEP")}</NextStep>
                                     </div>
                                 </Card.Body>
                             </Accordion.Collapse>
@@ -5126,96 +5160,92 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                    }} ref={ref => (inputs.current["23"] = ref)}/>
                                             <label htmlFor="23">{t("mount_Arc")}</label>
                                         </div>
-                                        {step2 === "Inside" &&
-                                            <div className={step21Err1 ? "secondary_options secondary_options_err" : "secondary_options"}>
-                                                <div className="card-body-display-flex">
-                                                    <div className="checkbox_style checkbox_style_step2">
-                                                        <input type="checkbox" text={t("mount_Inside")} value="1" name="step21" ref-num="2" checked={step21 === "true"}
-                                                               onChange={(e) => {
-                                                                   if (e.target.checked) {
-                                                                       selectChanged(e);
-                                                                       setStep21("true");
-                                                                       setStep21Err1(false);
-                                                                       // let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                                       // let refIndex = inputs.current["21"].getAttribute('ref-num');
-                                                                       // tempLabels[refIndex] = inputs.current["21"].getAttribute('text');
-                                                                       // setStepSelectedLabel(tempLabels);
-                                                                       setDeps("", "21");
+                                        <div className={step2 === "Inside" ? (step21Err1 ? "secondary_options secondary_options_err" : "secondary_options") : "noDisplay"}>
+                                            <div className="card-body-display-flex">
+                                                <div className="checkbox_style checkbox_style_step2">
+                                                    <input type="checkbox" text={t("mount_Inside")} value="1" name="step21" ref-num="2" checked={step21 === "true"}
+                                                           onChange={(e) => {
+                                                               if (e.target.checked) {
+                                                                   selectChanged(e);
+                                                                   setStep21("true");
+                                                                   setStep21Err1(false);
+                                                                   // let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                                   // let refIndex = inputs.current["21"].getAttribute('ref-num');
+                                                                   // tempLabels[refIndex] = inputs.current["21"].getAttribute('text');
+                                                                   // setStepSelectedLabel(tempLabels);
+                                                                   setDeps("", "21");
+                                                               } else {
+                                                                   setStep21("");
+                                                                   // modalHandleShow("noPower");
+                                                                   if (step3 !== "") {
+                                                                       setDeps("21,3", "3AOut,3BOut1,3BOut2,3COut,3DOut,3CArc1,3CArc2,3CArc3");
+                                                                       deleteSpecialSelects();
+                                                                       setCart("", "", "calcMeasurements,Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width3A,Height3C,Width1,Width2,Width3,Height1,Height2,Height3,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                                       setStep3("");
+                                                                       selectChanged(undefined, "2,3,3AOut,3BOut,3COut,3DOut,3CArc");
                                                                    } else {
-                                                                       setStep21("");
-                                                                       // modalHandleShow("noPower");
-                                                                       if (step3 !== "") {
-                                                                           setDeps("21,3", "3AOut,3BOut1,3BOut2,3COut,3DOut,3CArc1,3CArc2,3CArc3");
-                                                                           deleteSpecialSelects();
-                                                                           setCart("", "", "calcMeasurements,Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width3A,Height3C,Width1,Width2,Width3,Height1,Height2,Height3,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
-                                                                           setStep3("");
-                                                                           selectChanged(undefined, "2,3,3AOut,3BOut,3COut,3DOut,3CArc");
-                                                                       } else {
-                                                                           setDeps("21", "");
-                                                                           selectChanged(undefined, "2");
-                                                                       }
+                                                                       setDeps("21", "");
+                                                                       selectChanged(undefined, "2");
                                                                    }
-                                                               }} id="211" ref={ref => (inputs.current["211"] = ref)}/>
-                                                        <label htmlFor="211" className="checkbox_label">
-                                                            <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
-                                                                 alt=""/>
-                                                        </label>
-                                                        <span className="checkbox_text">
+                                                               }
+                                                           }} id="211" ref={ref => (inputs.current["211"] = ref)}/>
+                                                    <label htmlFor="211" className="checkbox_label">
+                                                        <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
+                                                             alt=""/>
+                                                    </label>
+                                                    <span className="checkbox_text">
                                                         {t("inside_checkbox_title")}
                                                     </span>
-                                                    </div>
                                                 </div>
                                             </div>
-                                        }
+                                        </div>
                                         {step21Err1 &&
                                             <div className="input_not_valid">{t("step21Err1")}</div>
                                         }
-                                        {step2 === "HiddenMoulding" &&
-                                            <div className={step21Err3 ? "secondary_options secondary_options_err" : "secondary_options"}>
-                                                <div className="card-body-display-flex">
-                                                    <div className="checkbox_style checkbox_style_step2">
-                                                        <input type="checkbox" text={t("mount_Arc")} value="3" name="step21" ref-num="2" checked={step21 === "true"}
-                                                               onChange={(e) => {
-                                                                   if (e.target.checked) {
-                                                                       selectChanged(e);
-                                                                       setStep21("true");
-                                                                       setStep21Err3(false);
-                                                                       // let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                                       // let refIndex = inputs.current["23"].getAttribute('ref-num');
-                                                                       // tempLabels[refIndex] = inputs.current["23"].getAttribute('text');
-                                                                       // setStepSelectedLabel(tempLabels);
-                                                                       setDeps("", "21");
+                                        <div className={step2 === "HiddenMoulding" ? (step21Err3 ? "secondary_options secondary_options_err" : "secondary_options") : "noDisplay"}>
+                                            <div className="card-body-display-flex">
+                                                <div className="checkbox_style checkbox_style_step2">
+                                                    <input type="checkbox" text={t("mount_Arc")} value="3" name="step21" ref-num="2" checked={step21 === "true"}
+                                                           onChange={(e) => {
+                                                               if (e.target.checked) {
+                                                                   selectChanged(e);
+                                                                   setStep21("true");
+                                                                   setStep21Err3(false);
+                                                                   // let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                                   // let refIndex = inputs.current["23"].getAttribute('ref-num');
+                                                                   // tempLabels[refIndex] = inputs.current["23"].getAttribute('text');
+                                                                   // setStepSelectedLabel(tempLabels);
+                                                                   setDeps("", "21");
+                                                               } else {
+                                                                   setStep21("");
+                                                                   // modalHandleShow("noPower");
+                                                            
+                                                                   if (step3 !== "") {
+                                                                       setDeps("21,3", "2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWall,2EWall,2FWall,2GWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
+                                                                       deleteSpecialSelects();
+                                                                       setCart("", "", "calcMeasurements,Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width1,Width2,Width3,Height1,Height2,Height3,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
+                                                                       setStep3("");
+                                                                       selectChanged(undefined, "2,3,3AIn,3BIn,3AOut,3BOut,3COut,3DOut");
                                                                    } else {
-                                                                       setStep21("");
-                                                                       // modalHandleShow("noPower");
-                                                                
-                                                                       if (step3 !== "") {
-                                                                           setDeps("21,3", "2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWall,2EWall,2FWall,2GWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
-                                                                           deleteSpecialSelects();
-                                                                           setCart("", "", "calcMeasurements,Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width1,Width2,Width3,Height1,Height2,Height3,Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3");
-                                                                           setStep3("");
-                                                                           selectChanged(undefined, "2,3,3AIn,3BIn,3AOut,3BOut,3COut,3DOut");
-                                                                       } else {
-                                                                           setDeps("21", "");
-                                                                           selectChanged(undefined, "2");
-                                                                       }
+                                                                       setDeps("21", "");
+                                                                       selectChanged(undefined, "2");
                                                                    }
-                                                               }} id="211" ref={ref => (inputs.current["211"] = ref)}/>
-                                                        <label htmlFor="211" className="checkbox_label">
-                                                            <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
-                                                                 alt=""/>
-                                                        </label>
-                                                        <span className="checkbox_text">
+                                                               }
+                                                           }} id="213" ref={ref => (inputs.current["213"] = ref)}/>
+                                                    <label htmlFor="213" className="checkbox_label">
+                                                        <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
+                                                             alt=""/>
+                                                    </label>
+                                                    <span className="checkbox_text">
                                                         {t("Arc_checkbox_title")}
                                                     </span>
-                                                    </div>
                                                 </div>
                                             </div>
-                                        }
+                                        </div>
                                         {step21Err3 &&
                                             <div className="input_not_valid">{t("step21Err3")}</div>
                                         }
-                                        <NextStep eventKey={(step2 === "Inside" || step2 === "HiddenMoulding") && step21 !== "true" ? "2" : "3"} onClick={() => {
+                                        <NextStep currentStep="2" eventKey={(step2 === "Inside" || step2 === "HiddenMoulding") && step21 !== "true" ? "2" : "3"} onClick={() => {
                                             if ((step2 === "Inside" || step2 === "HiddenMoulding") && step21 !== "true") {
                                                 if (step2 === "Inside") {
                                                     setStep21Err1(true);
@@ -5346,7 +5376,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                         
                                         </div>
                                         
-                                        {stepSelectedValue["3"] === "1" &&
+                                        {step3 === "false" &&
                                             <div className="own_measurements_container">
                                                 <div className="own_measurements_width">
                                                     <label className="select_label">{t("Width")}<p className="farsi_cm">{t("select_cm")}</p></label>
@@ -5439,10 +5469,10 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                             </div>
                                         }
                                         
-                                        <NextStep eventKey={measurementsNextStep}>{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="3" eventKey={measurementsNextStep}>{t("NEXT STEP")}</NextStep>
                                     </div>
                                     
-                                    {(stepSelectedValue["3"] === "1") &&
+                                    {(step3 === "false") &&
                                         <div className="accordion_help">
                                             <div className="help_container">
                                                 <div className="help_column help_left_column">
@@ -5462,7 +5492,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                             </div>
                                         </div>
                                     }
-                                    {(stepSelectedValue["3"] === "2") &&
+                                    {(step3 === "true") &&
                                         <div className="accordion_help">
                                             <div className="help_container">
                                                 <div className="help_column help_left_column">
@@ -5485,777 +5515,771 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                         </Card>
                         
                         {/* step 4A inside */}
-                        {stepSelectedValue["3"] === "2" && step2 === "Inside" && step21 === "true" &&
-                            <Card>
-                                <Card.Header>
-                                    <ContextAwareToggle eventKey="3A" stepNum={t("4A")} stepTitle={t("zebra_step3AInside")} stepRef="3AIn" type="2" required={requiredStep["3AIn"]}
-                                                        stepSelected={stepSelectedLabel["3AIn"] === undefined ? "" : stepSelectedLabel["3AIn"]}/>
-                                </Card.Header>
-                                <Accordion.Collapse eventKey="3A">
-                                    <Card.Body>
-                                        <div className="card_body">
-                                            <div className="box100">
-                                                <p className="step_selection_title">{t("step3A_title")}</p>
-                                                <img
-                                                    src={pageLanguage === 'fa' ? require('../Images/drapery/zebra/new_width_inside_3_fa.svg').default : require('../Images/drapery/zebra/new_width_inside_3.svg').default}
-                                                    className="img-fluid" alt=""/>
-                                            </div>
-                                            <div className="box100 Three_selection_container">
-                                                <div className="Three_select_container">
-                                                    <label className="select_label">{t("step3AIn_A")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                    <div className="select_container select_container_num">
-                                                        <Select
-                                                            className="select"
-                                                            placeholder={t("Please Select")}
-                                                            portal={document.body}
-                                                            dropdownPosition="bottom"
-                                                            dropdownHandle={false}
-                                                            dropdownGap={0}
-                                                            onDropdownOpen={() => {
-                                                                let temp1 = window.scrollY;
-                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                                setTimeout(() => {
-                                                                    let temp2 = window.scrollY;
-                                                                    if (temp2 === temp1)
-                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                                }, 100);
-                                                            }}
-                                                            values={selectCustomValues.width1}
-                                                            dropdownRenderer={
-                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                            }
-                                                            contentRenderer={
-                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                               postfixFa=""/>
-                                                            }
-                                                            // optionRenderer={
-                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                            // }
-                                                            onChange={(selected) => {
-                                                                if (selected[0] !== undefined) {
-                                                                    optionSelectChanged_three(selected[0], "3AIn", 0, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                    temp.width1 = selected;
-                                                                    setSelectCustomValues(temp);
-                                                                    setDeps("", "3AIn1");
-                                                                    setCart("Width1", selected[0].value);
-                                                                }
-                                                            }}
-                                                            options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="Three_select_container">
-                                                    <label className="select_label">{t("step3AIn_B")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                    <div className="select_container select_container_num">
-                                                        <Select
-                                                            className="select"
-                                                            placeholder={t("Please Select")}
-                                                            portal={document.body}
-                                                            dropdownPosition="bottom"
-                                                            dropdownHandle={false}
-                                                            dropdownGap={0}
-                                                            onDropdownOpen={() => {
-                                                                let temp1 = window.scrollY;
-                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                                setTimeout(() => {
-                                                                    let temp2 = window.scrollY;
-                                                                    if (temp2 === temp1)
-                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                                }, 100);
-                                                            }}
-                                                            values={selectCustomValues.width2}
-                                                            dropdownRenderer={
-                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                            }
-                                                            contentRenderer={
-                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                               postfixFa=""/>
-                                                            }
-                                                            // optionRenderer={
-                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                            // }
-                                                            onChange={(selected) => {
-                                                                if (selected[0] !== undefined) {
-                                                                    optionSelectChanged_three(selected[0], "3AIn", 1, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                    temp.width2 = selected;
-                                                                    setSelectCustomValues(temp);
-                                                                    setDeps("", "3AIn2");
-                                                                    setCart("Width2", selected[0].value);
-                                                                }
-                                                            }}
-                                                            options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="Three_select_container">
-                                                    <label className="select_label">{t("step3AIn_C")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                    <div className="select_container select_container_num">
-                                                        <Select
-                                                            className="select"
-                                                            placeholder={t("Please Select")}
-                                                            portal={document.body}
-                                                            dropdownPosition="bottom"
-                                                            dropdownHandle={false}
-                                                            dropdownGap={0}
-                                                            onDropdownOpen={() => {
-                                                                let temp1 = window.scrollY;
-                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                                setTimeout(() => {
-                                                                    let temp2 = window.scrollY;
-                                                                    if (temp2 === temp1)
-                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                                }, 100);
-                                                            }}
-                                                            values={selectCustomValues.width3}
-                                                            dropdownRenderer={
-                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                            }
-                                                            contentRenderer={
-                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                               postfixFa=""/>
-                                                            }
-                                                            // optionRenderer={
-                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                            // }
-                                                            onChange={(selected) => {
-                                                                if (selected[0] !== undefined) {
-                                                                    optionSelectChanged_three(selected[0], "3AIn", 2, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                    temp.width3 = selected;
-                                                                    setSelectCustomValues(temp);
-                                                                    setDeps("", "3AIn3");
-                                                                    setCart("Width3", selected[0].value);
-                                                                }
-                                                            }}
-                                                            options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <NextStep eventKey="3B">{t("NEXT STEP")}</NextStep>
+                        <Card className={step3 === "true" && step2 === "Inside" && step21 === "true" ? "" : "noDisplay"}>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
+                                <ContextAwareToggle eventKey="3A" stepNum={t("4A")} stepTitle={t("zebra_step3AInside")} stepRef="3AIn" type="2" required={requiredStep["3AIn"]}
+                                                    stepSelected={stepSelectedLabel["3AIn"] === undefined ? "" : stepSelectedLabel["3AIn"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="3A">
+                                <Card.Body>
+                                    <div className="card_body">
+                                        <div className="box100">
+                                            <p className="step_selection_title">{t("step3A_title")}</p>
+                                            <img
+                                                src={pageLanguage === 'fa' ? require('../Images/drapery/zebra/new_width_inside_3_fa.svg').default : require('../Images/drapery/zebra/new_width_inside_3.svg').default}
+                                                className="img-fluid" alt=""/>
                                         </div>
-                                        
-                                        <div className="accordion_help">
-                                            <div className="help_container">
-                                                <div className="help_column help_left_column">
-                                                    <p className="help_column_header"/>
-                                                    <ul className="help_column_list">
-                                                        <li className="no_listStyle single_line_height">{t("step3A_help_roller_1")}
-                                                        </li>
-                                                    </ul>
+                                        <div className="box100 Three_selection_container">
+                                            <div className="Three_select_container">
+                                                <label className="select_label">{t("step3AIn_A")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                <div className="select_container select_container_num">
+                                                    <Select
+                                                        className="select"
+                                                        placeholder={t("Please Select")}
+                                                        portal={document.body}
+                                                        dropdownPosition="bottom"
+                                                        dropdownHandle={false}
+                                                        dropdownGap={0}
+                                                        onDropdownOpen={() => {
+                                                            let temp1 = window.scrollY;
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            setTimeout(() => {
+                                                                let temp2 = window.scrollY;
+                                                                if (temp2 === temp1)
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                            }, 100);
+                                                        }}
+                                                        values={selectCustomValues.width1}
+                                                        dropdownRenderer={
+                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                        }
+                                                        contentRenderer={
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                           postfixFa=""/>
+                                                        }
+                                                        // optionRenderer={
+                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                        // }
+                                                        onChange={(selected) => {
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged_three(selected[0], "3AIn", 0, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
+                                                                temp.width1 = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3AIn1");
+                                                                setCart("Width1", selected[0].value);
+                                                            }
+                                                        }}
+                                                        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="Three_select_container">
+                                                <label className="select_label">{t("step3AIn_B")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                <div className="select_container select_container_num">
+                                                    <Select
+                                                        className="select"
+                                                        placeholder={t("Please Select")}
+                                                        portal={document.body}
+                                                        dropdownPosition="bottom"
+                                                        dropdownHandle={false}
+                                                        dropdownGap={0}
+                                                        onDropdownOpen={() => {
+                                                            let temp1 = window.scrollY;
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            setTimeout(() => {
+                                                                let temp2 = window.scrollY;
+                                                                if (temp2 === temp1)
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                            }, 100);
+                                                        }}
+                                                        values={selectCustomValues.width2}
+                                                        dropdownRenderer={
+                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                        }
+                                                        contentRenderer={
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                           postfixFa=""/>
+                                                        }
+                                                        // optionRenderer={
+                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                        // }
+                                                        onChange={(selected) => {
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged_three(selected[0], "3AIn", 1, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
+                                                                temp.width2 = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3AIn2");
+                                                                setCart("Width2", selected[0].value);
+                                                            }
+                                                        }}
+                                                        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="Three_select_container">
+                                                <label className="select_label">{t("step3AIn_C")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                <div className="select_container select_container_num">
+                                                    <Select
+                                                        className="select"
+                                                        placeholder={t("Please Select")}
+                                                        portal={document.body}
+                                                        dropdownPosition="bottom"
+                                                        dropdownHandle={false}
+                                                        dropdownGap={0}
+                                                        onDropdownOpen={() => {
+                                                            let temp1 = window.scrollY;
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            setTimeout(() => {
+                                                                let temp2 = window.scrollY;
+                                                                if (temp2 === temp1)
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                            }, 100);
+                                                        }}
+                                                        values={selectCustomValues.width3}
+                                                        dropdownRenderer={
+                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                        }
+                                                        contentRenderer={
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                           postfixFa=""/>
+                                                        }
+                                                        // optionRenderer={
+                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                        // }
+                                                        onChange={(selected) => {
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged_three(selected[0], "3AIn", 2, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
+                                                                temp.width3 = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3AIn3");
+                                                                setCart("Width3", selected[0].value);
+                                                            }
+                                                        }}
+                                                        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
-                                    </Card.Body>
-                                </Accordion.Collapse>
-                            </Card>
-                        }
+                                        <NextStep currentStep="3AIn" eventKey="3B">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                    
+                                    <div className="accordion_help">
+                                        <div className="help_container">
+                                            <div className="help_column help_left_column">
+                                                <p className="help_column_header"/>
+                                                <ul className="help_column_list">
+                                                    <li className="no_listStyle single_line_height">{t("step3A_help_roller_1")}
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
                         
                         {/* step 4B inside */}
-                        {stepSelectedValue["3"] === "2" && step2 === "Inside" && step21 === "true" &&
-                            <Card>
-                                <Card.Header>
-                                    <ContextAwareToggle eventKey="3B" stepNum={t("4B")} stepTitle={t("zebra_step3BInside")} stepRef="3BIn" type="2" required={requiredStep["3BIn"]}
-                                                        stepSelected={stepSelectedLabel["3BIn"] === undefined ? "" : stepSelectedLabel["3BIn"]}/>
-                                </Card.Header>
-                                <Accordion.Collapse eventKey="3B">
-                                    <Card.Body>
-                                        <div className="card_body">
-                                            <div className="box100">
-                                                <p className="step_selection_title">{t("step3B_title")}</p>
-                                                <img
-                                                    src={pageLanguage === 'fa' ? require('../Images/drapery/zebra/new_height_inside_3_fa.svg').default : require('../Images/drapery/zebra/new_height_inside_3.svg').default}
-                                                    className="img-fluid" alt=""/>
-                                            </div>
-                                            <div className="box100 Three_selection_container">
-                                                <div className="Three_select_container">
-                                                    <label className="select_label">{t("step3BIn_A")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                    <div className="select_container select_container_num">
-                                                        <Select
-                                                            className="select"
-                                                            placeholder={t("Please Select")}
-                                                            portal={document.body}
-                                                            dropdownPosition="bottom"
-                                                            dropdownHandle={false}
-                                                            dropdownGap={0}
-                                                            onDropdownOpen={() => {
-                                                                let temp1 = window.scrollY;
-                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                                setTimeout(() => {
-                                                                    let temp2 = window.scrollY;
-                                                                    if (temp2 === temp1)
-                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                                }, 100);
-                                                            }}
-                                                            values={selectCustomValues.height1}
-                                                            dropdownRenderer={
-                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                            }
-                                                            contentRenderer={
-                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                               postfixFa=""/>
-                                                            }
-                                                            // optionRenderer={
-                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                            // }
-                                                            onChange={(selected) => {
-                                                                if (selected[0] !== undefined) {
-                                                                    optionSelectChanged_three(selected[0], "3BIn", 0, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                    temp.height1 = selected;
-                                                                    setSelectCustomValues(temp);
-                                                                    setDeps("", "3BIn1");
-                                                                    setCart("Height1", selected[0].value);
-                                                                }
-                                                            }}
-                                                            options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="Three_select_container">
-                                                    <label className="select_label">{t("step3BIn_B")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                    <div className="select_container select_container_num">
-                                                        <Select
-                                                            className="select"
-                                                            placeholder={t("Please Select")}
-                                                            portal={document.body}
-                                                            dropdownPosition="bottom"
-                                                            dropdownHandle={false}
-                                                            dropdownGap={0}
-                                                            onDropdownOpen={() => {
-                                                                let temp1 = window.scrollY;
-                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                                setTimeout(() => {
-                                                                    let temp2 = window.scrollY;
-                                                                    if (temp2 === temp1)
-                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                                }, 100);
-                                                            }}
-                                                            values={selectCustomValues.height2}
-                                                            dropdownRenderer={
-                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                            }
-                                                            contentRenderer={
-                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                               postfixFa=""/>
-                                                            }
-                                                            // optionRenderer={
-                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                            // }
-                                                            onChange={(selected) => {
-                                                                if (selected[0] !== undefined) {
-                                                                    optionSelectChanged_three(selected[0], "3BIn", 1, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                    temp.height2 = selected;
-                                                                    setSelectCustomValues(temp);
-                                                                    setDeps("", "3BIn2");
-                                                                    setCart("Height2", selected[0].value);
-                                                                }
-                                                            }}
-                                                            options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="Three_select_container">
-                                                    <label className="select_label">{t("step3BIn_C")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                    <div className="select_container select_container_num">
-                                                        <Select
-                                                            className="select"
-                                                            placeholder={t("Please Select")}
-                                                            portal={document.body}
-                                                            dropdownPosition="bottom"
-                                                            dropdownHandle={false}
-                                                            dropdownGap={0}
-                                                            onDropdownOpen={() => {
-                                                                let temp1 = window.scrollY;
-                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                                setTimeout(() => {
-                                                                    let temp2 = window.scrollY;
-                                                                    if (temp2 === temp1)
-                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                                }, 100);
-                                                            }}
-                                                            values={selectCustomValues.height3}
-                                                            dropdownRenderer={
-                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                            }
-                                                            contentRenderer={
-                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                               postfixFa=""/>
-                                                            }
-                                                            // optionRenderer={
-                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                            // }
-                                                            onChange={(selected) => {
-                                                                if (selected[0] !== undefined) {
-                                                                    optionSelectChanged_three(selected[0], "3BIn", 2, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                    temp.height3 = selected;
-                                                                    setSelectCustomValues(temp);
-                                                                    setDeps("", "3BIn3");
-                                                                    setCart("Height3", selected[0].value);
-                                                                }
-                                                            }}
-                                                            options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            
-                                            <NextStep eventKey="4">{t("NEXT STEP")}</NextStep>
+                        <Card className={step3 === "true" && step2 === "Inside" && step21 === "true" ? "" : "noDisplay"}>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
+                                <ContextAwareToggle eventKey="3B" stepNum={t("4B")} stepTitle={t("zebra_step3BInside")} stepRef="3BIn" type="2" required={requiredStep["3BIn"]}
+                                                    stepSelected={stepSelectedLabel["3BIn"] === undefined ? "" : stepSelectedLabel["3BIn"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="3B">
+                                <Card.Body>
+                                    <div className="card_body">
+                                        <div className="box100">
+                                            <p className="step_selection_title">{t("step3B_title")}</p>
+                                            <img
+                                                src={pageLanguage === 'fa' ? require('../Images/drapery/zebra/new_height_inside_3_fa.svg').default : require('../Images/drapery/zebra/new_height_inside_3.svg').default}
+                                                className="img-fluid" alt=""/>
                                         </div>
-                                        
-                                        <div className="accordion_help">
-                                            <div className="help_container">
-                                                <div className="help_column help_left_column">
-                                                    <p className="help_column_header"/>
-                                                    <ul className="help_column_list">
-                                                        <li className="no_listStyle single_line_height">{t("step3B_help_1")}
-                                                        </li>
-                                                    </ul>
+                                        <div className="box100 Three_selection_container">
+                                            <div className="Three_select_container">
+                                                <label className="select_label">{t("step3BIn_A")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                <div className="select_container select_container_num">
+                                                    <Select
+                                                        className="select"
+                                                        placeholder={t("Please Select")}
+                                                        portal={document.body}
+                                                        dropdownPosition="bottom"
+                                                        dropdownHandle={false}
+                                                        dropdownGap={0}
+                                                        onDropdownOpen={() => {
+                                                            let temp1 = window.scrollY;
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            setTimeout(() => {
+                                                                let temp2 = window.scrollY;
+                                                                if (temp2 === temp1)
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                            }, 100);
+                                                        }}
+                                                        values={selectCustomValues.height1}
+                                                        dropdownRenderer={
+                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                        }
+                                                        contentRenderer={
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                           postfixFa=""/>
+                                                        }
+                                                        // optionRenderer={
+                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                        // }
+                                                        onChange={(selected) => {
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged_three(selected[0], "3BIn", 0, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
+                                                                temp.height1 = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3BIn1");
+                                                                setCart("Height1", selected[0].value);
+                                                            }
+                                                        }}
+                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="Three_select_container">
+                                                <label className="select_label">{t("step3BIn_B")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                <div className="select_container select_container_num">
+                                                    <Select
+                                                        className="select"
+                                                        placeholder={t("Please Select")}
+                                                        portal={document.body}
+                                                        dropdownPosition="bottom"
+                                                        dropdownHandle={false}
+                                                        dropdownGap={0}
+                                                        onDropdownOpen={() => {
+                                                            let temp1 = window.scrollY;
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            setTimeout(() => {
+                                                                let temp2 = window.scrollY;
+                                                                if (temp2 === temp1)
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                            }, 100);
+                                                        }}
+                                                        values={selectCustomValues.height2}
+                                                        dropdownRenderer={
+                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                        }
+                                                        contentRenderer={
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                           postfixFa=""/>
+                                                        }
+                                                        // optionRenderer={
+                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                        // }
+                                                        onChange={(selected) => {
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged_three(selected[0], "3BIn", 1, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
+                                                                temp.height2 = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3BIn2");
+                                                                setCart("Height2", selected[0].value);
+                                                            }
+                                                        }}
+                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="Three_select_container">
+                                                <label className="select_label">{t("step3BIn_C")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                <div className="select_container select_container_num">
+                                                    <Select
+                                                        className="select"
+                                                        placeholder={t("Please Select")}
+                                                        portal={document.body}
+                                                        dropdownPosition="bottom"
+                                                        dropdownHandle={false}
+                                                        dropdownGap={0}
+                                                        onDropdownOpen={() => {
+                                                            let temp1 = window.scrollY;
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            setTimeout(() => {
+                                                                let temp2 = window.scrollY;
+                                                                if (temp2 === temp1)
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                            }, 100);
+                                                        }}
+                                                        values={selectCustomValues.height3}
+                                                        dropdownRenderer={
+                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                        }
+                                                        contentRenderer={
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                           postfixFa=""/>
+                                                        }
+                                                        // optionRenderer={
+                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                        // }
+                                                        onChange={(selected) => {
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged_three(selected[0], "3BIn", 2, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
+                                                                temp.height3 = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3BIn3");
+                                                                setCart("Height3", selected[0].value);
+                                                            }
+                                                        }}
+                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
-                                    </Card.Body>
-                                </Accordion.Collapse>
-                            </Card>
-                        }
+                                        
+                                        <NextStep currentStep={[...depSet].findIndex(el => el.startsWith("3")) === -1 ? "3" : "3BIn"} eventKey="4">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                    
+                                    <div className="accordion_help">
+                                        <div className="help_container">
+                                            <div className="help_column help_left_column">
+                                                <p className="help_column_header"/>
+                                                <ul className="help_column_list">
+                                                    <li className="no_listStyle single_line_height">{t("step3B_help_1")}
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
                         
                         {/* step 4A outside */}
-                        {stepSelectedValue["3"] === "2" && !!(step2 === "Outside" || step2 === "HiddenMoulding") &&
-                            <Card>
-                                <Card.Header>
-                                    <ContextAwareToggle eventKey="3A" stepNum={t("4A")} stepTitle={t("zebra_step3AOutside")} stepRef="3AOut" type="2"
-                                                        required={requiredStep["3AOut"]}
-                                                        stepSelected={stepSelectedLabel["3AOut"] === undefined ? "" : stepSelectedLabel["3AOut"]}/>
-                                </Card.Header>
-                                <Accordion.Collapse eventKey="3A">
-                                    <Card.Body>
-                                        <div className="card_body">
+                        <Card className={step3 === "true" && !!(step2 === "Outside" || step2 === "HiddenMoulding") ? "" : "noDisplay"}>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
+                                <ContextAwareToggle eventKey="3A" stepNum={t("4A")} stepTitle={t("zebra_step3AOutside")} stepRef="3AOut" type="2"
+                                                    required={requiredStep["3AOut"]}
+                                                    stepSelected={stepSelectedLabel["3AOut"] === undefined ? "" : stepSelectedLabel["3AOut"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="3A">
+                                <Card.Body>
+                                    <div className="card_body">
+                                        <div className="box100">
+                                            <p className="step_selection_title">{t("step3A_out_title")}</p>
+                                            <img src={require('../Images/drapery/zebra/new_FrameSize.svg').default} className="img-fluid" alt=""/>
+                                        </div>
+                                        <div className="box100 Three_selection_container">
                                             <div className="box100">
-                                                <p className="step_selection_title">{t("step3A_out_title")}</p>
-                                                <img src={require('../Images/drapery/zebra/new_FrameSize.svg').default} className="img-fluid" alt=""/>
-                                            </div>
-                                            <div className="box100 Three_selection_container">
-                                                <div className="box100">
-                                                    <label className="select_label">{t("Width")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                    <div className="select_container select_container_num">
-                                                        <Select
-                                                            className="select"
-                                                            placeholder={t("Please Select")}
-                                                            portal={document.body}
-                                                            dropdownPosition="bottom"
-                                                            dropdownHandle={false}
-                                                            dropdownGap={0}
-                                                            onDropdownOpen={() => {
-                                                                let temp1 = window.scrollY;
-                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                                setTimeout(() => {
-                                                                    let temp2 = window.scrollY;
-                                                                    if (temp2 === temp1)
-                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                                }, 100);
-                                                            }}
-                                                            values={selectCustomValues.width3A}
-                                                            dropdownRenderer={
-                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                <label className="select_label">{t("Width")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                <div className="select_container select_container_num">
+                                                    <Select
+                                                        className="select"
+                                                        placeholder={t("Please Select")}
+                                                        portal={document.body}
+                                                        dropdownPosition="bottom"
+                                                        dropdownHandle={false}
+                                                        dropdownGap={0}
+                                                        onDropdownOpen={() => {
+                                                            let temp1 = window.scrollY;
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            setTimeout(() => {
+                                                                let temp2 = window.scrollY;
+                                                                if (temp2 === temp1)
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                            }, 100);
+                                                        }}
+                                                        values={selectCustomValues.width3A}
+                                                        dropdownRenderer={
+                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                        }
+                                                        contentRenderer={
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                           postfixFa=""/>
+                                                        }
+                                                        // optionRenderer={
+                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                        // }
+                                                        onChange={(selected) => {
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged("3AOut", selected[0], "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
+                                                                temp.width3A = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3AOut");
+                                                                setCart("Width3A", selected[0].value);
                                                             }
-                                                            contentRenderer={
-                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                               postfixFa=""/>
-                                                            }
-                                                            // optionRenderer={
-                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                            // }
-                                                            onChange={(selected) => {
-                                                                if (selected[0] !== undefined) {
-                                                                    optionSelectChanged("3AOut", selected[0], "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                    temp.width3A = selected;
-                                                                    setSelectCustomValues(temp);
-                                                                    setDeps("", "3AOut");
-                                                                    setCart("Width3A", selected[0].value);
-                                                                }
-                                                            }}
-                                                            options={SelectOptionRange(30, 290, 1, "cm", "", pageLanguage)}
-                                                        />
-                                                    </div>
+                                                        }}
+                                                        options={SelectOptionRange(30, 290, 1, "cm", "", pageLanguage)}
+                                                    />
                                                 </div>
                                             </div>
-                                            <NextStep eventKey="3B">{t("NEXT STEP")}</NextStep>
                                         </div>
-                                        
-                                        {/*<div className="accordion_help">*/}
-                                        {/*    <div className="help_container">*/}
-                                        {/*        <div className="help_column help_left_column">*/}
-                                        {/*            <p className="help_column_header"/>*/}
-                                        {/*            <ul className="help_column_list">*/}
-                                        {/*                <li className="no_listStyle single_line_height">{t("step3A_out_help__roller1")}*/}
-                                        {/*                </li>*/}
-                                        {/*            </ul>*/}
-                                        {/*        </div>*/}
-                                        {/*    </div>*/}
-                                        {/*</div>*/}
-                                    </Card.Body>
-                                </Accordion.Collapse>
-                            </Card>
-                        }
+                                        <NextStep currentStep="3AOut" eventKey="3B">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                    
+                                    {/*<div className="accordion_help">*/}
+                                    {/*    <div className="help_container">*/}
+                                    {/*        <div className="help_column help_left_column">*/}
+                                    {/*            <p className="help_column_header"/>*/}
+                                    {/*            <ul className="help_column_list">*/}
+                                    {/*                <li className="no_listStyle single_line_height">{t("step3A_out_help__roller1")}*/}
+                                    {/*                </li>*/}
+                                    {/*            </ul>*/}
+                                    {/*        </div>*/}
+                                    {/*    </div>*/}
+                                    {/*</div>*/}
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
                         
                         {/* step 4B outside */}
-                        {stepSelectedValue["3"] === "2" && !!(step2 === "Outside" || step2 === "HiddenMoulding") &&
-                            <Card>
-                                <Card.Header>
-                                    <ContextAwareToggle eventKey="3B" stepNum={t("4B")} stepTitle={t("zebra_step3BOutside")} stepRef="3BOut" type="2"
-                                                        required={requiredStep["3BOut"]}
-                                                        stepSelected={stepSelectedLabel["3BOut"] === undefined ? "" : stepSelectedLabel["3BOut"]}/>
-                                </Card.Header>
-                                <Accordion.Collapse eventKey="3B">
-                                    <Card.Body>
-                                        <div className="card_body">
-                                            <div className="box100">
-                                                <p className="step_selection_title">{t("step3B_out_title")}</p>
-                                                <img src={require('../Images/drapery/zebra/new_wall_cover.svg').default} className="img-fluid" alt=""/>
-                                            </div>
-                                            <div className="box100 Three_selection_container dir_ltr">
-                                                <div className="box50">
-                                                    <label className="select_label"><p className="farsi_cm">{t("select_cm")}</p>{t("Left")}</label>
-                                                    <div className="select_container select_container_num">
-                                                        <Select
-                                                            className="select"
-                                                            placeholder={t("Please Select")}
-                                                            portal={document.body}
-                                                            dropdownPosition="bottom"
-                                                            dropdownHandle={false}
-                                                            dropdownGap={0}
-                                                            onDropdownOpen={() => {
-                                                                let temp1 = window.scrollY;
-                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                                setTimeout(() => {
-                                                                    let temp2 = window.scrollY;
-                                                                    if (temp2 === temp1)
-                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                                }, 100);
-                                                            }}
-                                                            values={selectCustomValues.left}
-                                                            dropdownRenderer={
-                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                            }
-                                                            contentRenderer={
-                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                               postfixFa=""/>
-                                                            }
-                                                            // optionRenderer={
-                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                            // }
-                                                            onChange={(selected) => {
-                                                                if (selected[0] !== undefined) {
-                                                                    optionSelectChanged_LeftRight(selected[0], "3BOut", true, "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                    temp.left = selected;
-                                                                    setSelectCustomValues(temp);
-                                                                    setDeps("", "3BOut1");
-                                                                    setCart("ExtensionLeft", selected[0].value);
-                                                                }
-                                                            }}
-                                                            options={SelectOptionRange(1, 10, 1, "cm", "", pageLanguage)}
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="box50">
-                                                    <label className="select_label"><p className="farsi_cm">{t("select_cm")}</p>{t("Right")}</label>
-                                                    <div className="select_container select_container_num">
-                                                        <Select
-                                                            className="select"
-                                                            placeholder={t("Please Select")}
-                                                            portal={document.body}
-                                                            dropdownPosition="bottom"
-                                                            dropdownHandle={false}
-                                                            dropdownGap={0}
-                                                            onDropdownOpen={() => {
-                                                                let temp1 = window.scrollY;
-                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                                setTimeout(() => {
-                                                                    let temp2 = window.scrollY;
-                                                                    if (temp2 === temp1)
-                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                                }, 100);
-                                                            }}
-                                                            values={selectCustomValues.right}
-                                                            dropdownRenderer={
-                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                            }
-                                                            contentRenderer={
-                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                               postfixFa=""/>
-                                                            }
-                                                            // optionRenderer={
-                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                            // }
-                                                            onChange={(selected) => {
-                                                                if (selected[0] !== undefined) {
-                                                                    optionSelectChanged_LeftRight(selected[0], "3BOut", false, "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                    temp.right = selected;
-                                                                    setSelectCustomValues(temp);
-                                                                    setDeps("", "3BOut2");
-                                                                    setCart("ExtensionRight", selected[0].value);
-                                                                }
-                                                            }}
-                                                            options={SelectOptionRange(1, 10, 1, "cm", "", pageLanguage)}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            
-                                            <NextStep eventKey="3C">{t("NEXT STEP")}</NextStep>
+                        <Card className={step3 === "true" && !!(step2 === "Outside" || step2 === "HiddenMoulding") ? "" : "noDisplay"}>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
+                                <ContextAwareToggle eventKey="3B" stepNum={t("4B")} stepTitle={t("zebra_step3BOutside")} stepRef="3BOut" type="2"
+                                                    required={requiredStep["3BOut"]}
+                                                    stepSelected={stepSelectedLabel["3BOut"] === undefined ? "" : stepSelectedLabel["3BOut"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="3B">
+                                <Card.Body>
+                                    <div className="card_body">
+                                        <div className="box100">
+                                            <p className="step_selection_title">{t("step3B_out_title")}</p>
+                                            <img src={require('../Images/drapery/zebra/new_wall_cover.svg').default} className="img-fluid" alt=""/>
                                         </div>
-                                        
-                                        <div className="accordion_help">
-                                            <div className="help_container">
-                                                <div className="help_column help_left_column">
-                                                    <p className="help_column_header"/>
-                                                    <ul className="help_column_list">
-                                                        <li className="no_listStyle single_line_height">{t("step3B_out_help_1")}
-                                                        </li>
-                                                    </ul>
+                                        <div className="box100 Three_selection_container dir_ltr">
+                                            <div className="box50">
+                                                <label className="select_label"><p className="farsi_cm">{t("select_cm")}</p>{t("Left")}</label>
+                                                <div className="select_container select_container_num">
+                                                    <Select
+                                                        className="select"
+                                                        placeholder={t("Please Select")}
+                                                        portal={document.body}
+                                                        dropdownPosition="bottom"
+                                                        dropdownHandle={false}
+                                                        dropdownGap={0}
+                                                        onDropdownOpen={() => {
+                                                            let temp1 = window.scrollY;
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            setTimeout(() => {
+                                                                let temp2 = window.scrollY;
+                                                                if (temp2 === temp1)
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                            }, 100);
+                                                        }}
+                                                        values={selectCustomValues.left}
+                                                        dropdownRenderer={
+                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                        }
+                                                        contentRenderer={
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                           postfixFa=""/>
+                                                        }
+                                                        // optionRenderer={
+                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                        // }
+                                                        onChange={(selected) => {
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged_LeftRight(selected[0], "3BOut", true, "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
+                                                                temp.left = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3BOut1");
+                                                                setCart("ExtensionLeft", selected[0].value);
+                                                            }
+                                                        }}
+                                                        options={SelectOptionRange(1, 10, 1, "cm", "", pageLanguage)}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="box50">
+                                                <label className="select_label"><p className="farsi_cm">{t("select_cm")}</p>{t("Right")}</label>
+                                                <div className="select_container select_container_num">
+                                                    <Select
+                                                        className="select"
+                                                        placeholder={t("Please Select")}
+                                                        portal={document.body}
+                                                        dropdownPosition="bottom"
+                                                        dropdownHandle={false}
+                                                        dropdownGap={0}
+                                                        onDropdownOpen={() => {
+                                                            let temp1 = window.scrollY;
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            setTimeout(() => {
+                                                                let temp2 = window.scrollY;
+                                                                if (temp2 === temp1)
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                            }, 100);
+                                                        }}
+                                                        values={selectCustomValues.right}
+                                                        dropdownRenderer={
+                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                        }
+                                                        contentRenderer={
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                           postfixFa=""/>
+                                                        }
+                                                        // optionRenderer={
+                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                        // }
+                                                        onChange={(selected) => {
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged_LeftRight(selected[0], "3BOut", false, "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
+                                                                temp.right = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3BOut2");
+                                                                setCart("ExtensionRight", selected[0].value);
+                                                            }
+                                                        }}
+                                                        options={SelectOptionRange(1, 10, 1, "cm", "", pageLanguage)}
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
-                                    </Card.Body>
-                                </Accordion.Collapse>
-                            </Card>
-                        }
+                                        
+                                        <NextStep currentStep="3BOut" eventKey="3C">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                    
+                                    <div className="accordion_help">
+                                        <div className="help_container">
+                                            <div className="help_column help_left_column">
+                                                <p className="help_column_header"/>
+                                                <ul className="help_column_list">
+                                                    <li className="no_listStyle single_line_height">{t("step3B_out_help_1")}
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
                         
                         {/* step 4C outside */}
-                        {stepSelectedValue["3"] === "2" && step2 === "Outside" &&
-                            <Card>
-                                <Card.Header>
-                                    <ContextAwareToggle eventKey="3C" stepNum={t("4C")} stepTitle={t("zebra_step3COutside")} stepRef="3COut" type="2"
-                                                        required={requiredStep["3COut"]}
-                                                        stepSelected={stepSelectedLabel["3COut"] === undefined ? "" : stepSelectedLabel["3COut"]}/>
-                                </Card.Header>
-                                <Accordion.Collapse eventKey="3C">
-                                    <Card.Body>
-                                        <div className="card_body">
+                        <Card className={step3 === "true" && step2 === "Outside" ? "" : "noDisplay"}>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
+                                <ContextAwareToggle eventKey="3C" stepNum={t("4C")} stepTitle={t("zebra_step3COutside")} stepRef="3COut" type="2"
+                                                    required={requiredStep["3COut"]}
+                                                    stepSelected={stepSelectedLabel["3COut"] === undefined ? "" : stepSelectedLabel["3COut"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="3C">
+                                <Card.Body>
+                                    <div className="card_body">
+                                        <div className="box100">
+                                            <p className="step_selection_title">{t("step3C_out_title")}</p>
+                                            <img src={require('../Images/drapery/zebra/new_frame_height.svg').default} className="img-fluid" alt=""/>
+                                        </div>
+                                        <div className="box100 Three_selection_container">
                                             <div className="box100">
-                                                <p className="step_selection_title">{t("step3C_out_title")}</p>
-                                                <img src={require('../Images/drapery/zebra/new_frame_height.svg').default} className="img-fluid" alt=""/>
-                                            </div>
-                                            <div className="box100 Three_selection_container">
-                                                <div className="box100">
-                                                    <label className="select_label">{t("Height")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                    <div className="select_container select_container_num">
-                                                        <Select
-                                                            className="select"
-                                                            placeholder={t("Please Select")}
-                                                            portal={document.body}
-                                                            dropdownPosition="bottom"
-                                                            dropdownHandle={false}
-                                                            dropdownGap={0}
-                                                            onDropdownOpen={() => {
-                                                                let temp1 = window.scrollY;
-                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                                setTimeout(() => {
-                                                                    let temp2 = window.scrollY;
-                                                                    if (temp2 === temp1)
-                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                                }, 100);
-                                                            }}
-                                                            values={selectCustomValues.height3C}
-                                                            dropdownRenderer={
-                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                <label className="select_label">{t("Height")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                <div className="select_container select_container_num">
+                                                    <Select
+                                                        className="select"
+                                                        placeholder={t("Please Select")}
+                                                        portal={document.body}
+                                                        dropdownPosition="bottom"
+                                                        dropdownHandle={false}
+                                                        dropdownGap={0}
+                                                        onDropdownOpen={() => {
+                                                            let temp1 = window.scrollY;
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            setTimeout(() => {
+                                                                let temp2 = window.scrollY;
+                                                                if (temp2 === temp1)
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                            }, 100);
+                                                        }}
+                                                        values={selectCustomValues.height3C}
+                                                        dropdownRenderer={
+                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                        }
+                                                        contentRenderer={
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                           postfixFa=""/>
+                                                        }
+                                                        // optionRenderer={
+                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                        // }
+                                                        onChange={(selected) => {
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged("3COut", selected[0], "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
+                                                                temp.height3C = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3COut");
+                                                                setCart("Height3C", selected[0].value);
                                                             }
-                                                            contentRenderer={
-                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                               postfixFa=""/>
-                                                            }
-                                                            // optionRenderer={
-                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                            // }
-                                                            onChange={(selected) => {
-                                                                if (selected[0] !== undefined) {
-                                                                    optionSelectChanged("3COut", selected[0], "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                    temp.height3C = selected;
-                                                                    setSelectCustomValues(temp);
-                                                                    setDeps("", "3COut");
-                                                                    setCart("Height3C", selected[0].value);
-                                                                }
-                                                            }}
-                                                            options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
-                                                        />
-                                                    </div>
+                                                        }}
+                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                    />
                                                 </div>
                                             </div>
-                                            <NextStep eventKey="3D">{t("NEXT STEP")}</NextStep>
                                         </div>
-                                    
-                                    </Card.Body>
-                                </Accordion.Collapse>
-                            </Card>
-                        }
+                                        <NextStep currentStep="3COut" eventKey="3D">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
                         
                         {/* step 4C Arc */}
-                        {stepSelectedValue["3"] === "2" && step2 === "HiddenMoulding" &&
-                            <Card>
-                                <Card.Header>
-                                    <ContextAwareToggle eventKey="3C" stepNum={t("3C")} stepTitle={t("dk_step2D")} stepRef="3CArc" type="2" required={requiredStep["3CArc"]}
-                                                        stepSelected={stepSelectedLabel["3CArc"] === undefined ? "" : stepSelectedLabel["3CArc"]}/>
-                                </Card.Header>
-                                <Accordion.Collapse eventKey="3C">
-                                    <Card.Body>
-                                        <div className="card_body">
-                                            <div className="box100">
-                                                <p className="step_selection_title">{t("arc_step2D_title")}</p>
-                                                <img
-                                                    src={pageLanguage === 'fa' ? require('../Images/drapery/dk/new_ceiling_to_window_3_arc_fa.svg').default : require('../Images/drapery/dk/new_ceiling_to_window_3_arc.svg').default}
-                                                    className="img-fluid" alt=""/>
-                                            </div>
-                                            <div className="box100 Three_selection_container">
-                                                <div className="Three_select_container">
-                                                    <label className="select_label">{t("step3AIn_A")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                    <div className="select_container select_container_num">
-                                                        <Select
-                                                            className="select"
-                                                            placeholder={t("Please Select")}
-                                                            portal={document.body}
-                                                            dropdownPosition="bottom"
-                                                            dropdownHandle={false}
-                                                            dropdownGap={0}
-                                                            onDropdownOpen={() => {
-                                                                let temp1 = window.scrollY;
-                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                                setTimeout(() => {
-                                                                    let temp2 = window.scrollY;
-                                                                    if (temp2 === temp1)
-                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                                }, 100);
-                                                            }}
-                                                            values={selectCustomValues.CeilingToWindow1}
-                                                            dropdownRenderer={
-                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                            }
-                                                            contentRenderer={
-                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                               postfixFa=""/>
-                                                            }
-                                                            // optionRenderer={
-                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                            // }
-                                                            onChange={(selected) => {
-                                                                if (selected[0] !== undefined) {
-                                                                    optionSelectChanged_three(selected[0], "3CArc", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                    temp.CeilingToWindow1 = selected;
-                                                                    setSelectCustomValues(temp);
-                                                                    setDeps("", "3CArc1");
-                                                                    setCart("CeilingToWindow1", selected[0].value);
-                                                                }
-                                                            }}
-                                                            options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="Three_select_container">
-                                                    <label className="select_label">{t("step3AIn_B")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                    <div className="select_container select_container_num">
-                                                        <Select
-                                                            className="select"
-                                                            placeholder={t("Please Select")}
-                                                            portal={document.body}
-                                                            dropdownPosition="bottom"
-                                                            dropdownHandle={false}
-                                                            dropdownGap={0}
-                                                            onDropdownOpen={() => {
-                                                                let temp1 = window.scrollY;
-                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                                setTimeout(() => {
-                                                                    let temp2 = window.scrollY;
-                                                                    if (temp2 === temp1)
-                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                                }, 100);
-                                                            }}
-                                                            values={selectCustomValues.CeilingToWindow2}
-                                                            dropdownRenderer={
-                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                            }
-                                                            contentRenderer={
-                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                               postfixFa=""/>
-                                                            }
-                                                            // optionRenderer={
-                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                            // }
-                                                            onChange={(selected) => {
-                                                                if (selected[0] !== undefined) {
-                                                                    optionSelectChanged_three(selected[0], "3CArc", 1, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                    temp.CeilingToWindow2 = selected;
-                                                                    setSelectCustomValues(temp);
-                                                                    setDeps("", "3CArc2");
-                                                                    setCart("CeilingToWindow2", selected[0].value);
-                                                                }
-                                                            }}
-                                                            options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="Three_select_container">
-                                                    <label className="select_label">{t("step3AIn_C")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                    <div className="select_container select_container_num">
-                                                        <Select
-                                                            className="select"
-                                                            placeholder={t("Please Select")}
-                                                            portal={document.body}
-                                                            dropdownPosition="bottom"
-                                                            dropdownHandle={false}
-                                                            dropdownGap={0}
-                                                            onDropdownOpen={() => {
-                                                                let temp1 = window.scrollY;
-                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                                setTimeout(() => {
-                                                                    let temp2 = window.scrollY;
-                                                                    if (temp2 === temp1)
-                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                                }, 100);
-                                                            }}
-                                                            values={selectCustomValues.CeilingToWindow3}
-                                                            dropdownRenderer={
-                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                            }
-                                                            contentRenderer={
-                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                               postfixFa=""/>
-                                                            }
-                                                            // optionRenderer={
-                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                            // }
-                                                            onChange={(selected) => {
-                                                                if (selected[0] !== undefined) {
-                                                                    optionSelectChanged_three(selected[0], "3CArc", 2, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                    temp.CeilingToWindow3 = selected;
-                                                                    setSelectCustomValues(temp);
-                                                                    setDeps("", "3CArc3");
-                                                                    setCart("CeilingToWindow3", selected[0].value);
-                                                                }
-                                                            }}
-                                                            options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <NextStep eventKey="4">{t("NEXT STEP")}</NextStep>
+                        <Card className={step3 === "true" && step2 === "HiddenMoulding" ? "" : "noDisplay"}>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
+                                <ContextAwareToggle eventKey="3C" stepNum={t("3C")} stepTitle={t("dk_step2D")} stepRef="3CArc" type="2" required={requiredStep["3CArc"]}
+                                                    stepSelected={stepSelectedLabel["3CArc"] === undefined ? "" : stepSelectedLabel["3CArc"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="3C">
+                                <Card.Body>
+                                    <div className="card_body">
+                                        <div className="box100">
+                                            <p className="step_selection_title">{t("arc_step2D_title")}</p>
+                                            <img
+                                                src={pageLanguage === 'fa' ? require('../Images/drapery/dk/new_ceiling_to_window_3_arc_fa.svg').default : require('../Images/drapery/dk/new_ceiling_to_window_3_arc.svg').default}
+                                                className="img-fluid" alt=""/>
                                         </div>
-                                        
-                                        <div className="accordion_help">
-                                            <div className="help_container">
-                                                <div className="help_column help_left_column">
-                                                    <p className="help_column_header"/>
-                                                    <ul className="help_column_list">
-                                                        <li className="no_listStyle single_line_height">
+                                        <div className="box100 Three_selection_container">
+                                            <div className="Three_select_container">
+                                                <label className="select_label">{t("step3AIn_A")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                <div className="select_container select_container_num">
+                                                    <Select
+                                                        className="select"
+                                                        placeholder={t("Please Select")}
+                                                        portal={document.body}
+                                                        dropdownPosition="bottom"
+                                                        dropdownHandle={false}
+                                                        dropdownGap={0}
+                                                        onDropdownOpen={() => {
+                                                            let temp1 = window.scrollY;
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            setTimeout(() => {
+                                                                let temp2 = window.scrollY;
+                                                                if (temp2 === temp1)
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                            }, 100);
+                                                        }}
+                                                        values={selectCustomValues.CeilingToWindow1}
+                                                        dropdownRenderer={
+                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                        }
+                                                        contentRenderer={
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                           postfixFa=""/>
+                                                        }
+                                                        // optionRenderer={
+                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                        // }
+                                                        onChange={(selected) => {
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged_three(selected[0], "3CArc", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
+                                                                temp.CeilingToWindow1 = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3CArc1");
+                                                                setCart("CeilingToWindow1", selected[0].value);
+                                                            }
+                                                        }}
+                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="Three_select_container">
+                                                <label className="select_label">{t("step3AIn_B")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                <div className="select_container select_container_num">
+                                                    <Select
+                                                        className="select"
+                                                        placeholder={t("Please Select")}
+                                                        portal={document.body}
+                                                        dropdownPosition="bottom"
+                                                        dropdownHandle={false}
+                                                        dropdownGap={0}
+                                                        onDropdownOpen={() => {
+                                                            let temp1 = window.scrollY;
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            setTimeout(() => {
+                                                                let temp2 = window.scrollY;
+                                                                if (temp2 === temp1)
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                            }, 100);
+                                                        }}
+                                                        values={selectCustomValues.CeilingToWindow2}
+                                                        dropdownRenderer={
+                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                        }
+                                                        contentRenderer={
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                           postfixFa=""/>
+                                                        }
+                                                        // optionRenderer={
+                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                        // }
+                                                        onChange={(selected) => {
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged_three(selected[0], "3CArc", 1, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
+                                                                temp.CeilingToWindow2 = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3CArc2");
+                                                                setCart("CeilingToWindow2", selected[0].value);
+                                                            }
+                                                        }}
+                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="Three_select_container">
+                                                <label className="select_label">{t("step3AIn_C")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                                <div className="select_container select_container_num">
+                                                    <Select
+                                                        className="select"
+                                                        placeholder={t("Please Select")}
+                                                        portal={document.body}
+                                                        dropdownPosition="bottom"
+                                                        dropdownHandle={false}
+                                                        dropdownGap={0}
+                                                        onDropdownOpen={() => {
+                                                            let temp1 = window.scrollY;
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            setTimeout(() => {
+                                                                let temp2 = window.scrollY;
+                                                                if (temp2 === temp1)
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                            }, 100);
+                                                        }}
+                                                        values={selectCustomValues.CeilingToWindow3}
+                                                        dropdownRenderer={
+                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                        }
+                                                        contentRenderer={
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                           postfixFa=""/>
+                                                        }
+                                                        // optionRenderer={
+                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                        // }
+                                                        onChange={(selected) => {
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged_three(selected[0], "3CArc", 2, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
+                                                                temp.CeilingToWindow3 = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3CArc3");
+                                                                setCart("CeilingToWindow3", selected[0].value);
+                                                            }
+                                                        }}
+                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <NextStep currentStep={[...depSet].findIndex(el => el.startsWith("3")) === -1 ? "3" : "3CArc"} eventKey="4">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                    
+                                    <div className="accordion_help">
+                                        <div className="help_container">
+                                            <div className="help_column help_left_column">
+                                                <p className="help_column_header"/>
+                                                <ul className="help_column_list">
+                                                    <li className="no_listStyle single_line_height">
                                                         <span className="popover_indicator">
                                                             {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
                                                                                   children={<object className="popover_camera" type="image/svg+xml"
@@ -6290,95 +6314,94 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                                   }/>
                                                             }
                                                         </span>{t("dk_step2D_help_1")}
-                                                        </li>
-                                                    </ul>
-                                                </div>
+                                                    </li>
+                                                </ul>
                                             </div>
                                         </div>
-                                    </Card.Body>
-                                </Accordion.Collapse>
-                            </Card>
-                        }
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
                         
                         {/* step 4D outside */}
-                        {stepSelectedValue["3"] === "2" && step2 === "Outside" &&
-                            <Card>
-                                <Card.Header>
-                                    <ContextAwareToggle eventKey="3D" stepNum={t("4D")} stepTitle={t("zebra_step3DOutside")} stepRef="3DOut" type="2"
-                                                        required={requiredStep["3DOut"]}
-                                                        stepSelected={stepSelectedLabel["3DOut"] === undefined ? "" : stepSelectedLabel["3DOut"]}/>
-                                </Card.Header>
-                                <Accordion.Collapse eventKey="3D">
-                                    <Card.Body>
-                                        <div className="card_body">
+                        <Card className={step3 === "true" && step2 === "Outside" ? "" : "noDisplay"}>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
+                                <ContextAwareToggle eventKey="3D" stepNum={t("4D")} stepTitle={t("zebra_step3DOutside")} stepRef="3DOut" type="2"
+                                                    required={requiredStep["3DOut"]}
+                                                    stepSelected={stepSelectedLabel["3DOut"] === undefined ? "" : stepSelectedLabel["3DOut"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="3D">
+                                <Card.Body>
+                                    <div className="card_body">
+                                        <div className="box100">
+                                            <p className="step_selection_title">{t("step3D_out_title")}</p>
+                                            <img src={require('../Images/drapery/zebra/new_shade_mount.svg').default} className="img-fluid" alt=""/>
+                                        </div>
+                                        <div className="box100 Three_selection_container">
                                             <div className="box100">
-                                                <p className="step_selection_title">{t("step3D_out_title")}</p>
-                                                <img src={require('../Images/drapery/zebra/new_shade_mount.svg').default} className="img-fluid" alt=""/>
-                                            </div>
-                                            <div className="box100 Three_selection_container">
-                                                <div className="box100">
-                                                    <label className="select_label"/>
-                                                    <div className="select_container select_container_num">
-                                                        <Select
-                                                            className="select"
-                                                            placeholder={t("Please Select")}
-                                                            portal={document.body}
-                                                            dropdownPosition="bottom"
-                                                            dropdownHandle={false}
-                                                            dropdownGap={0}
-                                                            onDropdownOpen={() => {
-                                                                let temp1 = window.scrollY;
-                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                                setTimeout(() => {
-                                                                    let temp2 = window.scrollY;
-                                                                    if (temp2 === temp1)
-                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                                }, 100);
-                                                            }}
-                                                            values={selectCustomValues.shadeMount}
-                                                            dropdownRenderer={
-                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                <label className="select_label"/>
+                                                <div className="select_container select_container_num">
+                                                    <Select
+                                                        className="select"
+                                                        placeholder={t("Please Select")}
+                                                        portal={document.body}
+                                                        dropdownPosition="bottom"
+                                                        dropdownHandle={false}
+                                                        dropdownGap={0}
+                                                        onDropdownOpen={() => {
+                                                            let temp1 = window.scrollY;
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            setTimeout(() => {
+                                                                let temp2 = window.scrollY;
+                                                                if (temp2 === temp1)
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                            }, 100);
+                                                        }}
+                                                        values={selectCustomValues.shadeMount}
+                                                        dropdownRenderer={
+                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                                        }
+                                                        contentRenderer={
+                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                           postfixFa=""/>
+                                                        }
+                                                        // optionRenderer={
+                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                        // }
+                                                        onChange={(selected) => {
+                                                            if (selected[0] !== undefined) {
+                                                                optionSelectChanged("3DOut", selected[0], "cm", "س\u200Cم", pageLanguage);
+                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
+                                                                temp.shadeMount = selected;
+                                                                setSelectCustomValues(temp);
+                                                                setDeps("", "3DOut");
+                                                                setCart("ShadeMount", selected[0].value);
                                                             }
-                                                            contentRenderer={
-                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                               postfixFa=""/>
-                                                            }
-                                                            // optionRenderer={
-                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                            // }
-                                                            onChange={(selected) => {
-                                                                if (selected[0] !== undefined) {
-                                                                    optionSelectChanged("3DOut", selected[0], "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                    temp.shadeMount = selected;
-                                                                    setSelectCustomValues(temp);
-                                                                    setDeps("", "3DOut");
-                                                                    setCart("ShadeMount", selected[0].value);
-                                                                }
-                                                            }}
-                                                            options={SelectOptionRange(10, 100, 1, "cm", "", pageLanguage)}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <NextStep eventKey="4">{t("NEXT STEP")}</NextStep>
-                                        </div>
-                                        
-                                        <div className="accordion_help">
-                                            <div className="help_container">
-                                                <div className="help_column help_left_column">
-                                                    <p className="help_column_header"/>
-                                                    <ul className="help_column_list">
-                                                        <li className="no_listStyle single_line_height">{t("step3D_out_help_1")}
-                                                        </li>
-                                                    </ul>
+                                                        }}
+                                                        options={SelectOptionRange(10, 100, 1, "cm", "", pageLanguage)}
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
-                                    </Card.Body>
-                                </Accordion.Collapse>
-                            </Card>
-                        }
+                                        <NextStep currentStep={[...depSet].findIndex(el => el.startsWith("3")) === -1 ? "3" : "3DOut"} eventKey="4">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                    
+                                    <div className="accordion_help">
+                                        <div className="help_container">
+                                            <div className="help_column help_left_column">
+                                                <p className="help_column_header"/>
+                                                <ul className="help_column_list">
+                                                    <li className="no_listStyle single_line_height">{t("step3D_out_help_1")}
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
                         
                         {/* step 5 */}
                         <Card>
@@ -6423,110 +6446,112 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                             </label>
                                         
                                         </div>
-                                        {step4 === "Motorized" &&
-                                            <div className={motorErr1 ? "secondary_options secondary_options_err" : "secondary_options"}>
-                                                {/*<hr/>*/}
-                                                {/*<p className="no_power_title">{t("Motor_title")}</p>*/}
-                                                <div className="card-body-display-flex">
-                                                    {/*<div className="box50 radio_style">*/}
-                                                    {/*    <input className="radio" type="radio" text={t("Yes")} value="1" name="step41" ref-num="41" id="411" checked={step41 === "true"}*/}
-                                                    {/*           onChange={e => {*/}
-                                                    {/*               selectChanged(e);*/}
-                                                    {/*               setStep41("true");*/}
-                                                    {/*               setDeps("411", "41");*/}
-                                                    {/*               setCart("hasPower", true, "", "MotorChannels", [selectedMotorChannels.map(obj => obj.value)]);*/}
-                                                    {/*           }} ref={ref => (inputs.current["411"] = ref)}/>*/}
-                                                    {/*    <label htmlFor="411">{t("Yes")}</label>*/}
-                                                    {/*</div>*/}
-                                                    {/*<div className="box50 radio_style">*/}
-                                                    {/*    <input className="radio" type="radio" text={t("No")} value="2" name="step41" ref-num="41" id="412"*/}
-                                                    {/*           onClick={e => {*/}
-                                                    {/*               selectUncheck(e);*/}
-                                                    {/*               setStep41("");*/}
-                                                    {/*               modalHandleShow("noPower");*/}
-                                                    {/*               setDeps("41", "411");*/}
-                                                    {/*           }} ref={ref => (inputs.current["412"] = ref)}/>*/}
-                                                    {/*    <label htmlFor="412">{t("No")}</label>*/}
-                                                    {/*</div>*/}
-                                                    <div className="width_max checkbox_style">
-                                                        <input type="checkbox" text={t("Motorized")} value="2" name="step41" ref-num="4" checked={step41 === "true"}
-                                                               onChange={(e) => {
-                                                                   if (e.target.checked) {
-                                                                       selectChanged(e);
-                                                                       setStep41("true");
-                                                                       setMotorErr1(false);
-                                                                       // let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                                       // let refIndex = inputs.current["42"].getAttribute('ref-num');
-                                                                       // tempLabels[refIndex] = inputs.current["42"].getAttribute('text');
-                                                                       // setStepSelectedLabel(tempLabels);
-                                                                       setSelectedMotorPosition([]);
-                                                                       setSelectedMotorType([]);
-                                                                       setDeps("411,412", "41");
-                                                                       setCart("hasPower", true, "", "ControlType,MotorChannels", ["Motorized", selectedMotorChannels.map(obj => obj.value)]);
-                                                                   } else {
-                                                                       selectUncheck(e);
-                                                                       setStep41("");
-                                                                       // modalHandleShow("noPower");
-                                                                       setCustomMotorAcc({});
-                                                                       setDeps("41", "411");
-                                                                       setCart("", "", "ControlType,hasPower,MotorType,MotorPosition,RemoteName,MotorChannels");
-                                                                   }
-                                                               }} id="411" ref={ref => (inputs.current["411"] = ref)}/>
-                                                        <label htmlFor="411" className="checkbox_label">
-                                                            <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
-                                                                 alt=""/>
-                                                        </label>
-                                                        <span className="checkbox_text">
+                                        
+                                        <div className={step4 === "Motorized" ? (motorErr1 ? "secondary_options secondary_options_err" : "secondary_options") : "noDisplay"}>
+                                            {/*<hr/>*/}
+                                            {/*<p className="no_power_title">{t("Motor_title")}</p>*/}
+                                            <div className="card-body-display-flex">
+                                                {/*<div className="box50 radio_style">*/}
+                                                {/*    <input className="radio" type="radio" text={t("Yes")} value="1" name="step41" ref-num="41" id="411" checked={step41 === "true"}*/}
+                                                {/*           onChange={e => {*/}
+                                                {/*               selectChanged(e);*/}
+                                                {/*               setStep41("true");*/}
+                                                {/*               setDeps("411", "41");*/}
+                                                {/*               setCart("hasPower", true, "", "MotorChannels", [selectedMotorChannels.map(obj => obj.value)]);*/}
+                                                {/*           }} ref={ref => (inputs.current["411"] = ref)}/>*/}
+                                                {/*    <label htmlFor="411">{t("Yes")}</label>*/}
+                                                {/*</div>*/}
+                                                {/*<div className="box50 radio_style">*/}
+                                                {/*    <input className="radio" type="radio" text={t("No")} value="2" name="step41" ref-num="41" id="412"*/}
+                                                {/*           onClick={e => {*/}
+                                                {/*               selectUncheck(e);*/}
+                                                {/*               setStep41("");*/}
+                                                {/*               modalHandleShow("noPower");*/}
+                                                {/*               setDeps("41", "411,412");*/}
+                                                {/*           }} ref={ref => (inputs.current["412"] = ref)}/>*/}
+                                                {/*    <label htmlFor="412">{t("No")}</label>*/}
+                                                {/*</div>*/}
+                                                <div className="width_max checkbox_style">
+                                                    <input type="checkbox" text={t("Motorized")} value="2" name="step41" ref-num="4" checked={step41 === "true"}
+                                                           onChange={(e) => {
+                                                               if (e.target.checked) {
+                                                                   selectChanged(e);
+                                                                   setStep41("true");
+                                                                   setMotorErr1(false);
+                                                                   // let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                                   // let refIndex = inputs.current["42"].getAttribute('ref-num');
+                                                                   // tempLabels[refIndex] = inputs.current["42"].getAttribute('text');
+                                                                   // setStepSelectedLabel(tempLabels);
+                                                                   setSelectedMotorPosition([]);
+                                                                   setSelectedMotorType([]);
+                                                                   setDeps("411,412", "41");
+                                                                   setCart("hasPower", true, "", "ControlType,MotorChannels", ["Motorized", selectedMotorChannels.map(obj => obj.value)]);
+                                                               } else {
+                                                                   selectUncheck(e);
+                                                                   setStep41("");
+                                                                   // modalHandleShow("noPower");
+                                                                   setCustomMotorAcc({});
+                                                                   setDeps("41", "411,412");
+                                                                   setCart("", "", "ControlType,hasPower,MotorType,MotorPosition,RemoteName,MotorChannels");
+                                                               }
+                                                           }} id="411" ref={ref => (inputs.current["411"] = ref)}/>
+                                                    <label htmlFor="411" className="checkbox_label">
+                                                        <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
+                                                             alt=""/>
+                                                    </label>
+                                                    <span className="checkbox_text">
                                                         {t("Motor_title")}
                                                     </span>
-                                                    </div>
-                                                
                                                 </div>
+                                            
                                             </div>
-                                        }
+                                        </div>
+                                        
                                         {motorErr1 &&
                                             <div className="input_not_valid">{t("motorErr1")}</div>
                                         }
-                                        {step41 === "true" && step4 === "Motorized" &&
-                                            <div className="motorized_options">
-                                                <div className="motorized_option_left">
-                                                    <p>{t("Motor Type")}</p>
-                                                    &nbsp;
-                                                    <span onClick={() => modalHandleShow("learnMore")}>{t("(Learn More)")}</span>
-                                                </div>
-                                                <div className="motorized_option_right">
-                                                    <div className="select_container">
-                                                        <Select
-                                                            className="select"
-                                                            placeholder={t("Please Select")}
-                                                            portal={document.body}
-                                                            dropdownPosition="bottom"
-                                                            dropdownHandle={false}
-                                                            dropdownGap={0}
-                                                            values={selectedMotorType}
-                                                            onDropdownOpen={() => {
-                                                                let temp1 = window.scrollY;
-                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                                setTimeout(() => {
-                                                                    let temp2 = window.scrollY;
-                                                                    if (temp2 === temp1)
-                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                                }, 100);
-                                                            }}
-                                                            dropdownRenderer={
-                                                                ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
-                                                            }
-                                                            contentRenderer={
-                                                                ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
-                                                            }
-                                                            // optionRenderer={
-                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                            // }
-                                                            onChange={(selected) => {
-                                                                if (selected[0] && cartValues["WidthCart"] && cartValues["HeightCart"]) {
-                                                                    // console.log(MotorType);
-                                                                    setDeps("", "411");
-                                                                    setSelectedMotorType(selected);
+                                        <div className={step41 === "true" && step4 === "Motorized" ? "motorized_options" : "noDisplay"}>
+                                            <div className="motorized_option_left">
+                                                <p>{t("Motor Type")}</p>
+                                                &nbsp;
+                                                <span onClick={() => modalHandleShow("learnMore")}>{t("(Learn More)")}</span>
+                                            </div>
+                                            <div className="motorized_option_right">
+                                                <div className="select_container">
+                                                    <Select
+                                                        className="select"
+                                                        placeholder={t("Please Select")}
+                                                        portal={document.body}
+                                                        dropdownPosition="bottom"
+                                                        dropdownHandle={false}
+                                                        dropdownGap={0}
+                                                        values={selectedMotorType}
+                                                        onDropdownOpen={() => {
+                                                            let temp1 = window.scrollY;
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            setTimeout(() => {
+                                                                let temp2 = window.scrollY;
+                                                                if (temp2 === temp1)
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                            }, 100);
+                                                        }}
+                                                        dropdownRenderer={
+                                                            ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
+                                                        }
+                                                        contentRenderer={
+                                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                        }
+                                                        // optionRenderer={
+                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                        // }
+                                                        onChange={(selected) => {
+                                                            if (selected[0] && !motorLoad2) {
+                                                                // console.log(MotorType);
+                                                                setDeps("", "411");
+                                                                setSelectedMotorType(selected);
+                                                                if (motorLoad2) {
+                                                                    setMotorLoad2(false);
+                                                                } else {
                                                                     if (selected[0]["apiAccValue"]) {
                                                                         setCustomMotorAcc(selected[0]["apiAccValue"]);
                                                                         setCart("MotorType", selected[0].value, undefined, undefined, undefined, selected[0]["apiAccValue"]);
@@ -6534,17 +6559,66 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                         setCart("MotorType", selected[0].value);
                                                                     }
                                                                 }
-                                                            }}
-                                                            options={MotorType[pageLanguage]}
-                                                        />
-                                                    </div>
+                                                            }
+                                                            if (motorLoad2) {
+                                                                setMotorLoad2(false);
+                                                            }
+                                                        }}
+                                                        options={MotorType[pageLanguage]}
+                                                    />
                                                 </div>
-                                                <div className="motorized_option_left">
-                                                    <p>{t("Motor Position")}</p>
-                                                    &nbsp;
-                                                    <span onClick={() => modalHandleShow("learnMore2")}>{t("(Learn More)")}</span>
+                                            </div>
+                                            <div className="motorized_option_left">
+                                                <p>{t("Motor Position")}</p>
+                                                &nbsp;
+                                                <span onClick={() => modalHandleShow("learnMore2")}>{t("(Learn More)")}</span>
+                                            </div>
+                                            <div className="motorized_option_right">
+                                                <div className="select_container">
+                                                    <Select
+                                                        className="select"
+                                                        placeholder={t("Please Select")}
+                                                        portal={document.body}
+                                                        dropdownPosition="bottom"
+                                                        dropdownHandle={false}
+                                                        dropdownGap={0}
+                                                        values={selectedMotorPosition}
+                                                        onDropdownOpen={() => {
+                                                            let temp1 = window.scrollY;
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            setTimeout(() => {
+                                                                let temp2 = window.scrollY;
+                                                                if (temp2 === temp1)
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                            }, 100);
+                                                        }}
+                                                        dropdownRenderer={
+                                                            ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
+                                                        }
+                                                        contentRenderer={
+                                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                        }
+                                                        // optionRenderer={
+                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                        // }
+                                                        onChange={(selected) => {
+                                                            if (selected[0]) {
+                                                                setSelectedMotorPosition(selected);
+                                                                setDeps("", "412");
+                                                                setCart("MotorPosition", selected[0].value);
+                                                            }
+                                                        }}
+                                                        options={MotorPosition[pageLanguage]}
+                                                    />
                                                 </div>
-                                                <div className="motorized_option_right">
+                                            </div>
+                                            <div className="motorized_option_left">
+                                                <p>{t("Remote Name")}</p>
+                                                &nbsp;
+                                                <span onClick={() => modalHandleShow("learnMore3")}>{t("(Learn More)")}</span>
+                                            </div>
+                                            <div className="motorized_option_right">
+                                                {!!(remoteNames.length > 1) &&
                                                     <div className="select_container">
                                                         <Select
                                                             className="select"
@@ -6553,7 +6627,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                             dropdownPosition="bottom"
                                                             dropdownHandle={false}
                                                             dropdownGap={0}
-                                                            values={selectedMotorPosition}
+                                                            values={selectedRemoteName}
                                                             onDropdownOpen={() => {
                                                                 let temp1 = window.scrollY;
                                                                 window.scrollTo(window.scrollX, window.scrollY + 1);
@@ -6564,7 +6638,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                 }, 100);
                                                             }}
                                                             dropdownRenderer={
-                                                                ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
+                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
                                                             }
                                                             contentRenderer={
                                                                 ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
@@ -6573,146 +6647,101 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                             //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                             // }
                                                             onChange={(selected) => {
-                                                                setDeps("", "412");
-                                                                setCart("MotorPosition", selected[0].value);
                                                                 if (selected[0]) {
-                                                                    setSelectedMotorPosition(selected);
-                                                                }
-                                                            }}
-                                                            options={MotorPosition[pageLanguage]}
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="motorized_option_left">
-                                                    <p>{t("Remote Name")}</p>
-                                                    &nbsp;
-                                                    <span onClick={() => modalHandleShow("learnMore3")}>{t("(Learn More)")}</span>
-                                                </div>
-                                                <div className="motorized_option_right">
-                                                    {!!(remoteNames.length > 1) &&
-                                                        <div className="select_container">
-                                                            <Select
-                                                                className="select"
-                                                                placeholder={t("Please Select")}
-                                                                portal={document.body}
-                                                                dropdownPosition="bottom"
-                                                                dropdownHandle={false}
-                                                                dropdownGap={0}
-                                                                values={selectedRemoteName}
-                                                                onDropdownOpen={() => {
-                                                                    let temp1 = window.scrollY;
-                                                                    window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                                    setTimeout(() => {
-                                                                        let temp2 = window.scrollY;
-                                                                        if (temp2 === temp1)
-                                                                            window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                                    }, 100);
-                                                                }}
-                                                                dropdownRenderer={
-                                                                    ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                                }
-                                                                contentRenderer={
-                                                                    ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
-                                                                }
-                                                                // optionRenderer={
-                                                                //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                                // }
-                                                                onChange={(selected) => {
-                                                                    if (selected[0]) {
-                                                                        setSelectedRemoteName(selected);
-                                                                        if (selected[0]["value"] === "addNewRemoteName") {
-                                                                            setShowRemoteName(true);
-                                                                            setCart("", "", "RemoteName");
-                                                                            setRemoteName("");
-                                                                        } else {
-                                                                            setShowRemoteName(false);
-                                                                            setCart("RemoteName", selected[0]["value"]);
-                                                                            setRemoteName(selected[0]["value"]);
-                                                                        }
+                                                                    setSelectedRemoteName(selected);
+                                                                    if (selected[0]["value"] === "addNewRemoteName") {
+                                                                        setShowRemoteName(true);
+                                                                        setCart("", "", "RemoteName");
+                                                                        setRemoteName("");
+                                                                    } else {
+                                                                        setShowRemoteName(false);
+                                                                        setCart("RemoteName", selected[0]["value"]);
+                                                                        setRemoteName(selected[0]["value"]);
                                                                     }
-                                                                }}
-                                                                options={remoteNames}
-                                                            />
-                                                        </div>
-                                                    }
-                                                    {(remoteNames.length === 1 || remoteNames.length === 0) &&
-                                                        <DebounceInput debounceTimeout={500} onKeyDown={() => setCartLoading(true)} className="Remote_name" type="text"
-                                                                       name="Remote_name" value={remoteName}
-                                                                       placeholder={t("Enter a name for your remote")} onChange={(e) => {
-                                                            setCart("RemoteName", e.target.value);
-                                                            setRemoteName(Capitalize(e.target.value));
-                                                        }}/>
-                                                    }
-                                                </div>
-                                                {showRemoteName &&
-                                                    <div className="motorized_option_left">
-                                                        <p>&nbsp;</p>
-                                                    </div>
-                                                }
-                                                {showRemoteName &&
-                                                    <div className="motorized_option_right">
-                                                        <DebounceInput debounceTimeout={500} onKeyDown={() => setCartLoading(true)} className="Remote_name" type="text"
-                                                                       name="Remote_name" value={remoteName}
-                                                                       placeholder={t("Enter a name for your remote")} onChange={(e) => {
-                                                            setCart("RemoteName", e.target.value);
-                                                            setRemoteName(Capitalize(e.target.value));
-                                                        }}/>
-                                                    </div>
-                                                }
-                                                <div className="motorized_option_left">
-                                                    <p>{t("Channel(s)")}</p>
-                                                    &nbsp;
-                                                    <span onClick={() => modalHandleShow("learnMore4")}>{t("(Learn More)")}</span>
-                                                </div>
-                                                <div className="motorized_option_right">
-                                                    <div className="select_container multi_select_container">
-                                                        <Select
-                                                            className="select select_motor_channels"
-                                                            placeholder={t("Please Select")}
-                                                            portal={document.body}
-                                                            dropdownPosition="bottom"
-                                                            dropdownHandle={false}
-                                                            dropdownGap={0}
-                                                            multi={true}
-                                                            values={selectedMotorChannels}
-                                                            onDropdownOpen={() => {
-                                                                let temp1 = window.scrollY;
-                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                                setTimeout(() => {
-                                                                    let temp2 = window.scrollY;
-                                                                    if (temp2 === temp1)
-                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                                }, 100);
+                                                                }
                                                             }}
-                                                            dropdownRenderer={
-                                                                ({props, state, methods}) => <CustomDropdownMulti props={props} state={state} methods={methods}/>
-                                                            }
-                                                            contentRenderer={
-                                                                ({props, state, methods}) => <CustomControlMulti props={props} state={state} methods={methods}/>
-                                                            }
-                                                            // optionRenderer={
-                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                            // }
-                                                            onChange={(selected) => {
-                                                                // setDeps("", "412");
-                                                                setCart("MotorChannels", selected.map(obj => obj.value));
-                                                                setSelectedMotorChannels(selected);
-                                                            }}
-                                                            options={motorChannels[pageLanguage]}
+                                                            options={remoteNames}
                                                         />
                                                     </div>
+                                                }
+                                                {(remoteNames.length === 1 || remoteNames.length === 0) &&
+                                                    <DebounceInput debounceTimeout={500} onKeyDown={() => setCartLoading(true)} className="Remote_name" type="text"
+                                                                   name="Remote_name" value={remoteName}
+                                                                   placeholder={t("Enter a name for your remote")} onChange={(e) => {
+                                                        setCart("RemoteName", e.target.value);
+                                                        setRemoteName(Capitalize(e.target.value));
+                                                    }}/>
+                                                }
+                                            </div>
+                                            {showRemoteName &&
+                                                <div className="motorized_option_left">
+                                                    <p>&nbsp;</p>
+                                                </div>
+                                            }
+                                            {showRemoteName &&
+                                                <div className="motorized_option_right">
+                                                    <DebounceInput debounceTimeout={500} onKeyDown={() => setCartLoading(true)} className="Remote_name" type="text"
+                                                                   name="Remote_name" value={remoteName}
+                                                                   placeholder={t("Enter a name for your remote")} onChange={(e) => {
+                                                        setCart("RemoteName", e.target.value);
+                                                        setRemoteName(Capitalize(e.target.value));
+                                                    }}/>
+                                                </div>
+                                            }
+                                            <div className="motorized_option_left">
+                                                <p>{t("Channel(s)")}</p>
+                                                &nbsp;
+                                                <span onClick={() => modalHandleShow("learnMore4")}>{t("(Learn More)")}</span>
+                                            </div>
+                                            <div className="motorized_option_right">
+                                                <div className="select_container multi_select_container">
+                                                    <Select
+                                                        className="select select_motor_channels"
+                                                        placeholder={t("Please Select")}
+                                                        portal={document.body}
+                                                        dropdownPosition="bottom"
+                                                        dropdownHandle={false}
+                                                        dropdownGap={0}
+                                                        multi={true}
+                                                        values={selectedMotorChannels}
+                                                        onDropdownOpen={() => {
+                                                            let temp1 = window.scrollY;
+                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                            setTimeout(() => {
+                                                                let temp2 = window.scrollY;
+                                                                if (temp2 === temp1)
+                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                            }, 100);
+                                                        }}
+                                                        dropdownRenderer={
+                                                            ({props, state, methods}) => <CustomDropdownMulti props={props} state={state} methods={methods}/>
+                                                        }
+                                                        contentRenderer={
+                                                            ({props, state, methods}) => <CustomControlMulti props={props} state={state} methods={methods}/>
+                                                        }
+                                                        // optionRenderer={
+                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                        // }
+                                                        onChange={(selected) => {
+                                                            // setDeps("", "412");
+                                                            setCart("MotorChannels", selected.map(obj => obj.value));
+                                                            setSelectedMotorChannels(selected);
+                                                        }}
+                                                        options={motorChannels[pageLanguage]}
+                                                    />
                                                 </div>
                                             </div>
-                                        }
+                                        </div>
                                         
-                                        <NextStep eventKey={step4 === "Motorized" && step41 !== "true" ? "4" : controlTypeNextStep} onClick={() => {
+                                        
+                                        <NextStep currentStep="4" eventKey={step4 === "Motorized" && step41 !== "true" ? "4" : controlTypeNextStep} onClick={() => {
                                             if (step4 === "Motorized" && step41 !== "true") {
                                                 setMotorErr1(true);
                                             }
                                         }}>{t("NEXT STEP")}</NextStep>
                                     </div>
                                     
-                                    {(stepSelectedValue["4"] === "1" || stepSelectedValue["4"] === undefined) &&
+                                    {(step4 === "Continuous Loop" || step4 === "") &&
                                         <div className="accordion_help">
                                             <div className="help_container">
                                                 <div className="help_column help_left_column">
@@ -6773,179 +6802,177 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                         </Card>
                         
                         {/* step 5A */}
-                        {stepSelectedValue["4"] === "1" &&
-                            <Card>
-                                <Card.Header>
-                                    <ContextAwareToggle eventKey="4A" stepNum={t("5A")} stepTitle={t("zebra_step4A")} stepRef="4A" type="1" required={requiredStep["4A"]}
-                                                        stepSelected={stepSelectedLabel["4A"] === undefined ? "" : stepSelectedLabel["4A"]}/>
-                                </Card.Header>
-                                <Accordion.Collapse eventKey="4A">
-                                    <Card.Body>
-                                        <div className="card_body card_body_radio same_row_selection">
-                                            <div className="box50 radio_style">
-                                                <div className="same_row_selection_title">
-                                                    Front Shade Chain Position
-                                                </div>
-                                            </div>
-                                            <div className="box50 radio_style">
-                                                <div className="select_container">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        values={selectedPosition1}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
-                                                        }
-                                                        onChange={(selected) => {
-                                                            if (selected.length) {
-                                                                setDeps("", "4A1");
-                                                                setCart("controlPositionFront", selected[0].value);
-                                                                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                                tempLabels["4A"] = selected[0].label;
-                                                                setStepSelectedLabel(tempLabels);
-                                                                setSelectedPosition1(selected);
-                                                                setSelectedFrontPosition(selected[0].value);
-                                                            }
-                                                        }}
-                                                        options={optionsPosition[pageLanguage]}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="box50 radio_style">
-                                                <div className="same_row_selection_title">
-                                                    Back Shade Chain Position
-                                                </div>
-                                            </div>
-                                            <div className="box50 radio_style">
-                                                <div className="select_container">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        values={selectedPosition2}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
-                                                        }
-                                                        onChange={(selected) => {
-                                                            if (selected.length) {
-                                                                setDeps("", "4A2");
-                                                                setCart("controlPositionBack", selected[0].value);
-                                                                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                                tempLabels["4A"] = selected[0].label;
-                                                                setStepSelectedLabel(tempLabels);
-                                                                setSelectedPosition2(selected);
-                                                                setSelectedBackPosition(selected[0].value);
-                                                            }
-                                                        }}
-                                                        options={optionsPosition[pageLanguage]}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <NextStep eventKey="4B">{t("NEXT STEP")}</NextStep>
-                                        </div>
-                                        
-                                        
-                                        <div className="accordion_help">
-                                            <div className="help_container">
-                                                <div className="help_column help_left_column">
-                                                    <p className="help_column_header"/>
-                                                    <ul className="help_column_list">
-                                                        <li className="no_listStyle single_line_height">{t("step4A_help_1")}</li>
-                                                    </ul>
-                                                </div>
+                        <Card className={step4 === "Continuous Loop" ? "" : "noDisplay"}>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("4")) === -1 && (!accordionActiveKey.startsWith("4")) ? "hidden" : ""}>
+                                <ContextAwareToggle eventKey="4A" stepNum={t("5A")} stepTitle={t("zebra_step4A")} stepRef="4A" type="1" required={requiredStep["4A"]}
+                                                    stepSelected={stepSelectedLabel["4A"] === undefined ? "" : stepSelectedLabel["4A"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="4A">
+                                <Card.Body>
+                                    <div className="card_body card_body_radio same_row_selection">
+                                        <div className="box50 radio_style">
+                                            <div className="same_row_selection_title">
+                                                Front Shade Chain Position
                                             </div>
                                         </div>
+                                        <div className="box50 radio_style">
+                                            <div className="select_container">
+                                                <Select
+                                                    className="select"
+                                                    placeholder={t("Please Select")}
+                                                    portal={document.body}
+                                                    dropdownPosition="bottom"
+                                                    dropdownHandle={false}
+                                                    dropdownGap={0}
+                                                    values={selectedPosition1}
+                                                    onDropdownOpen={() => {
+                                                        let temp1 = window.scrollY;
+                                                        window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                        setTimeout(() => {
+                                                            let temp2 = window.scrollY;
+                                                            if (temp2 === temp1)
+                                                                window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                        }, 100);
+                                                    }}
+                                                    dropdownRenderer={
+                                                        ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
+                                                    }
+                                                    contentRenderer={
+                                                        ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                    }
+                                                    onChange={(selected) => {
+                                                        if (selected.length) {
+                                                            setDeps("", "4A1");
+                                                            setCart("controlPositionFront", selected[0].value);
+                                                            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                            tempLabels["4A"] = selected[0].label;
+                                                            setStepSelectedLabel(tempLabels);
+                                                            setSelectedPosition1(selected);
+                                                            setSelectedFrontPosition(selected[0].value);
+                                                        }
+                                                    }}
+                                                    options={optionsPosition[pageLanguage]}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="box50 radio_style">
+                                            <div className="same_row_selection_title">
+                                                Back Shade Chain Position
+                                            </div>
+                                        </div>
+                                        <div className="box50 radio_style">
+                                            <div className="select_container">
+                                                <Select
+                                                    className="select"
+                                                    placeholder={t("Please Select")}
+                                                    portal={document.body}
+                                                    dropdownPosition="bottom"
+                                                    dropdownHandle={false}
+                                                    dropdownGap={0}
+                                                    values={selectedPosition2}
+                                                    onDropdownOpen={() => {
+                                                        let temp1 = window.scrollY;
+                                                        window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                        setTimeout(() => {
+                                                            let temp2 = window.scrollY;
+                                                            if (temp2 === temp1)
+                                                                window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                        }, 100);
+                                                    }}
+                                                    dropdownRenderer={
+                                                        ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
+                                                    }
+                                                    contentRenderer={
+                                                        ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                    }
+                                                    onChange={(selected) => {
+                                                        if (selected.length) {
+                                                            setDeps("", "4A2");
+                                                            setCart("controlPositionBack", selected[0].value);
+                                                            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                            tempLabels["4A"] = selected[0].label;
+                                                            setStepSelectedLabel(tempLabels);
+                                                            setSelectedPosition2(selected);
+                                                            setSelectedBackPosition(selected[0].value);
+                                                        }
+                                                    }}
+                                                    options={optionsPosition[pageLanguage]}
+                                                />
+                                            </div>
+                                        </div>
+                                        <NextStep currentStep="4A" eventKey="4B">{t("NEXT STEP")}</NextStep>
+                                    </div>
                                     
-                                    </Card.Body>
-                                </Accordion.Collapse>
-                            </Card>
-                        }
+                                    
+                                    <div className="accordion_help">
+                                        <div className="help_container">
+                                            <div className="help_column help_left_column">
+                                                <p className="help_column_header"/>
+                                                <ul className="help_column_list">
+                                                    <li className="no_listStyle single_line_height">{t("step4A_help_1")}</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
                         
                         {/* step 5B */}
-                        {stepSelectedValue["4"] === "1" &&
-                            <Card>
-                                <Card.Header>
-                                    <ContextAwareToggle eventKey="4B" stepNum={t("5B")} stepTitle={t("zebra_step4B")} stepRef="4B" type="1" required={requiredStep["4B"]}
-                                                        stepSelected={stepSelectedLabel["4B"] === undefined ? "" : stepSelectedLabel["4B"]}/>
-                                </Card.Header>
-                                <Accordion.Collapse eventKey="4B">
-                                    <Card.Body>
-                                        <div className="card_body card_body_radio">
-                                            <div className="box33 radio_style">
-                                                <input className="radio" type="radio" text={t("150cm")} value="1" name="step4B" ref-num="4B" id="4B1" checked={step4B === "150"}
-                                                       onChange={e => {
-                                                           selectChanged(e);
-                                                           setStep4B("150");
-                                                           setDeps("", "4B");
-                                                           setCart("ChainLength", "150");
-                                                       }} ref={ref => (inputs.current["4B1"] = ref)}/>
-                                                <label htmlFor="4B1">{t("150cm")}<br/><p className="no_surcharge_price">{t("(No extra charge)")}</p></label>
-                                            </div>
-                                            <div className="box33 radio_style">
-                                                <input className="radio" type="radio" text={t("300cm")} value="2" name="step4B"
-                                                       ref-num="4B" id="4B2" checked={step4B === "300"}
-                                                       onChange={e => {
-                                                           selectChanged(e);
-                                                           setStep4B("300");
-                                                           setDeps("", "4B");
-                                                           setCart("ChainLength", "300");
-                                                       }} ref={ref => (inputs.current["4B2"] = ref)}/>
-                                                <label htmlFor="4B2">{t("300cm")}<br/><p
-                                                    className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add ") : t("Surcharge Applies")}{(modelAccessories["2"] ? (modelAccessories["2"]["2"] ? GetPrice(modelAccessories["2"]["2"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
-                                                </label>
-                                            </div>
-                                            <div className="box33 radio_style">
-                                                <input className="radio" type="radio" text={t("500cm")} value="3" name="step4B"
-                                                       ref-num="4B" id="4B3" checked={step4B === "500"}
-                                                       onChange={e => {
-                                                           selectChanged(e);
-                                                           setStep4B("500");
-                                                           setDeps("", "4B");
-                                                           setCart("ChainLength", "500");
-                                                       }} ref={ref => (inputs.current["4B3"] = ref)}/>
-                                                <label htmlFor="4B3">{t("500cm")}<br/><p
-                                                    className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add ") : t("Surcharge Applies")}{(modelAccessories["2"] ? (modelAccessories["2"]["3"] ? GetPrice(modelAccessories["2"]["3"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
-                                                </label>
-                                            </div>
-                                            <NextStep eventKey="5">{t("NEXT STEP")}</NextStep>
+                        <Card className={step4 === "Continuous Loop" ? "" : "noDisplay"}>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("4")) === -1 && (!accordionActiveKey.startsWith("4")) ? "hidden" : ""}>
+                                <ContextAwareToggle eventKey="4B" stepNum={t("5B")} stepTitle={t("zebra_step4B")} stepRef="4B" type="1" required={requiredStep["4B"]}
+                                                    stepSelected={stepSelectedLabel["4B"] === undefined ? "" : stepSelectedLabel["4B"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="4B">
+                                <Card.Body>
+                                    <div className="card_body card_body_radio">
+                                        <div className="box33 radio_style">
+                                            <input className="radio" type="radio" text={t("150cm")} value="1" name="step4B" ref-num="4B" id="4B1" checked={step4B === "150"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep4B("150");
+                                                       setDeps("", "4B");
+                                                       setCart("ChainLength", "150");
+                                                   }} ref={ref => (inputs.current["4B1"] = ref)}/>
+                                            <label htmlFor="4B1">{t("150cm")}<br/><p className="no_surcharge_price">{t("(No extra charge)")}</p></label>
                                         </div>
-                                        
-                                        <div className="accordion_help">
-                                            <div className="help_container help_container_third">
-                                                <div className="help_column help_left_column text_center">
-                                                    <ul className="help_column_list">
-                                                        <li className="no_listStyle">
+                                        <div className="box33 radio_style">
+                                            <input className="radio" type="radio" text={t("300cm")} value="2" name="step4B"
+                                                   ref-num="4B" id="4B2" checked={step4B === "300"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep4B("300");
+                                                       setDeps("", "4B");
+                                                       setCart("ChainLength", "300");
+                                                   }} ref={ref => (inputs.current["4B2"] = ref)}/>
+                                            <label htmlFor="4B2">{t("300cm")}<br/><p
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add ") : t("Surcharge Applies")}{(modelAccessories["2"] ? (modelAccessories["2"]["2"] ? GetPrice(modelAccessories["2"]["2"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
+                                            </label>
+                                        </div>
+                                        <div className="box33 radio_style">
+                                            <input className="radio" type="radio" text={t("500cm")} value="3" name="step4B"
+                                                   ref-num="4B" id="4B3" checked={step4B === "500"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep4B("500");
+                                                       setDeps("", "4B");
+                                                       setCart("ChainLength", "500");
+                                                   }} ref={ref => (inputs.current["4B3"] = ref)}/>
+                                            <label htmlFor="4B3">{t("500cm")}<br/><p
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add ") : t("Surcharge Applies")}{(modelAccessories["2"] ? (modelAccessories["2"]["3"] ? GetPrice(modelAccessories["2"]["3"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
+                                            </label>
+                                        </div>
+                                        <NextStep currentStep={[...depSet].findIndex(el => el.startsWith("4")) === -1 ? "4" : "4B"} eventKey="5">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                    
+                                    <div className="accordion_help">
+                                        <div className="help_container help_container_third">
+                                            <div className="help_column help_left_column text_center">
+                                                <ul className="help_column_list">
+                                                    <li className="no_listStyle">
                                                         <span className="popover_indicator">
                                                             {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
                                                                                   children={<object className="popover_camera" type="image/svg+xml"
@@ -6980,265 +7007,259 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                                   }/>
                                                             }
                                                         </span>{t("dualRoller_step5B_help_1")}</li>
-                                                    </ul>
-                                                </div>
+                                                </ul>
                                             </div>
                                         </div>
-                                    
-                                    </Card.Body>
-                                </Accordion.Collapse>
-                            </Card>
-                        }
+                                    </div>
+                                
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
                         
                         {/* step 6 */}
-                        {stepSelectedValue["2"] !== "3" &&
-                            <Card>
-                                <Card.Header>
-                                    <ContextAwareToggle eventKey="5" stepNum={t("6")} stepTitle={t("roller_step5")} stepRef="5" type="1" required={requiredStep["5"]}
-                                                        stepSelected={stepSelectedLabel["5"] === undefined ? "" : stepSelectedLabel["5"]}/>
-                                </Card.Header>
-                                <Accordion.Collapse eventKey="5">
-                                    <Card.Body>
-                                        <div className="card_body card_body_radio card_body_4">
-                                            <div className="box50 radio_style">
-                                                <img src={require('../Images/drapery/roller/roll_regular.svg').default} className="img-fluid half_margin" alt=""/>
-                                                <input className="radio" type="radio" text={t("roller_headrail1")} value="1" name="step5" ref-num="5" id="51"
-                                                       checked={step5 === "Exposed"}
-                                                       onChange={e => {
-                                                           if (step2 === "") {
-                                                               setStep5("");
-                                                               selectUncheck(e);
-                                                               modalHandleShow("noMount");
-                                                               setDeps("5", "");
-                                                               setCart("", "", "Headrail");
-                                                           } else {
-                                                               selectChanged(e);
-                                                               setStep5("Exposed");
-                                                               setDeps("", "5,53,54");
-                                                               setCart("Headrail", "Exposed");
-                                                               setHeadrailsNextStep("5A");
-                                                           }
-                                                       }} ref={ref => (inputs.current["51"] = ref)}/>
-                                                <label htmlFor="51">{t("roller_headrail1")}</label>
-                                            </div>
-                                            <div className="box50 radio_style">
-                                                <img src={require('../Images/drapery/roller/roll_upholstered_valance.svg').default} className="img-fluid half_margin" alt=""/>
-                                                <input className="radio" type="radio" text={t("roller_headrail2")} value="2" name="step5" ref-num="5" id="52"
-                                                       checked={step5 === "Upholstered"}
-                                                       onChange={e => {
-                                                           if (step2 === "") {
-                                                               setStep5("");
-                                                               selectUncheck(e);
-                                                               modalHandleShow("noMount");
-                                                               setDeps("5", "");
-                                                               setCart("", "", "Headrail");
-                                                           } else {
-                                                               selectChanged(e);
-                                                               setStep5("Upholstered");
-                                                               setDeps("", "5,53,54");
-                                                               setCart("Headrail", "Upholstered");
-                                                               setHeadrailsNextStep("6");
-                                                           }
-                                                       }} ref={ref => (inputs.current["52"] = ref)}/>
-                                                <label htmlFor="52">{t("roller_headrail2")}<br/><p
-                                                    className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add ") : t("Surcharge Applies")}{(modelAccessories["5"] ? (modelAccessories["5"]["8"] ? GetPrice(modelAccessories["5"]["8"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
-                                                </label>
-                                            </div>
-                                            <div className="box50 radio_style">
-                                                <img src={require('../Images/drapery/roller/roll_metal_valance.svg').default} className="img-fluid half_margin" alt=""/>
-                                                <input className="radio" type="radio" text={t("roller_headrail3")} value="3" name="step5" ref-num="5" id="53"
-                                                       checked={step5 === "MetalValance"}
-                                                       onChange={e => {
-                                                           if (step2 === "") {
-                                                               setStep5("");
-                                                               selectUncheck(e);
-                                                               modalHandleShow("noMount");
-                                                               setDeps("5", "");
-                                                               setCart("", "", "Headrail");
-                                                           } else {
-                                                               selectChanged(e);
-                                                               setStep5("MetalValance");
-                                                               setDeps("53", "5,54");
-                                                               setCart("Headrail", "MetalValance");
-                                                               setHeadrailsNextStep("6");
-                                                           }
-                                                       }} ref={ref => (inputs.current["53"] = ref)}/>
-                                                <label htmlFor="53">{t("roller_headrail3")}<br/><p
-                                                    className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add ") : t("Surcharge Applies")}{(modelAccessories["5"] ? (modelAccessories["5"]["10"] ? GetPrice(modelAccessories["5"]["10"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
-                                                </label>
-                                            </div>
-                                            <div className="box50 radio_style">
-                                                <img src={require('../Images/drapery/roller/roll_fabric_insert.svg').default} className="img-fluid half_margin" alt=""/>
-                                                <input className="radio" type="radio" text={t("roller_headrail4")} value="4" name="step5" ref-num="5" id="54"
-                                                       checked={step5 === "MetalValanceFabricInsert"}
-                                                       onChange={e => {
-                                                           if (step2 === "") {
-                                                               setStep5("");
-                                                               selectUncheck(e);
-                                                               modalHandleShow("noMount");
-                                                               setDeps("5", "");
-                                                               setCart("", "", "Headrail");
-                                                           } else {
-                                                               selectChanged(e);
-                                                               setStep5("MetalValanceFabricInsert");
-                                                               setDeps("54", "5,53");
-                                                               setCart("Headrail", "MetalValanceFabricInsert");
-                                                               setHeadrailsNextStep("6");
-                                                           }
-                                                       }} ref={ref => (inputs.current["54"] = ref)}/>
-                                                <label htmlFor="54">{t("roller_headrail4")}<br/><p
-                                                    className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add ") : t("Surcharge Applies")}{(modelAccessories["5"] ? (modelAccessories["5"]["12"] ? GetPrice(modelAccessories["5"]["12"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
-                                                </label>
-                                            </div>
-                                            {(stepSelectedValue["5"] === "3" || stepSelectedValue["5"] === "4") &&
-                                                <div className="selection_section">
-                                                    <div className="select_container">
-                                                        {stepSelectedValue["5"] === "3" &&
-                                                            <Select
-                                                                className="select"
-                                                                placeholder={t("Please Select")}
-                                                                portal={document.body}
-                                                                dropdownPosition="bottom"
-                                                                dropdownHandle={false}
-                                                                dropdownGap={0}
-                                                                values={selectedValanceColor1}
-                                                                onDropdownOpen={() => {
-                                                                    let temp1 = window.scrollY;
-                                                                    window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                                    setTimeout(() => {
-                                                                        let temp2 = window.scrollY;
-                                                                        if (temp2 === temp1)
-                                                                            window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                                    }, 100);
-                                                                }}
-                                                                dropdownRenderer={
-                                                                    ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
-                                                                }
-                                                                contentRenderer={
-                                                                    ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
-                                                                }
-                                                                // optionRenderer={
-                                                                //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                                // }
-                                                                onChange={(selected) => {
-                                                                    if (selected.length) {
-                                                                        setDeps("", "53");
-                                                                        setCart("MetalValanceColor", selected[0].value);
-                                                                        let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                                        tempLabels["5"] = t("roller_headrail3") + "/" + selected[0].label;
-                                                                        setStepSelectedLabel(tempLabels);
-                                                                    }
-                                                                }}
-                                                                options={optionsMetalValance[pageLanguage]}
-                                                            />
-                                                        }
-                                                    </div>
-                                                    <div className="select_container">
-                                                        {stepSelectedValue["5"] === "4" &&
-                                                            <Select
-                                                                className="select"
-                                                                placeholder={t("Please Select")}
-                                                                portal={document.body}
-                                                                dropdownPosition="bottom"
-                                                                dropdownHandle={false}
-                                                                dropdownGap={0}
-                                                                values={selectedValanceColor2}
-                                                                onDropdownOpen={() => {
-                                                                    let temp1 = window.scrollY;
-                                                                    window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                                    setTimeout(() => {
-                                                                        let temp2 = window.scrollY;
-                                                                        if (temp2 === temp1)
-                                                                            window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                                    }, 100);
-                                                                }}
-                                                                dropdownRenderer={
-                                                                    ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
-                                                                }
-                                                                contentRenderer={
-                                                                    ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
-                                                                }
-                                                                // optionRenderer={
-                                                                //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                                // }
-                                                                onChange={(selected) => {
-                                                                    if (selected.length) {
-                                                                        setDeps("", "54");
-                                                                        setCart("MetalValanceColor", selected[0].value);
-                                                                        let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                                        tempLabels["5"] = t("roller_headrail4") + "/" + selected[0].label;
-                                                                        setStepSelectedLabel(tempLabels);
-                                                                    }
-                                                                }}
-                                                                options={optionsMetalValanceFabricInsert[pageLanguage]}
-                                                            />
-                                                        }
-                                                    </div>
-                                                </div>
-                                            }
-                                            <NextStep eventKey={headrailsNextStep}>{t("NEXT STEP")}</NextStep>
+                        <Card className={step2 !== "HiddenMoulding" ? "" : "noDisplay"}>
+                            <Card.Header>
+                                <ContextAwareToggle eventKey="5" stepNum={t("6")} stepTitle={t("roller_step5")} stepRef="5" type="1" required={requiredStep["5"]}
+                                                    stepSelected={stepSelectedLabel["5"] === undefined ? "" : stepSelectedLabel["5"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="5">
+                                <Card.Body>
+                                    <div className="card_body card_body_radio card_body_4">
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/roller/roll_regular.svg').default} className="img-fluid half_margin" alt=""/>
+                                            <input className="radio" type="radio" text={t("roller_headrail1")} value="1" name="step5" ref-num="5" id="51"
+                                                   checked={step5 === "Exposed"}
+                                                   onChange={e => {
+                                                       if (step2 === "") {
+                                                           setStep5("");
+                                                           selectUncheck(e);
+                                                           modalHandleShow("noMount");
+                                                           setDeps("5", "");
+                                                           setCart("", "", "Headrail");
+                                                       } else {
+                                                           selectChanged(e);
+                                                           setStep5("Exposed");
+                                                           setDeps("", "5,53,54");
+                                                           setCart("Headrail", "Exposed");
+                                                           setHeadrailsNextStep("5A");
+                                                       }
+                                                   }} ref={ref => (inputs.current["51"] = ref)}/>
+                                            <label htmlFor="51">{t("roller_headrail1")}</label>
                                         </div>
-                                        <div className="accordion_help">
-                                            <div className="help_container">
-                                                <div className="help_column help_left_column">
-                                                    <p className="help_column_header"/>
-                                                    <ul className="help_column_list">
-                                                        <li className="no_listStyle single_line_height">
-                                                            <div className="measurementsHelp_link text-center" onClick={e => modalHandleShow("headrailHelp")}>
-                                                                {t("headrailHelp")}
-                                                            </div>
-                                                        </li>
-                                                    </ul>
-                                                </div>
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/roller/roll_upholstered_valance.svg').default} className="img-fluid half_margin" alt=""/>
+                                            <input className="radio" type="radio" text={t("roller_headrail2")} value="2" name="step5" ref-num="5" id="52"
+                                                   checked={step5 === "Upholstered"}
+                                                   onChange={e => {
+                                                       if (step2 === "") {
+                                                           setStep5("");
+                                                           selectUncheck(e);
+                                                           modalHandleShow("noMount");
+                                                           setDeps("5", "");
+                                                           setCart("", "", "Headrail");
+                                                       } else {
+                                                           selectChanged(e);
+                                                           setStep5("Upholstered");
+                                                           setDeps("", "5,53,54");
+                                                           setCart("Headrail", "Upholstered");
+                                                           setHeadrailsNextStep("6");
+                                                       }
+                                                   }} ref={ref => (inputs.current["52"] = ref)}/>
+                                            <label htmlFor="52">{t("roller_headrail2")}<br/><p
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add ") : t("Surcharge Applies")}{(modelAccessories["5"] ? (modelAccessories["5"]["8"] ? GetPrice(modelAccessories["5"]["8"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
+                                            </label>
+                                        </div>
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/roller/roll_metal_valance.svg').default} className="img-fluid half_margin" alt=""/>
+                                            <input className="radio" type="radio" text={t("roller_headrail3")} value="3" name="step5" ref-num="5" id="53"
+                                                   checked={step5 === "MetalValance"}
+                                                   onChange={e => {
+                                                       if (step2 === "") {
+                                                           setStep5("");
+                                                           selectUncheck(e);
+                                                           modalHandleShow("noMount");
+                                                           setDeps("5", "");
+                                                           setCart("", "", "Headrail");
+                                                       } else {
+                                                           selectChanged(e);
+                                                           setStep5("MetalValance");
+                                                           setDeps("53", "5,54");
+                                                           setCart("Headrail", "MetalValance");
+                                                           setHeadrailsNextStep("6");
+                                                       }
+                                                   }} ref={ref => (inputs.current["53"] = ref)}/>
+                                            <label htmlFor="53">{t("roller_headrail3")}<br/><p
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add ") : t("Surcharge Applies")}{(modelAccessories["5"] ? (modelAccessories["5"]["10"] ? GetPrice(modelAccessories["5"]["10"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
+                                            </label>
+                                        </div>
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/roller/roll_fabric_insert.svg').default} className="img-fluid half_margin" alt=""/>
+                                            <input className="radio" type="radio" text={t("roller_headrail4")} value="4" name="step5" ref-num="5" id="54"
+                                                   checked={step5 === "MetalValanceFabricInsert"}
+                                                   onChange={e => {
+                                                       if (step2 === "") {
+                                                           setStep5("");
+                                                           selectUncheck(e);
+                                                           modalHandleShow("noMount");
+                                                           setDeps("5", "");
+                                                           setCart("", "", "Headrail");
+                                                       } else {
+                                                           selectChanged(e);
+                                                           setStep5("MetalValanceFabricInsert");
+                                                           setDeps("54", "5,53");
+                                                           setCart("Headrail", "MetalValanceFabricInsert");
+                                                           setHeadrailsNextStep("6");
+                                                       }
+                                                   }} ref={ref => (inputs.current["54"] = ref)}/>
+                                            <label htmlFor="54">{t("roller_headrail4")}<br/><p
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add ") : t("Surcharge Applies")}{(modelAccessories["5"] ? (modelAccessories["5"]["12"] ? GetPrice(modelAccessories["5"]["12"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
+                                            </label>
+                                        </div>
+                                        
+                                        <div className={step5 === "MetalValance" || step5 === "MetalValanceFabricInsert" ? "selection_section" : "noDisplay"}>
+                                            <div className={step5 === "MetalValance" ? "select_container" : "noDisplay"}>
+                                                <Select
+                                                    className="select"
+                                                    placeholder={t("Please Select")}
+                                                    portal={document.body}
+                                                    dropdownPosition="bottom"
+                                                    dropdownHandle={false}
+                                                    dropdownGap={0}
+                                                    values={selectedValanceColor1}
+                                                    onDropdownOpen={() => {
+                                                        let temp1 = window.scrollY;
+                                                        window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                        setTimeout(() => {
+                                                            let temp2 = window.scrollY;
+                                                            if (temp2 === temp1)
+                                                                window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                        }, 100);
+                                                    }}
+                                                    dropdownRenderer={
+                                                        ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
+                                                    }
+                                                    contentRenderer={
+                                                        ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                    }
+                                                    // optionRenderer={
+                                                    //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                    // }
+                                                    onChange={(selected) => {
+                                                        if (selected.length) {
+                                                            setDeps("", "53");
+                                                            setCart("MetalValanceColor", selected[0].value);
+                                                            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                            tempLabels["5"] = t("roller_headrail3") + "/" + selected[0].label;
+                                                            setStepSelectedLabel(tempLabels);
+                                                        }
+                                                    }}
+                                                    options={optionsMetalValance[pageLanguage]}
+                                                />
+                                            </div>
+                                            <div className={step5 === "MetalValanceFabricInsert" ? "select_container" : "noDisplay"}>
+                                                <Select
+                                                    className="select"
+                                                    placeholder={t("Please Select")}
+                                                    portal={document.body}
+                                                    dropdownPosition="bottom"
+                                                    dropdownHandle={false}
+                                                    dropdownGap={0}
+                                                    values={selectedValanceColor2}
+                                                    onDropdownOpen={() => {
+                                                        let temp1 = window.scrollY;
+                                                        window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                        setTimeout(() => {
+                                                            let temp2 = window.scrollY;
+                                                            if (temp2 === temp1)
+                                                                window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                        }, 100);
+                                                    }}
+                                                    dropdownRenderer={
+                                                        ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
+                                                    }
+                                                    contentRenderer={
+                                                        ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                    }
+                                                    // optionRenderer={
+                                                    //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                    // }
+                                                    onChange={(selected) => {
+                                                        if (selected.length) {
+                                                            setDeps("", "54");
+                                                            setCart("MetalValanceColor", selected[0].value);
+                                                            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                            tempLabels["5"] = t("roller_headrail4") + "/" + selected[0].label;
+                                                            setStepSelectedLabel(tempLabels);
+                                                        }
+                                                    }}
+                                                    options={optionsMetalValanceFabricInsert[pageLanguage]}
+                                                />
                                             </div>
                                         </div>
-                                    </Card.Body>
-                                </Accordion.Collapse>
-                            </Card>
-                        }
+                                        
+                                        <NextStep currentStep="5" eventKey={headrailsNextStep}>{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                    <div className="accordion_help">
+                                        <div className="help_container">
+                                            <div className="help_column help_left_column">
+                                                <p className="help_column_header"/>
+                                                <ul className="help_column_list">
+                                                    <li className="no_listStyle single_line_height">
+                                                        <div className="measurementsHelp_link text-center" onClick={e => modalHandleShow("headrailHelp")}>
+                                                            {t("headrailHelp")}
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
                         
                         {/* step 6A */}
-                        {stepSelectedValue["5"] === "1" && stepSelectedValue["2"] !== "3" &&
-                            <Card>
-                                <Card.Header>
-                                    <ContextAwareToggle eventKey="5A" stepNum={t("6A")} stepTitle={t("roller_step5A")} stepRef="5A" type="1" required={requiredStep["5A"]}
-                                                        stepSelected={stepSelectedLabel["5A"] === undefined ? "" : stepSelectedLabel["5A"]}/>
-                                </Card.Header>
-                                <Accordion.Collapse eventKey="5A">
-                                    <Card.Body>
-                                        <div className="card_body card_body_radio">
-                                            <div className="box50 radio_style">
-                                                <img src={require('../Images/drapery/roller/roll_regular.svg').default} className="img-fluid half_margin" alt=""/>
-                                                <input className="radio" type="radio" text={t("RollType1")} value="1" name="step5A" ref-num="5A" id="5A1"
-                                                       checked={step5A === "Standard"}
-                                                       onChange={e => {
-                                                           selectChanged(e);
-                                                           setStep5A("Standard");
-                                                           setDeps("", "5A");
-                                                           setCart("RollType", "Standard");
-                                                       }} ref={ref => (inputs.current["5A1"] = ref)}/>
-                                                <label htmlFor="5A1">{t("RollType1")}</label>
-                                            </div>
-                                            <div className="box50 radio_style">
-                                                <img src={require('../Images/drapery/roller/roll_reverse.svg').default} className="img-fluid half_margin" alt=""/>
-                                                <input className="radio" type="radio" text={t("RollType2")} value="2" name="step5A" ref-num="5A" id="5A2"
-                                                       checked={step5A === "Reverse"}
-                                                       onChange={e => {
-                                                           selectChanged(e);
-                                                           setStep5A("Reverse");
-                                                           setDeps("", "5A");
-                                                           setCart("RollType", "Reverse");
-                                                       }} ref={ref => (inputs.current["5A2"] = ref)}/>
-                                                <label htmlFor="5A2">{t("RollType2")}</label>
-                                            </div>
-                                            <NextStep eventKey="5B">{t("NEXT STEP")}</NextStep>
+                        <Card className={step5 === "Exposed" && step2 !== "HiddenMoulding" ? "" : "noDisplay"}>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("5")) === -1 && (!accordionActiveKey.startsWith("5")) ? "hidden" : ""}>
+                                <ContextAwareToggle eventKey="5A" stepNum={t("6A")} stepTitle={t("roller_step5A")} stepRef="5A" type="1" required={requiredStep["5A"]}
+                                                    stepSelected={stepSelectedLabel["5A"] === undefined ? "" : stepSelectedLabel["5A"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="5A">
+                                <Card.Body>
+                                    <div className="card_body card_body_radio">
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/roller/roll_regular.svg').default} className="img-fluid half_margin" alt=""/>
+                                            <input className="radio" type="radio" text={t("RollType1")} value="1" name="step5A" ref-num="5A" id="5A1"
+                                                   checked={step5A === "Standard"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep5A("Standard");
+                                                       setDeps("", "5A");
+                                                       setCart("RollType", "Standard");
+                                                   }} ref={ref => (inputs.current["5A1"] = ref)}/>
+                                            <label htmlFor="5A1">{t("RollType1")}</label>
                                         </div>
-                                        <div className="accordion_help">
-                                            <div className="help_container">
-                                                <div className="help_column help_left_column help_left_column_mount_type">
-                                                    <p className="help_column_header">{t("RollType_help_1")}</p>
-                                                    <ul className="help_column_list">
-                                                        <li className="no_listStyle">
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/roller/roll_reverse.svg').default} className="img-fluid half_margin" alt=""/>
+                                            <input className="radio" type="radio" text={t("RollType2")} value="2" name="step5A" ref-num="5A" id="5A2"
+                                                   checked={step5A === "Reverse"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep5A("Reverse");
+                                                       setDeps("", "5A");
+                                                       setCart("RollType", "Reverse");
+                                                   }} ref={ref => (inputs.current["5A2"] = ref)}/>
+                                            <label htmlFor="5A2">{t("RollType2")}</label>
+                                        </div>
+                                        <NextStep currentStep="5A" eventKey="5B">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                    <div className="accordion_help">
+                                        <div className="help_container">
+                                            <div className="help_column help_left_column help_left_column_mount_type">
+                                                <p className="help_column_header">{t("RollType_help_1")}</p>
+                                                <ul className="help_column_list">
+                                                    <li className="no_listStyle">
                                                         <span className="popover_indicator">
                                                             {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
                                                                                   children={<object className="popover_camera" type="image/svg+xml"
@@ -7273,13 +7294,13 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                                   }/>
                                                             }
                                                         </span>{t("RollType_help_2")}</li>
-                                                        <li>{t("RollType_help_3")}</li>
-                                                    </ul>
-                                                </div>
-                                                <div className="help_column help_right_column help_right_column_mount_type">
-                                                    <p className="help_column_header">{t("RollType_help_4")}</p>
-                                                    <ul className="help_column_list">
-                                                        <li className="no_listStyle">
+                                                    <li>{t("RollType_help_3")}</li>
+                                                </ul>
+                                            </div>
+                                            <div className="help_column help_right_column help_right_column_mount_type">
+                                                <p className="help_column_header">{t("RollType_help_4")}</p>
+                                                <ul className="help_column_list">
+                                                    <li className="no_listStyle">
                                                         <span className="popover_indicator">
                                                             {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
                                                                                   children={<object className="popover_camera" type="image/svg+xml"
@@ -7314,69 +7335,66 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                                   }/>
                                                             }
                                                         </span>{t("RollType_help_5")}</li>
-                                                        <li>{t("RollType_help_6")}</li>
-                                                    </ul>
-                                                </div>
+                                                    <li>{t("RollType_help_6")}</li>
+                                                </ul>
                                             </div>
                                         </div>
-                                    </Card.Body>
-                                </Accordion.Collapse>
-                            </Card>
-                        }
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
                         
                         {/* step 6B */}
-                        {stepSelectedValue["5"] === "1" && stepSelectedValue["2"] !== "3" &&
-                            <Card>
-                                <Card.Header>
-                                    <ContextAwareToggle eventKey="5B" stepNum={t("6B")} stepTitle={t("roller_step5B")} stepRef="5B" type="1" required={requiredStep["5B"]}
-                                                        stepSelected={stepSelectedLabel["5B"] === undefined ? "" : stepSelectedLabel["5B"]}/>
-                                </Card.Header>
-                                <Accordion.Collapse eventKey="5B">
-                                    <Card.Body>
-                                        <div className="card_body card_body_radio">
-                                            <div className="box50 radio_style">
-                                                <img src={require('../Images/drapery/roller/bracket_type_round.png')} className="img-fluid half_margin" alt=""/>
-                                                <input className="radio" type="radio" text={t("BracketType1")} value="1" name="step5B" ref-num="5B" id="5B1"
-                                                       checked={step5B === "Round Edge"}
-                                                       onChange={e => {
-                                                           selectChanged(e);
-                                                           setStep5B("Round Edge");
-                                                           setDeps("", "5B");
-                                                           setCart("BracketType", "Round Edge");
-                                                       }} ref={ref => (inputs.current["5B1"] = ref)}/>
-                                                <label htmlFor="5B1">{t("BracketType1")}</label>
-                                            </div>
-                                            <div className="box50 radio_style">
-                                                <img src={require('../Images/drapery/roller/bracket_type_square.png')} className="img-fluid half_margin" alt=""/>
-                                                <input className="radio" type="radio" text={t("BracketType2")} value="2" name="step5B" ref-num="5B" id="5B2"
-                                                       checked={step5B === "Square Edge"}
-                                                       onChange={e => {
-                                                           selectChanged(e);
-                                                           setStep5B("Square Edge");
-                                                           setDeps("", "5B");
-                                                           setCart("BracketType", "Square Edge");
-                                                       }} ref={ref => (inputs.current["5B2"] = ref)}/>
-                                                <label htmlFor="5B2">{t("BracketType2")}</label>
-                                            </div>
-                                            <NextStep eventKey="5C">{t("NEXT STEP")}</NextStep>
+                        <Card className={step5 === "Exposed" && step2 !== "HiddenMoulding" ? "" : "noDisplay"}>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("5")) === -1 && (!accordionActiveKey.startsWith("5")) ? "hidden" : ""}>
+                                <ContextAwareToggle eventKey="5B" stepNum={t("6B")} stepTitle={t("roller_step5B")} stepRef="5B" type="1" required={requiredStep["5B"]}
+                                                    stepSelected={stepSelectedLabel["5B"] === undefined ? "" : stepSelectedLabel["5B"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="5B">
+                                <Card.Body>
+                                    <div className="card_body card_body_radio">
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/roller/bracket_type_round.png')} className="img-fluid half_margin" alt=""/>
+                                            <input className="radio" type="radio" text={t("BracketType1")} value="1" name="step5B" ref-num="5B" id="5B1"
+                                                   checked={step5B === "Round Edge"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep5B("Round Edge");
+                                                       setDeps("", "5B");
+                                                       setCart("BracketType", "Round Edge");
+                                                   }} ref={ref => (inputs.current["5B1"] = ref)}/>
+                                            <label htmlFor="5B1">{t("BracketType1")}</label>
                                         </div>
-                                    </Card.Body>
-                                </Accordion.Collapse>
-                            </Card>
-                        }
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/roller/bracket_type_square.png')} className="img-fluid half_margin" alt=""/>
+                                            <input className="radio" type="radio" text={t("BracketType2")} value="2" name="step5B" ref-num="5B" id="5B2"
+                                                   checked={step5B === "Square Edge"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep5B("Square Edge");
+                                                       setDeps("", "5B");
+                                                       setCart("BracketType", "Square Edge");
+                                                   }} ref={ref => (inputs.current["5B2"] = ref)}/>
+                                            <label htmlFor="5B2">{t("BracketType2")}</label>
+                                        </div>
+                                        <NextStep currentStep="5B" eventKey="5C">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
                         
                         {/* step 6C */}
-                        {stepSelectedValue["5"] === "1" && stepSelectedValue["2"] !== "3" &&
-                            <Card>
-                                <Card.Header>
-                                    <ContextAwareToggle eventKey="5C" stepNum={t("6C")} stepTitle={t("roller_step5C")} stepRef="5C" type="1" required={requiredStep["5C"]}
-                                                        stepSelected={stepSelectedLabel["5C"] === undefined ? "" : stepSelectedLabel["5C"]}/>
-                                </Card.Header>
-                                <Accordion.Collapse eventKey="5C">
-                                    <Card.Body>
-                                        <div className="card_body card_body_radio bracket_color">
-                                            <div className="box33">
-                                                {/*<img src={require('../Images/drapery/roller/SatinBrass.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                        <Card className={step5 === "Exposed" && step2 !== "HiddenMoulding" ? "" : "noDisplay"}>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("5")) === -1 && (!accordionActiveKey.startsWith("5")) ? "hidden" : ""}>
+                                <ContextAwareToggle eventKey="5C" stepNum={t("6C")} stepTitle={t("roller_step5C")} stepRef="5C" type="1" required={requiredStep["5C"]}
+                                                    stepSelected={stepSelectedLabel["5C"] === undefined ? "" : stepSelectedLabel["5C"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="5C">
+                                <Card.Body>
+                                    <div className="card_body card_body_radio bracket_color">
+                                        <div className="box33">
+                                            {/*<img src={require('../Images/drapery/roller/SatinBrass.jpg')} className="img-fluid bracket_color_img" alt=""/>
                                             <input className="radio" type="radio" text={t("BracketColor1")} value="1" name="step5C" ref-num="5C" id="5C1"
                                                    checked={step5C === "Satin Brass"}
                                                    onChange={e => {
@@ -7386,74 +7404,74 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                        setCart("BracketColor", "Satin Brass");
                                                    }} ref={ref => (inputs.current["5C1"] = ref)}/>
                                             <label htmlFor="5C1">{t("BracketColor1")}</label> */}
-                                                
-                                                <div className="radio_group">
-                                                    <label className="radio_container">
-                                                        <input className="radio" type="radio" text={t("BracketColor1")} value="1" name="step5C" ref-num="5C" id="5C1" outline="true"
-                                                               checked={step5C === "Satin Brass"}
-                                                               onChange={e => {
-                                                                   selectChanged(e);
-                                                                   setStep5C("Satin Brass");
-                                                                   setDeps("", "5C");
-                                                                   setCart("BracketColor", "Satin Brass");
-                                                               }} ref={ref => (inputs.current["5C1"] = ref)}/>
-                                                        <div className="frame_img">
-                                                            <img src={require('../Images/drapery/roller/SatinBrass.jpg')} className="img-fluid bracket_color_img" alt=""/>
-                                                        </div>
-                                                    </label>
-                                                    <div className="radio_group_name_container">
-                                                        <h1>{t("BracketColor1")}</h1>
+                                            
+                                            <div className="radio_group">
+                                                <label className="radio_container">
+                                                    <input className="radio" type="radio" text={t("BracketColor1")} value="1" name="step5C" ref-num="5C" id="5C1" outline="true"
+                                                           checked={step5C === "Satin Brass"}
+                                                           onChange={e => {
+                                                               selectChanged(e);
+                                                               setStep5C("Satin Brass");
+                                                               setDeps("", "5C");
+                                                               setCart("BracketColor", "Satin Brass");
+                                                           }} ref={ref => (inputs.current["5C1"] = ref)}/>
+                                                    <div className="frame_img">
+                                                        <img src={require('../Images/drapery/roller/SatinBrass.jpg')} className="img-fluid bracket_color_img" alt=""/>
                                                     </div>
+                                                </label>
+                                                <div className="radio_group_name_container">
+                                                    <h1>{t("BracketColor1")}</h1>
                                                 </div>
                                             </div>
-                                            <div className="box33">
-                                                <div className="radio_group">
-                                                    <label className="radio_container">
-                                                        <input className="radio" type="radio" text={t("BracketColor2")} value="2" name="step5C" ref-num="5C" id="5C2" outline="true"
-                                                               checked={step5C === "Satin Nickel"}
-                                                               onChange={e => {
-                                                                   selectChanged(e);
-                                                                   setStep5C("Satin Nickel");
-                                                                   setDeps("", "5C");
-                                                                   setCart("BracketColor", "Satin Nickel");
-                                                               }} ref={ref => (inputs.current["5C2"] = ref)}/>
-                                                        <div className="frame_img">
-                                                            <img src={require('../Images/drapery/roller/SatinNickel.jpg')} className="img-fluid bracket_color_img" alt=""/>
-                                                        </div>
-                                                    </label>
-                                                    <div className="radio_group_name_container">
-                                                        <h1>{t("BracketColor2")}</h1>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="box33">
-                                                <div className="radio_group">
-                                                    <label className="radio_container">
-                                                        <input className="radio" type="radio" text={t("BracketColor3")} value="3" name="step5C" ref-num="5C" id="5C3" outline="true"
-                                                               checked={step5C === "Gun Metal"}
-                                                               onChange={e => {
-                                                                   selectChanged(e);
-                                                                   setStep5C("Gun Metal");
-                                                                   setDeps("", "5C");
-                                                                   setCart("BracketColor", "Gun Metal");
-                                                               }} ref={ref => (inputs.current["5C3"] = ref)}/>
-                                                        <div className="frame_img">
-                                                            <img src={require('../Images/drapery/roller/GunMetal.jpg')} className="img-fluid bracket_color_img" alt=""/>
-                                                        </div>
-                                                    </label>
-                                                    <div className="radio_group_name_container">
-                                                        <h1>{t("BracketColor3")}</h1>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <NextStep eventKey="6">{t("NEXT STEP")}</NextStep>
                                         </div>
-                                        <div className="accordion_help">
-                                            <div className="help_container">
-                                                <div className="help_column help_left_column">
-                                                    <p className="help_column_header"/>
-                                                    <ul className="help_column_list">
-                                                        <li className="no_listStyle text-center">
+                                        <div className="box33">
+                                            <div className="radio_group">
+                                                <label className="radio_container">
+                                                    <input className="radio" type="radio" text={t("BracketColor2")} value="2" name="step5C" ref-num="5C" id="5C2" outline="true"
+                                                           checked={step5C === "Satin Nickel"}
+                                                           onChange={e => {
+                                                               selectChanged(e);
+                                                               setStep5C("Satin Nickel");
+                                                               setDeps("", "5C");
+                                                               setCart("BracketColor", "Satin Nickel");
+                                                           }} ref={ref => (inputs.current["5C2"] = ref)}/>
+                                                    <div className="frame_img">
+                                                        <img src={require('../Images/drapery/roller/SatinNickel.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                                                    </div>
+                                                </label>
+                                                <div className="radio_group_name_container">
+                                                    <h1>{t("BracketColor2")}</h1>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="box33">
+                                            <div className="radio_group">
+                                                <label className="radio_container">
+                                                    <input className="radio" type="radio" text={t("BracketColor3")} value="3" name="step5C" ref-num="5C" id="5C3" outline="true"
+                                                           checked={step5C === "Gun Metal"}
+                                                           onChange={e => {
+                                                               selectChanged(e);
+                                                               setStep5C("Gun Metal");
+                                                               setDeps("", "5C");
+                                                               setCart("BracketColor", "Gun Metal");
+                                                           }} ref={ref => (inputs.current["5C3"] = ref)}/>
+                                                    <div className="frame_img">
+                                                        <img src={require('../Images/drapery/roller/GunMetal.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                                                    </div>
+                                                </label>
+                                                <div className="radio_group_name_container">
+                                                    <h1>{t("BracketColor3")}</h1>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <NextStep currentStep={[...depSet].findIndex(el => el.startsWith("5")) === -1 ? "5" : "5C"} eventKey="6">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                    <div className="accordion_help">
+                                        <div className="help_container">
+                                            <div className="help_column help_left_column">
+                                                <p className="help_column_header"/>
+                                                <ul className="help_column_list">
+                                                    <li className="no_listStyle text-center">
                                                         
                                                         <span className="popover_indicator">
                                                             {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
@@ -7490,58 +7508,57 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                                   }/>
                                                             }
                                                         </span>{t("bracketColor_help")}
-                                                        </li>
-                                                    </ul>
-                                                </div>
+                                                    </li>
+                                                </ul>
                                             </div>
                                         </div>
-                                    </Card.Body>
-                                </Accordion.Collapse>
-                            </Card>
-                        }
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
                         
                         {/* step 6Arc */}
-                        {step2 === "HiddenMoulding" &&
-                            <Card>
-                                <Card.Header>
-                                    <ContextAwareToggle eventKey="5" stepNum={t("6")} stepTitle={t("roller_step5A")} stepRef="5Arc" type="1" required={requiredStep["5Arc"]}
-                                                        stepSelected={stepSelectedLabel["5Arc"] === undefined ? "" : stepSelectedLabel["5Arc"]}/>
-                                </Card.Header>
-                                <Accordion.Collapse eventKey="5">
-                                    <Card.Body>
-                                        <div className="card_body card_body_radio">
-                                            <div className="box50 radio_style">
-                                                <img src={require('../Images/drapery/roller/roll_regular.svg').default} className="img-fluid half_margin" alt=""/>
-                                                <input className="radio" type="radio" text={t("RollType1")} value="1" name="step5Arc" ref-num="5Arc" id="5Arc1"
-                                                       checked={step5Arc === "Standard"}
-                                                       onChange={e => {
-                                                           selectChanged(e);
-                                                           setStep5Arc("Standard");
-                                                           setDeps("", "5Arc");
-                                                           setCart("RollType", "Standard");
-                                                       }} ref={ref => (inputs.current["5Arc1"] = ref)}/>
-                                                <label htmlFor="5Arc1">{t("RollType1")}</label>
-                                            </div>
-                                            <div className="box50 radio_style">
-                                                <img src={require('../Images/drapery/roller/roll_reverse.svg').default} className="img-fluid half_margin" alt=""/>
-                                                <input className="radio" type="radio" text={t("RollType2")} value="2" name="step5Arc" ref-num="5Arc" id="5Arc2"
-                                                       checked={step5Arc === "Reverse"}
-                                                       onChange={e => {
-                                                           selectChanged(e);
-                                                           setStep5Arc("Reverse");
-                                                           setDeps("", "5Arc");
-                                                           setCart("RollType", "Reverse");
-                                                       }} ref={ref => (inputs.current["5Arc2"] = ref)}/>
-                                                <label htmlFor="5Arc2">{t("RollType2")}</label>
-                                            </div>
-                                            <NextStep eventKey="5A">{t("NEXT STEP")}</NextStep>
+                        <Card className={step2 === "HiddenMoulding" ? "" : "noDisplay"}>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("5")) === -1 && (!accordionActiveKey.startsWith("5")) ? "hidden" : ""}>
+                                <ContextAwareToggle eventKey="5" stepNum={t("6")} stepTitle={t("roller_step5A")} stepRef="5Arc" type="1" required={requiredStep["5Arc"]}
+                                                    stepSelected={stepSelectedLabel["5Arc"] === undefined ? "" : stepSelectedLabel["5Arc"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="5">
+                                <Card.Body>
+                                    <div className="card_body card_body_radio">
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/roller/roll_regular.svg').default} className="img-fluid half_margin" alt=""/>
+                                            <input className="radio" type="radio" text={t("RollType1")} value="1" name="step5Arc" ref-num="5Arc" id="5Arc1"
+                                                   checked={step5Arc === "Standard"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep5Arc("Standard");
+                                                       setDeps("", "5Arc");
+                                                       setCart("RollType", "Standard");
+                                                   }} ref={ref => (inputs.current["5Arc1"] = ref)}/>
+                                            <label htmlFor="5Arc1">{t("RollType1")}</label>
                                         </div>
-                                        <div className="accordion_help">
-                                            <div className="help_container">
-                                                <div className="help_column help_left_column help_left_column_mount_type">
-                                                    <p className="help_column_header">{t("RollType_help_1")}</p>
-                                                    <ul className="help_column_list">
-                                                        <li className="no_listStyle">
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/roller/roll_reverse.svg').default} className="img-fluid half_margin" alt=""/>
+                                            <input className="radio" type="radio" text={t("RollType2")} value="2" name="step5Arc" ref-num="5Arc" id="5Arc2"
+                                                   checked={step5Arc === "Reverse"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep5Arc("Reverse");
+                                                       setDeps("", "5Arc");
+                                                       setCart("RollType", "Reverse");
+                                                   }} ref={ref => (inputs.current["5Arc2"] = ref)}/>
+                                            <label htmlFor="5Arc2">{t("RollType2")}</label>
+                                        </div>
+                                        <NextStep currentStep="5Arc" eventKey="5A">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                    <div className="accordion_help">
+                                        <div className="help_container">
+                                            <div className="help_column help_left_column help_left_column_mount_type">
+                                                <p className="help_column_header">{t("RollType_help_1")}</p>
+                                                <ul className="help_column_list">
+                                                    <li className="no_listStyle">
                                                         <span className="popover_indicator">
                                                             {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
                                                                                   children={<object className="popover_camera" type="image/svg+xml"
@@ -7576,13 +7593,13 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                                   }/>
                                                             }
                                                         </span>{t("RollType_help_2")}</li>
-                                                        <li>{t("RollType_help_3")}</li>
-                                                    </ul>
-                                                </div>
-                                                <div className="help_column help_right_column help_right_column_mount_type">
-                                                    <p className="help_column_header">{t("RollType_help_4")}</p>
-                                                    <ul className="help_column_list">
-                                                        <li className="no_listStyle">
+                                                    <li>{t("RollType_help_3")}</li>
+                                                </ul>
+                                            </div>
+                                            <div className="help_column help_right_column help_right_column_mount_type">
+                                                <p className="help_column_header">{t("RollType_help_4")}</p>
+                                                <ul className="help_column_list">
+                                                    <li className="no_listStyle">
                                                         <span className="popover_indicator">
                                                             {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
                                                                                   children={<object className="popover_camera" type="image/svg+xml"
@@ -7617,69 +7634,67 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                                   }/>
                                                             }
                                                         </span>{t("RollType_help_5")}</li>
-                                                        <li>{t("RollType_help_6")}</li>
-                                                    </ul>
-                                                </div>
+                                                    <li>{t("RollType_help_6")}</li>
+                                                </ul>
                                             </div>
                                         </div>
-                                    </Card.Body>
-                                </Accordion.Collapse>
-                            </Card>
-                        }
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
                         
                         {/* step 6AArc */}
-                        {step2 === "HiddenMoulding" &&
-                            <Card>
-                                <Card.Header>
-                                    <ContextAwareToggle eventKey="5A" stepNum={t("6A")} stepTitle={t("roller_step5B")} stepRef="5AArc" type="1" required={requiredStep["5AArc"]}
-                                                        stepSelected={stepSelectedLabel["5AArc"] === undefined ? "" : stepSelectedLabel["5AArc"]}/>
-                                </Card.Header>
-                                <Accordion.Collapse eventKey="5A">
-                                    <Card.Body>
-                                        <div className="card_body card_body_radio">
-                                            <div className="box50 radio_style">
-                                                <img src={require('../Images/drapery/roller/bracket_type_round.png')} className="img-fluid half_margin" alt=""/>
-                                                <input className="radio" type="radio" text={t("BracketType1")} value="1" name="step5AArc" ref-num="5AArc" id="5AArc1"
-                                                       checked={step5AArc === "Round Edge"}
-                                                       onChange={e => {
-                                                           selectChanged(e);
-                                                           setStep5AArc("Round Edge");
-                                                           setDeps("", "5AArc");
-                                                           setCart("BracketType", "Round Edge");
-                                                       }} ref={ref => (inputs.current["5AArc1"] = ref)}/>
-                                                <label htmlFor="5AArc1">{t("BracketType1")}</label>
-                                            </div>
-                                            <div className="box50 radio_style">
-                                                <img src={require('../Images/drapery/roller/bracket_type_square.png')} className="img-fluid half_margin" alt=""/>
-                                                <input className="radio" type="radio" text={t("BracketType2")} value="2" name="step5AArc" ref-num="5AArc" id="5AArc2"
-                                                       checked={step5AArc === "Square Edge"}
-                                                       onChange={e => {
-                                                           selectChanged(e);
-                                                           setStep5AArc("Square Edge");
-                                                           setDeps("", "5AArc");
-                                                           setCart("BracketType", "Square Edge");
-                                                       }} ref={ref => (inputs.current["5AArc2"] = ref)}/>
-                                                <label htmlFor="5AArc2">{t("BracketType2")}</label>
-                                            </div>
-                                            <NextStep eventKey="5B">{t("NEXT STEP")}</NextStep>
+                        <Card className={step2 === "HiddenMoulding" ? "" : "noDisplay"}>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("5")) === -1 && (!accordionActiveKey.startsWith("5")) ? "hidden" : ""}>
+                                <ContextAwareToggle eventKey="5A" stepNum={t("6A")} stepTitle={t("roller_step5B")} stepRef="5AArc" type="1" required={requiredStep["5AArc"]}
+                                                    stepSelected={stepSelectedLabel["5AArc"] === undefined ? "" : stepSelectedLabel["5AArc"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="5A">
+                                <Card.Body>
+                                    <div className="card_body card_body_radio">
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/roller/bracket_type_round.png')} className="img-fluid half_margin" alt=""/>
+                                            <input className="radio" type="radio" text={t("BracketType1")} value="1" name="step5AArc" ref-num="5AArc" id="5AArc1"
+                                                   checked={step5AArc === "Round Edge"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep5AArc("Round Edge");
+                                                       setDeps("", "5AArc");
+                                                       setCart("BracketType", "Round Edge");
+                                                   }} ref={ref => (inputs.current["5AArc1"] = ref)}/>
+                                            <label htmlFor="5AArc1">{t("BracketType1")}</label>
                                         </div>
-                                    </Card.Body>
-                                </Accordion.Collapse>
-                            </Card>
-                        }
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/roller/bracket_type_square.png')} className="img-fluid half_margin" alt=""/>
+                                            <input className="radio" type="radio" text={t("BracketType2")} value="2" name="step5AArc" ref-num="5AArc" id="5AArc2"
+                                                   checked={step5AArc === "Square Edge"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep5AArc("Square Edge");
+                                                       setDeps("", "5AArc");
+                                                       setCart("BracketType", "Square Edge");
+                                                   }} ref={ref => (inputs.current["5AArc2"] = ref)}/>
+                                            <label htmlFor="5AArc2">{t("BracketType2")}</label>
+                                        </div>
+                                        <NextStep currentStep="5AArc" eventKey="5B">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
                         
                         {/* step 6BArc */}
-                        {step2 === "HiddenMoulding" &&
-                            <Card>
-                                <Card.Header>
-                                    <ContextAwareToggle eventKey="5B" stepNum={t("6B")} stepTitle={t("roller_step5C")} stepRef="5BArc" type="1" required={requiredStep["5BArc"]}
-                                                        stepSelected={stepSelectedLabel["5BArc"] === undefined ? "" : stepSelectedLabel["5BArc"]}/>
-                                </Card.Header>
-                                <Accordion.Collapse eventKey="5B">
-                                    <Card.Body>
-                                        <div className="card_body card_body_radio bracket_color">
-                                            <div className="box33">
-                                                {/*<img src={require('../Images/drapery/roller/SatinBrass.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                        <Card className={step2 === "HiddenMoulding" ? "" : "noDisplay"}>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("5")) === -1 && (!accordionActiveKey.startsWith("5")) ? "hidden" : ""}>
+                                <ContextAwareToggle eventKey="5B" stepNum={t("6B")} stepTitle={t("roller_step5C")} stepRef="5BArc" type="1" required={requiredStep["5BArc"]}
+                                                    stepSelected={stepSelectedLabel["5BArc"] === undefined ? "" : stepSelectedLabel["5BArc"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="5B">
+                                <Card.Body>
+                                    <div className="card_body card_body_radio bracket_color">
+                                        <div className="box33">
+                                            {/*<img src={require('../Images/drapery/roller/SatinBrass.jpg')} className="img-fluid bracket_color_img" alt=""/>
                                             <input className="radio" type="radio" text={t("BracketColor1")} value="1" name="step5C" ref-num="5C" id="5C1"
                                                    checked={step5C === "Satin Brass"}
                                                    onChange={e => {
@@ -7689,74 +7704,74 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                        setCart("BracketColor", "Satin Brass");
                                                    }} ref={ref => (inputs.current["5C1"] = ref)}/>
                                             <label htmlFor="5C1">{t("BracketColor1")}</label> */}
-                                                
-                                                <div className="radio_group">
-                                                    <label className="radio_container">
-                                                        <input className="radio" type="radio" text={t("BracketColor1")} value="1" name="step5BArc" ref-num="5BArc" id="5BArc1" outline="true"
-                                                               checked={step5BArc === "Satin Brass"}
-                                                               onChange={e => {
-                                                                   selectChanged(e);
-                                                                   setStep5BArc("Satin Brass");
-                                                                   setDeps("", "5BArc");
-                                                                   setCart("BracketColor", "Satin Brass");
-                                                               }} ref={ref => (inputs.current["5BArc1"] = ref)}/>
-                                                        <div className="frame_img">
-                                                            <img src={require('../Images/drapery/roller/SatinBrass.jpg')} className="img-fluid bracket_color_img" alt=""/>
-                                                        </div>
-                                                    </label>
-                                                    <div className="radio_group_name_container">
-                                                        <h1>{t("BracketColor1")}</h1>
+                                            
+                                            <div className="radio_group">
+                                                <label className="radio_container">
+                                                    <input className="radio" type="radio" text={t("BracketColor1")} value="1" name="step5BArc" ref-num="5BArc" id="5BArc1" outline="true"
+                                                           checked={step5BArc === "Satin Brass"}
+                                                           onChange={e => {
+                                                               selectChanged(e);
+                                                               setStep5BArc("Satin Brass");
+                                                               setDeps("", "5BArc");
+                                                               setCart("BracketColor", "Satin Brass");
+                                                           }} ref={ref => (inputs.current["5BArc1"] = ref)}/>
+                                                    <div className="frame_img">
+                                                        <img src={require('../Images/drapery/roller/SatinBrass.jpg')} className="img-fluid bracket_color_img" alt=""/>
                                                     </div>
+                                                </label>
+                                                <div className="radio_group_name_container">
+                                                    <h1>{t("BracketColor1")}</h1>
                                                 </div>
                                             </div>
-                                            <div className="box33">
-                                                <div className="radio_group">
-                                                    <label className="radio_container">
-                                                        <input className="radio" type="radio" text={t("BracketColor2")} value="2" name="step5BArc" ref-num="5BArc" id="5BArc2" outline="true"
-                                                               checked={step5BArc === "Satin Nickel"}
-                                                               onChange={e => {
-                                                                   selectChanged(e);
-                                                                   setStep5BArc("Satin Nickel");
-                                                                   setDeps("", "5BArc");
-                                                                   setCart("BracketColor", "Satin Nickel");
-                                                               }} ref={ref => (inputs.current["5BArc2"] = ref)}/>
-                                                        <div className="frame_img">
-                                                            <img src={require('../Images/drapery/roller/SatinNickel.jpg')} className="img-fluid bracket_color_img" alt=""/>
-                                                        </div>
-                                                    </label>
-                                                    <div className="radio_group_name_container">
-                                                        <h1>{t("BracketColor2")}</h1>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="box33">
-                                                <div className="radio_group">
-                                                    <label className="radio_container">
-                                                        <input className="radio" type="radio" text={t("BracketColor3")} value="3" name="step5BArc" ref-num="5BArc" id="5BArc3" outline="true"
-                                                               checked={step5BArc === "Gun Metal"}
-                                                               onChange={e => {
-                                                                   selectChanged(e);
-                                                                   setStep5BArc("Gun Metal");
-                                                                   setDeps("", "5BArc");
-                                                                   setCart("BracketColor", "Gun Metal");
-                                                               }} ref={ref => (inputs.current["5BArc3"] = ref)}/>
-                                                        <div className="frame_img">
-                                                            <img src={require('../Images/drapery/roller/GunMetal.jpg')} className="img-fluid bracket_color_img" alt=""/>
-                                                        </div>
-                                                    </label>
-                                                    <div className="radio_group_name_container">
-                                                        <h1>{t("BracketColor3")}</h1>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <NextStep eventKey="6">{t("NEXT STEP")}</NextStep>
                                         </div>
-                                        <div className="accordion_help">
-                                            <div className="help_container">
-                                                <div className="help_column help_left_column">
-                                                    <p className="help_column_header"/>
-                                                    <ul className="help_column_list">
-                                                        <li className="no_listStyle text-center">
+                                        <div className="box33">
+                                            <div className="radio_group">
+                                                <label className="radio_container">
+                                                    <input className="radio" type="radio" text={t("BracketColor2")} value="2" name="step5BArc" ref-num="5BArc" id="5BArc2" outline="true"
+                                                           checked={step5BArc === "Satin Nickel"}
+                                                           onChange={e => {
+                                                               selectChanged(e);
+                                                               setStep5BArc("Satin Nickel");
+                                                               setDeps("", "5BArc");
+                                                               setCart("BracketColor", "Satin Nickel");
+                                                           }} ref={ref => (inputs.current["5BArc2"] = ref)}/>
+                                                    <div className="frame_img">
+                                                        <img src={require('../Images/drapery/roller/SatinNickel.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                                                    </div>
+                                                </label>
+                                                <div className="radio_group_name_container">
+                                                    <h1>{t("BracketColor2")}</h1>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="box33">
+                                            <div className="radio_group">
+                                                <label className="radio_container">
+                                                    <input className="radio" type="radio" text={t("BracketColor3")} value="3" name="step5BArc" ref-num="5BArc" id="5BArc3" outline="true"
+                                                           checked={step5BArc === "Gun Metal"}
+                                                           onChange={e => {
+                                                               selectChanged(e);
+                                                               setStep5BArc("Gun Metal");
+                                                               setDeps("", "5BArc");
+                                                               setCart("BracketColor", "Gun Metal");
+                                                           }} ref={ref => (inputs.current["5BArc3"] = ref)}/>
+                                                    <div className="frame_img">
+                                                        <img src={require('../Images/drapery/roller/GunMetal.jpg')} className="img-fluid bracket_color_img" alt=""/>
+                                                    </div>
+                                                </label>
+                                                <div className="radio_group_name_container">
+                                                    <h1>{t("BracketColor3")}</h1>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <NextStep currentStep={[...depSet].findIndex(el => el.startsWith("5")) === -1 ? "5" : "5BArc"} eventKey="6">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                    <div className="accordion_help">
+                                        <div className="help_container">
+                                            <div className="help_column help_left_column">
+                                                <p className="help_column_header"/>
+                                                <ul className="help_column_list">
+                                                    <li className="no_listStyle text-center">
                                                         
                                                         <span className="popover_indicator">
                                                             {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
@@ -7793,15 +7808,15 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                                   }/>
                                                             }
                                                         </span>{t("bracketColor_help")}
-                                                        </li>
-                                                    </ul>
-                                                </div>
+                                                    </li>
+                                                </ul>
                                             </div>
                                         </div>
-                                    </Card.Body>
-                                </Accordion.Collapse>
-                            </Card>
-                        }
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
                         
                         {/* step 7 */}
                         <Card>
@@ -7869,7 +7884,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                 className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add ") : t("Surcharge Applies")}{(modelAccessories["4"] ? (modelAccessories["4"]["9"] ? GetPrice(modelAccessories["4"]["9"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
                                             </label>
                                         </div>
-                                        <NextStep eventKey={hemStyleNextStep}>{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="6" eventKey={hemStyleNextStep}>{t("NEXT STEP")}</NextStep>
                                     </div>
                                     <div className="accordion_help">
                                         <div className="help_container">
@@ -7890,50 +7905,49 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                         </Card>
                         
                         {/* step 7A */}
-                        {stepSelectedValue["6"] === "1" &&
-                            <Card>
-                                <Card.Header>
-                                    <ContextAwareToggle eventKey="6A" stepNum={t("7A")} stepTitle={t("roller_step6A")} stepRef="6A" type="1" required={requiredStep["6A"]}
-                                                        stepSelected={stepSelectedLabel["6A"] === undefined ? "" : stepSelectedLabel["6A"]}/>
-                                </Card.Header>
-                                <Accordion.Collapse eventKey="6A">
-                                    <Card.Body>
-                                        <div className="card_body card_body_radio">
-                                            <div className="box50 radio_style">
-                                                <img src={require('../Images/drapery/roller/bottom_bar_sewn_in.png')} className="img-fluid half_margin special_margin" alt=""/>
-                                                <input className="radio" type="radio" text={t("BottomBarStyle1")} value="1" name="step6A" ref-num="6A" id="6A1"
-                                                       checked={step6A === "Sewn-In"}
-                                                       onChange={e => {
-                                                           selectChanged(e);
-                                                           setStep6A("Sewn-In");
-                                                           setDeps("", "6A");
-                                                           setCart("BottomBarStyle", "Sewn-In");
-                                                       }} ref={ref => (inputs.current["6A1"] = ref)}/>
-                                                <label htmlFor="6A1">{t("BottomBarStyle1")}</label>
-                                            </div>
-                                            <div className="box50 radio_style">
-                                                <img src={require('../Images/drapery/roller/bottom_bar_exposed_designer.png')} className="img-fluid half_margin special_margin"
-                                                     alt=""/>
-                                                <input className="radio" type="radio" text={t("BottomBarStyle2")} value="2" name="step6A" ref-num="6A" id="6A2"
-                                                       checked={step6A === "Decorative Metal Bar"}
-                                                       onChange={e => {
-                                                           selectChanged(e);
-                                                           setStep6A("Decorative Metal Bar");
-                                                           setDeps("", "6A");
-                                                           setCart("BottomBarStyle", "Decorative Metal Bar");
-                                                       }} ref={ref => (inputs.current["6A2"] = ref)}/>
-                                                <label htmlFor="6A2">{t("BottomBarStyle2")}<br/><p
-                                                    className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add ") : t("Surcharge Applies")}{(modelAccessories["6"] ? (modelAccessories["6"]["13"] ? GetPrice(modelAccessories["6"]["13"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
-                                                </label>
-                                            </div>
-                                            <NextStep eventKey="7">{t("NEXT STEP")}</NextStep>
+                        <Card className={step6 === "Straight" ? "" : "noDisplay"}>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("6")) === -1 && (!accordionActiveKey.startsWith("6")) ? "hidden" : ""}>
+                                <ContextAwareToggle eventKey="6A" stepNum={t("7A")} stepTitle={t("roller_step6A")} stepRef="6A" type="1" required={requiredStep["6A"]}
+                                                    stepSelected={stepSelectedLabel["6A"] === undefined ? "" : stepSelectedLabel["6A"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="6A">
+                                <Card.Body>
+                                    <div className="card_body card_body_radio">
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/roller/bottom_bar_sewn_in.png')} className="img-fluid half_margin special_margin" alt=""/>
+                                            <input className="radio" type="radio" text={t("BottomBarStyle1")} value="1" name="step6A" ref-num="6A" id="6A1"
+                                                   checked={step6A === "Sewn-In"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep6A("Sewn-In");
+                                                       setDeps("", "6A");
+                                                       setCart("BottomBarStyle", "Sewn-In");
+                                                   }} ref={ref => (inputs.current["6A1"] = ref)}/>
+                                            <label htmlFor="6A1">{t("BottomBarStyle1")}</label>
                                         </div>
-                                        <div className="accordion_help">
-                                            <div className="help_container">
-                                                <div className="help_column help_left_column help_left_column_mount_type">
-                                                    <p className="help_column_header">{t("BottomBarStyle_help_1")}</p>
-                                                    <ul className="help_column_list">
-                                                        <li className="no_listStyle">
+                                        <div className="box50 radio_style">
+                                            <img src={require('../Images/drapery/roller/bottom_bar_exposed_designer.png')} className="img-fluid half_margin special_margin"
+                                                 alt=""/>
+                                            <input className="radio" type="radio" text={t("BottomBarStyle2")} value="2" name="step6A" ref-num="6A" id="6A2"
+                                                   checked={step6A === "Decorative Metal Bar"}
+                                                   onChange={e => {
+                                                       selectChanged(e);
+                                                       setStep6A("Decorative Metal Bar");
+                                                       setDeps("", "6A");
+                                                       setCart("BottomBarStyle", "Decorative Metal Bar");
+                                                   }} ref={ref => (inputs.current["6A2"] = ref)}/>
+                                            <label htmlFor="6A2">{t("BottomBarStyle2")}<br/><p
+                                                className="surcharge_price">{Object.keys(modelAccessories).length !== 0 ? t("Add ") : t("Surcharge Applies")}{(modelAccessories["6"] ? (modelAccessories["6"]["13"] ? GetPrice(modelAccessories["6"]["13"]["Price"], pageLanguage, t("TOMANS")) : null) : null)}</p>
+                                            </label>
+                                        </div>
+                                        <NextStep currentStep={[...depSet].findIndex(el => el.startsWith("6")) === -1 ? "6" : "6A"} eventKey="7">{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                    <div className="accordion_help">
+                                        <div className="help_container">
+                                            <div className="help_column help_left_column help_left_column_mount_type">
+                                                <p className="help_column_header">{t("BottomBarStyle_help_1")}</p>
+                                                <ul className="help_column_list">
+                                                    <li className="no_listStyle">
                                                         <span className="popover_indicator">
                                                             {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
                                                                                   children={<object className="popover_camera" type="image/svg+xml"
@@ -7962,12 +7976,12 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                                   }/>
                                                             }
                                                         </span>{t("BottomBarStyle_help_2")}</li>
-                                                    </ul>
-                                                </div>
-                                                <div className="help_column help_right_column help_right_column_mount_type">
-                                                    <p className="help_column_header">{t("BottomBarStyle_help_3")}</p>
-                                                    <ul className="help_column_list">
-                                                        <li className="no_listStyle">
+                                                </ul>
+                                            </div>
+                                            <div className="help_column help_right_column help_right_column_mount_type">
+                                                <p className="help_column_header">{t("BottomBarStyle_help_3")}</p>
+                                                <ul className="help_column_list">
+                                                    <li className="no_listStyle">
                                                         <span className="popover_indicator">
                                                             {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}
                                                                                   children={<object className="popover_camera" type="image/svg+xml"
@@ -7995,14 +8009,14 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                                   }/>
                                                             }
                                                         </span>{t("BottomBarStyle_help_4")}</li>
-                                                    </ul>
-                                                </div>
+                                                </ul>
                                             </div>
                                         </div>
-                                    </Card.Body>
-                                </Accordion.Collapse>
-                            </Card>
-                        }
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
                         
                         {/* step 8 */}
                         <Card>
@@ -8099,11 +8113,13 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                         //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                         // }
                                                         onChange={(selected) => {
-                                                            setDeps("", "71");
-                                                            roomLabelChanged(selected[0], "7", false);
-                                                            setSelectedRoomLabel(selected);
-                                                            // setCart("RoomNameEn", selected[0].value);
-                                                            setCart("RoomNameFa", rooms["fa"].find(opt => opt.value === selected[0].value).label, "", "RoomNameEn", [selected[0].value]);
+                                                            if (selected[0]) {
+                                                                setDeps("", "71");
+                                                                roomLabelChanged(selected[0], "7", false);
+                                                                setSelectedRoomLabel(selected);
+                                                                // setCart("RoomNameEn", selected[0].value);
+                                                                setCart("RoomNameFa", rooms["fa"].find(opt => opt.value === selected[0].value).label, "", "RoomNameEn", [selected[0].value]);
+                                                            }
                                                         }}
                                                         options={rooms[pageLanguage]}
                                                     />
@@ -8125,7 +8141,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                }}/>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="9">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="8" eventKey="9">{t("NEXT STEP")}</NextStep>
                                     </div>
                                     <div className=" accordion_help">
                                         <div className=" help_container">
@@ -8148,7 +8164,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                         </Card>
                         
                         {/* step 9 */}
-                        <Card>
+                        <Card className={accordionActiveKey===""?"card_little_margin":"card_big_margin"}>
                             <Card.Header>
                                 <ContextAwareToggle eventKey="9" stepNum={t("9")} stepTitle={t("zebra_step7")} stepTitle2={t("(Optional)")} stepRef="9" type="2"
                                                     required={requiredStep["9"]}
@@ -8457,7 +8473,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                         <p className="help_column_header">{t("TO DETERMINE INSIDE MOUNT")}</p>
                                         <ul className="help_column_list">
                                             <li>{t("modal_help_1")}</li>
-                                            <li>{t("modal_help_2")}</li>
+                                            <li>{t("roller_modal_help_2")}</li>
                                             <li>{t("modal_help_2.5")}</li>
                                             <li>{t("modal_help_3")}</li>
                                         </ul>
@@ -8466,8 +8482,8 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                     <div className="help_column help_left_column">
                                         <p className="help_column_header">{t("STEP 1: MEASURE WIDTH")}</p>
                                         <ul className="help_column_list">
-                                            <li>{t("modal_help_4")}</li>
-                                            <li>{t("modal_help_5")}</li>
+                                            <li>{t("roller_modal_help_4")}</li>
+                                            <li>{t("roller_modal_help_5")}</li>
                                         </ul>
                                     </div>
                                     
@@ -8475,7 +8491,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                         <p className="help_column_header">{t("STEP 2: MEASURE LENGTH")}</p>
                                         <ul className="help_column_list">
                                             <li>{t("modal_help_6")}</li>
-                                            <li>{t("modal_help_7")}</li>
+                                            <li>{t("roller_modal_help_7")}</li>
                                         </ul>
                                     </div>
                                 </div>
@@ -8485,7 +8501,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                     <div className="help_column help_right_column">
                                         <p className="help_column_header"/>
                                         <ul className="help_column_list">
-                                            <li><b>{t("Note:&nbsp;")}</b>{t("modal_help_8")}</li>
+                                            <li><b>{t("Note:&nbsp;")}</b>{t("roller_modal_help_8")}</li>
                                         </ul>
                                     </div>
                                 </div>

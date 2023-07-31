@@ -29,7 +29,7 @@ async function SaveUserProject(depSet, cartValues, Files, SewingModelId, price, 
             
             let tempPostObj = {};
             Object.keys(temp).forEach(key => {
-                if (temp[key] !== null || temp[key] !== "") {
+                if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
                     if (tempObj && tempObj["apiLabel"] !== "") {
                         if (tempObj["apiValue"] === null) {
@@ -63,7 +63,7 @@ async function SaveUserProject(depSet, cartValues, Files, SewingModelId, price, 
             
             tempPostObj["Accessories"] = [];
             Object.keys(temp).forEach(key => {
-                if (temp[key] !== null || temp[key] !== "") {
+                if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
                     if (tempObj) {
                         if (tempObj["apiAcc"] !== undefined) {
@@ -123,7 +123,8 @@ async function SaveUserProject(depSet, cartValues, Files, SewingModelId, price, 
                     resolve(true);
                 })
                 .catch(err => {
-                    if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                         refreshToken().then((response2) => {
                             if (response2 !== false) {
                                 resolve(401);
@@ -151,7 +152,7 @@ async function SaveUserProject(depSet, cartValues, Files, SewingModelId, price, 
             
             let tempPostObj = {};
             Object.keys(temp).forEach(key => {
-                if (temp[key] !== null || temp[key] !== "") {
+                if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
                     if (tempObj && tempObj["apiLabel"] !== "") {
                         if (tempObj["apiValue"] === null) {
@@ -185,7 +186,7 @@ async function SaveUserProject(depSet, cartValues, Files, SewingModelId, price, 
             
             tempPostObj["Accessories"] = [];
             Object.keys(temp).forEach(key => {
-                if (temp[key] !== null || temp[key] !== "") {
+                if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
                     if (tempObj) {
                         if (tempObj["apiAcc"] !== undefined) {
@@ -246,7 +247,8 @@ async function SaveUserProject(depSet, cartValues, Files, SewingModelId, price, 
                     resolve(true);
                 })
                 .catch(err => {
-                    if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                         refreshToken().then((response2) => {
                             if (response2 !== false) {
                                 resolve(401);

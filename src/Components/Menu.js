@@ -224,7 +224,7 @@ function Menu() {
             setShow(true);
         }).catch(err => {
             console.log(err);
-            if (err.response.status === 401) {
+            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         handleShow(WebsitePageId);
@@ -264,7 +264,8 @@ function Menu() {
                 setShowToast(true);
                 updateMenu();
             }).catch(err => {
-            if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         savePageEdit(e);
@@ -452,7 +453,8 @@ function Menu() {
                 getMenu();
                 setIsLoading(false);
             }).catch(err => {
-            if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         updateMenu();
@@ -622,7 +624,8 @@ function Menu() {
                                                         }).treeData
                                                     });
                                                 }).catch(err => {
-                                                if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                                                     refreshToken().then((response2) => {
                                                         if (response2 !== false) {
                                                         } else {
@@ -664,7 +667,8 @@ function Menu() {
                                                 });
                                                 setIsLoading(true);
                                             }).catch(err => {
-                                                if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                                                     refreshToken().then((response2) => {
                                                         if (response2 !== false) {
                                                         } else {
@@ -759,7 +763,8 @@ function Menu() {
                                                         handleShow(node["WebsitePageId"]);
                                                     })
                                                     .catch(err => {
-                                                        if (err.response.status === 401) {
+                                                        console.log(err);
+                                                        if (err.response && err.response.status === 401) {
                                                             refreshToken().then((response2) => {
                                                                 if (response2 !== false) {
                                                                 } else {

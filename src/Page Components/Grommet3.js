@@ -93,6 +93,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
     const [rodsLoad, setRodsLoad] = useState(undefined);
     const [rodsLoad2, setRodsLoad2] = useState(undefined);
     const [motorLoad, setMotorLoad] = useState(false);
+    const [motorLoad2, setMotorLoad2] = useState(false);
     const [models, setModels] = useState([]);
     const [projectData, setProjectData] = useState({});
     const [model, setModel] = useState({});
@@ -194,17 +195,23 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
         cartValue: "",
         event: ""
     });
+    const [sheerHeaderStyleTemp2, setSheerHeaderStyleTemp2] = useState({
+        stepValue: "",
+        id: "",
+        cartValue: "",
+        event: ""
+    });
     const [roomLabelComplete, setRoomLabelComplete] = useState(false);
     const [stepSelectedValue, setStepSelectedValue] = useState({});
     const [hasTrim, setHasTrim] = useState(false);
     const [showLabels, setShowLabels] = useState(true);
     const [headerTruncated, setHeaderTruncated] = useState([]);
     const [extendedTitle, setExtendedTitle] = useState({
-        "8":[],
-        "8A":[],
-        "8B":[],
-        "8C":[],
-        "9":[]
+        "8": [],
+        "8A": [],
+        "8B": [],
+        "8C": [],
+        "9": []
     });
     const [detailsShow, setDetailsShow] = useState(false);
     const [filtersShow, setFiltersShow] = useState(false);
@@ -268,7 +275,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
     });
     const [saveProjectCount, setSaveProjectCount] = useState(0);
     
-    const [depSet, setDepSet] = useState(new Set(['1', '2', '3', '4', '5', '6', '71', '72']));
+    const [depSet, setDepSet] = useState(new Set(['2', '2B', '3', '4', '5', '6', '7', '8', '1001', '1002']));
     
     const inputs = useRef({});
     const selectedTitle = useRef({});
@@ -281,6 +288,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
         "prices": []
     });
     const steps = useRef([]);
+    const stepHeaders = useRef([]);
     const draperyRef = useRef([]);
     
     const [filterChanged, setFilterChanged] = useState({
@@ -301,6 +309,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
     const [step2A, setStep2A] = useState("");
     const [step2B, setStep2B] = useState("");
     const [step2B1, setStep2B1] = useState("");
+    const [step2C, setStep2C] = useState("");
     const [step3, setStep3] = useState("");
     const [step31, setStep31] = useState("");
     const [step3A, setStep3A] = useState("");
@@ -493,7 +502,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
         }).catch(err => {
             console.log(err);
             setRails([]);
-            if(rodsLoad){
+            if (rodsLoad) {
                 setRodsLoad(false);
             }
         });
@@ -540,7 +549,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
             } else {
                 setRails2([]);
             }
-            if(rodsLoad2){
+            if (rodsLoad2) {
                 setRodsLoad2(false);
             }
         });
@@ -795,7 +804,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                 <div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key}>
                     <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
                         <hr/>
-                        <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(100000, pageLanguage1, pageLanguage1 === "en" ?"Tomans":"تومان")}</p></span>
+                        <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(100000, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")}</p></span>
                     </div>
                     {fabric}
                 </div>
@@ -921,7 +930,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
             fabricList.push(<div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key}>
                 <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
                     <hr/>
-                    <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(100000, pageLanguage1, pageLanguage1 === "en" ?"Tomans":"تومان")}</p></span>
+                    <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(100000, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")}</p></span>
                 </div>
                 {fabric}
             </div>);
@@ -1045,7 +1054,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
             fabricList.push(<div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key}>
                 <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
                     <hr/>
-                    <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(100000, pageLanguage1, pageLanguage1 === "en" ?"Tomans":"تومان")}</p></span>
+                    <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(100000, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")}</p></span>
                 </div>
                 {fabric}
             </div>);
@@ -1118,6 +1127,11 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                 </li>
                             ;
                             resolve();
+                        });
+                    } else if (obj["Photos"] && obj["Photos"].length) {
+                        obj["Photos"].forEach(obj => {
+                            if (obj["PhotoTypeId"] === 4702)
+                                PhotoPath = obj["PhotoUrl"];
                         });
                     }
                 });
@@ -1222,13 +1236,14 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
     
     function renderRods() {
         const rodList = [];
-        // const rodList2 = [];
+        const rodList2 = [];
         const rodList3 = [];
         const rodList4 = [];
         let pageLanguage1 = location.pathname.split('').slice(1, 3).join('');
         
         let promiseArr = [];
         let promiseArr2 = [];
+        let promiseArr3 = [];
         Object.keys(rods).forEach((key, index) => {
             promiseArr[index] = new Promise((resolve, reject) => {
                 let obj = rods[key][0] || {};
@@ -1251,9 +1266,40 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                setStep81(`${RailId}`);
                            }} ref={ref => (inputs.current["81" + index] = ref)}/>
                     <label htmlFor={"81" + index}>{pageLanguage1 === 'fa' ? DesignName : DesignEnName}
-                        {Price > 0 && <br/>}{Price > 0 && <p className="surcharge_price">{t("Add ")}{GetPrice(Price, pageLanguage, t("TOMANS"))}</p>}
+                        <br/><p className="surcharge_price">{Price > 0 ? ((pageLanguage1 === "en" ? "Add " : "+ ") + GetPrice(Price, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")) : (pageLanguage1 === "en" ? "Surcharge Applies" : "+ شامل هزینه")}</p>
                     </label>
                 </div>);
+                
+                // rodList2.push(<div className="box33 radio_style" key={index}>
+                //     <img
+                //         src={`https://api.atlaspood.ir/${PhotoPath}`} className="img-fluid height_auto" alt=""/>
+                //     <input className="radio" type="radio" text={pageLanguage1 === 'fa' ? DesignName : DesignEnName} value={index} name="step8A1" ref-num={"8A1"}
+                //            id={"8A1" + index}
+                //            checked={step8A1 === `${RailId}`}
+                //            onChange={e => {
+                //                setStep8A1(`${RailId}`);
+                //            }} ref={ref => (inputs.current["8A1" + index] = ref)}/>
+                //     <label htmlFor={"8A1" + index}>{pageLanguage1 === 'fa' ? DesignName : DesignEnName}
+                //         <br/><p className="surcharge_price">{Price > 0 ? ((pageLanguage1 === "en" ? "Add " : "+ ") + GetPrice(Price, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")) : (pageLanguage1 === "en" ? "Surcharge Applies" : "+ شامل هزینه")}</p>
+                //     </label>
+                // </div>);
+                
+                resolve();
+            });
+        });
+        
+        Object.keys(rods2).forEach((key, index) => {
+            promiseArr2[index] = new Promise((resolve, reject) => {
+                let obj = rods2[key][0] || {};
+                let DesignName = convertToPersian(obj["DesignName"]);
+                let DesignEnName = obj["DesignENName"];
+                let RailId = obj["RailId"];
+                let Price = obj["Price"];
+                let PhotoObj = {};
+                PhotoObj = obj["Photos"].filter(obj => {
+                    return obj["PhotoTypeId"] === 4701
+                })[0] || PhotoObj;
+                let PhotoPath = PhotoObj["PhotoUrl"] || "";
                 
                 rodList3.push(<div className="box33 radio_style" key={index}>
                     <img
@@ -1265,7 +1311,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                setStep8B1(`${RailId}`);
                            }} ref={ref => (inputs.current["8B1" + index] = ref)}/>
                     <label htmlFor={"8B1" + index}>{pageLanguage1 === 'fa' ? DesignName : DesignEnName}
-                        {Price > 0 && <br/>}{Price > 0 && <p className="surcharge_price">{t("Add ")}{GetPrice(Price, pageLanguage, t("TOMANS"))}</p>}
+                        <br/><p className="surcharge_price">{Price > 0 ? ((pageLanguage1 === "en" ? "Add " : "+ ") + GetPrice(Price, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")) : (pageLanguage1 === "en" ? "Surcharge Applies" : "+ شامل هزینه")}</p>
                     </label>
                 </div>);
                 
@@ -1273,9 +1319,9 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
             });
         });
         
-        Object.keys(rods2).forEach((key, index) => {
-            promiseArr2[index] = new Promise((resolve, reject) => {
-                let obj = rods2[key][0] || {};
+        Object.keys(rods3).forEach((key, index) => {
+            promiseArr3[index] = new Promise((resolve, reject) => {
+                let obj = rods3[key][0] || {};
                 let DesignName = convertToPersian(obj["DesignName"]);
                 let DesignEnName = obj["DesignENName"];
                 let RailId = obj["RailId"];
@@ -1296,19 +1342,22 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                setStep8C1(`${RailId}`);
                            }} ref={ref => (inputs.current["8C1" + index] = ref)}/>
                     <label htmlFor={"8C1" + index}>{pageLanguage1 === 'fa' ? DesignName : DesignEnName}
-                        {Price > 0 && <br/>}{Price > 0 && <p className="surcharge_price">{t("Add ")}{GetPrice(Price, pageLanguage, t("TOMANS"))}</p>}
+                        <br/><p className="surcharge_price">{Price > 0 ? ((pageLanguage1 === "en" ? "Add " : "+ ") + GetPrice(Price, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")) : (pageLanguage1 === "en" ? "Surcharge Applies" : "+ شامل هزینه")}</p>
                     </label>
                 </div>);
                 
                 resolve();
             });
         });
+        
         Promise.all(promiseArr).then(() => {
             setRodsList(rodList);
             // setRodsList2(rodList2);
-            setRodsList3(rodList3);
         });
         Promise.all(promiseArr2).then(() => {
+            setRodsList3(rodList3);
+        });
+        Promise.all(promiseArr3).then(() => {
             setRodsList4(rodList4);
         });
     }
@@ -1495,9 +1544,8 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
         }
         
         return (
-            <div
-                className={`w-100 h-100 steps_header ${isCurrentEventKey ? 'steps_header_active' : ''}`}
-                onClick={decoratedOnClick}>
+            <div className={`w-100 h-100 steps_header ${isCurrentEventKey ? 'steps_header_active' : ''}`}
+                onClick={decoratedOnClick} ref={ref => (stepHeaders.current[stepRef] = ref)}>
                 <div className="steps_header_num_container">
                     <div className="steps_header_num">{stepNum}</div>
                 </div>
@@ -1530,7 +1578,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         temp[stepNum] = false;
                         setHeaderTruncated(temp);
                     }} ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? (stepRef in extendedTitle && extendedTitle[stepRef].length > 0 ? (extendedTitle[stepRef][0]) : stepSelected) : null}{showLabels && stepRef in extendedTitle && extendedTitle[stepRef].length > 1 ? <h5> ...</h5> : ""}</div>
-                    {headerTruncated[stepNum] && <div className="header_tooltip">{stepRef in extendedTitle ? (stepRef==="8" ||stepRef==="8A" ||stepRef==="8B" ||stepRef==="8C" ? extendedTitle[stepRef].slice(1).filter(n => n):extendedTitle[stepRef].slice(1).filter(n => n).join(', \n')) : stepSelected}</div>}
+                    {headerTruncated[stepNum] && <div className="header_tooltip">{stepRef in extendedTitle ? (stepRef === "8" || stepRef === "8A" || stepRef === "8B" || stepRef === "8C" ? extendedTitle[stepRef].slice(1).filter(n => n) : extendedTitle[stepRef].slice(1).filter(n => n).join(', \n')) : stepSelected}</div>}
                     {/*{showLabels &&*/}
                     {/*    <TruncateMarkup lines={1} tokenize="words">*/}
                     {/*        <div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{stepSelected}</div>*/}
@@ -1566,15 +1614,16 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
         );
     }
     
-    function NextStep({children, eventKey, callback, onClick}) {
+    function NextStep({children, eventKey, callback, onClick, currentStep}) {
         const decoratedOnClick = useAccordionButton(
             eventKey,
             () => {
                 callback && callback(eventKey);
                 setAccordionActiveKey(eventKey);
-                // setTimeout(() => {
-                //     window.scrollTo(window.scrollX, window.scrollY + 1);
-                // }, 500);
+                setTimeout(() => {
+                    if (currentStep && stepHeaders.current[currentStep] !== undefined)
+                        stepHeaders.current[currentStep].scrollIntoView();
+                }, 500);
             },
         );
         return (
@@ -1666,7 +1715,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                 }
                 setStepSelectedLabel(tempLabels);
                 let minValue = Math.min(...temp.values[refIndex]);
-                let maxValue = Math.min(...temp.values[refIndex]);
+                let maxValue = Math.max(...temp.values[refIndex]);
                 if (maxValue - minValue >= 2) {
                     modalHandleShow(modalRef);
                 }
@@ -1928,7 +1977,8 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
             .then(() => {
                 renderCart();
             }).catch(err => {
-            if (err.response.status === 401) {
+            console.log(err);
+            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         editBasketProject(projectObj);
@@ -1955,7 +2005,8 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
             }
             renderCart();
         }).catch(err => {
-            if (err.response.status === 401) {
+            console.log(err);
+            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         deleteBasketProject(refIndex);
@@ -2007,7 +2058,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
         let userProjects = JSON.parse(JSON.stringify(UserProjects))[`${modelID}`]["data"];
         
         Object.keys(temp).forEach(key => {
-            if (temp[key] !== null || temp[key] !== "") {
+            if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                 if (tempObj === undefined) {
                     console.log(key);
@@ -2043,7 +2094,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
         tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
         
         Object.keys(temp).forEach(key => {
-            if (temp[key] !== null || temp[key] !== "") {
+            if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                 // console.log(key,userProjects.find(obj => obj["cart"] === key));
                 if (tempObj) {
@@ -2063,14 +2114,16 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
         });
         tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
         Object.keys(temp).forEach(key => {
-            if (temp[key] !== null || temp[key] !== "") {
+            if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                 if (tempObj) {
                     if (tempObj["apiAcc"] !== undefined) {
                         if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
                             tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
-                        } else {
-                            
+                        } else if (tempObj["apiAcc"] === "value") {
+                            let pushObj = tempObj["apiAccValue"] || {};
+                            pushObj["SewingAccessoryValue"] = temp[key].toString();
+                            tempPostObj["SewingOrderDetails"][0]["Accessories"].push(pushObj);
                         }
                     }
                 }
@@ -2169,7 +2222,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
             let userProjects = JSON.parse(JSON.stringify(UserProjects))[`${modelID}`]["data"];
             
             Object.keys(temp).forEach(key => {
-                if (temp[key] !== null || temp[key] !== "") {
+                if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
                     if (tempObj === undefined) {
                         window.location.reload();
@@ -2204,7 +2257,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
             tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
             
             Object.keys(temp).forEach(key => {
-                if (temp[key] !== null || temp[key] !== "") {
+                if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
                     // console.log(key,userProjects.find(obj => obj["cart"] === key));
                     if (tempObj) {
@@ -2227,7 +2280,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
             tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
             tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
             Object.keys(temp).forEach(key => {
-                if (temp[key] !== null || temp[key] !== "") {
+                if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
                     if (tempObj) {
                         if (tempObj["apiAcc"] !== undefined) {
@@ -2457,7 +2510,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
     
     function addToCart() {
         let tempDepSet = [...depSet];
-        // console.log(depSet);
+        console.log(tempDepSet);
         let tempNewSet = new Set();
         let tempErr = [];
         let promiseArr = [];
@@ -2486,7 +2539,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         if (dependency === "")
                             break;
                     }
-                    if (steps.current[dependency] !== undefined) {
+                    if (steps.current[dependency] !== undefined && steps.current[dependency] !== null) {
                         let type = steps.current[dependency].getAttribute("type-of-step") === "1" ? (pageLanguage === 'fa' ? " را مشخص کنید" : "SPECIFY ") : (pageLanguage === 'fa' ? " را انتخاب کنید" : "SELECT ");
                         tempErr.push(
                             <li key={index}>
@@ -2511,7 +2564,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         if (dependency === "")
                             break;
                     }
-                    if (steps.current[dependency] !== undefined) {
+                    if (steps.current[dependency] !== undefined && steps.current[dependency] !== null) {
                         temp[dependency] = true;
                         delete tempLabels[dependency];
                     }
@@ -2545,7 +2598,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                     tempPostObj["WindowCount"] = 1;
                     tempPostObj["SewingModelId"] = `${modelID}`;
                     Object.keys(temp).forEach(key => {
-                        if (temp[key] !== null || temp[key] !== "") {
+                        if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                             let tempObj = userProjects.find(obj => obj["cart"] === key);
                             // console.log(key,tempObj);
                             if (tempObj && tempObj["apiLabel"] !== "") {
@@ -2577,7 +2630,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                     tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
                     
                     Object.keys(temp).forEach(key => {
-                        if (temp[key] !== null || temp[key] !== "") {
+                        if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                             let tempObj = userProjects.find(obj => obj["cart"] === key);
                             // console.log(key,userProjects.find(obj => obj["cart"] === key));
                             if (tempObj) {
@@ -2600,7 +2653,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                     tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
                     tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
                     Object.keys(temp).forEach(key => {
-                        if (temp[key] !== null || temp[key] !== "") {
+                        if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                             let tempObj = userProjects.find(obj => obj["cart"] === key);
                             if (tempObj) {
                                 if (tempObj["apiAcc"] !== undefined) {
@@ -2669,6 +2722,14 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                             let objLabel = "";
                                             if (key === "ControlType" && cartValues["ControlType"] === "Motorized") {
                                                 objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(cartValues[key].toString())} / ${t(cartValues["MotorType"].toString())}`).toString() : `${t(cartValues[key].toString())} / ${t(cartValues["MotorType"].toString())}`;
+                                            } else if (key === "Hardware" && cartValues["Hardware"] === "Same Hardware For All Curtains") {
+                                                objLabel = t(cartValues[key].toString()) + " / " + (pageLanguage === "fa" ? cartValues["RailDesignFa"] : cartValues["RailDesignEn"]) + " / " + (pageLanguage === "fa" ? cartValues["RailColorFa"] : cartValues["RailColorEn"]) + " / " + t(cartValues["BatonOption"]);
+                                            } else if (key === "DraperyHardware" && cartValues["DraperyHardware"] !== "None") {
+                                                objLabel = t(cartValues[key].toString()) + " / " + (pageLanguage === "fa" ? cartValues["RailDesignFaA"] : cartValues["RailDesignEnA"]) + " / " + (pageLanguage === "fa" ? cartValues["RailColorFaA"] : cartValues["RailColorEnA"]) + " / " + t(cartValues["BatonOptionA"]);
+                                            } else if (key === "SheerHardware" && cartValues["SheerHardware"] !== "None") {
+                                                objLabel = t(cartValues[key].toString()) + " / " + (pageLanguage === "fa" ? cartValues["RailDesignFaB"] : cartValues["RailDesignEnB"]) + " / " + (pageLanguage === "fa" ? cartValues["RailColorFaB"] : cartValues["RailColorEnB"]) + " / " + t(cartValues["BatonOptionB"]);
+                                            } else if (key === "PrivacyLayerHardware" && cartValues["PrivacyLayerHardware"] !== "None") {
+                                                objLabel = t(cartValues[key].toString()) + " / " + (pageLanguage === "fa" ? cartValues["RailDesignFaC"] : cartValues["RailDesignEnC"]) + " / " + (pageLanguage === "fa" ? cartValues["RailColorFaC"] : cartValues["RailColorEnC"]) + " / " + t(cartValues["BatonOptionC"]);
                                             } else if (tempObj["titleValue"] === null || true) {
                                                 if (tempObj["titlePostfix"] === "") {
                                                     objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(cartValues[key].toString())}`).toString() : t(cartValues[key].toString());
@@ -2688,11 +2749,10 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                     objLabel = t(tempObj["titleValue"][cartValues[key].toString()]);
                                                 }
                                             }
-                                            temp1[tempObj["order"]] =
-                                                <li className="cart_agree_item" key={key}>
-                                                    <h1 className="cart_agree_item_title">{t(tempObj["title"])}&nbsp;</h1>
-                                                    <h2 className="cart_agree_item_desc">{objLabel}</h2>
-                                                </li>;
+                                            temp1[tempObj["order"]] = <li className="cart_agree_item" key={key}>
+                                                <h1 className="cart_agree_item_title">{t(tempObj["title"])}&nbsp;</h1>
+                                                <h2 className="cart_agree_item_desc">{objLabel}</h2>
+                                            </li>;
                                         }
                                     }
                                 });
@@ -2703,16 +2763,12 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                         <ul className="cart_agree_items_container">
                                             <GetMeasurementArray modelId={`${modelID}`} cartValues={cartValues}/>
                                             <li className="cart_agree_item">
-                                                <h1 className="cart_agree_item_title">{t("grommet_step1")}&nbsp;</h1>
-                                                <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? cartValues["FabricDesignFa"] + " / " + cartValues["FabricColorFa"] : cartValues["FabricDesignEn"] + " / " + cartValues["FabricColorEn"]}</h2>
-                                            </li>
-                                            <li className="cart_agree_item">
                                                 <h1 className="cart_agree_item_title">{t("grommet_step2")}&nbsp;</h1>
-                                                <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? cartValues["FabricDesignFa2"] + " / " + cartValues["FabricColorFa2"] : cartValues["FabricDesignEn2"] + " / " + cartValues["FabricColorEn2"]}</h2>
+                                                <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? cartValues["FabricDesignFa2"] + " / " + cartValues["FabricColorFa2"] : CapitalizeAllWords(cartValues["FabricDesignEn2"] + " / " + cartValues["FabricColorEn2"])}</h2>
                                             </li>
                                             <li className="cart_agree_item">
                                                 <h1 className="cart_agree_item_title">{t("grommet_step2B_color")}&nbsp;</h1>
-                                                <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? cartValues["PrivacyLayer"] + " / " + (cartValues["SheersColorFa"] || "") : cartValues["PrivacyLayer"] + " / " + (cartValues["SheersColorEn"] || "")}</h2>
+                                                <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? t(cartValues["PrivacyLayer"].toString()) + (cartValues["SheersColorFa"] ? " / " : "") + (cartValues["SheersColorFa"] || "") : CapitalizeAllWords(cartValues["PrivacyLayer"] + (cartValues["SheersColorEn"] ? " / " : "") + (cartValues["SheersColorEn"] || ""))}</h2>
                                             </li>
                                             {temp1}
                                             <li className="cart_agree_item">
@@ -2732,7 +2788,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                 setAddingLoading(false);
                                 
                             }).catch(err => {
-                                console.log(err);
+                            console.log(err);
                             if (err.response && err.response.status === 401) {
                                 refreshToken().then((response2) => {
                                     if (response2 !== false) {
@@ -2805,7 +2861,8 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         cartObjects = response.data ? response.data : {};
                         resolve();
                     }).catch(err => {
-                        if (err.response.status === 401) {
+                        console.log(err);
+                        if (err.response && err.response.status === 401) {
                             refreshToken().then((response2) => {
                                 if (response2 !== false) {
                                     renderCart(customPageCart);
@@ -3030,7 +3087,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                         tempPostObj["WindowCount"] = 1;
                                         tempPostObj["SewingModelId"] = obj["PreorderText"]["SewingModelId"];
                                         Object.keys(temp).forEach(key => {
-                                            if (temp[key] !== null || temp[key] !== "") {
+                                            if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                                                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                                                 // console.log(key,tempObj);
                                                 if (tempObj && tempObj["apiLabel"] !== "") {
@@ -3062,7 +3119,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                         tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
                                         
                                         Object.keys(temp).forEach(key => {
-                                            if (temp[key] !== null || temp[key] !== "") {
+                                            if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                                                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                                                 // console.log(key,userProjects.find(obj => obj["cart"] === key));
                                                 if (tempObj) {
@@ -3085,7 +3142,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                         tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
                                         tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
                                         Object.keys(temp).forEach(key => {
-                                            if (temp[key] !== null || temp[key] !== "") {
+                                            if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                                                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                                                 if (tempObj) {
                                                     if (tempObj["apiAcc"] !== undefined) {
@@ -3300,7 +3357,8 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         }
                     }
                 }).catch(err => {
-                    if (err.response.status === 401) {
+                    console.log(err);
+                    if (err.response && err.response.status === 401) {
                         refreshToken().then((response2) => {
                             if (response2 !== false) {
                                 fabricSwatch(e, SwatchId, SwatchDetailId);
@@ -3318,7 +3376,8 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                     }).then((response) => {
                         setCartChanged(cartChanged + 1);
                     }).catch(err => {
-                        if (err.response.status === 401) {
+                        console.log(err);
+                        if (err.response && err.response.status === 401) {
                             refreshToken().then((response2) => {
                                 if (response2 !== false) {
                                     fabricSwatch(e, SwatchId, SwatchDetailId);
@@ -3449,7 +3508,8 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                     modalHandleClose("uploadPdf");
                     setDetailsShow(false);
                 }).catch(err => {
-                if (err.response.status === 401) {
+                console.log(err);
+                if (err.response && err.response.status === 401) {
                     refreshToken().then((response2) => {
                         if (response2 !== false) {
                             submitUploadedFile(PDFOrImg);
@@ -3492,7 +3552,8 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                     modalHandleClose(" uploadImg");
                     setDetailsShow(false);
                 }).catch(err => {
-                if (err.response.status === 401) {
+                console.log(err);
+                if (err.response && err.response.status === 401) {
                     refreshToken().then((response2) => {
                         if (response2 !== false) {
                             submitUploadedFile(PDFOrImg);
@@ -3621,7 +3682,8 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                 }).then((response) => {
                     resolve();
                 }).catch(err => {
-                    if (err.response.status === 401) {
+                    console.log(err);
+                    if (err.response && err.response.status === 401) {
                         refreshToken().then((response2) => {
                             if (response2 !== false) {
                                 deleteUploadedImg(uploadedImagesList1, uploadedImagesNamesList1, fileUrl, index);
@@ -3669,7 +3731,8 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                 }).then((response) => {
                     resolve();
                 }).catch(err => {
-                    if (err.response.status === 401) {
+                    console.log(err);
+                    if (err.response && err.response.status === 401) {
                         refreshToken().then((response2) => {
                             if (response2 !== false) {
                                 deleteUploadedPdf(uploadedPdfsNamesList1, fileUrl, index);
@@ -3712,7 +3775,8 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
         }).then((response) => {
             setProjectDetails(response.data, basketId);
         }).catch(err => {
-            if (err.response.status === 401) {
+            console.log(err);
+            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         getProjectDetail();
@@ -4061,22 +4125,22 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         getWindowSize(temp["WindowWidth"], temp["WindowHeight"]);
                     }
                     
-                    if (temp["Lining"]) {
-                        setStep4(temp["Lining"]);
-                        if (temp["Lining"] === "Standard Lining") {
-                            let refIndex = inputs.current["41"].getAttribute('ref-num');
-                            tempLabels[refIndex] = inputs.current["41"].getAttribute('text');
-                            tempValue[refIndex] = inputs.current["41"].value;
-                            depSetTempArr = new Set([...setGetDeps("", "4", depSetTempArr)]);
-                        } else {
-                            let refIndex = inputs.current["42"].getAttribute('ref-num');
-                            tempLabels[refIndex] = inputs.current["42"].getAttribute('text');
-                            tempValue[refIndex] = inputs.current["42"].value;
-                            depSetTempArr = new Set([...setGetDeps("", "4", depSetTempArr)]);
-                        }
-                        setStepSelectedLabel(tempLabels);
-                        setStepSelectedValue(tempValue);
-                    }
+                    // if (temp["Lining"]) {
+                    //     setStep4(temp["Lining"]);
+                    //     if (temp["Lining"] === "Standard Lining") {
+                    //         let refIndex = inputs.current["41"].getAttribute('ref-num');
+                    //         tempLabels[refIndex] = inputs.current["41"].getAttribute('text');
+                    //         tempValue[refIndex] = inputs.current["41"].value;
+                    //         depSetTempArr = new Set([...setGetDeps("", "4", depSetTempArr)]);
+                    //     } else {
+                    //         let refIndex = inputs.current["42"].getAttribute('ref-num');
+                    //         tempLabels[refIndex] = inputs.current["42"].getAttribute('text');
+                    //         tempValue[refIndex] = inputs.current["42"].value;
+                    //         depSetTempArr = new Set([...setGetDeps("", "4", depSetTempArr)]);
+                    //     }
+                    //     setStepSelectedLabel(tempLabels);
+                    //     setStepSelectedValue(tempValue);
+                    // }
                     
                     if (temp["PanelCoverage"]) {
                         setStep5(temp["PanelCoverage"]);
@@ -4429,6 +4493,9 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
             setMotorType(tempObj);
             // console.log(selectedMotorType);
             if (selectedMotorType.length) {
+                if (!motorLoad2) {
+                    setMotorLoad2(true);
+                }
                 setSelectedMotorType(selectedMotorType[0].value ? [{
                     value: selectedMotorType[0].value,
                     label: tempObj[pageLanguage].find(opt => opt.value === selectedMotorType[0].value).label
@@ -4887,7 +4954,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                 // setStepSelectedLabel(tempLabels);
                 
                 let tempExtended = extendedTitle;
-                tempExtended["8"][1]= <li key="1" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Design")}</span><span className="step_title_extended_list_item_text">{pageLanguage === "fa" ? convertToPersian(railObject["DesignName"]) : railObject["DesignENName"]}</span></li>;
+                tempExtended["8"][1] = <li key="1" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Design")}</span><span className="step_title_extended_list_item_text">{pageLanguage === "fa" ? convertToPersian(railObject["DesignName"]) : railObject["DesignENName"]}</span></li>;
                 tempExtended["8"].splice(2, 3);
                 setExtendedTitle(tempExtended);
             }
@@ -4915,7 +4982,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                 // tempLabels["8"] = pageLanguage === "fa" ? convertToPersian(railObject["DesignName"]) + " / " + convertToPersian(railObject2["ColorName"]) : railObject["DesignENName"] + " / " + railObject2["ColorEnName"];
                 // setStepSelectedLabel(tempLabels);
                 let tempExtended = extendedTitle;
-                tempExtended["8"][2]= <li key="2" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Color")}</span><span className="step_title_extended_list_item_text">{pageLanguage === "fa" ? convertToPersian(railObject2["ColorName"]) : railObject2["ColorEnName"]}</span></li>;
+                tempExtended["8"][2] = <li key="2" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Color")}</span><span className="step_title_extended_list_item_text">{pageLanguage === "fa" ? convertToPersian(railObject2["ColorName"]) : railObject2["ColorEnName"]}</span></li>;
                 setExtendedTitle(tempExtended);
             }
             setCart("RailId", step82, "", "RailColorFa,RailColorEn", [railObject2["ColorName"], railObject2["ColorEnName"]]);
@@ -4980,7 +5047,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                 // tempLabels["8B"] = pageLanguage === "fa" ? convertToPersian(railObject["DesignName"]) + " / " + convertToPersian(railObject2["ColorName"]) : railObject["DesignENName"] + " / " + railObject2["ColorEnName"];
                 // setStepSelectedLabel(tempLabels);
                 let tempExtended = extendedTitle;
-                tempExtended["8B"][1]= <li key="2" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Color")}</span><span className="step_title_extended_list_item_text">{pageLanguage === "fa" ? convertToPersian(railObject2["ColorName"]) : railObject2["ColorEnName"]}</span></li>;
+                tempExtended["8B"][1] = <li key="2" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Color")}</span><span className="step_title_extended_list_item_text">{pageLanguage === "fa" ? convertToPersian(railObject2["ColorName"]) : railObject2["ColorEnName"]}</span></li>;
                 setExtendedTitle(tempExtended);
             }
             setCart("RailIdB", step8B2, "", "RailColorFaB,RailColorEnB", [railObject2["ColorName"], railObject2["ColorEnName"]]);
@@ -5010,12 +5077,12 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
             
             if (railObject["RailCategoryId"] === 5302) {
                 setIs8CMotor(true);
-                setCart("RailDesignC", step8C1,"RailIdC,RailColorFaC,RailColorEnC", "RailDesignFaC,RailDesignEnC", [railObject["DesignName"], railObject["DesignENName"]]);
+                setCart("RailDesignC", step8C1, "RailIdC,RailColorFaC,RailColorEnC", "RailDesignFaC,RailDesignEnC", [railObject["DesignName"], railObject["DesignENName"]]);
                 setDeps((step8C5 !== "true" ? ",8C5" : ""), "8C1,8C2,8C3");
             } else {
                 setIs8CMotor(false);
                 setStep8C5("");
-                setCart("RailDesignC", step8C1,"RailIdC,RailColorFaC,RailColorEnC", "RailDesignFaC,RailDesignEnC,hasPower,MotorPosition,RemoteName,MotorChannels", [railObject["DesignName"], railObject["DesignENName"]]);
+                setCart("RailDesignC", step8C1, "RailIdC,RailColorFaC,RailColorEnC", "RailDesignFaC,RailDesignEnC,hasPower,MotorPosition,RemoteName,MotorChannels", [railObject["DesignName"], railObject["DesignENName"]]);
                 setDeps("8C2,8C3", "8C1,8C5,8C51");
                 showRodsColor(railObject, "8C2");
             }
@@ -5045,7 +5112,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                 // tempLabels["8C"] = pageLanguage === "fa" ? convertToPersian(railObject["DesignName"]) + " / " + convertToPersian(railObject2["ColorName"]) : railObject["DesignENName"] + " / " + railObject2["ColorEnName"];
                 // setStepSelectedLabel(tempLabels);
                 let tempExtended = extendedTitle;
-                tempExtended["8C"][1]= <li key="2" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Color")}</span><span className="step_title_extended_list_item_text">{pageLanguage === "fa" ? convertToPersian(railObject2["ColorName"]) : railObject2["ColorEnName"]}</span></li>;
+                tempExtended["8C"][1] = <li key="2" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Color")}</span><span className="step_title_extended_list_item_text">{pageLanguage === "fa" ? convertToPersian(railObject2["ColorName"]) : railObject2["ColorEnName"]}</span></li>;
                 setExtendedTitle(tempExtended);
             }
             setCart("RailIdC", step8C2, "", "RailColorFaC,RailColorEnC", [railObject2["ColorName"], railObject2["ColorEnName"]]);
@@ -5202,7 +5269,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                 let DesignENName = stepAccessories[found][found2]["DesignENName"];
                                 let DesignName = stepAccessories[found][found2]["DesignName"];
                                 let qty = obj["Qty"];
-                                tempText.push(`${pageLanguage === "en" ? DesignENName : DesignName} ${pageLanguage === "en" ?`x${qty}`:NumberToPersianWord.convertEnToPe(`${qty}x`)}`);
+                                tempText.push(`${pageLanguage === "en" ? DesignENName : DesignName} ${pageLanguage === "en" ? `x${qty}` : NumberToPersianWord.convertEnToPe(`${qty}x`)}`);
                                 resolve();
                             } else {
                                 resolve();
@@ -5213,22 +5280,22 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                     }, 100);
                 });
             });
-    
+            
             Promise.all(promiseArr).then(() => {
                 tempLabels["9"] = tempText.join(', \n');
                 // setAccTitle(tempText);
-        
+                
                 let tempExtended = extendedTitle;
-                tempExtended["9"]=tempText;
+                tempExtended["9"] = tempText;
                 setExtendedTitle(tempExtended);
                 setStepSelectedLabel(tempLabels);
             });
         } else {
             let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
             tempLabels["9"] = "";
-    
+            
             let tempExtended = extendedTitle;
-            tempExtended["9"]=[];
+            tempExtended["9"] = [];
             setExtendedTitle(tempExtended);
             setStepSelectedLabel(tempLabels);
         }
@@ -5539,7 +5606,8 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                 });
                 setRemoteNames(tempArr);
             }).catch(err => {
-                if (err.response.status === 401) {
+                console.log(err);
+                if (err.response && err.response.status === 401) {
                     refreshToken().then((response2) => {
                         if (response2 !== false) {
                             getRemoteNames();
@@ -5609,7 +5677,8 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                     setBag(response.data ? response.data : {});
                     resolve(response.data ? response.data : {});
                 }).catch(err => {
-                    if (err.response.status === 401) {
+                    console.log(err);
+                    if (err.response && err.response.status === 401) {
                         refreshToken().then((response2) => {
                             if (response2 !== false) {
                                 setCartChanged(cartChanged + 1);
@@ -5701,10 +5770,10 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                     setRodsList4([]);
                 }
             }
-            if(rodsLoad){
+            if (rodsLoad) {
                 setRodsLoad(false);
             }
-            if(rodsLoad2){
+            if (rodsLoad2) {
                 setRodsLoad2(false);
             }
         });
@@ -6067,10 +6136,10 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         {/* step 1 */}
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="1" stepNum={t("1")} stepTitle={t("grommet_step2")} stepRef="2" type="1" required={requiredStep["2"]}
+                                <ContextAwareToggle eventKey="2" stepNum={t("1")} stepTitle={t("grommet_step2")} stepRef="2" type="1" required={requiredStep["2"]}
                                                     stepSelected={stepSelectedLabel["2"] === undefined ? "" : stepSelectedLabel["2"]}/>
                             </Card.Header>
-                            <Accordion.Collapse eventKey="1">
+                            <Accordion.Collapse eventKey="2">
                                 <Card.Body>
                                     <div className="card_body card-body-fabric">
                                         <div className="search_filter_container">
@@ -6081,21 +6150,16 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                            name="search_input" value={searchText}
                                                            ref={search_input}
                                                            onChange={(e) => {
-                                                               if (e.target.value !== "")
-                                                                   setSearchShow(true);
-                                                               else
-                                                                   setSearchShow(false);
+                                                               if (e.target.value !== "") setSearchShow(true); else setSearchShow(false);
                                                                setSearchText(e.target.value);
                                                            }}/>
-                                                    {searchShow &&
-                                                        <div className="clear-icon-container" onClick={() => {
-                                                            search_input.current.value = "";
-                                                            setSearchText("");
-                                                            setSearchShow(false)
-                                                        }}>
-                                                            <i className="fa fa-times-circle clear-icon"/>
-                                                        </div>
-                                                    }
+                                                    {searchShow && <div className="clear-icon-container" onClick={() => {
+                                                        search_input.current.value = "";
+                                                        setSearchText("");
+                                                        setSearchShow(false)
+                                                    }}>
+                                                        <i className="fa fa-times-circle clear-icon"/>
+                                                    </div>}
                                                     <div className="search-icon-container">
                                                         <i className="fa fa-search search-icon"/>
                                                     </div>
@@ -6110,8 +6174,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                     <span className="filters_toggle">{t("Filters")}</span>
                                                     <span className="filters_indicator">
                                                         {filtersShow && <img className="arrow_down img-fluid" src={require('../Images/public/arrow_up.svg').default} alt=""/>}
-                                                        {!filtersShow &&
-                                                            <img className="arrow_down img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>}
+                                                        {!filtersShow && <img className="arrow_down img-fluid" src={require('../Images/public/arrow_down.svg').default} alt=""/>}
                                                     </span>
                                                 </div>
                                             </div>
@@ -6198,7 +6261,315 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                         <div className="fabrics_list_container">
                                             {fabricsList2}
                                         </div>
-                                        <NextStep eventKey="2">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="2" eventKey={step2 !== "" ? "2A" : "2B"}>{t("NEXT STEP")}</NextStep>
+                                    </div>
+                                </Card.Body>
+                            </Accordion.Collapse>
+                        </Card>
+                        
+                        {/* step 1A */}
+                        <Card className={step2 !== "" ? "" : "noDisplay"}>
+                            <Card.Header className={step2A !== "" && (!accordionActiveKey.startsWith("2") || accordionActiveKey === "2B" || accordionActiveKey === "2C") ? "hidden" : ""}>
+                                <ContextAwareToggle eventKey="2A" stepNum={t("1A")} stepTitle={t("grommet_step2A")} stepRef="2A" type="1" required={requiredStep["2A"]}
+                                                    stepSelected={stepSelectedLabel["2A"] === undefined ? "" : stepSelectedLabel["2A"]}/>
+                            </Card.Header>
+                            <Accordion.Collapse eventKey="2A">
+                                <Card.Body>
+                                    {/*<div className="card_body card_body_radio bracket_color">*/}
+                                    {/*    <div className="box25">*/}
+                                    {/*        <div className="radio_group">*/}
+                                    {/*            <label className="radio_container">*/}
+                                    {/*                <input className="radio" type="radio" text={t("Grommet")} value="1" name="step2A" ref-num="2A" id="2A1" outline="true"*/}
+                                    {/*                       checked={step2A === "Grommet"}*/}
+                                    {/*                       onChange={e => {*/}
+                                    {/*                           selectChanged(e);*/}
+                                    {/*                           setStep2A("Grommet");*/}
+                                    {/*                           setDeps("", "2A");*/}
+                                    {/*                           setCart("HeaderStyle", "Grommet");*/}
+                                    {/*                       }} ref={ref => (inputs.current["2A1"] = ref)}/>*/}
+                                    {/*                <div className="frame_img">*/}
+                                    {/*                    <img src={require('../Images/drapery/grommet/eyelet.svg').default} className="img-fluid bracket_color_img" alt=""/>*/}
+                                    {/*                </div>*/}
+                                    {/*            </label>*/}
+                                    {/*            <div className="radio_group_name_container">*/}
+                                    {/*                <h1>{t("Grommet")}</h1>*/}
+                                    {/*            </div>*/}
+                                    {/*        </div>*/}
+                                    {/*    </div>*/}
+                                    {/*    <div className="box25">*/}
+                                    {/*        <div className="radio_group">*/}
+                                    {/*            <label className="radio_container">*/}
+                                    {/*                <input className="radio" type="radio" text={t("Inverted Box Pleat")} value="2" name="step2A" ref-num="2A" id="2A2"*/}
+                                    {/*                       outline="true"*/}
+                                    {/*                       checked={step2A === "Inverted Box Pleat"}*/}
+                                    {/*                       onChange={e => {*/}
+                                    {/*                           selectChanged(e);*/}
+                                    {/*                           setStep2A("Inverted Box Pleat");*/}
+                                    {/*                           setDeps("", "2A");*/}
+                                    {/*                           setCart("HeaderStyle", "Inverted Box Pleat");*/}
+                                    {/*                       }} ref={ref => (inputs.current["2A2"] = ref)}/>*/}
+                                    {/*                <div className="frame_img">*/}
+                                    {/*                    <img src={require('../Images/drapery/grommet/triplePinchPleat.svg').default} className="img-fluid bracket_color_img"*/}
+                                    {/*                         alt=""/>*/}
+                                    {/*                </div>*/}
+                                    {/*            </label>*/}
+                                    {/*            <div className="radio_group_name_container">*/}
+                                    {/*                <h1>{t("Inverted Box Pleat")}</h1>*/}
+                                    {/*            </div>*/}
+                                    {/*        </div>*/}
+                                    {/*    </div>*/}
+                                    {/*    <div className="box25">*/}
+                                    {/*        <div className="radio_group">*/}
+                                    {/*            <label className="radio_container">*/}
+                                    {/*                <input className="radio" type="radio" text={t("Pencil Pleat")} value="3" name="step2A" ref-num="2A" id="2A3" outline="true"*/}
+                                    {/*                       checked={step2A === "Pencil Pleat"}*/}
+                                    {/*                       onChange={e => {*/}
+                                    {/*                           selectChanged(e);*/}
+                                    {/*                           setStep2A("Pencil Pleat");*/}
+                                    {/*                           setDeps("", "2A");*/}
+                                    {/*                           setCart("HeaderStyle", "Pencil Pleat");*/}
+                                    {/*                       }} ref={ref => (inputs.current["2A3"] = ref)}/>*/}
+                                    {/*                <div className="frame_img">*/}
+                                    {/*                    <img src={require('../Images/drapery/grommet/pencilPleat.svg').default} className="img-fluid bracket_color_img" alt=""/>*/}
+                                    {/*                </div>*/}
+                                    {/*            </label>*/}
+                                    {/*            <div className="radio_group_name_container">*/}
+                                    {/*                <h1>{t("Pencil Pleat")}</h1>*/}
+                                    {/*            </div>*/}
+                                    {/*        </div>*/}
+                                    {/*    </div>*/}
+                                    {/*    <div className="box25">*/}
+                                    {/*        <div className="radio_group">*/}
+                                    {/*            <label className="radio_container">*/}
+                                    {/*                <input className="radio" type="radio" text={t("Rod Pocket")} value="4" name="step2A" ref-num="2A" id="2A4" outline="true"*/}
+                                    {/*                       checked={step2A === "Rod Pocket"}*/}
+                                    {/*                       onChange={e => {*/}
+                                    {/*                           selectChanged(e);*/}
+                                    {/*                           setStep2A("Rod Pocket");*/}
+                                    {/*                           setDeps("", "2A");*/}
+                                    {/*                           setCart("HeaderStyle", "Rod Pocket");*/}
+                                    {/*                       }} ref={ref => (inputs.current["2A4"] = ref)}/>*/}
+                                    {/*                <div className="frame_img">*/}
+                                    {/*                    <img src={require('../Images/drapery/grommet/doublePinchPleat.svg').default} className="img-fluid bracket_color_img"*/}
+                                    {/*                         alt=""/>*/}
+                                    {/*                </div>*/}
+                                    {/*            </label>*/}
+                                    {/*            <div className="radio_group_name_container">*/}
+                                    {/*                <h1>{t("Rod Pocket")}</h1>*/}
+                                    {/*            </div>*/}
+                                    {/*        </div>*/}
+                                    {/*    </div>*/}
+                                    {/*    <NextStep eventKey="2B">{t("NEXT STEP")}</NextStep>*/}
+                                    {/*</div>*/}
+                                    <div className="card_body card_body_radio card_body_radio_camera card_body_radio_small_img">
+                                        <div className="box33 radio_style">
+                                            <img src={require('../Images/drapery/grommet/Grommet_sketch.svg').default} className="img-fluid" alt=""/>
+                                            <input className="radio" type="radio" text={t("Grommet")} value="1" name="step2A" ref-num="2A" id="2A1"
+                                                   checked={step2A === "Grommet"}
+                                                   onChange={e => {
+                                                       if ((step2A === "Inverted Box Pleat" || step2A === "Pencil Pleat") && step8 === "Customize Hardware Per Curtain") {
+                                                           modalHandleShow("SheerHeaderStyleWarning");
+                                                           setSheerHeaderStyleTemp({
+                                                               stepValue: "Grommet",
+                                                               id: "0099",
+                                                               cartValue: "Grommet",
+                                                               event: e
+                                                           });
+                                                       } else {
+                                                           setStep2A("Grommet");
+                                                           setDeps("", "2A");
+                                                           setCart("SheerHeaderStyle", "Grommet");
+                                                           selectChanged(e);
+                                                           setSheersModelId("0099");
+                                                       }
+                                                   }} ref={ref => (inputs.current["2A1"] = ref)}/>
+                                            <label htmlFor="2A1">{t("HeaderStyle1")}
+                                                {/*<span className="popover_indicator">*/}
+                                                {/*    {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}*/}
+                                                {/*                          children={<object className="popover_camera" type="image/svg+xml"*/}
+                                                {/*                                            data={require('../Images/public/camera.svg').default}/>}*/}
+                                                {/*                          component={*/}
+                                                {/*                              <div className="clearfix">*/}
+                                                {/*                                  <div className="popover_image clearfix">*/}
+                                                {/*                                      <img*/}
+                                                {/*                                          src={popoverImages["step2a1"] === undefined ? require('../Images/drapery/grommet/pencilpleat.png') : popoverImages["step2a1"]}*/}
+                                                {/*                                          className="img-fluid" alt=""/>*/}
+                                                {/*                                  </div>*/}
+                                                {/*                                  <div className="popover_footer">*/}
+                                                {/*                                      <span className="popover_footer_title">{t("dk_step_help_camera_title")}</span>*/}
+                                                {/*                                      <span className="popover_thumbnails">*/}
+                                                {/*                                          <div>*/}
+                                                {/*                                              <img src={require('../Images/drapery/grommet/pencilpleat.png')}*/}
+                                                {/*                                                   text="step2a1"*/}
+                                                {/*                                                   onMouseEnter={(e) => popoverThumbnailHover(e)}*/}
+                                                {/*                                                   className="popover_thumbnail_img img-fluid"*/}
+                                                {/*                                                   alt=""/>*/}
+                                                {/*                                          </div>*/}
+                                                {/*                                      </span>*/}
+                                                {/*                                  </div>*/}
+                                                {/*                              </div>*/}
+                                                {/*                          }/>*/}
+                                                {/*    }*/}
+                                                {/*</span>*/}
+                                            </label>
+                                        </div>
+                                        <div className="box33 radio_style">
+                                            <img src={require('../Images/drapery/grommet/Inverted_sketch.svg').default} className="img-fluid" alt=""/>
+                                            <input className="radio" type="radio" text={t("Inverted Box Pleat")} value="2" name="step2A" ref-num="2A" id="2A2"
+                                                   checked={step2A === "Inverted Box Pleat"}
+                                                   onChange={e => {
+                                                       if ((step2A === "Grommet" || step2A === "Rod Pocket") && step8 === "Customize Hardware Per Curtain") {
+                                                           modalHandleShow("SheerHeaderStyleWarning");
+                                                           setSheerHeaderStyleTemp({
+                                                               stepValue: "Inverted Box Pleat",
+                                                               id: "0036",
+                                                               cartValue: "Inverted Box Pleat",
+                                                               event: e
+                                                           });
+                                                       } else {
+                                                           setStep2A("Inverted Box Pleat");
+                                                           setDeps("", "2A");
+                                                           setCart("SheerHeaderStyle", "Inverted Box Pleat");
+                                                           selectChanged(e);
+                                                           setSheersModelId("0036");
+                                                       }
+                                                   }} ref={ref => (inputs.current["2A2"] = ref)}/>
+                                            <label htmlFor="2A2">{t("HeaderStyle2")}
+                                                {/*<span className="popover_indicator">*/}
+                                                {/*    {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}*/}
+                                                {/*                          children={<object className="popover_camera" type="image/svg+xml"*/}
+                                                {/*                                            data={require('../Images/public/camera.svg').default}/>}*/}
+                                                {/*                          component={*/}
+                                                {/*                              <div className="clearfix">*/}
+                                                {/*                                  <div className="popover_image clearfix">*/}
+                                                {/*                                      <img*/}
+                                                {/*                                          src={popoverImages["step2a3"] === undefined ? require('../Images/drapery/grommet/invertedboxpleat.png') : popoverImages["step2a1"]}*/}
+                                                {/*                                          className="img-fluid" alt=""/>*/}
+                                                {/*                                  </div>*/}
+                                                {/*                                  <div className="popover_footer">*/}
+                                                {/*                                      <span className="popover_footer_title">{t("dk_step_help_camera_title")}</span>*/}
+                                                {/*                                      <span className="popover_thumbnails">*/}
+                                                {/*                                          <div>*/}
+                                                {/*                                              <img src={require('../Images/drapery/grommet/invertedboxpleat.png')}*/}
+                                                {/*                                                   text="step2a3"*/}
+                                                {/*                                                   onMouseEnter={(e) => popoverThumbnailHover(e)}*/}
+                                                {/*                                                   className="popover_thumbnail_img img-fluid"*/}
+                                                {/*                                                   alt=""/>*/}
+                                                {/*                                          </div>*/}
+                                                {/*                                      </span>*/}
+                                                {/*                                  </div>*/}
+                                                {/*                              </div>*/}
+                                                {/*                          }/>*/}
+                                                {/*    }*/}
+                                                {/*</span>*/}
+                                            </label>
+                                        </div>
+                                        <div className="box33 radio_style">
+                                            <img src={require('../Images/drapery/grommet/pencilPleat.svg').default} className="img-fluid" alt=""/>
+                                            <input className="radio" type="radio" text={t("Pencil Pleat")} value="3" name="step2A" ref-num="2A" id="2A3"
+                                                   checked={step2A === "Pencil Pleat"}
+                                                   onChange={e => {
+                                                       if ((step2A === "Grommet" || step2A === "Rod Pocket") && step8 === "Customize Hardware Per Curtain") {
+                                                           modalHandleShow("SheerHeaderStyleWarning");
+                                                           setSheerHeaderStyleTemp({
+                                                               stepValue: "Pencil Pleat",
+                                                               id: "0001",
+                                                               cartValue: "Pencil Pleat",
+                                                               event: e
+                                                           });
+                                                       } else {
+                                                           setStep2A("Pencil Pleat");
+                                                           setDeps("", "2A");
+                                                           setCart("SheerHeaderStyle", "Pencil Pleat");
+                                                           selectChanged(e);
+                                                           setSheersModelId("0001");
+                                                       }
+                                                   }} ref={ref => (inputs.current["2A3"] = ref)}/>
+                                            <label htmlFor="2A3">{t("HeaderStyle3")}
+                                                {/*<span className="popover_indicator">*/}
+                                                {/*    {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}*/}
+                                                {/*                          children={<object className="popover_camera" type="image/svg+xml"*/}
+                                                {/*                                            data={require('../Images/public/camera.svg').default}/>}*/}
+                                                {/*                          component={*/}
+                                                {/*                              <div className="clearfix">*/}
+                                                {/*                                  <div className="popover_image clearfix">*/}
+                                                {/*                                      <img*/}
+                                                {/*                                          src={popoverImages["step2a2"] === undefined ? require('../Images/drapery/grommet/pencilpleat.png') : popoverImages["step2a1"]}*/}
+                                                {/*                                          className="img-fluid" alt=""/>*/}
+                                                {/*                                  </div>*/}
+                                                {/*                                  <div className="popover_footer">*/}
+                                                {/*                                      <span className="popover_footer_title">{t("dk_step_help_camera_title")}</span>*/}
+                                                {/*                                      <span className="popover_thumbnails">*/}
+                                                {/*                                          <div>*/}
+                                                {/*                                              <img src={require('../Images/drapery/grommet/pencilpleat.png')}*/}
+                                                {/*                                                   text="step2a2"*/}
+                                                {/*                                                   onMouseEnter={(e) => popoverThumbnailHover(e)}*/}
+                                                {/*                                                   className="popover_thumbnail_img img-fluid"*/}
+                                                {/*                                                   alt=""/>*/}
+                                                {/*                                                   alt=""/>*/}
+                                                {/*                                          </div>*/}
+                                                {/*                                      </span>*/}
+                                                {/*                                  </div>*/}
+                                                {/*                              </div>*/}
+                                                {/*                          }/>*/}
+                                                {/*    }*/}
+                                                {/*</span>*/}
+                                            </label>
+                                        </div>
+                                        {/*<div className="box25 radio_style">*/}
+                                        {/*    <img src={require('../Images/drapery/grommet/doublePinchPleat.svg').default} className="img-fluid temp70" alt=""/>*/}
+                                        {/*    <input className="radio" type="radio" text={t("Rod Pocket")} value="4" name="step2A" ref-num="2A" id="2A4"*/}
+                                        {/*           checked={step2A === "Rod Pocket"}*/}
+                                        {/*           onChange={e => {*/}
+                                        {/*               if((step2A==="Inverted Box Pleat" || step2A==="Pencil Pleat") && step8==="Customize Hardware Per Curtain"){*/}
+                                        {/*                   modalHandleShow("SheerHeaderStyleWarning");*/}
+                                        {/*                   setSheerHeaderStyleTemp({*/}
+                                        {/*                       stepValue:"Rod Pocket",*/}
+                                        {/*                       id:"0037",*/}
+                                        {/*                       cartValue:"Rod Pocket",*/}
+                                        {/*                       event:e*/}
+                                        {/*                   });*/}
+                                        {/*               }*/}
+                                        {/*               else {*/}
+                                        {/*                   setStep2A("Rod Pocket");*/}
+                                        {/*                   setDeps("", "2A");*/}
+                                        {/*                   setCart("SheerHeaderStyle", "Rod Pocket");*/}
+                                        {/*                   selectChanged(e);*/}
+                                        {/*                   setSheersModelId("0037");*/}
+                                        {/*               }*/}
+                                        {/*           }} ref={ref => (inputs.current["2A4"] = ref)}/>*/}
+                                        {/*    <label htmlFor="2A4">{t("HeaderStyle4")}*/}
+                                        {/*        /!*<span className="popover_indicator">*!/*/}
+                                        {/*        /!*    {<PopoverStickOnHover placement={`${pageLanguage === 'fa' ? "right" : "left"}`}*!/*/}
+                                        {/*        /!*                          children={<object className="popover_camera" type="image/svg+xml"*!/*/}
+                                        {/*        /!*                                            data={require('../Images/public/camera.svg').default}/>}*!/*/}
+                                        {/*        /!*                          component={*!/*/}
+                                        {/*        /!*                              <div className="clearfix">*!/*/}
+                                        {/*        /!*                                  <div className="popover_image clearfix">*!/*/}
+                                        {/*        /!*                                      <img*!/*/}
+                                        {/*        /!*                                          src={popoverImages["step2a4"] === undefined ? require('../Images/drapery/grommet/pencilpleat.png') : popoverImages["step2a1"]}*!/*/}
+                                        {/*        /!*                                          className="img-fluid" alt=""/>*!/*/}
+                                        {/*        /!*                                  </div>*!/*/}
+                                        {/*        /!*                                  <div className="popover_footer">*!/*/}
+                                        {/*        /!*                                      <span className="popover_footer_title">{t("dk_step_help_camera_title")}</span>*!/*/}
+                                        {/*        /!*                                      <span className="popover_thumbnails">*!/*/}
+                                        {/*        /!*                                          <div>*!/*/}
+                                        {/*        /!*                                              <img src={require('../Images/drapery/grommet/pencilpleat.png')}*!/*/}
+                                        {/*        /!*                                                   text="step2a4"*!/*/}
+                                        {/*        /!*                                                   onMouseEnter={(e) => popoverThumbnailHover(e)}*!/*/}
+                                        {/*        /!*                                                   className="popover_thumbnail_img img-fluid"*!/*/}
+                                        {/*        /!*                                                   alt=""/>*!/*/}
+                                        {/*        /!*                                          </div>*!/*/}
+                                        {/*        /!*                                      </span>*!/*/}
+                                        {/*        /!*                                  </div>*!/*/}
+                                        {/*        /!*                              </div>*!/*/}
+                                        {/*        /!*                          }/>*!/*/}
+                                        {/*        /!*    }*!/*/}
+                                        {/*        /!*</span>*!/*/}
+                                        {/*    </label>*/}
+                                        {/*</div>*/}
+                                        
+                                        <NextStep currentStep="2A" eventKey="2B">{t("NEXT STEP")}</NextStep>
                                     </div>
                                 </Card.Body>
                             </Accordion.Collapse>
@@ -6207,10 +6578,10 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         {/* step 2 */}
                         <Card>
                             <Card.Header>
-                                <ContextAwareToggle eventKey="2" stepNum={t("2")} stepTitle={t("grommet3_step2")} stepRef="2B" type="1" required={requiredStep["2B"]}
+                                <ContextAwareToggle eventKey="2B" stepNum={t("2")} stepTitle={t("grommet3_step2")} stepRef="2B" type="1" required={requiredStep["2B"]}
                                                     stepSelected={stepSelectedLabel["2B"] === undefined ? "" : stepSelectedLabel["2B"]}/>
                             </Card.Header>
-                            <Accordion.Collapse eventKey="2">
+                            <Accordion.Collapse eventKey="2B">
                                 <Card.Body>
                                     <div className="card_body card_body_radio card-body-fabric_grommet">
                                         <div className="box33 radio_style">
@@ -6220,25 +6591,25 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                    onChange={e => {
                                                        setStep2B("None");
                                                        setStep2B1("");
-                                                       setStep2A("");
-                                                       if (step8 === "Customize Hardware For Per Curtains") {
+                                                       setStep2C("");
+                                                       if (step8 === "Customize Hardware Per Curtain") {
                                                            clearHardwareSteps();
                                                            // if (step31 !== "false") {
                                                            //     selectChanged(e, "8,8A,8B,8C");
                                                            //     setCart("PrivacyLayer", "None", "Hardware,DraperyHardware,SheerHardware,PrivacyLayerHardware,RodColor,BatonOption,Mount8,RodColorA,BatonOptionA,MountA,RodColorB,BatonOptionB,MountB,RodColorC,BatonOptionC,MountC");
-                                                           //     setDeps("", "2B,2B1", "8,8A,8B,8C,81,82,83,84,8A1,8A2,8A3,8A4,8B1,8B2,8B3,8B4,8C1,8C2,8C3");
+                                                           //     setDeps("", "2B,2B1", "8,8A,8B,8C,81,82,83,84,8A1,8A2,8A3,8A4,8B1,8B2,8B3,8C1,8C2,8C3");
                                                            // } else {
                                                            //     selectChanged(e, "8,8A,8B,8C");
                                                            //     setCart("PrivacyLayer", "None", "Hardware,DraperyHardware,SheerHardware,PrivacyLayerHardware,RodColor,BatonOption,RodColorA,BatonOptionA,MountA,RodColorB,BatonOptionB,MountB,RodColorC,BatonOptionC,MountC");
-                                                           //     setDeps("", "2B,2B1", "8,8A,8B,8C,81,82,83,84,8A1,8A2,8A3,8A4,8B1,8B2,8B3,8B4,8C1,8C2,8C3");
+                                                           //     setDeps("", "2B,2B1", "8,8A,8B,8C,81,82,83,84,8A1,8A2,8A3,8A4,8B1,8B2,8B3,8C1,8C2,8C3");
                                                            // }
                                                            selectChanged(e, "8,8A,8B,8C");
                                                            setCart("PrivacyLayer", "None", "PrivacyLayerHeaderStyle,Hardware,DraperyHardware,SheerHardware,PrivacyLayerHardware,RodColor,BatonOption,Mount8,RodColorA,BatonOptionA,MountA,RodColorB,BatonOptionB,MountB,RodColorC,BatonOptionC,MountC");
-                                                           setDeps("", "2B,2B1", "8,8A,8B,8C,81,82,83,84,8A1,8A2,8A3,8A4,8B1,8B2,8B3,8B4,8C1,8C2,8C3");
+                                                           setDeps("", "2B,2B1,2C", "8,8A,8B,8C,81,82,83,84,8A1,8A2,8A3,8A4,8B1,8B2,8B3,8C1,8C2,8C3");
                                                        } else {
                                                            selectChanged(e);
                                                            setCart("PrivacyLayer", "None", "PrivacyLayerHeaderStyle");
-                                                           setDeps("", "2B,2B1");
+                                                           setDeps("", "2B,2B1,2C");
                                                        }
                                                    }} ref={ref => (inputs.current["2B1"] = ref)}/>
                                             <label htmlFor="2B1">{t("None")}</label>
@@ -6250,24 +6621,24 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                    onChange={e => {
                                                        setStep2B("Semi Sheer");
                                                        setStep2B1("");
-                                                       if (step8 === "Customize Hardware For Per Curtains") {
+                                                       if (step8 === "Customize Hardware Per Curtain") {
                                                            clearHardwareSteps();
                                                            // if (step31 !== "false") {
                                                            //     selectChanged(e, "8,8A,8B,8C");
                                                            //     setCart("PrivacyLayer", "Semi Sheer", "Hardware,DraperyHardware,SheerHardware,PrivacyLayerHardware,RodColor,BatonOption,Mount8,RodColorA,BatonOptionA,MountA,RodColorB,BatonOptionB,MountB,RodColorC,BatonOptionC,MountC");
-                                                           //     setDeps("2B1", "2B", "8,8A,8B,8C,81,82,83,84,8A1,8A2,8A3,8A4,8B1,8B2,8B3,8B4,8C1,8C2,8C3");
+                                                           //     setDeps("2B1", "2B", "8,8A,8B,8C,81,82,83,84,8A1,8A2,8A3,8A4,8B1,8B2,8B3,8C1,8C2,8C3");
                                                            // } else {
                                                            //     selectChanged(e, "8,8A,8B,8C");
                                                            //     setCart("PrivacyLayer", "Semi Sheer", "Hardware,DraperyHardware,SheerHardware,PrivacyLayerHardware,RodColor,BatonOption,RodColorA,BatonOptionA,MountA,RodColorB,BatonOptionB,MountB,RodColorC,BatonOptionC,MountC");
-                                                           //     setDeps("2B1", "2B", "8,8A,8B,8C,81,82,83,84,8A1,8A2,8A3,8A4,8B1,8B2,8B3,8B4,8C1,8C2,8C3");
+                                                           //     setDeps("2B1", "2B", "8,8A,8B,8C,81,82,83,84,8A1,8A2,8A3,8A4,8B1,8B2,8B3,8C1,8C2,8C3");
                                                            // }
                                                            selectChanged(e, "8,8A,8B,8C");
                                                            setCart("PrivacyLayer", "Semi Sheer", "Hardware,DraperyHardware,SheerHardware,PrivacyLayerHardware,RodColor,BatonOption,Mount8,RodColorA,BatonOptionA,MountA,RodColorB,BatonOptionB,MountB,RodColorC,BatonOptionC,MountC");
-                                                           setDeps("2B1", "2B", "8,8A,8B,8C,81,82,83,84,8A1,8A2,8A3,8A4,8B1,8B2,8B3,8B4,8C1,8C2,8C3");
+                                                           setDeps("2B1,2C", "2B", "8,8A,8B,8C,81,82,83,84,8A1,8A2,8A3,8A4,8B1,8B2,8B3,8C1,8C2,8C3");
                                                        } else {
                                                            selectChanged(e);
                                                            setCart("PrivacyLayer", "Semi Sheer");
-                                                           setDeps("2B1", "2B");
+                                                           setDeps("2B1,2C", "2B");
                                                        }
                                                    }} ref={ref => (inputs.current["2B2"] = ref)}/>
                                             <label htmlFor="2B2">{t("Semi Sheer")}</label>
@@ -6279,24 +6650,24 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                    onChange={e => {
                                                        setStep2B("Opaque");
                                                        setStep2B1("");
-                                                       if (step8 === "Customize Hardware For Per Curtains") {
+                                                       if (step8 === "Customize Hardware Per Curtain") {
                                                            clearHardwareSteps();
                                                            // if (step31 !== "false") {
                                                            //     selectChanged(e, "8,8A,8B,8C");
                                                            //     setCart("PrivacyLayer", "Opaque", "Hardware,DraperyHardware,SheerHardware,PrivacyLayerHardware,RodColor,BatonOption,Mount,RodColorA,BatonOptionA,MountA,RodColorB,BatonOptionB,MountB,RodColorC,BatonOptionC,MountC");
-                                                           //     setDeps("2B1", "2B", "8,8A,8B,8C,81,82,83,84,8A1,8A2,8A3,8A4,8B1,8B2,8B3,8B4,8C1,8C2,8C3");
+                                                           //     setDeps("2B1", "2B", "8,8A,8B,8C,81,82,83,84,8A1,8A2,8A3,8A4,8B1,8B2,8B3,8C1,8C2,8C3");
                                                            // } else {
                                                            //     selectChanged(e, "8,8A,8B,8C");
                                                            //     setCart("PrivacyLayer", "Opaque", "Hardware,DraperyHardware,SheerHardware,PrivacyLayerHardware,RodColor,BatonOption,RodColorA,BatonOptionA,MountA,RodColorB,BatonOptionB,MountB,RodColorC,BatonOptionC,MountC");
-                                                           //     setDeps("2B1", "2B", "8,8A,8B,8C,81,82,83,84,8A1,8A2,8A3,8A4,8B1,8B2,8B3,8B4,8C1,8C2,8C3");
+                                                           //     setDeps("2B1", "2B", "8,8A,8B,8C,81,82,83,84,8A1,8A2,8A3,8A4,8B1,8B2,8B3,8C1,8C2,8C3");
                                                            // }
                                                            selectChanged(e, "8,8A,8B,8C");
                                                            setCart("PrivacyLayer", "Opaque", "Hardware,DraperyHardware,SheerHardware,PrivacyLayerHardware,RodColor,BatonOption,Mount,RodColorA,BatonOptionA,MountA,RodColorB,BatonOptionB,MountB,RodColorC,BatonOptionC,MountC");
-                                                           setDeps("2B1", "2B", "8,8A,8B,8C,81,82,83,84,8A1,8A2,8A3,8A4,8B1,8B2,8B3,8B4,8C1,8C2,8C3");
+                                                           setDeps("2B1,2C", "2B", "8,8A,8B,8C,81,82,83,84,8A1,8A2,8A3,8A4,8B1,8B2,8B3,8C1,8C2,8C3");
                                                        } else {
                                                            selectChanged(e);
                                                            setCart("PrivacyLayer", "Opaque");
-                                                           setDeps("2B1", "2B");
+                                                           setDeps("2B1,2C", "2B");
                                                        }
                                                    }} ref={ref => (inputs.current["2B3"] = ref)}/>
                                             <label htmlFor="2B3">{t("Opaque")}</label>
@@ -6312,7 +6683,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                 {sheersList2}
                                             </div>
                                         </div>
-                                        <NextStep eventKey={step2B !== "" && step2B !== "None" ? "2A" : "3"}>{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="2B" eventKey={step2B !== "" && step2B !== "None" ? "2C" : "3"}>{t("NEXT STEP")}</NextStep>
                                     </div>
                                 </Card.Body>
                             </Accordion.Collapse>
@@ -6320,87 +6691,87 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         
                         {/* step 2A */}
                         <Card className={step2B !== "" && step2B !== "None" ? "" : "noDisplay"}>
-                            <Card.Header>
-                                <ContextAwareToggle eventKey="2A" stepNum={t("2A")} stepTitle={t("grommet_step2A_sheer")} stepRef="2A" type="1" required={requiredStep["2A"]}
-                                                    stepSelected={stepSelectedLabel["2A"] === undefined ? "" : stepSelectedLabel["2A"]}/>
+                            <Card.Header className={step2C !== "" && (!accordionActiveKey.startsWith("2") || accordionActiveKey === "2A" || accordionActiveKey === "2") ? "hidden" : ""}>
+                                <ContextAwareToggle eventKey="2C" stepNum={t("2A")} stepTitle={t("grommet_step2A_sheer")} stepRef="2C" type="1" required={requiredStep["2C"]}
+                                                    stepSelected={stepSelectedLabel["2C"] === undefined ? "" : stepSelectedLabel["2C"]}/>
                             </Card.Header>
-                            <Accordion.Collapse eventKey="2A">
+                            <Accordion.Collapse eventKey="2C">
                                 <Card.Body>
                                     <div className="card_body card_body_radio card_body_radio_camera card_body_radio_small_img">
                                         <div className="box33 radio_style">
                                             <img src={require('../Images/drapery/grommet/Grommet_sketch.svg').default} className="img-fluid" alt=""/>
-                                            <input className="radio" type="radio" text={t("Grommet")} value="1" name="step2A" ref-num="2A" id="2A1"
-                                                   checked={step2A === "Grommet"}
+                                            <input className="radio" type="radio" text={t("Grommet")} value="1" name="step2C" ref-num="2C" id="2C1"
+                                                   checked={step2C === "Grommet"}
                                                    onChange={e => {
-                                                       if ((step2A === "Inverted Box Pleat" || step2A === "Pencil Pleat") && step8 === "Customize Hardware For Per Curtains") {
-                                                           modalHandleShow("SheerHeaderStyleWarning");
-                                                           setSheerHeaderStyleTemp({
+                                                       if ((step2C === "Inverted Box Pleat" || step2C === "Pencil Pleat") && step8 === "Customize Hardware Per Curtain") {
+                                                           modalHandleShow("SheerHeaderStyleWarning2");
+                                                           setSheerHeaderStyleTemp2({
                                                                stepValue: "Grommet",
                                                                id: "0099",
                                                                cartValue: "Grommet",
                                                                event: e
                                                            });
                                                        } else {
-                                                           setStep2A("Grommet");
-                                                           setDeps("", "2A");
+                                                           setStep2C("Grommet");
+                                                           setDeps("", "2C");
                                                            setCart("PrivacyLayerHeaderStyle", "Grommet");
                                                            selectChanged(e);
-                                                           setSheersModelId("0099");
+                                                           setSheersModelId2("0099");
                                                        }
-                                                   }} ref={ref => (inputs.current["2A1"] = ref)}/>
-                                            <label htmlFor="2A1">{t("HeaderStyle1")}
+                                                   }} ref={ref => (inputs.current["2C1"] = ref)}/>
+                                            <label htmlFor="2C1">{t("HeaderStyle1")}
                                             </label>
                                         </div>
                                         <div className="box33 radio_style">
                                             <img src={require('../Images/drapery/grommet/Inverted_sketch.svg').default} className="img-fluid" alt=""/>
-                                            <input className="radio" type="radio" text={t("Inverted Box Pleat")} value="2" name="step2A" ref-num="2A" id="2A2"
-                                                   checked={step2A === "Inverted Box Pleat"}
+                                            <input className="radio" type="radio" text={t("Inverted Box Pleat")} value="2" name="step2C" ref-num="2C" id="2C2"
+                                                   checked={step2C === "Inverted Box Pleat"}
                                                    onChange={e => {
-                                                       if ((step2A === "Grommet" || step2A === "Rod Pocket") && step8 === "Customize Hardware For Per Curtains") {
-                                                           modalHandleShow("SheerHeaderStyleWarning");
-                                                           setSheerHeaderStyleTemp({
+                                                       if ((step2C === "Grommet" || step2C === "Rod Pocket") && step8 === "Customize Hardware Per Curtain") {
+                                                           modalHandleShow("SheerHeaderStyleWarning2");
+                                                           setSheerHeaderStyleTemp2({
                                                                stepValue: "Inverted Box Pleat",
                                                                id: "0036",
                                                                cartValue: "Inverted Box Pleat",
                                                                event: e
                                                            });
                                                        } else {
-                                                           setStep2A("Inverted Box Pleat");
-                                                           setDeps("", "2A");
+                                                           setStep2C("Inverted Box Pleat");
+                                                           setDeps("", "2C");
                                                            setCart("PrivacyLayerHeaderStyle", "Inverted Box Pleat");
                                                            selectChanged(e);
-                                                           setSheersModelId("0036");
+                                                           setSheersModelId2("0036");
                                                        }
-                                                   }} ref={ref => (inputs.current["2A2"] = ref)}/>
-                                            <label htmlFor="2A2">{t("HeaderStyle2")}
+                                                   }} ref={ref => (inputs.current["2C2"] = ref)}/>
+                                            <label htmlFor="2C2">{t("HeaderStyle2")}
                                             </label>
                                         </div>
                                         <div className="box33 radio_style">
                                             <img src={require('../Images/drapery/grommet/pencilPleat.svg').default} className="img-fluid" alt=""/>
-                                            <input className="radio" type="radio" text={t("Pencil Pleat")} value="3" name="step2A" ref-num="2A" id="2A3"
-                                                   checked={step2A === "Pencil Pleat"}
+                                            <input className="radio" type="radio" text={t("Pencil Pleat")} value="3" name="step2C" ref-num="2C" id="2C3"
+                                                   checked={step2C === "Pencil Pleat"}
                                                    onChange={e => {
-                                                       if ((step2A === "Grommet" || step2A === "Rod Pocket") && step8 === "Customize Hardware For Per Curtains") {
-                                                           modalHandleShow("SheerHeaderStyleWarning");
-                                                           setSheerHeaderStyleTemp({
+                                                       if ((step2C === "Grommet" || step2C === "Rod Pocket") && step8 === "Customize Hardware Per Curtain") {
+                                                           modalHandleShow("SheerHeaderStyleWarning2");
+                                                           setSheerHeaderStyleTemp2({
                                                                stepValue: "Pencil Pleat",
                                                                id: "0001",
                                                                cartValue: "Pencil Pleat",
                                                                event: e
                                                            });
                                                        } else {
-                                                           setStep2A("Pencil Pleat");
-                                                           setDeps("", "2A");
+                                                           setStep2C("Pencil Pleat");
+                                                           setDeps("", "2C");
                                                            setCart("PrivacyLayerHeaderStyle", "Pencil Pleat");
                                                            selectChanged(e);
-                                                           setSheersModelId("0001");
+                                                           setSheersModelId2("0001");
                                                        }
-                                                   }} ref={ref => (inputs.current["2A3"] = ref)}/>
-                                            <label htmlFor="2A3">{t("HeaderStyle3")}
+                                                   }} ref={ref => (inputs.current["2C3"] = ref)}/>
+                                            <label htmlFor="2C3">{t("HeaderStyle3")}
                                             </label>
                                         </div>
                                         
-                                        <NextStep eventKey="3">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="2C" eventKey="3">{t("NEXT STEP")}</NextStep>
                                     </div>
                                 </Card.Body>
                             </Accordion.Collapse>
@@ -6482,7 +6853,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                                 setCart("Width", selected[0].value);
                                                             }
                                                         }}
-                                                        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
+                                                        options={SelectOptionRange(30, 500, 1, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
@@ -6750,7 +7121,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                 <label htmlFor="312">{t("grommet_no_rod")}</label>
                                             </div>
                                         </div>
-                                        <NextStep eventKey={measurementsNextStep}>{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="3" eventKey={measurementsNextStep}>{t("NEXT STEP")}</NextStep>
                                     </div>
                                     
                                     {(stepSelectedValue["3"] === "1") && <div className="accordion_help">
@@ -6786,7 +7157,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         
                         {/* step 3A */}
                         <Card className={step3 === "true" && step31 === "false" ? "" : "noDisplay"}>
-                            <Card.Header>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
                                 <ContextAwareToggle eventKey="3A" stepNum={t("3A")} stepTitle={t("grommet_step3A")} stepRef="3A" type="1" required={requiredStep["3A"]}
                                                     stepSelected={stepSelectedLabel["3A"] === undefined ? "" : stepSelectedLabel["3A"]}/>
                             </Card.Header>
@@ -7094,7 +7465,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         
                         {/* step 3B */}
                         <Card className={step3 === "true" && step31 === "false" ? "" : "noDisplay"}>
-                            <Card.Header>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
                                 <ContextAwareToggle eventKey="3B" stepNum={t("3B")} stepTitle={t("dk_step2A")} stepRef="3B" type="1" required={requiredStep["3B"]}
                                                     stepSelected={stepSelectedLabel["3B"] === undefined ? "" : stepSelectedLabel["3B"]}/>
                             </Card.Header>
@@ -7240,7 +7611,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                         </div>
                                         
                                         {step3BErr1 && <div className="input_not_valid">{t("grommet_step3AErr1")}</div>}
-                                        <NextStep eventKey="3C">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="3B" eventKey="3C">{t("NEXT STEP")}</NextStep>
                                     </div>
                                     
                                     <div className="accordion_help">
@@ -7262,7 +7633,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         {/* step 3C*/}
                         <Card
                             className={step3 === "true" && step31 === "false" && step3A !== "" && step3B !== "" && cartValues["Mount"] !== undefined ? "" : "noDisplay"}>
-                            <Card.Header>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
                                 <ContextAwareToggle eventKey="3C" stepNum={t("3C")} stepTitle={step3A === "Wall to Wall" ? t("grommet_width_wall") : t("dk_step2B")} stepRef="3C"
                                                     type="2" required={requiredStep["3C"]}
                                                     stepSelected={stepSelectedLabel["3C"] === undefined ? "" : stepSelectedLabel["3C"]}/>
@@ -7310,12 +7681,12 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                                 setCart("Width3C", selected[0].value);
                                                             }
                                                         }}
-                                                        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
+                                                        options={SelectOptionRange(30, 500, 1, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
                                         </div>
-                                        <NextStep eventKey={step3A === "Wall to Wall" ? "3E" : "3D"}>{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="3C" eventKey={step3A === "Wall to Wall" ? "3E" : "3D"}>{t("NEXT STEP")}</NextStep>
                                     </div>
                                 </Card.Body>
                             </Accordion.Collapse>
@@ -7324,7 +7695,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         {/* step 3D*/}
                         <Card
                             className={step3 === "true" && step31 === "false" && step3A !== "" && step3B !== "" && cartValues["Mount"] !== undefined && !(step3A === "Wall to Wall") ? "" : "noDisplay"}>
-                            <Card.Header>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
                                 <ContextAwareToggle eventKey="3D" stepNum={t("3D")} stepTitle={t("dk_step2CCeiling")} stepRef="3D" type="2"
                                                     required={requiredStep["3D"]}
                                                     stepSelected={stepSelectedLabel["3D"] === undefined ? "" : stepSelectedLabel["3D"]}/>
@@ -7470,7 +7841,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                             </div>
                                         </div>
                                         
-                                        <NextStep eventKey="3E">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="3D" eventKey="3E">{t("NEXT STEP")}</NextStep>
                                     </div>
                                     
                                     <div className="accordion_help">
@@ -7491,7 +7862,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         {/* step 3E*/}
                         <Card
                             className={step3 === "true" && step31 === "false" && step3A !== "" && step3B !== "" && cartValues["Mount"] !== undefined && !(cartValues["Mount"] === "Ceiling" && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window")) && !(step3A === "Wall to Wall" && cartValues["Mount"] === "Ceiling") && (step3B === "Sill" || step3B === "Apron") ? "" : "noDisplay"}>
-                            <Card.Header>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
                                 <ContextAwareToggle eventKey="3E" stepNum={step3A === "Wall to Wall" ? t("3D") : t("3E")} stepTitle={t("dk_step2EWall")} stepRef="3E" type="2"
                                                     required={requiredStep["3E"]}
                                                     stepSelected={stepSelectedLabel["3E"] === undefined ? "" : stepSelectedLabel["3E"]}/>
@@ -7544,7 +7915,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                 </div>
                                             </div>
                                         </div>
-                                        <NextStep eventKey={step3A === "Wall to Wall" ? "3F" : "3F"}>{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="3E" eventKey={step3A === "Wall to Wall" ? "3F" : "3F"}>{t("NEXT STEP")}</NextStep>
                                     </div>
                                 </Card.Body>
                             </Accordion.Collapse>
@@ -7553,7 +7924,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         {/* step 3EFloor */}
                         <Card
                             className={step3 === "true" && step31 === "false" && step3A !== "" && step3B !== "" && cartValues["Mount"] !== undefined && !(cartValues["Mount"] === "Ceiling" && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window")) && !(step3A === "Wall to Wall" && cartValues["Mount"] === "Ceiling") && (step3B === "Floor" || step3B === "Slight Puddle") ? "" : "noDisplay"}>
-                            <Card.Header>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
                                 <ContextAwareToggle eventKey="3E" stepNum={step3A === "Wall to Wall" ? t("3D") : t("3E")} stepTitle={t("dk_step2DWall")} stepRef="3EFloor" type="2"
                                                     required={requiredStep["3EFloor"]}
                                                     stepSelected={stepSelectedLabel["3EFloor"] === undefined ? "" : stepSelectedLabel["3EFloor"]}/>
@@ -7608,7 +7979,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                 </div>
                                             </div>
                                         </div>
-                                        <NextStep eventKey={step3A === "Wall to Wall" ? "3F" : "3F"}>{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="3EFloor" eventKey={step3A === "Wall to Wall" ? "3F" : "3F"}>{t("NEXT STEP")}</NextStep>
                                     </div>
                                 </Card.Body>
                             </Accordion.Collapse>
@@ -7617,7 +7988,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         {/* step 3EStandardCeiling */}
                         <Card
                             className={step3 === "true" && step31 === "false" && (cartValues["Mount"] === "Ceiling" && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window") || (step3A === "Wall to Wall" && cartValues["Mount"] === "Ceiling")) && step3B !== "" && cartValues["Mount"] !== undefined && (step3B === "Sill" || step3B === "Apron") ? "" : "noDisplay"}>
-                            <Card.Header>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
                                 <ContextAwareToggle eventKey="3E" stepNum={step3A === "Wall to Wall" ? t("3D") : t("3E")} stepTitle={t("dk_step2D_sill")}
                                                     stepRef="3EStandardCeiling" type="2" required={requiredStep["3EStandardCeiling"]}
                                                     stepSelected={stepSelectedLabel["3EStandardCeiling"] === undefined ? "" : stepSelectedLabel["3EStandardCeiling"]}/>
@@ -7750,7 +8121,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                 </div>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="4">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep={[...depSet].findIndex(el => el.startsWith("3")) === -1 ? "3" : "3EStandardCeiling"} eventKey="4">{t("NEXT STEP")}</NextStep>
                                     </div>
                                 </Card.Body>
                             </Accordion.Collapse>
@@ -7759,7 +8130,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         {/* step 3EStandardCeilingFloor */}
                         <Card
                             className={step3 === "true" && step31 === "false" && (cartValues["Mount"] === "Ceiling" && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window") || (step3A === "Wall to Wall" && cartValues["Mount"] === "Ceiling")) && step3B !== "" && cartValues["Mount"] !== undefined && (step3B === "Floor" || step3B === "Slight Puddle") ? "" : "noDisplay"}>
-                            <Card.Header>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
                                 <ContextAwareToggle eventKey="3E" stepNum={step3A === "Wall to Wall" ? t("3D") : t("3E")} stepTitle={t("dk_step2E")}
                                                     stepRef="3EStandardCeilingFloor" type="2" required={requiredStep["3EStandardCeilingFloor"]}
                                                     stepSelected={stepSelectedLabel["3EStandardCeilingFloor"] === undefined ? "" : stepSelectedLabel["3EStandardCeilingFloor"]}/>
@@ -7892,7 +8263,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                 </div>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="4">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep={[...depSet].findIndex(el => el.startsWith("3")) === -1 ? "3" : "3EStandardCeilingFloor"} eventKey="4">{t("NEXT STEP")}</NextStep>
                                     </div>
                                 </Card.Body>
                             </Accordion.Collapse>
@@ -7901,7 +8272,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         {/* step 3F */}
                         <Card
                             className={step3 === "true" && step31 === "false" && step3A !== "" && step3B !== "" && cartValues["Mount"] !== undefined && !(cartValues["Mount"] === "Ceiling" && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window")) && !(step3A === "Wall to Wall" && cartValues["Mount"] === "Ceiling") ? "" : "noDisplay"}>
-                            <Card.Header>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
                                 <ContextAwareToggle eventKey="3F" stepNum={step3A === "Wall to Wall" ? t("3E") : t("3F")} stepTitle={t("dk_step2FWall")} stepRef="3F" type="2"
                                                     required={requiredStep["3F"]}
                                                     stepSelected={stepSelectedLabel["3F"] === undefined ? "" : stepSelectedLabel["3F"]}/>
@@ -7956,7 +8327,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                 </div>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="3G">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="3F" eventKey="3G">{t("NEXT STEP")}</NextStep>
                                     </div>
                                     <div className="accordion_help">
                                         <div className="help_container">
@@ -7976,7 +8347,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         {/* step 3G*/}
                         <Card
                             className={step3 === "true" && step31 === "false" && step3A !== "" && step3B !== "" && cartValues["Mount"] !== undefined && !(step3A === "Wall to" + " Wall" && cartValues["Mount"] === "Ceiling") && !(cartValues["Mount"] === "Ceiling" && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window")) ? "" : "noDisplay"}>
-                            <Card.Header>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
                                 <ContextAwareToggle eventKey="3G" stepNum={step3A === "Wall to Wall" ? t("3F") : t("3G")} stepTitle={t("dk_step2FWall2")} stepRef="3G" type="2"
                                                     required={requiredStep["3G"]}
                                                     stepSelected={stepSelectedLabel["3G"] === undefined ? "" : stepSelectedLabel["3G"]}/>
@@ -8031,7 +8402,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                 </div>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="4">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep={[...depSet].findIndex(el => el.startsWith("3")) === -1 ? "3" : "3G"} eventKey="4">{t("NEXT STEP")}</NextStep>
                                     </div>
                                 </Card.Body>
                             </Accordion.Collapse>
@@ -8040,7 +8411,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         {/* step 3ARod */}
                         <Card
                             className={step3 === "true" && step31 === "true" ? "" : "noDisplay"}>
-                            <Card.Header>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
                                 <ContextAwareToggle eventKey="3A" stepNum={t("3A")} stepTitle={t("dk_step2A")} stepRef="3ARod" type="1" required={requiredStep["3ARod"]}
                                                     stepSelected={stepSelectedLabel["3ARod"] === undefined ? "" : stepSelectedLabel["3ARod"]}/>
                             </Card.Header>
@@ -8140,7 +8511,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                         </div>
                                         
                                         {step3ARodErr1 && <div className="input_not_valid">{t("grommet_step3AErr1")}</div>}
-                                        <NextStep eventKey="3B">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="3ARod" eventKey="3B">{t("NEXT STEP")}</NextStep>
                                     </div>
                                     
                                     <div className="accordion_help">
@@ -8162,7 +8533,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         {/* step 3BRod*/}
                         <Card
                             className={step3 === "true" && step31 === "true" && ((step3ARod !== "" && step3ARod !== "Apron") || (step3ARod === "Apron" && step3ARod1 === "true")) ? "" : "noDisplay"}>
-                            <Card.Header>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
                                 <ContextAwareToggle eventKey="3B" stepNum={t("3B")} stepTitle={t("grommet_step3BRod")} stepRef="3BRod" type="2" required={requiredStep["3BRod"]}
                                                     stepSelected={stepSelectedLabel["3BRod"] === undefined ? "" : stepSelectedLabel["3BRod"]}/>
                             </Card.Header>
@@ -8209,12 +8580,12 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                                 setCart("RodWidth", selected[0].value);
                                                             }
                                                         }}
-                                                        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
+                                                        options={SelectOptionRange(30, 500, 1, "cm", "", pageLanguage)}
                                                     />
                                                 </div>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="3C">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="3BRod" eventKey="3C">{t("NEXT STEP")}</NextStep>
                                     </div>
                                 </Card.Body>
                             </Accordion.Collapse>
@@ -8283,7 +8654,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         {/* step 3CRod*/}
                         <Card
                             className={step3 === "true" && step31 === "true" && (step3ARod === "Sill" || (step3ARod === "Apron" && step3ARod1 === "true")) ? "" : "noDisplay"}>
-                            <Card.Header>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
                                 <ContextAwareToggle eventKey="3C" stepNum={t("3C")} stepTitle={t("grommet_step3DRod")} stepRef="3CRod" type="2" required={requiredStep["3CRod"]}
                                                     stepSelected={stepSelectedLabel["3CRod"] === undefined ? "" : stepSelectedLabel["3CRod"]}/>
                             </Card.Header>
@@ -8335,7 +8706,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                 </div>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="3D">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="3CRod" eventKey="3D">{t("NEXT STEP")}</NextStep>
                                     </div>
                                 </Card.Body>
                             </Accordion.Collapse>
@@ -8344,7 +8715,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         {/* step 3CRodFloor*/}
                         <Card
                             className={step3 === "true" && step31 === "true" && (step3ARod === "Floor" || step3ARod === "Slight Puddle") ? "" : "noDisplay"}>
-                            <Card.Header>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
                                 <ContextAwareToggle eventKey="3C" stepNum={t("3C")} stepTitle={t("grommet_step3DRodFloor")} stepRef="3CRodFloor" type="2"
                                                     required={requiredStep["3CRodFloor"]}
                                                     stepSelected={stepSelectedLabel["3CRodFloor"] === undefined ? "" : stepSelectedLabel["3CRodFloor"]}/>
@@ -8399,7 +8770,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                 </div>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="3D">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="3CRodFloor" eventKey="3D">{t("NEXT STEP")}</NextStep>
                                     </div>
                                 </Card.Body>
                             </Accordion.Collapse>
@@ -8408,7 +8779,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         {/* step 3DRod */}
                         <Card
                             className={step3 === "true" && step31 === "true" && ((step3ARod !== "" && step3ARod !== "Apron") || (step3ARod === "Apron" && step3ARod1 === "true")) ? "" : "noDisplay"}>
-                            <Card.Header>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
                                 <ContextAwareToggle eventKey="3D" stepNum={t("3D")} stepTitle={t("dk_step2FWall2")} stepRef="3DRod" type="2" required={requiredStep["3DRod"]}
                                                     stepSelected={stepSelectedLabel["3DRod"] === undefined ? "" : stepSelectedLabel["3DRod"]}/>
                             </Card.Header>
@@ -8462,7 +8833,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                 </div>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="4">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep={[...depSet].findIndex(el => el.startsWith("3")) === -1 ? "3" : "3DRod"} eventKey="4">{t("NEXT STEP")}</NextStep>
                                     </div>
                                     <div className="accordion_help">
                                         <div className="help_container">
@@ -8514,7 +8885,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                             <label htmlFor="52">{t("Decorative")}</label>
                                         </div>
                                         
-                                        <NextStep eventKey="6">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="5" eventKey="6">{t("NEXT STEP")}</NextStep>
                                     </div>
                                     <div className="accordion_help">
                                         <div className="help_container">
@@ -8553,7 +8924,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                         <div className="card_body_info_body">
                                             <p className="card_body_info_text">{cartValues["WidthCart"] === undefined && step5 === "" ? t("panel_type_text1") : (cartValues["WidthCart"] === undefined && step5 !== "" ? t("panel_type_text2") : t("panel_type_text3"))}</p>
                                         </div>
-                                        <NextStep eventKey="7">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="6" eventKey="7">{t("NEXT STEP")}</NextStep>
                                     </div>
                                     <div className={cartValues["WidthCart"] !== undefined && step5 !== "" ? "card_body card_body_radio card_body_panel_type special_farsi_card_body" : "noDisplay"}>
                                         <div className={parseInt(cartValues["WidthCart"]) < 320 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"}>
@@ -8624,7 +8995,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                             <label htmlFor="64">{t("Four Panel, Split Draw")}</label>
                                             <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
                                         </div>
-                                        <NextStep eventKey="7">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="6" eventKey="7">{t("NEXT STEP")}</NextStep>
                                     </div>
                                     {cartValues["WidthCart"] !== undefined && step5 !== "" && <div className="accordion_help">
                                         <div className="help_container">
@@ -8765,7 +9136,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                 </div>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="8">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="7" eventKey="8">{t("NEXT STEP")}</NextStep>
                                     </div>
                                     <div className="accordion_help">
                                         <div className="help_container">
@@ -8845,7 +9216,9 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                        setStep8B("");
                                                        setStep8C("");
                                                        let tempExtended = extendedTitle;
-                                                       tempExtended["8"]=[t("None")];
+                                                       tempExtended["8"] = [t("None")];
+                                                       tempExtended["8B"] = [];
+                                                       tempExtended["8C"] = [];
                                                        setExtendedTitle(tempExtended);
                                                        selectChanged(e);
                                                        setStep8("None");
@@ -8865,7 +9238,9 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                        if (step3 === "" || (step3 === "true" && step31 === "")) {
                                                            setHardwareNextStep("9");
                                                            setStep8("");
-                                                           tempExtended["8"]=[];
+                                                           tempExtended["8"] = [];
+                                                           tempExtended["8B"] = [];
+                                                           tempExtended["8C"] = [];
                                                            selectUncheck(e);
                                                            modalHandleShow("noMeasurements");
                                                            setDeps("8", "81,82,83,84,8A,8A1,8A2,8A3,8A4,8B,8B1,8B2,8B3,8B4,8C,8C1,8C2,8C3");
@@ -8873,7 +9248,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                        } else {
                                                            selectChanged(e);
                                                            setStep8("Same Hardware For All Curtains");
-                                                           tempExtended["8"]=[t("hardware2")];
+                                                           tempExtended["8"] = [t("hardware2")];
                                                            setHardwareNextStep("9");
                                                            if (step31 === "false") {
                                                                setDeps("81,82,83", "8,84,8A,8A1,8A2,8A3,8A4,8B,8B1,8B2,8B3,8C,8C1,8C2,8C3");
@@ -8888,7 +9263,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                         </div>
                                         <div className={step2B !== "None" ? "box33 radio_style" : "noDisplay"}>
                                             <input className="radio" type="radio" text={t("hardware3")} value="3" name="step8" ref-num="8" id="83" outline="true"
-                                                   checked={step8 === "Customize Hardware For Per Curtains"}
+                                                   checked={step8 === "Customize Hardware Per Curtain"}
                                                    onChange={e => {
                                                        setStep81("");
                                                        setStep82("");
@@ -8897,10 +9272,13 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                        setStep8B("");
                                                        setStep8C("");
                                                        let tempExtended = extendedTitle;
-                                                       if (step2A === "" || step2B === "" || (step2B !== "None" && step2B1 === "")) {
+                                                       if (step2A === "" || step2B === "" || (step2B !== "None" && step2B1 === "") || (step2B !== "None" && step2C === "") || (step3 === "" || (step3 === "true" && step31 === ""))) {
                                                            setHardwareNextStep("9");
                                                            setStep8("");
-                                                           tempExtended["8"]=[];
+                                                           tempExtended["8"] = [];
+                                                           tempExtended["8A"] = [];
+                                                           tempExtended["8B"] = [];
+                                                           tempExtended["8C"] = [];
                                                            selectUncheck(e);
                                                            modalHandleShow("noPrivacyLayer");
                                                            setDeps("8", "81,82,83,84,8A,8A1,8A2,8A3,8A4,8B,8B1,8B2,8B3,8B4,8C,8C1,8C2,8C3");
@@ -8908,10 +9286,14 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                        } else {
                                                            setHardwareNextStep("8A");
                                                            selectChanged(e);
-                                                           setStep8("Customize Hardware For Per Curtains");
-                                                           tempExtended["8"]=[t("hardware3")];
-                                                           setDeps("8B,8C", "8,81,82,83,84");
-                                                           setCart("Hardware", "Customize Hardware For Per Curtains", "RailId,BatonOption,RodColor,Mount");
+                                                           setStep8("Customize Hardware Per Curtain");
+                                                           tempExtended["8"] = [t("hardware3")];
+                                                           if (step2B === "None") {
+                                                               setDeps("8B", "8,81,82,83,84,8C");
+                                                           } else {
+                                                               setDeps("8B,8C", "8,81,82,83,84");
+                                                           }
+                                                           setCart("Hardware", "Customize Hardware Per Curtain", "RailId,BatonOption,RodColor,Mount");
                                                        }
                                                    }} ref={ref => (inputs.current["83"] = ref)}/>
                                             <label htmlFor="83">{t("hardware3")}</label>
@@ -9072,42 +9454,42 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                 <input className="radio" type="radio" text={t("None")} value="1" name="step83" ref-num="83" id="831"
                                                        checked={step83 === "None"}
                                                        onChange={e => {
-                                                       setStep83("None");
-                                                       setDeps("", "83");
-                                                       setCart("BatonOption", "None");
-                                                       selectChanged(e);
-                                                       let tempExtended = extendedTitle;
-                                                       tempExtended["8"][3]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("None")}</span></li>;
-                                                       setExtendedTitle(tempExtended);
-                                                   }} ref={ref => (inputs.current["831"] = ref)}/>
+                                                           setStep83("None");
+                                                           setDeps("", "83");
+                                                           setCart("BatonOption", "None");
+                                                           selectChanged(e);
+                                                           let tempExtended = extendedTitle;
+                                                           tempExtended["8"][3] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("None")}</span></li>;
+                                                           setExtendedTitle(tempExtended);
+                                                       }} ref={ref => (inputs.current["831"] = ref)}/>
                                                 <label htmlFor="831">{t("None")}</label>
                                             </div>
                                             <div className="box33 radio_style">
                                                 <input className="radio" type="radio" text={t("Baton 30cm")} value="2" name="step83" ref-num="83" id="832"
                                                        checked={step83 === "Baton 30cm"}
                                                        onChange={e => {
-                                                       setStep83("Baton 30cm");
-                                                       setDeps("", "83");
-                                                       setCart("BatonOption", "Baton 30cm");
-                                                       selectChanged(e);
-                                                       let tempExtended = extendedTitle;
-                                                       tempExtended["8"][3]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 30cm")}</span></li>;
-                                                       setExtendedTitle(tempExtended);
-                                                   }} ref={ref => (inputs.current["832"] = ref)}/>
+                                                           setStep83("Baton 30cm");
+                                                           setDeps("", "83");
+                                                           setCart("BatonOption", "Baton 30cm");
+                                                           selectChanged(e);
+                                                           let tempExtended = extendedTitle;
+                                                           tempExtended["8"][3] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 30cm")}</span></li>;
+                                                           setExtendedTitle(tempExtended);
+                                                       }} ref={ref => (inputs.current["832"] = ref)}/>
                                                 <label htmlFor="832">{t("Baton 30cm")}</label>
                                             </div>
                                             <div className="box33 radio_style">
                                                 <input className="radio" type="radio" text={t("Baton 45cm")} value="3" name="step83" ref-num="83" id="833"
                                                        checked={step83 === "Baton 45cm"}
                                                        onChange={e => {
-                                                       setStep83("Baton 45cm");
-                                                       setDeps("", "83");
-                                                       setCart("BatonOption", "Baton 45cm");
-                                                       selectChanged(e);
-                                                       let tempExtended = extendedTitle;
-                                                       tempExtended["8"][3]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 45cm")}</span></li>;
-                                                       setExtendedTitle(tempExtended);
-                                                   }} ref={ref => (inputs.current["833"] = ref)}/>
+                                                           setStep83("Baton 45cm");
+                                                           setDeps("", "83");
+                                                           setCart("BatonOption", "Baton 45cm");
+                                                           selectChanged(e);
+                                                           let tempExtended = extendedTitle;
+                                                           tempExtended["8"][3] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 45cm")}</span></li>;
+                                                           setExtendedTitle(tempExtended);
+                                                       }} ref={ref => (inputs.current["833"] = ref)}/>
                                                 <label htmlFor="833">{t("Baton 45cm")}</label>
                                             </div>
                                         </div>
@@ -9126,7 +9508,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                            setCart("Mount8", "Wall");
                                                            selectChanged(e);
                                                            let tempExtended = extendedTitle;
-                                                           tempExtended["8"][4]= <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Wall")}</span></li>;
+                                                           tempExtended["8"][4] = <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Wall")}</span></li>;
                                                            setExtendedTitle(tempExtended);
                                                        }} ref={ref => (inputs.current["841"] = ref)}/>
                                                 <label htmlFor="841">{t("Wall")}</label>
@@ -9140,7 +9522,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                            setCart("Mount8", "Ceiling");
                                                            selectChanged(e);
                                                            let tempExtended = extendedTitle;
-                                                           tempExtended["8"][4]= <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Ceiling")}</span></li>;
+                                                           tempExtended["8"][4] = <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Ceiling")}</span></li>;
                                                            setExtendedTitle(tempExtended);
                                                        }} ref={ref => (inputs.current["842"] = ref)}/>
                                                 <label htmlFor="842">{t("Ceiling")}</label>
@@ -9148,12 +9530,14 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                             <div className="box33 radio_style"/>
                                         </div>
                                     </div>
-                                    <NextStep eventKey={hardwareNextStep}>{t("NEXT STEP")}</NextStep>
+                                    <NextStep currentStep="8" eventKey={hardwareNextStep}>{t("NEXT STEP")}</NextStep>
                                 </Card.Body>
                             </Accordion.Collapse>
                         </Card>
+                        
                         {/* step 7A */}
-                        <Card className={step8 === "Customize Hardware For Per Curtains" ? "" : "noDisplay"}>
+                        <Card className={step8 === "Customize Hardware Per Curtain" ? "" : "noDisplay"}>
+                            {/*<Card.Header className={[...depSet].findIndex(el => el.startsWith("8B")) === -1 && (!accordionActiveKey.startsWith("8")) ? "hidden" : ""}>*/}
                             <Card.Header>
                                 <ContextAwareToggle eventKey="8B" stepNum={t("7A")} stepTitle={t("grommet_step8B")} stepRef="8B" type="1" required={requiredStep["8B"]}
                                                     stepSelected={stepSelectedLabel["8B"] === undefined ? "" : stepSelectedLabel["8B"]}/>
@@ -9171,58 +9555,62 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                        // setStep8B4("");
                                                        setStep8B("None");
                                                        let tempExtended = extendedTitle;
-                                                       tempExtended["8B"]=[t("None")];
+                                                       tempExtended["8B"] = [t("None")];
                                                        setExtendedTitle(tempExtended);
-                                                       setDeps("", "8B,8B1,8B2,8B3,8B4");
+                                                       setDeps("", "8B,8B1,8B2,8B3");
                                                        setCart("SheerHardware", "None", "RailIdB,BatonOptionB,RodColorB,MountB");
                                                        selectChanged(e);
                                                    }} ref={ref => (inputs.current["8B1"] = ref)}/>
                                             <label htmlFor="8B1">{t("None")}</label>
                                         </div>
-                                        {/*<div className={tracksList.length > 0 ? "box33 radio_style" : "noDisplay"}>*/}
-                                        {/*    <input className="radio" type="radio" text={t("Track")} value="2" name="step8B" ref-num="8B" id="8B2"*/}
-                                        {/*           checked={step8B === "Track"}*/}
-                                        {/*           onChange={e => {*/}
-                                        {/*               setStep8B1("");*/}
-                                        {/*               setStep8B2("");*/}
-                                        {/*               setStep8B3("");*/}
-                                        {/*               setStep8B4("");*/}
-                                        {/*               setStep8B("Track");*/}
-                                        {/*               setDeps("8B1,8B2,8B3,8B4", "8B");*/}
-                                        {/*               setCart("SheerHardware", "Track", "RailIdB,BatonOptionB,RodColorB,MountB");*/}
-                                        {/*               selectChanged(e);*/}
-                                        {/*           }} ref={ref => (inputs.current["8B2"] = ref)}/>*/}
-                                        {/*    <label htmlFor="8B2">{t("Track")}</label>*/}
-                                        {/*</div>*/}
+                                        <div className={tracksList.length > 0 ? "box33 radio_style" : "noDisplay"}>
+                                            <input className="radio" type="radio" text={t("Track")} value="2" name="step8B" ref-num="8B" id="8B2"
+                                                   checked={step8B === "Track"}
+                                                   onChange={e => {
+                                                       setStep8B1("");
+                                                       setStep8B2("");
+                                                       setStep8B3("");
+                                                       // setStep8B4("");
+                                                       setStep8B("Track");
+                                                       let tempExtended = extendedTitle;
+                                                       tempExtended["8B"] = [t("Track")];
+                                                       setExtendedTitle(tempExtended);
+                                                       // setDeps("8B1,8B2,8B3", "8B");
+                                                       setCart("SheerHardware", "Track", "RailIdB,BatonOptionB,RodColorB,MountB");
+                                                       selectChanged(e);
+                                                       if (step84 === "" && step31 !== "false") {
+                                                           setDeps("8B1,8B2,8B3,8B4", "8B");
+                                                       } else {
+                                                           setDeps("8B1,8B2,8B3", "8B");
+                                                       }
+                                                   }} ref={ref => (inputs.current["8B2"] = ref)}/>
+                                            <label htmlFor="8B2">{t("Track")}</label>
+                                        </div>
                                         <div className={rodsList3.length > 0 ? "box33 radio_style" : "noDisplay"}>
                                             <input className="radio" type="radio" text={t("Rod")} value="3" name="step8B" ref-num="8B" id="8B3"
                                                    checked={step8B === "Rod"}
                                                    onChange={e => {
+                                                       setStep8B1("");
+                                                       setStep8B2("");
+                                                       setStep8B3("");
+                                                       // setStep8B4("");
+                                                       setStep8B("Rod");
                                                        let tempExtended = extendedTitle;
-                                                       if (step3 === "" || (step3 === "true" && step31 === "")) {
-                                                           selectUncheck(e);
-                                                           modalHandleShow("noMeasurements");
-                                                           setStep8B("");
-                                                           tempExtended["8B"]=[];
-                                                           setDeps("8B", "8B1,8B2,8B3,8B4");
-                                                           setCart("", "", "SheerHardware,RailIdB,BatonOptionB,RodColorB,MountB");
-                                                       } else {
-                                                           setStep8B("Rod");
-                                                           tempExtended["8B"]=[t("Rod")];
-                                                           if (step31 === "false") {
-                                                               setDeps("8B1,8B2,8B3", "8B,8B4");
-                                                           } else {
-                                                               setDeps("8B1,8B2,8B3,8B4", "8B");
-                                                           }
-                                                           setCart("SheerHardware", "Rod", "RailIdB,BatonOptionB,RodColorB,MountB");
-                                                           selectChanged(e);
-                                                       }
+                                                       tempExtended["8B"] = [t("Rod")];
                                                        setExtendedTitle(tempExtended);
+                                                       // setDeps("8B1,8B2,8B3", "8B");
+                                                       setCart("SheerHardware", "Rod", "RailIdB,BatonOptionB,RodColorB,MountB");
+                                                       selectChanged(e);
+                                                       if (step84 === "" && step31 !== "false") {
+                                                           setDeps("8B1,8B2,8B3,8B4", "8B");
+                                                       } else {
+                                                           setDeps("8B1,8B2,8B3", "8B");
+                                                       }
                                                    }} ref={ref => (inputs.current["8B3"] = ref)}/>
                                             <label htmlFor="8B3">{t("Rod")}</label>
                                         </div>
                                         
-                                        {/* step 8 Questions */}
+                                        {/* step 9 Questions */}
                                         <div className={step8B !== "None" && step8B !== "" ? "card_body card_body_radio card_body_Rod" : "noDisplay"}>
                                             {step8B === "Rod" ? rodsList3 : tracksList}
                                         </div>
@@ -9293,7 +9681,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                            setCart("BatonOptionB", "None");
                                                            selectChanged(e);
                                                            let tempExtended = extendedTitle;
-                                                           tempExtended["8B"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("None")}</span></li>;
+                                                           tempExtended["8B"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("None")}</span></li>;
                                                            setExtendedTitle(tempExtended);
                                                        }} ref={ref => (inputs.current["8B31"] = ref)}/>
                                                 <label htmlFor="8B31">{t("None")}</label>
@@ -9307,7 +9695,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                            setCart("BatonOptionB", "Baton 30cm");
                                                            selectChanged(e);
                                                            let tempExtended = extendedTitle;
-                                                           tempExtended["8B"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 30cm")}</span></li>;
+                                                           tempExtended["8B"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 30cm")}</span></li>;
                                                            setExtendedTitle(tempExtended);
                                                        }} ref={ref => (inputs.current["8B32"] = ref)}/>
                                                 <label htmlFor="8B32">{t("Baton 30cm")}<br/><p
@@ -9323,7 +9711,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                            setCart("BatonOptionB", "Baton 45cm");
                                                            selectChanged(e);
                                                            let tempExtended = extendedTitle;
-                                                           tempExtended["8B"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 45cm")}</span></li>;
+                                                           tempExtended["8B"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 45cm")}</span></li>;
                                                            setExtendedTitle(tempExtended);
                                                        }} ref={ref => (inputs.current["8B33"] = ref)}/>
                                                 <label htmlFor="8B33">{t("Baton 45cm")}<br/><p
@@ -9339,7 +9727,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                            setCart("BatonOptionB", "Cord");
                                                            selectChanged(e);
                                                            let tempExtended = extendedTitle;
-                                                           tempExtended["8B"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Cord")}</span></li>;
+                                                           tempExtended["8B"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Cord")}</span></li>;
                                                            setExtendedTitle(tempExtended);
                                                        }} ref={ref => (inputs.current["8B34"] = ref)}/>
                                                 <label htmlFor="8B34">{t("Cord")}<br/><p
@@ -9347,37 +9735,46 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                 </label>
                                             </div>
                                         </div>
-                                        {/*<div*/}
-                                        {/*    className={step8B !== "None" && step8B !== "" && step8B1 !== "" && step31 !== "false" && !is8BMotor ? "card_body card_body_radio card_body_rod_mount" : "noDisplay"}>*/}
-                                        {/*    <div className="box100">*/}
-                                        {/*        <p className="step_selection_title">{t("step8_rod_mount_title")}</p>*/}
-                                        {/*    </div>*/}
-                                        {/*    <div className="box33 radio_style">*/}
-                                        {/*        <input className="radio" type="radio" text={t("Wall")} value="1" name="step8B4" ref-num="8B4" id="8B41"*/}
-                                        {/*               checked={step8B4 === "Wall"}*/}
-                                        {/*               onChange={e => {*/}
-                                        {/*                   setStep8B4("Wall");*/}
-                                        {/*                   setDeps("", "8B4");*/}
-                                        {/*                   setCart("MountB", "Wall");*/}
-                                        {/*                   selectChanged(e);*/}
-                                        {/*               }} ref={ref => (inputs.current["8B41"] = ref)}/>*/}
-                                        {/*        <label htmlFor="8B41">{t("Wall")}</label>*/}
-                                        {/*    </div>*/}
-                                        {/*    <div className="box33 radio_style">*/}
-                                        {/*        <input className="radio" type="radio" text={t("Ceiling")} value="2" name="step8B4" ref-num="8B4" id="8B42"*/}
-                                        {/*               checked={step8B4 === "Ceiling"}*/}
-                                        {/*               onChange={e => {*/}
-                                        {/*                   setStep8B4("Ceiling");*/}
-                                        {/*                   setDeps("", "8B4");*/}
-                                        {/*                   setCart("MountB", "Ceiling");*/}
-                                        {/*                   selectChanged(e);*/}
-                                        {/*            */}
-                                        {/*               }} ref={ref => (inputs.current["8B42"] = ref)}/>*/}
-                                        {/*        <label htmlFor="8B42">{t("Ceiling")}</label>*/}
-                                        {/*    </div>*/}
-                                        {/*    <div className="box33 radio_style"/>*/}
-                                        {/*    <div className={step8B === "Track" ? "box33 radio_style" : "noDisplay"}/>*/}
-                                        {/*</div>*/}
+                                        <div className={step8B !== "None" && step8B !== "" && step8B1 !== "" && !is8BMotor && step31 !== "false" ? "card_body" + " card_body_radio card_body_rod_mount" : "noDisplay"}>
+                                            <div className="box100">
+                                                <p className="step_selection_title">{t("step8_rod_mount_title")}</p>
+                                            </div>
+                                            <div className="box33 radio_style">
+                                                <input className="radio" type="radio" text={t("Wall")} value="1" name="step8B4" ref-num="84" id="8B41"
+                                                       checked={step84 === "Wall"}
+                                                       onChange={e => {
+                                                           if (step84 !== "" && ((step8C !== "None" && step8C !== ""))) {
+                                                               modalHandleShow("mountAllChange");
+                                                           }
+                                                           setStep84("Wall");
+                                                           setDeps("", "84,8A4,8B4,8C4");
+                                                           setCart("Mount8", "Wall");
+                                                           selectChanged(e);
+                                                           let tempExtended = extendedTitle;
+                                                           tempExtended["8"][4] = <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Wall")}</span></li>;
+                                                           setExtendedTitle(tempExtended);
+                                                       }} ref={ref => (inputs.current["8B41"] = ref)}/>
+                                                <label htmlFor="8B41">{t("Wall")}</label>
+                                            </div>
+                                            <div className="box33 radio_style">
+                                                <input className="radio" type="radio" text={t("Ceiling")} value="2" name="step8B4" ref-num="84" id="8B42"
+                                                       checked={step84 === "Ceiling"}
+                                                       onChange={e => {
+                                                           if (step84 !== "" && ((step8C !== "None" && step8C !== ""))) {
+                                                               modalHandleShow("mountAllChange");
+                                                           }
+                                                           setStep84("Ceiling");
+                                                           setDeps("", "84,8A4,8B4,8C4");
+                                                           setCart("Mount8", "Ceiling");
+                                                           selectChanged(e);
+                                                           let tempExtended = extendedTitle;
+                                                           tempExtended["8"][4] = <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Ceiling")}</span></li>;
+                                                           setExtendedTitle(tempExtended);
+                                                       }} ref={ref => (inputs.current["8B42"] = ref)}/>
+                                                <label htmlFor="8B42">{t("Ceiling")}</label>
+                                            </div>
+                                            <div className="box33 radio_style"/>
+                                        </div>
                                         <div className={is8BMotor ? "tracks_motorized_section" : "noDisplay"}>
                                             <div className={motorErr1 ? "secondary_options secondary_options_err" : "secondary_options"}>
                                                 <div className="card-body-display-flex">
@@ -9447,10 +9844,10 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                             //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                             // }
                                                             onChange={(selected) => {
-                                                                setDeps("", "8B51");
-                                                                setCart("MotorPosition", selected[0].value);
                                                                 if (selected[0]) {
                                                                     setSelectedMotorPosition(selected);
+                                                                    setDeps("", "8B51");
+                                                                    setCart("MotorPosition", selected[0].value);
                                                                 }
                                                             }}
                                                             options={MotorPosition[pageLanguage]}
@@ -9581,13 +9978,14 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                             </div>
                                         </div>
                                     </div>
-                                    <NextStep eventKey="8C">{t("NEXT STEP")}</NextStep>
+                                    <NextStep currentStep="8B" eventKey="8C">{t("NEXT STEP")}</NextStep>
                                 </Card.Body>
                             </Accordion.Collapse>
                         </Card>
                         
                         {/* step 7B */}
-                        <Card className={step8 === "Customize Hardware For Per Curtains" && step2B !== "None" ? "" : "noDisplay"}>
+                        <Card className={step8 === "Customize Hardware Per Curtain" && step2B !== "None" ? "" : "noDisplay"}>
+                            {/*<Card.Header className={[...depSet].findIndex(el => el.startsWith("8C")) === -1 && (!accordionActiveKey.startsWith("8")) ? "hidden" : ""}>*/}
                             <Card.Header>
                                 <ContextAwareToggle eventKey="8C" stepNum={t("7B")} stepTitle={t("grommet_step8C")} stepRef="8C" type="1" required={requiredStep["8C"]}
                                                     stepSelected={stepSelectedLabel["8C"] === undefined ? "" : stepSelectedLabel["8C"]}/>
@@ -9605,7 +10003,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                        // setStep8C4("");
                                                        setStep8C("None");
                                                        let tempExtended = extendedTitle;
-                                                       tempExtended["8C"]=[t("None")];
+                                                       tempExtended["8C"] = [t("None")];
                                                        setExtendedTitle(tempExtended);
                                                        setDeps("", "8C,8C1,8C2,8C3");
                                                        setCart("PrivacyLayerHardware", "None", "RailIdC,BatonOptionC,RodColorC,MountC");
@@ -9623,11 +10021,16 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                        // setStep8C4("");
                                                        setStep8C("Track");
                                                        let tempExtended = extendedTitle;
-                                                       tempExtended["8C"]=[t("Track")];
+                                                       tempExtended["8C"] = [t("Track")];
                                                        setExtendedTitle(tempExtended);
-                                                       setDeps("8C1,8C2,8C3", "8C");
+                                                       // setDeps("8C1,8C2,8C3", "8C");
                                                        setCart("PrivacyLayerHardware", "Track", "RailIdC,BatonOptionC,RodColorC,MountC");
                                                        selectChanged(e);
+                                                       if (step84 === "" && step31 !== "false") {
+                                                           setDeps("8C1,8C2,8C3,8C4", "8C");
+                                                       } else {
+                                                           setDeps("8C1,8C2,8C3", "8C");
+                                                       }
                                                    }} ref={ref => (inputs.current["8C2"] = ref)}/>
                                             <label htmlFor="8C2">{t("Track")}</label>
                                         </div>
@@ -9641,16 +10044,21 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                        // setStep8C4("");
                                                        setStep8C("Rod");
                                                        let tempExtended = extendedTitle;
-                                                       tempExtended["8C"]=[t("Rod")];
+                                                       tempExtended["8C"] = [t("Rod")];
                                                        setExtendedTitle(tempExtended);
-                                                       setDeps("8C1,8C2,8C3", "8C");
+                                                       // setDeps("8C1,8C2,8C3", "8C");
                                                        setCart("PrivacyLayerHardware", "Rod", "RailIdC,BatonOptionC,RodColorC,MountC");
                                                        selectChanged(e);
+                                                       if (step84 === "" && step31 !== "false") {
+                                                           setDeps("8C1,8C2,8C3,8C4", "8C");
+                                                       } else {
+                                                           setDeps("8C1,8C2,8C3", "8C");
+                                                       }
                                                    }} ref={ref => (inputs.current["8C3"] = ref)}/>
                                             <label htmlFor="8C3">{t("Rod")}</label>
                                         </div>
                                         
-                                        {/* step 8 Questions */}
+                                        {/* step 9 Questions */}
                                         <div className={step8C !== "None" && step8C !== "" ? "card_body card_body_radio card_body_Rod" : "noDisplay"}>
                                             {step8C === "Rod" ? rodsList4 : tracksList2}
                                         </div>
@@ -9721,7 +10129,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                            setCart("BatonOptionC", "None");
                                                            selectChanged(e);
                                                            let tempExtended = extendedTitle;
-                                                           tempExtended["8C"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("None")}</span></li>;
+                                                           tempExtended["8C"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("None")}</span></li>;
                                                            setExtendedTitle(tempExtended);
                                                        }} ref={ref => (inputs.current["8C31"] = ref)}/>
                                                 <label htmlFor="8C31">{t("None")}</label>
@@ -9735,7 +10143,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                            setCart("BatonOptionC", "Baton 30cm");
                                                            selectChanged(e);
                                                            let tempExtended = extendedTitle;
-                                                           tempExtended["8C"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 30cm")}</span></li>;
+                                                           tempExtended["8C"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 30cm")}</span></li>;
                                                            setExtendedTitle(tempExtended);
                                                        }} ref={ref => (inputs.current["8C32"] = ref)}/>
                                                 <label htmlFor="8C32">{t("Baton 30cm")}<br/><p
@@ -9751,7 +10159,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                            setCart("BatonOptionC", "Baton 45cm");
                                                            selectChanged(e);
                                                            let tempExtended = extendedTitle;
-                                                           tempExtended["8C"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 45cm")}</span></li>;
+                                                           tempExtended["8C"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 45cm")}</span></li>;
                                                            setExtendedTitle(tempExtended);
                                                        }} ref={ref => (inputs.current["8C33"] = ref)}/>
                                                 <label htmlFor="8C33">{t("Baton 45cm")}<br/><p
@@ -9767,7 +10175,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                            setCart("BatonOptionC", "Cord");
                                                            selectChanged(e);
                                                            let tempExtended = extendedTitle;
-                                                           tempExtended["8C"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Cord")}</span></li>;
+                                                           tempExtended["8C"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Cord")}</span></li>;
                                                            setExtendedTitle(tempExtended);
                                                        }} ref={ref => (inputs.current["8C34"] = ref)}/>
                                                 <label htmlFor="8C34">{t("Cord")}<br/><p
@@ -9775,37 +10183,46 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                 </label>
                                             </div>
                                         </div>
-                                        {/*<div*/}
-                                        {/*    className={step8C !== "None" && step8C !== "" && step8C1 !== "" && step31 !== "false" && !is8CMotor ? "card_body card_body_radio card_body_rod_mount" : "noDisplay"}>*/}
-                                        {/*    <div className="box100">*/}
-                                        {/*        <p className="step_selection_title">{t("step8_rod_mount_title")}</p>*/}
-                                        {/*    </div>*/}
-                                        {/*    <div className="box33 radio_style">*/}
-                                        {/*        <input className="radio" type="radio" text={t("Wall")} value="1" name="step8C4" ref-num="8C4" id="8C41"*/}
-                                        {/*               checked={step8C4 === "Wall"}*/}
-                                        {/*               onChange={e => {*/}
-                                        {/*                   setStep8C4("Wall");*/}
-                                        {/*                   setDeps("", "8C4");*/}
-                                        {/*                   setCart("MountC", "Wall");*/}
-                                        {/*                   selectChanged(e);*/}
-                                        {/*               }} ref={ref => (inputs.current["8C41"] = ref)}/>*/}
-                                        {/*        <label htmlFor="8C41">{t("Wall")}</label>*/}
-                                        {/*    </div>*/}
-                                        {/*    <div className="box33 radio_style">*/}
-                                        {/*        <input className="radio" type="radio" text={t("Ceiling")} value="2" name="step8C4" ref-num="8C4" id="8C42"*/}
-                                        {/*               checked={step8C4 === "Ceiling"}*/}
-                                        {/*               onChange={e => {*/}
-                                        {/*                   setStep8C4("Ceiling");*/}
-                                        {/*                   setDeps("", "8C4");*/}
-                                        {/*                   setCart("MountC", "Ceiling");*/}
-                                        {/*                   selectChanged(e);*/}
-                                        {/*            */}
-                                        {/*               }} ref={ref => (inputs.current["8C42"] = ref)}/>*/}
-                                        {/*        <label htmlFor="8C42">{t("Ceiling")}</label>*/}
-                                        {/*    </div>*/}
-                                        {/*    <div className="box33 radio_style"/>*/}
-                                        {/*    <div className={step8C === "Track" ? "box33 radio_style" : "noDisplay"}/>*/}
-                                        {/*</div>*/}
+                                        <div className={step8C !== "None" && step8C !== "" && step8C1 !== "" && !is8CMotor && step31 !== "false" ? "card_body" + " card_body_radio card_body_rod_mount" : "noDisplay"}>
+                                            <div className="box100">
+                                                <p className="step_selection_title">{t("step8_rod_mount_title")}</p>
+                                            </div>
+                                            <div className="box33 radio_style">
+                                                <input className="radio" type="radio" text={t("Wall")} value="1" name="step8C4" ref-num="84" id="8C41"
+                                                       checked={step84 === "Wall"}
+                                                       onChange={e => {
+                                                           if (step84 !== "" && ((step8B !== "None" && step8B !== ""))) {
+                                                               modalHandleShow("mountAllChange");
+                                                           }
+                                                           setStep84("Wall");
+                                                           setDeps("", "84,8A4,8B4,8C4");
+                                                           setCart("Mount8", "Wall");
+                                                           selectChanged(e);
+                                                           let tempExtended = extendedTitle;
+                                                           tempExtended["8"][4] = <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Wall")}</span></li>;
+                                                           setExtendedTitle(tempExtended);
+                                                       }} ref={ref => (inputs.current["8C41"] = ref)}/>
+                                                <label htmlFor="8C41">{t("Wall")}</label>
+                                            </div>
+                                            <div className="box33 radio_style">
+                                                <input className="radio" type="radio" text={t("Ceiling")} value="2" name="step8C4" ref-num="84" id="8C42"
+                                                       checked={step84 === "Ceiling"}
+                                                       onChange={e => {
+                                                           if (step84 !== "" && ((step8B !== "None" && step8B !== ""))) {
+                                                               modalHandleShow("mountAllChange");
+                                                           }
+                                                           setStep84("Ceiling");
+                                                           setDeps("", "84,8A4,8B4,8C4");
+                                                           setCart("Mount8", "Ceiling");
+                                                           selectChanged(e);
+                                                           let tempExtended = extendedTitle;
+                                                           tempExtended["8"][4] = <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Ceiling")}</span></li>;
+                                                           setExtendedTitle(tempExtended);
+                                                       }} ref={ref => (inputs.current["8C42"] = ref)}/>
+                                                <label htmlFor="8C42">{t("Ceiling")}</label>
+                                            </div>
+                                            <div className="box33 radio_style"/>
+                                        </div>
                                         <div className={is8CMotor ? "tracks_motorized_section" : "noDisplay"}>
                                             <div className={motorErr1 ? "secondary_options secondary_options_err" : "secondary_options"}>
                                                 <div className="card-body-display-flex">
@@ -10009,7 +10426,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                             </div>
                                         </div>
                                     </div>
-                                    <NextStep eventKey="9">{t("NEXT STEP")}</NextStep>
+                                    <NextStep currentStep="8C" eventKey="9">{t("NEXT STEP")}</NextStep>
                                 </Card.Body>
                             </Accordion.Collapse>
                         </Card>
@@ -10029,7 +10446,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                             </ul>
                                         </div>
                                     </div>
-                                    <NextStep eventKey="10">{t("NEXT STEP")}</NextStep>
+                                    <NextStep currentStep="9" eventKey="10">{t("NEXT STEP")}</NextStep>
                                 </Card.Body>
                             </Accordion.Collapse>
                         </Card>
@@ -10176,7 +10593,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                                }}/>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="11">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="10" eventKey="11">{t("NEXT STEP")}</NextStep>
                                     </div>
                                     <div className=" accordion_help">
                                         <div className=" help_container">
@@ -10199,7 +10616,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         </Card>
                         
                         {/* step 10 */}
-                        <Card>
+                        <Card className={accordionActiveKey===""?"card_little_margin":"card_big_margin"}>
                             <Card.Header>
                                 <ContextAwareToggle eventKey="11" stepNum={t("10")} stepTitle={t("zebra_step7")} stepTitle2={t("(Optional)")} stepRef="11" type="2"
                                                     required={requiredStep["11"]}
@@ -10414,7 +10831,7 @@ function Grommet3({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                         <button className="btn white_btn" onClick={() => {
                             setStep2A(sheerHeaderStyleTemp.stepValue);
                             setDeps("", "2A,8,81,82,83,84,8A,8A1,8A2,8A3,8A4,8B,8B1,8B2,8B3,8B4,8B5,8B51,8C,8C1,8C2,8C3,8C5,8C51");
-                            setCart("SheerHeaderStyle", sheerHeaderStyleTemp.cartValue, "RailId,BatonOption,RodColor,Mount,RailIdA,BatonOptionA,RodColorA,MountA,RailIdB,BatonOptionB,RodColorB,MountB,RailIdC,BatonOptionC,RodColorC,MountC,hasPower,MotorPosition,RemoteName,MotorChannels");
+                            setCart("SheerHeaderStyle", sheerHeaderStyleTemp.cartValue, "RailId,BatonOption,RodColor,Mount8,RailIdA,BatonOptionA,RodColorA,MountA,RailIdB,BatonOptionB,RodColorB,MountB,RailIdC,BatonOptionC,RodColorC,MountC,hasPower,MotorPosition,RemoteName,MotorChannels");
                             selectChanged(sheerHeaderStyleTemp.event, "8");
                             setSheersModelId(sheerHeaderStyleTemp.id);
                             setStep8("");

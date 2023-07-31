@@ -13,7 +13,8 @@ async function getBasketZipcode(isLoggedIn) {
             }).then((response) => {
                 resolve(response.data);
             }).catch(err => {
-                if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                     refreshToken().then((response2) => {
                         if (response2 !== false) {
                             resolve(401);

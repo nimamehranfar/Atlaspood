@@ -279,6 +279,18 @@ input[type="checkbox"]:checked:not(.form-check-input) + label {
     flex: 1 0 auto;
 }
 
+.checkbox_style_inline input[type="checkbox"]:not(:checked):not(.form-check-input) + label,
+.checkbox_style_inline input[type="checkbox"]:checked:not(.form-check-input) + label {
+    position: relative;
+    background: #fff;
+    width: unset;
+    height: 1rem;
+    cursor: pointer;
+    flex: 1 0 auto;
+    display: flex;
+    gap: 0.3rem;
+}
+
 input[type="checkbox"]:not(:checked) + label:before,
 input[type="checkbox"]:checked + label:before {
     content: '';
@@ -291,6 +303,12 @@ input[type="checkbox"]:checked + label:before {
     background: transparent;
 }
 
+.checkbox_style_inline input[type="checkbox"]:not(:checked) + label:before{
+    position: unset;
+    width: 1rem;
+    flex-shrink: 0;
+}
+
 .checkbox_label_img{
     display: none
 }
@@ -300,6 +318,13 @@ input[type='checkbox']:checked +label .checkbox_label_img {
     width: 0.6rem;
     height: 0.8rem;
     margin: auto;
+}
+
+.checkbox_style_inline input[type='checkbox']:checked +label .checkbox_label_img {
+    display: block;
+    width: 0.6rem;
+    height: 0.8rem;
+    margin: 0 0.2rem 0.1rem;
 }
 
 .checkbox_style{
@@ -2052,6 +2077,7 @@ span.model_info_price_off {
     padding: 0 1rem;
     user-select: none;
     cursor: pointer;
+    scroll-margin-top: 90px;
 }
 
 .steps_header_num_container {
@@ -2204,13 +2230,16 @@ span.model_info_price_off {
     padding-top: 0;
     /*min-height: 24rem;*/
     /*overflow-y: scroll;*/
-    max-height: 45rem;
+    max-height: 32rem;
+    padding-inline-start: 0;
+    /*padding-inline-end: 0;*/
+    overflow-y: hidden;
 }
 
 .fabrics_list_container{
     min-height: 14rem;
-    padding-inline-end: 0.8125rem;
-    padding-inline-start: 0.8125rem;
+    /*padding-inline-end: 0.8125rem;*/
+    /*padding-inline-start: 0.8125rem;*/
     margin-top: 1.1rem;
     max-height: 27.5rem;
     overflow-y: scroll;
@@ -2297,6 +2326,18 @@ span.model_info_price_off {
     border-radius: 100%;
 }
 
+.radio_style input[type="radio"].radio_checked + label::after {
+    position: absolute;
+    content: '';
+    top: 0.71875rem;
+    left: 0.25rem;
+    width: 0.5rem;
+    height: 0.5rem;
+    margin-top: -0.25rem;
+    background: #393736;
+    border-radius: 100%;
+}
+
 .font_farsi .radio_style input[type="radio"]:hover + label::after {
     position: absolute;
     content: '';
@@ -2345,6 +2386,9 @@ span.model_info_price_off {
 .material_detail {
     display: block;
     text-align: initial;
+    padding-inline-end: 0.8125rem;
+    padding-inline-start: 0.8125rem;
+    margin: 0 0 1.6875rem 0;
 }
 
 .font_farsi .material_detail .material_traits {
@@ -2360,7 +2404,7 @@ span.model_info_price_off {
 }
 
 .material_detail .material_traits hr {
-    margin: 1.25rem 0;
+    margin: 0 0 1.6875rem 0;
 }
 
 .material_detail:nth-child(1) .material_traits hr {
@@ -9245,7 +9289,9 @@ height: 11.1875rem;
 }
 
 .card_body_panel_type{
-    padding-top: 3rem;
+    padding: 0.875rem 0;
+    border-top: 0.0625rem solid rgba(0, 0, 0, .4);
+    margin: 0.7rem 1.125rem 0;
 }
 
 .card_body_hardware{
@@ -9776,4 +9822,118 @@ height: 11.1875rem;
     width: 50%;
     text-align: initial;
     font-size: 0.875rem;
+}
+
+.card_body_panel_type  .step_selection_title{
+    text-align: initial;
+    margin-bottom: 2.5rem;
+}
+
+.Customize_Style_container{
+    padding: 0.875rem 0 0;
+    margin: 0.7rem 0 0;
+    border-top: 0.0625rem solid rgba(0, 0, 0, .4);
+}
+
+.card_body_panel_type .Customize_Style_container:first-child{
+    padding: 0;
+    margin: 0;
+    border: 0;
+}
+
+.fabric_design_checkbox_container {
+    margin-top: 1.6875rem;
+    margin-bottom: -1.25rem;
+}
+
+.fabric_design_checkbox_container .checkbox_text{
+    font-size: 0.9375rem;
+}
+
+.fabric_design_trim_border_container{
+    height: max-content;
+    max-height: 0;
+    transition: max-height 1s ease-in-out;
+    -webkit-transition: max-height 1s ease-in-out;
+    -moz-transition: max-height 1s ease-in-out;
+    -o-transition: max-height 1s ease-in-out;
+    overflow: hidden;
+    background-color: #ece9e580;
+    margin: 0 0.8125rem 0.75rem 0;
+    text-align: initial;
+}
+
+.fabric_design_trim_border_container.active{
+    height: max-content;
+    max-height: 100rem;
+}
+
+.fabric_design_border_list{
+    display: flex;
+    gap: 2.5%;
+}
+
+.fabric_design_border_list_item{
+    width: 3.4375rem;
+    height: 3.4375rem;
+    aspect-ratio: 1/1;
+}
+
+.fabric_design_border_list .fabric_design_border_list_item .radio_group{
+    width: 100%;
+    float: unset;
+    aspect-ratio: 1/1;
+    max-height: unset;
+    height: unset;
+    margin: 0 !important;
+}
+
+.fabric_design_trim_border_title{
+    font-size: 0.9375rem;
+    margin: 0.5rem 0.5rem 0;
+}
+
+.fabric_design_border_container{
+    margin: 1.125rem 1rem 0;
+    border-top: 0.0625rem solid rgba(0, 0, 0, .2);
+    padding: 1.125rem 0 0;
+}
+
+.fabric_design_trim_border_container  .fabric_design_border_container:nth-child(2){
+    border: 0;
+    padding: 0;
+}
+
+.fabric_design_trim_border_container  .fabric_design_border_container:last-child{
+    padding: 1.125rem 0 1.125rem;
+}
+
+.fabric_design_trim_border_title2{
+    font-size: 0.8125rem;
+    margin: 0 0 1.125rem;
+}
+
+.fabric_design_trim_border_title3{
+    font-size: 0.9375rem;
+    margin: 1.125rem 0 0.5rem;
+}
+
+.fabric_design_border_checkbox_container .radio_style label{
+    font-size: 0.9375rem;
+}
+
+.fabric_design_border_checkbox_container .radio_style{
+    margin-bottom: 0.25rem;
+}
+
+.fabric_design_border_checkbox_container .radio_style label::before {
+    border: 0.0625rem solid #000000;
+}
+
+.accordion .card.card_little_margin{
+    margin-bottom: 10rem;
+}
+
+.accordion .card.card_big_margin{
+    margin-bottom: 80rem;
 }

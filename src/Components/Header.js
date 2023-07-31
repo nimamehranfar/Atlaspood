@@ -759,7 +759,8 @@ function Header() {
         }).then((response) => {
             setCartCount(response.data);
         }).catch(err => {
-            if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         getCartCount();
@@ -964,7 +965,8 @@ function Header() {
                         setCart(response.data ? response.data : {});
                         localStorage.removeItem("cart");
                     }).catch(err => {
-                        if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                             refreshToken().then((response2) => {
                                 if (response2 !== false) {
                                 } else {
@@ -1015,7 +1017,8 @@ function Header() {
                         setCart(response.data ? response.data : {});
                         localStorage.removeItem("cart");
                     }).catch(err => {
-                        if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                             refreshToken().then((response2) => {
                                 if (response2 !== false) {
                                 } else {

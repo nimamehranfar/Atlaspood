@@ -100,7 +100,8 @@ function Projects() {
                 setUserProjectsRender([<h1 key={1} className="no_project">You don't have any saved project yet.</h1>]);
             }
         }).catch(err => {
-            if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         getUserProjects();
@@ -476,7 +477,8 @@ function Projects() {
             .then(() => {
                 getUserProjects();
             }).catch(err => {
-            if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         editProject(projectObj);
@@ -501,7 +503,8 @@ function Projects() {
             }
             getUserProjects();
         }).catch(err => {
-            if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         deleteUserProject(projectId);
@@ -573,7 +576,8 @@ function Projects() {
             .then(() => {
                 renderCart();
             }).catch(err => {
-            if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         editBasketProject(projectObj);
@@ -600,7 +604,8 @@ function Projects() {
             }
             renderCart();
         }).catch(err => {
-            if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         deleteBasketProject(refIndex);
@@ -635,7 +640,7 @@ function Projects() {
             tempPostObj["WindowCount"] = 1;
             tempPostObj["SewingModelId"] = projectObj["SewingModelId"];
             Object.keys(temp).forEach(key => {
-                if (temp[key] !== null || temp[key] !== "") {
+                if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
                     if (tempObj && tempObj["apiLabel"] !== "") {
                         if (tempObj["apiValue"] === null) {
@@ -659,13 +664,13 @@ function Projects() {
             tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = tempPostObj["SewingModelId"];
             
             tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2302;
-            tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `0002`;
+            tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = tempPostObj["SewingModelId"]==="0325" ? tempPostObj["SewingModelId"]:`0002`;
             
             tempPostObj["SewingOrderDetails"][2]["CurtainPartId"] = 2301;
             tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
             
             Object.keys(temp).forEach(key => {
-                if (temp[key] !== null || temp[key] !== "") {
+                if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
                     // console.log(key,userProjects.find(obj => obj["cart"] === key));
                     if (tempObj) {
@@ -688,7 +693,7 @@ function Projects() {
             tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
             tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
             Object.keys(temp).forEach(key => {
-                if (temp[key] !== null || temp[key] !== "") {
+                if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
                     if (tempObj) {
                         if (tempObj["apiAcc"] !== undefined) {
@@ -758,7 +763,7 @@ function Projects() {
                                     let objLabel = "";
                                     if (key === "ControlType" && cartValues["ControlType"] === "Motorized") {
                                         objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(cartValues[key].toString())} / ${t(cartValues["MotorType"].toString())}`).toString() : `${t(cartValues[key].toString())} / ${t(cartValues["MotorType"].toString())}`;
-                                    } else if (tempObj["titleValue"] === null || true) {
+                                    } else if (tempObj["titleValue"] === null) {
                                         if (tempObj["titlePostfix"] === "") {
                                             objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(cartValues[key].toString())}`).toString() : t(cartValues[key].toString());
                                         } else {
@@ -823,7 +828,8 @@ function Projects() {
                         //     }
                         // });
                     }).catch(err => {
-                    if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                         refreshToken().then((response2) => {
                             if (response2 !== false) {
                                 addProjectToBag(projectObj, index);
@@ -888,7 +894,8 @@ function Projects() {
                     cartObjects = response.data ? response.data : {};
                     resolve();
                 }).catch(err => {
-                    if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                         refreshToken().then((response2) => {
                             if (response2 !== false) {
                                 renderCart(customPageCart);
@@ -1149,7 +1156,8 @@ function Projects() {
                 }).then((response) => {
                     resolve();
                 }).catch(err => {
-                    if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                         refreshToken().then((response2) => {
                             if (response2 !== false) {
                                 deleteUploaded(fileUrl);

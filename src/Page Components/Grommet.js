@@ -93,12 +93,15 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
     const [rodsLoad, setRodsLoad] = useState(undefined);
     const [rodsLoad2, setRodsLoad2] = useState(undefined);
     const [motorLoad, setMotorLoad] = useState(false);
+    const [motorLoad2, setMotorLoad2] = useState(false);
     const [models, setModels] = useState([]);
     const [projectData, setProjectData] = useState({});
     const [model, setModel] = useState({});
     const [modelAccessories, setModelAccessories] = useState({});
     const [stepAccessories, setStepAccessories] = useState({});
     const [stepAccessoriesList, setStepAccessoriesList] = useState([]);
+    const [trimAccessories, setTrimAccessories] = useState({});
+    const [trimAccessoriesList, setTrimAccessoriesList] = useState([]);
     const [fabrics, setFabrics] = useState({});
     const [fabrics2, setFabrics2] = useState({});
     const [fabricsList, setFabricsList] = useState([]);
@@ -168,6 +171,18 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
     const [fabricSelected2, setFabricSelected2] = useState({
         selectedFabricId: 0, selectedTextEn: "", selectedTextFa: "", selectedColorEn: "", selectedColorFa: "", selectedHasTrim: false, selectedPhoto: ""
     });
+    const [borderSelected, setBorderSelected] = useState({
+        selectedFabricId: 0, selectedTextEn: "", selectedTextFa: "", selectedDesignCode: "", selectedColorEn: "", selectedColorFa: "", selectedHasTrim: false, selectedPhoto: ""
+    });
+    const [trimSelected, setTrimSelected] = useState({
+        selectedFabricId: 0, selectedTextEn: "", selectedTextFa: "", selectedDesignCode: "", selectedColorEn: "", selectedColorFa: "", selectedHasTrim: false, selectedPhoto: ""
+    });
+    const [borderSelected2, setBorderSelected2] = useState({
+        selectedFabricId: 0, selectedTextEn: "", selectedTextFa: "", selectedDesignCode: "", selectedColorEn: "", selectedColorFa: "", selectedHasTrim: false, selectedPhoto: ""
+    });
+    const [trimSelected2, setTrimSelected2] = useState({
+        selectedFabricId: 0, selectedTextEn: "", selectedTextFa: "", selectedDesignCode: "", selectedColorEn: "", selectedColorFa: "", selectedHasTrim: false, selectedPhoto: ""
+    });
     const [sheersSelected, setSheersSelected] = useState({
         selectedFabricId: 0, selectedTextEn: "", selectedTextFa: "", selectedColorEn: "", selectedColorFa: "", selectedHasTrim: false, selectedPhoto: ""
     });
@@ -191,15 +206,15 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
     });
     const [roomLabelComplete, setRoomLabelComplete] = useState(false);
     const [stepSelectedValue, setStepSelectedValue] = useState({});
-    const [hasTrim, setHasTrim] = useState(false);
+    // const [hasTrim, setHasTrim] = useState(false);
     const [showLabels, setShowLabels] = useState(true);
     const [headerTruncated, setHeaderTruncated] = useState([]);
     const [extendedTitle, setExtendedTitle] = useState({
-        "8":[],
-        "8A":[],
-        "8B":[],
-        "8C":[],
-        "9":[]
+        "8": [],
+        "8A": [],
+        "8B": [],
+        "8C": [],
+        "9": []
     });
     const [detailsShow, setDetailsShow] = useState(false);
     const [filtersShow, setFiltersShow] = useState(false);
@@ -233,7 +248,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
     });
     const [saveProjectCount, setSaveProjectCount] = useState(0);
     
-    const [depSet, setDepSet] = useState(new Set(['1', '2', '3', '4', '5', '6', '7', '8', '1001', '1002']));
+    const [depSet, setDepSet] = useState(new Set(['1', '2', '2B', '3', '4', '5', '61', '7', '8', '1001', '1002']));
     
     const inputs = useRef({});
     const selectedTitle = useRef({});
@@ -243,6 +258,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         "colors": [], "patterns": [], "types": [], "prices": []
     });
     const steps = useRef([]);
+    const stepHeaders = useRef([]);
     const draperyRef = useRef([]);
     
     const [filterChanged, setFilterChanged] = useState({
@@ -257,6 +273,14 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
     const [isClearAll, setIsClearAll] = useState(false);
     
     const [step1, setStep1] = useState("");
+    const [step1Check, setStep1Check] = useState("");
+    const [step1Border, setStep1Border] = useState("");
+    const [step1BorderRadio, setStep1BorderRadio] = useState("");
+    const [step1Trim, setStep1Trim] = useState("");
+    const [step2Check, setStep2Check] = useState("");
+    const [step2Border, setStep2Border] = useState("");
+    const [step2BorderRadio, setStep2BorderRadio] = useState("");
+    const [step2Trim, setStep2Trim] = useState("");
     const [step2, setStep2] = useState("");
     const [step2A, setStep2A] = useState("");
     const [step2B, setStep2B] = useState("");
@@ -271,7 +295,11 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
     const [step3ARod1, setStep3ARod1] = useState("");
     const [step4, setStep4] = useState("");
     const [step5, setStep5] = useState("");
-    const [step6, setStep6] = useState("");
+    const [step6, setStep6] = useState("Same Style For All Curtains");
+    const [step61, setStep61] = useState("");
+    const [step6A1, setStep6A1] = useState("");
+    const [step6B1, setStep6B1] = useState("");
+    const [step6C1, setStep6C1] = useState("");
     const [step7, setStep7] = useState("");
     const [step8, setStep8] = useState("");
     const [step81, setStep81] = useState("");
@@ -452,7 +480,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         }).catch(err => {
             console.log(err);
             setRails([]);
-            if(rodsLoad){
+            if (rodsLoad) {
                 setRodsLoad(false);
             }
         });
@@ -499,7 +527,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
             } else {
                 setRails2([]);
             }
-            if(rodsLoad2){
+            if (rodsLoad2) {
                 setRodsLoad2(false);
             }
         });
@@ -590,10 +618,12 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     response.data.forEach(obj => {
                         obj["ShowMore"] = false;
                         if (obj["FabricGroupId"] === "100101") {
-                            if (tempFabrics[obj["DesignEnName"]] === "" || tempFabrics[obj["DesignEnName"]] === undefined || tempFabrics[obj["DesignEnName"]] === null || tempFabrics[obj["DesignEnName"]] === []) tempFabrics[obj["DesignEnName"]] = [];
+                            if (tempFabrics[obj["DesignEnName"]] === "" || tempFabrics[obj["DesignEnName"]] === undefined || tempFabrics[obj["DesignEnName"]] === null || tempFabrics[obj["DesignEnName"]] === [])
+                                tempFabrics[obj["DesignEnName"]] = [];
                             tempFabrics[obj["DesignEnName"]].push(obj);
                         } else if (obj["FabricGroupId"] === "100102") {
-                            if (tempFabrics2[obj["DesignEnName"]] === "" || tempFabrics2[obj["DesignEnName"]] === undefined || tempFabrics2[obj["DesignEnName"]] === null || tempFabrics2[obj["DesignEnName"]] === []) tempFabrics2[obj["DesignEnName"]] = [];
+                            if (tempFabrics2[obj["DesignEnName"]] === "" || tempFabrics2[obj["DesignEnName"]] === undefined || tempFabrics2[obj["DesignEnName"]] === null || tempFabrics2[obj["DesignEnName"]] === [])
+                                tempFabrics2[obj["DesignEnName"]] = [];
                             tempFabrics2[obj["DesignEnName"]].push(obj);
                         }
                     });
@@ -649,10 +679,14 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         }
         
         Object.keys(fabrics).forEach((key, index) => {
-            let DesignName = convertToPersian(fabrics[key][0].DesignName);
-            let DesignEnName = fabrics[key][0].DesignEnName;
+            let DesignName = convertToPersian(fabrics[key][0]["DesignName"]);
+            let DesignEnName = fabrics[key][0]["DesignEnName"];
+            let HasTrim = fabrics[key][0]["HasFaricTrim"] || true;
+            let HasBorder = fabrics[key][0]["CanHasBorder"] || true;
+            let DesignCode = fabrics[key][0]["DesignCode"];
             
             const fabric = [];
+            const fabric1 = [];
             for (let j = 0; j < fabrics[key].length; j++) {
                 let FabricId = fabrics[key][j].FabricId;
                 // console.log(fabrics,key);
@@ -662,8 +696,6 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 });
                 
                 let FabricOnModelPhotoUrl = fabrics[key][j].FabricOnModelPhotoUrl;
-                let HasTrim = fabrics[key][j].HasTrim;
-                let DesignCode = fabrics[key][j].DesignCode;
                 let DesignRaportLength = fabrics[key][j].DesignRaportLength;
                 let DesignRaportWidth = fabrics[key][j].DesignRaportWidth;
                 let PolyesterPercent = fabrics[key][j].PolyesterPercent;
@@ -704,7 +736,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                            data-for={"fabric" + key + j} className={`radio_container ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}
                            data-img={`https://www.doopsalta.com/upload/${PhotoPath}`}>
                         {/*<ReactTooltip id={"fabric" + key + j} place="top" type="light" effect="float"/>*/}
-                        <input className="radio" type="radio" ref-num="2" default-fabric-photo={FabricOnModelPhotoUrl}
+                        <input className="radio" type="radio" ref-num="1" default-fabric-photo={FabricOnModelPhotoUrl}
                                onChange={e => {
                                    // console.log("hi1");
                                    let temp = JSON.parse(JSON.stringify(fabricSelected));
@@ -741,15 +773,166 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                             }} disabled={SwatchId === -1}>{HasSwatchId ? (pageLanguage1 === 'en' ? "SWATCH IN CART" : "نمونه در سبد") : (pageLanguage1 === 'en' ? "ORDER" + " SWATCH" : "سفارش نمونه")}</button>
                 </div>);
                 
+                fabric1.push(
+                    <li className="fabric_design_border_list_item" key={"border" + key + j}>
+                        <OverlayContainer classNames="Accessories_List_item_color"
+                                          placement="middle"
+                                          children={
+                                              <div className={`radio_group ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
+                                                  <label>
+                                                      <input className="radio" type="radio" outline="true"
+                                                             onChange={e => {
+                                                                 let temp = JSON.parse(JSON.stringify(borderSelected));
+                                                                 temp.selectedFabricId = FabricId;
+                                                                 temp.selectedTextEn = DesignEnName;
+                                                                 temp.selectedTextFa = DesignName;
+                                                                 temp.selectedDesignCode = DesignCode;
+                                                                 temp.selectedColorEn = ColorEnName;
+                                                                 temp.selectedColorFa = ColorName;
+                                                                 setBorderSelected(temp);
+                                                             }} name="border-trim"
+                                                             model-id={modelID} value={FabricId} checked={`${FabricId}` === step1Border}
+                                                             ref={ref => (inputs.current[`border-trim${FabricId}`] = ref)}/>
+                                                      <div className="frame_img">
+                                                          <img className={`img-fluid ${`${FabricId}` === step1Border ? "img-fluid_checked" : ""}`} src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
+                                                      </div>
+                                                  </label>
+                                              </div>}
+                                          component={
+                                              <div className="Accessories_List_item_color_container">
+                                                  <p className="Accessories_List_item_color_text">{pageLanguage1 === 'en' ? ColorEnName : ColorName}</p>
+                                              </div>
+                                          }/>
+                    </li>);
             }
             
-            fabricList.push(<div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key}>
-                <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
-                    <hr/>
-                    <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(100000, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")}</p></span>
-                </div>
-                {fabric}
-            </div>);
+            fabricList.push(
+                <React.Fragment key={"fabric" + key}>
+                    <div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
+                        <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
+                            <hr/>
+                            <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(100000, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")}</p></span>
+                        </div>
+                        {fabric}
+                        {(HasTrim || HasBorder) &&
+                            <div className="fabric_design_checkbox_container width_max checkbox_style checkbox_style_inline">
+                                <input type="checkbox" name="step1Check" checked={step1Check === `${DesignCode}`}
+                                       onChange={(e) => {
+                                           if (step1 !== "" && fabrics[DesignEnName].some(obj => obj["FabricId"] === step1)) {
+                                               if (e.target.checked) {
+                                                   setStep1Check(`${DesignCode}`);
+                                               } else {
+                                                   setStep1Check("");
+                                               }
+                                           } else {
+                                               setStep1Check("");
+                                               modalHandleShow("FabricDesignNotSelected");
+                                           }
+                                       }} id={`${DesignCode}`} ref={ref => (inputs.current[`trim-${DesignCode}`] = ref)}/>
+                                <label htmlFor={`${DesignCode}`} className="checkbox_label">
+                                    <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
+                                         alt=""/>
+                                    <span className="checkbox_text">
+                                        {HasTrim && HasBorder ? (pageLanguage1 === 'en' ? "Add a Decorative Border / Trim" : "یک حاشیه / برش تزئینی اضافه کنید") : (HasTrim ? (pageLanguage1 === 'en' ? "Add a Trim" : "یک برش اضافه کنید") : (HasBorder ? (pageLanguage1 === 'en' ? "Add a Decorative Border" : "یک حاشیه تزئینی اضافه کنید") : ""))}
+                                    </span>
+                                </label>
+                            </div>
+                        }
+                    </div>
+                    <div className={step1Check === `${DesignCode}` ? "fabric_design_trim_border_container active" : "fabric_design_trim_border_container"}>
+                        <h1 className="fabric_design_trim_border_title">{HasTrim && HasBorder ? (pageLanguage1 === 'en' ? "Select your Decorative Border / Trim Material" : "") : (HasTrim ? (pageLanguage1 === 'en' ? "Select your Trim Material" : "") : (HasBorder ? (pageLanguage1 === 'en' ? "Select your Decorative Border" : "") : ""))}</h1>
+                        
+                        {HasBorder &&
+                            <div className="fabric_design_border_container">
+                                <h2 className="fabric_design_trim_border_title2">{pageLanguage1 === 'en' ? "DECORATIVE BORDER" : "حاشیه تزئینی"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</h2>
+                                <ul className="fabric_design_border_list">
+                                    {fabric1}
+                                </ul>
+                                {step1Border !== "" &&
+                                    <div className="fabric_design_border_checkbox_container">
+                                        <h3 className="fabric_design_trim_border_title3">{pageLanguage1 === 'en' ? "Select a border position:" : "محل نصب حاشیه را مشخص کنید:"}</h3>
+                                        <div className="box100 radio_style">
+                                            <input className={step1BorderRadio === "10 cm leading edge" ? "radio radio_checked" : "radio"} type="radio" text={t("10 cm leading edge")} value="1" name="step1bordercheck" id="border1"
+                                                   checked={step1BorderRadio === "10 cm leading edge"}
+                                                   onChange={e => {
+                                                       setStep1BorderRadio("10 cm leading edge");
+                                                       setCart("borderPosition", "10 cm leading edge");
+                                                   }} ref={ref => (inputs.current["border1"] = ref)}/>
+                                            <label htmlFor="border1">{t("10 cm leading edge")}</label>
+                                        </div>
+                                        <div className="box100 radio_style">
+                                            <input className={step1BorderRadio === "60 cm bottom border" ? "radio radio_checked" : "radio"} type="radio" text={t("60 cm bottom border")} value="2" name="step1bordercheck" id="border2"
+                                                   checked={step1BorderRadio === "60 cm bottom border"}
+                                                   onChange={e => {
+                                                       setStep1BorderRadio("60 cm bottom border");
+                                                       setCart("borderPosition", "60 cm bottom border");
+                                                   }} ref={ref => (inputs.current["border2"] = ref)}/>
+                                            <label htmlFor="border2">{t("60 cm bottom border")}</label>
+                                        </div>
+                                        <div className="box100 radio_style">
+                                            <input className={step1BorderRadio === "10 cm leading edge and 60 cm bottom border" ? "radio radio_checked" : "radio"} type="radio" text={t("10 cm leading edge and 60 cm bottom border")} value="3" name="step1bordercheck" id="border3"
+                                                   checked={step1BorderRadio === "10 cm leading edge and 60 cm bottom border"}
+                                                   onChange={e => {
+                                                       setStep1BorderRadio("10 cm leading edge and 60 cm bottom border");
+                                                       setCart("borderPosition", "10 cm leading edge and 60 cm bottom border");
+                                                   }} ref={ref => (inputs.current["border3"] = ref)}/>
+                                            <label htmlFor="border3">{t("10 cm leading edge and 60 cm bottom border")}</label>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        {HasTrim &&
+                            <>
+                                {Object.keys(trimAccessories).map((key, index) => {
+                                    return (
+                                        <div className="fabric_design_border_container" key={"trim" + key}>
+                                            <h2 className="fabric_design_trim_border_title2">{pageLanguage1 === 'en' ? "DECORATIVE TRIM" : "برش تزئینی"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</h2>
+                                            <ul className="fabric_design_border_list">
+                                                {trimAccessories[key].map((el, i) => {
+                                                    let FabricId = el["DetailId"];
+                                                    let DesignName = convertToPersian(el["DesignName"]);
+                                                    let DesignEnName = el["DesignENName"];
+                                                    let ColorName = convertToPersian(el["ColorName"]);
+                                                    let ColorEnName = el["ColorENName"];
+                                                    let PhotoPath = "";
+                                                    el["Photos"].forEach(obj => {
+                                                        if (obj.PhotoTypeId === 4702) PhotoPath = obj.PhotoUrl;
+                                                    });
+                                                    return (
+                                                        <li className="fabric_design_border_list_item" key={"trim" + key + i}>
+                                                            <div className={`radio_group ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
+                                                                <label>
+                                                                    {/*<ReactTooltip id={"fabric" + key + j} place="top" type="light" effect="float"/>*/}
+                                                                    <input className="radio" type="radio" outline="true"
+                                                                           onChange={e => {
+                                                                               let temp = JSON.parse(JSON.stringify(trimSelected));
+                                                                               temp.selectedFabricId = FabricId;
+                                                                               temp.selectedTextEn = DesignEnName;
+                                                                               temp.selectedTextFa = DesignName;
+                                                                               temp.selectedDesignCode = DesignCode;
+                                                                               temp.selectedColorEn = ColorEnName;
+                                                                               temp.selectedColorFa = ColorName;
+                                                                               setTrimSelected(temp);
+                                                                           }} name="border-trim"
+                                                                           model-id={modelID} value={FabricId} checked={`${FabricId}` === step1Trim}
+                                                                           ref={ref => (inputs.current[`border-trim${FabricId}`] = ref)}/>
+                                                                    <div className="frame_img">
+                                                                        <img className={`img-fluid ${`${FabricId}` === step1Trim ? "img-fluid_checked" : ""}`} src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
+                                                                    </div>
+                                                                </label>
+                                                            </div>
+                                                        </li>
+                                                    )
+                                                })}
+                                            </ul>
+                                        </div>
+                                    )
+                                })}
+                            </>
+                        }
+                    </div>
+                </React.Fragment>);
             
         });
         setFabricsList(fabricList);
@@ -773,10 +956,14 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         
         Object.keys(fabrics2).forEach((key, index) => {
             let fabrics = fabrics2;
-            let DesignName = convertToPersian(fabrics[key][0].DesignName);
-            let DesignEnName = fabrics[key][0].DesignEnName;
+            let DesignName = convertToPersian(fabrics[key][0]["DesignName"]);
+            let DesignEnName = fabrics[key][0]["DesignEnName"];
+            let HasTrim = fabrics[key][0]["HasFaricTrim"] || true;
+            let HasBorder = fabrics[key][0]["CanHasBorder"] || true;
+            let DesignCode = fabrics[key][0]["DesignCode"];
             
             const fabric = [];
+            const fabric1 = [];
             for (let j = 0; j < fabrics[key].length; j++) {
                 let FabricId = fabrics[key][j].FabricId;
                 // console.log(fabrics,key);
@@ -786,8 +973,6 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 });
                 
                 let FabricOnModelPhotoUrl = fabrics[key][j].FabricOnModelPhotoUrl;
-                let HasTrim = fabrics[key][j].HasTrim;
-                let DesignCode = fabrics[key][j].DesignCode;
                 let DesignRaportLength = fabrics[key][j].DesignRaportLength;
                 let DesignRaportWidth = fabrics[key][j].DesignRaportWidth;
                 let PolyesterPercent = fabrics[key][j].PolyesterPercent;
@@ -865,15 +1050,167 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                             }} disabled={SwatchId === -1}>{HasSwatchId ? (pageLanguage1 === 'en' ? "SWATCH IN CART" : "نمونه در سبد") : (pageLanguage1 === 'en' ? "ORDER" + " SWATCH" : "سفارش نمونه")}</button>
                 </div>);
                 
+                fabric1.push(
+                    <li className="fabric_design_border_list_item" key={"border" + key + j}>
+                        <OverlayContainer classNames="Accessories_List_item_color"
+                                          placement="middle"
+                                          children={
+                                              <div className={`radio_group ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
+                                                  <label>
+                                                      {/*<ReactTooltip id={"fabric" + key + j} place="top" type="light" effect="float"/>*/}
+                                                      <input className="radio" type="radio" outline="true"
+                                                             onChange={e => {
+                                                                 let temp = JSON.parse(JSON.stringify(borderSelected2));
+                                                                 temp.selectedFabricId = FabricId;
+                                                                 temp.selectedTextEn = DesignEnName;
+                                                                 temp.selectedTextFa = DesignName;
+                                                                 temp.selectedDesignCode = DesignCode;
+                                                                 temp.selectedColorEn = ColorEnName;
+                                                                 temp.selectedColorFa = ColorName;
+                                                                 setBorderSelected2(temp);
+                                                             }} name="border-trim"
+                                                             model-id={modelID} value={FabricId} checked={`${FabricId}` === step2Border}
+                                                             ref={ref => (inputs.current[`border-trim${FabricId}`] = ref)}/>
+                                                      <div className="frame_img">
+                                                          <img className={`img-fluid ${`${FabricId}` === step2Border ? "img-fluid_checked" : ""}`} src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
+                                                      </div>
+                                                  </label>
+                                              </div>}
+                                          component={
+                                              <div className="Accessories_List_item_color_container">
+                                                  <p className="Accessories_List_item_color_text">{pageLanguage1 === 'en' ? ColorEnName : ColorName}</p>
+                                              </div>
+                                          }/>
+                    </li>);
             }
             
-            fabricList.push(<div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key}>
-                <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
-                    <hr/>
-                    <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(100000, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")}</p></span>
-                </div>
-                {fabric}
-            </div>);
+            fabricList.push(
+                <React.Fragment key={"fabric" + key}>
+                    <div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
+                        <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
+                            <hr/>
+                            <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(100000, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")}</p></span>
+                        </div>
+                        {fabric}
+                        {(HasTrim || HasBorder) &&
+                            <div className="fabric_design_checkbox_container width_max checkbox_style checkbox_style_inline">
+                                <input type="checkbox" name="step1Check" checked={step2Check === `${DesignCode}`}
+                                       onChange={(e) => {
+                                           if (step1 !== "" && fabrics[DesignEnName].some(obj => obj["FabricId"] === step1)) {
+                                               if (e.target.checked) {
+                                                   setStep2Check(`${DesignCode}`);
+                                               } else {
+                                                   setStep2Check("");
+                                               }
+                                           } else {
+                                               setStep2Check("");
+                                               modalHandleShow("FabricDesignNotSelected");
+                                           }
+                                       }} id={`${DesignCode}`} ref={ref => (inputs.current[`trim-${DesignCode}`] = ref)}/>
+                                <label htmlFor={`${DesignCode}`} className="checkbox_label">
+                                    <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
+                                         alt=""/>
+                                    <span className="checkbox_text">
+                                        {HasTrim && HasBorder ? (pageLanguage1 === 'en' ? "Add a Decorative Border / Trim" : "یک حاشیه / برش تزئینی اضافه کنید") : (HasTrim ? (pageLanguage1 === 'en' ? "Add a Trim" : "یک برش اضافه کنید") : (HasBorder ? (pageLanguage1 === 'en' ? "Add a Decorative Border" : "یک حاشیه تزئینی اضافه کنید") : ""))}
+                                    </span>
+                                </label>
+                            </div>
+                        }
+                    </div>
+                    <div className={step2Check === `${DesignCode}` ? "fabric_design_trim_border_container active" : "fabric_design_trim_border_container"}>
+                        <h1 className="fabric_design_trim_border_title">{HasTrim && HasBorder ? (pageLanguage1 === 'en' ? "Select your Decorative Border / Trim Material" : "") : (HasTrim ? (pageLanguage1 === 'en' ? "Select your Trim Material" : "") : (HasBorder ? (pageLanguage1 === 'en' ? "Select your Decorative Border" : "") : ""))}</h1>
+                        
+                        {HasBorder &&
+                            <div className="fabric_design_border_container">
+                                <h2 className="fabric_design_trim_border_title2">{pageLanguage1 === 'en' ? "DECORATIVE BORDER" : "حاشیه تزئینی"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</h2>
+                                <ul className="fabric_design_border_list">
+                                    {fabric1}
+                                </ul>
+                                {step2Border !== "" &&
+                                    <div className="fabric_design_border_checkbox_container">
+                                        <h3 className="fabric_design_trim_border_title3">{pageLanguage1 === 'en' ? "Select a border position:" : "محل نصب حاشیه را مشخص کنید:"}</h3>
+                                        <div className="box100 radio_style">
+                                            <input className="radio" type="radio" text={t("10 cm leading edge")} value="1" name="step1bordercheck" id="border1"
+                                                   checked={step2BorderRadio === "10 cm leading edge"}
+                                                   onChange={e => {
+                                                       setStep2BorderRadio("10 cm leading edge");
+                                                       setCart("borderPosition2", "10 cm leading edge");
+                                                   }} ref={ref => (inputs.current["border1"] = ref)}/>
+                                            <label htmlFor="border1">{t("10 cm leading edge")}</label>
+                                        </div>
+                                        <div className="box100 radio_style">
+                                            <input className="radio" type="radio" text={t("60 cm bottom border")} value="2" name="step1bordercheck" id="border2"
+                                                   checked={step2BorderRadio === "60 cm bottom border"}
+                                                   onChange={e => {
+                                                       setStep2BorderRadio("60 cm bottom border");
+                                                       setCart("borderPosition2", "60 cm bottom border");
+                                                   }} ref={ref => (inputs.current["border2"] = ref)}/>
+                                            <label htmlFor="border2">{t("60 cm bottom border")}</label>
+                                        </div>
+                                        <div className="box100 radio_style">
+                                            <input className="radio" type="radio" text={t("10 cm leading edge and 60 cm bottom border")} value="3" name="step1bordercheck" id="border3"
+                                                   checked={step2BorderRadio === "10 cm leading edge and 60 cm bottom border"}
+                                                   onChange={e => {
+                                                       setStep2BorderRadio("10 cm leading edge and 60 cm bottom border");
+                                                       setCart("borderPosition2", "10 cm leading edge and 60 cm bottom border");
+                                                   }} ref={ref => (inputs.current["border3"] = ref)}/>
+                                            <label htmlFor="border3">{t("10 cm leading edge and 60 cm bottom border")}</label>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        {HasTrim &&
+                            <>
+                                {Object.keys(trimAccessories).map((key, index) => {
+                                    return (
+                                        <div className="fabric_design_border_container" key={"trim" + key}>
+                                            <h2 className="fabric_design_trim_border_title2">{pageLanguage1 === 'en' ? "DECORATIVE TRIM" : "برش تزئینی"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</h2>
+                                            <ul className="fabric_design_border_list">
+                                                {trimAccessories[key].map((el, i) => {
+                                                    let FabricId = el["DetailId"];
+                                                    let DesignName = convertToPersian(el["DesignName"]);
+                                                    let DesignEnName = el["DesignENName"];
+                                                    let ColorName = convertToPersian(el["ColorName"]);
+                                                    let ColorEnName = el["ColorENName"];
+                                                    let PhotoPath = "";
+                                                    el["Photos"].forEach(obj => {
+                                                        if (obj.PhotoTypeId === 4702) PhotoPath = obj.PhotoUrl;
+                                                    });
+                                                    return (
+                                                        <li className="fabric_design_border_list_item" key={"trim" + key + i}>
+                                                            <div className={`radio_group ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
+                                                                <label>
+                                                                    {/*<ReactTooltip id={"fabric" + key + j} place="top" type="light" effect="float"/>*/}
+                                                                    <input className="radio" type="radio" outline="true"
+                                                                           onChange={e => {
+                                                                               let temp = JSON.parse(JSON.stringify(trimSelected2));
+                                                                               temp.selectedFabricId = FabricId;
+                                                                               temp.selectedTextEn = DesignEnName;
+                                                                               temp.selectedTextFa = DesignName;
+                                                                               temp.selectedDesignCode = DesignCode;
+                                                                               temp.selectedColorEn = ColorEnName;
+                                                                               temp.selectedColorFa = ColorName;
+                                                                               setTrimSelected2(temp);
+                                                                           }} name="border-trim"
+                                                                           model-id={modelID} value={FabricId} checked={`${FabricId}` === step2Trim}
+                                                                           ref={ref => (inputs.current[`border-trim${FabricId}`] = ref)}/>
+                                                                    <div className="frame_img">
+                                                                        <img className={`img-fluid ${`${FabricId}` === step2Trim ? "img-fluid_checked" : ""}`} src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
+                                                                    </div>
+                                                                </label>
+                                                            </div>
+                                                        </li>
+                                                    )
+                                                })}
+                                            </ul>
+                                        </div>
+                                    )
+                                })}
+                            </>
+                        }
+                    </div>
+                </React.Fragment>);
             
         });
         setFabricsList2(fabricList);
@@ -1193,6 +1530,11 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                             ;
                             resolve();
                         });
+                    } else if (obj["Photos"] && obj["Photos"].length) {
+                        obj["Photos"].forEach(obj => {
+                            if (obj["PhotoTypeId"] === 4702)
+                                PhotoPath = obj["PhotoUrl"];
+                        });
                     }
                 });
                 
@@ -1205,7 +1547,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     let Price = obj["Price"];
                     
                     let designOrderSelected = params["Designs"] && params["Designs"][DesignCode] && (params["Designs"][DesignCode]["order"] && params["Designs"][DesignCode]["order"] >= 0) ? params["Designs"][DesignCode]["order"] : -1;
-    
+                    
                     let pushIndex = 0;
                     if (designOrderSelected !== -1 && !tempList[designOrderSelected]) {
                         pushIndex = designOrderSelected;
@@ -1216,7 +1558,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                         let index = tempList.findIndex(Object.is.bind(null, undefined));
                         pushIndex = index === -1 ? tempList.length : index;
                     }
-    
+                    
                     tempList[pushIndex] =
                         <li className="Accessories_List_item" key={index}>
                             <div className="Accessories_List_item_image">
@@ -1600,50 +1942,52 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         }
         // console.log(extendedTitle[stepRef]);
         
-        return (<div
-            className={`w-100 h-100 steps_header ${isCurrentEventKey ? 'steps_header_active' : ''}`}
-            onClick={decoratedOnClick}>
-            <div className="steps_header_num_container">
-                <div className="steps_header_num">{stepNum}</div>
-            </div>
-            <div className="steps_header_title_container">
-                <div className={"steps_header_title " + stepTitle2 ? "steps_header_title_max_content" : ""} type-of-step={type}
-                     cart-custom-text={cartCustomText === undefined ? stepTitle : cartCustomText}
-                     ref={ref => (steps.current[stepRef] = ref)}>{stepTitle}<h5>{stepTitle2}</h5></div>
-            </div>
-            {/*<div className="steps_header_selected_container">*/}
-            {/*    <PopoverStickOnHover classNames="step_label_popover"*/}
-            {/*                         placement="bottom"*/}
-            {/*                         children={<div className="steps_header_selected"*/}
-            {/*                                        ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? stepSelected : null}</div>}*/}
-            {/*                         component={*/}
-            {/*                             <div className="step_label_popover_container">*/}
-            {/*                                 <div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? stepSelected : null}</div>*/}
-            {/*                             </div>*/}
-            {/*                         }/>*/}
-            {/*</div>*/}
-            <div className="steps_header_selected_container">
-                <div className="steps_header_selected" onMouseEnter={() => {
-                    // if (selectedTitle.current[stepNum].clientWidth < selectedTitle.current[stepNum].scrollWidth || (stepRef in extendedTitle && extendedTitle[stepRef].length > 1)) {
-                    if (stepRef in extendedTitle && extendedTitle[stepRef].length > 1) {
+        return (
+            <div className={`w-100 h-100 steps_header ${isCurrentEventKey ? 'steps_header_active' : ''}`}
+                 onClick={decoratedOnClick} ref={ref => (stepHeaders.current[stepRef] = ref)}>
+                <div className="steps_header_num_container">
+                    <div className="steps_header_num">{stepNum}</div>
+                </div>
+                <div className="steps_header_title_container">
+                    <div className={"steps_header_title " + stepTitle2 ? "steps_header_title_max_content" : ""} type-of-step={type}
+                         cart-custom-text={cartCustomText === undefined ? stepTitle : cartCustomText}
+                         ref={ref => (steps.current[stepRef] = ref)}>{stepTitle}<h5>{stepTitle2}</h5>
+                    </div>
+                </div>
+                {/*<div className="steps_header_selected_container">*/}
+                {/*    <PopoverStickOnHover classNames="step_label_popover"*/}
+                {/*                         placement="bottom"*/}
+                {/*                         children={<div className="steps_header_selected"*/}
+                {/*                                        ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? stepSelected : null}</div>}*/}
+                {/*                         component={*/}
+                {/*                             <div className="step_label_popover_container">*/}
+                {/*                                 <div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? stepSelected : null}</div>*/}
+                {/*                             </div>*/}
+                {/*                         }/>*/}
+                {/*</div>*/}
+                <div className="steps_header_selected_container">
+                    <div className="steps_header_selected" onMouseEnter={() => {
+                        // if (selectedTitle.current[stepNum].clientWidth < selectedTitle.current[stepNum].scrollWidth || (stepRef in extendedTitle && extendedTitle[stepRef].length > 1)) {
+                        if (stepRef in extendedTitle && extendedTitle[stepRef].length > 1) {
+                            let temp = JSON.parse(JSON.stringify(headerTruncated))
+                            temp[stepNum] = true;
+                            setHeaderTruncated(temp);
+                        }
+                    }} onMouseLeave={() => {
                         let temp = JSON.parse(JSON.stringify(headerTruncated))
-                        temp[stepNum] = true;
+                        temp[stepNum] = false;
                         setHeaderTruncated(temp);
-                    }
-                }} onMouseLeave={() => {
-                    let temp = JSON.parse(JSON.stringify(headerTruncated))
-                    temp[stepNum] = false;
-                    setHeaderTruncated(temp);
-                }} ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? (stepRef in extendedTitle && extendedTitle[stepRef].length > 0 ? (extendedTitle[stepRef][0]) : stepSelected) : null}{showLabels && stepRef in extendedTitle && extendedTitle[stepRef].length > 1 ? <h5> ...</h5> : ""}</div>
-                {headerTruncated[stepNum] && <div className="header_tooltip">{stepRef in extendedTitle ? (stepRef==="8" ||stepRef==="8A" ||stepRef==="8B" ||stepRef==="8C" ? extendedTitle[stepRef].slice(1).filter(n => n):extendedTitle[stepRef].slice(1).filter(n => n).join(', \n')) : stepSelected}</div>}
-                {/*{showLabels &&*/}
-                {/*    <TruncateMarkup lines={1} tokenize="words">*/}
-                {/*        <div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{stepSelected}</div>*/}
-                {/*    </TruncateMarkup>*/}
-                {/*}*/}
+                    }} ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? (stepRef in extendedTitle && extendedTitle[stepRef].length > 0 ? (extendedTitle[stepRef][0]) : stepSelected) : null}{showLabels && stepRef in extendedTitle && extendedTitle[stepRef].length > 1 ? <h5> ...</h5> : ""}</div>
+                    {headerTruncated[stepNum] && <div className="header_tooltip">{stepRef in extendedTitle ? (stepRef === "8" || stepRef === "8A" || stepRef === "8B" || stepRef === "8C" ? extendedTitle[stepRef].slice(1).filter(n => n) : extendedTitle[stepRef].slice(1).filter(n => n).join(', \n')) : stepSelected}</div>}
+                    {/*{showLabels &&*/}
+                    {/*    <TruncateMarkup lines={1} tokenize="words">*/}
+                    {/*        <div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{stepSelected}</div>*/}
+                    {/*    </TruncateMarkup>*/}
+                    {/*}*/}
+                </div>
+                {required && stepSelected === "" && <div className="stepRequired"/>}
             </div>
-            {required && stepSelected === "" && <div className="stepRequired"/>}
-        </div>);
+        );
     }
     
     function ContextAwareToggleViewDetails({eventKey, callback, textOnHide, textOnShow, customClass, customClass2}) {
@@ -1663,17 +2007,23 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         </button>);
     }
     
-    function NextStep({children, eventKey, callback, onClick}) {
-        const decoratedOnClick = useAccordionButton(eventKey, () => {
-            callback && callback(eventKey);
-            setAccordionActiveKey(eventKey);
-            // setTimeout(() => {
-            //     window.scrollTo(window.scrollX, window.scrollY + 1);
-            // }, 500);
-        },);
-        return (<div className="nextStep_area" onClick={onClick}>
-            <div className="nextStep" onClick={decoratedOnClick}>{children}</div>
-        </div>);
+    function NextStep({children, eventKey, callback, onClick, currentStep}) {
+        const decoratedOnClick = useAccordionButton(
+            eventKey,
+            () => {
+                callback && callback(eventKey);
+                setAccordionActiveKey(eventKey);
+                setTimeout(() => {
+                    if (currentStep && stepHeaders.current[currentStep] !== undefined)
+                        stepHeaders.current[currentStep].scrollIntoView();
+                }, 500);
+            },
+        );
+        return (
+            <div className="nextStep_area" onClick={onClick}>
+                <div className="nextStep" onClick={decoratedOnClick}>{children}</div>
+            </div>
+        );
     }
     
     function clearAllFilters() {
@@ -1752,7 +2102,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 }
                 setStepSelectedLabel(tempLabels);
                 let minValue = Math.min(...temp.values[refIndex]);
-                let maxValue = Math.min(...temp.values[refIndex]);
+                let maxValue = Math.max(...temp.values[refIndex]);
                 if (maxValue - minValue >= 2) {
                     modalHandleShow(modalRef);
                 }
@@ -1996,10 +2346,10 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         setStep8C3("");
         // setStep8C4("");
         let tempExtended = JSON.parse(JSON.stringify(extendedTitle));
-        tempExtended["8"]= [];
-        tempExtended["8A"]= [];
-        tempExtended["8B"]= [];
-        tempExtended["8C"]= [];
+        tempExtended["8"] = [];
+        tempExtended["8A"] = [];
+        tempExtended["8B"] = [];
+        tempExtended["8C"] = [];
         setExtendedTitle(tempExtended);
         setHardwareNextStep("9");
     }
@@ -2014,7 +2364,8 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
             .then(() => {
                 renderCart();
             }).catch(err => {
-            if (err.response.status === 401) {
+            console.log(err);
+            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         editBasketProject(projectObj);
@@ -2040,7 +2391,8 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
             }
             renderCart();
         }).catch(err => {
-            if (err.response.status === 401) {
+            console.log(err);
+            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         deleteBasketProject(refIndex);
@@ -2057,10 +2409,11 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
     }
     
     function setCart(refIndex, cartValue, delRefs, secondRefIndex, secondCartValue, customAccCart) {
-        // console.log(refIndex, cartValue, delRefs, secondRefIndex, secondCartValue, customAccCart , pageLoad, rodsLoad, rodsLoad2);
+        // console.log(refIndex, cartValue, delRefs, secondRefIndex, secondCartValue);
         let temp = {
             ...{
-                "Mount": "Ceiling"
+                "Mount": "Ceiling",
+                "PanelTypeOption": "Same Style For All Curtains"
             }, ...JSON.parse(JSON.stringify(cartValues))
         };
         if (refIndex !== undefined) {
@@ -2094,7 +2447,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         let userProjects = JSON.parse(JSON.stringify(UserProjects))[`${modelID}`]["data"];
         
         Object.keys(temp).forEach(key => {
-            if (temp[key] !== null || temp[key] !== "") {
+            if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                 if (tempObj === undefined) {
                     console.log(key);
@@ -2130,7 +2483,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
         
         Object.keys(temp).forEach(key => {
-            if (temp[key] !== null || temp[key] !== "") {
+            if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                 // console.log(key,userProjects.find(obj => obj["cart"] === key));
                 if (tempObj) {
@@ -2153,28 +2506,34 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
         tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
         Object.keys(temp).forEach(key => {
-            if (temp[key] !== null || temp[key] !== "") {
+            if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                 if (tempObj) {
                     if (tempObj["apiAcc"] !== undefined) {
                         if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
                             tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
-                        } else {
-                        
+                        } else if (tempObj["apiAcc"] === "value") {
+                            let pushObj = tempObj["apiAccValue"] || {};
+                            pushObj["SewingAccessoryValue"] = temp[key].toString();
+                            tempPostObj["SewingOrderDetails"][0]["Accessories"].push(pushObj);
                         }
                     }
                     if (tempObj["apiAcc2"] !== undefined) {
                         if (tempObj["apiAcc2"] === true && tempObj["apiAccValue2"][temp[key]]) {
                             tempPostObj["SewingOrderDetails"][1]["Accessories"].push(tempObj["apiAccValue2"][temp[key]]);
-                        } else {
-                        
+                        } else if (tempObj["apiAcc"] === "value") {
+                            let pushObj = tempObj["apiAccValue2"] || {};
+                            pushObj["SewingAccessoryValue"] = temp[key].toString();
+                            tempPostObj["SewingOrderDetails"][1]["Accessories"].push(pushObj);
                         }
                     }
                     if (tempObj["apiAcc3"] !== undefined) {
                         if (tempObj["apiAcc3"] === true && tempObj["apiAccValue3"][temp[key]]) {
                             tempPostObj["SewingOrderDetails"][2]["Accessories"].push(tempObj["apiAccValue3"][temp[key]]);
-                        } else {
-                        
+                        } else if (tempObj["apiAcc"] === "value") {
+                            let pushObj = tempObj["apiAccValue3"] || {};
+                            pushObj["SewingAccessoryValue"] = temp[key].toString();
+                            tempPostObj["SewingOrderDetails"][2]["Accessories"].push(pushObj);
                         }
                     }
                 }
@@ -2200,7 +2559,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     tempPostObj["ZipCode"] = zipcode;
                 }
                 // if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined && stepSelectedValue["2"] !== undefined && stepSelectedValue["3"] !== undefined) {
-    
+                
                 // console.log(refIndex, cartValue, delRefs, secondRefIndex, secondCartValue, customAccCart, pageLoad, rodsLoad, rodsLoad2);
                 axios.post(baseURLPrice, tempPostObj)
                     .then((response) => {
@@ -2275,7 +2634,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
             let userProjects = JSON.parse(JSON.stringify(UserProjects))[`${modelID}`]["data"];
             
             Object.keys(temp).forEach(key => {
-                if (temp[key] !== null || temp[key] !== "") {
+                if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
                     if (tempObj === undefined) {
                         window.location.reload();
@@ -2310,7 +2669,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
             tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
             
             Object.keys(temp).forEach(key => {
-                if (temp[key] !== null || temp[key] !== "") {
+                if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
                     // console.log(key,userProjects.find(obj => obj["cart"] === key));
                     if (tempObj) {
@@ -2333,7 +2692,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
             tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
             tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
             Object.keys(temp).forEach(key => {
-                if (temp[key] !== null || temp[key] !== "") {
+                if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
                     if (tempObj) {
                         if (tempObj["apiAcc"] !== undefined) {
@@ -2551,7 +2910,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 }
             });
         }
-        console.log([...new Set(depSetTempArr)]);
+        // console.log([...new Set(depSetTempArr)]);
         setDepSet(depSetTempArr);
     }
     
@@ -2560,7 +2919,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
     
     function addToCart() {
         let tempDepSet = [...depSet];
-        // console.log(depSet);
+        console.log(tempDepSet);
         let tempNewSet = new Set();
         let tempErr = [];
         let promiseArr = [];
@@ -2588,7 +2947,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                         dependency = dependency.slice(0, -1);
                         if (dependency === "") break;
                     }
-                    if (steps.current[dependency] !== undefined) {
+                    if (steps.current[dependency] !== undefined && steps.current[dependency] !== null) {
                         let type = steps.current[dependency].getAttribute("type-of-step") === "1" ? (pageLanguage === 'fa' ? " را مشخص کنید" : "SPECIFY ") : (pageLanguage === 'fa' ? " را انتخاب کنید" : "SELECT ");
                         tempErr.push(<li key={index}>
                             {pageLanguage === 'fa' ? "شما باید " + steps.current[dependency].getAttribute("cart-custom-text") + type : "YOU MUST " + type + steps.current[dependency].getAttribute("cart-custom-text")}
@@ -2610,7 +2969,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                         dependency = dependency.slice(0, -1);
                         if (dependency === "") break;
                     }
-                    if (steps.current[dependency] !== undefined) {
+                    if (steps.current[dependency] !== undefined && steps.current[dependency] !== null) {
                         temp[dependency] = true;
                         delete tempLabels[dependency];
                     }
@@ -2644,7 +3003,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     tempPostObj["WindowCount"] = 1;
                     tempPostObj["SewingModelId"] = `${modelID}`;
                     Object.keys(temp).forEach(key => {
-                        if (temp[key] !== null || temp[key] !== "") {
+                        if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                             let tempObj = userProjects.find(obj => obj["cart"] === key);
                             // console.log(key,tempObj);
                             if (tempObj && tempObj["apiLabel"] !== "") {
@@ -2676,7 +3035,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
                     
                     Object.keys(temp).forEach(key => {
-                        if (temp[key] !== null || temp[key] !== "") {
+                        if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                             let tempObj = userProjects.find(obj => obj["cart"] === key);
                             // console.log(key,userProjects.find(obj => obj["cart"] === key));
                             if (tempObj) {
@@ -2699,7 +3058,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
                     tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
                     Object.keys(temp).forEach(key => {
-                        if (temp[key] !== null || temp[key] !== "") {
+                        if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                             let tempObj = userProjects.find(obj => obj["cart"] === key);
                             if (tempObj) {
                                 if (tempObj["apiAcc"] !== undefined) {
@@ -2769,13 +3128,13 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             if (key === "ControlType" && cartValues["ControlType"] === "Motorized") {
                                                 objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(cartValues[key].toString())} / ${t(cartValues["MotorType"].toString())}`).toString() : `${t(cartValues[key].toString())} / ${t(cartValues["MotorType"].toString())}`;
                                             } else if (key === "Hardware" && cartValues["Hardware"] === "Same Hardware For All Curtains") {
-                                                objLabel = t(cartValues[key].toString()) + " / " + (pageLanguage === "fa" ?cartValues["RailDesignFa"]:cartValues["RailDesignEn"]) + " / " + (pageLanguage === "fa" ?cartValues["RailColorFa"]:cartValues["RailColorEn"]) + " / " + t(cartValues["BatonOption"]);
+                                                objLabel = t(cartValues[key].toString()) + " / " + (pageLanguage === "fa" ? cartValues["RailDesignFa"] : cartValues["RailDesignEn"]) + " / " + (pageLanguage === "fa" ? cartValues["RailColorFa"] : cartValues["RailColorEn"]) + " / " + t(cartValues["BatonOption"]);
                                             } else if (key === "DraperyHardware" && cartValues["DraperyHardware"] !== "None") {
-                                                objLabel = t(cartValues[key].toString()) + " / " + (pageLanguage === "fa" ?cartValues["RailDesignFaA"]:cartValues["RailDesignEnA"]) + " / " + (pageLanguage === "fa" ?cartValues["RailColorFaA"]:cartValues["RailColorEnA"]) + " / " + t(cartValues["BatonOptionA"]);
+                                                objLabel = t(cartValues[key].toString()) + " / " + (pageLanguage === "fa" ? cartValues["RailDesignFaA"] : cartValues["RailDesignEnA"]) + " / " + (pageLanguage === "fa" ? cartValues["RailColorFaA"] : cartValues["RailColorEnA"]) + " / " + t(cartValues["BatonOptionA"]);
                                             } else if (key === "SheerHardware" && cartValues["SheerHardware"] !== "None") {
-                                                objLabel = t(cartValues[key].toString()) + " / " + (pageLanguage === "fa" ?cartValues["RailDesignFaB"]:cartValues["RailDesignEnB"]) + " / " + (pageLanguage === "fa" ?cartValues["RailColorFaB"]:cartValues["RailColorEnB"]) + " / " + t(cartValues["BatonOptionB"]);
+                                                objLabel = t(cartValues[key].toString()) + " / " + (pageLanguage === "fa" ? cartValues["RailDesignFaB"] : cartValues["RailDesignEnB"]) + " / " + (pageLanguage === "fa" ? cartValues["RailColorFaB"] : cartValues["RailColorEnB"]) + " / " + t(cartValues["BatonOptionB"]);
                                             } else if (key === "PrivacyLayerHardware" && cartValues["PrivacyLayerHardware"] !== "None") {
-                                                objLabel = t(cartValues[key].toString()) + " / " + (pageLanguage === "fa" ?cartValues["RailDesignFaC"]:cartValues["RailDesignEnC"]) + " / " + (pageLanguage === "fa" ?cartValues["RailColorFaC"]:cartValues["RailColorEnC"]) + " / " + t(cartValues["BatonOptionC"]);
+                                                objLabel = t(cartValues[key].toString()) + " / " + (pageLanguage === "fa" ? cartValues["RailDesignFaC"] : cartValues["RailDesignEnC"]) + " / " + (pageLanguage === "fa" ? cartValues["RailColorFaC"] : cartValues["RailColorEnC"]) + " / " + t(cartValues["BatonOptionC"]);
                                             } else if (tempObj["titleValue"] === null || true) {
                                                 if (tempObj["titlePostfix"] === "") {
                                                     objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(cartValues[key].toString())}`).toString() : t(cartValues[key].toString());
@@ -2817,7 +3176,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         </li>
                                         <li className="cart_agree_item">
                                             <h1 className="cart_agree_item_title">{t("grommet_step2B_color")}&nbsp;</h1>
-                                            <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? t(cartValues["PrivacyLayer"].toString()) + (cartValues["SheersColorFa"]?" / ":"") + (cartValues["SheersColorFa"] || "") : CapitalizeAllWords(cartValues["PrivacyLayer"] + (cartValues["SheersColorEn"]?" / ":"") + (cartValues["SheersColorEn"] || ""))}</h2>
+                                            <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? t(cartValues["PrivacyLayer"].toString()) + (cartValues["SheersColorFa"] ? " / " : "") + (cartValues["SheersColorFa"] || "") : CapitalizeAllWords(cartValues["PrivacyLayer"] + (cartValues["SheersColorEn"] ? " / " : "") + (cartValues["SheersColorEn"] || ""))}</h2>
                                         </li>
                                         {temp1}
                                         <li className="cart_agree_item">
@@ -2836,7 +3195,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                 setAddingLoading(false);
                                 
                             }).catch(err => {
-                                console.log(err);
+                            console.log(err);
                             if (err.response && err.response.status === 401) {
                                 refreshToken().then((response2) => {
                                     if (response2 !== false) {
@@ -2909,7 +3268,8 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                         cartObjects = response.data ? response.data : {};
                         resolve();
                     }).catch(err => {
-                        if (err.response.status === 401) {
+                        console.log(err);
+                        if (err.response && err.response.status === 401) {
                             refreshToken().then((response2) => {
                                 if (response2 !== false) {
                                     renderCart(customPageCart);
@@ -3130,7 +3490,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         tempPostObj["WindowCount"] = 1;
                                         tempPostObj["SewingModelId"] = obj["PreorderText"]["SewingModelId"];
                                         Object.keys(temp).forEach(key => {
-                                            if (temp[key] !== null || temp[key] !== "") {
+                                            if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                                                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                                                 // console.log(key,tempObj);
                                                 if (tempObj && tempObj["apiLabel"] !== "") {
@@ -3162,7 +3522,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
                                         
                                         Object.keys(temp).forEach(key => {
-                                            if (temp[key] !== null || temp[key] !== "") {
+                                            if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                                                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                                                 // console.log(key,userProjects.find(obj => obj["cart"] === key));
                                                 if (tempObj) {
@@ -3185,7 +3545,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
                                         tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
                                         Object.keys(temp).forEach(key => {
-                                            if (temp[key] !== null || temp[key] !== "") {
+                                            if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                                                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                                                 if (tempObj) {
                                                     if (tempObj["apiAcc"] !== undefined) {
@@ -3367,7 +3727,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
     
     function fabricClicked(photo, hasTrim) {
         setDefaultFabricPhoto(photo);
-        setHasTrim(hasTrim);
+        // setHasTrim(hasTrim);
         // console.log(hasTrim)
     }
     
@@ -3396,7 +3756,8 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                         }
                     }
                 }).catch(err => {
-                    if (err.response.status === 401) {
+                    console.log(err);
+                    if (err.response && err.response.status === 401) {
                         refreshToken().then((response2) => {
                             if (response2 !== false) {
                                 fabricSwatch(e, SwatchId, SwatchDetailId);
@@ -3414,7 +3775,8 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     }).then((response) => {
                         setCartChanged(cartChanged + 1);
                     }).catch(err => {
-                        if (err.response.status === 401) {
+                        console.log(err);
+                        if (err.response && err.response.status === 401) {
                             refreshToken().then((response2) => {
                                 if (response2 !== false) {
                                     fabricSwatch(e, SwatchId, SwatchDetailId);
@@ -3544,7 +3906,8 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     modalHandleClose("uploadPdf");
                     setDetailsShow(false);
                 }).catch(err => {
-                if (err.response.status === 401) {
+                console.log(err);
+                if (err.response && err.response.status === 401) {
                     refreshToken().then((response2) => {
                         if (response2 !== false) {
                             submitUploadedFile(PDFOrImg);
@@ -3586,7 +3949,8 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     modalHandleClose(" uploadImg");
                     setDetailsShow(false);
                 }).catch(err => {
-                if (err.response.status === 401) {
+                console.log(err);
+                if (err.response && err.response.status === 401) {
                     refreshToken().then((response2) => {
                         if (response2 !== false) {
                             submitUploadedFile(PDFOrImg);
@@ -3713,7 +4077,8 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 }).then((response) => {
                     resolve();
                 }).catch(err => {
-                    if (err.response.status === 401) {
+                    console.log(err);
+                    if (err.response && err.response.status === 401) {
                         refreshToken().then((response2) => {
                             if (response2 !== false) {
                                 deleteUploadedImg(uploadedImagesList1, uploadedImagesNamesList1, fileUrl, index);
@@ -3760,7 +4125,8 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 }).then((response) => {
                     resolve();
                 }).catch(err => {
-                    if (err.response.status === 401) {
+                    console.log(err);
+                    if (err.response && err.response.status === 401) {
                         refreshToken().then((response2) => {
                             if (response2 !== false) {
                                 deleteUploadedPdf(uploadedPdfsNamesList1, fileUrl, index);
@@ -3802,7 +4168,8 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         }).then((response) => {
             setProjectDetails(response.data, basketId);
         }).catch(err => {
-            if (err.response.status === 401) {
+            console.log(err);
+            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         getProjectDetail();
@@ -3820,13 +4187,13 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         setPageLoad(true);
         setRodsLoad(true);
         setRodsLoad2(true);
-    
+        
         setExtendedTitle({
-            "8":[],
-            "8A":[],
-            "8B":[],
-            "8C":[],
-            "9":[]
+            "8": [],
+            "8A": [],
+            "8B": [],
+            "8C": [],
+            "9": []
         });
         if (data && Object.keys(data).length !== 0) {
             setProjectData(data);
@@ -3950,954 +4317,956 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     promise2.reject();
                 }
             }).catch(() => {
-                // console.log(temp);
-                if (temp["SheerHeaderStyle"]) {
-                    setStep2A(temp["SheerHeaderStyle"]);
-                    if (temp["SheerHeaderStyle"] === "Grommet") {
-                        let refIndex = inputs.current["2A1"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["2A1"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["2A1"].value;
-                        depSetTempArr = new Set([...setGetDeps("", "2A", depSetTempArr)]);
-                        setSheersModelId("0099");
-                    } else if (temp["SheerHeaderStyle"] === "Inverted Box Pleat") {
-                        let refIndex = inputs.current["2A2"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["2A2"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["2A2"].value;
-                        depSetTempArr = new Set([...setGetDeps("", "2A", depSetTempArr)]);
-                        setSheersModelId("0036");
-                    } else if (temp["SheerHeaderStyle"] === "Pencil Pleat") {
-                        let refIndex = inputs.current["2A3"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["2A3"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["2A3"].value;
-                        depSetTempArr = new Set([...setGetDeps("", "2A", depSetTempArr)]);
-                        setSheersModelId("0001");
-                    } else {
-                        let refIndex = inputs.current["2A4"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["2A4"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["2A4"].value;
-                        depSetTempArr = new Set([...setGetDeps("", "2A", depSetTempArr)]);
-                    }
-                    setStepSelectedLabel(tempLabels);
-                    setStepSelectedValue(tempValue);
-                }
-                
-                if (temp["PrivacyLayer"]) {
-                    setStep2B(temp["PrivacyLayer"]);
-                    if (temp["PrivacyLayer"] === "None") {
-                        let refIndex = inputs.current["2B1"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["2B1"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["2B1"].value;
-                        depSetTempArr = new Set([...setGetDeps("", "2B,2B1", depSetTempArr)]);
-                    } else if (temp["PrivacyLayer"] === "Semi Sheer") {
-                        let refIndex = inputs.current["2B2"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["2B2"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["2B2"].value;
-                        depSetTempArr = new Set([...setGetDeps("", "2B", depSetTempArr)]);
-                    } else {
-                        let refIndex = inputs.current["2B3"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["2B3"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["2B3"].value;
-                        depSetTempArr = new Set([...setGetDeps("", "2B", depSetTempArr)]);
-                    }
-    
-                    if(temp["PrivacyLayer"] !== "None") {
-                        if (temp["PrivacyLayerHeaderStyle"]) {
-                            setStep2C(temp["PrivacyLayerHeaderStyle"]);
-                            if (temp["PrivacyLayerHeaderStyle"] === "Grommet") {
-                                let refIndex = inputs.current["2C1"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["2C1"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["2C1"].value;
-                                depSetTempArr = new Set([...setGetDeps("", "2C", depSetTempArr)]);
-                                setSheersModelId2("0099");
-                            } else if (temp["PrivacyLayerHeaderStyle"] === "Inverted Box Pleat") {
-                                let refIndex = inputs.current["2C2"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["2C2"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["2C2"].value;
-                                depSetTempArr = new Set([...setGetDeps("", "2C", depSetTempArr)]);
-                                setSheersModelId2("0036");
-                            } else if (temp["PrivacyLayerHeaderStyle"] === "Pencil Pleat") {
-                                let refIndex = inputs.current["2C3"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["2C3"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["2C3"].value;
-                                depSetTempArr = new Set([...setGetDeps("", "2C", depSetTempArr)]);
-                                setSheersModelId2("0001");
-                            } else {
-                                let refIndex = inputs.current["2C4"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["2C4"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["2C4"].value;
-                                depSetTempArr = new Set([...setGetDeps("", "2C", depSetTempArr)]);
-                            }
-                        }
-                    }
-                    setStepSelectedLabel(tempLabels);
-                    setStepSelectedValue(tempValue);
-                }
-                
-                if (temp["calcMeasurements"] !== undefined) {
-                    setStep3(temp["calcMeasurements"].toString());
-                    if (!temp["calcMeasurements"]) {
-                        let refIndex = inputs.current["31"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["31"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["31"].value;
-                        setStepSelectedLabel(tempLabels);
-                        setStepSelectedValue(tempValue);
-                        
-                        selectValues["width"] = temp["Width"] ? [{value: temp["Width"]}] : [];
-                        selectValues["length"] = temp["Height"] ? [{value: temp["Height"]}] : [];
-                        depSetTempArr = new Set([...setGetDeps((temp["Width"] ? "" : "311,") + (temp["Height"] ? "" : "312,"), "3", depSetTempArr)]);
-                        setSelectCustomValues(selectValues);
-                    } else {
-                        let refIndex = inputs.current["32"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["32"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["32"].value;
-                        setStepSelectedLabel(tempLabels);
-                        setStepSelectedValue(tempValue);
-                        
-                        if (temp["hasRod"] !== undefined) {
-                            setStep31(temp["hasRod"].toString());
-                            if (!temp["hasRod"]) {
-                                let scenario = 0;
-                                if (temp["CurtainPosition"]) {
-                                    setStep3A(temp["CurtainPosition"].toString());
-                                    if (temp["CurtainPosition"] === "Standard") {
-                                        let refIndex = inputs.current["3A1"].getAttribute('ref-num');
-                                        tempLabels[refIndex] = inputs.current["3A1"].getAttribute('text');
-                                        tempValue[refIndex] = inputs.current["3A1"].value;
-                                        if (temp["Mount"]) {
-                                            setSelectedMountOutsideType(temp["Mount"] ? [{
-                                                value: temp["Mount"],
-                                                label: optionsOutside[pageLanguage].find(opt => opt.value === temp["Mount"]).label
-                                            }] : []);
-                                        }
-                                    } else if (temp["CurtainPosition"] === "Wall to Wall") {
-                                        let refIndex = inputs.current["3A2"].getAttribute('ref-num');
-                                        tempLabels[refIndex] = inputs.current["3A2"].getAttribute('text');
-                                        tempValue[refIndex] = inputs.current["3A2"].value;
-                                        if (temp["Mount"]) {
-                                            setSelectedMountOutsideType2(temp["Mount"] ? [{
-                                                value: temp["Mount"],
-                                                label: optionsOutside[pageLanguage].find(opt => opt.value === temp["Mount"]).label
-                                            }] : []);
-                                        }
-                                    } else if (temp["CurtainPosition"] === "Left Corner Window") {
-                                        let refIndex = inputs.current["3A3"].getAttribute('ref-num');
-                                        tempLabels[refIndex] = inputs.current["3A3"].getAttribute('text');
-                                        tempValue[refIndex] = inputs.current["3A3"].value;
-                                        if (temp["Mount"]) {
-                                            setSelectedMountOutsideType3(temp["Mount"] ? [{
-                                                value: temp["Mount"],
-                                                label: optionsOutside[pageLanguage].find(opt => opt.value === temp["Mount"]).label
-                                            }] : []);
-                                        }
-                                    } else {
-                                        let refIndex = inputs.current["3A4"].getAttribute('ref-num');
-                                        tempLabels[refIndex] = inputs.current["3A4"].getAttribute('text');
-                                        tempValue[refIndex] = inputs.current["3A4"].value;
-                                        if (temp["Mount"]) {
-                                            setSelectedMountOutsideType4(temp["Mount"] ? [{
-                                                value: temp["Mount"],
-                                                label: optionsOutside[pageLanguage].find(opt => opt.value === temp["Mount"]).label
-                                            }] : []);
-                                        }
-                                    }
-                                    if (temp["Mount"]) {
-                                        if (temp["FinishedLengthType"]) {
-                                            setStep3B(temp["FinishedLengthType"].toString());
-                                            if (temp["FinishedLengthType"] === "Sill" || temp["FinishedLengthType"] === "Apron") {
-                                                if (temp["Mount"] === "Ceiling" && (temp["CurtainPosition"] === "Standard" || temp["CurtainPosition"] === "Left Corner Window" || temp["CurtainPosition"] === "Right Corner Window")) {
-                                                    scenario = 1;
-                                                } else if (temp["CurtainPosition"] === "Wall to Wall" && temp["Mount"] === "Wall") {
-                                                    scenario = 2;
-                                                } else if (temp["CurtainPosition"] === "Wall to Wall" && temp["Mount"] === "Ceiling") {
-                                                    scenario = 3;
-                                                } else {
-                                                    scenario = 4;
-                                                }
-                                                
-                                                if (temp["FinishedLengthType"] === "Sill") {
-                                                    let refIndex = inputs.current["3B1"].getAttribute('ref-num');
-                                                    tempLabels[refIndex] = inputs.current["3B1"].getAttribute('text');
-                                                    tempValue[refIndex] = inputs.current["3B1"].value;
-                                                } else {
-                                                    let refIndex = inputs.current["3B11"].getAttribute('ref-num');
-                                                    tempLabels[refIndex] = inputs.current["3B11"].getAttribute('text');
-                                                    tempValue[refIndex] = inputs.current["3B11"].value;
-                                                    setStep3B1("true");
-                                                }
-                                                
-                                            } else {
-                                                if (temp["Mount"] === "Ceiling" && (temp["CurtainPosition"] === "Standard" || temp["CurtainPosition"] === "Left Corner Window" || temp["CurtainPosition"] === "Right Corner Window")) {
-                                                    scenario = 5;
-                                                } else if (temp["CurtainPosition"] === "Wall to Wall" && temp["Mount"] === "Wall") {
-                                                    scenario = 6;
-                                                } else if (temp["CurtainPosition"] === "Wall to Wall" && temp["Mount"] === "Ceiling") {
-                                                    scenario = 7;
-                                                } else {
-                                                    scenario = 8;
-                                                }
-                                                
-                                                if (temp["FinishedLengthType"] === "Floor") {
-                                                    let refIndex = inputs.current["3B3"].getAttribute('ref-num');
-                                                    tempLabels[refIndex] = inputs.current["3B3"].getAttribute('text');
-                                                    tempValue[refIndex] = inputs.current["3B3"].value;
-                                                } else {
-                                                    let refIndex = inputs.current["3B4"].getAttribute('ref-num');
-                                                    tempLabels[refIndex] = inputs.current["3B4"].getAttribute('text');
-                                                    tempValue[refIndex] = inputs.current["3B4"].value;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                setTimeout(() => {
-                                    if (scenario > 0) {
-                                        if (scenario === 1) {
-                                            let tempWidth = changeLang ? temp["Width3C"] : temp["Width"];
-                                            let tempHeight = changeLang ? temp["CeilingToWindow1"] : temp["Height"];
-                                            let tempHeight2 = changeLang ? temp["CeilingToWindow2"] : temp["Height2"];
-                                            let tempHeight3 = changeLang ? temp["CeilingToWindow3"] : temp["Height3"];
-                                            
-                                            selectValues["Width3C"] = tempWidth ? [{value: tempWidth}] : [];
-                                            if (tempWidth) {
-                                                tempLabels["3C"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
-                                            }
-                                            
-                                            selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
-                                            selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
-                                            if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
-                                                tempLabels["3D"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
-                                            }
-                                            
-                                            selectValues["CeilingToWindow1"] = tempHeight ? [{value: tempHeight}] : [];
-                                            selectValues["CeilingToWindow2"] = tempHeight2 ? [{value: tempHeight2}] : [];
-                                            selectValues["CeilingToWindow3"] = tempHeight3 ? [{value: tempHeight3}] : [];
-                                            if (tempHeight && tempHeight2 && tempHeight3) {
-                                                let tempMax = Math.min(tempHeight, tempHeight2, tempHeight3);
-                                                tempLabels["3EStandardCeiling"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + postfixFa : tempMax + postfixEn;
-                                            }
-                                            
-                                            depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "3C,") + (temp["ExtensionLeft"] !== undefined ? "" : "3D1,") + (temp["ExtensionRight"] !== undefined ? "" : "3D2,") + (tempHeight !== undefined ? "" : "3EStandardCeiling1,") + (tempHeight2 !== undefined ? "" : "3EStandardCeiling2,") + (tempHeight3 !== undefined ? "" : "3EStandardCeiling3,"), "31,3A,3B,3B1", depSetTempArr)]);
-                                            
-                                        } else if (scenario === 2) {
-                                            let tempWidth = changeLang ? temp["Width3C"] : temp["Width"];
-                                            let tempHeight = changeLang ? temp["Height3E"] : temp["Height"];
-                                            
-                                            selectValues["Width3C"] = tempWidth ? [{value: tempWidth}] : [];
-                                            if (tempWidth) {
-                                                tempLabels["3C"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
-                                            }
-                                            
-                                            selectValues["Height3E"] = tempHeight ? [{value: tempHeight}] : [];
-                                            if (tempHeight) {
-                                                tempLabels["3E"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
-                                            }
-                                            
-                                            selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
-                                            if (temp["ShadeMount"] !== undefined) {
-                                                tempLabels["3F"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["ShadeMount"]}`) + postfixFa : temp["ShadeMount"] + postfixEn;
-                                            }
-                                            
-                                            selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
-                                            if (temp["CeilingToFloor"] !== undefined) {
-                                                tempLabels["3G"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
-                                            }
-                                            
-                                            depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "3C,") + (tempHeight !== undefined ? "" : "3E,") + +(selectValues["ShadeMount"] !== undefined ? "" : "3F,") + (selectValues["CeilingToFloor"] !== undefined ? "" : "3G,"), "31,3A,3B,3B1", depSetTempArr)]);
-                                            
-                                        } else if (scenario === 3) {
-                                            let tempWidth = changeLang ? temp["Width3C"] : temp["Width"];
-                                            let tempHeight = changeLang ? temp["CeilingToWindow1"] : temp["Height"];
-                                            let tempHeight2 = changeLang ? temp["CeilingToWindow2"] : temp["Height2"];
-                                            let tempHeight3 = changeLang ? temp["CeilingToWindow3"] : temp["Height3"];
-                                            
-                                            selectValues["Width3C"] = tempWidth ? [{value: tempWidth}] : [];
-                                            if (tempWidth) {
-                                                tempLabels["3C"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
-                                            }
-                                            
-                                            selectValues["CeilingToWindow1"] = tempHeight ? [{value: tempHeight}] : [];
-                                            selectValues["CeilingToWindow2"] = tempHeight2 ? [{value: tempHeight2}] : [];
-                                            selectValues["CeilingToWindow3"] = tempHeight3 ? [{value: tempHeight3}] : [];
-                                            if (tempHeight && tempHeight2 && tempHeight3) {
-                                                let tempMax = Math.min(tempHeight, tempHeight2, tempHeight3);
-                                                tempLabels["3EStandardCeiling"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + postfixFa : tempMax + postfixEn;
-                                            }
-                                            
-                                            depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "3C,") + (tempHeight !== undefined ? "" : "3EStandardCeiling1,") + (tempHeight2 !== undefined ? "" : "3EStandardCeiling2,") + (tempHeight3 !== undefined ? "" : "3EStandardCeiling3,"), "31,3A,3B,3B1", depSetTempArr)]);
-                                            
-                                        } else if (scenario === 4) {
-                                            let tempWidth = changeLang ? temp["Width3C"] : temp["Width"];
-                                            let tempHeight = changeLang ? temp["Height3E"] : temp["Height"];
-                                            
-                                            selectValues["Width3C"] = tempWidth ? [{value: tempWidth}] : [];
-                                            if (tempWidth) {
-                                                tempLabels["3C"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
-                                            }
-                                            
-                                            selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
-                                            selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
-                                            if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
-                                                tempLabels["3D"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
-                                            }
-                                            
-                                            selectValues["Height3E"] = tempHeight ? [{value: tempHeight}] : [];
-                                            if (tempHeight) {
-                                                tempLabels["3E"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
-                                            }
-                                            
-                                            selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
-                                            if (temp["ShadeMount"] !== undefined) {
-                                                tempLabels["3F"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["ShadeMount"]}`) + postfixFa : temp["ShadeMount"] + postfixEn;
-                                            }
-                                            
-                                            selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
-                                            if (temp["CeilingToFloor"] !== undefined) {
-                                                tempLabels["3G"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
-                                            }
-                                            
-                                            depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "3C,") + (temp["ExtensionLeft"] !== undefined ? "" : "3D1,") + (temp["ExtensionRight"] !== undefined ? "" : "3D2,") + (tempHeight !== undefined ? "" : "3E,") + +(selectValues["ShadeMount"] !== undefined ? "" : "3F,") + (selectValues["CeilingToFloor"] !== undefined ? "" : "3G,"), "31,3A,3B,3B1", depSetTempArr)]);
-                                            
-                                        } else if (scenario === 5) {
-                                            let tempWidth = changeLang ? temp["Width3C"] : temp["Width"];
-                                            let tempHeight = changeLang ? temp["CeilingToFloor1"] : temp["Height"];
-                                            let tempHeight2 = changeLang ? temp["CeilingToFloor2"] : temp["Height2"];
-                                            let tempHeight3 = changeLang ? temp["CeilingToFloor3"] : temp["Height3"];
-                                            
-                                            selectValues["Width3C"] = tempWidth ? [{value: tempWidth}] : [];
-                                            if (tempWidth) {
-                                                tempLabels["3C"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
-                                            }
-                                            
-                                            selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
-                                            selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
-                                            if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
-                                                tempLabels["3D"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
-                                            }
-                                            
-                                            selectValues["CeilingToFloor1"] = tempHeight ? [{value: tempHeight}] : [];
-                                            selectValues["CeilingToFloor2"] = tempHeight2 ? [{value: tempHeight2}] : [];
-                                            selectValues["CeilingToFloor3"] = tempHeight3 ? [{value: tempHeight3}] : [];
-                                            if (tempHeight && tempHeight2 && tempHeight3) {
-                                                let tempMax = Math.min(tempHeight, tempHeight2, tempHeight3);
-                                                tempLabels["3EStandardCeilingFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + postfixFa : tempMax + postfixEn;
-                                            }
-                                            
-                                            depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "3C,") + (temp["ExtensionLeft"] !== undefined ? "" : "3D1,") + (temp["ExtensionRight"] !== undefined ? "" : "3D2,") + (tempHeight !== undefined ? "" : "3EStandardCeilingFloor1,") + (tempHeight2 !== undefined ? "" : "3EStandardCeilingFloor2,") + (tempHeight3 !== undefined ? "" : "3EStandardCeilingFloor3,"), "31,3A,3B,3B1", depSetTempArr)]);
-                                            
-                                        } else if (scenario === 6) {
-                                            let tempWidth = changeLang ? temp["Width3C"] : temp["Width"];
-                                            let tempHeight = changeLang ? temp["WindowToFloor"] : temp["Height"];
-                                            
-                                            selectValues["Width3C"] = tempWidth ? [{value: tempWidth}] : [];
-                                            if (tempWidth) {
-                                                tempLabels["3C"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
-                                            }
-                                            
-                                            selectValues["WindowToFloor"] = tempHeight ? [{value: tempHeight}] : [];
-                                            if (tempHeight) {
-                                                tempLabels["3EFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
-                                            }
-                                            
-                                            selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
-                                            if (temp["ShadeMount"] !== undefined) {
-                                                tempLabels["3F"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["ShadeMount"]}`) + postfixFa : temp["ShadeMount"] + postfixEn;
-                                            }
-                                            
-                                            selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
-                                            if (temp["CeilingToFloor"] !== undefined) {
-                                                tempLabels["3G"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
-                                            }
-                                            
-                                            depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "3C,") + (tempHeight !== undefined ? "" : "3EFloor,") + +(selectValues["ShadeMount"] !== undefined ? "" : "3F,") + (selectValues["CeilingToFloor"] !== undefined ? "" : "3G,"), "31,3A,3B,3B1", depSetTempArr)]);
-                                            
-                                        } else if (scenario === 7) {
-                                            let tempWidth = changeLang ? temp["Width3C"] : temp["Width"];
-                                            let tempHeight = changeLang ? temp["CeilingToFloor1"] : temp["Height"];
-                                            let tempHeight2 = changeLang ? temp["CeilingToFloor2"] : temp["Height2"];
-                                            let tempHeight3 = changeLang ? temp["CeilingToFloor3"] : temp["Height3"];
-                                            
-                                            selectValues["Width3C"] = tempWidth ? [{value: tempWidth}] : [];
-                                            if (tempWidth) {
-                                                tempLabels["3C"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
-                                            }
-                                            
-                                            selectValues["CeilingToFloor1"] = tempHeight ? [{value: tempHeight}] : [];
-                                            selectValues["CeilingToFloor2"] = tempHeight2 ? [{value: tempHeight2}] : [];
-                                            selectValues["CeilingToFloor3"] = tempHeight3 ? [{value: tempHeight3}] : [];
-                                            if (tempHeight && tempHeight2 && tempHeight3) {
-                                                let tempMax = Math.min(tempHeight, tempHeight2, tempHeight3);
-                                                tempLabels["3EStandardCeilingFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + postfixFa : tempMax + postfixEn;
-                                            }
-                                            
-                                            depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "3C,") + (tempHeight !== undefined ? "" : "3EStandardCeilingFloor1,") + (tempHeight2 !== undefined ? "" : "3EStandardCeilingFloor2,") + (tempHeight3 !== undefined ? "" : "3EStandardCeilingFloor3,"), "31,3A,3B,3B1", depSetTempArr)]);
-                                            
-                                        } else {
-                                            let tempWidth = changeLang ? temp["Width3C"] : temp["Width"];
-                                            let tempHeight = changeLang ? temp["WindowToFloor"] : temp["Height"];
-                                            
-                                            selectValues["Width3C"] = tempWidth ? [{value: tempWidth}] : [];
-                                            if (tempWidth) {
-                                                tempLabels["3C"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
-                                            }
-                                            
-                                            selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
-                                            selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
-                                            if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
-                                                tempLabels["3D"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
-                                            }
-                                            
-                                            selectValues["WindowToFloor"] = tempHeight ? [{value: tempHeight}] : [];
-                                            if (tempHeight) {
-                                                tempLabels["3EFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
-                                            }
-                                            
-                                            selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
-                                            if (temp["ShadeMount"] !== undefined) {
-                                                tempLabels["3F"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["ShadeMount"]}`) + postfixFa : temp["ShadeMount"] + postfixEn;
-                                            }
-                                            
-                                            selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
-                                            if (temp["CeilingToFloor"] !== undefined) {
-                                                tempLabels["3G"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
-                                            }
-                                            
-                                            depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "3C,") + (temp["ExtensionLeft"] !== undefined ? "" : "3D1,") + (temp["ExtensionRight"] !== undefined ? "" : "3D2,") + (tempHeight !== undefined ? "" : "3EFloor,") + +(selectValues["ShadeMount"] !== undefined ? "" : "3F,") + (selectValues["CeilingToFloor"] !== undefined ? "" : "3G,"), "31,3A,3B,3B1", depSetTempArr)]);
-                                            
-                                        }
-                                        setSelectCustomValues(selectValues);
-                                        setStepSelectedLabel(tempLabels);
-                                        setStepSelectedValue(tempValue);
-                                    } else {
-                                        depSetTempArr = new Set([...setGetDeps((temp["Mount"] ? "" : "3A1,") + (temp["FinishedLengthType"] ? "" : "3B,") + "3A", "3,31", depSetTempArr)]);
-                                    }
-                                }, 100);
-                            } else {
-                                if (temp["FinishedLengthType"]) {
-                                    setStep3ARod(temp["FinishedLengthType"].toString());
-                                    if (temp["FinishedLengthType"] === "Sill" || temp["FinishedLengthType"] === "Apron") {
-                                        if (temp["FinishedLengthType"] === "Sill") {
-                                            let refIndex = inputs.current["3ARod1"].getAttribute('ref-num');
-                                            tempLabels[refIndex] = inputs.current["3ARod1"].getAttribute('text');
-                                            tempValue[refIndex] = inputs.current["3ARod1"].value;
-                                        } else {
-                                            let refIndex = inputs.current["3ARod11"].getAttribute('ref-num');
-                                            tempLabels[refIndex] = inputs.current["3ARod11"].getAttribute('text');
-                                            tempValue[refIndex] = inputs.current["3ARod11"].value;
-                                            setStep3ARod1("true");
-                                        }
-                                        
-                                        let tempWidth = changeLang ? temp["RodWidth"] : temp["Width"];
-                                        let tempHeight = changeLang ? temp["RodToBottom"] : temp["Height"];
-                                        
-                                        selectValues["RodWidth"] = tempWidth ? [{value: tempWidth}] : [];
-                                        if (tempWidth) {
-                                            tempLabels["3BRod"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
-                                        }
-                                        
-                                        selectValues["RodToBottom"] = tempHeight ? [{value: tempHeight}] : [];
-                                        if (tempHeight) {
-                                            tempLabels["3CRod"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
-                                        }
-                                        
-                                        selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
-                                        if (temp["CeilingToFloor"] !== undefined) {
-                                            tempLabels["3DRod"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
-                                        }
-                                        
-                                        depSetTempArr = new Set([...setGetDeps((tempWidth !== undefined ? "" : "3BRod,") + (tempHeight !== undefined ? "" : "3CRod,") + (temp["CeilingToFloor"] !== undefined ? "" : "3DRod,"), "31,3B,3B1", depSetTempArr)]);
-                                        setSelectCustomValues(selectValues);
-                                        setStepSelectedLabel(tempLabels);
-                                        setStepSelectedValue(tempValue);
-                                        
-                                    } else {
-                                        if (temp["FinishedLengthType"] === "Floor") {
-                                            let refIndex = inputs.current["3ARod3"].getAttribute('ref-num');
-                                            tempLabels[refIndex] = inputs.current["3ARod3"].getAttribute('text');
-                                            tempValue[refIndex] = inputs.current["3ARod3"].value;
-                                        } else {
-                                            let refIndex = inputs.current["3ARod4"].getAttribute('ref-num');
-                                            tempLabels[refIndex] = inputs.current["3ARod4"].getAttribute('text');
-                                            tempValue[refIndex] = inputs.current["3ARod4"].value;
-                                        }
-                                        
-                                        let tempWidth = changeLang ? temp["RodWidth"] : temp["Width"];
-                                        let tempHeight = changeLang ? temp["RodToFloor"] : temp["Height"];
-                                        
-                                        selectValues["RodWidth"] = tempWidth ? [{value: tempWidth}] : [];
-                                        if (tempWidth) {
-                                            tempLabels["3BRod"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
-                                        }
-                                        
-                                        selectValues["RodToFloor"] = tempHeight ? [{value: tempHeight}] : [];
-                                        if (tempHeight) {
-                                            tempLabels["3CRodFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
-                                        }
-                                        
-                                        selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
-                                        if (temp["CeilingToFloor"] !== undefined) {
-                                            tempLabels["3DRod"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
-                                        }
-                                        
-                                        depSetTempArr = new Set([...setGetDeps((tempWidth !== undefined ? "" : "3BRod,") + (tempHeight !== undefined ? "" : "3CRodFloor,") + (temp["CeilingToFloor"] !== undefined ? "" : "3DRod,"), "31,3B,3B1", depSetTempArr)]);
-                                        setSelectCustomValues(selectValues);
-                                        setStepSelectedLabel(tempLabels);
-                                        setStepSelectedValue(tempValue);
-                                        
-                                    }
-                                }
-                                
-                            }
-                        } else {
-                            depSetTempArr = new Set([...setGetDeps("31", "3", depSetTempArr)]);
-                        }
-                    }
-                }
-                if (temp["WindowWidth"] && temp["WindowHeight"]) {
-                    getWindowSize(temp["WindowWidth"], temp["WindowHeight"]);
-                }
-                
-                if (temp["Lining"]) {
-                    setStep4(temp["Lining"]);
-                    if (temp["Lining"] === "Standard Lining") {
-                        let refIndex = inputs.current["41"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["41"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["41"].value;
-                        depSetTempArr = new Set([...setGetDeps("", "4", depSetTempArr)]);
-                    } else {
-                        let refIndex = inputs.current["42"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["42"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["42"].value;
-                        depSetTempArr = new Set([...setGetDeps("", "4", depSetTempArr)]);
-                    }
-                    setStepSelectedLabel(tempLabels);
-                    setStepSelectedValue(tempValue);
-                }
-                
-                if (temp["PanelCoverage"]) {
-                    setStep5(temp["PanelCoverage"]);
-                    if (temp["PanelCoverage"] === "Full") {
-                        let refIndex = inputs.current["51"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["51"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["51"].value;
-                        depSetTempArr = new Set([...setGetDeps("", "5", depSetTempArr)]);
-                    } else {
-                        let refIndex = inputs.current["52"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["52"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["52"].value;
-                        depSetTempArr = new Set([...setGetDeps("", "5", depSetTempArr)]);
-                    }
-                    setStepSelectedLabel(tempLabels);
-                    setStepSelectedValue(tempValue);
-                }
-                
-                if (temp["PanelType"]) {
-                    setStep6(temp["PanelType"]);
-                    if (temp["PanelType"] === "Single Panel, Left") {
-                        let refIndex = inputs.current["61"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["61"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["61"].value;
-                        depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
-                    } else if (temp["PanelType"] === "Single Panel, Right") {
-                        let refIndex = inputs.current["62"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["62"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["62"].value;
-                        depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
-                    } else if (temp["PanelType"] === "Pair, Split Draw") {
-                        let refIndex = inputs.current["63"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["63"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["63"].value;
-                        depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
-                    } else {
-                        let refIndex = inputs.current["64"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["64"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["64"].value;
-                        depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
-                    }
-                    setStepSelectedLabel(tempLabels);
-                    setStepSelectedValue(tempValue);
-                }
-                
-                if (temp["GrommetFinish"]) {
-                    setStep7(temp["GrommetFinish"]);
-                    if (temp["GrommetFinish"] === "Satin Brass") {
-                        let refIndex = inputs.current["71"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["71"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["71"].value;
-                        depSetTempArr = new Set([...setGetDeps("", "7", depSetTempArr)]);
-                    } else if (temp["GrommetFinish"] === "Satin Nickel") {
-                        let refIndex = inputs.current["72"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["72"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["72"].value;
-                        depSetTempArr = new Set([...setGetDeps("", "7", depSetTempArr)]);
-                    } else {
-                        let refIndex = inputs.current["73"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["73"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["73"].value;
-                        depSetTempArr = new Set([...setGetDeps("", "7", depSetTempArr)]);
-                    }
-                    setStepSelectedLabel(tempLabels);
-                    setStepSelectedValue(tempValue);
-                }
-    
-                let tempExtended = extendedTitle;
-                if (temp["Hardware"]) {
-                    setStep8(temp["Hardware"]);
-                    if (temp["Hardware"] === "None") {
-                        let refIndex = inputs.current["81"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["81"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["81"].value;
-                        tempExtended["8"]= [];
-                        depSetTempArr = new Set([...setGetDeps("", "8", depSetTempArr)]);
-                    } else if (temp["Hardware"] === "Same Hardware For All Curtains") {
-                        let refIndex = inputs.current["82"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["82"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["82"].value;
-                        tempExtended["8"]= [inputs.current["82"].getAttribute('text')];
-                        
-                        let tempMount = changeLang ? temp["Mount8"] : temp["Mount"];
-                        if (temp["RailDesign"]) {
-                            setStep81(temp["RailDesign"]);
-                            setTimeout(() => {
-                                if (temp["RailId"]) {
-                                    setStep82(temp["RailId"]);
-                                }
-                                if (temp["BatonOption"]) {
-                                    setStep83(temp["BatonOption"]);
-                                    if (temp["BatonOption"] === "None") {
-                                        tempExtended["8"][3]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("None")}</span></li>;
-                                    } else if (temp["BatonOption"] === "Baton 30cm") {
-                                        tempExtended["8"][3]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 30cm")}</span></li>;
-                                    } else if (temp["BatonOption"] === "Baton 45cm") {
-                                        tempExtended["8"][3]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 45cm")}</span></li>;
-                                    } else {
-                                        tempExtended["8"][3]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Cord")}</span></li>;
-                                    }
-                                }
-                                if (tempMount) {
-                                    setStep84(tempMount);
-                                    if (tempMount === "Wall") {
-                                        tempExtended["8"][4]= <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Wall")}</span></li>;
-                                    } else {
-                                        tempExtended["8"][4]= <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Ceiling")}</span></li>;
-                                    }
-                                }
-                            }, 200);
-                        }
-                        depSetTempArr = new Set([...setGetDeps((temp["RailDesign"] !== undefined ? "" : "81,") + (temp["RailId"] !== undefined ? "" : "82,") + (temp["BatonOption"] !== undefined ? "" : "83,") + (tempMount !== undefined ? "" : "84,"), "8", depSetTempArr)]);
-                        
-                    } else {
-                        let refIndex = inputs.current["83"].getAttribute('ref-num');
-                        tempLabels[refIndex] = inputs.current["83"].getAttribute('text');
-                        tempValue[refIndex] = inputs.current["83"].value;
-                        depSetTempArr = new Set([...setGetDeps("8A,8B"+(temp["PrivacyLayer"] === "None" ? "" : "8C,"), "8", depSetTempArr)]);
-                        tempExtended["8"]= [inputs.current["83"].getAttribute('text')];
-                        
-                        if (temp["DraperyHardware"]) {
-                            setStep8A(temp["DraperyHardware"]);
-                            if (temp["DraperyHardware"] === "None") {
-                                let refIndex = inputs.current["8A1"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["8A1"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["8A1"].value;
-                                tempExtended["8A"]= [];
-                                depSetTempArr = new Set([...setGetDeps("", "8A", depSetTempArr)]);
-                            } else {
-                                let refIndex = inputs.current["8A2"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["8A2"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["8A2"].value;
-                                tempExtended["8A"]= [inputs.current["8A2"].getAttribute('text')];
-                                
-                                let tempMount = changeLang ? temp["MountA"] : temp["Mount"];
-                                if (temp["RailDesignA"]) {
-                                    setStep8A1(temp["RailDesignA"]);
-                                    setTimeout(() => {
-                                        if (temp["RailIdA"]) {
-                                            setStep8A2(temp["RailIdA"]);
-                                        }
-                                        if (temp["BatonOptionA"]) {
-                                            setStep8A3(temp["BatonOptionA"]);
-                                            if (temp["BatonOptionA"] === "None") {
-                                                tempExtended["8A"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("None")}</span></li>;
-                                            } else if (temp["BatonOptionA"] === "Baton 30cm") {
-                                                tempExtended["8A"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 30cm")}</span></li>;
-                                            } else if (temp["BatonOptionA"] === "Baton 45cm") {
-                                                tempExtended["8A"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 45cm")}</span></li>;
-                                            } else {
-                                                tempExtended["8A"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Cord")}</span></li>;
-                                            }
-                                        }
-                                        if (tempMount) {
-                                            setStep8A4(tempMount);
-                                            if (tempMount === "Wall") {
-                                                tempExtended["8A"][3]= <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Wall")}</span></li>;
-                                            } else {
-                                                tempExtended["8A"][3]= <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Ceiling")}</span></li>;
-                                            }
-                                        }
-                                    }, 200);
-                                }
-                                depSetTempArr = new Set([...setGetDeps((temp["RailDesignA"] !== undefined ? "" : "8A1,") + (temp["RailIdA"] !== undefined ? "" : "8A2,") + (temp["BatonOptionA"] !== undefined ? "" : "8A3,") + (tempMount !== undefined ? "" : "8A4,"), "8A", depSetTempArr)]);
-                            }
-                        }
-                        
-                        if (temp["SheerHardware"]) {
-                            setStep8B(temp["SheerHardware"]);
-                            if (temp["SheerHardware"] === "None") {
-                                let refIndex = inputs.current["8B1"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["8B1"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["8B1"].value;
-                                tempExtended["8B"]= [];
-                                depSetTempArr = new Set([...setGetDeps("", "8B", depSetTempArr)]);
-                            } else if (temp["SheerHardware"] === "Track") {
-                                let refIndex = inputs.current["8B2"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["8B2"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["8B2"].value;
-                                tempExtended["8B"]= [inputs.current["8B2"].getAttribute('text')];
-                                
-                                // let tempMount = changeLang ? temp["MountB"] : temp["Mount"];
-                                if (temp["RailDesignB"]) {
-                                    setStep8B1(temp["RailDesignB"]);
-                                    setTimeout(() => {
-                                        if (temp["RailIdB"]) {
-                                            setStep8B2(temp["RailIdB"]);
-                                        }
-                                        if (temp["BatonOptionB"]) {
-                                            setStep8B3(temp["BatonOptionB"]);
-                                            if (temp["BatonOptionB"] === "None") {
-                                                tempExtended["8B"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("None")}</span></li>;
-                                            } else if (temp["BatonOptionB"] === "Baton 30cm") {
-                                                tempExtended["8B"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 30cm")}</span></li>;
-                                            } else if (temp["BatonOptionB"] === "Baton 45cm") {
-                                                tempExtended["8B"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 45cm")}</span></li>;
-                                            } else {
-                                                tempExtended["8B"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Cord")}</span></li>;
-                                            }
-                                        }
-                                        // if (tempMount) {
-                                        //     setStep8B4(tempMount);
-                                        // }
-                                        
-                                        if (temp["hasPower"]) {
-                                            setStep8B5(temp["hasPower"]);
-                                            setSelectedMotorPosition(temp["MotorPosition"] ? [{
-                                                value: temp["MotorPosition"],
-                                                label: MotorPosition[pageLanguage].find(opt => opt.value === temp["MotorPosition"]).label
-                                            }] : []);
-                                            setRemoteName(temp["RemoteName"] ? temp["RemoteName"] : "");
-                                            setSelectedRemoteName(temp["RemoteName"] && temp["RemoteName"] !== "" ? [{value: temp["RemoteName"], label: temp["RemoteName"]}] : []);
-                                            setSelectedMotorChannels(temp["MotorChannels"] ? temp["MotorChannels"].map(item => ({
-                                                value: item,
-                                                label: motorChannels[pageLanguage].find(opt => opt.value === item).label
-                                            })) : []);
-                                        }
-                                    }, 200);
-                                }
-                                depSetTempArr = new Set([...setGetDeps((temp["hasPower"] ? ((temp["MotorPosition"] ? "" : "8B51,")) : "8B5,") + (temp["RailDesignB"] !== undefined ? "" : "8B1,") + (temp["RailIdB"] !== undefined ? "" : "8B2,") + (temp["BatonOptionB"] !== undefined ? "" : "8B3,"), "8B", depSetTempArr)]);
-                            } else {
-                                let refIndex = inputs.current["8B3"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["8B3"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["8B3"].value;
-                                tempExtended["8B"]= [inputs.current["8B3"].getAttribute('text')];
-                                
-                                // let tempMount = changeLang ? temp["MountB"] : temp["Mount"];
-                                if (temp["RailDesignB"]) {
-                                    setStep8B1(temp["RailDesignB"]);
-                                    setTimeout(() => {
-                                        if (temp["RailIdB"]) {
-                                            setStep8B2(temp["RailIdB"]);
-                                        }
-                                        if (temp["BatonOptionB"]) {
-                                            setStep8B3(temp["BatonOptionB"]);
-                                        }
-                                        // if (tempMount) {
-                                        //     setStep8B4(tempMount);
-                                        // }
-                                    }, 200);
-                                }
-                                depSetTempArr = new Set([...setGetDeps((temp["RailDesignB"] !== undefined ? "" : "8B1,") + (temp["RailIdB"] !== undefined ? "" : "8B2,") + (temp["BatonOptionB"] !== undefined ? "" : "8B3,"), "8B", depSetTempArr)]);
-                            }
-                        }
-                        
-                        if (temp["PrivacyLayerHardware"]) {
-                            setStep8C(temp["PrivacyLayerHardware"]);
-                            if (temp["PrivacyLayerHardware"] === "None") {
-                                let refIndex = inputs.current["8C1"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["8C1"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["8C1"].value;
-                                tempExtended["8C"]= [];
-                                depSetTempArr = new Set([...setGetDeps("", "8C", depSetTempArr)]);
-                            } else if (temp["PrivacyLayerHardware"] === "Track") {
-                                let refIndex = inputs.current["8C2"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["8C2"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["8C2"].value;
-                                tempExtended["8C"]= [inputs.current["8C2"].getAttribute('text')];
-                                
-                                // let tempMount = changeLang ? temp["MountC"] : temp["Mount"];
-                                if (temp["RailDesignC"]) {
-                                    setStep8C1(temp["RailDesignC"]);
-                                    setTimeout(() => {
-                                        if (temp["RailIdC"]) {
-                                            setStep8C2(temp["RailIdC"]);
-                                        }
-                                        if (temp["BatonOptionC"]) {
-                                            setStep8C3(temp["BatonOptionC"]);
-                                            if (temp["BatonOptionC"] === "None") {
-                                                tempExtended["8C"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("None")}</span></li>;
-                                            } else if (temp["BatonOptionC"] === "Baton 30cm") {
-                                                tempExtended["8C"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 30cm")}</span></li>;
-                                            } else if (temp["BatonOptionC"] === "Baton 45cm") {
-                                                tempExtended["8C"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 45cm")}</span></li>;
-                                            } else {
-                                                tempExtended["8C"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Cord")}</span></li>;
-                                            }
-                                        }
-                                        // if (tempMount) {
-                                        //     setStep8C4(tempMount);
-                                        // }
-                                        
-                                        if (temp["hasPower"]) {
-                                            setStep8C5(temp["hasPower"]);
-                                            setSelectedMotorPosition(temp["MotorPosition"] ? [{
-                                                value: temp["MotorPosition"],
-                                                label: MotorPosition[pageLanguage].find(opt => opt.value === temp["MotorPosition"]).label
-                                            }] : []);
-                                            setRemoteName(temp["RemoteName"] ? temp["RemoteName"] : "");
-                                            setSelectedRemoteName(temp["RemoteName"] && temp["RemoteName"] !== "" ? [{value: temp["RemoteName"], label: temp["RemoteName"]}] : []);
-                                            setSelectedMotorChannels(temp["MotorChannels"] ? temp["MotorChannels"].map(item => ({
-                                                value: item,
-                                                label: motorChannels[pageLanguage].find(opt => opt.value === item).label
-                                            })) : []);
-                                        }
-                                    }, 200);
-                                }
-                                depSetTempArr = new Set([...setGetDeps((temp["hasPower"] ? ((temp["MotorPosition"] ? "" : "8C51,")) : "8C5,") + (temp["RailDesignC"] !== undefined ? "" : "8C1,") + (temp["RailIdC"] !== undefined ? "" : "8C2,") + (temp["BatonOptionC"] !== undefined ? "" : "8C3,"), "8C", depSetTempArr)]);
-                            } else {
-                                let refIndex = inputs.current["8C3"].getAttribute('ref-num');
-                                tempLabels[refIndex] = inputs.current["8C3"].getAttribute('text');
-                                tempValue[refIndex] = inputs.current["8C3"].value;
-                                tempExtended["8C"]= [inputs.current["8C3"].getAttribute('text')];
-                                
-                                // let tempMount = changeLang ? temp["MountC"] : temp["Mount"];
-                                if (temp["RailDesignC"]) {
-                                    setStep8C1(temp["RailDesignC"]);
-                                    setTimeout(() => {
-                                        if (temp["RailIdC"]) {
-                                            setStep8C2(temp["RailIdC"]);
-                                        }
-                                        if (temp["BatonOptionC"]) {
-                                            setStep8C3(temp["BatonOptionC"]);
-                                        }
-                                        // if (tempMount) {
-                                        //     setStep8C4(tempMount);
-                                        // }
-                                    }, 200);
-                                }
-                                depSetTempArr = new Set([...setGetDeps((temp["RailDesignC"] !== undefined ? "" : "8C1,") + (temp["RailIdC"] !== undefined ? "" : "8C2,") + (temp["BatonOptionC"] !== undefined ? "" : "8C3,"), "8C", depSetTempArr)]);
-                            }
-                        }
-                    }
-                    setStepSelectedLabel(tempLabels);
-                    setStepSelectedValue(tempValue);
-                }
-                
-                if (temp["RoomNameEn"]) {
-                    setSavedProjectRoomLabel(temp["RoomNameEn"]);
-                    
-                    depSetTempArr = new Set([...setGetDeps("", "1001", depSetTempArr)]);
-                    setSelectedRoomLabel(temp["RoomNameEn"] ? [{
-                        value: temp["RoomNameEn"], label: rooms[pageLanguage].find(opt => opt.value === temp["RoomNameEn"]).label
-                    }] : []);
-                    tempSelect.label = rooms[pageLanguage].find(opt => opt.value === temp["RoomNameEn"]).label;
-                    tempSelect.value = temp["RoomNameEn"];
-                    setRoomLabelSelect(tempSelect);
-                    if (temp["WindowName"] === undefined || (temp["WindowName"] && temp["WindowName"] === "")) {
-                        tempLabels["10"] = tempSelect.label;
-                    } else if (temp["WindowName"]) {
-                        tempLabels["10"] = tempSelect.label + " - " + temp["WindowName"];
-                    }
-                    setStepSelectedLabel(tempLabels);
-                }
-                if (temp["WindowName"] && temp["WindowName"] !== "") {
-                    setSavedProjectRoomText(temp["WindowName"]);
-                    depSetTempArr = new Set([...setGetDeps("", "1002", depSetTempArr)]);
-                    setRoomLabelText(temp["WindowName"]);
-                }
-                
-                if (temp["ZipCode"] && temp["ZipCode"] !== "" && temp["InstallAmount"] && temp["InstallAmount"] > 0 && temp["TransportationAmount"] && temp["TransportationAmount"] > 0) {
-                    setZipcode(temp["ZipCode"]);
-                    setZipcodeButton(true);
-                    setHasInstall(true);
-                    setZipcodeChecked("true");
-                    setInstallPrice(temp["InstallAmount"]);
-                    setTransportPrice(temp["TransportationAmount"]);
-                }
-                
-                if (temp["uploadedImagesURL"] && temp["uploadedImagesURL"].length > 0) {
-                    setUploadedImagesURL(temp["uploadedImagesURL"]);
-                    setUploadedImagesFile(temp["uploadedImagesFile"]);
-                    let tempArrayNames = [];
-                    let tempArray = [];
-                    
-                    let promise3 = new Promise((resolve, reject) => {
-                        temp["uploadedImagesFile"].forEach((obj, index) => {
-                            tempArrayNames[index] = <li className="uploaded_name_item" key={index}>
-                                <i className="fa fa-file"/>
-                                <span className="uploaded_name_item_text">{obj.replace(/\.[^/.]+$/, "")}</span>
-                                <span className="uploaded_name_item_x" onClick={() => {
-                                    setDeleteUploaded(temp["uploadedImagesURL"][index], index, 2);
-                                }}>X</span>
-                            </li>;
-                            
-                            tempArray[index] = <li className="uploaded_image_item" key={index}>
-                                <img src={`https://api.atlaspood.ir/${temp["uploadedImagesURL"][index]}`} className="img-fluid" alt=""/>
-                            </li>;
-                            
-                            if (index === temp["uploadedImagesFile"].length - 1) {
-                                resolve();
-                            }
-                        });
-                    });
-                    
-                    promise3.then(() => {
-                        setUploadedImagesNamesList(tempArrayNames);
-                        setUploadedImagesList(tempArray);
-                    });
-                    
-                }
-                if (temp["uploadedPDFURL"] && temp["uploadedPDFURL"].length > 0) {
-                    setUploadedPDFURL(temp["uploadedPDFURL"]);
-                    setUploadedPDFFile(temp["uploadedPDFFile"]);
-                    let tempArrayNames = [];
-                    
-                    let promise3 = new Promise((resolve, reject) => {
-                        temp["uploadedPDFFile"].forEach((obj, index) => {
-                            tempArrayNames[index] = <li className="uploaded_name_item" key={index}>
-                                <i className="fa fa-file"/>
-                                <span className="uploaded_name_item_text">{obj.replace(/\.[^/.]+$/, "")}</span>
-                                <span className="uploaded_name_item_x" onClick={() => {
-                                    setDeleteUploaded(temp["uploadedPDFURL"][index], index, 1);
-                                }}>X</span>
-                            </li>;
-                            if (index === temp["uploadedPDFFile"].length - 1) {
-                                resolve();
-                            }
-                        });
-                    });
-                    
-                    promise3.then(() => {
-                        setUploadedPDFNameList(tempArrayNames);
-                    });
-                }
-                
-                
                 setTimeout(() => {
-                    setDepSet(depSetTempArr);
-                    setSelectCustomValues(selectValues);
-                    setStepSelectedLabel(tempLabels);
-                    setStepSelectedValue(tempValue);
-                    setExtendedTitle(tempExtended);
-                    setPageLoad(false);
-                }, 300);
-                
+                    // console.log(temp);
+                    if (temp["SheerHeaderStyle"]) {
+                        setStep2A(temp["SheerHeaderStyle"]);
+                        if (temp["SheerHeaderStyle"] === "Grommet") {
+                            let refIndex = inputs.current["2A1"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["2A1"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["2A1"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "2A", depSetTempArr)]);
+                            setSheersModelId("0099");
+                        } else if (temp["SheerHeaderStyle"] === "Inverted Box Pleat") {
+                            let refIndex = inputs.current["2A2"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["2A2"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["2A2"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "2A", depSetTempArr)]);
+                            setSheersModelId("0036");
+                        } else if (temp["SheerHeaderStyle"] === "Pencil Pleat") {
+                            let refIndex = inputs.current["2A3"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["2A3"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["2A3"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "2A", depSetTempArr)]);
+                            setSheersModelId("0001");
+                        } else {
+                            let refIndex = inputs.current["2A4"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["2A4"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["2A4"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "2A", depSetTempArr)]);
+                        }
+                        setStepSelectedLabel(tempLabels);
+                        setStepSelectedValue(tempValue);
+                    }
+                    
+                    if (temp["PrivacyLayer"]) {
+                        setStep2B(temp["PrivacyLayer"]);
+                        if (temp["PrivacyLayer"] === "None") {
+                            let refIndex = inputs.current["2B1"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["2B1"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["2B1"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "2B,2B1", depSetTempArr)]);
+                        } else if (temp["PrivacyLayer"] === "Semi Sheer") {
+                            let refIndex = inputs.current["2B2"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["2B2"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["2B2"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "2B", depSetTempArr)]);
+                        } else {
+                            let refIndex = inputs.current["2B3"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["2B3"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["2B3"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "2B", depSetTempArr)]);
+                        }
+                        
+                        if (temp["PrivacyLayer"] !== "None") {
+                            if (temp["PrivacyLayerHeaderStyle"]) {
+                                setStep2C(temp["PrivacyLayerHeaderStyle"]);
+                                if (temp["PrivacyLayerHeaderStyle"] === "Grommet") {
+                                    let refIndex = inputs.current["2C1"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["2C1"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["2C1"].value;
+                                    depSetTempArr = new Set([...setGetDeps("", "2C", depSetTempArr)]);
+                                    setSheersModelId2("0099");
+                                } else if (temp["PrivacyLayerHeaderStyle"] === "Inverted Box Pleat") {
+                                    let refIndex = inputs.current["2C2"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["2C2"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["2C2"].value;
+                                    depSetTempArr = new Set([...setGetDeps("", "2C", depSetTempArr)]);
+                                    setSheersModelId2("0036");
+                                } else if (temp["PrivacyLayerHeaderStyle"] === "Pencil Pleat") {
+                                    let refIndex = inputs.current["2C3"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["2C3"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["2C3"].value;
+                                    depSetTempArr = new Set([...setGetDeps("", "2C", depSetTempArr)]);
+                                    setSheersModelId2("0001");
+                                } else {
+                                    let refIndex = inputs.current["2C4"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["2C4"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["2C4"].value;
+                                    depSetTempArr = new Set([...setGetDeps("", "2C", depSetTempArr)]);
+                                }
+                            }
+                        }
+                        setStepSelectedLabel(tempLabels);
+                        setStepSelectedValue(tempValue);
+                    }
+                    
+                    if (temp["calcMeasurements"] !== undefined) {
+                        setStep3(temp["calcMeasurements"].toString());
+                        if (!temp["calcMeasurements"]) {
+                            let refIndex = inputs.current["31"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["31"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["31"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            
+                            selectValues["width"] = temp["Width"] ? [{value: temp["Width"]}] : [];
+                            selectValues["length"] = temp["Height"] ? [{value: temp["Height"]}] : [];
+                            depSetTempArr = new Set([...setGetDeps((temp["Width"] ? "" : "311,") + (temp["Height"] ? "" : "312,"), "3", depSetTempArr)]);
+                            setSelectCustomValues(selectValues);
+                        } else {
+                            let refIndex = inputs.current["32"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["32"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["32"].value;
+                            setStepSelectedLabel(tempLabels);
+                            setStepSelectedValue(tempValue);
+                            depSetTempArr = new Set([...setGetDeps("", "3", depSetTempArr)]);
+                            
+                            if (temp["hasRod"] !== undefined) {
+                                setStep31(temp["hasRod"].toString());
+                                if (!temp["hasRod"]) {
+                                    let scenario = 0;
+                                    if (temp["CurtainPosition"]) {
+                                        setStep3A(temp["CurtainPosition"].toString());
+                                        if (temp["CurtainPosition"] === "Standard") {
+                                            let refIndex = inputs.current["3A1"].getAttribute('ref-num');
+                                            tempLabels[refIndex] = inputs.current["3A1"].getAttribute('text');
+                                            tempValue[refIndex] = inputs.current["3A1"].value;
+                                            if (temp["Mount"]) {
+                                                setSelectedMountOutsideType(temp["Mount"] ? [{
+                                                    value: temp["Mount"],
+                                                    label: optionsOutside[pageLanguage].find(opt => opt.value === temp["Mount"]).label
+                                                }] : []);
+                                            }
+                                        } else if (temp["CurtainPosition"] === "Wall to Wall") {
+                                            let refIndex = inputs.current["3A2"].getAttribute('ref-num');
+                                            tempLabels[refIndex] = inputs.current["3A2"].getAttribute('text');
+                                            tempValue[refIndex] = inputs.current["3A2"].value;
+                                            if (temp["Mount"]) {
+                                                setSelectedMountOutsideType2(temp["Mount"] ? [{
+                                                    value: temp["Mount"],
+                                                    label: optionsOutside[pageLanguage].find(opt => opt.value === temp["Mount"]).label
+                                                }] : []);
+                                            }
+                                        } else if (temp["CurtainPosition"] === "Left Corner Window") {
+                                            let refIndex = inputs.current["3A3"].getAttribute('ref-num');
+                                            tempLabels[refIndex] = inputs.current["3A3"].getAttribute('text');
+                                            tempValue[refIndex] = inputs.current["3A3"].value;
+                                            if (temp["Mount"]) {
+                                                setSelectedMountOutsideType3(temp["Mount"] ? [{
+                                                    value: temp["Mount"],
+                                                    label: optionsOutside[pageLanguage].find(opt => opt.value === temp["Mount"]).label
+                                                }] : []);
+                                            }
+                                        } else {
+                                            let refIndex = inputs.current["3A4"].getAttribute('ref-num');
+                                            tempLabels[refIndex] = inputs.current["3A4"].getAttribute('text');
+                                            tempValue[refIndex] = inputs.current["3A4"].value;
+                                            if (temp["Mount"]) {
+                                                setSelectedMountOutsideType4(temp["Mount"] ? [{
+                                                    value: temp["Mount"],
+                                                    label: optionsOutside[pageLanguage].find(opt => opt.value === temp["Mount"]).label
+                                                }] : []);
+                                            }
+                                        }
+                                        if (temp["Mount"]) {
+                                            if (temp["FinishedLengthType"]) {
+                                                setStep3B(temp["FinishedLengthType"].toString());
+                                                if (temp["FinishedLengthType"] === "Sill" || temp["FinishedLengthType"] === "Apron") {
+                                                    if (temp["Mount"] === "Ceiling" && (temp["CurtainPosition"] === "Standard" || temp["CurtainPosition"] === "Left Corner Window" || temp["CurtainPosition"] === "Right Corner Window")) {
+                                                        scenario = 1;
+                                                    } else if (temp["CurtainPosition"] === "Wall to Wall" && temp["Mount"] === "Wall") {
+                                                        scenario = 2;
+                                                    } else if (temp["CurtainPosition"] === "Wall to Wall" && temp["Mount"] === "Ceiling") {
+                                                        scenario = 3;
+                                                    } else {
+                                                        scenario = 4;
+                                                    }
+                                                    
+                                                    if (temp["FinishedLengthType"] === "Sill") {
+                                                        let refIndex = inputs.current["3B1"].getAttribute('ref-num');
+                                                        tempLabels[refIndex] = inputs.current["3B1"].getAttribute('text');
+                                                        tempValue[refIndex] = inputs.current["3B1"].value;
+                                                    } else {
+                                                        let refIndex = inputs.current["3B11"].getAttribute('ref-num');
+                                                        tempLabels[refIndex] = inputs.current["3B11"].getAttribute('text');
+                                                        tempValue[refIndex] = inputs.current["3B11"].value;
+                                                        setStep3B1("true");
+                                                    }
+                                                    
+                                                } else {
+                                                    if (temp["Mount"] === "Ceiling" && (temp["CurtainPosition"] === "Standard" || temp["CurtainPosition"] === "Left Corner Window" || temp["CurtainPosition"] === "Right Corner Window")) {
+                                                        scenario = 5;
+                                                    } else if (temp["CurtainPosition"] === "Wall to Wall" && temp["Mount"] === "Wall") {
+                                                        scenario = 6;
+                                                    } else if (temp["CurtainPosition"] === "Wall to Wall" && temp["Mount"] === "Ceiling") {
+                                                        scenario = 7;
+                                                    } else {
+                                                        scenario = 8;
+                                                    }
+                                                    
+                                                    if (temp["FinishedLengthType"] === "Floor") {
+                                                        let refIndex = inputs.current["3B3"].getAttribute('ref-num');
+                                                        tempLabels[refIndex] = inputs.current["3B3"].getAttribute('text');
+                                                        tempValue[refIndex] = inputs.current["3B3"].value;
+                                                    } else {
+                                                        let refIndex = inputs.current["3B4"].getAttribute('ref-num');
+                                                        tempLabels[refIndex] = inputs.current["3B4"].getAttribute('text');
+                                                        tempValue[refIndex] = inputs.current["3B4"].value;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    setTimeout(() => {
+                                        if (scenario > 0) {
+                                            if (scenario === 1) {
+                                                let tempWidth = changeLang ? temp["Width3C"] : temp["Width"];
+                                                let tempHeight = changeLang ? temp["CeilingToWindow1"] : temp["Height"];
+                                                let tempHeight2 = changeLang ? temp["CeilingToWindow2"] : temp["Height2"];
+                                                let tempHeight3 = changeLang ? temp["CeilingToWindow3"] : temp["Height3"];
+                                                
+                                                selectValues["Width3C"] = tempWidth ? [{value: tempWidth}] : [];
+                                                if (tempWidth) {
+                                                    tempLabels["3C"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                }
+                                                
+                                                selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
+                                                selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                                if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
+                                                    tempLabels["3D"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
+                                                }
+                                                
+                                                selectValues["CeilingToWindow1"] = tempHeight ? [{value: tempHeight}] : [];
+                                                selectValues["CeilingToWindow2"] = tempHeight2 ? [{value: tempHeight2}] : [];
+                                                selectValues["CeilingToWindow3"] = tempHeight3 ? [{value: tempHeight3}] : [];
+                                                if (tempHeight && tempHeight2 && tempHeight3) {
+                                                    let tempMax = Math.min(tempHeight, tempHeight2, tempHeight3);
+                                                    tempLabels["3EStandardCeiling"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + postfixFa : tempMax + postfixEn;
+                                                }
+                                                
+                                                depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "3C,") + (temp["ExtensionLeft"] !== undefined ? "" : "3D1,") + (temp["ExtensionRight"] !== undefined ? "" : "3D2,") + (tempHeight !== undefined ? "" : "3EStandardCeiling1,") + (tempHeight2 !== undefined ? "" : "3EStandardCeiling2,") + (tempHeight3 !== undefined ? "" : "3EStandardCeiling3,"), "31,3A,3B,3B1", depSetTempArr)]);
+                                                
+                                            } else if (scenario === 2) {
+                                                let tempWidth = changeLang ? temp["Width3C"] : temp["Width"];
+                                                let tempHeight = changeLang ? temp["Height3E"] : temp["Height"];
+                                                
+                                                selectValues["Width3C"] = tempWidth ? [{value: tempWidth}] : [];
+                                                if (tempWidth) {
+                                                    tempLabels["3C"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                }
+                                                
+                                                selectValues["Height3E"] = tempHeight ? [{value: tempHeight}] : [];
+                                                if (tempHeight) {
+                                                    tempLabels["3E"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
+                                                }
+                                                
+                                                selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
+                                                if (temp["ShadeMount"] !== undefined) {
+                                                    tempLabels["3F"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["ShadeMount"]}`) + postfixFa : temp["ShadeMount"] + postfixEn;
+                                                }
+                                                
+                                                selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
+                                                if (temp["CeilingToFloor"] !== undefined) {
+                                                    tempLabels["3G"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
+                                                }
+                                                
+                                                depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "3C,") + (tempHeight !== undefined ? "" : "3E,") + +(selectValues["ShadeMount"] !== undefined ? "" : "3F,") + (selectValues["CeilingToFloor"] !== undefined ? "" : "3G,"), "31,3A,3B,3B1", depSetTempArr)]);
+                                                
+                                            } else if (scenario === 3) {
+                                                let tempWidth = changeLang ? temp["Width3C"] : temp["Width"];
+                                                let tempHeight = changeLang ? temp["CeilingToWindow1"] : temp["Height"];
+                                                let tempHeight2 = changeLang ? temp["CeilingToWindow2"] : temp["Height2"];
+                                                let tempHeight3 = changeLang ? temp["CeilingToWindow3"] : temp["Height3"];
+                                                
+                                                selectValues["Width3C"] = tempWidth ? [{value: tempWidth}] : [];
+                                                if (tempWidth) {
+                                                    tempLabels["3C"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                }
+                                                
+                                                selectValues["CeilingToWindow1"] = tempHeight ? [{value: tempHeight}] : [];
+                                                selectValues["CeilingToWindow2"] = tempHeight2 ? [{value: tempHeight2}] : [];
+                                                selectValues["CeilingToWindow3"] = tempHeight3 ? [{value: tempHeight3}] : [];
+                                                if (tempHeight && tempHeight2 && tempHeight3) {
+                                                    let tempMax = Math.min(tempHeight, tempHeight2, tempHeight3);
+                                                    tempLabels["3EStandardCeiling"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + postfixFa : tempMax + postfixEn;
+                                                }
+                                                
+                                                depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "3C,") + (tempHeight !== undefined ? "" : "3EStandardCeiling1,") + (tempHeight2 !== undefined ? "" : "3EStandardCeiling2,") + (tempHeight3 !== undefined ? "" : "3EStandardCeiling3,"), "31,3A,3B,3B1", depSetTempArr)]);
+                                                
+                                            } else if (scenario === 4) {
+                                                let tempWidth = changeLang ? temp["Width3C"] : temp["Width"];
+                                                let tempHeight = changeLang ? temp["Height3E"] : temp["Height"];
+                                                
+                                                selectValues["Width3C"] = tempWidth ? [{value: tempWidth}] : [];
+                                                if (tempWidth) {
+                                                    tempLabels["3C"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                }
+                                                
+                                                selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
+                                                selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                                if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
+                                                    tempLabels["3D"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
+                                                }
+                                                
+                                                selectValues["Height3E"] = tempHeight ? [{value: tempHeight}] : [];
+                                                if (tempHeight) {
+                                                    tempLabels["3E"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
+                                                }
+                                                
+                                                selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
+                                                if (temp["ShadeMount"] !== undefined) {
+                                                    tempLabels["3F"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["ShadeMount"]}`) + postfixFa : temp["ShadeMount"] + postfixEn;
+                                                }
+                                                
+                                                selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
+                                                if (temp["CeilingToFloor"] !== undefined) {
+                                                    tempLabels["3G"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
+                                                }
+                                                
+                                                depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "3C,") + (temp["ExtensionLeft"] !== undefined ? "" : "3D1,") + (temp["ExtensionRight"] !== undefined ? "" : "3D2,") + (tempHeight !== undefined ? "" : "3E,") + +(selectValues["ShadeMount"] !== undefined ? "" : "3F,") + (selectValues["CeilingToFloor"] !== undefined ? "" : "3G,"), "31,3A,3B,3B1", depSetTempArr)]);
+                                                
+                                            } else if (scenario === 5) {
+                                                let tempWidth = changeLang ? temp["Width3C"] : temp["Width"];
+                                                let tempHeight = changeLang ? temp["CeilingToFloor1"] : temp["Height"];
+                                                let tempHeight2 = changeLang ? temp["CeilingToFloor2"] : temp["Height2"];
+                                                let tempHeight3 = changeLang ? temp["CeilingToFloor3"] : temp["Height3"];
+                                                
+                                                selectValues["Width3C"] = tempWidth ? [{value: tempWidth}] : [];
+                                                if (tempWidth) {
+                                                    tempLabels["3C"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                }
+                                                
+                                                selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
+                                                selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                                if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
+                                                    tempLabels["3D"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
+                                                }
+                                                
+                                                selectValues["CeilingToFloor1"] = tempHeight ? [{value: tempHeight}] : [];
+                                                selectValues["CeilingToFloor2"] = tempHeight2 ? [{value: tempHeight2}] : [];
+                                                selectValues["CeilingToFloor3"] = tempHeight3 ? [{value: tempHeight3}] : [];
+                                                if (tempHeight && tempHeight2 && tempHeight3) {
+                                                    let tempMax = Math.min(tempHeight, tempHeight2, tempHeight3);
+                                                    tempLabels["3EStandardCeilingFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + postfixFa : tempMax + postfixEn;
+                                                }
+                                                
+                                                depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "3C,") + (temp["ExtensionLeft"] !== undefined ? "" : "3D1,") + (temp["ExtensionRight"] !== undefined ? "" : "3D2,") + (tempHeight !== undefined ? "" : "3EStandardCeilingFloor1,") + (tempHeight2 !== undefined ? "" : "3EStandardCeilingFloor2,") + (tempHeight3 !== undefined ? "" : "3EStandardCeilingFloor3,"), "31,3A,3B,3B1", depSetTempArr)]);
+                                                
+                                            } else if (scenario === 6) {
+                                                let tempWidth = changeLang ? temp["Width3C"] : temp["Width"];
+                                                let tempHeight = changeLang ? temp["WindowToFloor"] : temp["Height"];
+                                                
+                                                selectValues["Width3C"] = tempWidth ? [{value: tempWidth}] : [];
+                                                if (tempWidth) {
+                                                    tempLabels["3C"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                }
+                                                
+                                                selectValues["WindowToFloor"] = tempHeight ? [{value: tempHeight}] : [];
+                                                if (tempHeight) {
+                                                    tempLabels["3EFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
+                                                }
+                                                
+                                                selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
+                                                if (temp["ShadeMount"] !== undefined) {
+                                                    tempLabels["3F"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["ShadeMount"]}`) + postfixFa : temp["ShadeMount"] + postfixEn;
+                                                }
+                                                
+                                                selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
+                                                if (temp["CeilingToFloor"] !== undefined) {
+                                                    tempLabels["3G"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
+                                                }
+                                                
+                                                depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "3C,") + (tempHeight !== undefined ? "" : "3EFloor,") + +(selectValues["ShadeMount"] !== undefined ? "" : "3F,") + (selectValues["CeilingToFloor"] !== undefined ? "" : "3G,"), "31,3A,3B,3B1", depSetTempArr)]);
+                                                
+                                            } else if (scenario === 7) {
+                                                let tempWidth = changeLang ? temp["Width3C"] : temp["Width"];
+                                                let tempHeight = changeLang ? temp["CeilingToFloor1"] : temp["Height"];
+                                                let tempHeight2 = changeLang ? temp["CeilingToFloor2"] : temp["Height2"];
+                                                let tempHeight3 = changeLang ? temp["CeilingToFloor3"] : temp["Height3"];
+                                                
+                                                selectValues["Width3C"] = tempWidth ? [{value: tempWidth}] : [];
+                                                if (tempWidth) {
+                                                    tempLabels["3C"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                }
+                                                
+                                                selectValues["CeilingToFloor1"] = tempHeight ? [{value: tempHeight}] : [];
+                                                selectValues["CeilingToFloor2"] = tempHeight2 ? [{value: tempHeight2}] : [];
+                                                selectValues["CeilingToFloor3"] = tempHeight3 ? [{value: tempHeight3}] : [];
+                                                if (tempHeight && tempHeight2 && tempHeight3) {
+                                                    let tempMax = Math.min(tempHeight, tempHeight2, tempHeight3);
+                                                    tempLabels["3EStandardCeilingFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + postfixFa : tempMax + postfixEn;
+                                                }
+                                                
+                                                depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "3C,") + (tempHeight !== undefined ? "" : "3EStandardCeilingFloor1,") + (tempHeight2 !== undefined ? "" : "3EStandardCeilingFloor2,") + (tempHeight3 !== undefined ? "" : "3EStandardCeilingFloor3,"), "31,3A,3B,3B1", depSetTempArr)]);
+                                                
+                                            } else {
+                                                let tempWidth = changeLang ? temp["Width3C"] : temp["Width"];
+                                                let tempHeight = changeLang ? temp["WindowToFloor"] : temp["Height"];
+                                                
+                                                selectValues["Width3C"] = tempWidth ? [{value: tempWidth}] : [];
+                                                if (tempWidth) {
+                                                    tempLabels["3C"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                                }
+                                                
+                                                selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
+                                                selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                                if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
+                                                    tempLabels["3D"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
+                                                }
+                                                
+                                                selectValues["WindowToFloor"] = tempHeight ? [{value: tempHeight}] : [];
+                                                if (tempHeight) {
+                                                    tempLabels["3EFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
+                                                }
+                                                
+                                                selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
+                                                if (temp["ShadeMount"] !== undefined) {
+                                                    tempLabels["3F"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["ShadeMount"]}`) + postfixFa : temp["ShadeMount"] + postfixEn;
+                                                }
+                                                
+                                                selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
+                                                if (temp["CeilingToFloor"] !== undefined) {
+                                                    tempLabels["3G"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
+                                                }
+                                                
+                                                depSetTempArr = new Set([...setGetDeps((tempWidth ? "" : "3C,") + (temp["ExtensionLeft"] !== undefined ? "" : "3D1,") + (temp["ExtensionRight"] !== undefined ? "" : "3D2,") + (tempHeight !== undefined ? "" : "3EFloor,") + +(selectValues["ShadeMount"] !== undefined ? "" : "3F,") + (selectValues["CeilingToFloor"] !== undefined ? "" : "3G,"), "31,3A,3B,3B1", depSetTempArr)]);
+                                                
+                                            }
+                                            setSelectCustomValues(selectValues);
+                                            setStepSelectedLabel(tempLabels);
+                                            setStepSelectedValue(tempValue);
+                                        } else {
+                                            depSetTempArr = new Set([...setGetDeps((temp["Mount"] ? "" : "3A1,") + (temp["FinishedLengthType"] ? "" : "3B,") + "3A", "3,31", depSetTempArr)]);
+                                        }
+                                    }, 100);
+                                } else {
+                                    if (temp["FinishedLengthType"]) {
+                                        setStep3ARod(temp["FinishedLengthType"].toString());
+                                        if (temp["FinishedLengthType"] === "Sill" || temp["FinishedLengthType"] === "Apron") {
+                                            if (temp["FinishedLengthType"] === "Sill") {
+                                                let refIndex = inputs.current["3ARod1"].getAttribute('ref-num');
+                                                tempLabels[refIndex] = inputs.current["3ARod1"].getAttribute('text');
+                                                tempValue[refIndex] = inputs.current["3ARod1"].value;
+                                            } else {
+                                                let refIndex = inputs.current["3ARod11"].getAttribute('ref-num');
+                                                tempLabels[refIndex] = inputs.current["3ARod11"].getAttribute('text');
+                                                tempValue[refIndex] = inputs.current["3ARod11"].value;
+                                                setStep3ARod1("true");
+                                            }
+                                            
+                                            let tempWidth = changeLang ? temp["RodWidth"] : temp["Width"];
+                                            let tempHeight = changeLang ? temp["RodToBottom"] : temp["Height"];
+                                            
+                                            selectValues["RodWidth"] = tempWidth ? [{value: tempWidth}] : [];
+                                            if (tempWidth) {
+                                                tempLabels["3BRod"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                            }
+                                            
+                                            selectValues["RodToBottom"] = tempHeight ? [{value: tempHeight}] : [];
+                                            if (tempHeight) {
+                                                tempLabels["3CRod"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
+                                            }
+                                            
+                                            selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
+                                            if (temp["CeilingToFloor"] !== undefined) {
+                                                tempLabels["3DRod"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
+                                            }
+                                            
+                                            depSetTempArr = new Set([...setGetDeps((tempWidth !== undefined ? "" : "3BRod,") + (tempHeight !== undefined ? "" : "3CRod,") + (temp["CeilingToFloor"] !== undefined ? "" : "3DRod,"), "31,3B,3B1", depSetTempArr)]);
+                                            setSelectCustomValues(selectValues);
+                                            setStepSelectedLabel(tempLabels);
+                                            setStepSelectedValue(tempValue);
+                                            
+                                        } else {
+                                            if (temp["FinishedLengthType"] === "Floor") {
+                                                let refIndex = inputs.current["3ARod3"].getAttribute('ref-num');
+                                                tempLabels[refIndex] = inputs.current["3ARod3"].getAttribute('text');
+                                                tempValue[refIndex] = inputs.current["3ARod3"].value;
+                                            } else {
+                                                let refIndex = inputs.current["3ARod4"].getAttribute('ref-num');
+                                                tempLabels[refIndex] = inputs.current["3ARod4"].getAttribute('text');
+                                                tempValue[refIndex] = inputs.current["3ARod4"].value;
+                                            }
+                                            
+                                            let tempWidth = changeLang ? temp["RodWidth"] : temp["Width"];
+                                            let tempHeight = changeLang ? temp["RodToFloor"] : temp["Height"];
+                                            
+                                            selectValues["RodWidth"] = tempWidth ? [{value: tempWidth}] : [];
+                                            if (tempWidth) {
+                                                tempLabels["3BRod"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
+                                            }
+                                            
+                                            selectValues["RodToFloor"] = tempHeight ? [{value: tempHeight}] : [];
+                                            if (tempHeight) {
+                                                tempLabels["3CRodFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
+                                            }
+                                            
+                                            selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
+                                            if (temp["CeilingToFloor"] !== undefined) {
+                                                tempLabels["3DRod"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
+                                            }
+                                            
+                                            depSetTempArr = new Set([...setGetDeps((tempWidth !== undefined ? "" : "3BRod,") + (tempHeight !== undefined ? "" : "3CRodFloor,") + (temp["CeilingToFloor"] !== undefined ? "" : "3DRod,"), "31,3B,3B1", depSetTempArr)]);
+                                            setSelectCustomValues(selectValues);
+                                            setStepSelectedLabel(tempLabels);
+                                            setStepSelectedValue(tempValue);
+                                            
+                                        }
+                                    }
+                                    
+                                }
+                            } else {
+                                depSetTempArr = new Set([...setGetDeps("31", "3", depSetTempArr)]);
+                            }
+                        }
+                    }
+                    if (temp["WindowWidth"] && temp["WindowHeight"]) {
+                        getWindowSize(temp["WindowWidth"], temp["WindowHeight"]);
+                    }
+                    
+                    if (temp["Lining"]) {
+                        setStep4(temp["Lining"]);
+                        if (temp["Lining"] === "Standard Lining") {
+                            let refIndex = inputs.current["41"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["41"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["41"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "4", depSetTempArr)]);
+                        } else {
+                            let refIndex = inputs.current["42"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["42"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["42"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "4", depSetTempArr)]);
+                        }
+                        setStepSelectedLabel(tempLabels);
+                        setStepSelectedValue(tempValue);
+                    }
+                    
+                    if (temp["PanelCoverage"]) {
+                        setStep5(temp["PanelCoverage"]);
+                        if (temp["PanelCoverage"] === "Full") {
+                            let refIndex = inputs.current["51"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["51"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["51"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "5", depSetTempArr)]);
+                        } else {
+                            let refIndex = inputs.current["52"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["52"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["52"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "5", depSetTempArr)]);
+                        }
+                        setStepSelectedLabel(tempLabels);
+                        setStepSelectedValue(tempValue);
+                    }
+                    
+                    if (temp["PanelType"]) {
+                        setStep61(temp["PanelType"]);
+                        if (temp["PanelType"] === "Single Panel, Left") {
+                            let refIndex = inputs.current["611"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["611"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["611"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
+                        } else if (temp["PanelType"] === "Single Panel, Right") {
+                            let refIndex = inputs.current["612"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["612"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["612"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
+                        } else if (temp["PanelType"] === "Pair, Split Draw") {
+                            let refIndex = inputs.current["613"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["613"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["613"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
+                        } else {
+                            let refIndex = inputs.current["614"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["614"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["614"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
+                        }
+                        setStepSelectedLabel(tempLabels);
+                        setStepSelectedValue(tempValue);
+                    }
+                    
+                    if (temp["GrommetFinish"]) {
+                        setStep7(temp["GrommetFinish"]);
+                        if (temp["GrommetFinish"] === "Satin Brass") {
+                            let refIndex = inputs.current["71"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["71"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["71"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "7", depSetTempArr)]);
+                        } else if (temp["GrommetFinish"] === "Satin Nickel") {
+                            let refIndex = inputs.current["72"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["72"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["72"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "7", depSetTempArr)]);
+                        } else {
+                            let refIndex = inputs.current["73"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["73"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["73"].value;
+                            depSetTempArr = new Set([...setGetDeps("", "7", depSetTempArr)]);
+                        }
+                        setStepSelectedLabel(tempLabels);
+                        setStepSelectedValue(tempValue);
+                    }
+                    
+                    let tempExtended = extendedTitle;
+                    if (temp["Hardware"]) {
+                        setStep8(temp["Hardware"]);
+                        if (temp["Hardware"] === "None") {
+                            let refIndex = inputs.current["81"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["81"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["81"].value;
+                            tempExtended["8"] = [];
+                            depSetTempArr = new Set([...setGetDeps("", "8", depSetTempArr)]);
+                        } else if (temp["Hardware"] === "Same Hardware For All Curtains") {
+                            let refIndex = inputs.current["82"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["82"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["82"].value;
+                            tempExtended["8"] = [inputs.current["82"].getAttribute('text')];
+                            
+                            let tempMount = changeLang ? temp["Mount8"] : temp["Mount"];
+                            if (temp["RailDesign"]) {
+                                setStep81(temp["RailDesign"]);
+                                setTimeout(() => {
+                                    if (temp["RailId"]) {
+                                        setStep82(temp["RailId"]);
+                                    }
+                                    if (temp["BatonOption"]) {
+                                        setStep83(temp["BatonOption"]);
+                                        if (temp["BatonOption"] === "None") {
+                                            tempExtended["8"][3] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("None")}</span></li>;
+                                        } else if (temp["BatonOption"] === "Baton 30cm") {
+                                            tempExtended["8"][3] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 30cm")}</span></li>;
+                                        } else if (temp["BatonOption"] === "Baton 45cm") {
+                                            tempExtended["8"][3] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 45cm")}</span></li>;
+                                        } else {
+                                            tempExtended["8"][3] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Cord")}</span></li>;
+                                        }
+                                    }
+                                    if (tempMount) {
+                                        setStep84(tempMount);
+                                        if (tempMount === "Wall") {
+                                            tempExtended["8"][4] = <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Wall")}</span></li>;
+                                        } else {
+                                            tempExtended["8"][4] = <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Ceiling")}</span></li>;
+                                        }
+                                    }
+                                }, 200);
+                            }
+                            depSetTempArr = new Set([...setGetDeps((temp["RailDesign"] !== undefined ? "" : "81,") + (temp["RailId"] !== undefined ? "" : "82,") + (temp["BatonOption"] !== undefined ? "" : "83,") + (tempMount !== undefined ? "" : "84,"), "8", depSetTempArr)]);
+                            
+                        } else {
+                            let refIndex = inputs.current["83"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["83"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["83"].value;
+                            depSetTempArr = new Set([...setGetDeps("8A,8B," + (temp["PrivacyLayer"] === "None" ? "" : "8C,"), "8", depSetTempArr)]);
+                            tempExtended["8"] = [inputs.current["83"].getAttribute('text')];
+                            
+                            if (temp["DraperyHardware"]) {
+                                setStep8A(temp["DraperyHardware"]);
+                                if (temp["DraperyHardware"] === "None") {
+                                    let refIndex = inputs.current["8A1"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["8A1"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["8A1"].value;
+                                    tempExtended["8A"] = [];
+                                    depSetTempArr = new Set([...setGetDeps("", "8A", depSetTempArr)]);
+                                } else {
+                                    let refIndex = inputs.current["8A2"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["8A2"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["8A2"].value;
+                                    tempExtended["8A"] = [inputs.current["8A2"].getAttribute('text')];
+                                    
+                                    let tempMount = changeLang ? temp["MountA"] : temp["Mount"];
+                                    if (temp["RailDesignA"]) {
+                                        setStep8A1(temp["RailDesignA"]);
+                                        setTimeout(() => {
+                                            if (temp["RailIdA"]) {
+                                                setStep8A2(temp["RailIdA"]);
+                                            }
+                                            if (temp["BatonOptionA"]) {
+                                                setStep8A3(temp["BatonOptionA"]);
+                                                if (temp["BatonOptionA"] === "None") {
+                                                    tempExtended["8A"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("None")}</span></li>;
+                                                } else if (temp["BatonOptionA"] === "Baton 30cm") {
+                                                    tempExtended["8A"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 30cm")}</span></li>;
+                                                } else if (temp["BatonOptionA"] === "Baton 45cm") {
+                                                    tempExtended["8A"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 45cm")}</span></li>;
+                                                } else {
+                                                    tempExtended["8A"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Cord")}</span></li>;
+                                                }
+                                            }
+                                            if (tempMount) {
+                                                setStep8A4(tempMount);
+                                                if (tempMount === "Wall") {
+                                                    tempExtended["8A"][3] = <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Wall")}</span></li>;
+                                                } else {
+                                                    tempExtended["8A"][3] = <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Ceiling")}</span></li>;
+                                                }
+                                            }
+                                        }, 200);
+                                    }
+                                    depSetTempArr = new Set([...setGetDeps((temp["RailDesignA"] !== undefined ? "" : "8A1,") + (temp["RailIdA"] !== undefined ? "" : "8A2,") + (temp["BatonOptionA"] !== undefined ? "" : "8A3,") + (tempMount !== undefined ? "" : "8A4,"), "8A", depSetTempArr)]);
+                                }
+                            }
+                            
+                            if (temp["SheerHardware"]) {
+                                setStep8B(temp["SheerHardware"]);
+                                if (temp["SheerHardware"] === "None") {
+                                    let refIndex = inputs.current["8B1"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["8B1"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["8B1"].value;
+                                    tempExtended["8B"] = [];
+                                    depSetTempArr = new Set([...setGetDeps("", "8B", depSetTempArr)]);
+                                } else if (temp["SheerHardware"] === "Track") {
+                                    let refIndex = inputs.current["8B2"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["8B2"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["8B2"].value;
+                                    tempExtended["8B"] = [inputs.current["8B2"].getAttribute('text')];
+                                    
+                                    // let tempMount = changeLang ? temp["MountB"] : temp["Mount"];
+                                    if (temp["RailDesignB"]) {
+                                        setStep8B1(temp["RailDesignB"]);
+                                        setTimeout(() => {
+                                            if (temp["RailIdB"]) {
+                                                setStep8B2(temp["RailIdB"]);
+                                            }
+                                            if (temp["BatonOptionB"]) {
+                                                setStep8B3(temp["BatonOptionB"]);
+                                                if (temp["BatonOptionB"] === "None") {
+                                                    tempExtended["8B"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("None")}</span></li>;
+                                                } else if (temp["BatonOptionB"] === "Baton 30cm") {
+                                                    tempExtended["8B"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 30cm")}</span></li>;
+                                                } else if (temp["BatonOptionB"] === "Baton 45cm") {
+                                                    tempExtended["8B"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 45cm")}</span></li>;
+                                                } else {
+                                                    tempExtended["8B"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Cord")}</span></li>;
+                                                }
+                                            }
+                                            // if (tempMount) {
+                                            //     setStep8B4(tempMount);
+                                            // }
+                                            
+                                            if (temp["hasPower"]) {
+                                                setStep8B5(temp["hasPower"]);
+                                                setSelectedMotorPosition(temp["MotorPosition"] ? [{
+                                                    value: temp["MotorPosition"],
+                                                    label: MotorPosition[pageLanguage].find(opt => opt.value === temp["MotorPosition"]).label
+                                                }] : []);
+                                                setRemoteName(temp["RemoteName"] ? temp["RemoteName"] : "");
+                                                setSelectedRemoteName(temp["RemoteName"] && temp["RemoteName"] !== "" ? [{value: temp["RemoteName"], label: temp["RemoteName"]}] : []);
+                                                setSelectedMotorChannels(temp["MotorChannels"] ? temp["MotorChannels"].map(item => ({
+                                                    value: item,
+                                                    label: motorChannels[pageLanguage].find(opt => opt.value === item).label
+                                                })) : []);
+                                            }
+                                        }, 200);
+                                    }
+                                    depSetTempArr = new Set([...setGetDeps((temp["hasPower"] ? ((temp["MotorPosition"] ? "" : "8B51,")) : "8B5,") + (temp["RailDesignB"] !== undefined ? "" : "8B1,") + (temp["RailIdB"] !== undefined ? "" : "8B2,") + (temp["BatonOptionB"] !== undefined ? "" : "8B3,"), "8B", depSetTempArr)]);
+                                } else {
+                                    let refIndex = inputs.current["8B3"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["8B3"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["8B3"].value;
+                                    tempExtended["8B"] = [inputs.current["8B3"].getAttribute('text')];
+                                    
+                                    // let tempMount = changeLang ? temp["MountB"] : temp["Mount"];
+                                    if (temp["RailDesignB"]) {
+                                        setStep8B1(temp["RailDesignB"]);
+                                        setTimeout(() => {
+                                            if (temp["RailIdB"]) {
+                                                setStep8B2(temp["RailIdB"]);
+                                            }
+                                            if (temp["BatonOptionB"]) {
+                                                setStep8B3(temp["BatonOptionB"]);
+                                            }
+                                            // if (tempMount) {
+                                            //     setStep8B4(tempMount);
+                                            // }
+                                        }, 200);
+                                    }
+                                    depSetTempArr = new Set([...setGetDeps((temp["RailDesignB"] !== undefined ? "" : "8B1,") + (temp["RailIdB"] !== undefined ? "" : "8B2,") + (temp["BatonOptionB"] !== undefined ? "" : "8B3,"), "8B", depSetTempArr)]);
+                                }
+                            }
+                            
+                            if (temp["PrivacyLayerHardware"]) {
+                                setStep8C(temp["PrivacyLayerHardware"]);
+                                if (temp["PrivacyLayerHardware"] === "None") {
+                                    let refIndex = inputs.current["8C1"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["8C1"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["8C1"].value;
+                                    tempExtended["8C"] = [];
+                                    depSetTempArr = new Set([...setGetDeps("", "8C", depSetTempArr)]);
+                                } else if (temp["PrivacyLayerHardware"] === "Track") {
+                                    let refIndex = inputs.current["8C2"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["8C2"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["8C2"].value;
+                                    tempExtended["8C"] = [inputs.current["8C2"].getAttribute('text')];
+                                    
+                                    // let tempMount = changeLang ? temp["MountC"] : temp["Mount"];
+                                    if (temp["RailDesignC"]) {
+                                        setStep8C1(temp["RailDesignC"]);
+                                        setTimeout(() => {
+                                            if (temp["RailIdC"]) {
+                                                setStep8C2(temp["RailIdC"]);
+                                            }
+                                            if (temp["BatonOptionC"]) {
+                                                setStep8C3(temp["BatonOptionC"]);
+                                                if (temp["BatonOptionC"] === "None") {
+                                                    tempExtended["8C"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("None")}</span></li>;
+                                                } else if (temp["BatonOptionC"] === "Baton 30cm") {
+                                                    tempExtended["8C"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 30cm")}</span></li>;
+                                                } else if (temp["BatonOptionC"] === "Baton 45cm") {
+                                                    tempExtended["8C"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 45cm")}</span></li>;
+                                                } else {
+                                                    tempExtended["8C"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Cord")}</span></li>;
+                                                }
+                                            }
+                                            // if (tempMount) {
+                                            //     setStep8C4(tempMount);
+                                            // }
+                                            
+                                            if (temp["hasPower"]) {
+                                                setStep8C5(temp["hasPower"]);
+                                                setSelectedMotorPosition(temp["MotorPosition"] ? [{
+                                                    value: temp["MotorPosition"],
+                                                    label: MotorPosition[pageLanguage].find(opt => opt.value === temp["MotorPosition"]).label
+                                                }] : []);
+                                                setRemoteName(temp["RemoteName"] ? temp["RemoteName"] : "");
+                                                setSelectedRemoteName(temp["RemoteName"] && temp["RemoteName"] !== "" ? [{value: temp["RemoteName"], label: temp["RemoteName"]}] : []);
+                                                setSelectedMotorChannels(temp["MotorChannels"] ? temp["MotorChannels"].map(item => ({
+                                                    value: item,
+                                                    label: motorChannels[pageLanguage].find(opt => opt.value === item).label
+                                                })) : []);
+                                            }
+                                        }, 200);
+                                    }
+                                    depSetTempArr = new Set([...setGetDeps((temp["hasPower"] ? ((temp["MotorPosition"] ? "" : "8C51,")) : "8C5,") + (temp["RailDesignC"] !== undefined ? "" : "8C1,") + (temp["RailIdC"] !== undefined ? "" : "8C2,") + (temp["BatonOptionC"] !== undefined ? "" : "8C3,"), "8C", depSetTempArr)]);
+                                } else {
+                                    let refIndex = inputs.current["8C3"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["8C3"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["8C3"].value;
+                                    tempExtended["8C"] = [inputs.current["8C3"].getAttribute('text')];
+                                    
+                                    // let tempMount = changeLang ? temp["MountC"] : temp["Mount"];
+                                    if (temp["RailDesignC"]) {
+                                        setStep8C1(temp["RailDesignC"]);
+                                        setTimeout(() => {
+                                            if (temp["RailIdC"]) {
+                                                setStep8C2(temp["RailIdC"]);
+                                            }
+                                            if (temp["BatonOptionC"]) {
+                                                setStep8C3(temp["BatonOptionC"]);
+                                            }
+                                            // if (tempMount) {
+                                            //     setStep8C4(tempMount);
+                                            // }
+                                        }, 200);
+                                    }
+                                    depSetTempArr = new Set([...setGetDeps((temp["RailDesignC"] !== undefined ? "" : "8C1,") + (temp["RailIdC"] !== undefined ? "" : "8C2,") + (temp["BatonOptionC"] !== undefined ? "" : "8C3,"), "8C", depSetTempArr)]);
+                                }
+                            }
+                        }
+                        setStepSelectedLabel(tempLabels);
+                        setStepSelectedValue(tempValue);
+                    }
+                    
+                    if (temp["RoomNameEn"]) {
+                        setSavedProjectRoomLabel(temp["RoomNameEn"]);
+                        
+                        depSetTempArr = new Set([...setGetDeps("", "1001", depSetTempArr)]);
+                        setSelectedRoomLabel(temp["RoomNameEn"] ? [{
+                            value: temp["RoomNameEn"], label: rooms[pageLanguage].find(opt => opt.value === temp["RoomNameEn"]).label
+                        }] : []);
+                        tempSelect.label = rooms[pageLanguage].find(opt => opt.value === temp["RoomNameEn"]).label;
+                        tempSelect.value = temp["RoomNameEn"];
+                        setRoomLabelSelect(tempSelect);
+                        if (temp["WindowName"] === undefined || (temp["WindowName"] && temp["WindowName"] === "")) {
+                            tempLabels["10"] = tempSelect.label;
+                        } else if (temp["WindowName"]) {
+                            tempLabels["10"] = tempSelect.label + " - " + temp["WindowName"];
+                        }
+                        setStepSelectedLabel(tempLabels);
+                    }
+                    if (temp["WindowName"] && temp["WindowName"] !== "") {
+                        setSavedProjectRoomText(temp["WindowName"]);
+                        depSetTempArr = new Set([...setGetDeps("", "1002", depSetTempArr)]);
+                        setRoomLabelText(temp["WindowName"]);
+                    }
+                    
+                    if (temp["ZipCode"] && temp["ZipCode"] !== "" && temp["InstallAmount"] && temp["InstallAmount"] > 0 && temp["TransportationAmount"] && temp["TransportationAmount"] > 0) {
+                        setZipcode(temp["ZipCode"]);
+                        setZipcodeButton(true);
+                        setHasInstall(true);
+                        setZipcodeChecked("true");
+                        setInstallPrice(temp["InstallAmount"]);
+                        setTransportPrice(temp["TransportationAmount"]);
+                    }
+                    
+                    if (temp["uploadedImagesURL"] && temp["uploadedImagesURL"].length > 0) {
+                        setUploadedImagesURL(temp["uploadedImagesURL"]);
+                        setUploadedImagesFile(temp["uploadedImagesFile"]);
+                        let tempArrayNames = [];
+                        let tempArray = [];
+                        
+                        let promise3 = new Promise((resolve, reject) => {
+                            temp["uploadedImagesFile"].forEach((obj, index) => {
+                                tempArrayNames[index] = <li className="uploaded_name_item" key={index}>
+                                    <i className="fa fa-file"/>
+                                    <span className="uploaded_name_item_text">{obj.replace(/\.[^/.]+$/, "")}</span>
+                                    <span className="uploaded_name_item_x" onClick={() => {
+                                        setDeleteUploaded(temp["uploadedImagesURL"][index], index, 2);
+                                    }}>X</span>
+                                </li>;
+                                
+                                tempArray[index] = <li className="uploaded_image_item" key={index}>
+                                    <img src={`https://api.atlaspood.ir/${temp["uploadedImagesURL"][index]}`} className="img-fluid" alt=""/>
+                                </li>;
+                                
+                                if (index === temp["uploadedImagesFile"].length - 1) {
+                                    resolve();
+                                }
+                            });
+                        });
+                        
+                        promise3.then(() => {
+                            setUploadedImagesNamesList(tempArrayNames);
+                            setUploadedImagesList(tempArray);
+                        });
+                        
+                    }
+                    if (temp["uploadedPDFURL"] && temp["uploadedPDFURL"].length > 0) {
+                        setUploadedPDFURL(temp["uploadedPDFURL"]);
+                        setUploadedPDFFile(temp["uploadedPDFFile"]);
+                        let tempArrayNames = [];
+                        
+                        let promise3 = new Promise((resolve, reject) => {
+                            temp["uploadedPDFFile"].forEach((obj, index) => {
+                                tempArrayNames[index] = <li className="uploaded_name_item" key={index}>
+                                    <i className="fa fa-file"/>
+                                    <span className="uploaded_name_item_text">{obj.replace(/\.[^/.]+$/, "")}</span>
+                                    <span className="uploaded_name_item_x" onClick={() => {
+                                        setDeleteUploaded(temp["uploadedPDFURL"][index], index, 1);
+                                    }}>X</span>
+                                </li>;
+                                if (index === temp["uploadedPDFFile"].length - 1) {
+                                    resolve();
+                                }
+                            });
+                        });
+                        
+                        promise3.then(() => {
+                            setUploadedPDFNameList(tempArrayNames);
+                        });
+                    }
+                    
+                    
+                    setTimeout(() => {
+                        setDepSet(depSetTempArr);
+                        setSelectCustomValues(selectValues);
+                        setStepSelectedLabel(tempLabels);
+                        setStepSelectedValue(tempValue);
+                        setExtendedTitle(tempExtended);
+                        setPageLoad(false);
+                    }, 300);
+                }, 500);
             });
         });
     }
@@ -5059,10 +5428,14 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
     
     useEffect(() => {
         if (!pageLoad && !rodsLoad && !rodsLoad2) {
-            setStep6("");
-            setDeps("6", "");
+            setStep6("Same Style For All Curtains");
+            setStep61("");
+            setStep6A1("");
+            setStep6B1("");
+            setStep6C1("");
+            setDeps("61", "6,6A1,6B1,6C1");
             setCart("", "", "PanelType");
-            selectChanged(undefined, "6");
+            // selectChanged(undefined, "6");
             if (cartValues["WidthCart"] && parseInt(cartValues["WidthCart"]) > 0) {
                 getRails(parseInt(cartValues["WidthCart"]));
                 if (sheersModelId !== "")
@@ -5108,6 +5481,42 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
     }, [fabricSelected2]);
     
     useEffect(() => {
+        if (borderSelected.selectedFabricId) {
+            setCart("BorderOrTrimId", `${borderSelected.selectedFabricId}`);
+            
+            setStep1Border(borderSelected.selectedFabricId.toString());
+            setStep1Trim("");
+        }
+    }, [borderSelected]);
+    
+    useEffect(() => {
+        if (trimSelected.selectedFabricId) {
+            setCart("BorderOrTrimId", `${trimSelected.selectedFabricId}`);
+            
+            setStep1Border("");
+            setStep1Trim(trimSelected.selectedFabricId.toString());
+        }
+    }, [trimSelected]);
+    
+    useEffect(() => {
+        if (borderSelected2.selectedFabricId) {
+            setCart("BorderOrTrimId2", `${borderSelected2.selectedFabricId}`);
+            
+            setStep2Border(borderSelected2.selectedFabricId.toString());
+            setStep2Trim("");
+        }
+    }, [borderSelected2]);
+    
+    useEffect(() => {
+        if (trimSelected2.selectedFabricId) {
+            setCart("BorderOrTrimId2", `${trimSelected2.selectedFabricId}`);
+            
+            setStep2Border("");
+            setStep2Trim(trimSelected2.selectedFabricId.toString());
+        }
+    }, [trimSelected2]);
+    
+    useEffect(() => {
         if (sheersSelected.selectedFabricId && sheersSelected.selectedFabricId !== 0) {
             setCart("SheersId1", `${sheersSelected.selectedFabricId}`, "", "SheersDesignFa,SheersDesignEn,SheersColorEn,SheersColorFa,SheersPhotoUrl", [sheersSelected.selectedTextFa, sheersSelected.selectedTextEn, sheersSelected.selectedColorEn, sheersSelected.selectedColorFa, sheersSelected.selectedPhoto]);
             // setCart("SheersId1", `${sheersSelected.selectedFabricId}`);
@@ -5115,7 +5524,8 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
             setStep2B1(sheersSelected.selectedFabricId.toString());
             
             let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-            tempLabels["2B"] = inputs.current["2B2"].getAttribute('text') + " / " + (pageLanguage === "fa" ? sheersSelected.selectedColorFa : sheersSelected.selectedColorEn);
+            // tempLabels["2B"] = inputs.current["2B2"].getAttribute('text') + " / " + (pageLanguage === "fa" ? sheersSelected.selectedColorFa : sheersSelected.selectedColorEn);
+            tempLabels["2B"] = location.pathname.split('').slice(1, 3).join('') === "fa" ? sheersSelected.selectedTextFa + "/" + fabricSelected.selectedColorFa : sheersSelected.selectedTextEn + "/" + sheersSelected.selectedColorEn;
             setStepSelectedLabel(tempLabels);
         }
     }, [sheersSelected]);
@@ -5128,7 +5538,8 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
             setStep2B1(sheersSelected2.selectedFabricId.toString());
             
             let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-            tempLabels["2B"] = inputs.current["2B3"].getAttribute('text') + " / " + (pageLanguage === "fa" ? sheersSelected2.selectedColorFa : sheersSelected2.selectedColorEn);
+            // tempLabels["2B"] = inputs.current["2B3"].getAttribute('text') + " / " + (pageLanguage === "fa" ? sheersSelected2.selectedColorFa : sheersSelected2.selectedColorEn);
+            tempLabels["2B"] = location.pathname.split('').slice(1, 3).join('') === "fa" ? sheersSelected2.selectedTextFa + "/" + sheersSelected2.selectedColorFa : sheersSelected2.selectedTextEn + "/" + sheersSelected2.selectedColorEn;
             setStepSelectedLabel(tempLabels);
         }
     }, [sheersSelected2]);
@@ -5176,6 +5587,22 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
             }
         });
     }, [step1]);
+    
+    useEffect(() => {
+        if (Object.keys(fabrics).length) {
+            renderFabrics(bag);
+        } else {
+            setFabricsList([]);
+        }
+    }, [step1Check, step1Border, step1BorderRadio, step1Trim]);
+    
+    useEffect(() => {
+        if (Object.keys(fabrics2).length) {
+            renderFabrics2(bag);
+        } else {
+            setFabricsList2([]);
+        }
+    }, [step2Check, step2Border, step2BorderRadio, step2Trim]);
     
     useEffect(() => {
         getCart().then((temp) => {
@@ -5424,7 +5851,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 // setStepSelectedLabel(tempLabels);
                 
                 let tempExtended = extendedTitle;
-                tempExtended["8"][1]= <li key="1" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Design")}</span><span className="step_title_extended_list_item_text">{pageLanguage === "fa" ? convertToPersian(railObject["DesignName"]) : railObject["DesignENName"]}</span></li>;
+                tempExtended["8"][1] = <li key="1" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Design")}</span><span className="step_title_extended_list_item_text">{pageLanguage === "fa" ? convertToPersian(railObject["DesignName"]) : railObject["DesignENName"]}</span></li>;
                 tempExtended["8"].splice(2, 3);
                 setExtendedTitle(tempExtended);
             }
@@ -5452,7 +5879,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 // tempLabels["8"] = pageLanguage === "fa" ? convertToPersian(railObject["DesignName"]) + " / " + convertToPersian(railObject2["ColorName"]) : railObject["DesignENName"] + " / " + railObject2["ColorEnName"];
                 // setStepSelectedLabel(tempLabels);
                 let tempExtended = extendedTitle;
-                tempExtended["8"][2]= <li key="2" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Color")}</span><span className="step_title_extended_list_item_text">{pageLanguage === "fa" ? convertToPersian(railObject2["ColorName"]) : railObject2["ColorEnName"]}</span></li>;
+                tempExtended["8"][2] = <li key="2" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Color")}</span><span className="step_title_extended_list_item_text">{pageLanguage === "fa" ? convertToPersian(railObject2["ColorName"]) : railObject2["ColorEnName"]}</span></li>;
                 setExtendedTitle(tempExtended);
             }
             setCart("RailId", step82, "", "RailColorFa,RailColorEn", [railObject2["ColorName"], railObject2["ColorEnName"]]);
@@ -5503,7 +5930,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 // tempLabels["8A"] = pageLanguage === "fa" ? convertToPersian(railObject["DesignName"]) + " / " + convertToPersian(railObject2["ColorName"]) : railObject["DesignENName"] + " / " + railObject2["ColorEnName"];
                 // setStepSelectedLabel(tempLabels);
                 let tempExtended = extendedTitle;
-                tempExtended["8A"][1]= <li key="2" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Color")}</span><span className="step_title_extended_list_item_text">{pageLanguage === "fa" ? convertToPersian(railObject2["ColorName"]) : railObject2["ColorEnName"]}</span></li>;
+                tempExtended["8A"][1] = <li key="2" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Color")}</span><span className="step_title_extended_list_item_text">{pageLanguage === "fa" ? convertToPersian(railObject2["ColorName"]) : railObject2["ColorEnName"]}</span></li>;
                 setExtendedTitle(tempExtended);
             }
             setCart("RailIdA", step8A2, "", "RailColorFaA,RailColorEnA", [railObject2["ColorName"], railObject2["ColorEnName"]]);
@@ -5568,7 +5995,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 // tempLabels["8B"] = pageLanguage === "fa" ? convertToPersian(railObject["DesignName"]) + " / " + convertToPersian(railObject2["ColorName"]) : railObject["DesignENName"] + " / " + railObject2["ColorEnName"];
                 // setStepSelectedLabel(tempLabels);
                 let tempExtended = extendedTitle;
-                tempExtended["8B"][1]= <li key="2" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Color")}</span><span className="step_title_extended_list_item_text">{pageLanguage === "fa" ? convertToPersian(railObject2["ColorName"]) : railObject2["ColorEnName"]}</span></li>;
+                tempExtended["8B"][1] = <li key="2" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Color")}</span><span className="step_title_extended_list_item_text">{pageLanguage === "fa" ? convertToPersian(railObject2["ColorName"]) : railObject2["ColorEnName"]}</span></li>;
                 setExtendedTitle(tempExtended);
             }
             setCart("RailIdB", step8B2, "", "RailColorFaB,RailColorEnB", [railObject2["ColorName"], railObject2["ColorEnName"]]);
@@ -5598,12 +6025,12 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
             
             if (railObject["RailCategoryId"] === 5302) {
                 setIs8CMotor(true);
-                setCart("RailDesignC", step8C1,"RailIdC,RailColorFaC,RailColorEnC", "RailDesignFaC,RailDesignEnC", [railObject["DesignName"], railObject["DesignENName"]]);
+                setCart("RailDesignC", step8C1, "RailIdC,RailColorFaC,RailColorEnC", "RailDesignFaC,RailDesignEnC", [railObject["DesignName"], railObject["DesignENName"]]);
                 setDeps((step8C5 !== "true" ? ",8C5" : ""), "8C1,8C2,8C3");
             } else {
                 setIs8CMotor(false);
                 setStep8C5("");
-                setCart("RailDesignC", step8C1,"RailIdC,RailColorFaC,RailColorEnC", "RailDesignFaC,RailDesignEnC,hasPower,MotorPosition,RemoteName,MotorChannels", [railObject["DesignName"], railObject["DesignENName"]]);
+                setCart("RailDesignC", step8C1, "RailIdC,RailColorFaC,RailColorEnC", "RailDesignFaC,RailDesignEnC,hasPower,MotorPosition,RemoteName,MotorChannels", [railObject["DesignName"], railObject["DesignENName"]]);
                 setDeps("8C2,8C3", "8C1,8C5,8C51");
                 showRodsColor(railObject, "8C2");
             }
@@ -5633,7 +6060,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 // tempLabels["8C"] = pageLanguage === "fa" ? convertToPersian(railObject["DesignName"]) + " / " + convertToPersian(railObject2["ColorName"]) : railObject["DesignENName"] + " / " + railObject2["ColorEnName"];
                 // setStepSelectedLabel(tempLabels);
                 let tempExtended = extendedTitle;
-                tempExtended["8C"][1]= <li key="2" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Color")}</span><span className="step_title_extended_list_item_text">{pageLanguage === "fa" ? convertToPersian(railObject2["ColorName"]) : railObject2["ColorEnName"]}</span></li>;
+                tempExtended["8C"][1] = <li key="2" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Color")}</span><span className="step_title_extended_list_item_text">{pageLanguage === "fa" ? convertToPersian(railObject2["ColorName"]) : railObject2["ColorEnName"]}</span></li>;
                 setExtendedTitle(tempExtended);
             }
             setCart("RailIdC", step8C2, "", "RailColorFaC,RailColorEnC", [railObject2["ColorName"], railObject2["ColorEnName"]]);
@@ -5790,7 +6217,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                 let DesignENName = stepAccessories[found][found2]["DesignENName"];
                                 let DesignName = stepAccessories[found][found2]["DesignName"];
                                 let qty = obj["Qty"];
-                                tempText.push(`${pageLanguage === "en" ? DesignENName : DesignName} ${pageLanguage === "en" ?`x${qty}`:NumberToPersianWord.convertEnToPe(`${qty}x`)}`);
+                                tempText.push(`${pageLanguage === "en" ? DesignENName : DesignName} ${pageLanguage === "en" ? `x${qty}` : NumberToPersianWord.convertEnToPe(`${qty}x`)}`);
                                 resolve();
                             } else {
                                 resolve();
@@ -5805,9 +6232,9 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
             Promise.all(promiseArr).then(() => {
                 tempLabels["9"] = tempText.join(', \n');
                 // setAccTitle(tempText);
-    
+                
                 let tempExtended = extendedTitle;
-                tempExtended["9"]=tempText;
+                tempExtended["9"] = tempText;
                 setExtendedTitle(tempExtended);
                 setStepSelectedLabel(tempLabels);
             });
@@ -5816,7 +6243,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
             tempLabels["9"] = "";
             
             let tempExtended = extendedTitle;
-            tempExtended["9"]=[];
+            tempExtended["9"] = [];
             setExtendedTitle(tempExtended);
             setStepSelectedLabel(tempLabels);
         }
@@ -6062,6 +6489,47 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         } else {
             setStepAccessories({});
         }
+        if (Object.keys(model).length > 0) {
+            let tempArr = [];
+            let promiseArr = [];
+            model["Accessories"].forEach((obj, index) => {
+                promiseArr[index] = new Promise((resolve, reject) => {
+                    let promiseArr2 = [];
+                    if (obj["SewingAccessoryId"] === 28) {
+                        obj["SewingAccessoryDetails"].forEach((el, index2) => {
+                            promiseArr2[index2] = new Promise((resolve, reject) => {
+                                el["SewingModelAccessoryId"] = obj["SewingModelAccessoryId"];
+                                tempArr.push(JSON.parse(JSON.stringify(el)));
+                                resolve();
+                            });
+                        });
+                    }
+                    Promise.all(promiseArr2).then(() => {
+                        resolve();
+                    });
+                });
+            });
+            
+            Promise.all(promiseArr).then(() => {
+                let tempFabrics = {};
+                let promiseArr2 = [];
+                tempArr.forEach((obj, index) => {
+                    promiseArr2[index] = new Promise((resolve, reject) => {
+                        if (obj["ProductGroupId"] === "100703") {
+                            if (tempFabrics[obj["DesignCode"]] === "" || tempFabrics[obj["DesignCode"]] === undefined || tempFabrics[obj["DesignCode"]] === null || tempFabrics[obj["DesignCode"]] === [])
+                                tempFabrics[obj["DesignCode"]] = [];
+                            tempFabrics[obj["DesignCode"]].push(obj);
+                        }
+                        resolve();
+                    });
+                });
+                Promise.all(promiseArr2).then(() => {
+                    setTrimAccessories(tempFabrics);
+                });
+            });
+        } else {
+            setTrimAccessories([]);
+        }
     }, [model, JSON.stringify(cartValues)]);
     
     useEffect(() => {
@@ -6143,7 +6611,8 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     setBag(response.data ? response.data : {});
                     resolve(response.data ? response.data : {});
                 }).catch(err => {
-                    if (err.response.status === 401) {
+                    console.log(err);
+                    if (err.response && err.response.status === 401) {
                         refreshToken().then((response2) => {
                             if (response2 !== false) {
                                 setCartChanged(cartChanged + 1);
@@ -6234,10 +6703,10 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     setRodsList4([]);
                 }
             }
-            if(rodsLoad){
+            if (rodsLoad) {
                 setRodsLoad(false);
             }
-            if(rodsLoad2){
+            if (rodsLoad2) {
                 setRodsLoad2(false);
             }
         });
@@ -6284,6 +6753,58 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
             setCustomAccActive({});
         }
     }, [stepAccessories, location.pathname]);
+    
+    // useEffect(() => {
+    //     if (trimAccessories.length > 0) {
+    //         let pageLanguage1 = location.pathname.split('').slice(1, 3).join('');
+    //         let temp = [];
+    //
+    //         let promiseArr = [];
+    //         trimAccessories.forEach((el, index) => {
+    //             promiseArr[index] = new Promise((resolve, reject) => {
+    //                 let FabricId = el["DetailId"];
+    //                 let DesignName = convertToPersian(el["DesignName"]);
+    //                 let DesignEnName = el["DesignENName"];
+    //                 let ColorName = convertToPersian(el["ColorName"]);
+    //                 let ColorEnName = el["ColorENName"];
+    //                 let PhotoPath = "";
+    //                 el["Photos"].forEach(obj => {
+    //                     if (obj.PhotoTypeId === 4702) PhotoPath = obj.PhotoUrl;
+    //                 });
+    //                 temp.push(
+    //                     <li className="fabric_design_border_list_item" key={"trim" + index}>
+    //                         <div className={`radio_group ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
+    //                             <label>
+    //                                 {/*<ReactTooltip id={"fabric" + key + j} place="top" type="light" effect="float"/>*/}
+    //                                 <input className="radio" type="radio" outline="true"
+    //                                        onChange={e => {
+    //                                            let temp = JSON.parse(JSON.stringify(trimSelected));
+    //                                            temp.selectedFabricId = FabricId;
+    //                                            temp.selectedTextEn = DesignEnName;
+    //                                            temp.selectedTextFa = DesignName;
+    //                                            temp.selectedColorEn = ColorEnName;
+    //                                            temp.selectedColorFa = ColorName;
+    //                                            setTrimSelected(temp);
+    //                                        }} name="trim"
+    //                                        model-id={modelID} value={FabricId} checked={`${FabricId}` === step1Trim}
+    //                                        ref={ref => (inputs.current[`trim${FabricId}`] = ref)}/>
+    //                                 <div className="frame_img">
+    //                                     <img className={`img-fluid ${`${FabricId}` === step1Trim ? "img-fluid_checked" : ""}`} src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
+    //                                 </div>
+    //                             </label>
+    //                         </div>
+    //                     </li>
+    //                 );
+    //                 resolve();
+    //             });
+    //         });
+    //         Promise.all(promiseArr).then(() => {
+    //             setTrimAccessoriesList(temp);
+    //         });
+    //     } else {
+    //         setTrimAccessoriesList([]);
+    //     }
+    // }, [trimAccessories]);
     
     // useEffect(() => {
     //     if (pageLanguage !== '') {
@@ -6777,7 +7298,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                     <div className="fabrics_list_container">
                                         {fabricsList}
                                     </div>
-                                    <NextStep eventKey="2">{t("NEXT STEP")}</NextStep>
+                                    <NextStep currentStep="1" eventKey="2">{t("NEXT STEP")}</NextStep>
                                 </div>
                             </Card.Body>
                         </Accordion.Collapse>
@@ -6911,7 +7432,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                     <div className="fabrics_list_container">
                                         {fabricsList2}
                                     </div>
-                                    <NextStep eventKey={step2 !== "" ? "2A" : "2B"}>{t("NEXT STEP")}</NextStep>
+                                    <NextStep currentStep="2" eventKey={step2 !== "" ? "2A" : "2B"}>{t("NEXT STEP")}</NextStep>
                                 </div>
                             </Card.Body>
                         </Accordion.Collapse>
@@ -7017,7 +7538,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         <input className="radio" type="radio" text={t("Grommet")} value="1" name="step2A" ref-num="2A" id="2A1"
                                                checked={step2A === "Grommet"}
                                                onChange={e => {
-                                                   if ((step2A === "Inverted Box Pleat" || step2A === "Pencil Pleat") && step8 === "Customize Hardware For Per Curtains") {
+                                                   if ((step2A === "Inverted Box Pleat" || step2A === "Pencil Pleat") && step8 === "Customize Hardware Per Curtain") {
                                                        modalHandleShow("SheerHeaderStyleWarning");
                                                        setSheerHeaderStyleTemp({
                                                            stepValue: "Grommet",
@@ -7068,7 +7589,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         <input className="radio" type="radio" text={t("Inverted Box Pleat")} value="2" name="step2A" ref-num="2A" id="2A2"
                                                checked={step2A === "Inverted Box Pleat"}
                                                onChange={e => {
-                                                   if ((step2A === "Grommet" || step2A === "Rod Pocket") && step8 === "Customize Hardware For Per Curtains") {
+                                                   if ((step2A === "Grommet" || step2A === "Rod Pocket") && step8 === "Customize Hardware Per Curtain") {
                                                        modalHandleShow("SheerHeaderStyleWarning");
                                                        setSheerHeaderStyleTemp({
                                                            stepValue: "Inverted Box Pleat",
@@ -7119,7 +7640,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         <input className="radio" type="radio" text={t("Pencil Pleat")} value="3" name="step2A" ref-num="2A" id="2A3"
                                                checked={step2A === "Pencil Pleat"}
                                                onChange={e => {
-                                                   if ((step2A === "Grommet" || step2A === "Rod Pocket") && step8 === "Customize Hardware For Per Curtains") {
+                                                   if ((step2A === "Grommet" || step2A === "Rod Pocket") && step8 === "Customize Hardware Per Curtain") {
                                                        modalHandleShow("SheerHeaderStyleWarning");
                                                        setSheerHeaderStyleTemp({
                                                            stepValue: "Pencil Pleat",
@@ -7171,7 +7692,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                     {/*    <input className="radio" type="radio" text={t("Rod Pocket")} value="4" name="step2A" ref-num="2A" id="2A4"*/}
                                     {/*           checked={step2A === "Rod Pocket"}*/}
                                     {/*           onChange={e => {*/}
-                                    {/*               if((step2A==="Inverted Box Pleat" || step2A==="Pencil Pleat") && step8==="Customize Hardware For Per Curtains"){*/}
+                                    {/*               if((step2A==="Inverted Box Pleat" || step2A==="Pencil Pleat") && step8==="Customize Hardware Per Curtain"){*/}
                                     {/*                   modalHandleShow("SheerHeaderStyleWarning");*/}
                                     {/*                   setSheerHeaderStyleTemp({*/}
                                     {/*                       stepValue:"Rod Pocket",*/}
@@ -7219,7 +7740,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                     {/*    </label>*/}
                                     {/*</div>*/}
                                     
-                                    <NextStep eventKey="2B">{t("NEXT STEP")}</NextStep>
+                                    <NextStep currentStep="2A" eventKey="2B">{t("NEXT STEP")}</NextStep>
                                 </div>
                             </Card.Body>
                         </Accordion.Collapse>
@@ -7242,7 +7763,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    setStep2B("None");
                                                    setStep2B1("");
                                                    setStep2C("");
-                                                   if (step8 === "Customize Hardware For Per Curtains") {
+                                                   if (step8 === "Customize Hardware Per Curtain") {
                                                        clearHardwareSteps();
                                                        // if (step31 !== "false") {
                                                        //     selectChanged(e, "8,8A,8B,8C");
@@ -7271,7 +7792,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                onChange={e => {
                                                    setStep2B("Semi Sheer");
                                                    setStep2B1("");
-                                                   if (step8 === "Customize Hardware For Per Curtains") {
+                                                   if (step8 === "Customize Hardware Per Curtain") {
                                                        clearHardwareSteps();
                                                        // if (step31 !== "false") {
                                                        //     selectChanged(e, "8,8A,8B,8C");
@@ -7300,7 +7821,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                onChange={e => {
                                                    setStep2B("Opaque");
                                                    setStep2B1("");
-                                                   if (step8 === "Customize Hardware For Per Curtains") {
+                                                   if (step8 === "Customize Hardware Per Curtain") {
                                                        clearHardwareSteps();
                                                        // if (step31 !== "false") {
                                                        //     selectChanged(e, "8,8A,8B,8C");
@@ -7312,7 +7833,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        //     setDeps("2B1", "2B", "8,8A,8B,8C,81,82,83,84,8A1,8A2,8A3,8A4,8B1,8B2,8B3,8C1,8C2,8C3");
                                                        // }
                                                        selectChanged(e, "8,8A,8B,8C");
-                                                       setCart("PrivacyLayer", "Opaque", "Hardware,DraperyHardware,SheerHardware,PrivacyLayerHardware,RodColor,BatonOption,Mount,RodColorA,BatonOptionA,MountA,RodColorB,BatonOptionB,MountB,RodColorC,BatonOptionC,MountC");
+                                                       setCart("PrivacyLayer", "Opaque", "Hardware,DraperyHardware,SheerHardware,PrivacyLayerHardware,RodColor,BatonOption,mount8,RodColorA,BatonOptionA,MountA,RodColorB,BatonOptionB,MountB,RodColorC,BatonOptionC,MountC");
                                                        setDeps("2B1,2C", "2B", "8,8A,8B,8C,81,82,83,84,8A1,8A2,8A3,8A4,8B1,8B2,8B3,8C1,8C2,8C3");
                                                    } else {
                                                        selectChanged(e);
@@ -7333,7 +7854,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             {sheersList2}
                                         </div>
                                     </div>
-                                    <NextStep eventKey={step2B !== "" && step2B !== "None" ? "2C" : "3"}>{t("NEXT STEP")}</NextStep>
+                                    <NextStep currentStep="2B" eventKey={step2B !== "" && step2B !== "None" ? "2C" : "3"}>{t("NEXT STEP")}</NextStep>
                                 </div>
                             </Card.Body>
                         </Accordion.Collapse>
@@ -7353,7 +7874,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         <input className="radio" type="radio" text={t("Grommet")} value="1" name="step2C" ref-num="2C" id="2C1"
                                                checked={step2C === "Grommet"}
                                                onChange={e => {
-                                                   if ((step2C === "Inverted Box Pleat" || step2C === "Pencil Pleat") && step8 === "Customize Hardware For Per Curtains") {
+                                                   if ((step2C === "Inverted Box Pleat" || step2C === "Pencil Pleat") && step8 === "Customize Hardware Per Curtain") {
                                                        modalHandleShow("SheerHeaderStyleWarning2");
                                                        setSheerHeaderStyleTemp2({
                                                            stepValue: "Grommet",
@@ -7377,7 +7898,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         <input className="radio" type="radio" text={t("Inverted Box Pleat")} value="2" name="step2C" ref-num="2C" id="2C2"
                                                checked={step2C === "Inverted Box Pleat"}
                                                onChange={e => {
-                                                   if ((step2C === "Grommet" || step2C === "Rod Pocket") && step8 === "Customize Hardware For Per Curtains") {
+                                                   if ((step2C === "Grommet" || step2C === "Rod Pocket") && step8 === "Customize Hardware Per Curtain") {
                                                        modalHandleShow("SheerHeaderStyleWarning2");
                                                        setSheerHeaderStyleTemp2({
                                                            stepValue: "Inverted Box Pleat",
@@ -7401,7 +7922,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         <input className="radio" type="radio" text={t("Pencil Pleat")} value="3" name="step2C" ref-num="2C" id="2C3"
                                                checked={step2C === "Pencil Pleat"}
                                                onChange={e => {
-                                                   if ((step2C === "Grommet" || step2C === "Rod Pocket") && step8 === "Customize Hardware For Per Curtains") {
+                                                   if ((step2C === "Grommet" || step2C === "Rod Pocket") && step8 === "Customize Hardware Per Curtain") {
                                                        modalHandleShow("SheerHeaderStyleWarning2");
                                                        setSheerHeaderStyleTemp2({
                                                            stepValue: "Pencil Pleat",
@@ -7421,7 +7942,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         </label>
                                     </div>
                                     
-                                    <NextStep eventKey="3">{t("NEXT STEP")}</NextStep>
+                                    <NextStep currentStep="2C" eventKey="3">{t("NEXT STEP")}</NextStep>
                                 </div>
                             </Card.Body>
                         </Accordion.Collapse>
@@ -7443,7 +7964,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                onChange={e => {
                                                    setStep3("false");
                                                    setStep31("");
-                                                   setStep6("");
+                                                   setStep61("");
                                                    selectChanged(e, "3A,3B,3C,3D,3E,3EFloor,3F,3G,3ARod,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling,3EStandardCeilingFloor");
                                                    setMeasurementsNextStep("4");
                                                    setDeps("311,312", "3,31,3A,3A1,3B,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3ARod,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
@@ -7458,7 +7979,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                onChange={e => {
                                                    setStep3("true");
                                                    setStep31("");
-                                                   setStep6("");
+                                                   setStep61("");
                                                    deleteSpecialSelects();
                                                    selectChanged(e);
                                                    setDeps("31", "3,311,312");
@@ -7503,7 +8024,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                             setCart("Width", selected[0].value);
                                                         }
                                                     }}
-                                                    options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
+                                                    options={SelectOptionRange(30, 500, 1, "cm", "", pageLanguage)}
                                                 />
                                             </div>
                                         </div>
@@ -7772,7 +8293,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             <label htmlFor="312">{t("grommet_no_rod")}</label>
                                         </div>
                                     </div>
-                                    <NextStep eventKey={measurementsNextStep}>{t("NEXT STEP")}</NextStep>
+                                    <NextStep currentStep="3" eventKey={measurementsNextStep}>{t("NEXT STEP")}</NextStep>
                                 </div>
                                 
                                 {(stepSelectedValue["3"] === "1") && <div className="accordion_help">
@@ -7879,7 +8400,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                         if (selected.length) {
                                                             setStep3B("");
                                                             selectChanged(undefined, "3B,3C,3D,3E,3EFloor,3F,3G,3ARod,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling,3EStandardCeilingFloor");
-                                                            setDeps("3B", "3A1,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3ARod,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
+                                                            setDeps("3B", "84,8A4,8B4,8C4,3A1,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3ARod,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
                                                             setSelectedMountOutsideType(selected);
                                                             setCart("Mount", selected[0].value, "FinishedLengthType,Width3C,ExtensionLeft,ExtensionRight,ShadeMount,Height3E,WindowToFloor,CeilingToFloor,RodWidth,RodToBottom,RodToFloor,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3");
                                                             setMountErr1(false);
@@ -7921,7 +8442,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                         if (selected.length) {
                                                             setStep3B("");
                                                             selectChanged(undefined, "3B,3C,3D,3E,3EFloor,3F,3G,3ARod,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling,3EStandardCeilingFloor");
-                                                            setDeps("3B", "3A1,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3ARod,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
+                                                            setDeps("3B", "84,8A4,8B4,8C4,3A1,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3ARod,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
                                                             setSelectedMountOutsideType2(selected);
                                                             setCart("Mount", selected[0].value, "FinishedLengthType,Width3C,ExtensionLeft,ExtensionRight,ShadeMount,Height3E,WindowToFloor,CeilingToFloor,RodWidth,RodToBottom,RodToFloor,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3");
                                                             setMountErr1(false);
@@ -8000,7 +8521,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                         if (selected.length) {
                                                             setStep3B("");
                                                             selectChanged(undefined, "3B,3C,3D,3E,3EFloor,3F,3G,3ARod,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling,3EStandardCeilingFloor");
-                                                            setDeps("3B", "3A1,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3ARod,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
+                                                            setDeps("3B", "84,8A4,8B4,8C4,3A1,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3ARod,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
                                                             setSelectedMountOutsideType3(selected);
                                                             setCart("Mount", selected[0].value, "FinishedLengthType,Width3C,ExtensionLeft,ExtensionRight,ShadeMount,Height3E,WindowToFloor,CeilingToFloor,RodWidth,RodToBottom,RodToFloor,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3");
                                                             setMountErr1(false);
@@ -8042,7 +8563,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                         if (selected.length) {
                                                             setStep3B("");
                                                             selectChanged(undefined, "3B,3C,3D,3E,3EFloor,3F,3G,3ARod,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling,3EStandardCeilingFloor");
-                                                            setDeps("3B", "3A1,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3ARod,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
+                                                            setDeps("3B", "84,8A4,8B4,8C4,3A1,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3ARod,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
                                                             setSelectedMountOutsideType4(selected);
                                                             setCart("Mount", selected[0].value, "FinishedLengthType,Width3C,ExtensionLeft,ExtensionRight,ShadeMount,Height3E,WindowToFloor,CeilingToFloor,RodWidth,RodToBottom,RodToFloor,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3");
                                                             setMountErr1(false);
@@ -8262,7 +8783,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                     </div>
                                     
                                     {step3BErr1 && <div className="input_not_valid">{t("grommet_step3AErr1")}</div>}
-                                    <NextStep eventKey="3C">{t("NEXT STEP")}</NextStep>
+                                    <NextStep currentStep="3B" eventKey="3C">{t("NEXT STEP")}</NextStep>
                                 </div>
                                 
                                 <div className="accordion_help">
@@ -8333,12 +8854,12 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                             setCart("Width3C", selected[0].value);
                                                         }
                                                     }}
-                                                    options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
+                                                    options={SelectOptionRange(30, 500, 1, "cm", "", pageLanguage)}
                                                 />
                                             </div>
                                         </div>
                                     </div>
-                                    <NextStep eventKey={step3A === "Wall to Wall" ? "3E" : "3D"}>{t("NEXT STEP")}</NextStep>
+                                    <NextStep currentStep="3C" eventKey={step3A === "Wall to Wall" ? "3E" : "3D"}>{t("NEXT STEP")}</NextStep>
                                 </div>
                             </Card.Body>
                         </Accordion.Collapse>
@@ -8493,7 +9014,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         </div>
                                     </div>
                                     
-                                    <NextStep eventKey="3E">{t("NEXT STEP")}</NextStep>
+                                    <NextStep currentStep="3D" eventKey="3E">{t("NEXT STEP")}</NextStep>
                                 </div>
                                 
                                 <div className="accordion_help">
@@ -8515,7 +9036,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     <Card
                         className={step3 === "true" && step31 === "false" && step3A !== "" && step3B !== "" && cartValues["Mount"] !== undefined && !(cartValues["Mount"] === "Ceiling" && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window")) && !(step3A === "Wall to Wall" && cartValues["Mount"] === "Ceiling") && (step3B === "Sill" || step3B === "Apron") ? "" : "noDisplay"}>
                         <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
-                            <ContextAwareToggle eventKey="3E" stepNum={step3A === "Wall to Wall" ? t("3D") : t("3E")} stepTitle={t("dk_step2EWall")} stepRef="3E" type="2"
+                            <ContextAwareToggle eventKey="3E" stepNum={step3A === "Wall to Wall" ? t("4D") : t("4E")} stepTitle={t("dk_step2EWall")} stepRef="3E" type="2"
                                                 required={requiredStep["3E"]}
                                                 stepSelected={stepSelectedLabel["3E"] === undefined ? "" : stepSelectedLabel["3E"]}/>
                         </Card.Header>
@@ -8567,7 +9088,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             </div>
                                         </div>
                                     </div>
-                                    <NextStep eventKey={step3A === "Wall to Wall" ? "3F" : "3F"}>{t("NEXT STEP")}</NextStep>
+                                    <NextStep currentStep="3E" eventKey={step3A === "Wall to Wall" ? "3F" : "3F"}>{t("NEXT STEP")}</NextStep>
                                 </div>
                             </Card.Body>
                         </Accordion.Collapse>
@@ -8577,7 +9098,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     <Card
                         className={step3 === "true" && step31 === "false" && step3A !== "" && step3B !== "" && cartValues["Mount"] !== undefined && !(cartValues["Mount"] === "Ceiling" && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window")) && !(step3A === "Wall to Wall" && cartValues["Mount"] === "Ceiling") && (step3B === "Floor" || step3B === "Slight Puddle") ? "" : "noDisplay"}>
                         <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
-                            <ContextAwareToggle eventKey="3E" stepNum={step3A === "Wall to Wall" ? t("3D") : t("3E")} stepTitle={t("dk_step2DWall")} stepRef="3EFloor" type="2"
+                            <ContextAwareToggle eventKey="3E" stepNum={step3A === "Wall to Wall" ? t("4D") : t("4E")} stepTitle={t("dk_step2DWall")} stepRef="3EFloor" type="2"
                                                 required={requiredStep["3EFloor"]}
                                                 stepSelected={stepSelectedLabel["3EFloor"] === undefined ? "" : stepSelectedLabel["3EFloor"]}/>
                         </Card.Header>
@@ -8631,7 +9152,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             </div>
                                         </div>
                                     </div>
-                                    <NextStep eventKey={step3A === "Wall to Wall" ? "3F" : "3F"}>{t("NEXT STEP")}</NextStep>
+                                    <NextStep currentStep="3EFloor" eventKey={step3A === "Wall to Wall" ? "3F" : "3F"}>{t("NEXT STEP")}</NextStep>
                                 </div>
                             </Card.Body>
                         </Accordion.Collapse>
@@ -8641,7 +9162,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     <Card
                         className={step3 === "true" && step31 === "false" && (cartValues["Mount"] === "Ceiling" && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window") || (step3A === "Wall to Wall" && cartValues["Mount"] === "Ceiling")) && step3B !== "" && cartValues["Mount"] !== undefined && (step3B === "Sill" || step3B === "Apron") ? "" : "noDisplay"}>
                         <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
-                            <ContextAwareToggle eventKey="3E" stepNum={step3A === "Wall to Wall" ? t("3D") : t("3E")} stepTitle={t("dk_step2D_sill")}
+                            <ContextAwareToggle eventKey="3E" stepNum={step3A === "Wall to Wall" ? t("4D") : t("4E")} stepTitle={t("dk_step2D_sill")}
                                                 stepRef="3EStandardCeiling" type="2" required={requiredStep["3EStandardCeiling"]}
                                                 stepSelected={stepSelectedLabel["3EStandardCeiling"] === undefined ? "" : stepSelectedLabel["3EStandardCeiling"]}/>
                         </Card.Header>
@@ -8773,7 +9294,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             </div>
                                         </div>
                                     </div>
-                                    <NextStep eventKey="4">{t("NEXT STEP")}</NextStep>
+                                    <NextStep currentStep={[...depSet].findIndex(el => el.startsWith("3")) === -1 ? "3" : "3EStandardCeiling"} eventKey="4">{t("NEXT STEP")}</NextStep>
                                 </div>
                             </Card.Body>
                         </Accordion.Collapse>
@@ -8783,7 +9304,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     <Card
                         className={step3 === "true" && step31 === "false" && (cartValues["Mount"] === "Ceiling" && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window") || (step3A === "Wall to Wall" && cartValues["Mount"] === "Ceiling")) && step3B !== "" && cartValues["Mount"] !== undefined && (step3B === "Floor" || step3B === "Slight Puddle") ? "" : "noDisplay"}>
                         <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
-                            <ContextAwareToggle eventKey="3E" stepNum={step3A === "Wall to Wall" ? t("3D") : t("3E")} stepTitle={t("dk_step2E")}
+                            <ContextAwareToggle eventKey="3E" stepNum={step3A === "Wall to Wall" ? t("4D") : t("4E")} stepTitle={t("dk_step2E")}
                                                 stepRef="3EStandardCeilingFloor" type="2" required={requiredStep["3EStandardCeilingFloor"]}
                                                 stepSelected={stepSelectedLabel["3EStandardCeilingFloor"] === undefined ? "" : stepSelectedLabel["3EStandardCeilingFloor"]}/>
                         </Card.Header>
@@ -8915,7 +9436,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             </div>
                                         </div>
                                     </div>
-                                    <NextStep eventKey="4">{t("NEXT STEP")}</NextStep>
+                                    <NextStep currentStep={[...depSet].findIndex(el => el.startsWith("3")) === -1 ? "3" : "3EStandardCeilingFloor"} eventKey="4">{t("NEXT STEP")}</NextStep>
                                 </div>
                             </Card.Body>
                         </Accordion.Collapse>
@@ -8925,7 +9446,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     <Card
                         className={step3 === "true" && step31 === "false" && step3A !== "" && step3B !== "" && cartValues["Mount"] !== undefined && !(cartValues["Mount"] === "Ceiling" && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window")) && !(step3A === "Wall to Wall" && cartValues["Mount"] === "Ceiling") ? "" : "noDisplay"}>
                         <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
-                            <ContextAwareToggle eventKey="3F" stepNum={step3A === "Wall to Wall" ? t("3E") : t("3F")} stepTitle={t("dk_step2FWall")} stepRef="3F" type="2"
+                            <ContextAwareToggle eventKey="3F" stepNum={step3A === "Wall to Wall" ? t("4E") : t("4F")} stepTitle={t("dk_step2FWall")} stepRef="3F" type="2"
                                                 required={requiredStep["3F"]}
                                                 stepSelected={stepSelectedLabel["3F"] === undefined ? "" : stepSelectedLabel["3F"]}/>
                         </Card.Header>
@@ -8979,7 +9500,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             </div>
                                         </div>
                                     </div>
-                                    <NextStep eventKey="3G">{t("NEXT STEP")}</NextStep>
+                                    <NextStep currentStep="3F" eventKey="3G">{t("NEXT STEP")}</NextStep>
                                 </div>
                                 <div className="accordion_help">
                                     <div className="help_container">
@@ -9000,7 +9521,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     <Card
                         className={step3 === "true" && step31 === "false" && step3A !== "" && step3B !== "" && cartValues["Mount"] !== undefined && !(step3A === "Wall to" + " Wall" && cartValues["Mount"] === "Ceiling") && !(cartValues["Mount"] === "Ceiling" && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window")) ? "" : "noDisplay"}>
                         <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
-                            <ContextAwareToggle eventKey="3G" stepNum={step3A === "Wall to Wall" ? t("3F") : t("3G")} stepTitle={t("dk_step2FWall2")} stepRef="3G" type="2"
+                            <ContextAwareToggle eventKey="3G" stepNum={step3A === "Wall to Wall" ? t("4F") : t("4G")} stepTitle={t("dk_step2FWall2")} stepRef="3G" type="2"
                                                 required={requiredStep["3G"]}
                                                 stepSelected={stepSelectedLabel["3G"] === undefined ? "" : stepSelectedLabel["3G"]}/>
                         </Card.Header>
@@ -9054,7 +9575,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             </div>
                                         </div>
                                     </div>
-                                    <NextStep eventKey="4">{t("NEXT STEP")}</NextStep>
+                                    <NextStep currentStep={[...depSet].findIndex(el => el.startsWith("3")) === -1 ? "3" : "3G"} eventKey="4">{t("NEXT STEP")}</NextStep>
                                 </div>
                             </Card.Body>
                         </Accordion.Collapse>
@@ -9163,7 +9684,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                     </div>
                                     
                                     {step3ARodErr1 && <div className="input_not_valid">{t("grommet_step3AErr1")}</div>}
-                                    <NextStep eventKey="3B">{t("NEXT STEP")}</NextStep>
+                                    <NextStep currentStep="3ARod" eventKey="3B">{t("NEXT STEP")}</NextStep>
                                 </div>
                                 
                                 <div className="accordion_help">
@@ -9233,12 +9754,12 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                             setCart("RodWidth", selected[0].value);
                                                         }
                                                     }}
-                                                    options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
+                                                    options={SelectOptionRange(30, 500, 1, "cm", "", pageLanguage)}
                                                 />
                                             </div>
                                         </div>
                                     </div>
-                                    <NextStep eventKey="3C">{t("NEXT STEP")}</NextStep>
+                                    <NextStep currentStep="3BRod" eventKey="3C">{t("NEXT STEP")}</NextStep>
                                 </div>
                             </Card.Body>
                         </Accordion.Collapse>
@@ -9359,7 +9880,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             </div>
                                         </div>
                                     </div>
-                                    <NextStep eventKey="3D">{t("NEXT STEP")}</NextStep>
+                                    <NextStep currentStep="3CRod" eventKey="3D">{t("NEXT STEP")}</NextStep>
                                 </div>
                             </Card.Body>
                         </Accordion.Collapse>
@@ -9423,7 +9944,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             </div>
                                         </div>
                                     </div>
-                                    <NextStep eventKey="3D">{t("NEXT STEP")}</NextStep>
+                                    <NextStep currentStep="3CRodFloor" eventKey="3D">{t("NEXT STEP")}</NextStep>
                                 </div>
                             </Card.Body>
                         </Accordion.Collapse>
@@ -9486,7 +10007,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             </div>
                                         </div>
                                     </div>
-                                    <NextStep eventKey="4">{t("NEXT STEP")}</NextStep>
+                                    <NextStep currentStep={[...depSet].findIndex(el => el.startsWith("3")) === -1 ? "3" : "3DRod"} eventKey="4">{t("NEXT STEP")}</NextStep>
                                 </div>
                                 <div className="accordion_help">
                                     <div className="help_container">
@@ -9542,7 +10063,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         </label>
                                     </div>
                                     
-                                    <NextStep eventKey="5">{t("NEXT STEP")}</NextStep>
+                                    <NextStep currentStep="4" eventKey="5">{t("NEXT STEP")}</NextStep>
                                 </div>
                                 <div className="accordion_help">
                                     <div className="help_container">
@@ -9651,7 +10172,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         <label htmlFor="52">{t("Decorative")}</label>
                                     </div>
                                     
-                                    <NextStep eventKey="6">{t("NEXT STEP")}</NextStep>
+                                    <NextStep currentStep="5" eventKey="6">{t("NEXT STEP")}</NextStep>
                                 </div>
                                 <div className="accordion_help">
                                     <div className="help_container">
@@ -9682,7 +10203,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                         </Card.Header>
                         <Accordion.Collapse eventKey="6">
                             <Card.Body>
-                                <div className={cartValues["WidthCart"] === undefined || step5 === "" ? "card_body card_body_info" : "noDisplay"}>
+                                <div className={(cartValues["WidthCart"] === undefined || step5 === "") ? "card_body card_body_info" : "noDisplay"}>
                                     <div className="card_body_info_header">
                                         <h1 className="card_body_info_header_title">{t("more_info")}</h1>
                                     </div>
@@ -9690,79 +10211,343 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                     <div className="card_body_info_body">
                                         <p className="card_body_info_text">{cartValues["WidthCart"] === undefined && step5 === "" ? t("panel_type_text1") : (cartValues["WidthCart"] === undefined && step5 !== "" ? t("panel_type_text2") : t("panel_type_text3"))}</p>
                                     </div>
-                                    <NextStep eventKey="7">{t("NEXT STEP")}</NextStep>
                                 </div>
-                                <div className={cartValues["WidthCart"] !== undefined && step5 !== "" ? "card_body card_body_radio card_body_panel_type special_farsi_card_body" : "noDisplay"}>
-                                    <div className={parseInt(cartValues["WidthCart"]) < 320 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"}>
+                                <div className={cartValues["WidthCart"] !== undefined && step5 !== "" ? "card_body card_body_radio" : "noDisplay"}>
+                                    <div className="box33 radio_style">
+                                        <input className="radio" type="radio" text={t("PanelType1")} value="2" name="step6" ref-num="6" id="61"
+                                               checked={step6 === "Same Style For All Curtains"}
+                                               onChange={e => {
+                                                   setStep6("Same Style For All Curtains");
+                                                   setStep6A1("");
+                                                   setStep6B1("");
+                                                   setStep6C1("");
+                                                   selectChanged(e);
+                                                   setDeps("61", "6,6A1,6B1,6C1");
+                                                   setCart("PanelTypeOption", "Same Style For All Curtains");
+                                               }} ref={ref => (inputs.current["61"] = ref)}/>
+                                        <label htmlFor="61">{t("PanelType1")}</label>
+                                    </div>
+                                    <div className="box33 radio_style">
+                                        <input className="radio" type="radio" text={t("PanelType2")} value="2" name="step6" ref-num="6" id="62"
+                                               checked={step6 === "Customize Style Per Curtain"}
+                                               onChange={e => {
+                                                   setStep6("Customize Style Per Curtain");
+                                                   setStep6A1("");
+                                                   setStep6B1("");
+                                                   setStep6C1("");
+                                                   selectChanged(e);
+                                                   setDeps("6A1,6B1,6C1", "6,61");
+                                                   setCart("PanelTypeOption", "Customize Style Per Curtain");
+                                               }} ref={ref => (inputs.current["62"] = ref)}/>
+                                        <label htmlFor="62">{t("PanelType2")}</label>
+                                    </div>
+                                </div>
+                                <div className={cartValues["WidthCart"] !== undefined && step5 !== "" && step6 === "Same Style For All Curtains" ? "card_body card_body_radio card_body_panel_type special_farsi_card_body" : "noDisplay"}>
+                                    <div className="box100">
+                                        <p className="step_selection_title">{t("All Curtains Panel Type")}</p>
+                                    </div>
+                                    <div className={parseInt(cartValues["WidthCart"]) <= 160 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"}>
                                         <img
                                             src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_left.svg').default : require('../Images/drapery/grommet/panel_type_left.svg').default}
                                             className="img-fluid height_auto" alt=""/>
-                                        <input className="radio" type="radio" text={t("Single Panel, Left")} value="1" name="step6" ref-num="6" id="61"
-                                               checked={step6 === "Single Panel, Left"}
+                                        <input className="radio" type="radio" text={t("Single Panel, Left")} value="1" name="step61" ref-num="6" id="611"
+                                               checked={step61 === "Single Panel, Left"}
                                                onChange={e => {
-                                                   setStep6("Single Panel, Left");
-                                                   setDeps("", "6");
+                                                   setStep61("Single Panel, Left");
+                                                   setDeps("", "61");
                                                    setCart("PanelType", "Single Panel, Left");
                                                    selectChanged(e);
-                                                   if (step5 === "Full" && parseInt(cartValues["WidthCart"]) >= 180) {
-                                                       modalHandleShow("panelTypeWarning");
-                                                   }
-                                               }} ref={ref => (inputs.current["61"] = ref)}/>
-                                        <label htmlFor="61">{t("Single Panel, Left")}</label>
+                                               }} ref={ref => (inputs.current["611"] = ref)}/>
+                                        <label htmlFor="611">{t("Single Panel, Left")}</label>
                                     </div>
-                                    <div className={parseInt(cartValues["WidthCart"]) < 320 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"}>
+                                    <div className={parseInt(cartValues["WidthCart"]) <= 160 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"}>
                                         <img
                                             src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_right.svg').default : require('../Images/drapery/grommet/panel_type_right.svg').default}
                                             className="img-fluid height_auto" alt=""/>
-                                        <input className="radio" type="radio" text={t("Single Panel, Right")} value="2" name="step6" ref-num="6" id="62"
-                                               checked={step6 === "Single Panel, Right"}
+                                        <input className="radio" type="radio" text={t("Single Panel, Right")} value="2" name="step61" ref-num="6" id="612"
+                                               checked={step61 === "Single Panel, Right"}
                                                onChange={e => {
-                                                   setStep6("Single Panel, Right");
-                                                   setDeps("", "6");
+                                                   setStep61("Single Panel, Right");
+                                                   setDeps("", "61");
                                                    setCart("PanelType", "Single Panel, Right");
                                                    selectChanged(e);
-                                                   if (step5 === "Full" && parseInt(cartValues["WidthCart"]) >= 180) {
-                                                       modalHandleShow("panelTypeWarning");
-                                                   }
-                                               }} ref={ref => (inputs.current["62"] = ref)}/>
-                                        <label htmlFor="62">{t("Single Panel, Right")}</label>
+                                               }} ref={ref => (inputs.current["612"] = ref)}/>
+                                        <label htmlFor="612">{t("Single Panel, Right")}</label>
                                     </div>
-                                    <div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) >= 180 ? (parseInt(cartValues["WidthCart"]) > 320 ? "box33" + " radio_style" : "box33 radio_style radio_recommended") : "box33 radio_style") : "box33 radio_style"}>
+                                    <div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 160 ? (parseInt(cartValues["WidthCart"]) > 320 ? "box33 radio_style" : "box33 radio_style radio_recommended") : "box33 radio_style") : "box33 radio_style"}>
                                         <img
                                             src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_both.svg').default : require('../Images/drapery/grommet/panel_type_both.svg').default}
                                             className="img-fluid height_auto" alt=""/>
-                                        <input className="radio" type="radio" text={t("Pair, Split Draw")} value="3" name="step6" ref-num="6" id="63"
-                                               checked={step6 === "Pair, Split Draw"}
+                                        <input className="radio" type="radio" text={t("Pair, Split Draw")} value="3" name="step61" ref-num="6" id="613"
+                                               checked={step61 === "Pair, Split Draw"}
                                                onChange={e => {
-                                                   setStep6("Pair, Split Draw");
-                                                   setDeps("", "6");
+                                                   setStep61("Pair, Split Draw");
+                                                   setDeps("", "61");
                                                    setCart("PanelType", "Pair, Split Draw");
                                                    selectChanged(e);
-                                                   if (step5 === "Full" && parseInt(cartValues["WidthCart"]) >= 320) {
+                                                   if (step5 === "Full" && parseInt(cartValues["WidthCart"]) > 320) {
                                                        modalHandleShow("panelTypeWarning");
                                                    }
-                                               }} ref={ref => (inputs.current["63"] = ref)}/>
-                                        <label htmlFor="63">{t("Pair, Split Draw")}</label>
+                                               }} ref={ref => (inputs.current["613"] = ref)}/>
+                                        <label htmlFor="613">{t("Pair, Split Draw")}</label>
                                         <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
                                     </div>
                                     <div
-                                        className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) >= 320 ? "box33 radio_style radio_recommended" : "noDisplay") : "noDisplay"}>
+                                        className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 320 ? "box33 radio_style radio_recommended" : "noDisplay") : "noDisplay"}>
                                         <img
                                             src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_four.svg').default : require('../Images/drapery/grommet/panel_type_four.svg').default}
                                             className="img-fluid height_auto width_max" alt=""/>
-                                        <input className="radio" type="radio" text={t("Four Panel, Split Draw")} value="4" name="step6" ref-num="6" id="64"
-                                               checked={step6 === "Four Panel, Split Draw"}
+                                        <input className="radio" type="radio" text={t("Four Panel, Split Draw")} value="4" name="step61" ref-num="6" id="614"
+                                               checked={step61 === "Four Panel, Split Draw"}
                                                onChange={e => {
-                                                   setStep6("Four Panel, Split Draw");
-                                                   setDeps("", "6");
+                                                   setStep61("Four Panel, Split Draw");
+                                                   setDeps("", "61");
                                                    setCart("PanelType", "Four Panel, Split Draw");
                                                    selectChanged(e);
-                                               }} ref={ref => (inputs.current["64"] = ref)}/>
-                                        <label htmlFor="64">{t("Four Panel, Split Draw")}</label>
+                                               }} ref={ref => (inputs.current["614"] = ref)}/>
+                                        <label htmlFor="614">{t("Four Panel, Split Draw")}</label>
                                         <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
                                     </div>
-                                    <NextStep eventKey="7">{t("NEXT STEP")}</NextStep>
+                                    <div
+                                        className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 160 && parseInt(cartValues["WidthCart"]) <= 320 ? "box33 radio_style" : "noDisplay") : "noDisplay"}>
+                                        <img
+                                            src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_four.svg').default : require('../Images/drapery/grommet/panel_type_four.svg').default}
+                                            className="img-fluid height_auto width_max" alt=""/>
+                                        <input className="radio" type="radio" text={t("Free Hanging")} value="5" name="step61" ref-num="6" id="615"
+                                               checked={step61 === "Free Hanging"}
+                                               onChange={e => {
+                                                   setStep61("Free Hanging");
+                                                   setDeps("", "61");
+                                                   setCart("PanelType", "Free Hanging");
+                                                   selectChanged(e);
+                                               }} ref={ref => (inputs.current["615"] = ref)}/>
+                                        <label htmlFor="615">{t("Free Hanging")}</label>
+                                        <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
+                                    </div>
                                 </div>
+                                
+                                <div className={cartValues["WidthCart"] !== undefined && step5 !== "" && step6 === "Customize Style Per Curtain" ? "card_body_panel_type special_farsi_card_body" : "noDisplay"}>
+                                    <div className="card_body card_body_radio Customize_Style_container">
+                                        <div className="box100">
+                                            <p className="step_selection_title">{t("Drapery Curtain Panel Type")}</p>
+                                        </div>
+                                        <div className={parseInt(cartValues["WidthCart"]) < 320 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"}>
+                                            <img
+                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_left.svg').default : require('../Images/drapery/grommet/panel_type_left.svg').default}
+                                                className="img-fluid height_auto" alt=""/>
+                                            <input className="radio" type="radio" text={t("Single Panel, Left")} value="1" name="step6A1" ref-num="6" id="6A11"
+                                                   checked={step6A1 === "Single Panel, Left"}
+                                                   onChange={e => {
+                                                       setStep6A1("Single Panel, Left");
+                                                       setDeps("", "6A1");
+                                                       setCart("PanelTypeA", "Single Panel, Left");
+                                                       selectChanged(e);
+                                                       if (step5 === "Full" && parseInt(cartValues["WidthCart"]) >= 180) {
+                                                           modalHandleShow("panelTypeWarning");
+                                                       }
+                                                   }} ref={ref => (inputs.current["6A11"] = ref)}/>
+                                            <label htmlFor="6A11">{t("Single Panel, Left")}</label>
+                                        </div>
+                                        <div className={parseInt(cartValues["WidthCart"]) < 320 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"}>
+                                            <img
+                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_right.svg').default : require('../Images/drapery/grommet/panel_type_right.svg').default}
+                                                className="img-fluid height_auto" alt=""/>
+                                            <input className="radio" type="radio" text={t("Single Panel, Right")} value="2" name="step6A1" ref-num="6" id="6A12"
+                                                   checked={step6A1 === "Single Panel, Right"}
+                                                   onChange={e => {
+                                                       setStep6A1("Single Panel, Right");
+                                                       setDeps("", "6A1");
+                                                       setCart("PanelTypeA", "Single Panel, Right");
+                                                       selectChanged(e);
+                                                       if (step5 === "Full" && parseInt(cartValues["WidthCart"]) >= 180) {
+                                                           modalHandleShow("panelTypeWarning");
+                                                       }
+                                                   }} ref={ref => (inputs.current["6A12"] = ref)}/>
+                                            <label htmlFor="6A12">{t("Single Panel, Right")}</label>
+                                        </div>
+                                        <div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) >= 180 ? (parseInt(cartValues["WidthCart"]) > 320 ? "box33" + " radio_style" : "box33 radio_style radio_recommended") : "box33 radio_style") : "box33 radio_style"}>
+                                            <img
+                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_both.svg').default : require('../Images/drapery/grommet/panel_type_both.svg').default}
+                                                className="img-fluid height_auto" alt=""/>
+                                            <input className="radio" type="radio" text={t("Pair, Split Draw")} value="3" name="step6A1" ref-num="6" id="6A13"
+                                                   checked={step6A1 === "Pair, Split Draw"}
+                                                   onChange={e => {
+                                                       setStep6A1("Pair, Split Draw");
+                                                       setDeps("", "6A1");
+                                                       setCart("PanelTypeA", "Pair, Split Draw");
+                                                       selectChanged(e);
+                                                       if (step5 === "Full" && parseInt(cartValues["WidthCart"]) >= 320) {
+                                                           modalHandleShow("panelTypeWarning");
+                                                       }
+                                                   }} ref={ref => (inputs.current["6A13"] = ref)}/>
+                                            <label htmlFor="6A13">{t("Pair, Split Draw")}</label>
+                                            <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
+                                        </div>
+                                        <div
+                                            className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) >= 320 ? "box33 radio_style radio_recommended" : "noDisplay") : "noDisplay"}>
+                                            <img
+                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_four.svg').default : require('../Images/drapery/grommet/panel_type_four.svg').default}
+                                                className="img-fluid height_auto width_max" alt=""/>
+                                            <input className="radio" type="radio" text={t("Four Panel, Split Draw")} value="4" name="step6A1" ref-num="6" id="6A14"
+                                                   checked={step6A1 === "Four Panel, Split Draw"}
+                                                   onChange={e => {
+                                                       setStep6A1("Four Panel, Split Draw");
+                                                       setDeps("", "6A1");
+                                                       setCart("PanelTypeA", "Four Panel, Split Draw");
+                                                       selectChanged(e);
+                                                   }} ref={ref => (inputs.current["6A14"] = ref)}/>
+                                            <label htmlFor="6A14">{t("Four Panel, Split Draw")}</label>
+                                            <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
+                                        </div>
+                                    </div>
+                                    <div className="card_body card_body_radio Customize_Style_container">
+                                        <div className="box100">
+                                            <p className="step_selection_title">{t("Sheer Curtain Panel Type")}</p>
+                                        </div>
+                                        <div className={parseInt(cartValues["WidthCart"]) < 320 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"}>
+                                            <img
+                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_left.svg').default : require('../Images/drapery/grommet/panel_type_left.svg').default}
+                                                className="img-fluid height_auto" alt=""/>
+                                            <input className="radio" type="radio" text={t("Single Panel, Left")} value="1" name="step6B1" ref-num="6" id="6B11"
+                                                   checked={step6B1 === "Single Panel, Left"}
+                                                   onChange={e => {
+                                                       setStep6B1("Single Panel, Left");
+                                                       setDeps("", "6B1");
+                                                       setCart("PanelTypeB", "Single Panel, Left");
+                                                       selectChanged(e);
+                                                       if (step5 === "Full" && parseInt(cartValues["WidthCart"]) >= 180) {
+                                                           modalHandleShow("panelTypeWarning");
+                                                       }
+                                                   }} ref={ref => (inputs.current["6B11"] = ref)}/>
+                                            <label htmlFor="6B11">{t("Single Panel, Left")}</label>
+                                        </div>
+                                        <div className={parseInt(cartValues["WidthCart"]) < 320 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"}>
+                                            <img
+                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_right.svg').default : require('../Images/drapery/grommet/panel_type_right.svg').default}
+                                                className="img-fluid height_auto" alt=""/>
+                                            <input className="radio" type="radio" text={t("Single Panel, Right")} value="2" name="step6B1" ref-num="6" id="6B12"
+                                                   checked={step6B1 === "Single Panel, Right"}
+                                                   onChange={e => {
+                                                       setStep6B1("Single Panel, Right");
+                                                       setDeps("", "6B1");
+                                                       setCart("PanelTypeB", "Single Panel, Right");
+                                                       selectChanged(e);
+                                                       if (step5 === "Full" && parseInt(cartValues["WidthCart"]) >= 180) {
+                                                           modalHandleShow("panelTypeWarning");
+                                                       }
+                                                   }} ref={ref => (inputs.current["6B12"] = ref)}/>
+                                            <label htmlFor="6B12">{t("Single Panel, Right")}</label>
+                                        </div>
+                                        <div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) >= 180 ? (parseInt(cartValues["WidthCart"]) > 320 ? "box33" + " radio_style" : "box33 radio_style radio_recommended") : "box33 radio_style") : "box33 radio_style"}>
+                                            <img
+                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_both.svg').default : require('../Images/drapery/grommet/panel_type_both.svg').default}
+                                                className="img-fluid height_auto" alt=""/>
+                                            <input className="radio" type="radio" text={t("Pair, Split Draw")} value="3" name="step6B1" ref-num="6" id="6B13"
+                                                   checked={step6B1 === "Pair, Split Draw"}
+                                                   onChange={e => {
+                                                       setStep6B1("Pair, Split Draw");
+                                                       setDeps("", "6B1");
+                                                       setCart("PanelTypeB", "Pair, Split Draw");
+                                                       selectChanged(e);
+                                                       if (step5 === "Full" && parseInt(cartValues["WidthCart"]) >= 320) {
+                                                           modalHandleShow("panelTypeWarning");
+                                                       }
+                                                   }} ref={ref => (inputs.current["6B13"] = ref)}/>
+                                            <label htmlFor="6B13">{t("Pair, Split Draw")}</label>
+                                            <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
+                                        </div>
+                                        <div
+                                            className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) >= 320 ? "box33 radio_style radio_recommended" : "noDisplay") : "noDisplay"}>
+                                            <img
+                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_four.svg').default : require('../Images/drapery/grommet/panel_type_four.svg').default}
+                                                className="img-fluid height_auto width_max" alt=""/>
+                                            <input className="radio" type="radio" text={t("Four Panel, Split Draw")} value="4" name="step6B1" ref-num="6" id="6B14"
+                                                   checked={step6B1 === "Four Panel, Split Draw"}
+                                                   onChange={e => {
+                                                       setStep6B1("Four Panel, Split Draw");
+                                                       setDeps("", "6B1");
+                                                       setCart("PanelTypeB", "Four Panel, Split Draw");
+                                                       selectChanged(e);
+                                                   }} ref={ref => (inputs.current["6B14"] = ref)}/>
+                                            <label htmlFor="6B14">{t("Four Panel, Split Draw")}</label>
+                                            <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
+                                        </div>
+                                    </div>
+                                    <div className="card_body card_body_radio Customize_Style_container">
+                                        <div className="box100">
+                                            <p className="step_selection_title">{t("Privacy Layer Panel Type")}</p>
+                                        </div>
+                                        <div className={parseInt(cartValues["WidthCart"]) < 320 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"}>
+                                            <img
+                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_left.svg').default : require('../Images/drapery/grommet/panel_type_left.svg').default}
+                                                className="img-fluid height_auto" alt=""/>
+                                            <input className="radio" type="radio" text={t("Single Panel, Left")} value="1" name="step6C1" ref-num="6" id="6C11"
+                                                   checked={step6C1 === "Single Panel, Left"}
+                                                   onChange={e => {
+                                                       setStep6C1("Single Panel, Left");
+                                                       setDeps("", "6C1");
+                                                       setCart("PanelTypeC", "Single Panel, Left");
+                                                       selectChanged(e);
+                                                       if (step5 === "Full" && parseInt(cartValues["WidthCart"]) >= 180) {
+                                                           modalHandleShow("panelTypeWarning");
+                                                       }
+                                                   }} ref={ref => (inputs.current["6C11"] = ref)}/>
+                                            <label htmlFor="6C11">{t("Single Panel, Left")}</label>
+                                        </div>
+                                        <div className={parseInt(cartValues["WidthCart"]) < 320 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"}>
+                                            <img
+                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_right.svg').default : require('../Images/drapery/grommet/panel_type_right.svg').default}
+                                                className="img-fluid height_auto" alt=""/>
+                                            <input className="radio" type="radio" text={t("Single Panel, Right")} value="2" name="step6C1" ref-num="6" id="6C12"
+                                                   checked={step6C1 === "Single Panel, Right"}
+                                                   onChange={e => {
+                                                       setStep6C1("Single Panel, Right");
+                                                       setDeps("", "6C1");
+                                                       setCart("PanelTypeC", "Single Panel, Right");
+                                                       selectChanged(e);
+                                                       if (step5 === "Full" && parseInt(cartValues["WidthCart"]) >= 180) {
+                                                           modalHandleShow("panelTypeWarning");
+                                                       }
+                                                   }} ref={ref => (inputs.current["6C12"] = ref)}/>
+                                            <label htmlFor="6C12">{t("Single Panel, Right")}</label>
+                                        </div>
+                                        <div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) >= 180 ? (parseInt(cartValues["WidthCart"]) > 320 ? "box33" + " radio_style" : "box33 radio_style radio_recommended") : "box33 radio_style") : "box33 radio_style"}>
+                                            <img
+                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_both.svg').default : require('../Images/drapery/grommet/panel_type_both.svg').default}
+                                                className="img-fluid height_auto" alt=""/>
+                                            <input className="radio" type="radio" text={t("Pair, Split Draw")} value="3" name="step6C1" ref-num="6" id="6C13"
+                                                   checked={step6C1 === "Pair, Split Draw"}
+                                                   onChange={e => {
+                                                       setStep6C1("Pair, Split Draw");
+                                                       setDeps("", "6C1");
+                                                       setCart("PanelTypeC", "Pair, Split Draw");
+                                                       selectChanged(e);
+                                                       if (step5 === "Full" && parseInt(cartValues["WidthCart"]) >= 320) {
+                                                           modalHandleShow("panelTypeWarning");
+                                                       }
+                                                   }} ref={ref => (inputs.current["6C13"] = ref)}/>
+                                            <label htmlFor="6C13">{t("Pair, Split Draw")}</label>
+                                            <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
+                                        </div>
+                                        <div
+                                            className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) >= 320 ? "box33 radio_style radio_recommended" : "noDisplay") : "noDisplay"}>
+                                            <img
+                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_four.svg').default : require('../Images/drapery/grommet/panel_type_four.svg').default}
+                                                className="img-fluid height_auto width_max" alt=""/>
+                                            <input className="radio" type="radio" text={t("Four Panel, Split Draw")} value="4" name="step6C1" ref-num="6" id="6C14"
+                                                   checked={step6C1 === "Four Panel, Split Draw"}
+                                                   onChange={e => {
+                                                       setStep6C1("Four Panel, Split Draw");
+                                                       setDeps("", "6C1");
+                                                       setCart("PanelTypeC", "Four Panel, Split Draw");
+                                                       selectChanged(e);
+                                                   }} ref={ref => (inputs.current["6C14"] = ref)}/>
+                                            <label htmlFor="6C14">{t("Four Panel, Split Draw")}</label>
+                                            <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <NextStep currentStep="6" eventKey="7">{t("NEXT STEP")}</NextStep>
                                 {cartValues["WidthCart"] !== undefined && step5 !== "" && <div className="accordion_help">
                                     <div className="help_container">
                                         <div className="help_column help_left_column">
@@ -9902,7 +10687,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             </div>
                                         </div>
                                     </div>
-                                    <NextStep eventKey="8">{t("NEXT STEP")}</NextStep>
+                                    <NextStep currentStep="7" eventKey="8">{t("NEXT STEP")}</NextStep>
                                 </div>
                                 <div className="accordion_help">
                                     <div className="help_container">
@@ -9980,13 +10765,16 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    setStep8B("");
                                                    setStep8C("");
                                                    let tempExtended = extendedTitle;
-                                                   tempExtended["8"]=[t("None")];
+                                                   tempExtended["8"] = [t("None")];
+                                                   tempExtended["8A"] = [];
+                                                   tempExtended["8B"] = [];
+                                                   tempExtended["8C"] = [];
                                                    setExtendedTitle(tempExtended);
                                                    selectChanged(e);
                                                    setStep8("None");
                                                    setHardwareNextStep("9");
                                                    setDeps("", "8,81,82,83,84,8A,8A1,8A2,8A3,8A4,8B,8B1,8B2,8B3,8B5,8B51,8C,8C1,8C2,8C3,8C5,8C51");
-                                                   setCart("Hardware", "None", "RailId,BatonOption,RodColor,Mount8,BatonOptionA,RodColorA,MountA,RailIdB,BatonOptionB,RodColorB,MountB,RailIdC,BatonOptionC,RodColorC,MountC,hasPower,MotorPosition,RemoteName,MotorChannels");
+                                                   setCart("Hardware", "None", "RailId,BatonOption,RailDesign,RailDesignEn,RailDesignFa,RailColorEn,RailColorFa,RodColor,mount8,BatonOptionA,RailDesignA,RailDesignEnA,RailDesignFaA,RailColorEnA,RailColorFaA,RodColorA,MountA,RailIdB,BatonOptionB,RailDesignB,RailDesignEnB,RailDesignFaB,RailColorEnB,RailColorFaB,RodColorB,MountB,RailIdC,BatonOptionC,RailDesignC,RailDesignEnC,RailDesignFaC,RailColorEnC,RailColorFaC,RodColorC,MountC,hasPower,MotorPosition,RemoteName,MotorChannels");
                                                }} ref={ref => (inputs.current["81"] = ref)}/>
                                         <label htmlFor="81">{t("hardware1")}</label>
                                     </div>
@@ -10001,22 +10789,27 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    if (step3 === "" || (step3 === "true" && step31 === "")) {
                                                        setHardwareNextStep("9");
                                                        setStep8("");
-                                                       tempExtended["8"]=[];
+                                                       tempExtended["8"] = [];
+                                                       tempExtended["8A"] = [];
+                                                       tempExtended["8B"] = [];
+                                                       tempExtended["8C"] = [];
                                                        selectUncheck(e);
                                                        modalHandleShow("noMeasurements");
                                                        setDeps("8", "81,82,83,84,8A,8A1,8A2,8A3,8A4,8B,8B1,8B2,8B3,8C,8C1,8C2,8C3");
-                                                       setCart("", "", "Hardware,BatonOptionA,RodColorA,MountA,RailIdB,BatonOptionB,RodColorB,MountB,RailIdC,BatonOptionC,RodColorC,MountC,hasPower,MotorPosition,RemoteName,MotorChannels");
+                                                       setCart("", "", "Hardware,BatonOptionA,RailDesignA,RailDesignEnA,RailDesignFaA,RailColorEnA,RailColorFaA,RodColorA,MountA,RailIdB,BatonOptionB,RailDesignB,RailDesignEnB,RailDesignFaB,RailColorEnB,RailColorFaB,RodColorB,MountB,RailIdC,BatonOptionC,RailDesignC,RailDesignEnC,RailDesignFaC,RailColorEnC,RailColorFaC,RodColorC,MountC,hasPower,MotorPosition,RemoteName,MotorChannels");
                                                    } else {
                                                        selectChanged(e);
-                                                       setStep8("Same Hardware For All Curtains");
-                                                       tempExtended["8"]=[t("hardware2")];
+                                                       setTimeout(() => {
+                                                           setStep8("Same Hardware For All Curtains");
+                                                       }, 300);
+                                                       tempExtended["8"] = [t("hardware2")];
                                                        setHardwareNextStep("9");
                                                        if (step31 === "false") {
                                                            setDeps("81,82,83", "8,84,8A,8A1,8A2,8A3,8A4,8B,8B1,8B2,8B3,8C,8C1,8C2,8C3");
                                                        } else {
                                                            setDeps("81,82,83,84", "8,8A,8A1,8A2,8A3,8A4,8B,8B1,8B2,8B3,8C,8C1,8C2,8C3");
                                                        }
-                                                       setCart("Hardware", "Same Hardware For All Curtains", "BatonOptionA,RodColorA,MountA,RailIdB,BatonOptionB,RodColorB,MountB,RailIdC,BatonOptionC,RodColorC,MountC,hasPower,MotorPosition,RemoteName,MotorChannels");
+                                                       setCart("Hardware", "Same Hardware For All Curtains", "BatonOptionA,RailDesignA,RailDesignEnA,RailDesignFaA,RailColorEnA,RailColorFaA,RodColorA,MountA,RailIdB,BatonOptionB,RailDesignB,RailDesignEnB,RailDesignFaB,RailColorEnB,RailColorFaB,RodColorB,MountB,RailIdC,BatonOptionC,RailDesignC,RailDesignEnC,RailDesignFaC,RailColorEnC,RailColorFaC,RodColorC,MountC,hasPower,MotorPosition,RemoteName,MotorChannels");
                                                    }
                                                    setExtendedTitle(tempExtended);
                                                }} ref={ref => (inputs.current["82"] = ref)}/>
@@ -10024,7 +10817,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                     </div>
                                     <div className="box33 radio_style">
                                         <input className="radio" type="radio" text={t("hardware3")} value="3" name="step8" ref-num="8" id="83" outline="true"
-                                               checked={step8 === "Customize Hardware For Per Curtains"}
+                                               checked={step8 === "Customize Hardware Per Curtain"}
                                                onChange={e => {
                                                    setStep81("");
                                                    setStep82("");
@@ -10034,26 +10827,28 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    setStep8B("");
                                                    setStep8C("");
                                                    let tempExtended = extendedTitle;
-                                                   if (step2A === "" || step2B === "" || (step2B !== "None" && step2B1 === "") || (step2B !== "None" && step2C === "")) {
+                                                   if (step2A === "" || step2B === "" || (step2B !== "None" && step2B1 === "") || (step2B !== "None" && step2C === "") || (step3 === "" || (step3 === "true" && step31 === ""))) {
                                                        setHardwareNextStep("9");
                                                        setStep8("");
-                                                       tempExtended["8"]=[];
+                                                       tempExtended["8"] = [];
+                                                       tempExtended["8A"] = [];
+                                                       tempExtended["8B"] = [];
+                                                       tempExtended["8C"] = [];
                                                        selectUncheck(e);
                                                        modalHandleShow("noPrivacyLayer");
                                                        setDeps("8", "81,82,83,84,8A,8A1,8A2,8A3,8A4,8B,8B1,8B2,8B3,8C,8C1,8C2,8C3");
-                                                       setCart("", "", "Hardware,RailId,BatonOption,RodColor,Mount8,BatonOptionA,RodColorA,MountA,RailIdB,BatonOptionB,RodColorB,MountB,RailIdC,BatonOptionC,RodColorC,MountC,hasPower,MotorPosition,RemoteName,MotorChannels");
+                                                       setCart("", "", "Hardware,RailId,BatonOption,RailDesign,RailDesignEn,RailDesignFa,RailColorEn,RailColorFa,RodColor,Mount8,BatonOptionA,RailDesignA,RailDesignEnA,RailDesignFaA,RailColorEnA,RailColorFaA,RodColorA,MountA,RailIdB,BatonOptionB,RailDesignB,RailDesignEnB,RailDesignFaB,RailColorEnB,RailColorFaB,RodColorB,MountB,RailIdC,BatonOptionC,RailDesignC,RailDesignEnC,RailDesignFaC,RailColorEnC,RailColorFaC,RodColorC,MountC,hasPower,MotorPosition,RemoteName,MotorChannels");
                                                    } else {
                                                        setHardwareNextStep("8A");
                                                        selectChanged(e);
-                                                       setStep8("Customize Hardware For Per Curtains");
-                                                       tempExtended["8"]=[t("hardware3")];
-                                                       if(step2B === "None"){
+                                                       setStep8("Customize Hardware Per Curtain");
+                                                       tempExtended["8"] = [t("hardware3")];
+                                                       if (step2B === "None") {
                                                            setDeps("8A,8B", "8,81,82,83,84,8C");
-                                                       }
-                                                       else{
+                                                       } else {
                                                            setDeps("8A,8B,8C", "8,81,82,83,84");
                                                        }
-                                                       setCart("Hardware", "Customize Hardware For Per Curtains", "RailId,BatonOption,RodColor,Mount8");
+                                                       setCart("Hardware", "Customize Hardware Per Curtain", "RailId,BatonOption,RailDesign,RailDesignEn,RailDesignFa,RailColorEn,RailColorFa,RodColor,Mount8");
                                                    }
                                                    setExtendedTitle(tempExtended);
                                                }} ref={ref => (inputs.current["83"] = ref)}/>
@@ -10220,7 +11015,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setCart("BatonOption", "None");
                                                        selectChanged(e);
                                                        let tempExtended = extendedTitle;
-                                                       tempExtended["8"][3]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("None")}</span></li>;
+                                                       tempExtended["8"][3] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("None")}</span></li>;
                                                        setExtendedTitle(tempExtended);
                                                    }} ref={ref => (inputs.current["831"] = ref)}/>
                                             <label htmlFor="831">{t("None")}</label>
@@ -10234,7 +11029,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setCart("BatonOption", "Baton 30cm");
                                                        selectChanged(e);
                                                        let tempExtended = extendedTitle;
-                                                       tempExtended["8"][3]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 30cm")}</span></li>;
+                                                       tempExtended["8"][3] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 30cm")}</span></li>;
                                                        setExtendedTitle(tempExtended);
                                                    }} ref={ref => (inputs.current["832"] = ref)}/>
                                             <label htmlFor="832">{t("Baton 30cm")}<br/><p
@@ -10250,7 +11045,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setCart("BatonOption", "Baton 45cm");
                                                        selectChanged(e);
                                                        let tempExtended = extendedTitle;
-                                                       tempExtended["8"][3]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 45cm")}</span></li>;
+                                                       tempExtended["8"][3] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 45cm")}</span></li>;
                                                        setExtendedTitle(tempExtended);
                                                    }} ref={ref => (inputs.current["833"] = ref)}/>
                                             <label htmlFor="833">{t("Baton 45cm")}<br/><p
@@ -10259,8 +11054,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         </div>
                                     </div>
                                     
-                                    <div
-                                        className={step8 === "Same Hardware For All Curtains" && step81 !== "" && step31 !== "false" ? "card_body" + " card_body_radio card_body_rod_mount" : "noDisplay"}>
+                                    <div className={step8 === "Same Hardware For All Curtains" && step81 !== "" && step31 !== "false" ? "card_body" + " card_body_radio card_body_rod_mount" : "noDisplay"}>
                                         <div className="box100">
                                             <p className="step_selection_title">{t("step8_rod_mount_title")}</p>
                                         </div>
@@ -10269,11 +11063,11 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    checked={step84 === "Wall"}
                                                    onChange={e => {
                                                        setStep84("Wall");
-                                                       setDeps("", "84");
+                                                       setDeps("", "84,8A4,8B4,8C4");
                                                        setCart("Mount8", "Wall");
                                                        selectChanged(e);
                                                        let tempExtended = extendedTitle;
-                                                       tempExtended["8"][4]= <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Wall")}</span></li>;
+                                                       tempExtended["8"][4] = <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Wall")}</span></li>;
                                                        setExtendedTitle(tempExtended);
                                                    }} ref={ref => (inputs.current["841"] = ref)}/>
                                             <label htmlFor="841">{t("Wall")}</label>
@@ -10283,11 +11077,11 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    checked={step84 === "Ceiling"}
                                                    onChange={e => {
                                                        setStep84("Ceiling");
-                                                       setDeps("", "84");
+                                                       setDeps("", "84,8A4,8B4,8C4");
                                                        setCart("Mount8", "Ceiling");
                                                        selectChanged(e);
                                                        let tempExtended = extendedTitle;
-                                                       tempExtended["8"][4]= <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Ceiling")}</span></li>;
+                                                       tempExtended["8"][4] = <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Ceiling")}</span></li>;
                                                        setExtendedTitle(tempExtended);
                                                    }} ref={ref => (inputs.current["842"] = ref)}/>
                                             <label htmlFor="842">{t("Ceiling")}</label>
@@ -10295,13 +11089,13 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         <div className="box33 radio_style"/>
                                     </div>
                                 </div>
-                                <NextStep eventKey={hardwareNextStep}>{t("NEXT STEP")}</NextStep>
+                                <NextStep currentStep="8" eventKey={hardwareNextStep}>{t("NEXT STEP")}</NextStep>
                             </Card.Body>
                         </Accordion.Collapse>
                     </Card>
                     
                     {/* step 9A */}
-                    <Card className={step8 === "Customize Hardware For Per Curtains" ? "" : "noDisplay"}>
+                    <Card className={step8 === "Customize Hardware Per Curtain" ? "" : "noDisplay"}>
                         {/*<Card.Header className={[...depSet].findIndex(el => el.startsWith("8A")) === -1 && (!accordionActiveKey.startsWith("8")) ? "hidden" : ""}>*/}
                         <Card.Header>
                             <ContextAwareToggle eventKey="8A" stepNum={t("9A")} stepTitle={t("grommet_step8A")} stepRef="8A" type="1" required={requiredStep["8A"]}
@@ -10320,10 +11114,10 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    setStep8A4("");
                                                    setStep8A("None");
                                                    let tempExtended = extendedTitle;
-                                                   tempExtended["8A"]=[t("None")];
+                                                   tempExtended["8A"] = [t("None")];
                                                    setExtendedTitle(tempExtended);
                                                    setDeps("", "8A,8A1,8A2,8A3,8A4");
-                                                   setCart("DraperyHardware", "None", "BatonOptionA,RodColorA,MountA");
+                                                   setCart("DraperyHardware", "None", "BatonOptionA,RailDesignA,RailDesignEnA,RailDesignFaA,RailColorEnA,RailColorFaA,RodColorA,MountA");
                                                    selectChanged(e);
                                                }} ref={ref => (inputs.current["8A1"] = ref)}/>
                                         <label htmlFor="8A1">{t("None")}</label>
@@ -10339,21 +11133,23 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    setStep8A4("");
                                                    if (step3 === "" || (step3 === "true" && step31 === "")) {
                                                        setStep8A("");
-                                                       tempExtended["8A"]=[];
+                                                       tempExtended["8A"] = [];
                                                        selectUncheck(e);
                                                        modalHandleShow("noMeasurements");
                                                        setDeps("8A", "8A1,8A2,8A3,8A4");
-                                                       setCart("", "", "DraperyHardware,BatonOptionA,RodColorA,MountA");
+                                                       setCart("", "", "DraperyHardware,BatonOptionA,RailDesignA,RailDesignEnA,RailDesignFaA,RailColorEnA,RailColorFaA,RodColorA,MountA");
                                                    } else {
-                                                       setStep8A("Rod");
-                                                       tempExtended["8A"]=[t("Rod")];
-                                                       if (step31 === "false") {
-                                                           setDeps("8A1,8A2,8A3", "8A,8A4");
-                                                       } else {
-                                                           setDeps("8A1,8A2,8A3,8A4", "8A");
-                                                       }
+                                                       setTimeout(() => {
+                                                           setStep8A("Rod");
+                                                       }, 300);
+                                                       tempExtended["8A"] = [t("Rod")];
                                                        setCart("DraperyHardware", "Rod");
                                                        selectChanged(e);
+                                                       if (step84 === "" && step31 !== "false") {
+                                                           setDeps("8A1,8A2,8A3,8A4", "8A");
+                                                       } else {
+                                                           setDeps("8A1,8A2,8A3", "8A");
+                                                       }
                                                    }
                                                    setExtendedTitle(tempExtended);
                                                }} ref={ref => (inputs.current["8A2"] = ref)}/>
@@ -10431,7 +11227,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setCart("BatonOptionA", "None");
                                                        selectChanged(e);
                                                        let tempExtended = extendedTitle;
-                                                       tempExtended["8A"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("None")}</span></li>;
+                                                       tempExtended["8A"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("None")}</span></li>;
                                                        setExtendedTitle(tempExtended);
                                                    }} ref={ref => (inputs.current["8A31"] = ref)}/>
                                             <label htmlFor="8A31">{t("None")}</label>
@@ -10445,7 +11241,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setCart("BatonOptionA", "Baton 30cm");
                                                        selectChanged(e);
                                                        let tempExtended = extendedTitle;
-                                                       tempExtended["8A"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 30cm")}</span></li>;
+                                                       tempExtended["8A"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 30cm")}</span></li>;
                                                        setExtendedTitle(tempExtended);
                                                    }} ref={ref => (inputs.current["8A32"] = ref)}/>
                                             <label htmlFor="8A32">{t("Baton 30cm")}<br/><p
@@ -10461,7 +11257,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setCart("BatonOptionA", "Baton 45cm");
                                                        selectChanged(e);
                                                        let tempExtended = extendedTitle;
-                                                       tempExtended["8A"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 45cm")}</span></li>;
+                                                       tempExtended["8A"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 45cm")}</span></li>;
                                                        setExtendedTitle(tempExtended);
                                                    }} ref={ref => (inputs.current["8A33"] = ref)}/>
                                             <label htmlFor="8A33">{t("Baton 45cm")}<br/><p
@@ -10469,35 +11265,74 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             </label>
                                         </div>
                                     </div>
-                                    <div
-                                        className={step8A !== "None" && step8A !== "" && step8A1 !== "" && step31 !== "false" ? "card_body card_body_radio card_body_rod_mount" : "noDisplay"}>
+                                    {/*<div className={step8A !== "None" && step8A !== "" && step8A1 !== "" && step31 !== "false" ? "card_body card_body_radio card_body_rod_mount" : "noDisplay"}>*/}
+                                    {/*    <div className="box100">*/}
+                                    {/*        <p className="step_selection_title">{t("step8_rod_mount_title")}</p>*/}
+                                    {/*    </div>*/}
+                                    {/*    <div className="box33 radio_style">*/}
+                                    {/*        <input className="radio" type="radio" text={t("Wall")} value="1" name="step8A4" ref-num="8A4" id="8A41"*/}
+                                    {/*               checked={step8A4 === "Wall"}*/}
+                                    {/*               onChange={e => {*/}
+                                    {/*                   setStep8A4("Wall");*/}
+                                    {/*                   setDeps("", "8A4");*/}
+                                    {/*                   setCart("MountA", "Wall");*/}
+                                    {/*                   selectChanged(e);*/}
+                                    {/*                   let tempExtended = extendedTitle;*/}
+                                    {/*                   tempExtended["8A"][3]= <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Wall")}</span></li>;*/}
+                                    {/*                   setExtendedTitle(tempExtended);*/}
+                                    {/*               }} ref={ref => (inputs.current["8A41"] = ref)}/>*/}
+                                    {/*        <label htmlFor="8A41">{t("Wall")}</label>*/}
+                                    {/*    </div>*/}
+                                    {/*    <div className="box33 radio_style">*/}
+                                    {/*        <input className="radio" type="radio" text={t("Ceiling")} value="2" name="step8A4" ref-num="8A4" id="8A42"*/}
+                                    {/*               checked={step8A4 === "Ceiling"}*/}
+                                    {/*               onChange={e => {*/}
+                                    {/*                   setStep8A4("Ceiling");*/}
+                                    {/*                   setDeps("", "8A4");*/}
+                                    {/*                   setCart("MountA", "Ceiling");*/}
+                                    {/*                   selectChanged(e);*/}
+                                    {/*                   let tempExtended = extendedTitle;*/}
+                                    {/*                   tempExtended["8A"][3]= <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Ceiling")}</span></li>;*/}
+                                    {/*                   setExtendedTitle(tempExtended);*/}
+                                    {/*               }} ref={ref => (inputs.current["8A42"] = ref)}/>*/}
+                                    {/*        <label htmlFor="8A42">{t("Ceiling")}</label>*/}
+                                    {/*    </div>*/}
+                                    {/*    <div className="box33 radio_style"/>*/}
+                                    {/*</div>*/}
+                                    <div className={step8A !== "None" && step8A !== "" && step8A1 !== "" && step31 !== "false" ? "card_body" + " card_body_radio card_body_rod_mount" : "noDisplay"}>
                                         <div className="box100">
                                             <p className="step_selection_title">{t("step8_rod_mount_title")}</p>
                                         </div>
                                         <div className="box33 radio_style">
-                                            <input className="radio" type="radio" text={t("Wall")} value="1" name="step8A4" ref-num="8A4" id="8A41"
-                                                   checked={step8A4 === "Wall"}
+                                            <input className="radio" type="radio" text={t("Wall")} value="1" name="step8A4" ref-num="84" id="8A41"
+                                                   checked={step84 === "Wall"}
                                                    onChange={e => {
-                                                       setStep8A4("Wall");
-                                                       setDeps("", "8A4");
-                                                       setCart("MountA", "Wall");
+                                                       if (step84 !== "" && ((step8B !== "None" && step8B !== "") || (step8C !== "None" && step8C !== ""))) {
+                                                           modalHandleShow("mountAllChange");
+                                                       }
+                                                       setStep84("Wall");
+                                                       setDeps("", "84,8A4,8B4,8C4");
+                                                       setCart("Mount8", "Wall");
                                                        selectChanged(e);
                                                        let tempExtended = extendedTitle;
-                                                       tempExtended["8A"][3]= <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Wall")}</span></li>;
+                                                       tempExtended["8"][4] = <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Wall")}</span></li>;
                                                        setExtendedTitle(tempExtended);
                                                    }} ref={ref => (inputs.current["8A41"] = ref)}/>
                                             <label htmlFor="8A41">{t("Wall")}</label>
                                         </div>
                                         <div className="box33 radio_style">
-                                            <input className="radio" type="radio" text={t("Ceiling")} value="2" name="step8A4" ref-num="8A4" id="8A42"
-                                                   checked={step8A4 === "Ceiling"}
+                                            <input className="radio" type="radio" text={t("Ceiling")} value="2" name="step8A4" ref-num="84" id="8A42"
+                                                   checked={step84 === "Ceiling"}
                                                    onChange={e => {
-                                                       setStep8A4("Ceiling");
-                                                       setDeps("", "8A4");
-                                                       setCart("MountA", "Ceiling");
+                                                       if (step84 !== "" && ((step8B !== "None" && step8B !== "") || (step8C !== "None" && step8C !== ""))) {
+                                                           modalHandleShow("mountAllChange");
+                                                       }
+                                                       setStep84("Ceiling");
+                                                       setDeps("", "84,8A4,8B4,8C4");
+                                                       setCart("Mount8", "Ceiling");
                                                        selectChanged(e);
                                                        let tempExtended = extendedTitle;
-                                                       tempExtended["8A"][3]= <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Ceiling")}</span></li>;
+                                                       tempExtended["8"][4] = <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Ceiling")}</span></li>;
                                                        setExtendedTitle(tempExtended);
                                                    }} ref={ref => (inputs.current["8A42"] = ref)}/>
                                             <label htmlFor="8A42">{t("Ceiling")}</label>
@@ -10505,13 +11340,13 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         <div className="box33 radio_style"/>
                                     </div>
                                 </div>
-                                <NextStep eventKey="8B">{t("NEXT STEP")}</NextStep>
+                                <NextStep currentStep="8A" eventKey="8B">{t("NEXT STEP")}</NextStep>
                             </Card.Body>
                         </Accordion.Collapse>
                     </Card>
                     
                     {/* step 9B */}
-                    <Card className={step8 === "Customize Hardware For Per Curtains" ? "" : "noDisplay"}>
+                    <Card className={step8 === "Customize Hardware Per Curtain" ? "" : "noDisplay"}>
                         {/*<Card.Header className={[...depSet].findIndex(el => el.startsWith("8B")) === -1 && (!accordionActiveKey.startsWith("8")) ? "hidden" : ""}>*/}
                         <Card.Header>
                             <ContextAwareToggle eventKey="8B" stepNum={t("9B")} stepTitle={t("grommet_step8B")} stepRef="8B" type="1" required={requiredStep["8B"]}
@@ -10530,10 +11365,10 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    // setStep8B4("");
                                                    setStep8B("None");
                                                    let tempExtended = extendedTitle;
-                                                   tempExtended["8B"]=[t("None")];
+                                                   tempExtended["8B"] = [t("None")];
                                                    setExtendedTitle(tempExtended);
                                                    setDeps("", "8B,8B1,8B2,8B3");
-                                                   setCart("SheerHardware", "None", "RailIdB,BatonOptionB,RodColorB,MountB");
+                                                   setCart("SheerHardware", "None", "RailIdB,BatonOptionB,RailDesignB,RailDesignEnB,RailDesignFaB,RailColorEnB,RailColorFaB,RodColorB,MountB");
                                                    selectChanged(e);
                                                }} ref={ref => (inputs.current["8B1"] = ref)}/>
                                         <label htmlFor="8B1">{t("None")}</label>
@@ -10546,13 +11381,20 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    setStep8B2("");
                                                    setStep8B3("");
                                                    // setStep8B4("");
-                                                   setStep8B("Track");
+                                                   setTimeout(() => {
+                                                       setStep8B("Track");
+                                                   }, 300);
                                                    let tempExtended = extendedTitle;
-                                                   tempExtended["8B"]=[t("Track")];
+                                                   tempExtended["8B"] = [t("Track")];
                                                    setExtendedTitle(tempExtended);
-                                                   setDeps("8B1,8B2,8B3", "8B");
-                                                   setCart("SheerHardware", "Track", "RailIdB,BatonOptionB,RodColorB,MountB");
+                                                   // setDeps("8B1,8B2,8B3", "8B");
+                                                   setCart("SheerHardware", "Track", "RailIdB,BatonOptionB,RailDesignB,RailDesignEnB,RailDesignFaB,RailColorEnB,RailColorFaB,RodColorB,MountB");
                                                    selectChanged(e);
+                                                   if (step84 === "" && step31 !== "false") {
+                                                       setDeps("8B1,8B2,8B3,8B4", "8B");
+                                                   } else {
+                                                       setDeps("8B1,8B2,8B3", "8B");
+                                                   }
                                                }} ref={ref => (inputs.current["8B2"] = ref)}/>
                                         <label htmlFor="8B2">{t("Track")}</label>
                                     </div>
@@ -10564,13 +11406,20 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    setStep8B2("");
                                                    setStep8B3("");
                                                    // setStep8B4("");
-                                                   setStep8B("Rod");
+                                                   setTimeout(() => {
+                                                       setStep8B("Rod");
+                                                   }, 300);
                                                    let tempExtended = extendedTitle;
-                                                   tempExtended["8B"]=[t("Rod")];
+                                                   tempExtended["8B"] = [t("Rod")];
                                                    setExtendedTitle(tempExtended);
-                                                   setDeps("8B1,8B2,8B3", "8B");
-                                                   setCart("SheerHardware", "Rod", "RailIdB,BatonOptionB,RodColorB,MountB");
+                                                   // setDeps("8B1,8B2,8B3", "8B");
+                                                   setCart("SheerHardware", "Rod", "RailIdB,BatonOptionB,RailDesignB,RailDesignEnB,RailDesignFaB,RailColorEnB,RailColorFaB,RodColorB,MountB");
                                                    selectChanged(e);
+                                                   if (step84 === "" && step31 !== "false") {
+                                                       setDeps("8B1,8B2,8B3,8B4", "8B");
+                                                   } else {
+                                                       setDeps("8B1,8B2,8B3", "8B");
+                                                   }
                                                }} ref={ref => (inputs.current["8B3"] = ref)}/>
                                         <label htmlFor="8B3">{t("Rod")}</label>
                                     </div>
@@ -10646,7 +11495,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setCart("BatonOptionB", "None");
                                                        selectChanged(e);
                                                        let tempExtended = extendedTitle;
-                                                       tempExtended["8B"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("None")}</span></li>;
+                                                       tempExtended["8B"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("None")}</span></li>;
                                                        setExtendedTitle(tempExtended);
                                                    }} ref={ref => (inputs.current["8B31"] = ref)}/>
                                             <label htmlFor="8B31">{t("None")}</label>
@@ -10660,7 +11509,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setCart("BatonOptionB", "Baton 30cm");
                                                        selectChanged(e);
                                                        let tempExtended = extendedTitle;
-                                                       tempExtended["8B"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 30cm")}</span></li>;
+                                                       tempExtended["8B"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 30cm")}</span></li>;
                                                        setExtendedTitle(tempExtended);
                                                    }} ref={ref => (inputs.current["8B32"] = ref)}/>
                                             <label htmlFor="8B32">{t("Baton 30cm")}<br/><p
@@ -10676,7 +11525,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setCart("BatonOptionB", "Baton 45cm");
                                                        selectChanged(e);
                                                        let tempExtended = extendedTitle;
-                                                       tempExtended["8B"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 45cm")}</span></li>;
+                                                       tempExtended["8B"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 45cm")}</span></li>;
                                                        setExtendedTitle(tempExtended);
                                                    }} ref={ref => (inputs.current["8B33"] = ref)}/>
                                             <label htmlFor="8B33">{t("Baton 45cm")}<br/><p
@@ -10692,7 +11541,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setCart("BatonOptionB", "Cord");
                                                        selectChanged(e);
                                                        let tempExtended = extendedTitle;
-                                                       tempExtended["8B"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Cord")}</span></li>;
+                                                       tempExtended["8B"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Cord")}</span></li>;
                                                        setExtendedTitle(tempExtended);
                                                    }} ref={ref => (inputs.current["8B34"] = ref)}/>
                                             <label htmlFor="8B34">{t("Cord")}<br/><p
@@ -10700,37 +11549,46 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             </label>
                                         </div>
                                     </div>
-                                    {/*<div*/}
-                                    {/*    className={step8B !== "None" && step8B !== "" && step8B1 !== "" && step31 !== "false" && !is8BMotor ? "card_body card_body_radio card_body_rod_mount" : "noDisplay"}>*/}
-                                    {/*    <div className="box100">*/}
-                                    {/*        <p className="step_selection_title">{t("step8_rod_mount_title")}</p>*/}
-                                    {/*    </div>*/}
-                                    {/*    <div className="box33 radio_style">*/}
-                                    {/*        <input className="radio" type="radio" text={t("Wall")} value="1" name="step8B4" ref-num="8B4" id="8B41"*/}
-                                    {/*               checked={step8B4 === "Wall"}*/}
-                                    {/*               onChange={e => {*/}
-                                    {/*                   setStep8B4("Wall");*/}
-                                    {/*                   setDeps("", "8B4");*/}
-                                    {/*                   setCart("MountB", "Wall");*/}
-                                    {/*                   selectChanged(e);*/}
-                                    {/*               }} ref={ref => (inputs.current["8B41"] = ref)}/>*/}
-                                    {/*        <label htmlFor="8B41">{t("Wall")}</label>*/}
-                                    {/*    </div>*/}
-                                    {/*    <div className="box33 radio_style">*/}
-                                    {/*        <input className="radio" type="radio" text={t("Ceiling")} value="2" name="step8B4" ref-num="8B4" id="8B42"*/}
-                                    {/*               checked={step8B4 === "Ceiling"}*/}
-                                    {/*               onChange={e => {*/}
-                                    {/*                   setStep8B4("Ceiling");*/}
-                                    {/*                   setDeps("", "8B4");*/}
-                                    {/*                   setCart("MountB", "Ceiling");*/}
-                                    {/*                   selectChanged(e);*/}
-                                    {/*            */}
-                                    {/*               }} ref={ref => (inputs.current["8B42"] = ref)}/>*/}
-                                    {/*        <label htmlFor="8B42">{t("Ceiling")}</label>*/}
-                                    {/*    </div>*/}
-                                    {/*    <div className="box33 radio_style"/>*/}
-                                    {/*    <div className={step8B === "Track" ? "box33 radio_style" : "noDisplay"}/>*/}
-                                    {/*</div>*/}
+                                    <div className={step8B !== "None" && step8B !== "" && step8B1 !== "" && !is8BMotor && step31 !== "false" ? "card_body" + " card_body_radio card_body_rod_mount" : "noDisplay"}>
+                                        <div className="box100">
+                                            <p className="step_selection_title">{t("step8_rod_mount_title")}</p>
+                                        </div>
+                                        <div className="box33 radio_style">
+                                            <input className="radio" type="radio" text={t("Wall")} value="1" name="step8B4" ref-num="84" id="8B41"
+                                                   checked={step84 === "Wall"}
+                                                   onChange={e => {
+                                                       if (step84 !== "" && ((step8A !== "None" && step8A !== "") || (step8C !== "None" && step8C !== ""))) {
+                                                           modalHandleShow("mountAllChange");
+                                                       }
+                                                       setStep84("Wall");
+                                                       setDeps("", "84,8A4,8B4,8C4");
+                                                       setCart("Mount8", "Wall");
+                                                       selectChanged(e);
+                                                       let tempExtended = extendedTitle;
+                                                       tempExtended["8"][4] = <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Wall")}</span></li>;
+                                                       setExtendedTitle(tempExtended);
+                                                   }} ref={ref => (inputs.current["8B41"] = ref)}/>
+                                            <label htmlFor="8B41">{t("Wall")}</label>
+                                        </div>
+                                        <div className="box33 radio_style">
+                                            <input className="radio" type="radio" text={t("Ceiling")} value="2" name="step8B4" ref-num="84" id="8B42"
+                                                   checked={step84 === "Ceiling"}
+                                                   onChange={e => {
+                                                       if (step84 !== "" && ((step8A !== "None" && step8A !== "") || (step8C !== "None" && step8C !== ""))) {
+                                                           modalHandleShow("mountAllChange");
+                                                       }
+                                                       setStep84("Ceiling");
+                                                       setDeps("", "84,8A4,8B4,8C4");
+                                                       setCart("Mount8", "Ceiling");
+                                                       selectChanged(e);
+                                                       let tempExtended = extendedTitle;
+                                                       tempExtended["8"][4] = <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Ceiling")}</span></li>;
+                                                       setExtendedTitle(tempExtended);
+                                                   }} ref={ref => (inputs.current["8B42"] = ref)}/>
+                                            <label htmlFor="8B42">{t("Ceiling")}</label>
+                                        </div>
+                                        <div className="box33 radio_style"/>
+                                    </div>
                                     <div className={is8BMotor ? "tracks_motorized_section" : "noDisplay"}>
                                         <div className={motorErr1 ? "secondary_options secondary_options_err" : "secondary_options"}>
                                             <div className="card-body-display-flex">
@@ -10800,10 +11658,10 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                         //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                         // }
                                                         onChange={(selected) => {
-                                                            setDeps("", "8B51");
-                                                            setCart("MotorPosition", selected[0].value);
                                                             if (selected[0]) {
                                                                 setSelectedMotorPosition(selected);
+                                                                setDeps("", "8B51");
+                                                                setCart("MotorPosition", selected[0].value);
                                                             }
                                                         }}
                                                         options={MotorPosition[pageLanguage]}
@@ -10934,13 +11792,13 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         </div>
                                     </div>
                                 </div>
-                                <NextStep eventKey="8C">{t("NEXT STEP")}</NextStep>
+                                <NextStep currentStep="8B" eventKey="8C">{t("NEXT STEP")}</NextStep>
                             </Card.Body>
                         </Accordion.Collapse>
                     </Card>
                     
                     {/* step 9C */}
-                    <Card className={step8 === "Customize Hardware For Per Curtains" && step2B !== "None" ? "" : "noDisplay"}>
+                    <Card className={step8 === "Customize Hardware Per Curtain" && step2B !== "None" ? "" : "noDisplay"}>
                         {/*<Card.Header className={[...depSet].findIndex(el => el.startsWith("8C")) === -1 && (!accordionActiveKey.startsWith("8")) ? "hidden" : ""}>*/}
                         <Card.Header>
                             <ContextAwareToggle eventKey="8C" stepNum={t("9C")} stepTitle={t("grommet_step8C")} stepRef="8C" type="1" required={requiredStep["8C"]}
@@ -10959,10 +11817,10 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    // setStep8C4("");
                                                    setStep8C("None");
                                                    let tempExtended = extendedTitle;
-                                                   tempExtended["8C"]=[t("None")];
+                                                   tempExtended["8C"] = [t("None")];
                                                    setExtendedTitle(tempExtended);
                                                    setDeps("", "8C,8C1,8C2,8C3");
-                                                   setCart("PrivacyLayerHardware", "None", "RailIdC,BatonOptionC,RodColorC,MountC");
+                                                   setCart("PrivacyLayerHardware", "None", "RailIdC,BatonOptionC,RailDesignC,RailDesignEnC,RailDesignFaC,RailColorEnC,RailColorFaC,RodColorC,MountC");
                                                    selectChanged(e);
                                                }} ref={ref => (inputs.current["8C1"] = ref)}/>
                                         <label htmlFor="8C1">{t("None")}</label>
@@ -10975,13 +11833,20 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    setStep8C2("");
                                                    setStep8C3("");
                                                    // setStep8C4("");
-                                                   setStep8C("Track");
+                                                   setTimeout(() => {
+                                                       setStep8C("Track");
+                                                   }, 300);
                                                    let tempExtended = extendedTitle;
-                                                   tempExtended["8C"]=[t("Track")];
+                                                   tempExtended["8C"] = [t("Track")];
                                                    setExtendedTitle(tempExtended);
-                                                   setDeps("8C1,8C2,8C3", "8C");
-                                                   setCart("PrivacyLayerHardware", "Track", "RailIdC,BatonOptionC,RodColorC,MountC");
+                                                   // setDeps("8C1,8C2,8C3", "8C");
+                                                   setCart("PrivacyLayerHardware", "Track", "RailIdC,BatonOptionC,RailDesignC,RailDesignEnC,RailDesignFaC,RailColorEnC,RailColorFaC,RodColorC,MountC");
                                                    selectChanged(e);
+                                                   if (step84 === "" && step31 !== "false") {
+                                                       setDeps("8C1,8C2,8C3,8C4", "8C");
+                                                   } else {
+                                                       setDeps("8C1,8C2,8C3", "8C");
+                                                   }
                                                }} ref={ref => (inputs.current["8C2"] = ref)}/>
                                         <label htmlFor="8C2">{t("Track")}</label>
                                     </div>
@@ -10993,13 +11858,20 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    setStep8C2("");
                                                    setStep8C3("");
                                                    // setStep8C4("");
-                                                   setStep8C("Rod");
+                                                   setTimeout(() => {
+                                                       setStep8C("Rod");
+                                                   }, 300);
                                                    let tempExtended = extendedTitle;
-                                                   tempExtended["8C"]=[t("Rod")];
+                                                   tempExtended["8C"] = [t("Rod")];
                                                    setExtendedTitle(tempExtended);
-                                                   setDeps("8C1,8C2,8C3", "8C");
-                                                   setCart("PrivacyLayerHardware", "Rod", "RailIdC,BatonOptionC,RodColorC,MountC");
+                                                   // setDeps("8C1,8C2,8C3", "8C");
+                                                   setCart("PrivacyLayerHardware", "Rod", "RailIdC,BatonOptionC,RailDesignC,RailDesignEnC,RailDesignFaC,RailColorEnC,RailColorFaC,RodColorC,MountC");
                                                    selectChanged(e);
+                                                   if (step84 === "" && step31 !== "false") {
+                                                       setDeps("8C1,8C2,8C3,8C4", "8C");
+                                                   } else {
+                                                       setDeps("8C1,8C2,8C3", "8C");
+                                                   }
                                                }} ref={ref => (inputs.current["8C3"] = ref)}/>
                                         <label htmlFor="8C3">{t("Rod")}</label>
                                     </div>
@@ -11075,7 +11947,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setCart("BatonOptionC", "None");
                                                        selectChanged(e);
                                                        let tempExtended = extendedTitle;
-                                                       tempExtended["8C"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("None")}</span></li>;
+                                                       tempExtended["8C"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("None")}</span></li>;
                                                        setExtendedTitle(tempExtended);
                                                    }} ref={ref => (inputs.current["8C31"] = ref)}/>
                                             <label htmlFor="8C31">{t("None")}</label>
@@ -11089,7 +11961,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setCart("BatonOptionC", "Baton 30cm");
                                                        selectChanged(e);
                                                        let tempExtended = extendedTitle;
-                                                       tempExtended["8C"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 30cm")}</span></li>;
+                                                       tempExtended["8C"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 30cm")}</span></li>;
                                                        setExtendedTitle(tempExtended);
                                                    }} ref={ref => (inputs.current["8C32"] = ref)}/>
                                             <label htmlFor="8C32">{t("Baton 30cm")}<br/><p
@@ -11105,7 +11977,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setCart("BatonOptionC", "Baton 45cm");
                                                        selectChanged(e);
                                                        let tempExtended = extendedTitle;
-                                                       tempExtended["8C"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 45cm")}</span></li>;
+                                                       tempExtended["8C"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Baton 45cm")}</span></li>;
                                                        setExtendedTitle(tempExtended);
                                                    }} ref={ref => (inputs.current["8C33"] = ref)}/>
                                             <label htmlFor="8C33">{t("Baton 45cm")}<br/><p
@@ -11121,7 +11993,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setCart("BatonOptionC", "Cord");
                                                        selectChanged(e);
                                                        let tempExtended = extendedTitle;
-                                                       tempExtended["8C"][2]= <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Cord")}</span></li>;
+                                                       tempExtended["8C"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Baton Option")}</span><span className="step_title_extended_list_item_text">{t("Cord")}</span></li>;
                                                        setExtendedTitle(tempExtended);
                                                    }} ref={ref => (inputs.current["8C34"] = ref)}/>
                                             <label htmlFor="8C34">{t("Cord")}<br/><p
@@ -11129,37 +12001,46 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             </label>
                                         </div>
                                     </div>
-                                    {/*<div*/}
-                                    {/*    className={step8C !== "None" && step8C !== "" && step8C1 !== "" && step31 !== "false" && !is8CMotor ? "card_body card_body_radio card_body_rod_mount" : "noDisplay"}>*/}
-                                    {/*    <div className="box100">*/}
-                                    {/*        <p className="step_selection_title">{t("step8_rod_mount_title")}</p>*/}
-                                    {/*    </div>*/}
-                                    {/*    <div className="box33 radio_style">*/}
-                                    {/*        <input className="radio" type="radio" text={t("Wall")} value="1" name="step8C4" ref-num="8C4" id="8C41"*/}
-                                    {/*               checked={step8C4 === "Wall"}*/}
-                                    {/*               onChange={e => {*/}
-                                    {/*                   setStep8C4("Wall");*/}
-                                    {/*                   setDeps("", "8C4");*/}
-                                    {/*                   setCart("MountC", "Wall");*/}
-                                    {/*                   selectChanged(e);*/}
-                                    {/*               }} ref={ref => (inputs.current["8C41"] = ref)}/>*/}
-                                    {/*        <label htmlFor="8C41">{t("Wall")}</label>*/}
-                                    {/*    </div>*/}
-                                    {/*    <div className="box33 radio_style">*/}
-                                    {/*        <input className="radio" type="radio" text={t("Ceiling")} value="2" name="step8C4" ref-num="8C4" id="8C42"*/}
-                                    {/*               checked={step8C4 === "Ceiling"}*/}
-                                    {/*               onChange={e => {*/}
-                                    {/*                   setStep8C4("Ceiling");*/}
-                                    {/*                   setDeps("", "8C4");*/}
-                                    {/*                   setCart("MountC", "Ceiling");*/}
-                                    {/*                   selectChanged(e);*/}
-                                    {/*            */}
-                                    {/*               }} ref={ref => (inputs.current["8C42"] = ref)}/>*/}
-                                    {/*        <label htmlFor="8C42">{t("Ceiling")}</label>*/}
-                                    {/*    </div>*/}
-                                    {/*    <div className="box33 radio_style"/>*/}
-                                    {/*    <div className={step8C === "Track" ? "box33 radio_style" : "noDisplay"}/>*/}
-                                    {/*</div>*/}
+                                    <div className={step8C !== "None" && step8C !== "" && step8C1 !== "" && !is8CMotor && step31 !== "false" ? "card_body" + " card_body_radio card_body_rod_mount" : "noDisplay"}>
+                                        <div className="box100">
+                                            <p className="step_selection_title">{t("step8_rod_mount_title")}</p>
+                                        </div>
+                                        <div className="box33 radio_style">
+                                            <input className="radio" type="radio" text={t("Wall")} value="1" name="step8C4" ref-num="84" id="8C41"
+                                                   checked={step84 === "Wall"}
+                                                   onChange={e => {
+                                                       if (step84 !== "" && ((step8A !== "None" && step8A !== "") || (step8B !== "None" && step8B !== ""))) {
+                                                           modalHandleShow("mountAllChange");
+                                                       }
+                                                       setStep84("Wall");
+                                                       setDeps("", "84,8A4,8B4,8C4");
+                                                       setCart("Mount8", "Wall");
+                                                       selectChanged(e);
+                                                       let tempExtended = extendedTitle;
+                                                       tempExtended["8"][4] = <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Wall")}</span></li>;
+                                                       setExtendedTitle(tempExtended);
+                                                   }} ref={ref => (inputs.current["8C41"] = ref)}/>
+                                            <label htmlFor="8C41">{t("Wall")}</label>
+                                        </div>
+                                        <div className="box33 radio_style">
+                                            <input className="radio" type="radio" text={t("Ceiling")} value="2" name="step8C4" ref-num="84" id="8C42"
+                                                   checked={step84 === "Ceiling"}
+                                                   onChange={e => {
+                                                       if (step84 !== "" && ((step8A !== "None" && step8A !== "") || (step8B !== "None" && step8B !== ""))) {
+                                                           modalHandleShow("mountAllChange");
+                                                       }
+                                                       setStep84("Ceiling");
+                                                       setDeps("", "84,8A4,8B4,8C4");
+                                                       setCart("Mount8", "Ceiling");
+                                                       selectChanged(e);
+                                                       let tempExtended = extendedTitle;
+                                                       tempExtended["8"][4] = <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Mount Type")}</span><span className="step_title_extended_list_item_text">{t("Ceiling")}</span></li>;
+                                                       setExtendedTitle(tempExtended);
+                                                   }} ref={ref => (inputs.current["8C42"] = ref)}/>
+                                            <label htmlFor="8C42">{t("Ceiling")}</label>
+                                        </div>
+                                        <div className="box33 radio_style"/>
+                                    </div>
                                     <div className={is8CMotor ? "tracks_motorized_section" : "noDisplay"}>
                                         <div className={motorErr1 ? "secondary_options secondary_options_err" : "secondary_options"}>
                                             <div className="card-body-display-flex">
@@ -11363,7 +12244,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         </div>
                                     </div>
                                 </div>
-                                <NextStep eventKey="9">{t("NEXT STEP")}</NextStep>
+                                <NextStep currentStep="8C" eventKey="9">{t("NEXT STEP")}</NextStep>
                             </Card.Body>
                         </Accordion.Collapse>
                     </Card>
@@ -11424,7 +12305,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         </ul>
                                     </div>
                                 </div>
-                                <NextStep eventKey="10">{t("NEXT STEP")}</NextStep>
+                                <NextStep currentStep="9" eventKey="10">{t("NEXT STEP")}</NextStep>
                             </Card.Body>
                         </Accordion.Collapse>
                     </Card>
@@ -11559,7 +12440,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                            }}/>
                                         </div>
                                     </div>
-                                    <NextStep eventKey="11">{t("NEXT STEP")}</NextStep>
+                                    <NextStep currentStep="10" eventKey="11">{t("NEXT STEP")}</NextStep>
                                 </div>
                                 <div className=" accordion_help">
                                     <div className=" help_container">
@@ -11582,7 +12463,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     </Card>
                     
                     {/* step 12 */}
-                    <Card>
+                    <Card className={accordionActiveKey===""?"card_little_margin":"card_big_margin"}>
                         <Card.Header>
                             <ContextAwareToggle eventKey="11" stepNum={t("12")} stepTitle={t("zebra_step7")} stepTitle2={t("(Optional)")} stepRef="11" type="2"
                                                 required={requiredStep["11"]}
@@ -11732,6 +12613,22 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         </Modal>
         
         <Modal dialogClassName={`warning_modal2 bigSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+               show={modals["FabricDesignNotSelected"] === undefined ? false : modals["FabricDesignNotSelected"]}
+               onHide={() => modalHandleClose("FabricDesignNotSelected")}>
+            <Modal.Header closeButton>
+                {/*<Modal.Title>Modal heading</Modal.Title>*/}
+            </Modal.Header>
+            <Modal.Body>
+                <p className="text_center">{t("FabricDesignNotSelected")}</p>
+                
+                <br/>
+                <div className=" text_center">
+                    <button className=" btn btn-new-dark" onClick={() => modalHandleClose("FabricDesignNotSelected")}>{t("CONTINUE")}</button>
+                </div>
+            </Modal.Body>
+        </Modal>
+        
+        <Modal dialogClassName={`warning_modal2 bigSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                show={modals["panelTypeWarning"] === undefined ? false : modals["panelTypeWarning"]}
                onHide={() => modalHandleClose(" panelTypeWarning")}>
             <Modal.Header closeButton>
@@ -11744,7 +12641,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 <div className="buttons_section">
                     <button className="btn btn-new-dark" onClick={() => {
                         modalHandleClose("widthDifferent");
-                        setStep6("");
+                        setStep61("");
                         setDeps("6", "");
                         setCart("", "", "PanelType");
                         selectChanged(undefined, "6");
@@ -11779,7 +12676,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     <button className="btn white_btn" onClick={() => {
                         setStep2A(sheerHeaderStyleTemp.stepValue);
                         setDeps("", "2A,8,81,82,83,84,8A,8A1,8A2,8A3,8A4,8B,8B1,8B2,8B3,8B5,8B51,8C,8C1,8C2,8C3,8C5,8C51");
-                        setCart("SheerHeaderStyle", sheerHeaderStyleTemp.cartValue, "RailId,BatonOption,RodColor,Mount,BatonOptionA,RodColorA,MountA,RailIdB,BatonOptionB,RodColorB,MountB,RailIdC,BatonOptionC,RodColorC,MountC,hasPower,MotorPosition,RemoteName,MotorChannels");
+                        setCart("SheerHeaderStyle", sheerHeaderStyleTemp.cartValue, "RailId,BatonOption,RailDesign,RailDesignEn,RailDesignFa,RailColorEn,RailColorFa,RodColor,Mount8,BatonOptionA,RailDesignA,RailDesignEnA,RailDesignFaA,RailColorEnA,RailColorFaA,RodColorA,MountA,RailIdB,BatonOptionB,RailDesignB,RailDesignEnB,RailDesignFaB,RailColorEnB,RailColorFaB,RodColorB,MountB,RailIdC,BatonOptionC,RailDesignC,RailDesignEnC,RailDesignFaC,RailColorEnC,RailColorFaC,RodColorC,MountC,hasPower,MotorPosition,RemoteName,MotorChannels");
                         selectChanged(sheerHeaderStyleTemp.event, "8");
                         setSheersModelId(sheerHeaderStyleTemp.id);
                         setStep8("");
@@ -11809,11 +12706,11 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     }}>{t("DON'T CHANGE HEADER STYLE")}
                     </button>
                     <button className="btn white_btn" onClick={() => {
-                        setStep2C(sheerHeaderStyleTemp.stepValue);
+                        setStep2C(sheerHeaderStyleTemp2.stepValue);
                         setDeps("", "2C,8,81,82,83,84,8A,8A1,8A2,8A3,8A4,8B,8B1,8B2,8B3,8B5,8B51,8C,8C1,8C2,8C3,8C5,8C51");
-                        setCart("PrivacyLayerHeaderStyle", sheerHeaderStyleTemp.cartValue, "RailId,BatonOption,RodColor,Mount,BatonOptionA,RodColorA,MountA,RailIdB,BatonOptionB,RodColorB,MountB,RailIdC,BatonOptionC,RodColorC,MountC,hasPower,MotorPosition,RemoteName,MotorChannels");
-                        selectChanged(sheerHeaderStyleTemp.event, "8");
-                        setSheersModelId2(sheerHeaderStyleTemp.id);
+                        setCart("PrivacyLayerHeaderStyle", sheerHeaderStyleTemp2.cartValue, "RailId,BatonOption,RailDesign,RailDesignEn,RailDesignFa,RailColorEn,RailColorFa,RodColor,Mount8,BatonOptionA,RailDesignA,RailDesignEnA,RailDesignFaA,RailColorEnA,RailColorFaA,RodColorA,MountA,RailIdB,BatonOptionB,RailDesignB,RailDesignEnB,RailDesignFaB,RailColorEnB,RailColorFaB,RodColorB,MountB,RailIdC,BatonOptionC,RailDesignC,RailDesignEnC,RailDesignFaC,RailColorEnC,RailColorFaC,RodColorC,MountC,hasPower,MotorPosition,RemoteName,MotorChannels");
+                        selectChanged(sheerHeaderStyleTemp2.event, "8");
+                        setSheersModelId2(sheerHeaderStyleTemp2.id);
                         setStep8("");
                         modalHandleClose("SheerHeaderStyleWarning2");
                     }}>{t("I AGREE, CONTINUE ANYWAY")}
@@ -11890,6 +12787,25 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 <br/>
                 <div className=" text_center">
                     <button className=" btn btn-new-dark" onClick={() => modalHandleClose(" noMeasurements")}>{t("CONTINUE")}</button>
+                </div>
+            </Modal.Body>
+            {/*<Modal.Footer>*/}
+            {/*    */}
+            {/*</Modal.Footer>*/}
+        </Modal>
+        
+        <Modal dialogClassName={`noMount_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+               show={modals["mountAllChange"] === undefined ? false : modals["mountAllChange"]}
+               onHide={() => modalHandleClose(" mountAllChange")}>
+            <Modal.Header closeButton>
+                {/*<Modal.Title>Modal heading</Modal.Title>*/}
+            </Modal.Header>
+            <Modal.Body>
+                <p>{t("modal_select_mountAllChange")}</p>
+                
+                <br/>
+                <div className=" text_center">
+                    <button className=" btn btn-new-dark" onClick={() => modalHandleClose(" mountAllChange")}>{t("CONTINUE")}</button>
                 </div>
             </Modal.Body>
             {/*<Modal.Footer>*/}

@@ -1,315 +1,35 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="136.485" height="211.869" viewBox="0 0 136.485 211.869">
-  <defs>
-    <filter id="Rectangle_13" x="80.485" y="0" width="23" height="211.482" filterUnits="userSpaceOnUse">
-      <feOffset input="SourceAlpha"/>
-      <feGaussianBlur stdDeviation="3" result="blur"/>
-      <feFlood flood-opacity="0.161"/>
-      <feComposite operator="in" in2="blur"/>
-    </filter>
-    <filter id="Rectangle_13-2" x="80.485" y="0" width="23" height="211.482" filterUnits="userSpaceOnUse">
-      <feOffset dx="-0.01" input="SourceAlpha"/>
-      <feGaussianBlur stdDeviation="1.2" result="blur-2"/>
-      <feFlood result="color"/>
-      <feComposite operator="out" in="SourceGraphic" in2="blur-2"/>
-      <feComposite operator="in" in="color"/>
-      <feComposite operator="in" in2="SourceGraphic"/>
-    </filter>
-    <filter id="Rectangle_43" x="91.485" y="0" width="23" height="211.482" filterUnits="userSpaceOnUse">
-      <feOffset input="SourceAlpha"/>
-      <feGaussianBlur stdDeviation="3" result="blur-3"/>
-      <feFlood flood-opacity="0.161"/>
-      <feComposite operator="in" in2="blur-3"/>
-    </filter>
-    <filter id="Rectangle_43-2" x="91.485" y="0" width="23" height="211.482" filterUnits="userSpaceOnUse">
-      <feOffset dx="-0.01" input="SourceAlpha"/>
-      <feGaussianBlur stdDeviation="1.2" result="blur-4"/>
-      <feFlood result="color-2"/>
-      <feComposite operator="out" in="SourceGraphic" in2="blur-4"/>
-      <feComposite operator="in" in="color-2"/>
-      <feComposite operator="in" in2="SourceGraphic"/>
-    </filter>
-    <filter id="Rectangle_46" x="102.485" y="0" width="23" height="211.482" filterUnits="userSpaceOnUse">
-      <feOffset input="SourceAlpha"/>
-      <feGaussianBlur stdDeviation="3" result="blur-5"/>
-      <feFlood flood-opacity="0.161"/>
-      <feComposite operator="in" in2="blur-5"/>
-    </filter>
-    <filter id="Rectangle_46-2" x="102.485" y="0" width="23" height="211.482" filterUnits="userSpaceOnUse">
-      <feOffset dx="-0.01" input="SourceAlpha"/>
-      <feGaussianBlur stdDeviation="1.2" result="blur-6"/>
-      <feFlood result="color-3"/>
-      <feComposite operator="out" in="SourceGraphic" in2="blur-6"/>
-      <feComposite operator="in" in="color-3"/>
-      <feComposite operator="in" in2="SourceGraphic"/>
-    </filter>
-    <filter id="Rectangle_49" x="113.485" y="0" width="23" height="211.482" filterUnits="userSpaceOnUse">
-      <feOffset input="SourceAlpha"/>
-      <feGaussianBlur stdDeviation="3" result="blur-7"/>
-      <feFlood flood-opacity="0.161"/>
-      <feComposite operator="in" in2="blur-7"/>
-    </filter>
-    <filter id="Rectangle_49-2" x="113.485" y="0" width="23" height="211.482" filterUnits="userSpaceOnUse">
-      <feOffset dx="-0.01" input="SourceAlpha"/>
-      <feGaussianBlur stdDeviation="1.2" result="blur-8"/>
-      <feFlood result="color-4"/>
-      <feComposite operator="out" in="SourceGraphic" in2="blur-8"/>
-      <feComposite operator="in" in="color-4"/>
-      <feComposite operator="in" in2="SourceGraphic"/>
-    </filter>
-    <filter id="Rectangle_13-3" x="0" y="0" width="23" height="211.482" filterUnits="userSpaceOnUse">
-      <feOffset input="SourceAlpha"/>
-      <feGaussianBlur stdDeviation="3" result="blur-9"/>
-      <feFlood flood-opacity="0.161"/>
-      <feComposite operator="in" in2="blur-9"/>
-    </filter>
-    <filter id="Rectangle_13-4" x="0" y="0" width="23" height="211.482" filterUnits="userSpaceOnUse">
-      <feOffset dx="-0.01" input="SourceAlpha"/>
-      <feGaussianBlur stdDeviation="1.2" result="blur-10"/>
-      <feFlood result="color-5"/>
-      <feComposite operator="out" in="SourceGraphic" in2="blur-10"/>
-      <feComposite operator="in" in="color-5"/>
-      <feComposite operator="in" in2="SourceGraphic"/>
-    </filter>
-    <filter id="Rectangle_43-3" x="11" y="0" width="23" height="211.482" filterUnits="userSpaceOnUse">
-      <feOffset input="SourceAlpha"/>
-      <feGaussianBlur stdDeviation="3" result="blur-11"/>
-      <feFlood flood-opacity="0.161"/>
-      <feComposite operator="in" in2="blur-11"/>
-    </filter>
-    <filter id="Rectangle_43-4" x="11" y="0" width="23" height="211.482" filterUnits="userSpaceOnUse">
-      <feOffset dx="-0.01" input="SourceAlpha"/>
-      <feGaussianBlur stdDeviation="1.2" result="blur-12"/>
-      <feFlood result="color-6"/>
-      <feComposite operator="out" in="SourceGraphic" in2="blur-12"/>
-      <feComposite operator="in" in="color-6"/>
-      <feComposite operator="in" in2="SourceGraphic"/>
-    </filter>
-    <filter id="Rectangle_46-3" x="22" y="0" width="23" height="211.482" filterUnits="userSpaceOnUse">
-      <feOffset input="SourceAlpha"/>
-      <feGaussianBlur stdDeviation="3" result="blur-13"/>
-      <feFlood flood-opacity="0.161"/>
-      <feComposite operator="in" in2="blur-13"/>
-    </filter>
-    <filter id="Rectangle_46-4" x="22" y="0" width="23" height="211.482" filterUnits="userSpaceOnUse">
-      <feOffset dx="-0.01" input="SourceAlpha"/>
-      <feGaussianBlur stdDeviation="1.2" result="blur-14"/>
-      <feFlood result="color-7"/>
-      <feComposite operator="out" in="SourceGraphic" in2="blur-14"/>
-      <feComposite operator="in" in="color-7"/>
-      <feComposite operator="in" in2="SourceGraphic"/>
-    </filter>
-    <filter id="Rectangle_49-3" x="33" y="0" width="23" height="211.482" filterUnits="userSpaceOnUse">
-      <feOffset input="SourceAlpha"/>
-      <feGaussianBlur stdDeviation="3" result="blur-15"/>
-      <feFlood flood-opacity="0.161"/>
-      <feComposite operator="in" in2="blur-15"/>
-    </filter>
-    <filter id="Rectangle_49-4" x="33" y="0" width="23" height="211.482" filterUnits="userSpaceOnUse">
-      <feOffset dx="-0.01" input="SourceAlpha"/>
-      <feGaussianBlur stdDeviation="1.2" result="blur-16"/>
-      <feFlood result="color-8"/>
-      <feComposite operator="out" in="SourceGraphic" in2="blur-16"/>
-      <feComposite operator="in" in="color-8"/>
-      <feComposite operator="in" in2="SourceGraphic"/>
-    </filter>
-  </defs>
-  <g id="Group_42" data-name="Group 42" transform="translate(-776.711 -273.529)">
-    <rect id="Rectangle_51" data-name="Rectangle 51" width="135" height="206" transform="translate(777.625 279.398)" fill="none"/>
-    <g id="Rectangle_4" data-name="Rectangle 4" transform="translate(797.42 300.651)" fill="#fff" stroke="#454545" stroke-width="1.1">
-      <rect width="95.067" height="131.563" stroke="none"/>
-      <rect x="0.55" y="0.55" width="93.967" height="130.463" fill="none"/>
-    </g>
-    <g id="Rectangle_5" data-name="Rectangle 5" transform="translate(805.711 308.942)" fill="#fff" stroke="#454545" stroke-width="1.1">
-      <rect width="78.485" height="114.982" stroke="none"/>
-      <rect x="0.55" y="0.55" width="77.385" height="113.882" fill="none"/>
-    </g>
-    <g id="Group_3" data-name="Group 3" transform="translate(866.126 282.282)">
-      <rect id="wrapper1" width="37.789" height="193.611" transform="translate(0.281 -0.282)" fill="#e2e2e2"/>
-      <line id="Line_12" data-name="Line 12" x2="1.658" transform="translate(4.61 3.903)" fill="none" stroke="rgba(112,112,112,0.7)" stroke-width="2"/>
-      <line id="Line_34" data-name="Line 34" x2="1.658" transform="translate(15.61 3.903)" fill="none" stroke="rgba(112,112,112,0.7)" stroke-width="2"/>
-      <line id="Line_38" data-name="Line 38" x2="1.658" transform="translate(26.61 3.903)" fill="none" stroke="rgba(112,112,112,0.7)" stroke-width="2"/>
-      <line id="Line_30" data-name="Line 30" x2="1.658" transform="translate(4.492 192.203)" fill="none" stroke="rgba(112,112,112,0.7)" stroke-width="2"/>
-      <line id="Line_33" data-name="Line 33" x2="1.658" transform="translate(15.492 192.203)" fill="none" stroke="rgba(112,112,112,0.7)" stroke-width="2"/>
-      <line id="Line_37" data-name="Line 37" x2="1.658" transform="translate(26.492 192.203)" fill="none" stroke="rgba(112,112,112,0.7)" stroke-width="2"/>
-      <line id="Line_13" data-name="Line 13" x2="1.658" transform="translate(9.584 3.903)" fill="none" stroke="rgba(112,112,112,0.7)" stroke-width="2"/>
-      <line id="Line_32" data-name="Line 32" x2="1.658" transform="translate(20.584 3.903)" fill="none" stroke="rgba(112,112,112,0.7)" stroke-width="2"/>
-      <line id="Line_36" data-name="Line 36" x2="1.658" transform="translate(31.584 3.903)" fill="none" stroke="rgba(112,112,112,0.7)" stroke-width="2"/>
-      <line id="Line_29" data-name="Line 29" x2="1.658" transform="translate(9.466 192.203)" fill="none" stroke="rgba(112,112,112,0.7)" stroke-width="2"/>
-      <line id="Line_31" data-name="Line 31" x2="1.658" transform="translate(20.466 192.203)" fill="none" stroke="rgba(112,112,112,0.7)" stroke-width="2"/>
-      <line id="Line_35" data-name="Line 35" x2="1.658" transform="translate(31.466 192.203)" fill="none" stroke="rgba(112,112,112,0.7)" stroke-width="2"/>
-      <g data-type="innerShadowGroup">
-        <g transform="matrix(1, 0, 0, 1, -89.42, -8.75)" filter="url(#Rectangle_13)">
-          <g id="Rectangle_13-5" data-name="Rectangle 13" transform="translate(89.49 9)" fill="#fff" stroke="rgba(123,123,123,0.7)" stroke-width="1">
-            <rect width="5" height="193.482" rx="2.5" stroke="none"/>
-            <rect x="0.5" y="0.5" width="4" height="192.482" rx="2" fill="none"/>
-          </g>
-        </g>
-        <rect id="Rectangle_13-6" data-name="Rectangle 13" width="5" height="193.482" rx="2.5" transform="translate(0.07 0.247)" fill="#fff"/>
-        <g transform="matrix(1, 0, 0, 1, -89.42, -8.75)" filter="url(#Rectangle_13-2)">
-          <rect id="Rectangle_13-7" data-name="Rectangle 13" width="5" height="193.482" rx="2.5" transform="translate(89.49 9)" fill="#fff"/>
-        </g>
-        <g id="Rectangle_13-8" data-name="Rectangle 13" transform="translate(0.07 0.247)" fill="none" stroke="rgba(123,123,123,0.7)" stroke-width="1">
-          <rect width="5" height="193.482" rx="2.5" stroke="none"/>
-          <rect x="0.5" y="0.5" width="4" height="192.482" rx="2" fill="none"/>
-        </g>
-      </g>
-      <g data-type="innerShadowGroup">
-        <g transform="matrix(1, 0, 0, 1, -89.42, -8.75)" filter="url(#Rectangle_43)">
-          <g id="Rectangle_43-5" data-name="Rectangle 43" transform="translate(100.49 9)" fill="#fff" stroke="rgba(123,123,123,0.7)" stroke-width="1">
-            <rect width="5" height="193.482" rx="2.5" stroke="none"/>
-            <rect x="0.5" y="0.5" width="4" height="192.482" rx="2" fill="none"/>
-          </g>
-        </g>
-        <rect id="Rectangle_43-6" data-name="Rectangle 43" width="5" height="193.482" rx="2.5" transform="translate(11.07 0.247)" fill="#fff"/>
-        <g transform="matrix(1, 0, 0, 1, -89.42, -8.75)" filter="url(#Rectangle_43-2)">
-          <rect id="Rectangle_43-7" data-name="Rectangle 43" width="5" height="193.482" rx="2.5" transform="translate(100.49 9)" fill="#fff"/>
-        </g>
-        <g id="Rectangle_43-8" data-name="Rectangle 43" transform="translate(11.07 0.247)" fill="none" stroke="rgba(123,123,123,0.7)" stroke-width="1">
-          <rect width="5" height="193.482" rx="2.5" stroke="none"/>
-          <rect x="0.5" y="0.5" width="4" height="192.482" rx="2" fill="none"/>
-        </g>
-      </g>
-      <g data-type="innerShadowGroup">
-        <g transform="matrix(1, 0, 0, 1, -89.42, -8.75)" filter="url(#Rectangle_46)">
-          <g id="Rectangle_46-5" data-name="Rectangle 46" transform="translate(111.49 9)" fill="#fff" stroke="rgba(123,123,123,0.7)" stroke-width="1">
-            <rect width="5" height="193.482" rx="2.5" stroke="none"/>
-            <rect x="0.5" y="0.5" width="4" height="192.482" rx="2" fill="none"/>
-          </g>
-        </g>
-        <rect id="Rectangle_46-6" data-name="Rectangle 46" width="5" height="193.482" rx="2.5" transform="translate(22.07 0.247)" fill="#fff"/>
-        <g transform="matrix(1, 0, 0, 1, -89.42, -8.75)" filter="url(#Rectangle_46-2)">
-          <rect id="Rectangle_46-7" data-name="Rectangle 46" width="5" height="193.482" rx="2.5" transform="translate(111.49 9)" fill="#fff"/>
-        </g>
-        <g id="Rectangle_46-8" data-name="Rectangle 46" transform="translate(22.07 0.247)" fill="none" stroke="rgba(123,123,123,0.7)" stroke-width="1">
-          <rect width="5" height="193.482" rx="2.5" stroke="none"/>
-          <rect x="0.5" y="0.5" width="4" height="192.482" rx="2" fill="none"/>
-        </g>
-      </g>
-      <g data-type="innerShadowGroup">
-        <g transform="matrix(1, 0, 0, 1, -89.42, -8.75)" filter="url(#Rectangle_49)">
-          <g id="Rectangle_49-5" data-name="Rectangle 49" transform="translate(122.49 9)" fill="#fff" stroke="rgba(123,123,123,0.7)" stroke-width="1">
-            <rect width="5" height="193.482" rx="2.5" stroke="none"/>
-            <rect x="0.5" y="0.5" width="4" height="192.482" rx="2" fill="none"/>
-          </g>
-        </g>
-        <rect id="Rectangle_49-6" data-name="Rectangle 49" width="5" height="193.482" rx="2.5" transform="translate(33.07 0.247)" fill="#fff"/>
-        <g transform="matrix(1, 0, 0, 1, -89.42, -8.75)" filter="url(#Rectangle_49-2)">
-          <rect id="Rectangle_49-7" data-name="Rectangle 49" width="5" height="193.482" rx="2.5" transform="translate(122.49 9)" fill="#fff"/>
-        </g>
-        <g id="Rectangle_49-8" data-name="Rectangle 49" transform="translate(33.07 0.247)" fill="none" stroke="rgba(123,123,123,0.7)" stroke-width="1">
-          <rect width="5" height="193.482" rx="2.5" stroke="none"/>
-          <rect x="0.5" y="0.5" width="4" height="192.482" rx="2" fill="none"/>
-        </g>
-      </g>
-      <g id="Rectangle_14" data-name="Rectangle 14" transform="translate(5.715 0.247)" fill="#fff" stroke="rgba(123,123,123,0.7)" stroke-width="1">
-        <rect width="4.422" height="193.482" stroke="none"/>
-        <rect x="0.5" y="0.5" width="3.422" height="192.482" fill="none"/>
-      </g>
-      <g id="Rectangle_42" data-name="Rectangle 42" transform="translate(16.715 0.247)" fill="#fff" stroke="rgba(123,123,123,0.7)" stroke-width="1">
-        <rect width="4.422" height="193.482" stroke="none"/>
-        <rect x="0.5" y="0.5" width="3.422" height="192.482" fill="none"/>
-      </g>
-      <g id="Rectangle_45" data-name="Rectangle 45" transform="translate(27.715 0.247)" fill="#fff" stroke="rgba(123,123,123,0.7)" stroke-width="1">
-        <rect width="4.422" height="193.482" stroke="none"/>
-        <rect x="0.5" y="0.5" width="3.422" height="192.482" fill="none"/>
-      </g>
-    </g>
-    <g id="Group_43" data-name="Group 43" transform="translate(785.641 282.282)">
-      <rect id="wrapper1-2" data-name="wrapper1" width="37.789" height="193.611" transform="translate(0.281 -0.282)" fill="#e2e2e2"/>
-      <line id="Line_12-2" data-name="Line 12" x2="1.658" transform="translate(4.61 3.903)" fill="none" stroke="rgba(112,112,112,0.7)" stroke-width="2"/>
-      <line id="Line_34-2" data-name="Line 34" x2="1.658" transform="translate(15.61 3.903)" fill="none" stroke="rgba(112,112,112,0.7)" stroke-width="2"/>
-      <line id="Line_38-2" data-name="Line 38" x2="1.658" transform="translate(26.61 3.903)" fill="none" stroke="rgba(112,112,112,0.7)" stroke-width="2"/>
-      <line id="Line_30-2" data-name="Line 30" x2="1.658" transform="translate(4.492 192.203)" fill="none" stroke="rgba(112,112,112,0.7)" stroke-width="2"/>
-      <line id="Line_33-2" data-name="Line 33" x2="1.658" transform="translate(15.492 192.203)" fill="none" stroke="rgba(112,112,112,0.7)" stroke-width="2"/>
-      <line id="Line_37-2" data-name="Line 37" x2="1.658" transform="translate(26.492 192.203)" fill="none" stroke="rgba(112,112,112,0.7)" stroke-width="2"/>
-      <line id="Line_13-2" data-name="Line 13" x2="1.658" transform="translate(9.584 3.903)" fill="none" stroke="rgba(112,112,112,0.7)" stroke-width="2"/>
-      <line id="Line_32-2" data-name="Line 32" x2="1.658" transform="translate(20.584 3.903)" fill="none" stroke="rgba(112,112,112,0.7)" stroke-width="2"/>
-      <line id="Line_36-2" data-name="Line 36" x2="1.658" transform="translate(31.584 3.903)" fill="none" stroke="rgba(112,112,112,0.7)" stroke-width="2"/>
-      <line id="Line_29-2" data-name="Line 29" x2="1.658" transform="translate(9.466 192.203)" fill="none" stroke="rgba(112,112,112,0.7)" stroke-width="2"/>
-      <line id="Line_31-2" data-name="Line 31" x2="1.658" transform="translate(20.466 192.203)" fill="none" stroke="rgba(112,112,112,0.7)" stroke-width="2"/>
-      <line id="Line_35-2" data-name="Line 35" x2="1.658" transform="translate(31.466 192.203)" fill="none" stroke="rgba(112,112,112,0.7)" stroke-width="2"/>
-      <g data-type="innerShadowGroup">
-        <g transform="matrix(1, 0, 0, 1, -8.93, -8.75)" filter="url(#Rectangle_13-3)">
-          <g id="Rectangle_13-9" data-name="Rectangle 13" transform="translate(9 9)" fill="#fff" stroke="rgba(123,123,123,0.7)" stroke-width="1">
-            <rect width="5" height="193.482" rx="2.5" stroke="none"/>
-            <rect x="0.5" y="0.5" width="4" height="192.482" rx="2" fill="none"/>
-          </g>
-        </g>
-        <rect id="Rectangle_13-10" data-name="Rectangle 13" width="5" height="193.482" rx="2.5" transform="translate(0.07 0.247)" fill="#fff"/>
-        <g transform="matrix(1, 0, 0, 1, -8.93, -8.75)" filter="url(#Rectangle_13-4)">
-          <rect id="Rectangle_13-11" data-name="Rectangle 13" width="5" height="193.482" rx="2.5" transform="translate(9 9)" fill="#fff"/>
-        </g>
-        <g id="Rectangle_13-12" data-name="Rectangle 13" transform="translate(0.07 0.247)" fill="none" stroke="rgba(123,123,123,0.7)" stroke-width="1">
-          <rect width="5" height="193.482" rx="2.5" stroke="none"/>
-          <rect x="0.5" y="0.5" width="4" height="192.482" rx="2" fill="none"/>
-        </g>
-      </g>
-      <g data-type="innerShadowGroup">
-        <g transform="matrix(1, 0, 0, 1, -8.93, -8.75)" filter="url(#Rectangle_43-3)">
-          <g id="Rectangle_43-9" data-name="Rectangle 43" transform="translate(20 9)" fill="#fff" stroke="rgba(123,123,123,0.7)" stroke-width="1">
-            <rect width="5" height="193.482" rx="2.5" stroke="none"/>
-            <rect x="0.5" y="0.5" width="4" height="192.482" rx="2" fill="none"/>
-          </g>
-        </g>
-        <rect id="Rectangle_43-10" data-name="Rectangle 43" width="5" height="193.482" rx="2.5" transform="translate(11.07 0.247)" fill="#fff"/>
-        <g transform="matrix(1, 0, 0, 1, -8.93, -8.75)" filter="url(#Rectangle_43-4)">
-          <rect id="Rectangle_43-11" data-name="Rectangle 43" width="5" height="193.482" rx="2.5" transform="translate(20 9)" fill="#fff"/>
-        </g>
-        <g id="Rectangle_43-12" data-name="Rectangle 43" transform="translate(11.07 0.247)" fill="none" stroke="rgba(123,123,123,0.7)" stroke-width="1">
-          <rect width="5" height="193.482" rx="2.5" stroke="none"/>
-          <rect x="0.5" y="0.5" width="4" height="192.482" rx="2" fill="none"/>
-        </g>
-      </g>
-      <g data-type="innerShadowGroup">
-        <g transform="matrix(1, 0, 0, 1, -8.93, -8.75)" filter="url(#Rectangle_46-3)">
-          <g id="Rectangle_46-9" data-name="Rectangle 46" transform="translate(31 9)" fill="#fff" stroke="rgba(123,123,123,0.7)" stroke-width="1">
-            <rect width="5" height="193.482" rx="2.5" stroke="none"/>
-            <rect x="0.5" y="0.5" width="4" height="192.482" rx="2" fill="none"/>
-          </g>
-        </g>
-        <rect id="Rectangle_46-10" data-name="Rectangle 46" width="5" height="193.482" rx="2.5" transform="translate(22.07 0.247)" fill="#fff"/>
-        <g transform="matrix(1, 0, 0, 1, -8.93, -8.75)" filter="url(#Rectangle_46-4)">
-          <rect id="Rectangle_46-11" data-name="Rectangle 46" width="5" height="193.482" rx="2.5" transform="translate(31 9)" fill="#fff"/>
-        </g>
-        <g id="Rectangle_46-12" data-name="Rectangle 46" transform="translate(22.07 0.247)" fill="none" stroke="rgba(123,123,123,0.7)" stroke-width="1">
-          <rect width="5" height="193.482" rx="2.5" stroke="none"/>
-          <rect x="0.5" y="0.5" width="4" height="192.482" rx="2" fill="none"/>
-        </g>
-      </g>
-      <g data-type="innerShadowGroup">
-        <g transform="matrix(1, 0, 0, 1, -8.93, -8.75)" filter="url(#Rectangle_49-3)">
-          <g id="Rectangle_49-9" data-name="Rectangle 49" transform="translate(42 9)" fill="#fff" stroke="rgba(123,123,123,0.7)" stroke-width="1">
-            <rect width="5" height="193.482" rx="2.5" stroke="none"/>
-            <rect x="0.5" y="0.5" width="4" height="192.482" rx="2" fill="none"/>
-          </g>
-        </g>
-        <rect id="Rectangle_49-10" data-name="Rectangle 49" width="5" height="193.482" rx="2.5" transform="translate(33.07 0.247)" fill="#fff"/>
-        <g transform="matrix(1, 0, 0, 1, -8.93, -8.75)" filter="url(#Rectangle_49-4)">
-          <rect id="Rectangle_49-11" data-name="Rectangle 49" width="5" height="193.482" rx="2.5" transform="translate(42 9)" fill="#fff"/>
-        </g>
-        <g id="Rectangle_49-12" data-name="Rectangle 49" transform="translate(33.07 0.247)" fill="none" stroke="rgba(123,123,123,0.7)" stroke-width="1">
-          <rect width="5" height="193.482" rx="2.5" stroke="none"/>
-          <rect x="0.5" y="0.5" width="4" height="192.482" rx="2" fill="none"/>
-        </g>
-      </g>
-      <g id="Rectangle_14-2" data-name="Rectangle 14" transform="translate(5.715 0.247)" fill="#fff" stroke="rgba(123,123,123,0.7)" stroke-width="1">
-        <rect width="4.422" height="193.482" stroke="none"/>
-        <rect x="0.5" y="0.5" width="3.422" height="192.482" fill="none"/>
-      </g>
-      <g id="Rectangle_42-2" data-name="Rectangle 42" transform="translate(16.715 0.247)" fill="#fff" stroke="rgba(123,123,123,0.7)" stroke-width="1">
-        <rect width="4.422" height="193.482" stroke="none"/>
-        <rect x="0.5" y="0.5" width="3.422" height="192.482" fill="none"/>
-      </g>
-      <g id="Rectangle_45-2" data-name="Rectangle 45" transform="translate(27.715 0.247)" fill="#fff" stroke="rgba(123,123,123,0.7)" stroke-width="1">
-        <rect width="4.422" height="193.482" stroke="none"/>
-        <rect x="0.5" y="0.5" width="3.422" height="192.482" fill="none"/>
-      </g>
-    </g>
-    <g id="Group_25" data-name="Group 25" transform="translate(777.522 279)">
-      <rect id="Rectangle_41" data-name="Rectangle 41" width="135" height="167" transform="translate(0.477 0)" fill="none"/>
-      <line id="Line_1" data-name="Line 1" x2="127.124" transform="translate(3.869 3.982)" fill="none" stroke="#606060" stroke-width="2"/>
-      <circle id="Ellipse_1" data-name="Ellipse 1" cx="3.869" cy="3.869" r="3.869" transform="translate(127.124 0.113)" fill="#606060"/>
-      <circle id="Ellipse_2" data-name="Ellipse 2" cx="3.869" cy="3.869" r="3.869" transform="translate(0 0.113)" fill="#606060"/>
-    </g>
-  </g>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 18.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="433.9px" height="729px" viewBox="0 0 433.9 729" enable-background="new 0 0 433.9 729" xml:space="preserve">
+<g>
+	<rect x="76.8" y="96.4" fill="#FFFFFF" stroke="#464545" stroke-width="3" width="280.2" height="389"/>
+	<rect x="99.9" y="119.5" fill="none" stroke="#464545" stroke-width="3" width="234" height="342.8"/>
+</g>
+<g>
+	<rect x="23.9" y="34.5" fill="#FFFFFF" stroke="#464545" stroke-width="1.7037" width="404.4" height="13"/>
+</g>
+<rect x="407.8" y="32.5" fill="#FFFFFF" stroke="#464545" stroke-width="1.5" width="24" height="17"/>
+<rect x="2.1" y="32.5" fill="#FFFFFF" stroke="#464545" stroke-width="1.5" width="24" height="17"/>
+<g>
+	<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9532" stroke-miterlimit="10" d="M256.6,675c0,0,7.7,8.2,15.6,8.3
+		c7.9,0.1,14.6-7.3,14.6-7.3V52.4c0,0-4.9,0-15.1,0c-10.2,0-15.1,0-15.1,0V675z"/>
+	<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9525" stroke-miterlimit="10" d="M286.8,676c4.6-2.4,8.1,0.5,8.1,0.5
+		s5.2,6.8,13.2,6.8s13.2-7.3,13.2-7.3V52.4h-34.5V676z"/>
+	<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9525" stroke-miterlimit="10" d="M321.3,676c4.6-2.4,8.1,0.5,8.1,0.5
+		s5.2,6.8,13.2,6.8s13.2-7.3,13.2-7.3V52.4h-34.5V676z"/>
+	<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9525" stroke-miterlimit="10" d="M355.8,676c4.6-2.4,8.1,0.5,8.1,0.5
+		s5.2,6.8,13.2,6.8s13.2-7.3,13.2-7.3V52.4h-34.5V676z"/>
+</g>
+<g>
+	<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9532" stroke-miterlimit="10" d="M177.2,674c0,0-7.7,8.2-15.6,8.3
+		c-7.9,0.1-14.6-7.3-14.6-7.3V52.4c0,0,4.9,0,15.1,0s15.1,0,15.1,0V674z"/>
+	<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9525" stroke-miterlimit="10" d="M147,675c-4.6-2.4-8.1,0.5-8.1,0.5
+		s-5.2,6.8-13.2,6.8s-13.2-7.3-13.2-7.3V52.4H147V675z"/>
+	<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9525" stroke-miterlimit="10" d="M112.5,675c-4.6-2.4-8.1,0.5-8.1,0.5
+		s-5.2,6.8-13.2,6.8S78,675,78,675V52.4h34.5V675z"/>
+	<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9525" stroke-miterlimit="10" d="M78,675c-4.6-2.4-8.1,0.5-8.1,0.5
+		s-5.2,6.8-13.2,6.8S43.5,675,43.5,675V52.4H78V675z"/>
+</g>
 </svg>

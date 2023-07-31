@@ -258,7 +258,8 @@ function PageItems() {
             let arr = response.data;
             setPageItems(arr);
         }).catch(err => {
-            if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         getPageItems();
@@ -290,7 +291,8 @@ function PageItems() {
                 setModels(tempArr);
                 resolve();
             }).catch(err => {
-                if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                     refreshToken().then((response2) => {
                         if (response2 !== false) {
                             getSelections();
@@ -1762,7 +1764,8 @@ function PageItems() {
             getPageItems();
             setShowToast(true);
         }).catch(err => {
-            if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         deletePageItems(id);
@@ -1843,7 +1846,8 @@ function PageItems() {
                 getPageItems();
                 setIsLoading(false);
             }).catch(err => {
-            if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         updatePageItems(e, refIndex, delField)
@@ -1916,7 +1920,8 @@ function PageItems() {
                 getPageItems();
                 setIsLoading(false);
             }).catch(err => {
-            if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         addPageItems();

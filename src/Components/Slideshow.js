@@ -98,7 +98,8 @@ function Slideshow() {
                 setslide(tempslide);
                 setIsUploading(false);
             }).catch(err => {
-            if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         updatePicture(e);
@@ -126,7 +127,8 @@ function Slideshow() {
             .then(() => {
                 setShowToast(true);
             }).catch(err => {
-            if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         updateslide();

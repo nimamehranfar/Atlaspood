@@ -516,6 +516,13 @@
         "order": 7,
         "apiLabel": "RemoteName",
         "apiValue": null,
+        "apiAcc": "value",
+        "apiAccValue": {
+          "SewingAccessoryId": 8,
+          "SewingModelAccessoryId": 0,
+          "SewingAccessoryValue": null,
+          "Qty": 1
+        },
         "lang": [
           "en",
           "fa"
@@ -529,6 +536,13 @@
         "order": 8,
         "apiLabel": "MotorChannels",
         "apiValue": null,
+        "apiAcc": "value",
+        "apiAccValue": {
+          "SewingAccessoryId": 9,
+          "SewingModelAccessoryId": 0,
+          "SewingAccessoryValue": null,
+          "Qty": 1
+        },
         "lang": [
           "en",
           "fa"
@@ -1302,6 +1316,13 @@
         "order": 7,
         "apiLabel": "RemoteName",
         "apiValue": null,
+        "apiAcc": "value",
+        "apiAccValue": {
+          "SewingAccessoryId": 8,
+          "SewingModelAccessoryId": 0,
+          "SewingAccessoryValue": null,
+          "Qty": 1
+        },
         "lang": [
           "en",
           "fa"
@@ -1315,6 +1336,13 @@
         "order": 8,
         "apiLabel": "MotorChannels",
         "apiValue": null,
+        "apiAcc": "value",
+        "apiAccValue": {
+          "SewingAccessoryId": 9,
+          "SewingModelAccessoryId": 0,
+          "SewingAccessoryValue": null,
+          "Qty": 1
+        },
         "lang": [
           "en",
           "fa"
@@ -1717,6 +1745,8 @@
         "apiValue": null,
         "apiLabel2": "LiningId",
         "apiValue2": null,
+        "apiLabel3": "FabricId",
+        "apiValue3": null,
         "lang": [
           "en",
           "fa"
@@ -2283,6 +2313,13 @@
         "order": 7,
         "apiLabel": "RemoteName",
         "apiValue": null,
+        "apiAcc": "value",
+        "apiAccValue": {
+          "SewingAccessoryId": 8,
+          "SewingModelAccessoryId": 0,
+          "SewingAccessoryValue": null,
+          "Qty": 1
+        },
         "lang": [
           "en",
           "fa"
@@ -2296,6 +2333,13 @@
         "order": 8,
         "apiLabel": "MotorChannels",
         "apiValue": null,
+        "apiAcc": "value",
+        "apiAccValue": {
+          "SewingAccessoryId": 9,
+          "SewingModelAccessoryId": 0,
+          "SewingAccessoryValue": null,
+          "Qty": 1
+        },
         "lang": [
           "en",
           "fa"
@@ -4181,10 +4225,10 @@
       },
       {
         "cart": "hasRod",
-        "title": "has Rod",
+        "title": "Is Rod Installed",
         "titleValue": null,
-        "titlePostfix": "cm",
-        "order": 13,
+        "titlePostfix": "",
+        "order": -1,
         "apiLabel": "RodInstalled",
         "apiValue": null,
         "measurements": true,
@@ -4473,11 +4517,24 @@
         ]
       },
       {
+        "cart": "PanelTypeOption",
+        "title": "Panel Type Option",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 17,
+        "apiLabel": "PanelTypeOption",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
         "cart": "PanelType",
         "title": "Panel Type",
         "titleValue": null,
         "titlePostfix": "",
-        "order": 17,
+        "order": 18,
         "apiLabel": "PanelType",
         "apiValue": null,
         "lang": [
@@ -4490,7 +4547,7 @@
         "title": "Grommet Finish",
         "titleValue": null,
         "titlePostfix": "",
-        "order": 18,
+        "order": 19,
         "apiLabel": "GrommetFinish",
         "apiValue": null,
         "lang": [
@@ -4503,7 +4560,7 @@
         "title": "Hardware",
         "titleValue": null,
         "titlePostfix": "",
-        "order": 19,
+        "order": 20,
         "apiLabel": "Hardware",
         "apiValue": null,
         "lang": [
@@ -4675,15 +4732,20 @@
       {
         "cart": "Mount8",
         "title": "Mount",
-        "titleValue": null,
+        "titleValue": {
+          "true": "Wall",
+          "false": "Ceiling"
+        },
         "titlePostfix": "",
-        "order": -1,
-        "apiLabel": "Mount8",
-        "apiValue": null,
-        "apiLabel2": "Mount8",
+        "order": 10,
+        "apiLabel": "IsWalled",
+        "apiValue": {
+          "Wall": true,
+          "Ceiling": false
+        },
+        "apiLabel2": "IsWalled",
         "apiValue2": null,
         "lang": [
-          "en",
           "fa"
         ]
       },
@@ -4692,7 +4754,7 @@
         "title": "Drapery Hardware",
         "titleValue": null,
         "titlePostfix": "",
-        "order": 19,
+        "order": 21,
         "apiLabel": "DraperyHardware",
         "apiValue": null,
         "lang": [
@@ -4814,26 +4876,11 @@
         ]
       },
       {
-        "cart": "MountA",
-        "title": "Mount",
-        "titleValue": null,
-        "titlePostfix": "",
-        "order": -1,
-        "apiLabel": "MountA",
-        "apiValue": null,
-        "apiLabel2": "MountA",
-        "apiValue2": null,
-        "lang": [
-          "en",
-          "fa"
-        ]
-      },
-      {
         "cart": "SheerHardware",
         "title": "Sheer Hardware",
         "titleValue": null,
         "titlePostfix": "",
-        "order": 20,
+        "order": 22,
         "apiLabel": "SheerHardware",
         "apiValue": null,
         "lang": [
@@ -4955,26 +5002,11 @@
         ]
       },
       {
-        "cart": "MountB",
-        "title": "Mount",
-        "titleValue": null,
-        "titlePostfix": "",
-        "order": -1,
-        "apiLabel": "MountB",
-        "apiValue": null,
-        "apiLabel3": "MountB",
-        "apiValue3": null,
-        "lang": [
-          "en",
-          "fa"
-        ]
-      },
-      {
         "cart": "PrivacyLayerHardware",
         "title": "Privacy Layer Hardware",
         "titleValue": null,
         "titlePostfix": "",
-        "order": 21,
+        "order": 23,
         "apiLabel": "PrivacyLayerHardware",
         "apiValue": null,
         "lang": [
@@ -5129,6 +5161,13 @@
         "order": 31,
         "apiLabel": "RemoteName",
         "apiValue": null,
+        "apiAcc": "value",
+        "apiAccValue": {
+          "SewingAccessoryId": 8,
+          "SewingModelAccessoryId": 0,
+          "SewingAccessoryValue": null,
+          "Qty": 1
+        },
         "lang": [
           "en",
           "fa"
@@ -5142,6 +5181,13 @@
         "order": 32,
         "apiLabel": "MotorChannels",
         "apiValue": null,
+        "apiAcc": "value",
+        "apiAccValue": {
+          "SewingAccessoryId": 9,
+          "SewingModelAccessoryId": 0,
+          "SewingAccessoryValue": null,
+          "Qty": 1
+        },
         "lang": [
           "en",
           "fa"
@@ -5328,7 +5374,7 @@
         ]
       }
     ],
-    "route": "/Curtain/Dual-Roller-Shades/0099"
+    "route": "/Curtain/Grommet-Drapery/0099"
   },
   "0302": {}
 }

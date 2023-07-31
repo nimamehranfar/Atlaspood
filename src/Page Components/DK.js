@@ -93,6 +93,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
     const [pageLoad, setPageLoad] = useState(undefined);
     const [pageLoadDK, setPageLoadDK] = useState(undefined);
     const [motorLoad, setMotorLoad] = useState(false);
+    const [motorLoad2, setMotorLoad2] = useState(false);
     const [models, setModels] = useState([]);
     const [projectData, setProjectData] = useState({});
     const [model, setModel] = useState({});
@@ -238,6 +239,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
         "prices": []
     });
     const steps = useRef([]);
+    const stepHeaders = useRef([]);
     const draperyRef = useRef([]);
     
     const [filterChanged, setFilterChanged] = useState({
@@ -396,7 +398,9 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
             }
             setMotorType(tempObj);
             if (selectedMotorType.length) {
-                // console.log("hi");
+                if (!motorLoad2) {
+                    setMotorLoad2(true);
+                }
                 setSelectedMotorType(selectedMotorType[0].value ? [{
                     value: selectedMotorType[0].value,
                     label: tempObj[pageLanguage].find(opt => opt.value === selectedMotorType[0].value).label
@@ -712,7 +716,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                 <div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key}>
                     <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
                         <hr/>
-                        <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(100000, pageLanguage1, pageLanguage1 === "en" ?"Tomans":"تومان")}</p></span>
+                        <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(100000, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")}</p></span>
                     </div>
                     {fabric}
                 </div>;
@@ -891,9 +895,8 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
         }
         
         return (
-            <div
-                className={`w-100 h-100 steps_header ${isCurrentEventKey ? 'steps_header_active' : ''}`}
-                onClick={decoratedOnClick}>
+            <div className={`w-100 h-100 steps_header ${isCurrentEventKey ? 'steps_header_active' : ''}`}
+                onClick={decoratedOnClick} ref={ref => (stepHeaders.current[stepRef] = ref)}>
                 <div className="steps_header_num_container">
                     <div className="steps_header_num">{stepNum}</div>
                 </div>
@@ -951,15 +954,16 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
         );
     }
     
-    function NextStep({children, eventKey, callback, onClick}) {
+    function NextStep({children, eventKey, callback, onClick, currentStep}) {
         const decoratedOnClick = useAccordionButton(
             eventKey,
             () => {
                 callback && callback(eventKey);
                 setAccordionActiveKey(eventKey);
-                // setTimeout(() => {
-                //     window.scrollTo(window.scrollX, window.scrollY + 1);
-                // }, 500);
+                setTimeout(() => {
+                    if (currentStep && stepHeaders.current[currentStep] !== undefined)
+                        stepHeaders.current[currentStep].scrollIntoView();
+                }, 500);
             },
         );
         return (
@@ -1044,7 +1048,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                 }
                 setStepSelectedLabel(tempLabels);
                 let minValue = Math.min(...temp.values[refIndex]);
-                let maxValue = Math.min(...temp.values[refIndex]);
+                let maxValue = Math.max(...temp.values[refIndex]);
                 if (maxValue - minValue >= 2) {
                     modalHandleShow(modalRef);
                 }
@@ -1278,7 +1282,8 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
             .then(() => {
                 renderCart();
             }).catch(err => {
-            if (err.response.status === 401) {
+            console.log(err);
+            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         editBasketProject(projectObj);
@@ -1305,7 +1310,8 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
             }
             renderCart();
         }).catch(err => {
-            if (err.response.status === 401) {
+            console.log(err);
+            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         deleteBasketProject(refIndex);
@@ -1354,7 +1360,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
         let userProjects = JSON.parse(JSON.stringify(UserProjects))[`${modelID}`]["data"];
         
         Object.keys(temp).forEach(key => {
-            if (temp[key] !== null || temp[key] !== "") {
+            if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                 if (tempObj === undefined) {
                     console.log(key);
@@ -1391,7 +1397,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
         tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
         
         Object.keys(temp).forEach(key => {
-            if (temp[key] !== null || temp[key] !== "") {
+            if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                 // console.log(key,userProjects.find(obj => obj["cart"] === key));
                 if (tempObj) {
@@ -1414,7 +1420,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
         tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
         tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
         Object.keys(temp).forEach(key => {
-            if (temp[key] !== null || temp[key] !== "") {
+            if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                 if (tempObj) {
                     if (tempObj["apiAcc"] !== undefined) {
@@ -1539,7 +1545,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
             let userProjects = JSON.parse(JSON.stringify(UserProjects))[`${modelID}`]["data"];
             
             Object.keys(temp).forEach(key => {
-                if (temp[key] !== null || temp[key] !== "") {
+                if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
                     if (tempObj === undefined) {
                         // window.location.reload();
@@ -1575,7 +1581,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
             tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
             
             Object.keys(temp).forEach(key => {
-                if (temp[key] !== null || temp[key] !== "") {
+                if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
                     // console.log(key,userProjects.find(obj => obj["cart"] === key));
                     if (tempObj) {
@@ -1598,7 +1604,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
             tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
             tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
             Object.keys(temp).forEach(key => {
-                if (temp[key] !== null || temp[key] !== "") {
+                if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                     let tempObj = userProjects.find(obj => obj["cart"] === key);
                     if (tempObj) {
                         if (tempObj["apiAcc"] !== undefined) {
@@ -1817,309 +1823,320 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
     
     function addToCart() {
         let tempDepSet = [...depSet];
+        console.log(tempDepSet);
         let tempNewSet = new Set();
         let tempErr = [];
-        tempDepSet.forEach(dependency => {
-            tempNewSet.add(dependency.split('')[0]);
-            // tempNewSet.add(dependency);
+        let promiseArr = [];
+        tempDepSet.forEach((dependency, index) => {
+            promiseArr[index] = new Promise((resolve, reject) => {
+                if (dependency.split('')[1] === '0') {
+                    tempNewSet.add(dependency.slice(0, 3));
+                } else {
+                    tempNewSet.add(dependency.split('')[0]);
+                }
+                // tempNewSet.add(dependency);
+                resolve();
+            });
         });
         
-        if (tempNewSet.size > 0) {
-            setAddingLoading(false);
-            let temp = JSON.parse(JSON.stringify(requiredStep));
-            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-            [...tempNewSet].sort(function (a, b) {
-                return a - b
-            }).forEach((dependency, index) => {
-                while (steps.current[dependency] === undefined) {
-                    dependency = dependency.slice(0, -1);
-                    if (dependency === "")
-                        break;
-                }
-                if (steps.current[dependency] !== undefined) {
-                    let type = steps.current[dependency].getAttribute("type-of-step") === "1" ? (pageLanguage === 'fa' ? " را مشخص کنید" : "SPECIFY ") : (pageLanguage === 'fa' ? " را انتخاب کنید" : "SELECT ");
-                    tempErr.push(
-                        <li key={index}>
-                            {pageLanguage === 'fa' ? "شما باید " + steps.current[dependency].getAttribute("cart-custom-text") + type : "YOU MUST " + type + steps.current[dependency].getAttribute("cart-custom-text")}
-                        </li>
-                    );
-                }
-            });
-            
-            tempNewSet = new Set();
-            
-            tempDepSet.forEach(dependency => {
-                // tempNewSet.add(dependency.split('')[0]);
-                tempNewSet.add(dependency);
-                // console.log(dependency)
-            });
-            [...tempNewSet].sort(function (a, b) {
-                return a - b
-            }).forEach((dependency, index) => {
-                while (steps.current[dependency] === undefined) {
-                    dependency = dependency.slice(0, -1);
-                    if (dependency === "")
-                        break;
-                }
-                if (steps.current[dependency] !== undefined) {
-                    temp[dependency] = true;
-                    delete tempLabels[dependency];
-                }
-            });
-            
-            setTimeout(() => {
-                setRequiredStep(temp);
-            }, 1000);
-            setStepSelectedLabel(tempLabels);
-            setAddCartErr(tempErr);
-            modalHandleShow("addToCartErr");
-        } else if (cartValues["HeightCart"] === undefined || cartValues["WidthCart"] === undefined) {
-            // console.log(cartValues);
-            if (measureWindowSize()) {
-                addToCart();
-            } else {
+        Promise.all(promiseArr).then(() => {
+            if (tempNewSet.size > 0) {
                 setAddingLoading(false);
-            }
-        } else {
-            if (price) {
-                // console.log(cartValues,"hi");
-                let userProjects = JSON.parse(JSON.stringify(UserProjects))[`${modelID}`]["data"];
-                let tempArr = [];
-                let temp1 = [];
-                let temp = JSON.parse(JSON.stringify(cartValues));
-                let tempPostObj = {};
-                let tempBagPrice = 0;
-                
-                
-                // tempPostObj["ApiKey"] = window.$apikey;
-                tempPostObj["WindowCount"] = 1;
-                tempPostObj["SewingModelId"] = `${modelID}`;
-                Object.keys(temp).forEach(key => {
-                    if (temp[key] !== null || temp[key] !== "") {
-                        let tempObj = userProjects.find(obj => obj["cart"] === key);
-                        // console.log(key,tempObj);
-                        if (tempObj && tempObj["apiLabel"] !== "") {
-                            if (tempObj["apiValue"] === null) {
-                                tempPostObj[tempObj["apiLabel"]] = temp[key];
-                            } else {
-                                tempPostObj[tempObj["apiLabel"]] = tempObj["apiValue"][temp[key]];
-                            }
-                        }
+                let temp = JSON.parse(JSON.stringify(requiredStep));
+                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                [...tempNewSet].sort(function (a, b) {
+                    return a - b
+                }).forEach((dependency, index) => {
+                    while (steps.current[dependency] === undefined) {
+                        dependency = dependency.slice(0, -1);
+                        if (dependency === "")
+                            break;
+                    }
+                    if (steps.current[dependency] !== undefined && steps.current[dependency] !== null) {
+                        let type = steps.current[dependency].getAttribute("type-of-step") === "1" ? (pageLanguage === 'fa' ? " را مشخص کنید" : "SPECIFY ") : (pageLanguage === 'fa' ? " را انتخاب کنید" : "SELECT ");
+                        tempErr.push(
+                            <li key={index}>
+                                {pageLanguage === 'fa' ? "شما باید " + steps.current[dependency].getAttribute("cart-custom-text") + type : "YOU MUST " + type + steps.current[dependency].getAttribute("cart-custom-text")}
+                            </li>
+                        );
                     }
                 });
                 
-                tempPostObj["SewingOrderDetails"] = [];
-                for (let i = 0; i < 3; i++) {
-                    tempPostObj["SewingOrderDetails"][i] = {};
-                    tempPostObj["SewingOrderDetails"][i]["IsLowWrinkle"] = true;
-                    tempPostObj["SewingOrderDetails"][i]["IsCoverAll"] = true;
-                    tempPostObj["SewingOrderDetails"][i]["IsAltogether"] = true;
+                tempNewSet = new Set();
+                
+                tempDepSet.forEach(dependency => {
+                    // tempNewSet.add(dependency.split('')[0]);
+                    tempNewSet.add(dependency);
+                    // console.log(dependency)
+                });
+                [...tempNewSet].sort(function (a, b) {
+                    return a - b
+                }).forEach((dependency, index) => {
+                    while (steps.current[dependency] === undefined) {
+                        dependency = dependency.slice(0, -1);
+                        if (dependency === "")
+                            break;
+                    }
+                    if (steps.current[dependency] !== undefined && steps.current[dependency] !== null) {
+                        temp[dependency] = true;
+                        delete tempLabels[dependency];
+                    }
+                });
+                
+                setTimeout(() => {
+                    setRequiredStep(temp);
+                }, 1000);
+                setStepSelectedLabel(tempLabels);
+                setAddCartErr(tempErr);
+                modalHandleShow("addToCartErr");
+            } else if (cartValues["HeightCart"] === undefined || cartValues["WidthCart"] === undefined) {
+                // console.log(cartValues);
+                if (measureWindowSize()) {
+                    addToCart();
+                } else {
+                    setAddingLoading(false);
                 }
-                
-                
-                tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
-                tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
-                
-                tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2302;
-                tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `0002`;
-                
-                tempPostObj["SewingOrderDetails"][2]["CurtainPartId"] = 2301;
-                tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
-                
-                Object.keys(temp).forEach(key => {
-                    if (temp[key] !== null || temp[key] !== "") {
-                        let tempObj = userProjects.find(obj => obj["cart"] === key);
-                        // console.log(key,userProjects.find(obj => obj["cart"] === key));
-                        if (tempObj) {
-                            for (let i = 0; i < 3; i++) {
-                                let j = +i + +2;
-                                if (tempObj["apiLabel" + j] !== undefined) {
-                                    if (tempObj["apiValue" + j] === null) {
-                                        tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = temp[key];
-                                        // console.log(i,tempObj["cart"],tempPostObj["SewingOrderDetails"],tempPostObj["SewingOrderDetails"][i]);
-                                    } else {
-                                        tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = tempObj["apiValue" + j][temp[key]];
+            } else {
+                if (price) {
+                    // console.log(cartValues,"hi");
+                    let userProjects = JSON.parse(JSON.stringify(UserProjects))[`${modelID}`]["data"];
+                    let tempArr = [];
+                    let temp1 = [];
+                    let temp = JSON.parse(JSON.stringify(cartValues));
+                    let tempPostObj = {};
+                    let tempBagPrice = 0;
+                    
+                    
+                    // tempPostObj["ApiKey"] = window.$apikey;
+                    tempPostObj["WindowCount"] = 1;
+                    tempPostObj["SewingModelId"] = `${modelID}`;
+                    Object.keys(temp).forEach(key => {
+                        if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
+                            let tempObj = userProjects.find(obj => obj["cart"] === key);
+                            // console.log(key,tempObj);
+                            if (tempObj && tempObj["apiLabel"] !== "") {
+                                if (tempObj["apiValue"] === null) {
+                                    tempPostObj[tempObj["apiLabel"]] = temp[key];
+                                } else {
+                                    tempPostObj[tempObj["apiLabel"]] = tempObj["apiValue"][temp[key]];
+                                }
+                            }
+                        }
+                    });
+                    
+                    tempPostObj["SewingOrderDetails"] = [];
+                    for (let i = 0; i < 3; i++) {
+                        tempPostObj["SewingOrderDetails"][i] = {};
+                        tempPostObj["SewingOrderDetails"][i]["IsLowWrinkle"] = true;
+                        tempPostObj["SewingOrderDetails"][i]["IsCoverAll"] = true;
+                        tempPostObj["SewingOrderDetails"][i]["IsAltogether"] = true;
+                    }
+                    
+                    
+                    tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
+                    tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${modelID}`;
+                    
+                    tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2302;
+                    tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `0002`;
+                    
+                    tempPostObj["SewingOrderDetails"][2]["CurtainPartId"] = 2301;
+                    tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
+                    
+                    Object.keys(temp).forEach(key => {
+                        if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
+                            let tempObj = userProjects.find(obj => obj["cart"] === key);
+                            // console.log(key,userProjects.find(obj => obj["cart"] === key));
+                            if (tempObj) {
+                                for (let i = 0; i < 3; i++) {
+                                    let j = +i + +2;
+                                    if (tempObj["apiLabel" + j] !== undefined) {
+                                        if (tempObj["apiValue" + j] === null) {
+                                            tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = temp[key];
+                                            // console.log(i,tempObj["cart"],tempPostObj["SewingOrderDetails"],tempPostObj["SewingOrderDetails"][i]);
+                                        } else {
+                                            tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = tempObj["apiValue" + j][temp[key]];
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                });
-                // console.log(tempPostObj["SewingOrderDetails"]);
-                tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
-                tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
-                tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
-                Object.keys(temp).forEach(key => {
-                    if (temp[key] !== null || temp[key] !== "") {
-                        let tempObj = userProjects.find(obj => obj["cart"] === key);
-                        if (tempObj) {
-                            if (tempObj["apiAcc"] !== undefined) {
-                                if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
-                                    tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
-                                } else {
-                                
+                    });
+                    // console.log(tempPostObj["SewingOrderDetails"]);
+                    tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
+                    tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
+                    tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
+                    Object.keys(temp).forEach(key => {
+                        if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
+                            let tempObj = userProjects.find(obj => obj["cart"] === key);
+                            if (tempObj) {
+                                if (tempObj["apiAcc"] !== undefined) {
+                                    if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
+                                        tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
+                                    } else {
+                                    
+                                    }
                                 }
-                            }
-                            if (tempObj["apiAcc2"] !== undefined) {
-                                if (tempObj["apiAcc2"] === true && tempObj["apiAccValue2"][temp[key]]) {
-                                    tempPostObj["SewingOrderDetails"][1]["Accessories"].push(tempObj["apiAccValue2"][temp[key]]);
-                                } else {
-                                
+                                if (tempObj["apiAcc2"] !== undefined) {
+                                    if (tempObj["apiAcc2"] === true && tempObj["apiAccValue2"][temp[key]]) {
+                                        tempPostObj["SewingOrderDetails"][1]["Accessories"].push(tempObj["apiAccValue2"][temp[key]]);
+                                    } else {
+                                    
+                                    }
                                 }
-                            }
-                            if (tempObj["apiAcc3"] !== undefined) {
-                                if (tempObj["apiAcc3"] === true && tempObj["apiAccValue3"][temp[key]]) {
-                                    tempPostObj["SewingOrderDetails"][2]["Accessories"].push(tempObj["apiAccValue3"][temp[key]]);
-                                } else {
-                                
+                                if (tempObj["apiAcc3"] !== undefined) {
+                                    if (tempObj["apiAcc3"] === true && tempObj["apiAccValue3"][temp[key]]) {
+                                        tempPostObj["SewingOrderDetails"][2]["Accessories"].push(tempObj["apiAccValue3"][temp[key]]);
+                                    } else {
+                                    
+                                    }
                                 }
                             }
                         }
-                    }
-                });
-                tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
-                    return el != null;
-                });
-                // console.log(tempPostObj);
+                    });
+                    tempPostObj["SewingOrderDetails"][0]["Accessories"] = tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(function (el) {
+                        return el != null;
+                    });
+                    // console.log(tempPostObj);
                     for (let i = tempPostObj["SewingOrderDetails"].length - 1; i >= 0; i--) {
                         if (tempPostObj["SewingOrderDetails"] && tempPostObj["SewingOrderDetails"][i] && tempPostObj["SewingOrderDetails"][i]["FabricId"] === undefined) {
                             tempPostObj["SewingOrderDetails"].splice(i, 1);
                         }
                     }
                     if (tempPostObj["SewingOrderDetails"][0]["FabricId"] !== undefined) {
-                    // console.log(JSON.stringify(tempPostObj));
-                    axios.post(baseURLPrice, tempPostObj)
-                        .then((response) => {
-                            setBagPrice(response.data["price"]);
-                            tempBagPrice = response.data["price"];
-                            temp["Price"] = response.data["price"];
-                            if (zipcodeChecked && response.data["InstallAmount"]) {
-                                temp["InstallAmount"] = response.data["InstallAmount"];
-                                temp["TransportationAmount"] = response.data["TransportationAmount"];
-                            }
-                            // console.log(response.data);
-                            
-                            let roomNameFa = cartValues["RoomNameFa"];
-                            let roomName = cartValues["RoomNameEn"];
-                            let WindowName = cartValues["WindowName"] === undefined ? "" : cartValues["WindowName"];
-                            Object.keys(cartValues).forEach(key => {
-                                let tempObj = userProjects.find(obj => obj["cart"] === key);
-                                if (tempObj === undefined) {
-                                    // window.location.reload();
-                                    console.log(key);
-                                } else {
-                                    if (key === "WindowHeight" || key === "WindowWidth") {
+                        // console.log(JSON.stringify(tempPostObj));
+                        axios.post(baseURLPrice, tempPostObj)
+                            .then((response) => {
+                                setBagPrice(response.data["price"]);
+                                tempBagPrice = response.data["price"];
+                                temp["Price"] = response.data["price"];
+                                if (zipcodeChecked && response.data["InstallAmount"]) {
+                                    temp["InstallAmount"] = response.data["InstallAmount"];
+                                    temp["TransportationAmount"] = response.data["TransportationAmount"];
+                                }
+                                // console.log(response.data);
+                                
+                                let roomNameFa = cartValues["RoomNameFa"];
+                                let roomName = cartValues["RoomNameEn"];
+                                let WindowName = cartValues["WindowName"] === undefined ? "" : cartValues["WindowName"];
+                                Object.keys(cartValues).forEach(key => {
+                                    let tempObj = userProjects.find(obj => obj["cart"] === key);
+                                    if (tempObj === undefined) {
+                                        // window.location.reload();
+                                        console.log(key);
+                                    } else {
+                                        if (key === "WindowHeight" || key === "WindowWidth") {
                                         
-                                    } else if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
-                                        let objLabel = "";
-                                        if (key === "ControlType" && cartValues["ControlType"] === "Motorized") {
-                                            objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(cartValues[key].toString())} / ${t(cartValues["MotorType"].toString())}`).toString() : `${t(cartValues[key].toString())} / ${t(cartValues["MotorType"].toString())}`;
-                                        } else if (tempObj["titleValue"] === null || true) {
-                                            if (tempObj["titlePostfix"] === "") {
-                                                objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(cartValues[key].toString())}`).toString() : t(cartValues[key].toString());
-                                            } else {
-                                                objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${cartValues[key]}`).toString() + t(tempObj["titlePostfix"]) : cartValues[key].toString() + t(tempObj["titlePostfix"]);
-                                            }
-                                            // objLabel = cartValues[key].toString() + tempObj["titlePostfix"];
-                                        } else {
-                                            // console.log(tempObj["titleValue"],tempObj["titleValue"][cartValues[key].toString()],cartValues[key]);
-                                            if (tempObj["titleValue"][cartValues[key].toString()] === null) {
+                                        } else if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
+                                            let objLabel = "";
+                                            if (key === "ControlType" && cartValues["ControlType"] === "Motorized") {
+                                                objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(cartValues[key].toString())} / ${t(cartValues["MotorType"].toString())}`).toString() : `${t(cartValues[key].toString())} / ${t(cartValues["MotorType"].toString())}`;
+                                            } else if (tempObj["titleValue"] === null || true) {
                                                 if (tempObj["titlePostfix"] === "") {
-                                                    objLabel = t(cartValues[key].toString());
+                                                    objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(cartValues[key].toString())}`).toString() : t(cartValues[key].toString());
                                                 } else {
                                                     objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${cartValues[key]}`).toString() + t(tempObj["titlePostfix"]) : cartValues[key].toString() + t(tempObj["titlePostfix"]);
                                                 }
+                                                // objLabel = cartValues[key].toString() + tempObj["titlePostfix"];
                                             } else {
-                                                objLabel = t(tempObj["titleValue"][cartValues[key].toString()]);
+                                                // console.log(tempObj["titleValue"],tempObj["titleValue"][cartValues[key].toString()],cartValues[key]);
+                                                if (tempObj["titleValue"][cartValues[key].toString()] === null) {
+                                                    if (tempObj["titlePostfix"] === "") {
+                                                        objLabel = t(cartValues[key].toString());
+                                                    } else {
+                                                        objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${cartValues[key]}`).toString() + t(tempObj["titlePostfix"]) : cartValues[key].toString() + t(tempObj["titlePostfix"]);
+                                                    }
+                                                } else {
+                                                    objLabel = t(tempObj["titleValue"][cartValues[key].toString()]);
+                                                }
                                             }
+                                            temp1[tempObj["order"]] =
+                                                <li className="cart_agree_item" key={key}>
+                                                    <h1 className="cart_agree_item_title">{t(tempObj["title"])}&nbsp;</h1>
+                                                    <h2 className="cart_agree_item_desc">{objLabel}</h2>
+                                                </li>;
                                         }
-                                        temp1[tempObj["order"]] =
-                                            <li className="cart_agree_item" key={key}>
-                                                <h1 className="cart_agree_item_title">{t(tempObj["title"])}&nbsp;</h1>
-                                                <h2 className="cart_agree_item_desc">{objLabel}</h2>
-                                            </li>;
                                     }
-                                }
-                            });
+                                });
+                                
+                                tempArr.push(
+                                    <div key={defaultModelName}>
+                                        <h2 className="cart_agree_title">{pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</h2>
+                                        <ul className="cart_agree_items_container">
+                                            <GetMeasurementArray modelId={`${modelID}`} cartValues={cartValues}/>
+                                            <li className="cart_agree_item">
+                                                <h1 className="cart_agree_item_title">{t("Fabric")}</h1>
+                                                <h2 className="cart_agree_item_desc">
+                                                    <div className={`dk_curtain_preview_container`}>
+                                                        <Accordion>
+                                                            <Accordion.Item eventKey="0">
+                                                                <ContextAwareToggleViewDetails eventKey="0" textOnHide={t("View Details")} textOnShow={t("Hide Details")}/>
+                                                                <Accordion.Body className="basket_item_title_dropdown dk_curtain_preview_dropdown">
+                                                                    <div className="dk_curtain_preview_detail_container">
+                                                                        {/*{dkCurtainPreviewList}*/}
+                                                                        {temp["SodFabrics"].map((item, i) =>
+                                                                            <div key={i}
+                                                                                 className="dk_curtain_preview_detail">
+                                                                                <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + " / " + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
+                                                                                <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"], pageLanguage)}</h3>
+                                                                            </div>)}
+                                                                    </div>
+                                                                </Accordion.Body>
+                                                            </Accordion.Item>
+                                                        </Accordion>
+                                                    </div>
+                                                </h2>
+                                            </li>
+                                            {temp1}
+                                            <li className="cart_agree_item">
+                                                <h1 className="cart_agree_item_title">{pageLanguage === 'fa' ? "نام اتاق" : "Room Label"}&nbsp;</h1>
+                                                <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? roomNameFa + (WindowName === "" ? "" : " / " + WindowName) : roomName + (WindowName === "" ? "" : " / " + WindowName)}</h2>
+                                            </li>
+                                            <li className="cart_agree_item">
+                                                <h1 className="cart_agree_item_title">{t("Price")}&nbsp;</h1>
+                                                <h2 className="cart_agree_item_desc">{GetPrice(tempBagPrice, pageLanguage, t("TOMANS"))}</h2>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                );
+                                setCartAgree(tempArr);
+                                modalHandleShow("cart_modal");
+                                setCartValues(temp);
+                                setAddingLoading(false);
+                                
+                            }).catch(err => {
+                            console.log(err);
+                            if (err.response && err.response.status === 401) {
+                                refreshToken().then((response2) => {
+                                    if (response2 !== false) {
+                                        addToCart();
+                                    } else {
+                                        setPrice(0);
+                                        setBagPrice(0);
+                                        temp["Price"] = 0;
+                                        setCartValues(temp);
+                                        setAddingLoading(false);
+                                        navigate("/" + pageLanguage + "/User");
+                                    }
+                                });
+                            } else {
+                                setPrice(0);
+                                setBagPrice(0);
+                                temp["Price"] = 0;
+                                setCartValues(temp);
+                                setAddingLoading(false);
+                            }
                             
-                            tempArr.push(
-                                <div key={defaultModelName}>
-                                    <h2 className="cart_agree_title">{pageLanguage === 'fa' ? convertToPersian(defaultModelNameFa) + " سفارشی " : "Custom " + defaultModelName}</h2>
-                                    <ul className="cart_agree_items_container">
-                                        <GetMeasurementArray modelId={`${modelID}`} cartValues={cartValues}/>
-                                        <li className="cart_agree_item">
-                                            <h1 className="cart_agree_item_title">{t("Fabric")}</h1>
-                                            <h2 className="cart_agree_item_desc">
-                                                <div className={`dk_curtain_preview_container`}>
-                                                    <Accordion>
-                                                        <Accordion.Item eventKey="0">
-                                                            <ContextAwareToggleViewDetails eventKey="0" textOnHide={t("View Details")} textOnShow={t("Hide Details")}/>
-                                                            <Accordion.Body className="basket_item_title_dropdown dk_curtain_preview_dropdown">
-                                                                <div className="dk_curtain_preview_detail_container">
-                                                                    {/*{dkCurtainPreviewList}*/}
-                                                                    {temp["SodFabrics"].map((item, i) =>
-                                                                        <div key={i}
-                                                                             className="dk_curtain_preview_detail">
-                                                                            <h2>{(pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["DesignEnName"]) : item["FabricObj"]["DesignName"]).toString() + " / " + (pageLanguage === 'en' ? CapitalizeAllWords(item["FabricObj"]["ColorEnName"]) : item["FabricObj"]["ColorName"]).toString()}</h2>
-                                                                            <h5>&nbsp;X</h5><h3>{NumToFa(item["Qty"], pageLanguage)}</h3>
-                                                                        </div>)}
-                                                                </div>
-                                                            </Accordion.Body>
-                                                        </Accordion.Item>
-                                                    </Accordion>
-                                                </div>
-                                            </h2>
-                                        </li>
-                                        {temp1}
-                                        <li className="cart_agree_item">
-                                            <h1 className="cart_agree_item_title">{pageLanguage === 'fa' ? "نام اتاق" : "Room Label"}&nbsp;</h1>
-                                            <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? roomNameFa + (WindowName === "" ? "" : " / " + WindowName) : roomName + (WindowName === "" ? "" : " / " + WindowName)}</h2>
-                                        </li>
-                                        <li className="cart_agree_item">
-                                            <h1 className="cart_agree_item_title">{t("Price")}&nbsp;</h1>
-                                            <h2 className="cart_agree_item_desc">{GetPrice(tempBagPrice, pageLanguage, t("TOMANS"))}</h2>
-                                        </li>
-                                    </ul>
-                                </div>
-                            );
-                            setCartAgree(tempArr);
-                            modalHandleShow("cart_modal");
-                            setCartValues(temp);
-                            setAddingLoading(false);
-                            
-                        }).catch(err => {
-                        if (err.response.status === 401) {
-                            refreshToken().then((response2) => {
-                                if (response2 !== false) {
-                                    addToCart();
-                                } else {
-                                    setPrice(0);
-                                    setBagPrice(0);
-                                    temp["Price"] = 0;
-                                    setCartValues(temp);
-                                    setAddingLoading(false);
-                                    navigate("/" + pageLanguage + "/User");
-                                }
-                            });
-                        } else {
-                            setPrice(0);
-                            setBagPrice(0);
-                            temp["Price"] = 0;
-                            setCartValues(temp);
-                            setAddingLoading(false);
-                        }
-                        
-                    });
-                } else {
-                    setAddingLoading(false);
+                        });
+                    } else {
+                        setAddingLoading(false);
+                    }
+                    // console.log(cartValues);
                 }
-                // console.log(cartValues);
             }
-        }
-        // modalHandleShow("cart_modal");
-        // renderCart();
-        // setCartStateAgree(true);
-        
+            // modalHandleShow("cart_modal");
+            // renderCart();
+            // setCartStateAgree(true);
+        });
     }
     
     function addToCart_agreed() {
@@ -2159,7 +2176,8 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                         cartObjects = response.data ? response.data : {};
                         resolve();
                     }).catch(err => {
-                        if (err.response.status === 401) {
+                        console.log(err);
+                        if (err.response && err.response.status === 401) {
                             refreshToken().then((response2) => {
                                 if (response2 !== false) {
                                     renderCart(customPageCart);
@@ -2384,7 +2402,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                         tempPostObj["WindowCount"] = 1;
                                         tempPostObj["SewingModelId"] = obj["PreorderText"]["SewingModelId"];
                                         Object.keys(temp).forEach(key => {
-                                            if (temp[key] !== null || temp[key] !== "") {
+                                            if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                                                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                                                 // console.log(key,tempObj);
                                                 if (tempObj && tempObj["apiLabel"] !== "") {
@@ -2416,7 +2434,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                         tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
                                         
                                         Object.keys(temp).forEach(key => {
-                                            if (temp[key] !== null || temp[key] !== "") {
+                                            if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                                                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                                                 // console.log(key,userProjects.find(obj => obj["cart"] === key));
                                                 if (tempObj) {
@@ -2439,7 +2457,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                         tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
                                         tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
                                         Object.keys(temp).forEach(key => {
-                                            if (temp[key] !== null || temp[key] !== "") {
+                                            if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                                                 let tempObj = userProjects.find(obj => obj["cart"] === key);
                                                 if (tempObj) {
                                                     if (tempObj["apiAcc"] !== undefined) {
@@ -2655,7 +2673,8 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                         }
                     }
                 }).catch(err => {
-                    if (err.response.status === 401) {
+                    console.log(err);
+                    if (err.response && err.response.status === 401) {
                         refreshToken().then((response2) => {
                             if (response2 !== false) {
                                 fabricSwatch(e, SwatchId, SwatchDetailId);
@@ -2673,7 +2692,8 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                     }).then((response) => {
                         setCartChanged(cartChanged + 1);
                     }).catch(err => {
-                        if (err.response.status === 401) {
+                        console.log(err);
+                        if (err.response && err.response.status === 401) {
                             refreshToken().then((response2) => {
                                 if (response2 !== false) {
                                     fabricSwatch(e, SwatchId, SwatchDetailId);
@@ -2804,7 +2824,8 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                     modalHandleClose("uploadPdf");
                     setDetailsShow(false);
                 }).catch(err => {
-                if (err.response.status === 401) {
+                console.log(err);
+                if (err.response && err.response.status === 401) {
                     refreshToken().then((response2) => {
                         if (response2 !== false) {
                             submitUploadedFile(PDFOrImg);
@@ -2847,7 +2868,8 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                     modalHandleClose(" uploadImg");
                     setDetailsShow(false);
                 }).catch(err => {
-                if (err.response.status === 401) {
+                console.log(err);
+                if (err.response && err.response.status === 401) {
                     refreshToken().then((response2) => {
                         if (response2 !== false) {
                             submitUploadedFile(PDFOrImg);
@@ -2976,7 +2998,8 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                 }).then((response) => {
                     resolve();
                 }).catch(err => {
-                    if (err.response.status === 401) {
+                    console.log(err);
+                    if (err.response && err.response.status === 401) {
                         refreshToken().then((response2) => {
                             if (response2 !== false) {
                                 deleteUploadedImg(uploadedImagesList1, uploadedImagesNamesList1, fileUrl, index);
@@ -3024,7 +3047,8 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                 }).then((response) => {
                     resolve();
                 }).catch(err => {
-                    if (err.response.status === 401) {
+                    console.log(err);
+                    if (err.response && err.response.status === 401) {
                         refreshToken().then((response2) => {
                             if (response2 !== false) {
                                 deleteUploadedPdf(uploadedPdfsNamesList1, fileUrl, index);
@@ -3101,7 +3125,8 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
         }).then((response) => {
             setProjectDetails(response.data, basketId);
         }).catch(err => {
-            if (err.response.status === 401) {
+            console.log(err);
+            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         getProjectDetail();
@@ -4701,7 +4726,8 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                     setBag(response.data ? response.data : {});
                     resolve(response.data ? response.data : {});
                 }).catch(err => {
-                    if (err.response.status === 401) {
+                    console.log(err);
+                    if (err.response && err.response.status === 401) {
                         refreshToken().then((response2) => {
                             if (response2 !== false) {
                                 setCartChanged(cartChanged + 1);
@@ -5178,151 +5204,144 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                    }} ref={ref => (inputs.current["13"] = ref)}/>
                                             <label htmlFor="13">{t("mount_Arc")}</label>
                                         </div>
-                                        
-                                        {step1 === "Inside" &&
-                                            <div className={step21Err1 ? "secondary_options secondary_options_err" : "secondary_options"}>
-                                                <div className="card-body-display-flex">
-                                                    <div className="checkbox_style checkbox_style_step2">
-                                                        <input type="checkbox" text={t("mount_Inside")} value="1" name="step11" ref-num="1" checked={step11 === "true"}
-                                                               onChange={(e) => {
-                                                                   if (e.target.checked) {
-                                                                       selectChanged(e);
-                                                                       setStep11("true");
-                                                                       setStep21Err1(false);
-                                                                       // let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                                       // let refIndex = inputs.current["11"].getAttribute('ref-num');
-                                                                       // tempLabels[refIndex] = inputs.current["11"].getAttribute('text');
-                                                                       // setStepSelectedLabel(tempLabels);
-                                                                       setDeps("", "11");
+                                        <div className={step1 === "Inside" ? (step21Err1 ? "secondary_options secondary_options_err" : "secondary_options") : "noDisplay"}>
+                                            <div className="card-body-display-flex">
+                                                <div className="checkbox_style checkbox_style_step2">
+                                                    <input type="checkbox" text={t("mount_Inside")} value="1" name="step11" ref-num="1" checked={step11 === "true"}
+                                                           onChange={(e) => {
+                                                               if (e.target.checked) {
+                                                                   selectChanged(e);
+                                                                   setStep11("true");
+                                                                   setStep21Err1(false);
+                                                                   // let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                                   // let refIndex = inputs.current["11"].getAttribute('ref-num');
+                                                                   // tempLabels[refIndex] = inputs.current["11"].getAttribute('text');
+                                                                   // setStepSelectedLabel(tempLabels);
+                                                                   setDeps("", "11");
+                                                               } else {
+                                                                   setStep11("");
+                                                                   // modalHandleShow("noPower");
+                                                                   if (step2 !== "") {
+                                                                       setDeps("11,2", "2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWallFloor,2DWall,2EWall,2FWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
+                                                                       deleteSpecialSelects();
+                                                                       setCart("", "", "calcMeasurements,Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width1,Width2,Width3,Height1,Height2,Height3,FinishedLengthType,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
+                                                                       setStep2("");
+                                                                       selectChanged(undefined, "1,2,2AIn,2BIn,2A,2B,2E,2DWallFloor,2DWall,2EWall,2FWall,2EWallFloor,2FWallFloor,2C,2CCeiling,2D,2DFloor");
                                                                    } else {
-                                                                       setStep11("");
-                                                                       // modalHandleShow("noPower");
-                                                                       if (step2 !== "") {
-                                                                           setDeps("11,2", "2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWallFloor,2DWall,2EWall,2FWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
-                                                                           deleteSpecialSelects();
-                                                                           setCart("", "", "calcMeasurements,Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width1,Width2,Width3,Height1,Height2,Height3,FinishedLengthType,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
-                                                                           setStep2("");
-                                                                           selectChanged(undefined, "1,2,2AIn,2BIn,2A,2B,2E,2DWallFloor,2DWall,2EWall,2FWall,2EWallFloor,2FWallFloor,2C,2CCeiling,2D,2DFloor");
-                                                                       } else {
-                                                                           setDeps("11", "");
-                                                                           selectChanged(undefined, "1");
-                                                                       }
+                                                                       setDeps("11", "");
+                                                                       selectChanged(undefined, "1");
                                                                    }
-                                                               }} id="111" ref={ref => (inputs.current["111"] = ref)}/>
-                                                        <label htmlFor="111" className="checkbox_label">
-                                                            <img className="checkbox_label_img checkmark1 img-fluid"
-                                                                 src={require('../Images/public/checkmark1_checkbox.png')}
-                                                                 alt=""/>
-                                                        </label>
-                                                        <span className="checkbox_text">
+                                                               }
+                                                           }} id="111" ref={ref => (inputs.current["111"] = ref)}/>
+                                                    <label htmlFor="111" className="checkbox_label">
+                                                        <img className="checkbox_label_img checkmark1 img-fluid"
+                                                             src={require('../Images/public/checkmark1_checkbox.png')}
+                                                             alt=""/>
+                                                    </label>
+                                                    <span className="checkbox_text">
                                                         {t("inside_checkbox_title")}
                                                     </span>
-                                                    </div>
                                                 </div>
                                             </div>
-                                        }
+                                        </div>
                                         {step21Err1 &&
                                             <div className="input_not_valid">{t("step21Err1")}</div>
                                         }
-                                        {step1 === "Outside" &&
-                                            <div className="selection_section">
-                                                <div className={step21Err2 ? "select_container select_container_red" : "select_container"}>
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        values={selectedMountOutsideType}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected.length) {
-                                                                setSelectedMountOutsideType(selected);
-                                                                setStep21Err2(false);
-                                                                // setDeps("", "11");
-                                                                // setCart("IsWalled", selected[0].value);
-                                                                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                                tempLabels["1"] = t("mount_Outside") + "/" + selected[0].label;
-                                                                setStepSelectedLabel(tempLabels);
-                                                                if (step2 !== "") {
-                                                                    setDeps("2", "1,11,2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWallFloor,2DWall,2EWall,2FWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
-                                                                    deleteSpecialSelects();
-                                                                    setCart("IsWalled", selected[0].value, "calcMeasurements,Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width1,Width2,Width3,Height1,Height2,Height3,FinishedLengthType,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
-                                                                    setStep2("");
-                                                                    // selectChanged(undefined, "2,2AIn,2BIn,2A,2B,2E,2DWallFloor,2DWall,2EWall,2FWall,2EWallFloor,2FWallFloor,2C,2CCeiling,2D,2DFloor");
-                                                                } else {
-                                                                    setDeps("", "1,11");
-                                                                    setCart("IsWalled", selected[0].value, "Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
-                                                                    // selectChanged(undefined, "");
-                                                                }
+                                        <div className={step1 === "Outside" ? "selection_section" : "noDisplay"}>
+                                            <div className={step21Err2 ? "select_container select_container_red" : "select_container"}>
+                                                <Select
+                                                    className="select"
+                                                    placeholder={t("Please Select")}
+                                                    portal={document.body}
+                                                    dropdownPosition="bottom"
+                                                    dropdownHandle={false}
+                                                    dropdownGap={0}
+                                                    values={selectedMountOutsideType}
+                                                    onDropdownOpen={() => {
+                                                        let temp1 = window.scrollY;
+                                                        window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                        setTimeout(() => {
+                                                            let temp2 = window.scrollY;
+                                                            if (temp2 === temp1)
+                                                                window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                        }, 100);
+                                                    }}
+                                                    dropdownRenderer={
+                                                        ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>
+                                                    }
+                                                    contentRenderer={
+                                                        ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>
+                                                    }
+                                                    // optionRenderer={
+                                                    //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                    // }
+                                                    onChange={(selected) => {
+                                                        if (selected.length) {
+                                                            setSelectedMountOutsideType(selected);
+                                                            setStep21Err2(false);
+                                                            // setDeps("", "11");
+                                                            // setCart("IsWalled", selected[0].value);
+                                                            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                            tempLabels["1"] = t("mount_Outside") + "/" + selected[0].label;
+                                                            setStepSelectedLabel(tempLabels);
+                                                            if (step2 !== "") {
+                                                                setDeps("2", "1,11,2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWallFloor,2DWall,2EWall,2FWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
+                                                                deleteSpecialSelects();
+                                                                setCart("IsWalled", selected[0].value, "calcMeasurements,Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width1,Width2,Width3,Height1,Height2,Height3,FinishedLengthType,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
+                                                                setStep2("");
+                                                                // selectChanged(undefined, "2,2AIn,2BIn,2A,2B,2E,2DWallFloor,2DWall,2EWall,2FWall,2EWallFloor,2FWallFloor,2C,2CCeiling,2D,2DFloor");
+                                                            } else {
+                                                                setDeps("", "1,11");
+                                                                setCart("IsWalled", selected[0].value, "Width3A,Height3C,ExtensionLeft,ExtensionRight,ShadeMount");
+                                                                // selectChanged(undefined, "");
                                                             }
-                                                        }}
-                                                        options={optionsOutside[pageLanguage]}
-                                                    />
-                                                </div>
+                                                        }
+                                                    }}
+                                                    options={optionsOutside[pageLanguage]}
+                                                />
                                             </div>
-                                        }
-                                        {step1 === "HiddenMoulding" &&
-                                            <div className={step21Err3 ? "secondary_options secondary_options_err" : "secondary_options"}>
-                                                <div className="card-body-display-flex">
-                                                    <div className="checkbox_style checkbox_style_step2">
-                                                        <input type="checkbox" text={t("mount_Arc")} value="3" name="step11" ref-num="1" checked={step11 === "true"}
-                                                               onChange={(e) => {
-                                                                   if (e.target.checked) {
-                                                                       selectChanged(e);
-                                                                       setStep11("true");
-                                                                       setStep21Err3(false);
-                                                                       // let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-                                                                       // let refIndex = inputs.current["13"].getAttribute('ref-num');
-                                                                       // tempLabels[refIndex] = inputs.current["13"].getAttribute('text');
-                                                                       // setStepSelectedLabel(tempLabels);
-                                                                       setDeps("", "11");
+                                        </div>
+                                        <div className={step1 === "HiddenMoulding" ? (step21Err3 ? "secondary_options secondary_options_err" : "secondary_options") : "noDisplay"}>
+                                            <div className="card-body-display-flex">
+                                                <div className="checkbox_style checkbox_style_step2">
+                                                    <input type="checkbox" text={t("mount_Arc")} value="3" name="step11" ref-num="1" checked={step11 === "true"}
+                                                           onChange={(e) => {
+                                                               if (e.target.checked) {
+                                                                   selectChanged(e);
+                                                                   setStep11("true");
+                                                                   setStep21Err3(false);
+                                                                   // let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                                                                   // let refIndex = inputs.current["13"].getAttribute('ref-num');
+                                                                   // tempLabels[refIndex] = inputs.current["13"].getAttribute('text');
+                                                                   // setStepSelectedLabel(tempLabels);
+                                                                   setDeps("", "11");
+                                                               } else {
+                                                                   setStep11("");
+                                                                   // modalHandleShow("noPower");
+                                                            
+                                                                   if (step2 !== "") {
+                                                                       setDeps("11,2", "2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWallFloor,2DWall,2EWall,2FWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
+                                                                       deleteSpecialSelects();
+                                                                       setCart("", "", "calcMeasurements,Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width1,Width2,Width3,Height1,Height2,Height3,FinishedLengthType,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
+                                                                       setStep2("");
+                                                                       selectChanged(undefined, "1,2,2AIn,2BIn,2A,2B,2E,2DWallFloor,2DWall,2EWall,2FWall,2DWallFloor,2FWallFloor,2C,2CCeiling,2D,2DFloor");
                                                                    } else {
-                                                                       setStep11("");
-                                                                       // modalHandleShow("noPower");
-                                                                
-                                                                       if (step2 !== "") {
-                                                                           setDeps("11,2", "2AIn1,2AIn2,2AIn3,2BIn1,2BIn2,2BIn3,2A,2B,2E,2DWallFloor,2DWall,2EWall,2FWall,2EWallFloor,2FWallFloor,2C1,2C2,2CCeiling1,2CCeiling2,2D1,2D2,2D3,2DFloor1,2DFloor2,2DFloor3");
-                                                                           deleteSpecialSelects();
-                                                                           setCart("", "", "calcMeasurements,Width,Height,WidthCart,HeightCart,WindowWidth,WindowHeight,Width1,Width2,Width3,Height1,Height2,Height3,FinishedLengthType,Width2B,Height2D,ExtensionLeft,ExtensionRight,ShadeMount,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3,WindowToFloor");
-                                                                           setStep2("");
-                                                                           selectChanged(undefined, "1,2,2AIn,2BIn,2A,2B,2E,2DWallFloor,2DWall,2EWall,2FWall,2DWallFloor,2FWallFloor,2C,2CCeiling,2D,2DFloor");
-                                                                       } else {
-                                                                           setDeps("11", "");
-                                                                           selectChanged(undefined, "1");
-                                                                       }
+                                                                       setDeps("11", "");
+                                                                       selectChanged(undefined, "1");
                                                                    }
-                                                               }} id="131" ref={ref => (inputs.current["131"] = ref)}/>
-                                                        <label htmlFor="131" className="checkbox_label">
-                                                            <img className="checkbox_label_img checkmark1 img-fluid"
-                                                                 src={require('../Images/public/checkmark1_checkbox.png')}
-                                                                 alt=""/>
-                                                        </label>
-                                                        <span className="checkbox_text">
+                                                               }
+                                                           }} id="131" ref={ref => (inputs.current["131"] = ref)}/>
+                                                    <label htmlFor="131" className="checkbox_label">
+                                                        <img className="checkbox_label_img checkmark1 img-fluid"
+                                                             src={require('../Images/public/checkmark1_checkbox.png')}
+                                                             alt=""/>
+                                                    </label>
+                                                    <span className="checkbox_text">
                                                         {t("dk_Arc_checkbox_title")}
                                                     </span>
-                                                    </div>
                                                 </div>
                                             </div>
-                                        }
+                                        </div>
                                         {step21Err3 &&
                                             <div className="input_not_valid">{t("step21Err3")}</div>
                                         }
@@ -5568,8 +5587,8 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 </div>
                                             </div>
                                         </div>
-                                        
-                                        <NextStep eventKey={measurementsNextStep}>{t("NEXT STEP")}</NextStep>
+    
+                                        <NextStep currentStep="2" eventKey={measurementsNextStep}>{t("NEXT STEP")}</NextStep>
                                     </div>
                                     
                                     {(step2 === "false") &&
@@ -5711,7 +5730,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                    }} ref={ref => (inputs.current["2A3"] = ref)}/>
                                             <label htmlFor="2A3">{t("Floor")}</label>
                                         </div>
-                                        <NextStep eventKey="2B">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="2A" eventKey="2B">{t("NEXT STEP")}</NextStep>
                                     </div>
                                     
                                     <div className="accordion_help">
@@ -5791,7 +5810,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 </div>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="2C">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="2B" eventKey="2C">{t("NEXT STEP")}</NextStep>
                                     </div>
                                 </Card.Body>
                             </Accordion.Collapse>
@@ -5901,7 +5920,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                             </div>
                                         </div>
                                         
-                                        <NextStep eventKey="2D">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="2C" eventKey="2D">{t("NEXT STEP")}</NextStep>
                                     </div>
                                     
                                     <div className="accordion_help">
@@ -6025,7 +6044,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                             </div>
                                         </div>
                                         
-                                        <NextStep eventKey="2D">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="2CCeiling" eventKey="2D">{t("NEXT STEP")}</NextStep>
                                     </div>
                                     
                                     <div className="accordion_help">
@@ -6193,7 +6212,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 </div>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="3">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="2D" eventKey="3">{t("NEXT STEP")}</NextStep>
                                     </div>
                                     
                                     <div className="accordion_help">
@@ -6462,7 +6481,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 </div>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="3">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="2DFloor" eventKey="3">{t("NEXT STEP")}</NextStep>
                                     </div>
                                     
                                     <div className="accordion_help">
@@ -6540,7 +6559,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 </div>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="2E">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="2DWall" eventKey="2E">{t("NEXT STEP")}</NextStep>
                                     </div>
                                 </Card.Body>
                             </Accordion.Collapse>
@@ -6608,7 +6627,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 </div>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="2F">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="2EWall" eventKey="2F">{t("NEXT STEP")}</NextStep>
                                     </div>
                                     <div className="accordion_help">
                                         <div className="help_container">
@@ -6687,7 +6706,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 </div>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="3">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="2FWall" eventKey="3">{t("NEXT STEP")}</NextStep>
                                     </div>
                                 </Card.Body>
                             </Accordion.Collapse>
@@ -6756,7 +6775,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 </div>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="2E">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="2DWallFloor" eventKey="2E">{t("NEXT STEP")}</NextStep>
                                     </div>
                                 </Card.Body>
                             </Accordion.Collapse>
@@ -6825,7 +6844,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 </div>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="2F">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="2EWallFloor" eventKey="2F">{t("NEXT STEP")}</NextStep>
                                     </div>
                                     <div className="accordion_help">
                                         <div className="help_container">
@@ -6905,7 +6924,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 </div>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="3">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="2FWallFloor" eventKey="3">{t("NEXT STEP")}</NextStep>
                                     </div>
                                 </Card.Body>
                             </Accordion.Collapse>
@@ -7060,7 +7079,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 </div>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="2B">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="2AIn" eventKey="2B">{t("NEXT STEP")}</NextStep>
                                     </div>
                                     
                                     <div className="accordion_help">
@@ -7228,7 +7247,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                             </div>
                                         </div>
                                         
-                                        <NextStep eventKey="3">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="2BIn" eventKey="3">{t("NEXT STEP")}</NextStep>
                                     </div>
                                     
                                     <div className="accordion_help">
@@ -7399,7 +7418,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                         disabled={swatchId === -1}>{hasSwatchId ? t("SWATCH IN CART") : t("ORDER SWATCH")}</button>
                                             </Modal.Footer>
                                         </Modal>
-                                        <NextStep eventKey="4">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="3" eventKey="4">{t("NEXT STEP")}</NextStep>
                                     </div>
                                 </Card.Body>
                             </Accordion.Collapse>
@@ -7469,7 +7488,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                         
                         {/* step 4A */}
                         <Card className={step4 === "CenterSplit" ? "" : "noDisplay"}>
-                            <Card.Header>
+                            <Card.Header className={[...depSet].findIndex(el => el.startsWith("4")) === -1 && (!accordionActiveKey.startsWith("4")) ? "hidden" : ""}>
                                 <ContextAwareToggle eventKey="4A" stepNum={t("4A")} stepTitle={t("DK_step5")} stepRef="4A" type="1" required={requiredStep["4A"]}
                                                     stepSelected={stepSelectedLabel["4A"] === undefined ? "" : stepSelectedLabel["4A"]}/>
                             </Card.Header>
@@ -7498,7 +7517,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                    }} ref={ref => (inputs.current["4A2"] = ref)}/>
                                             <label htmlFor="4A2">{t("Right")}</label>
                                         </div>
-                                        <NextStep eventKey="5">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep={[...depSet].findIndex(el => el.startsWith("4")) === -1 ? "4" : "4A"} eventKey="5">{t("NEXT STEP")}</NextStep>
                                     </div>
                                     <div className="accordion_help">
                                         <div className="help_container">
@@ -7621,16 +7640,23 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                         // }
                                                         onChange={(selected) => {
                                                             // if (selected[0] && cartValues["WidthCart"] && cartValues["HeightCart"]) {
-                                                            if (selected[0]) {
+                                                            if (selected[0] && !motorLoad2) {
                                                                 // console.log(MotorType);
                                                                 setDeps("", "511");
                                                                 setSelectedMotorType(selected);
-                                                                if (selected[0]["apiAccValue"]) {
-                                                                    setCustomMotorAcc(selected[0]["apiAccValue"]);
-                                                                    setCart("MotorType", selected[0].value, undefined, undefined, undefined, selected[0]["apiAccValue"]);
+                                                                if (motorLoad2) {
+                                                                    setMotorLoad2(false);
                                                                 } else {
-                                                                    setCart("MotorType", selected[0].value);
+                                                                    if (selected[0]["apiAccValue"]) {
+                                                                        setCustomMotorAcc(selected[0]["apiAccValue"]);
+                                                                        setCart("MotorType", selected[0].value, undefined, undefined, undefined, selected[0]["apiAccValue"]);
+                                                                    } else {
+                                                                        setCart("MotorType", selected[0].value);
+                                                                    }
                                                                 }
+                                                            }
+                                                            if (motorLoad2) {
+                                                                setMotorLoad2(false);
                                                             }
                                                         }}
                                                         options={MotorType[pageLanguage]}
@@ -7639,7 +7665,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                             </div>
                                         </div>
                                         
-                                        <NextStep eventKey={step5 === "Motorized" && step51 !== "true" ? "5" : "6"} onClick={() => {
+                                        <NextStep currentStep="5" eventKey={step5 === "Motorized" && step51 !== "true" ? "5" : "6"} onClick={() => {
                                             if (step5 === "Motorized" && step51 !== "true") {
                                                 setMotorErr1(true);
                                             }
@@ -7801,11 +7827,13 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                         //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
                                                         // }
                                                         onChange={(selected) => {
-                                                            setDeps("", "61");
-                                                            roomLabelChanged(selected[0], "6", false);
-                                                            setSelectedRoomLabel(selected);
-                                                            // setCart("RoomNameEn", selected[0].value);
-                                                            setCart("RoomNameFa", rooms["fa"].find(opt => opt.value === selected[0].value).label, "", "RoomNameEn", [selected[0].value]);
+                                                            if (selected[0]) {
+                                                                setDeps("", "61");
+                                                                roomLabelChanged(selected[0], "6", false);
+                                                                setSelectedRoomLabel(selected);
+                                                                // setCart("RoomNameEn", selected[0].value);
+                                                                setCart("RoomNameFa", rooms["fa"].find(opt => opt.value === selected[0].value).label, "", "RoomNameEn", [selected[0].value]);
+                                                            }
                                                         }}
                                                         options={rooms[pageLanguage]}
                                                     />
@@ -7827,7 +7855,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                                }}/>
                                             </div>
                                         </div>
-                                        <NextStep eventKey="7">{t("NEXT STEP")}</NextStep>
+                                        <NextStep currentStep="6" eventKey="7">{t("NEXT STEP")}</NextStep>
                                     </div>
                                     <div className=" accordion_help">
                                         <div className=" help_container">
@@ -7850,7 +7878,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                         </Card>
                         
                         {/* step 7 */}
-                        <Card>
+                        <Card className={accordionActiveKey===""?"card_little_margin":"card_big_margin"}>
                             <Card.Header>
                                 <ContextAwareToggle eventKey="7" stepNum={t("7")} stepTitle={t("zebra_step7")} stepTitle2={t("(Optional)")} stepRef="7" type="2"
                                                     required={requiredStep["7"]}

@@ -302,7 +302,8 @@ function Basket() {
             .then((response) => {
                 setCart(response.data ? response.data : {});
             }).catch(err => {
-            if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         editBasketProject(projectObj);
@@ -326,7 +327,8 @@ function Basket() {
             }
             setCart(response.data ? response.data : {});
         }).catch(err => {
-            if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         deleteBasketProject(refIndex);
@@ -353,7 +355,8 @@ function Basket() {
                 }
                 setCart(response.data ? response.data : {});
             }).catch(err => {
-                if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                     refreshToken().then((response2) => {
                         if (response2 !== false) {
                             saveForLaterBasketProject(refIndex);
@@ -459,7 +462,8 @@ function Basket() {
                 setCart(response.data ? response.data : {});
             })
             .catch(err => {
-                if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                     refreshToken().then((response2) => {
                         if (response2 !== false) {
                             copyBagObject(tempObj);
@@ -534,7 +538,8 @@ function Basket() {
                 }).then((response) => {
                     resolve();
                 }).catch(err => {
-                    if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                         refreshToken().then((response2) => {
                             if (response2 !== false) {
                                 deleteUploaded(fileUrl);
@@ -617,7 +622,8 @@ function Basket() {
                         setHasInstall(null);
                         setCart(response.data ? response.data : {});
                     }).catch(err => {
-                        if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                             refreshToken().then((response2) => {
                                 if (response2 !== false) {
                                     changeZipcode();
@@ -678,7 +684,8 @@ function Basket() {
                 setCart(response.data ? response.data : {});
                 setFirstBasket(false);
             }).catch(err => {
-                if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                     refreshToken().then((response2) => {
                         if (response2 !== false) {
                             getCart();
@@ -839,13 +846,13 @@ function Basket() {
                                             let apiValue = obj[tempObj["apiLabel"]] === null ? "null" : obj[tempObj["apiLabel"]].toString();
                                             if (tempObj["apiLabel"] === "ControlType" && obj["ControlType"] === "Motorized") {
                                                 objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(obj[tempObj["apiLabel"]].toString())} / ${t(obj["MotorType"].toString())}`).toString() : `${t(obj[tempObj["apiLabel"]].toString())} / ${t(obj["MotorType"].toString())}`;
-                                            } else if (SewingModelId === "0399" &&tempObj["apiLabel"] === "Hardware" && obj["Hardware"] === "Same Hardware For All Curtains") {
+                                            } else if (SewingModelId === "0099" &&tempObj["apiLabel"] === "Hardware" && obj["Hardware"] === "Same Hardware For All Curtains") {
                                                 objLabel = t(obj[tempObj["apiLabel"]].toString()) + " / " + (pageLanguage === "fa" ?obj["RailDesignFa"].toString():obj["RailDesignEn"].toString()) + " / " + (pageLanguage === "fa" ?obj["RailColorFa"].toString():obj["RailColorEn"].toString()) + " / " + t(obj["BatonOption"].toString());
-                                            } else if (SewingModelId === "0399" &&tempObj["apiLabel"] === "DraperyHardware" && obj["DraperyHardware"] !== "None") {
+                                            } else if (SewingModelId === "0099" &&tempObj["apiLabel"] === "DraperyHardware" && obj["DraperyHardware"] !== "None") {
                                                 objLabel = t(obj[tempObj["apiLabel"]].toString()) + " / " + (pageLanguage === "fa" ?obj["RailDesignFaA"].toString():obj["RailDesignEnA"].toString()) + " / " + (pageLanguage === "fa" ?obj["RailColorFaA"].toString():obj["RailColorEnA"].toString()) + " / " + t(obj["BatonOptionA"].toString());
-                                            } else if (SewingModelId === "0399" &&tempObj["apiLabel"] === "SheerHardware" && obj["SheerHardware"] !== "None") {
+                                            } else if (SewingModelId === "0099" &&tempObj["apiLabel"] === "SheerHardware" && obj["SheerHardware"] !== "None") {
                                                 objLabel = t(obj[tempObj["apiLabel"]].toString()) + " / " + (pageLanguage === "fa" ?obj["RailDesignFaB"].toString():obj["RailDesignEnB"].toString()) + " / " + (pageLanguage === "fa" ?obj["RailColorFaB"].toString():obj["RailColorEnB"].toString()) + " / " + t(obj["BatonOptionB"].toString());
-                                            } else if (SewingModelId === "0399" &&tempObj["apiLabel"] === "PrivacyLayerHardware" && obj["PrivacyLayerHardware"] !== "None") {
+                                            } else if (SewingModelId === "0099" &&tempObj["apiLabel"] === "PrivacyLayerHardware" && obj["PrivacyLayerHardware"] !== "None") {
                                                 objLabel = t(obj[tempObj["apiLabel"]].toString()) + " / " + (pageLanguage === "fa" ?obj["RailDesignFaC"].toString():obj["RailDesignEnC"].toString()) + " / " + (pageLanguage === "fa" ?obj["RailColorFaC"].toString():obj["RailColorEnC"].toString()) + " / " + t(obj["BatonOptionC"].toString());
                                             } else if (tempObj["titleValue"] === null) {
                                                 if (tempObj["titlePostfix"] === "") {
@@ -931,19 +938,19 @@ function Basket() {
                                                     <h4>{pageLanguage === 'fa' ? obj["FabricDesignFa2"] + " / " + obj["FabricColorFa2"] : obj["FabricDesignEn2"] + " / " + obj["FabricColorEn2"]}</h4>
                                                 </div>
                                             }
-                                            {SewingModelId === "0399" &&
+                                            {SewingModelId === "0099" &&
                                                 <>
-                                                    <li className="cart_agree_item">
-                                                        <h1 className="cart_agree_item_title">{t("grommet_step1")}&nbsp;</h1>
-                                                        <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? obj["FabricDesignFa"] + " / " + obj["FabricColorFa"] : obj["FabricDesignEn"] + " / " + obj["FabricColorEn"]}</h2>
+                                                    <li className="basket_item_title_desc">
+                                                        <h3>{t("grommet_step1")}&nbsp;</h3>
+                                                        <h4>{pageLanguage === 'fa' ? obj["FabricDesignFa"] + " / " + obj["FabricColorFa"] : obj["FabricDesignEn"] + " / " + obj["FabricColorEn"]}</h4>
                                                     </li>
-                                                    <li className="cart_agree_item">
-                                                        <h1 className="cart_agree_item_title">{t("grommet_step2")}&nbsp;</h1>
-                                                        <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? obj["FabricDesignFa2"] + " / " + obj["FabricColorFa2"] : obj["FabricDesignEn2"] + " / " + obj["FabricColorEn2"]}</h2>
+                                                    <li className="basket_item_title_desc">
+                                                        <h3>{t("grommet_step2")}&nbsp;</h3>
+                                                        <h4>{pageLanguage === 'fa' ? obj["FabricDesignFa2"] + " / " + obj["FabricColorFa2"] : obj["FabricDesignEn2"] + " / " + obj["FabricColorEn2"]}</h4>
                                                     </li>
-                                                    <li className="cart_agree_item">
-                                                        <h1 className="cart_agree_item_title">{t("grommet_step2B_color")}&nbsp;</h1>
-                                                        <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? obj["PrivacyLayer"] + " / " + (obj["SheersColorFa"] || "") : obj["PrivacyLayer"] + " / " + (obj["SheersColorEn"] || "")}</h2>
+                                                    <li className="basket_item_title_desc">
+                                                        <h3>{t("grommet_step2B_color")}&nbsp;</h3>
+                                                        <h4>{pageLanguage === 'fa' ? obj["PrivacyLayer"] + " / " + (obj["SheersColorFa"] || "") : obj["PrivacyLayer"] + " / " + (obj["SheersColorEn"] || "")}</h4>
                                                     </li>
                                                 </>
                                             }
@@ -1126,7 +1133,7 @@ function Basket() {
                                 tempPostObj["WindowCount"] = 1;
                                 tempPostObj["SewingModelId"] = obj["SewingModelId"];
                                 Object.keys(temp).forEach(key => {
-                                    if (temp[key] !== null || temp[key] !== "") {
+                                    if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                                         let tempObj = userProjects.find(obj => obj["cart"] === key);
                                         // console.log(key,tempObj);
                                         if (tempObj && tempObj["apiLabel"] !== "") {
@@ -1152,13 +1159,13 @@ function Basket() {
                                 tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = obj["SewingModelId"];
                                 
                                 tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2302;
-                                tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `0002`;
+                                tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = obj["SewingModelId"]==="0325" ? obj["SewingModelId"]:`0002`;
                                 
                                 tempPostObj["SewingOrderDetails"][2]["CurtainPartId"] = 2301;
                                 tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
                                 
                                 Object.keys(temp).forEach(key => {
-                                    if (temp[key] !== null || temp[key] !== "") {
+                                    if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                                         let tempObj = userProjects.find(obj => obj["cart"] === key);
                                         // console.log(key,userProjects.find(obj => obj["cart"] === key));
                                         if (tempObj) {
@@ -1181,7 +1188,7 @@ function Basket() {
                                 tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
                                 tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
                                 Object.keys(temp).forEach(key => {
-                                    if (temp[key] !== null || temp[key] !== "") {
+                                    if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                                         let tempObj = userProjects.find(obj => obj["cart"] === key);
                                         if (tempObj) {
                                             if (tempObj["apiAcc"] !== undefined) {
@@ -1353,13 +1360,13 @@ function Basket() {
                                             let apiValue = obj[tempObj["apiLabel"]] === null ? "null" : obj[tempObj["apiLabel"]].toString();
                                             if (tempObj["apiLabel"] === "ControlType" && obj["ControlType"] === "Motorized") {
                                                 objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(obj[key].toString())} / ${t(obj["MotorType"].toString())}`).toString() : `${t(obj[key].toString())} / ${t(obj["MotorType"].toString())}`;
-                                            } else if (SewingModelId === "0399" &&key === "Hardware" && obj["Hardware"] === "Same Hardware For All Curtains") {
+                                            } else if (SewingModelId === "0099" &&key === "Hardware" && obj["Hardware"] === "Same Hardware For All Curtains") {
                                                 objLabel = t(obj[key].toString()) + " / " + (pageLanguage === "fa" ?obj["RailDesignFa"].toString():obj["RailDesignEn"].toString()) + " / " + (pageLanguage === "fa" ?obj["RailColorFa"].toString():obj["RailColorEn"].toString()) + " / " + t(obj["BatonOption"].toString());
-                                            } else if (SewingModelId === "0399" &&key === "DraperyHardware" && obj["DraperyHardware"] !== "None") {
+                                            } else if (SewingModelId === "0099" &&key === "DraperyHardware" && obj["DraperyHardware"] !== "None") {
                                                 objLabel = t(obj[key].toString()) + " / " + (pageLanguage === "fa" ?obj["RailDesignFaA"].toString():obj["RailDesignEnA"].toString()) + " / " + (pageLanguage === "fa" ?obj["RailColorFaA"].toString():obj["RailColorEnA"].toString()) + " / " + t(obj["BatonOptionA"].toString());
-                                            } else if (SewingModelId === "0399" &&key === "SheerHardware" && obj["SheerHardware"] !== "None") {
+                                            } else if (SewingModelId === "0099" &&key === "SheerHardware" && obj["SheerHardware"] !== "None") {
                                                 objLabel = t(obj[key].toString()) + " / " + (pageLanguage === "fa" ?obj["RailDesignFaB"].toString():obj["RailDesignEnB"].toString()) + " / " + (pageLanguage === "fa" ?obj["RailColorFaB"].toString():obj["RailColorEnB"].toString()) + " / " + t(obj["BatonOptionB"].toString());
-                                            } else if (SewingModelId === "0399" &&key === "PrivacyLayerHardware" && obj["PrivacyLayerHardware"] !== "None") {
+                                            } else if (SewingModelId === "0099" &&key === "PrivacyLayerHardware" && obj["PrivacyLayerHardware"] !== "None") {
                                                 objLabel = t(obj[key].toString()) + " / " + (pageLanguage === "fa" ?obj["RailDesignFaC"].toString():obj["RailDesignEnC"].toString()) + " / " + (pageLanguage === "fa" ?obj["RailColorFaC"].toString():obj["RailColorEnC"].toString()) + " / " + t(obj["BatonOptionC"].toString());
                                             } else if (tempObj["titleValue"] === null) {
                                                 if (tempObj["titlePostfix"] === "") {
@@ -1437,19 +1444,19 @@ function Basket() {
                                                         <h4>{pageLanguage === 'fa' ? obj["FabricDesignFa2"] + " / " + obj["FabricColorFa2"] : obj["FabricDesignEn2"] + " / " + obj["FabricColorEn2"]}</h4>
                                                     </div>
                                                 }
-                                                {SewingModelId === "0399" &&
+                                                {SewingModelId === "0099" &&
                                                     <>
-                                                        <li className="cart_agree_item">
-                                                            <h1 className="cart_agree_item_title">{t("grommet_step1")}&nbsp;</h1>
-                                                            <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? obj["FabricDesignFa"] + " / " + obj["FabricColorFa"] : obj["FabricDesignEn"] + " / " + obj["FabricColorEn"]}</h2>
+                                                        <li className="basket_item_title_desc">
+                                                            <h3>{t("grommet_step1")}&nbsp;</h3>
+                                                            <h4>{pageLanguage === 'fa' ? obj["FabricDesignFa"] + " / " + obj["FabricColorFa"] : obj["FabricDesignEn"] + " / " + obj["FabricColorEn"]}</h4>
                                                         </li>
-                                                        <li className="cart_agree_item">
-                                                            <h1 className="cart_agree_item_title">{t("grommet_step2")}&nbsp;</h1>
-                                                            <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? obj["FabricDesignFa2"] + " / " + obj["FabricColorFa2"] : obj["FabricDesignEn2"] + " / " + obj["FabricColorEn2"]}</h2>
+                                                        <li className="basket_item_title_desc">
+                                                            <h3>{t("grommet_step2")}&nbsp;</h3>
+                                                            <h4>{pageLanguage === 'fa' ? obj["FabricDesignFa2"] + " / " + obj["FabricColorFa2"] : obj["FabricDesignEn2"] + " / " + obj["FabricColorEn2"]}</h4>
                                                         </li>
-                                                        <li className="cart_agree_item">
-                                                            <h1 className="cart_agree_item_title">{t("grommet_step2B_color")}&nbsp;</h1>
-                                                            <h2 className="cart_agree_item_desc">{pageLanguage === 'fa' ? obj["PrivacyLayer"] + " / " + (obj["SheersColorFa"] || "") : obj["PrivacyLayer"] + " / " + (obj["SheersColorEn"] || "")}</h2>
+                                                        <li className="basket_item_title_desc">
+                                                            <h3>{t("grommet_step2B_color")}&nbsp;</h3>
+                                                            <h4>{pageLanguage === 'fa' ? obj["PrivacyLayer"] + " / " + (obj["SheersColorFa"] || "") : obj["PrivacyLayer"] + " / " + (obj["SheersColorEn"] || "")}</h4>
                                                         </li>
                                                     </>
                                                 }

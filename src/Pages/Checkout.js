@@ -304,7 +304,8 @@ function Checkout() {
                 
                 setCart(response.data ? response.data : {});
             }).catch(err => {
-                if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                     refreshToken().then((response2) => {
                         if (response2 !== false) {
                             checkDiscount();
@@ -424,7 +425,8 @@ function Checkout() {
         }).then((response) => {
             setCartChanged(cartChanged + 1);
         }).catch(err => {
-            if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         removeDiscount(discountText);
@@ -464,7 +466,8 @@ function Checkout() {
         }).then((response) => {
             setUserAddress(response.data);
         }).catch(err => {
-            if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                 refreshToken().then((response2) => {
                     if (response2 !== false) {
                         getUserAddress();
@@ -666,7 +669,8 @@ function Checkout() {
             }).then((response) => {
                 setCart(response.data ? response.data : {});
             }).catch(err => {
-                if (err.response.status === 401) {
+                                console.log(err);
+                            if (err.response && err.response.status === 401) {
                     refreshToken().then((response2) => {
                         if (response2 !== false) {
                             setCartChanged(cartChanged + 1);
@@ -933,7 +937,7 @@ function Checkout() {
                             tempPostObj["WindowCount"] = 1;
                             tempPostObj["SewingModelId"] = obj["SewingModelId"];
                             Object.keys(temp).forEach(key => {
-                                if (temp[key] !== null || temp[key] !== "") {
+                                if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                                     let tempObj = userProjects.find(obj => obj["cart"] === key);
                                     // console.log(key,tempObj);
                                     if (tempObj && tempObj["apiLabel"] !== "") {
@@ -959,13 +963,13 @@ function Checkout() {
                             tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = obj["SewingModelId"];
                             
                             tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2302;
-                            tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `0002`;
+                            tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = obj["SewingModelId"]==="0325" ? obj["SewingModelId"]:`0002`;
                             
                             tempPostObj["SewingOrderDetails"][2]["CurtainPartId"] = 2301;
                             tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
                             
                             Object.keys(temp).forEach(key => {
-                                if (temp[key] !== null || temp[key] !== "") {
+                                if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                                     let tempObj = userProjects.find(obj => obj["cart"] === key);
                                     // console.log(key,userProjects.find(obj => obj["cart"] === key));
                                     if (tempObj) {
@@ -988,7 +992,7 @@ function Checkout() {
                             tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
                             tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
                             Object.keys(temp).forEach(key => {
-                                if (temp[key] !== null || temp[key] !== "") {
+                                if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                                     let tempObj = userProjects.find(obj => obj["cart"] === key);
                                     if (tempObj) {
                                         if (tempObj["apiAcc"] !== undefined) {
