@@ -569,6 +569,7 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
         Object.keys(fabrics).forEach((key, index) => {
             let DesignName = convertToPersian(fabrics[key][0].DesignName);
             let DesignEnName = fabrics[key][0].DesignEnName;
+            let SamplePrice = fabrics[key][0]["SamplePrice"];
             
             const fabric = [];
             for (let j = 0; j < fabrics[key].length; j++) {
@@ -669,7 +670,7 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                 <div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key}>
                     <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
                         <hr/>
-                        <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(100000, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")}</p></span>
+                        <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(SamplePrice, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")}</p></span>
                     </div>
                     {fabric}
                 </div>
@@ -3010,7 +3011,7 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                     setSelectedFile(undefined);
                     setSelectedFileName("");
                     setEditedFileName("");
-                    modalHandleClose(" uploadImg");
+                    modalHandleClose("uploadImg");
                     setDetailsShow(false);
                 }).catch(err => {
                 console.log(err);
@@ -3023,7 +3024,7 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                             setSelectedFile(undefined);
                             setSelectedFileName("");
                             setEditedFileName("");
-                            modalHandleClose(" uploadImg");
+                            modalHandleClose("uploadImg");
                             setDetailsShow(false);
                             
                             dispatch({
@@ -5478,8 +5479,8 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                    }}/>
                                             <label htmlFor="32">{t("Calculate my measurements.")}</label>
                                         </div>
-                                        
-                                        {step3 === "false" && <div className="own_measurements_container">
+    
+                                        <div className={step3 === "false" ? "own_measurements_container" : "noDisplay"}>
                                             <div className="own_measurements_width">
                                                 <label className="select_label">{t("Width")}<p className="farsi_cm">{t("select_cm")}</p></label>
                                                 <div className="select_container select_container_num">
@@ -5558,7 +5559,7 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                                                     />
                                                 </div>
                                             </div>
-                                        </div>}
+                                        </div>
                                         
                                         {/*{step3 === "false" &&*/}
                                         {/*    <div className="own_measurements_container grommet_own_measurements_container">*/}
@@ -8496,7 +8497,7 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
             
             <Modal dialogClassName={`noPower_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["noPower"] === undefined ? false : modals["noPower"]}
-                   onHide={() => modalHandleClose(" noPower")}>
+                   onHide={() => modalHandleClose("noPower")}>
                 <Modal.Header closeButton>
                     {/*<Modal.Title>Modal heading</Modal.Title>*/}
                 </Modal.Header>
@@ -8505,7 +8506,7 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                     
                     <br/>
                     <div className=" text_center">
-                        <button className=" btn btn-new-dark" onClick={() => modalHandleClose(" noPower")}>{t("CONTINUE")}</button>
+                        <button className=" btn btn-new-dark" onClick={() => modalHandleClose("noPower")}>{t("CONTINUE")}</button>
                     </div>
                 </Modal.Body>
                 {/*<Modal.Footer>*/}
@@ -8515,7 +8516,7 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
             
             <Modal dialogClassName={`warning_modal2 bigSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["panelTypeWarning"] === undefined ? false : modals["panelTypeWarning"]}
-                   onHide={() => modalHandleClose(" panelTypeWarning")}>
+                   onHide={() => modalHandleClose("panelTypeWarning")}>
                 <Modal.Header closeButton>
                     {/*<Modal.Title>Modal heading</Modal.Title>*/}
                 </Modal.Header>
@@ -8545,7 +8546,7 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
             
             <Modal dialogClassName={`noInsideUnderstand_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["noInsideUnderstand"] === undefined ? false : modals["noInsideUnderstand"]}
-                   onHide={() => modalHandleClose(" noInsideUnderstand")}>
+                   onHide={() => modalHandleClose("noInsideUnderstand")}>
                 <Modal.Header closeButton>
                     {/*<Modal.Title>Modal heading</Modal.Title>*/}
                 </Modal.Header>
@@ -8554,7 +8555,7 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                     
                     {/*<br/>*/}
                     {/*<div className=" text_center">*/}
-                    {/*    <button className=" btn btn-new-dark" onClick={() => modalHandleClose(" noMount")}>{t("CONTINUE")}</button>*/}
+                    {/*    <button className=" btn btn-new-dark" onClick={() => modalHandleClose("noMount")}>{t("CONTINUE")}</button>*/}
                     {/*</div>*/}
                 </Modal.Body>
                 {/*<Modal.Footer>*/}
@@ -8579,7 +8580,7 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
             
             <Modal dialogClassName={`noMount_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["noMount"] === undefined ? false : modals["noMount"]}
-                   onHide={() => modalHandleClose(" noMount")}>
+                   onHide={() => modalHandleClose("noMount")}>
                 <Modal.Header closeButton>
                     {/*<Modal.Title>Modal heading</Modal.Title>*/}
                 </Modal.Header>
@@ -8588,7 +8589,7 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                     
                     <br/>
                     <div className=" text_center">
-                        <button className=" btn btn-new-dark" onClick={() => modalHandleClose(" noMount")}>{t("CONTINUE")}</button>
+                        <button className=" btn btn-new-dark" onClick={() => modalHandleClose("noMount")}>{t("CONTINUE")}</button>
                     </div>
                 </Modal.Body>
                 {/*<Modal.Footer>*/}
@@ -8759,7 +8760,7 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
                        setSelectedFile(undefined);
                        setSelectedFileName("");
                        setEditedFileName("");
-                       modalHandleClose(" uploadImg");
+                       modalHandleClose("uploadImg");
                        setDetailsShow(false)
                    }}>
                 <Modal.Header closeButton>
@@ -8852,7 +8853,7 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
             <Modal dialogClassName={`upload_modal uploadPdf_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["uploadPdf"] === undefined ? false : modals["uploadPdf"]}
                    onHide={() => {
-                       modalHandleClose(" uploadPdf");
+                       modalHandleClose("uploadPdf");
                        setDetailsShow(false)
                    }}>
                 <Modal.Header closeButton>
@@ -9088,7 +9089,7 @@ function Grommet2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Qu
             <Modal backdrop="static" keyboard={false} dialogClassName={`warning_modal bigSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["heightDifferent"] === undefined ? false : modals["heightDifferent"]}
                    onHide={() => {
-                       modalHandleClose(" heightDifferent");
+                       modalHandleClose("heightDifferent");
                    }}>
                 <Modal.Header>
                     {/*<div className="required"/>*/}

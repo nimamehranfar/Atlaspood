@@ -579,6 +579,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             let designTypeSelected = params["Designs"] && params["Designs"][DesignCode] && params["Designs"][DesignCode]["type"] ? params["Designs"][DesignCode]["type"] : "none";
             let designOnlyOneSelected = params["Designs"] && params["Designs"][DesignCode] && params["Designs"][DesignCode]["onlyOne"] ? params["Designs"][DesignCode]["onlyOne"] : false;
             let showMoreCount = designTypeSelected === "Base" ? 4 : 8;
+            let SamplePrice = fabrics[key][0]["SamplePrice"];
             
             const fabric = [];
             for (let j = 0; j < fabrics[key].length; j++) {
@@ -723,7 +724,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     <div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key}>
                         <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
                             <hr/>
-                            <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(100000, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")}</p></span>
+                            <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(SamplePrice, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")}</p></span>
                         </div>
                         {fabric}
                     </div>;
@@ -743,7 +744,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     <div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key}>
                         <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
                             <hr/>
-                            <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(100000, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")}</p></span>
+                            <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(SamplePrice, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")}</p></span>
                         </div>
                         {fabric}
                     </div>;
@@ -2934,7 +2935,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     setSelectedFile(undefined);
                     setSelectedFileName("");
                     setEditedFileName("");
-                    modalHandleClose(" uploadImg");
+                    modalHandleClose("uploadImg");
                     setDetailsShow(false);
                 }).catch(err => {
                 console.log(err);
@@ -2947,7 +2948,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                             setSelectedFile(undefined);
                             setSelectedFileName("");
                             setEditedFileName("");
-                            modalHandleClose(" uploadImg");
+                            modalHandleClose("uploadImg");
                             setDetailsShow(false);
                             
                             dispatch({
@@ -5637,9 +5638,8 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                             <label htmlFor="22">{t("Calculate my measurements.")}</label>
                                         
                                         </div>
-                                        
-                                        {step2 === "false" &&
-                                            <div className="own_measurements_container">
+    
+                                        <div className={step2 === "false" ? "own_measurements_container" : "noDisplay"}>
                                                 <div className="own_measurements_width">
                                                     <label className="select_label">{t("Width")}<p className="farsi_cm">{t("select_cm")}</p></label>
                                                     <div className="select_container select_container_num">
@@ -5729,7 +5729,6 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                     </div>
                                                 </div>
                                             </div>
-                                        }
     
                                         <NextStep currentStep="2" eventKey={measurementsNextStep}>{t("NEXT STEP")}</NextStep>
                                     </div>
@@ -8342,7 +8341,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             
             <Modal dialogClassName={`noPower_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["noPower"] === undefined ? false : modals["noPower"]}
-                   onHide={() => modalHandleClose(" noPower")}>
+                   onHide={() => modalHandleClose("noPower")}>
                 <Modal.Header closeButton>
                     {/*<Modal.Title>Modal heading</Modal.Title>*/}
                 </Modal.Header>
@@ -8351,7 +8350,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     
                     <br/>
                     <div className=" text_center">
-                        <button className=" btn btn-new-dark" onClick={() => modalHandleClose(" noPower")}>{t("CONTINUE")}</button>
+                        <button className=" btn btn-new-dark" onClick={() => modalHandleClose("noPower")}>{t("CONTINUE")}</button>
                     </div>
                 </Modal.Body>
                 {/*<Modal.Footer>*/}
@@ -8370,7 +8369,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     
                     <br/>
                     <div className=" text_center">
-                        <button className=" btn btn-new-dark" onClick={() => modalHandleClose(" noPower")}>{t("CONTINUE")}</button>
+                        <button className=" btn btn-new-dark" onClick={() => modalHandleClose("noPower")}>{t("CONTINUE")}</button>
                     </div>
                 </Modal.Body>
                 {/*<Modal.Footer>*/}
@@ -8395,7 +8394,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             
             <Modal dialogClassName={`noInsideUnderstand_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["noInsideUnderstand"] === undefined ? false : modals["noInsideUnderstand"]}
-                   onHide={() => modalHandleClose(" noInsideUnderstand")}>
+                   onHide={() => modalHandleClose("noInsideUnderstand")}>
                 <Modal.Header closeButton>
                     {/*<Modal.Title>Modal heading</Modal.Title>*/}
                 </Modal.Header>
@@ -8404,7 +8403,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     
                     {/*<br/>*/}
                     {/*<div className=" text_center">*/}
-                    {/*    <button className=" btn btn-new-dark" onClick={() => modalHandleClose(" noMount")}>{t("CONTINUE")}</button>*/}
+                    {/*    <button className=" btn btn-new-dark" onClick={() => modalHandleClose("noMount")}>{t("CONTINUE")}</button>*/}
                     {/*</div>*/}
                 </Modal.Body>
                 {/*<Modal.Footer>*/}
@@ -8414,7 +8413,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             
             <Modal dialogClassName={`noMount_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["noMount"] === undefined ? false : modals["noMount"]}
-                   onHide={() => modalHandleClose(" noMount")}>
+                   onHide={() => modalHandleClose("noMount")}>
                 <Modal.Header closeButton>
                     {/*<Modal.Title>Modal heading</Modal.Title>*/}
                 </Modal.Header>
@@ -8423,7 +8422,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                     
                     <br/>
                     <div className=" text_center">
-                        <button className=" btn btn-new-dark" onClick={() => modalHandleClose(" noMount")}>{t("CONTINUE")}</button>
+                        <button className=" btn btn-new-dark" onClick={() => modalHandleClose("noMount")}>{t("CONTINUE")}</button>
                     </div>
                 </Modal.Body>
                 {/*<Modal.Footer>*/}
@@ -8433,7 +8432,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             
             <Modal dialogClassName={`learnMore_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["learnMore"] === undefined ? false : modals["learnMore"]}
-                   onHide={() => modalHandleClose(" learnMore")}>
+                   onHide={() => modalHandleClose("learnMore")}>
                 <Modal.Header closeButton>
                     {/*<Modal.Title>Modal heading</Modal.Title>*/}
                 </Modal.Header>
@@ -8468,7 +8467,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             
             <Modal dialogClassName={`learnMore_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["onlyOneBase"] === undefined ? false : modals["onlyOneBase"]}
-                   onHide={() => modalHandleClose(" onlyOneBase")}>
+                   onHide={() => modalHandleClose("onlyOneBase")}>
                 <Modal.Header closeButton>
                     {/*<Modal.Title>Modal heading</Modal.Title>*/}
                 </Modal.Header>
@@ -8491,7 +8490,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             
             <Modal dialogClassName={`learnMore_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["onlyOneBase"] === undefined ? false : modals["onlyOneDecor"]}
-                   onHide={() => modalHandleClose(" onlyOneDecor")}>
+                   onHide={() => modalHandleClose("onlyOneDecor")}>
                 <Modal.Header closeButton>
                     {/*<Modal.Title>Modal heading</Modal.Title>*/}
                 </Modal.Header>
@@ -8768,7 +8767,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                        setSelectedFile(undefined);
                        setSelectedFileName("");
                        setEditedFileName("");
-                       modalHandleClose(" uploadImg");
+                       modalHandleClose("uploadImg");
                        setDetailsShow(false)
                    }}>
                 <Modal.Header closeButton>
@@ -8861,7 +8860,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             <Modal dialogClassName={`upload_modal uploadPdf_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["uploadPdf"] === undefined ? false : modals["uploadPdf"]}
                    onHide={() => {
-                       modalHandleClose(" uploadPdf");
+                       modalHandleClose("uploadPdf");
                        setDetailsShow(false)
                    }}>
                 <Modal.Header closeButton>
@@ -9097,7 +9096,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
             <Modal backdrop="static" keyboard={false} dialogClassName={`warning_modal bigSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["heightDifferent"] === undefined ? false : modals["heightDifferent"]}
                    onHide={() => {
-                       modalHandleClose(" heightDifferent");
+                       modalHandleClose("heightDifferent");
                    }}>
                 <Modal.Header>
                     {/*<div className="required"/>*/}

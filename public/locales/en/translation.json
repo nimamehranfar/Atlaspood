@@ -223,7 +223,7 @@
   "step3A_title": "What's your window width?",
   "step3B_title": "What's your window height?",
   "step3A_out_title": "What's your window width?\n(Frame outer edge to edge.)",
-  "step3B_out_title": "How many cm would you like the shade to extend\nslightly beyond the window frame?",
+  "step3B_out_title": "How many cm would you like the shade to extend\npast your window frame?",
   "step3C_out_title": "What's your window height?\n(Frame outer edge to edge.)",
   "step3D_out_title": "How many cm above window frame would you like to mount the shade?",
   "step3A_help_dk_1": "For accurate sizing, measure the horizontal width of inside of the window frame in 3 locations top, middle and bottom.",
@@ -863,7 +863,7 @@
   "panel_type_text1": "Please complete your selection for measurements and panel coverage (step 4 and 6) to view panel type options.",
   "panel_type_text2": "Please complete your selection for measurements in step 4 to view panel type options.",
   "panel_type_text3": "Please complete your selection for panel coverage in step 5 to view panel type options.",
-  "RECOMMENDED FOR YOUR MEASUREMENTS": "RECOMMENDED FOR\nYOUR MEASUREMENTS",
+  "RECOMMENDED FOR YOUR MEASUREMENTS": "Recommended For\nYour Measurements",
   "panelTypeWarning": "Poles ordered over 160cm wide will come with additional center support brackets (as a support bracket is required at least every 160cm). Please note, if there is a center support bracket required for your span, the drapery will not be able to pass over the additional bracket or brackets.",
   "hardware1": "None",
   "hardware2": "Same\nHardware\nFor All Curtains",
@@ -926,5 +926,9 @@
   "10 cm leading edge": "10 cm leading edge",
   "60 cm bottom border": "60 cm bottom border",
   "10 cm leading edge and 60 cm bottom border": "10 cm leading edge and 60 cm bottom border",
+  "mount_MouldingMount": "Moulding",
+  "cm_label": "cm",
+  "moreThan300": "the addition of Width, Left extension and Right extension of your measurements is more than 300cm.",
+  "Min: ": "Min:",
   "": ""
 }

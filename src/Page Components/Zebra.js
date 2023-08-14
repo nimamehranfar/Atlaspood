@@ -178,6 +178,23 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
         "height3C": [],
         "shadeMount": []
     });
+    const [width, setWidth] = useState(undefined);
+    const [height, setHeight] = useState(undefined);
+    const [width1, setWidth1] = useState(undefined);
+    const [width2, setWidth2] = useState(undefined);
+    const [width3, setWidth3] = useState(undefined);
+    const [height1, setHeight1] = useState(undefined);
+    const [height2, setHeight2] = useState(undefined);
+    const [height3, setHeight3] = useState(undefined);
+    const [ceilingToWindow1, setCeilingToWindow1] = useState(undefined);
+    const [ceilingToWindow2, setCeilingToWindow2] = useState(undefined);
+    const [ceilingToWindow3, setCeilingToWindow3] = useState(undefined);
+    const [width3A, setWidth3A] = useState(undefined);
+    const [left, setLeft] = useState(undefined);
+    const [right, setRight] = useState(undefined);
+    const [height3C, setHeight3C] = useState(undefined);
+    const [mount, setMount] = useState(undefined);
+    
     const [requiredStep, setRequiredStep] = useState({
         "1": false,
         "2": false,
@@ -460,6 +477,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
         Object.keys(fabrics).forEach((key, index) => {
             let DesignName = convertToPersian(fabrics[key][0].DesignName);
             let DesignEnName = fabrics[key][0].DesignEnName;
+            let SamplePrice = fabrics[key][0]["SamplePrice"];
             
             const fabric = [];
             for (let j = 0; j < fabrics[key].length; j++) {
@@ -560,7 +578,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                 <div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key}>
                     <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
                         <hr/>
-                        <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(100000, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")}</p></span>
+                        <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(SamplePrice, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")}</p></span>
                     </div>
                     {fabric}
                 </div>
@@ -685,7 +703,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
         
         return (
             <div className={`w-100 h-100 steps_header ${isCurrentEventKey ? 'steps_header_active' : ''}`}
-                onClick={decoratedOnClick} ref={ref => (stepHeaders.current[stepRef] = ref)}>
+                 onClick={decoratedOnClick} ref={ref => (stepHeaders.current[stepRef] = ref)}>
                 <div className="steps_header_num_container">
                     <div className="steps_header_num">{stepNum}</div>
                 </div>
@@ -821,7 +839,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
     }
     
     function optionSelectChanged_three(obj, refIndex, position, isMin, modalRef, postfixEn, postfixFa, pageLang) {
-        if (obj !== undefined) {
+        if (obj !== undefined && typeof selected === 'object') {
             let temp = JSON.parse(JSON.stringify(stepSelectedOptions));
             if (temp.labels[refIndex] === undefined)
                 temp.labels[refIndex] = [];
@@ -849,11 +867,39 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                     modalHandleShow(modalRef);
                 }
             }
+        } else if (obj !== undefined) {
+            let temp = JSON.parse(JSON.stringify(stepSelectedOptions));
+            if (temp.labels[refIndex] === undefined)
+                temp.labels[refIndex] = [];
+            if (temp.values[refIndex] === undefined)
+                temp.values[refIndex] = [];
+            temp.labels[refIndex][position] = obj;
+            temp.values[refIndex][position] = parseFloat(obj);
+            setStepSelectedOptions(temp);
+    
+            if (temp.values[refIndex].filter(function (e) {
+                return e
+            }).length === 3) {
+                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                if (isMin) {
+                    let tempMin = temp.values[refIndex][temp.values[refIndex].indexOf(Math.min(...temp.values[refIndex]))];
+                    tempLabels[refIndex] = pageLang === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
+                } else {
+                    let tempMax = temp.values[refIndex][temp.values[refIndex].indexOf(Math.min(...temp.values[refIndex]))];
+                    tempLabels[refIndex] = pageLang === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + postfixFa : tempMax + postfixEn;
+                }
+                setStepSelectedLabel(tempLabels);
+                let minValue = Math.min(...temp.values[refIndex]);
+                let maxValue = Math.max(...temp.values[refIndex]);
+                if (maxValue - minValue >= 2) {
+                    modalHandleShow(modalRef);
+                }
+            }
         }
     }
     
     function optionSelectChanged_WidthLength(obj, refIndex, isWidth, postfixEn, postfixFa, pageLang) {
-        if (obj !== undefined) {
+        if (obj !== undefined && typeof selected === 'object') {
             if (isWidth) {
                 let temp = JSON.parse(JSON.stringify(widthLength));
                 temp.width = obj.value;
@@ -875,11 +921,13 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                     // setStepSelectedLabel(tempLabels);
                 }
             }
+        } else if (obj !== undefined) {
+        
         }
     }
     
     function optionSelectChanged_LeftRight(obj, refIndex, isLeft, postfixEn, postfixFa, pageLang) {
-        if (obj !== undefined) {
+        if (obj !== undefined && typeof obj === 'object') {
             if (isLeft) {
                 let temp = JSON.parse(JSON.stringify(leftRight));
                 temp.left = obj.value;
@@ -901,17 +949,48 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                     setStepSelectedLabel(tempLabels);
                 }
             }
+        } else if (obj !== undefined) {
+            if (isLeft) {
+                let temp = JSON.parse(JSON.stringify(leftRight));
+                temp.left = obj;
+                setLeftRight(temp);
+                
+                if (temp.right !== "" && temp.left !== "") {
+                    let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                    tempLabels[refIndex] = pageLang === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp.right}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp.left}`) + postfixFa}` : `Left: ${temp.left + postfixEn}\u00A0\u00A0\u00A0Right: ${temp.right + postfixEn}`;
+                    setStepSelectedLabel(tempLabels);
+                }
+            } else {
+                let temp = JSON.parse(JSON.stringify(leftRight));
+                temp.right = obj;
+                setLeftRight(temp);
+                
+                if (temp.right !== "" && temp.left !== "") {
+                    let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                    tempLabels[refIndex] = pageLang === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp.right}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp.left}`) + postfixFa}` : `Left: ${temp.left + postfixEn}\u00A0\u00A0\u00A0Right: ${temp.right + postfixEn}`;
+                    setStepSelectedLabel(tempLabels);
+                }
+            }
         }
     }
     
     function optionSelectChanged(refIndex, selected, postfixEn, postfixFa, pageLang) {
-        if (selected !== undefined) {
+        if (selected !== undefined && typeof selected === 'object') {
             let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
             tempLabels[refIndex] = pageLang === "fa" ? `${NumberToPersianWord.convertEnToPe(`${selected.value}`) + postfixFa}` : `${selected.value + postfixEn}`;
             setStepSelectedLabel(tempLabels);
             
             let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
             tempValue[refIndex] = selected.value;
+            // console.log(tempValue);
+            setStepSelectedValue(tempValue);
+        } else if (selected !== undefined) {
+            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+            tempLabels[refIndex] = pageLang === "fa" ? `${NumberToPersianWord.convertEnToPe(`${selected}`) + postfixFa}` : `${selected + postfixEn}`;
+            setStepSelectedLabel(tempLabels);
+            
+            let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
+            tempValue[refIndex] = selected;
             // console.log(tempValue);
             setStepSelectedValue(tempValue);
         }
@@ -2663,7 +2742,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                     setSelectedFile(undefined);
                     setSelectedFileName("");
                     setEditedFileName("");
-                    modalHandleClose(" uploadImg");
+                    modalHandleClose("uploadImg");
                     setDetailsShow(false);
                 }).catch(err => {
                 console.log(err);
@@ -2676,7 +2755,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                             setSelectedFile(undefined);
                             setSelectedFileName("");
                             setEditedFileName("");
-                            modalHandleClose(" uploadImg");
+                            modalHandleClose("uploadImg");
                             setDetailsShow(false);
                             
                             dispatch({
@@ -3006,8 +3085,10 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                             setStepSelectedLabel(tempLabels);
                             setStepSelectedValue(tempValue);
                             
-                            selectValues["width"] = temp["Width"] ? [{value: temp["Width"]}] : [];
-                            selectValues["length"] = temp["Height"] ? [{value: temp["Height"]}] : [];
+                            // selectValues["width"] = temp["Width"] ? [{value: temp["Width"]}] : [];
+                            // selectValues["length"] = temp["Height"] ? [{value: temp["Height"]}] : [];
+                            setWidth(temp["Width"] ? temp["Width"] : undefined);
+                            setHeight(temp["Height"] ? temp["Height"] : undefined);
                             depSetTempArr = new Set([...setGetDeps((temp["Width"] ? "" : "31,") + (temp["Height"] ? "" : "32,"), "3", depSetTempArr)]);
                             setSelectCustomValues(selectValues);
                             
@@ -3023,12 +3104,18 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                     let tempWidth = changeLang ? temp["Width1"] : temp["Width"];
                                     let tempHeight = changeLang ? temp["Height1"] : temp["Height"];
                                     
-                                    selectValues["width1"] = tempWidth ? [{value: tempWidth}] : [];
-                                    selectValues["width2"] = temp["Width2"] ? [{value: temp["Width2"]}] : [];
-                                    selectValues["width3"] = temp["Width3"] ? [{value: temp["Width3"]}] : [];
-                                    selectValues["height1"] = tempHeight ? [{value: tempHeight}] : [];
-                                    selectValues["height2"] = temp["Height2"] ? [{value: temp["Height2"]}] : [];
-                                    selectValues["height3"] = temp["Height3"] ? [{value: temp["Height3"]}] : [];
+                                    // selectValues["width1"] = tempWidth ? [{value: tempWidth}] : [];
+                                    // selectValues["width2"] = temp["Width2"] ? [{value: temp["Width2"]}] : [];
+                                    // selectValues["width3"] = temp["Width3"] ? [{value: temp["Width3"]}] : [];
+                                    // selectValues["height1"] = tempHeight ? [{value: tempHeight}] : [];
+                                    // selectValues["height2"] = temp["Height2"] ? [{value: temp["Height2"]}] : [];
+                                    // selectValues["height3"] = temp["Height3"] ? [{value: temp["Height3"]}] : [];
+                                    setWidth1(tempWidth ? tempWidth : undefined);
+                                    setWidth2(temp["Width2"] ? temp["Width2"] : undefined);
+                                    setWidth3(temp["Width3"] ? temp["Width3"] : undefined);
+                                    setHeight1(tempHeight ? tempHeight : undefined);
+                                    setHeight2(temp["Height2"] ? temp["Height2"] : undefined);
+                                    setHeight3(temp["Height3"] ? temp["Height3"] : undefined);
                                     if (tempWidth && temp["Width2"] && temp["Width3"]) {
                                         let tempMin = Math.min(tempWidth, temp["Width2"], temp["Width3"]);
                                         tempLabels["3AIn"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
@@ -3048,20 +3135,25 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                     
                                     // console.log(temp,tempWidth,tempHeight);
                                     
-                                    selectValues["width3A"] = tempWidth ? [{value: tempWidth}] : [];
+                                    // selectValues["width3A"] = tempWidth ? [{value: tempWidth}] : [];
+                                    setWidth3A(tempWidth ? tempWidth : undefined);
                                     if (tempWidth) {
                                         tempLabels["3AOut"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
                                     }
-                                    selectValues["height3C"] = tempHeight ? [{value: tempHeight}] : [];
+                                    // selectValues["height3C"] = tempHeight ? [{value: tempHeight}] : [];
+                                    setHeight3C(tempHeight ? tempHeight : undefined);
                                     if (tempHeight) {
                                         tempLabels["3COut"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
                                     }
-                                    selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
-                                    selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                    // selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
+                                    // selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                    setLeft(temp["ExtensionLeft"] ? temp["ExtensionLeft"] : undefined);
+                                    setRight(temp["ExtensionRight"] ? temp["ExtensionRight"] : undefined);
                                     if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
                                         tempLabels["3BOut"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
                                     }
-                                    selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
+                                    // selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
+                                    setMount(temp["ShadeMount"] ? temp["ShadeMount"] : undefined);
                                     if (temp["ShadeMount"] !== undefined) {
                                         tempLabels["3DOut"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["ShadeMount"]}`) + postfixFa : temp["ShadeMount"] + postfixEn;
                                     }
@@ -3076,18 +3168,24 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                     let tempHeight2 = changeLang ? temp["CeilingToWindow2"] : temp["Height2"];
                                     let tempHeight3 = changeLang ? temp["CeilingToWindow3"] : temp["Height3"];
                                     
-                                    selectValues["width3A"] = tempWidth ? [{value: tempWidth}] : [];
+                                    // selectValues["width3A"] = tempWidth ? [{value: tempWidth}] : [];
+                                    setWidth3A(tempWidth ? tempWidth : undefined);
                                     if (tempWidth) {
                                         tempLabels["3AOut"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
                                     }
-                                    selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
-                                    selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                    // selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
+                                    // selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
+                                    setLeft(temp["ExtensionLeft"] ? temp["ExtensionLeft"] : undefined);
+                                    setRight(temp["ExtensionRight"] ? temp["ExtensionRight"] : undefined);
                                     if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
                                         tempLabels["3BOut"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
                                     }
-                                    selectValues["CeilingToWindow1"] = tempHeight ? [{value: tempHeight}] : [];
-                                    selectValues["CeilingToWindow2"] = tempHeight2 ? [{value: tempHeight2}] : [];
-                                    selectValues["CeilingToWindow3"] = tempHeight3 ? [{value: tempHeight3}] : [];
+                                    // selectValues["CeilingToWindow1"] = tempHeight ? [{value: tempHeight}] : [];
+                                    // selectValues["CeilingToWindow2"] = tempHeight2 ? [{value: tempHeight2}] : [];
+                                    // selectValues["CeilingToWindow3"] = tempHeight3 ? [{value: tempHeight3}] : [];
+                                    setCeilingToWindow1(tempHeight ? tempHeight : undefined);
+                                    setCeilingToWindow2(tempHeight2 ? tempHeight2 : undefined);
+                                    setCeilingToWindow3(tempHeight3 ? tempHeight3 : undefined);
                                     if (tempHeight && tempHeight2 && tempHeight3) {
                                         let tempMax = Math.min(tempHeight, tempHeight2, tempHeight3);
                                         tempLabels["3CArc"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + postfixFa : tempMax + postfixEn;
@@ -3727,6 +3825,15 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
             }
         });
     }, [step1]);
+    
+    useEffect(() => {
+        if(width3A && left && right && !(width3A < 30 || width3A > 290) && !(left < 1 || left > 10) && !(right < 1 || right > 10)){
+            if(+width3A + +left + +right>300){
+                modalHandleShow("moreThan300");
+            }
+        }
+    }, [width3A,left,right]);
+    
     // useEffect(() => {
     //     if (firstRender === false) {
     //         const tempLang = location.pathname.split('');
@@ -4812,98 +4919,162 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                         
                                         </div>
                                         
-                                        {stepSelectedValue["3"] === "1" &&
-                                            <div className="own_measurements_container">
-                                                <div className="own_measurements_width">
-                                                    <label className="select_label">{t("Width")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                    <div className="select_container select_container_num">
-                                                        <Select
-                                                            className="select"
-                                                            placeholder={t("Please Select")}
-                                                            portal={document.body}
-                                                            dropdownPosition="bottom"
-                                                            dropdownHandle={false}
-                                                            dropdownGap={0}
-                                                            values={selectCustomValues.width}
-                                                            onDropdownOpen={() => {
-                                                                let temp1 = window.scrollY;
-                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                                setTimeout(() => {
-                                                                    let temp2 = window.scrollY;
-                                                                    if (temp2 === temp1)
-                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                                }, 100);
-                                                            }}
-                                                            dropdownRenderer={
-                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
+                                        <div className={step3 === "false" ? "own_measurements_container" : "noDisplay"}>
+                                            <div className="own_measurements_width">
+                                                {/*<label className="select_label">{t("Width")}<p className="farsi_cm">{t("select_cm")}</p></label>*/}
+                                                {/*<div className="select_container select_container_num">*/}
+                                                {/*    <Select*/}
+                                                {/*        className="select"*/}
+                                                {/*        placeholder={t("Please Select")}*/}
+                                                {/*        portal={document.body}*/}
+                                                {/*        dropdownPosition="bottom"*/}
+                                                {/*        dropdownHandle={false}*/}
+                                                {/*        dropdownGap={0}*/}
+                                                {/*        values={selectCustomValues.width}*/}
+                                                {/*        onDropdownOpen={() => {*/}
+                                                {/*            let temp1 = window.scrollY;*/}
+                                                {/*            window.scrollTo(window.scrollX, window.scrollY + 1);*/}
+                                                {/*            setTimeout(() => {*/}
+                                                {/*                let temp2 = window.scrollY;*/}
+                                                {/*                if (temp2 === temp1)*/}
+                                                {/*                    window.scrollTo(window.scrollX, window.scrollY - 1);*/}
+                                                {/*            }, 100);*/}
+                                                {/*        }}*/}
+                                                {/*        dropdownRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>*/}
+                                                {/*        }*/}
+                                                {/*        contentRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"*/}
+                                                {/*                                                           postfixFa=""/>*/}
+                                                {/*        }*/}
+                                                {/*        // optionRenderer={*/}
+                                                {/*        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>*/}
+                                                {/*        // }*/}
+                                                {/*        onChange={(selected) => {*/}
+                                                {/*            if (selected[0] !== undefined) {*/}
+                                                {/*                optionSelectChanged_WidthLength(selected[0], "3", true, "cm", "س\u200Cم", pageLanguage);*/}
+                                                {/*                let temp = JSON.parse(JSON.stringify(selectCustomValues));*/}
+                                                {/*                temp.width = selected;*/}
+                                                {/*                setSelectCustomValues(temp);*/}
+                                                {/*                setDeps("", "31", "3", "4");*/}
+                                                {/*                setCart("Width", selected[0].value);*/}
+                                                {/*            }*/}
+                                                {/*        }}*/}
+                                                {/*        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}*/}
+                                                {/*    />*/}
+                                                {/*</div>*/}
+                                                <div className="measure_input_container">
+                                                    <h1 className="measure_input_label">{t("Width")}</h1>
+                                                    <div className="measure_input_field_container">
+                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                            if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                                e.preventDefault();
                                                             }
-                                                            contentRenderer={
-                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                               postfixFa=""/>
-                                                            }
-                                                            // optionRenderer={
-                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                            // }
-                                                            onChange={(selected) => {
-                                                                if (selected[0] !== undefined) {
-                                                                    optionSelectChanged_WidthLength(selected[0], "3", true, "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                    temp.width = selected;
-                                                                    setSelectCustomValues(temp);
-                                                                    setDeps("", "31", "3", "4");
-                                                                    setCart("Width", selected[0].value);
-                                                                }
-                                                            }}
-                                                            options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
-                                                        />
+                                                        }} className={"measure_input" + (width !== undefined && (width < 30 || width > 300) ? " measure_input_err" : "")} type="text"
+                                                                       name="width" value={NumToFa(`${width||""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue= isNaN(newValue)?"":newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 300) {
+                                                                               setCartLoading(true);
+                                                                               setCart("Width", parseInt(newValue));
+                                                                               setDeps("", "31");
+                                                                               setWidth(parseInt(newValue));
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "Width");
+                                                                               setDeps("31", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setWidth(undefined);
+                                                                               } else {
+                                                                                   setWidth(parseInt(newValue));
+                                                                               }
+                                                                               setWindowSize("");
+                                                                           }
+                                                                       }}/>
+                                                        <div className="measure_input_postfix">{t("cm_label")}</div>
                                                     </div>
-                                                </div>
-                                                <div className="own_measurements_Length">
-                                                    <label className="select_label">{t("Length_step3")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                    <div className="select_container select_container_num">
-                                                        <Select
-                                                            className="select"
-                                                            placeholder={t("Please Select")}
-                                                            portal={document.body}
-                                                            dropdownPosition="bottom"
-                                                            dropdownHandle={false}
-                                                            dropdownGap={0}
-                                                            values={selectCustomValues.length}
-                                                            onDropdownOpen={() => {
-                                                                let temp1 = window.scrollY;
-                                                                window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                                setTimeout(() => {
-                                                                    let temp2 = window.scrollY;
-                                                                    if (temp2 === temp1)
-                                                                        window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                                }, 100);
-                                                            }}
-                                                            dropdownRenderer={
-                                                                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                            }
-                                                            contentRenderer={
-                                                                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                               postfixFa=""/>
-                                                            }
-                                                            // optionRenderer={
-                                                            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                            // }
-                                                            onChange={(selected) => {
-                                                                if (selected[0] !== undefined) {
-                                                                    optionSelectChanged_WidthLength(selected[0], "3", false, "cm", "س\u200Cم", pageLanguage);
-                                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                    temp.length = selected;
-                                                                    setSelectCustomValues(temp);
-                                                                    setDeps("", "32", "3", "4");
-                                                                    setCart("Height", selected[0].value);
-                                                                }
-                                                            }}
-                                                            options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
-                                                        />
-                                                    </div>
+                                                    <h2 className={"measure_input_desc" + (width !== undefined && (width < 30 || width > 300) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 300`, pageLanguage)} {t("cm_label")}</h2>
                                                 </div>
                                             </div>
-                                        }
+                                            <div className="own_measurements_Length">
+                                                {/*<label className="select_label">{t("Length_step3")}<p className="farsi_cm">{t("select_cm")}</p></label>*/}
+                                                {/*<div className="select_container select_container_num">*/}
+                                                {/*    <Select*/}
+                                                {/*        className="select"*/}
+                                                {/*        placeholder={t("Please Select")}*/}
+                                                {/*        portal={document.body}*/}
+                                                {/*        dropdownPosition="bottom"*/}
+                                                {/*        dropdownHandle={false}*/}
+                                                {/*        dropdownGap={0}*/}
+                                                {/*        values={selectCustomValues.length}*/}
+                                                {/*        onDropdownOpen={() => {*/}
+                                                {/*            let temp1 = window.scrollY;*/}
+                                                {/*            window.scrollTo(window.scrollX, window.scrollY + 1);*/}
+                                                {/*            setTimeout(() => {*/}
+                                                {/*                let temp2 = window.scrollY;*/}
+                                                {/*                if (temp2 === temp1)*/}
+                                                {/*                    window.scrollTo(window.scrollX, window.scrollY - 1);*/}
+                                                {/*            }, 100);*/}
+                                                {/*        }}*/}
+                                                {/*        dropdownRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>*/}
+                                                {/*        }*/}
+                                                {/*        contentRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"*/}
+                                                {/*                                                           postfixFa=""/>*/}
+                                                {/*        }*/}
+                                                {/*        // optionRenderer={*/}
+                                                {/*        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>*/}
+                                                {/*        // }*/}
+                                                {/*        onChange={(selected) => {*/}
+                                                {/*            if (selected[0] !== undefined) {*/}
+                                                {/*                optionSelectChanged_WidthLength(selected[0], "3", false, "cm", "س\u200Cم", pageLanguage);*/}
+                                                {/*                let temp = JSON.parse(JSON.stringify(selectCustomValues));*/}
+                                                {/*                temp.length = selected;*/}
+                                                {/*                setSelectCustomValues(temp);*/}
+                                                {/*                setDeps("", "32", "3", "4");*/}
+                                                {/*                setCart("Height", selected[0].value);*/}
+                                                {/*            }*/}
+                                                {/*        }}*/}
+                                                {/*        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}*/}
+                                                {/*    />*/}
+                                                {/*</div>*/}
+                                                <div className="measure_input_container">
+                                                    <h1 className="measure_input_label">{t("Height")}</h1>
+                                                    <div className="measure_input_field_container">
+                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                                if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                                e.preventDefault();
+                                                            }
+                                                        }} className={"measure_input" + (height !== undefined && (height < 30 || height > 400) ? " measure_input_err" : "")} type="text"
+                                                                       name="width" value={NumToFa(`${height||""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue= isNaN(newValue)?"":newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
+                                                                               setCartLoading(true);
+                                                                               setCart("Height", parseInt(newValue));
+                                                                               setDeps("", "32");
+                                                                               setHeight(parseInt(newValue));
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "Height");
+                                                                               setDeps("32", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setHeight(undefined);
+                                                                               } else {
+                                                                                   setHeight(parseInt(newValue));
+                                                                               }
+                                                                               setWindowSize("");
+                                                                           }
+                                                                       }}/>
+                                                        <div className="measure_input_postfix">{t("cm_label")}</div>
+                                                    </div>
+                                                    <h2 className={"measure_input_desc" + (height !== undefined && (height < 30 || height > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>
+                                                </div>
+                                            </div>
+                                        </div>
                                         
                                         <NextStep currentStep="3" eventKey={measurementsNextStep}>{t("NEXT STEP")}</NextStep>
                                     </div>
@@ -4967,135 +5138,237 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                         </div>
                                         <div className="box100 Three_selection_container">
                                             <div className="Three_select_container">
-                                                <label className="select_label">{t("step3AIn_A")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.width1}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                           postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_three(selected[0], "3AIn", 0, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                temp.width1 = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3AIn1", "3A", "3B");
-                                                                setCart("Width1", selected[0].value);
+                                                {/*<label className="select_label">{t("step3AIn_A")}<p className="farsi_cm">{t("select_cm")}</p></label>*/}
+                                                {/*<div className="select_container select_container_num">*/}
+                                                {/*    <Select*/}
+                                                {/*        className="select"*/}
+                                                {/*        placeholder={t("Please Select")}*/}
+                                                {/*        portal={document.body}*/}
+                                                {/*        dropdownPosition="bottom"*/}
+                                                {/*        dropdownHandle={false}*/}
+                                                {/*        dropdownGap={0}*/}
+                                                {/*        onDropdownOpen={() => {*/}
+                                                {/*            let temp1 = window.scrollY;*/}
+                                                {/*            window.scrollTo(window.scrollX, window.scrollY + 1);*/}
+                                                {/*            setTimeout(() => {*/}
+                                                {/*                let temp2 = window.scrollY;*/}
+                                                {/*                if (temp2 === temp1)*/}
+                                                {/*                    window.scrollTo(window.scrollX, window.scrollY - 1);*/}
+                                                {/*            }, 100);*/}
+                                                {/*        }}*/}
+                                                {/*        values={selectCustomValues.width1}*/}
+                                                {/*        dropdownRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>*/}
+                                                {/*        }*/}
+                                                {/*        contentRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"*/}
+                                                {/*                                                           postfixFa=""/>*/}
+                                                {/*        }*/}
+                                                {/*        // optionRenderer={*/}
+                                                {/*        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>*/}
+                                                {/*        // }*/}
+                                                {/*        onChange={(selected) => {*/}
+                                                {/*            if (selected[0] !== undefined) {*/}
+                                                {/*                optionSelectChanged_three(selected[0], "3AIn", 0, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);*/}
+                                                {/*                let temp = JSON.parse(JSON.stringify(selectCustomValues));*/}
+                                                {/*                temp.width1 = selected;*/}
+                                                {/*                setSelectCustomValues(temp);*/}
+                                                {/*                setDeps("", "3AIn1", "3A", "3B");*/}
+                                                {/*                setCart("Width1", selected[0].value);*/}
+                                                {/*            }*/}
+                                                {/*        }}*/}
+                                                {/*        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}*/}
+                                                {/*    />*/}
+                                                {/*</div>*/}
+                                                <div className="measure_input_container">
+                                                    <h1 className="measure_input_label">{t("step3AIn_A")}</h1>
+                                                    <div className="measure_input_field_container">
+                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                                if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                                e.preventDefault();
                                                             }
-                                                        }}
-                                                        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
-                                                    />
+                                                        }} className={"measure_input" + (width1 !== undefined && (width1 < 30 || width1 > 300) ? " measure_input_err" : "")} type="text"
+                                                                       name="width1" value={NumToFa(`${width1||""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue= isNaN(newValue)?"":newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 300) {
+                                                                               setCartLoading(true);
+                                                                               setCart("Width1", parseInt(newValue));
+                                                                               setDeps("", "3AIn1");
+                                                                               setWidth1(parseInt(newValue));
+                                                                               optionSelectChanged_three(parseInt(newValue), "3AIn", 0, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "Width1");
+                                                                               setDeps("3AIn1", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setWidth1(undefined);
+                                                                               } else {
+                                                                                   setWidth1(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3AIn");
+                                                                           }
+                                                                       }}/>
+                                                        <div className="measure_input_postfix">{t("cm_label")}</div>
+                                                    </div>
+                                                    <h2 className={"measure_input_desc" + (width1 !== undefined && (width1 < 30 || width1 > 300) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 300`, pageLanguage)} {t("cm_label")}</h2>
                                                 </div>
                                             </div>
                                             <div className="Three_select_container">
-                                                <label className="select_label">{t("step3AIn_B")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.width2}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                           postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_three(selected[0], "3AIn", 1, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                temp.width2 = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3AIn2", "3A", "3B");
-                                                                setCart("Width2", selected[0].value);
+                                                {/*<label className="select_label">{t("step3AIn_B")}<p className="farsi_cm">{t("select_cm")}</p></label>*/}
+                                                {/*<div className="select_container select_container_num">*/}
+                                                {/*    <Select*/}
+                                                {/*        className="select"*/}
+                                                {/*        placeholder={t("Please Select")}*/}
+                                                {/*        portal={document.body}*/}
+                                                {/*        dropdownPosition="bottom"*/}
+                                                {/*        dropdownHandle={false}*/}
+                                                {/*        dropdownGap={0}*/}
+                                                {/*        onDropdownOpen={() => {*/}
+                                                {/*            let temp1 = window.scrollY;*/}
+                                                {/*            window.scrollTo(window.scrollX, window.scrollY + 1);*/}
+                                                {/*            setTimeout(() => {*/}
+                                                {/*                let temp2 = window.scrollY;*/}
+                                                {/*                if (temp2 === temp1)*/}
+                                                {/*                    window.scrollTo(window.scrollX, window.scrollY - 1);*/}
+                                                {/*            }, 100);*/}
+                                                {/*        }}*/}
+                                                {/*        values={selectCustomValues.width2}*/}
+                                                {/*        dropdownRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>*/}
+                                                {/*        }*/}
+                                                {/*        contentRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"*/}
+                                                {/*                                                           postfixFa=""/>*/}
+                                                {/*        }*/}
+                                                {/*        // optionRenderer={*/}
+                                                {/*        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>*/}
+                                                {/*        // }*/}
+                                                {/*        onChange={(selected) => {*/}
+                                                {/*            if (selected[0] !== undefined) {*/}
+                                                {/*                optionSelectChanged_three(selected[0], "3AIn", 1, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);*/}
+                                                {/*                let temp = JSON.parse(JSON.stringify(selectCustomValues));*/}
+                                                {/*                temp.width2 = selected;*/}
+                                                {/*                setSelectCustomValues(temp);*/}
+                                                {/*                setDeps("", "3AIn2", "3A", "3B");*/}
+                                                {/*                setCart("Width2", selected[0].value);*/}
+                                                {/*            }*/}
+                                                {/*        }}*/}
+                                                {/*        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}*/}
+                                                {/*    />*/}
+                                                {/*</div>*/}
+                                                <div className="measure_input_container">
+                                                    <h1 className="measure_input_label">{t("step3AIn_B")}</h1>
+                                                    <div className="measure_input_field_container">
+                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                                if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                                e.preventDefault();
                                                             }
-                                                        }}
-                                                        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
-                                                    />
+                                                        }} className={"measure_input" + (width2 !== undefined && (width2 < 30 || width2 > 300) ? " measure_input_err" : "")} type="text"
+                                                                       name="width2" value={NumToFa(`${width2||""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue= isNaN(newValue)?"":newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 300) {
+                                                                               setCartLoading(true);
+                                                                               setCart("Width2", parseInt(newValue));
+                                                                               setDeps("", "3AIn2");
+                                                                               setWidth2(parseInt(newValue));
+                                                                               optionSelectChanged_three(parseInt(newValue), "3AIn", 1, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "Width2");
+                                                                               setDeps("3AIn2", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setWidth2(undefined);
+                                                                               } else {
+                                                                                   setWidth2(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3AIn");
+                                                                           }
+                                                                       }}/>
+                                                        <div className="measure_input_postfix">{t("cm_label")}</div>
+                                                    </div>
+                                                    <h2 className={"measure_input_desc" + (width2 !== undefined && (width2 < 30 || width2 > 300) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 300`, pageLanguage)} {t("cm_label")}</h2>
                                                 </div>
                                             </div>
                                             <div className="Three_select_container">
-                                                <label className="select_label">{t("step3AIn_C")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.width3}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                           postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_three(selected[0], "3AIn", 2, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                temp.width3 = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3AIn3", "3A", "3B");
-                                                                setCart("Width3", selected[0].value);
+                                                {/*<label className="select_label">{t("step3AIn_C")}<p className="farsi_cm">{t("select_cm")}</p></label>*/}
+                                                {/*<div className="select_container select_container_num">*/}
+                                                {/*    <Select*/}
+                                                {/*        className="select"*/}
+                                                {/*        placeholder={t("Please Select")}*/}
+                                                {/*        portal={document.body}*/}
+                                                {/*        dropdownPosition="bottom"*/}
+                                                {/*        dropdownHandle={false}*/}
+                                                {/*        dropdownGap={0}*/}
+                                                {/*        onDropdownOpen={() => {*/}
+                                                {/*            let temp1 = window.scrollY;*/}
+                                                {/*            window.scrollTo(window.scrollX, window.scrollY + 1);*/}
+                                                {/*            setTimeout(() => {*/}
+                                                {/*                let temp2 = window.scrollY;*/}
+                                                {/*                if (temp2 === temp1)*/}
+                                                {/*                    window.scrollTo(window.scrollX, window.scrollY - 1);*/}
+                                                {/*            }, 100);*/}
+                                                {/*        }}*/}
+                                                {/*        values={selectCustomValues.width3}*/}
+                                                {/*        dropdownRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>*/}
+                                                {/*        }*/}
+                                                {/*        contentRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"*/}
+                                                {/*                                                           postfixFa=""/>*/}
+                                                {/*        }*/}
+                                                {/*        // optionRenderer={*/}
+                                                {/*        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>*/}
+                                                {/*        // }*/}
+                                                {/*        onChange={(selected) => {*/}
+                                                {/*            if (selected[0] !== undefined) {*/}
+                                                {/*                optionSelectChanged_three(selected[0], "3AIn", 2, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);*/}
+                                                {/*                let temp = JSON.parse(JSON.stringify(selectCustomValues));*/}
+                                                {/*                temp.width3 = selected;*/}
+                                                {/*                setSelectCustomValues(temp);*/}
+                                                {/*                setDeps("", "3AIn3", "3A", "3B");*/}
+                                                {/*                setCart("Width3", selected[0].value);*/}
+                                                {/*            }*/}
+                                                {/*        }}*/}
+                                                {/*        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}*/}
+                                                {/*    />*/}
+                                                {/*</div>*/}
+                                                <div className="measure_input_container">
+                                                    <h1 className="measure_input_label">{t("step3AIn_C")}</h1>
+                                                    <div className="measure_input_field_container">
+                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                                if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                                e.preventDefault();
                                                             }
-                                                        }}
-                                                        options={SelectOptionRange(30, 300, 1, "cm", "", pageLanguage)}
-                                                    />
+                                                        }} className={"measure_input" + (width3 !== undefined && (width3 < 30 || width3 > 300) ? " measure_input_err" : "")} type="text"
+                                                                       name="width3" value={NumToFa(`${width3||""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue= isNaN(newValue)?"":newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 300) {
+                                                                               setCartLoading(true);
+                                                                               setCart("Width3", parseInt(newValue));
+                                                                               setDeps("", "3AIn3");
+                                                                               setWidth3(parseInt(newValue));
+                                                                               optionSelectChanged_three(parseInt(newValue), "3AIn", 2, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "Width3");
+                                                                               setDeps("3AIn3", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setWidth3(undefined);
+                                                                               } else {
+                                                                                   setWidth3(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3AIn");
+                                                                           }
+                                                                       }}/>
+                                                        <div className="measure_input_postfix">{t("cm_label")}</div>
+                                                    </div>
+                                                    <h2 className={"measure_input_desc" + (width3 !== undefined && (width3 < 30 || width3 > 300) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 300`, pageLanguage)} {t("cm_label")}</h2>
                                                 </div>
                                             </div>
                                         </div>
@@ -5134,135 +5407,237 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                         </div>
                                         <div className="box100 Three_selection_container">
                                             <div className="Three_select_container">
-                                                <label className="select_label">{t("step3BIn_A")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.height1}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                           postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_three(selected[0], "3BIn", 0, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                temp.height1 = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3BIn1", "3B", "4");
-                                                                setCart("Height1", selected[0].value);
+                                                {/*<label className="select_label">{t("step3BIn_A")}<p className="farsi_cm">{t("select_cm")}</p></label>*/}
+                                                {/*<div className="select_container select_container_num">*/}
+                                                {/*    <Select*/}
+                                                {/*        className="select"*/}
+                                                {/*        placeholder={t("Please Select")}*/}
+                                                {/*        portal={document.body}*/}
+                                                {/*        dropdownPosition="bottom"*/}
+                                                {/*        dropdownHandle={false}*/}
+                                                {/*        dropdownGap={0}*/}
+                                                {/*        onDropdownOpen={() => {*/}
+                                                {/*            let temp1 = window.scrollY;*/}
+                                                {/*            window.scrollTo(window.scrollX, window.scrollY + 1);*/}
+                                                {/*            setTimeout(() => {*/}
+                                                {/*                let temp2 = window.scrollY;*/}
+                                                {/*                if (temp2 === temp1)*/}
+                                                {/*                    window.scrollTo(window.scrollX, window.scrollY - 1);*/}
+                                                {/*            }, 100);*/}
+                                                {/*        }}*/}
+                                                {/*        values={selectCustomValues.height1}*/}
+                                                {/*        dropdownRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>*/}
+                                                {/*        }*/}
+                                                {/*        contentRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"*/}
+                                                {/*                                                           postfixFa=""/>*/}
+                                                {/*        }*/}
+                                                {/*        // optionRenderer={*/}
+                                                {/*        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>*/}
+                                                {/*        // }*/}
+                                                {/*        onChange={(selected) => {*/}
+                                                {/*            if (selected[0] !== undefined) {*/}
+                                                {/*                optionSelectChanged_three(selected[0], "3BIn", 0, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);*/}
+                                                {/*                let temp = JSON.parse(JSON.stringify(selectCustomValues));*/}
+                                                {/*                temp.height1 = selected;*/}
+                                                {/*                setSelectCustomValues(temp);*/}
+                                                {/*                setDeps("", "3BIn1", "3B", "4");*/}
+                                                {/*                setCart("Height1", selected[0].value);*/}
+                                                {/*            }*/}
+                                                {/*        }}*/}
+                                                {/*        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}*/}
+                                                {/*    />*/}
+                                                {/*</div>*/}
+                                                <div className="measure_input_container">
+                                                    <h1 className="measure_input_label">{t("step3BIn_A")}</h1>
+                                                    <div className="measure_input_field_container">
+                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                                if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                                e.preventDefault();
                                                             }
-                                                        }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
-                                                    />
+                                                        }} className={"measure_input" + (height1 !== undefined && (height1 < 30 || height1 > 400) ? " measure_input_err" : "")} type="text"
+                                                                       name="height1" value={NumToFa(`${height1||""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue= isNaN(newValue)?"":newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
+                                                                               setCartLoading(true);
+                                                                               setCart("Height1", parseInt(newValue));
+                                                                               setDeps("", "3BIn1");
+                                                                               setHeight1(parseInt(newValue));
+                                                                               optionSelectChanged_three(parseInt(newValue), "3BIn", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "Height1");
+                                                                               setDeps("3BIn1", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setHeight1(undefined);
+                                                                               } else {
+                                                                                   setHeight1(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3BIn");
+                                                                           }
+                                                                       }}/>
+                                                        <div className="measure_input_postfix">{t("cm_label")}</div>
+                                                    </div>
+                                                    <h2 className={"measure_input_desc" + (height1 !== undefined && (height1 < 30 || height1 > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>
                                                 </div>
                                             </div>
                                             <div className="Three_select_container">
-                                                <label className="select_label">{t("step3BIn_B")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.height2}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                           postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_three(selected[0], "3BIn", 1, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                temp.height2 = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3BIn2", "3B", "4");
-                                                                setCart("Height2", selected[0].value);
+                                                {/*<label className="select_label">{t("step3BIn_B")}<p className="farsi_cm">{t("select_cm")}</p></label>*/}
+                                                {/*<div className="select_container select_container_num">*/}
+                                                {/*    <Select*/}
+                                                {/*        className="select"*/}
+                                                {/*        placeholder={t("Please Select")}*/}
+                                                {/*        portal={document.body}*/}
+                                                {/*        dropdownPosition="bottom"*/}
+                                                {/*        dropdownHandle={false}*/}
+                                                {/*        dropdownGap={0}*/}
+                                                {/*        onDropdownOpen={() => {*/}
+                                                {/*            let temp1 = window.scrollY;*/}
+                                                {/*            window.scrollTo(window.scrollX, window.scrollY + 1);*/}
+                                                {/*            setTimeout(() => {*/}
+                                                {/*                let temp2 = window.scrollY;*/}
+                                                {/*                if (temp2 === temp1)*/}
+                                                {/*                    window.scrollTo(window.scrollX, window.scrollY - 1);*/}
+                                                {/*            }, 100);*/}
+                                                {/*        }}*/}
+                                                {/*        values={selectCustomValues.height2}*/}
+                                                {/*        dropdownRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>*/}
+                                                {/*        }*/}
+                                                {/*        contentRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"*/}
+                                                {/*                                                           postfixFa=""/>*/}
+                                                {/*        }*/}
+                                                {/*        // optionRenderer={*/}
+                                                {/*        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>*/}
+                                                {/*        // }*/}
+                                                {/*        onChange={(selected) => {*/}
+                                                {/*            if (selected[0] !== undefined) {*/}
+                                                {/*                optionSelectChanged_three(selected[0], "3BIn", 1, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);*/}
+                                                {/*                let temp = JSON.parse(JSON.stringify(selectCustomValues));*/}
+                                                {/*                temp.height2 = selected;*/}
+                                                {/*                setSelectCustomValues(temp);*/}
+                                                {/*                setDeps("", "3BIn2", "3B", "4");*/}
+                                                {/*                setCart("Height2", selected[0].value);*/}
+                                                {/*            }*/}
+                                                {/*        }}*/}
+                                                {/*        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}*/}
+                                                {/*    />*/}
+                                                {/*</div>*/}
+                                                <div className="measure_input_container">
+                                                    <h1 className="measure_input_label">{t("step3BIn_B")}</h1>
+                                                    <div className="measure_input_field_container">
+                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                                if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                                e.preventDefault();
                                                             }
-                                                        }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
-                                                    />
+                                                        }} className={"measure_input" + (height2 !== undefined && (height2 < 30 || height2 > 400) ? " measure_input_err" : "")} type="text"
+                                                                       name="height2" value={NumToFa(`${height2||""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue= isNaN(newValue)?"":newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
+                                                                               setCartLoading(true);
+                                                                               setCart("Height2", parseInt(newValue));
+                                                                               setDeps("", "3BIn2");
+                                                                               setHeight2(parseInt(newValue));
+                                                                               optionSelectChanged_three(parseInt(newValue), "3BIn", 1, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "Height2");
+                                                                               setDeps("3BIn2", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setHeight2(undefined);
+                                                                               } else {
+                                                                                   setHeight2(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3BIn");
+                                                                           }
+                                                                       }}/>
+                                                        <div className="measure_input_postfix">{t("cm_label")}</div>
+                                                    </div>
+                                                    <h2 className={"measure_input_desc" + (height2 !== undefined && (height2 < 30 || height2 > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>
                                                 </div>
                                             </div>
                                             <div className="Three_select_container">
-                                                <label className="select_label">{t("step3BIn_C")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.height3}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                           postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_three(selected[0], "3BIn", 2, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                temp.height3 = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3BIn3", "3B", "4");
-                                                                setCart("Height3", selected[0].value);
+                                                {/*<label className="select_label">{t("step3BIn_C")}<p className="farsi_cm">{t("select_cm")}</p></label>*/}
+                                                {/*<div className="select_container select_container_num">*/}
+                                                {/*    <Select*/}
+                                                {/*        className="select"*/}
+                                                {/*        placeholder={t("Please Select")}*/}
+                                                {/*        portal={document.body}*/}
+                                                {/*        dropdownPosition="bottom"*/}
+                                                {/*        dropdownHandle={false}*/}
+                                                {/*        dropdownGap={0}*/}
+                                                {/*        onDropdownOpen={() => {*/}
+                                                {/*            let temp1 = window.scrollY;*/}
+                                                {/*            window.scrollTo(window.scrollX, window.scrollY + 1);*/}
+                                                {/*            setTimeout(() => {*/}
+                                                {/*                let temp2 = window.scrollY;*/}
+                                                {/*                if (temp2 === temp1)*/}
+                                                {/*                    window.scrollTo(window.scrollX, window.scrollY - 1);*/}
+                                                {/*            }, 100);*/}
+                                                {/*        }}*/}
+                                                {/*        values={selectCustomValues.height3}*/}
+                                                {/*        dropdownRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>*/}
+                                                {/*        }*/}
+                                                {/*        contentRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"*/}
+                                                {/*                                                           postfixFa=""/>*/}
+                                                {/*        }*/}
+                                                {/*        // optionRenderer={*/}
+                                                {/*        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>*/}
+                                                {/*        // }*/}
+                                                {/*        onChange={(selected) => {*/}
+                                                {/*            if (selected[0] !== undefined) {*/}
+                                                {/*                optionSelectChanged_three(selected[0], "3BIn", 2, false, "heightDifferent", "cm", "س\u200Cم", pageLanguage);*/}
+                                                {/*                let temp = JSON.parse(JSON.stringify(selectCustomValues));*/}
+                                                {/*                temp.height3 = selected;*/}
+                                                {/*                setSelectCustomValues(temp);*/}
+                                                {/*                setDeps("", "3BIn3", "3B", "4");*/}
+                                                {/*                setCart("Height3", selected[0].value);*/}
+                                                {/*            }*/}
+                                                {/*        }}*/}
+                                                {/*        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}*/}
+                                                {/*    />*/}
+                                                {/*</div>*/}
+                                                <div className="measure_input_container">
+                                                    <h1 className="measure_input_label">{t("step3BIn_C")}</h1>
+                                                    <div className="measure_input_field_container">
+                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                                if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                                e.preventDefault();
                                                             }
-                                                        }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
-                                                    />
+                                                        }} className={"measure_input" + (height3 !== undefined && (height3 < 30 || height3 > 400) ? " measure_input_err" : "")} type="text"
+                                                                       name="height3" value={NumToFa(`${height3||""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue= isNaN(newValue)?"":newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
+                                                                               setCartLoading(true);
+                                                                               setCart("Height3", parseInt(newValue));
+                                                                               setDeps("", "3BIn3");
+                                                                               setHeight3(parseInt(newValue));
+                                                                               optionSelectChanged_three(parseInt(newValue), "3BIn", 2, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "Height3");
+                                                                               setDeps("3BIn3", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setHeight3(undefined);
+                                                                               } else {
+                                                                                   setHeight3(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3BIn");
+                                                                           }
+                                                                       }}/>
+                                                        <div className="measure_input_postfix">{t("cm_label")}</div>
+                                                    </div>
+                                                    <h2 className={"measure_input_desc" + (height3 !== undefined && (height3 < 30 || height3 > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>
                                                 </div>
                                             </div>
                                         </div>
@@ -5300,48 +5675,85 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                             <img src={require('../Images/drapery/zebra/new_FrameSize.svg').default} className="img-fluid" alt=""/>
                                         </div>
                                         <div className="box100 Three_selection_container">
+                                            {/*<div className="box100">*/}
+                                            {/*    <label className="select_label">{t("Width")}<p className="farsi_cm">{t("select_cm")}</p></label>*/}
+                                            {/*    <div className="select_container select_container_num">*/}
+                                            {/*        <Select*/}
+                                            {/*            className="select"*/}
+                                            {/*            placeholder={t("Please Select")}*/}
+                                            {/*            portal={document.body}*/}
+                                            {/*            dropdownPosition="bottom"*/}
+                                            {/*            dropdownHandle={false}*/}
+                                            {/*            dropdownGap={0}*/}
+                                            {/*            onDropdownOpen={() => {*/}
+                                            {/*                let temp1 = window.scrollY;*/}
+                                            {/*                window.scrollTo(window.scrollX, window.scrollY + 1);*/}
+                                            {/*                setTimeout(() => {*/}
+                                            {/*                    let temp2 = window.scrollY;*/}
+                                            {/*                    if (temp2 === temp1)*/}
+                                            {/*                        window.scrollTo(window.scrollX, window.scrollY - 1);*/}
+                                            {/*                }, 100);*/}
+                                            {/*            }}*/}
+                                            {/*            values={selectCustomValues.width3A}*/}
+                                            {/*            dropdownRenderer={*/}
+                                            {/*                ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>*/}
+                                            {/*            }*/}
+                                            {/*            contentRenderer={*/}
+                                            {/*                ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"*/}
+                                            {/*                                                               postfixFa=""/>*/}
+                                            {/*            }*/}
+                                            {/*            // optionRenderer={*/}
+                                            {/*            //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>*/}
+                                            {/*            // }*/}
+                                            {/*            onChange={(selected) => {*/}
+                                            {/*                if (selected[0] !== undefined) {*/}
+                                            {/*                    optionSelectChanged("3AOut", selected[0], "cm", "س\u200Cم", pageLanguage);*/}
+                                            {/*                    let temp = JSON.parse(JSON.stringify(selectCustomValues));*/}
+                                            {/*                    temp.width3A = selected;*/}
+                                            {/*                    setSelectCustomValues(temp);*/}
+                                            {/*                    setDeps("", "3AOut", "3A", "3B");*/}
+                                            {/*                    setCart("Width3A", selected[0].value);*/}
+                                            {/*                }*/}
+                                            {/*            }}*/}
+                                            {/*            options={SelectOptionRange(30, 290, 1, "cm", "", pageLanguage)}*/}
+                                            {/*        />*/}
+                                            {/*    </div>*/}
+                                            {/*</div>*/}
+                                            
                                             <div className="box100">
-                                                <label className="select_label">{t("Width")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.width3A}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                           postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged("3AOut", selected[0], "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                temp.width3A = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3AOut", "3A", "3B");
-                                                                setCart("Width3A", selected[0].value);
+                                                <div className="measure_input_container">
+                                                    <h1 className="measure_input_label">{t("Width")}</h1>
+                                                    <div className="measure_input_field_container">
+                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                                if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                                e.preventDefault();
                                                             }
-                                                        }}
-                                                        options={SelectOptionRange(30, 290, 1, "cm", "", pageLanguage)}
-                                                    />
+                                                        }} className={"measure_input" + (width3A !== undefined && (width3A < 30 || width3A > 290) ? " measure_input_err" : "")} type="text"
+                                                                       name="width3A" value={NumToFa(`${width3A||""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue= isNaN(newValue)?"":newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 290) {
+                                                                               setCartLoading(true);
+                                                                               setCart("Width3A", parseInt(newValue));
+                                                                               setDeps("", "3AOut");
+                                                                               setWidth3A(parseInt(newValue));
+                                                                               optionSelectChanged("3AOut", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "Width3A");
+                                                                               setDeps("3AOut", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setWidth3A(undefined);
+                                                                               } else {
+                                                                                   setWidth3A(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3AOut");
+                                                                           }
+                                                                       }}/>
+                                                        <div className="measure_input_postfix">{t("cm_label")}</div>
+                                                    </div>
+                                                    <h2 className={"measure_input_desc" + (width3A !== undefined && (width3A < 30 || width3A > 290) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 290`, pageLanguage)} {t("cm_label")}</h2>
                                                 </div>
                                             </div>
                                         </div>
@@ -5379,91 +5791,159 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                         </div>
                                         <div className="box100 Three_selection_container dir_ltr">
                                             <div className="box50">
-                                                <label className="select_label"><p className="farsi_cm">{t("select_cm")}</p>{t("Left")}</label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.left}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                           postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_LeftRight(selected[0], "3BOut", true, "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                temp.left = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3BOut1", "3B", "3C");
-                                                                setCart("ExtensionLeft", selected[0].value);
+                                                {/*<label className="select_label"><p className="farsi_cm">{t("select_cm")}</p>{t("Left")}</label>*/}
+                                                {/*<div className="select_container select_container_num">*/}
+                                                {/*    <Select*/}
+                                                {/*        className="select"*/}
+                                                {/*        placeholder={t("Please Select")}*/}
+                                                {/*        portal={document.body}*/}
+                                                {/*        dropdownPosition="bottom"*/}
+                                                {/*        dropdownHandle={false}*/}
+                                                {/*        dropdownGap={0}*/}
+                                                {/*        onDropdownOpen={() => {*/}
+                                                {/*            let temp1 = window.scrollY;*/}
+                                                {/*            window.scrollTo(window.scrollX, window.scrollY + 1);*/}
+                                                {/*            setTimeout(() => {*/}
+                                                {/*                let temp2 = window.scrollY;*/}
+                                                {/*                if (temp2 === temp1)*/}
+                                                {/*                    window.scrollTo(window.scrollX, window.scrollY - 1);*/}
+                                                {/*            }, 100);*/}
+                                                {/*        }}*/}
+                                                {/*        values={selectCustomValues.left}*/}
+                                                {/*        dropdownRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>*/}
+                                                {/*        }*/}
+                                                {/*        contentRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"*/}
+                                                {/*                                                           postfixFa=""/>*/}
+                                                {/*        }*/}
+                                                {/*        // optionRenderer={*/}
+                                                {/*        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>*/}
+                                                {/*        // }*/}
+                                                {/*        onChange={(selected) => {*/}
+                                                {/*            if (selected[0] !== undefined) {*/}
+                                                {/*                optionSelectChanged_LeftRight(selected[0], "3BOut", true, "cm", "س\u200Cم", pageLanguage);*/}
+                                                {/*                let temp = JSON.parse(JSON.stringify(selectCustomValues));*/}
+                                                {/*                temp.left = selected;*/}
+                                                {/*                setSelectCustomValues(temp);*/}
+                                                {/*                setDeps("", "3BOut1", "3B", "3C");*/}
+                                                {/*                setCart("ExtensionLeft", selected[0].value);*/}
+                                                {/*            }*/}
+                                                {/*        }}*/}
+                                                {/*        options={SelectOptionRange(1, 10, 1, "cm", "", pageLanguage)}*/}
+                                                {/*    />*/}
+                                                {/*</div>*/}
+                                                <div className="measure_input_container">
+                                                    <h1 className="measure_input_label">{t("Left")}</h1>
+                                                    <div className="measure_input_field_container">
+                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                                if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                                e.preventDefault();
                                                             }
-                                                        }}
-                                                        options={SelectOptionRange(1, 10, 1, "cm", "", pageLanguage)}
-                                                    />
+                                                        }} className={"measure_input" + (left !== undefined && (left < 1 || left > 10) ? " measure_input_err" : "")} type="text"
+                                                                       name="Left" value={NumToFa(`${left||""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue= isNaN(newValue)?"":newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 10) {
+                                                                               setCartLoading(true);
+                                                                               setCart("ExtensionLeft", parseInt(newValue));
+                                                                               setDeps("", "3BOut1");
+                                                                               setLeft(parseInt(newValue));
+                                                                               optionSelectChanged_LeftRight(parseInt(newValue), "3BOut", true, "cm", "س\u200Cم", pageLanguage);
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "ExtensionLeft");
+                                                                               setDeps("3BOut1", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setLeft(undefined);
+                                                                               } else {
+                                                                                   setLeft(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3BOut");
+                                                                           }
+                                                                       }}/>
+                                                        <div className="measure_input_postfix">{t("cm_label")}</div>
+                                                    </div>
+                                                    {/*<h2 className={"measure_input_desc" + (left !== undefined && (left < 1 || left > 10) ? " measure_input_desc_err" : "")}>Max. 10cm</h2>*/}
                                                 </div>
                                             </div>
                                             <div className="box50">
-                                                <label className="select_label"><p className="farsi_cm">{t("select_cm")}</p>{t("Right")}</label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.right}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                           postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_LeftRight(selected[0], "3BOut", false, "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                temp.right = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3BOut2", "3B", "3C");
-                                                                setCart("ExtensionRight", selected[0].value);
+                                                {/*<label className="select_label"><p className="farsi_cm">{t("select_cm")}</p>{t("Right")}</label>*/}
+                                                {/*<div className="select_container select_container_num">*/}
+                                                {/*    <Select*/}
+                                                {/*        className="select"*/}
+                                                {/*        placeholder={t("Please Select")}*/}
+                                                {/*        portal={document.body}*/}
+                                                {/*        dropdownPosition="bottom"*/}
+                                                {/*        dropdownHandle={false}*/}
+                                                {/*        dropdownGap={0}*/}
+                                                {/*        onDropdownOpen={() => {*/}
+                                                {/*            let temp1 = window.scrollY;*/}
+                                                {/*            window.scrollTo(window.scrollX, window.scrollY + 1);*/}
+                                                {/*            setTimeout(() => {*/}
+                                                {/*                let temp2 = window.scrollY;*/}
+                                                {/*                if (temp2 === temp1)*/}
+                                                {/*                    window.scrollTo(window.scrollX, window.scrollY - 1);*/}
+                                                {/*            }, 100);*/}
+                                                {/*        }}*/}
+                                                {/*        values={selectCustomValues.right}*/}
+                                                {/*        dropdownRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>*/}
+                                                {/*        }*/}
+                                                {/*        contentRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"*/}
+                                                {/*                                                           postfixFa=""/>*/}
+                                                {/*        }*/}
+                                                {/*        // optionRenderer={*/}
+                                                {/*        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>*/}
+                                                {/*        // }*/}
+                                                {/*        onChange={(selected) => {*/}
+                                                {/*            if (selected[0] !== undefined) {*/}
+                                                {/*                optionSelectChanged_LeftRight(selected[0], "3BOut", false, "cm", "س\u200Cم", pageLanguage);*/}
+                                                {/*                let temp = JSON.parse(JSON.stringify(selectCustomValues));*/}
+                                                {/*                temp.right = selected;*/}
+                                                {/*                setSelectCustomValues(temp);*/}
+                                                {/*                setDeps("", "3BOut2", "3B", "3C");*/}
+                                                {/*                setCart("ExtensionRight", selected[0].value);*/}
+                                                {/*            }*/}
+                                                {/*        }}*/}
+                                                {/*        options={SelectOptionRange(1, 10, 1, "cm", "", pageLanguage)}*/}
+                                                {/*    />*/}
+                                                {/*</div>*/}
+                                                <div className="measure_input_container">
+                                                    <h1 className="measure_input_label">{t("Right")}</h1>
+                                                    <div className="measure_input_field_container">
+                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                                if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                                e.preventDefault();
                                                             }
-                                                        }}
-                                                        options={SelectOptionRange(1, 10, 1, "cm", "", pageLanguage)}
-                                                    />
+                                                        }} className={"measure_input" + (right !== undefined && (right < 1 || right > 10) ? " measure_input_err" : "")} type="text"
+                                                                       name="Right" value={NumToFa(`${right||""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue= isNaN(newValue)?"":newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 10) {
+                                                                               setCartLoading(true);
+                                                                               setCart("ExtensionRight", parseInt(newValue));
+                                                                               setDeps("", "3BOut2");
+                                                                               setRight(parseInt(newValue));
+                                                                               optionSelectChanged_LeftRight(parseInt(newValue), "3BOut", false, "cm", "س\u200Cم", pageLanguage);
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "ExtensionRight");
+                                                                               setDeps("3BOut2", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setRight(undefined);
+                                                                               } else {
+                                                                                   setRight(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3BOut");
+                                                                           }
+                                                                       }}/>
+                                                        <div className="measure_input_postfix">{t("cm_label")}</div>
+                                                    </div>
+                                                    {/*<h2 className={"measure_input_desc" + (right !== undefined && (right < 1 || right > 10) ? " measure_input_desc_err" : "")}>Max. 10cm</h2>*/}
                                                 </div>
                                             </div>
                                         </div>
@@ -5502,47 +5982,81 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                         </div>
                                         <div className="box100 Three_selection_container">
                                             <div className="box100">
-                                                <label className="select_label">{t("Height")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.height3C}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                           postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged("3COut", selected[0], "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                temp.height3C = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3COut", "3C", "3D");
-                                                                setCart("Height3C", selected[0].value);
+                                                {/*<label className="select_label">{t("Height")}<p className="farsi_cm">{t("select_cm")}</p></label>*/}
+                                                {/*<div className="select_container select_container_num">*/}
+                                                {/*    <Select*/}
+                                                {/*        className="select"*/}
+                                                {/*        placeholder={t("Please Select")}*/}
+                                                {/*        portal={document.body}*/}
+                                                {/*        dropdownPosition="bottom"*/}
+                                                {/*        dropdownHandle={false}*/}
+                                                {/*        dropdownGap={0}*/}
+                                                {/*        onDropdownOpen={() => {*/}
+                                                {/*            let temp1 = window.scrollY;*/}
+                                                {/*            window.scrollTo(window.scrollX, window.scrollY + 1);*/}
+                                                {/*            setTimeout(() => {*/}
+                                                {/*                let temp2 = window.scrollY;*/}
+                                                {/*                if (temp2 === temp1)*/}
+                                                {/*                    window.scrollTo(window.scrollX, window.scrollY - 1);*/}
+                                                {/*            }, 100);*/}
+                                                {/*        }}*/}
+                                                {/*        values={selectCustomValues.height3C}*/}
+                                                {/*        dropdownRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>*/}
+                                                {/*        }*/}
+                                                {/*        contentRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"*/}
+                                                {/*                                                           postfixFa=""/>*/}
+                                                {/*        }*/}
+                                                {/*        // optionRenderer={*/}
+                                                {/*        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>*/}
+                                                {/*        // }*/}
+                                                {/*        onChange={(selected) => {*/}
+                                                {/*            if (selected[0] !== undefined) {*/}
+                                                {/*                optionSelectChanged("3COut", selected[0], "cm", "س\u200Cم", pageLanguage);*/}
+                                                {/*                let temp = JSON.parse(JSON.stringify(selectCustomValues));*/}
+                                                {/*                temp.height3C = selected;*/}
+                                                {/*                setSelectCustomValues(temp);*/}
+                                                {/*                setDeps("", "3COut", "3C", "3D");*/}
+                                                {/*                setCart("Height3C", selected[0].value);*/}
+                                                {/*            }*/}
+                                                {/*        }}*/}
+                                                {/*        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}*/}
+                                                {/*    />*/}
+                                                {/*</div>*/}
+                                                <div className="measure_input_container">
+                                                    <h1 className="measure_input_label">{t("Height")}</h1>
+                                                    <div className="measure_input_field_container">
+                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                                if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                                e.preventDefault();
                                                             }
-                                                        }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
-                                                    />
+                                                        }} className={"measure_input" + (height3C !== undefined && (height3C < 30 || height3C > 400) ? " measure_input_err" : "")} type="text"
+                                                                       name="height3C" value={NumToFa(`${height3C||""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue= isNaN(newValue)?"":newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
+                                                                               setCartLoading(true);
+                                                                               setCart("Height3C", parseInt(newValue));
+                                                                               setDeps("", "3COut");
+                                                                               setHeight3C(parseInt(newValue));
+                                                                               optionSelectChanged("3COut", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "Height3C");
+                                                                               setDeps("3COut", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setHeight3C(undefined);
+                                                                               } else {
+                                                                                   setHeight3C(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3COut");
+                                                                           }
+                                                                       }}/>
+                                                        <div className="measure_input_postfix">{t("cm_label")}</div>
+                                                    </div>
+                                                    <h2 className={"measure_input_desc" + (height3C !== undefined && (height3C < 30 || height3C > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>
                                                 </div>
                                             </div>
                                         </div>
@@ -5570,135 +6084,237 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                         </div>
                                         <div className="box100 Three_selection_container">
                                             <div className="Three_select_container">
-                                                <label className="select_label">{t("step3AIn_A")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.CeilingToWindow1}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                           postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_three(selected[0], "3CArc", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                temp.CeilingToWindow1 = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3CArc1", "3C", "3D");
-                                                                setCart("CeilingToWindow1", selected[0].value);
+                                                {/*<label className="select_label">{t("step3AIn_A")}<p className="farsi_cm">{t("select_cm")}</p></label>*/}
+                                                {/*<div className="select_container select_container_num">*/}
+                                                {/*    <Select*/}
+                                                {/*        className="select"*/}
+                                                {/*        placeholder={t("Please Select")}*/}
+                                                {/*        portal={document.body}*/}
+                                                {/*        dropdownPosition="bottom"*/}
+                                                {/*        dropdownHandle={false}*/}
+                                                {/*        dropdownGap={0}*/}
+                                                {/*        onDropdownOpen={() => {*/}
+                                                {/*            let temp1 = window.scrollY;*/}
+                                                {/*            window.scrollTo(window.scrollX, window.scrollY + 1);*/}
+                                                {/*            setTimeout(() => {*/}
+                                                {/*                let temp2 = window.scrollY;*/}
+                                                {/*                if (temp2 === temp1)*/}
+                                                {/*                    window.scrollTo(window.scrollX, window.scrollY - 1);*/}
+                                                {/*            }, 100);*/}
+                                                {/*        }}*/}
+                                                {/*        values={selectCustomValues.CeilingToWindow1}*/}
+                                                {/*        dropdownRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>*/}
+                                                {/*        }*/}
+                                                {/*        contentRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"*/}
+                                                {/*                                                           postfixFa=""/>*/}
+                                                {/*        }*/}
+                                                {/*        // optionRenderer={*/}
+                                                {/*        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>*/}
+                                                {/*        // }*/}
+                                                {/*        onChange={(selected) => {*/}
+                                                {/*            if (selected[0] !== undefined) {*/}
+                                                {/*                optionSelectChanged_three(selected[0], "3CArc", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);*/}
+                                                {/*                let temp = JSON.parse(JSON.stringify(selectCustomValues));*/}
+                                                {/*                temp.CeilingToWindow1 = selected;*/}
+                                                {/*                setSelectCustomValues(temp);*/}
+                                                {/*                setDeps("", "3CArc1", "3C", "3D");*/}
+                                                {/*                setCart("CeilingToWindow1", selected[0].value);*/}
+                                                {/*            }*/}
+                                                {/*        }}*/}
+                                                {/*        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}*/}
+                                                {/*    />*/}
+                                                {/*</div>*/}
+                                                <div className="measure_input_container">
+                                                    <h1 className="measure_input_label">{t("step3AIn_A")}</h1>
+                                                    <div className="measure_input_field_container">
+                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                                if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                                e.preventDefault();
                                                             }
-                                                        }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
-                                                    />
+                                                        }} className={"measure_input" + (ceilingToWindow1 !== undefined && (ceilingToWindow1 < 30 || ceilingToWindow1 > 400) ? " measure_input_err" : "")} type="text"
+                                                                       name="ceilingToWindow1" value={NumToFa(`${ceilingToWindow1||""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue= isNaN(newValue)?"":newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
+                                                                               setCartLoading(true);
+                                                                               setCart("CeilingToWindow1", parseInt(newValue));
+                                                                               setDeps("", "3CArc1");
+                                                                               setCeilingToWindow1(parseInt(newValue));
+                                                                               optionSelectChanged_three(parseInt(newValue), "3CArc", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "CeilingToWindow1");
+                                                                               setDeps("3CArc1", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setCeilingToWindow1(undefined);
+                                                                               } else {
+                                                                                   setCeilingToWindow1(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3CArc");
+                                                                           }
+                                                                       }}/>
+                                                        <div className="measure_input_postfix">{t("cm_label")}</div>
+                                                    </div>
+                                                    <h2 className={"measure_input_desc" + (ceilingToWindow1 !== undefined && (ceilingToWindow1 < 30 || ceilingToWindow1 > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>
                                                 </div>
                                             </div>
                                             <div className="Three_select_container">
-                                                <label className="select_label">{t("step3AIn_B")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.CeilingToWindow2}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                           postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_three(selected[0], "3CArc", 1, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                temp.CeilingToWindow2 = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3CArc2", "3C", "3D");
-                                                                setCart("CeilingToWindow2", selected[0].value);
+                                                {/*<label className="select_label">{t("step3AIn_B")}<p className="farsi_cm">{t("select_cm")}</p></label>*/}
+                                                {/*<div className="select_container select_container_num">*/}
+                                                {/*    <Select*/}
+                                                {/*        className="select"*/}
+                                                {/*        placeholder={t("Please Select")}*/}
+                                                {/*        portal={document.body}*/}
+                                                {/*        dropdownPosition="bottom"*/}
+                                                {/*        dropdownHandle={false}*/}
+                                                {/*        dropdownGap={0}*/}
+                                                {/*        onDropdownOpen={() => {*/}
+                                                {/*            let temp1 = window.scrollY;*/}
+                                                {/*            window.scrollTo(window.scrollX, window.scrollY + 1);*/}
+                                                {/*            setTimeout(() => {*/}
+                                                {/*                let temp2 = window.scrollY;*/}
+                                                {/*                if (temp2 === temp1)*/}
+                                                {/*                    window.scrollTo(window.scrollX, window.scrollY - 1);*/}
+                                                {/*            }, 100);*/}
+                                                {/*        }}*/}
+                                                {/*        values={selectCustomValues.CeilingToWindow2}*/}
+                                                {/*        dropdownRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>*/}
+                                                {/*        }*/}
+                                                {/*        contentRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"*/}
+                                                {/*                                                           postfixFa=""/>*/}
+                                                {/*        }*/}
+                                                {/*        // optionRenderer={*/}
+                                                {/*        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>*/}
+                                                {/*        // }*/}
+                                                {/*        onChange={(selected) => {*/}
+                                                {/*            if (selected[0] !== undefined) {*/}
+                                                {/*                optionSelectChanged_three(selected[0], "3CArc", 1, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);*/}
+                                                {/*                let temp = JSON.parse(JSON.stringify(selectCustomValues));*/}
+                                                {/*                temp.CeilingToWindow2 = selected;*/}
+                                                {/*                setSelectCustomValues(temp);*/}
+                                                {/*                setDeps("", "3CArc2", "3C", "3D");*/}
+                                                {/*                setCart("CeilingToWindow2", selected[0].value);*/}
+                                                {/*            }*/}
+                                                {/*        }}*/}
+                                                {/*        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}*/}
+                                                {/*    />*/}
+                                                {/*</div>*/}
+                                                <div className="measure_input_container">
+                                                    <h1 className="measure_input_label">{t("step3AIn_B")}</h1>
+                                                    <div className="measure_input_field_container">
+                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                                if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                                e.preventDefault();
                                                             }
-                                                        }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
-                                                    />
+                                                        }} className={"measure_input" + (ceilingToWindow2 !== undefined && (ceilingToWindow2 < 30 || ceilingToWindow2 > 400) ? " measure_input_err" : "")} type="text"
+                                                                       name="ceilingToWindow2" value={NumToFa(`${ceilingToWindow2||""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue= isNaN(newValue)?"":newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
+                                                                               setCartLoading(true);
+                                                                               setCart("CeilingToWindow2", parseInt(newValue));
+                                                                               setDeps("", "3CArc2");
+                                                                               setCeilingToWindow2(parseInt(newValue));
+                                                                               optionSelectChanged_three(parseInt(newValue), "3CArc", 1, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "CeilingToWindow2");
+                                                                               setDeps("3CArc2", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setCeilingToWindow2(undefined);
+                                                                               } else {
+                                                                                   setCeilingToWindow2(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3CArc");
+                                                                           }
+                                                                       }}/>
+                                                        <div className="measure_input_postfix">{t("cm_label")}</div>
+                                                    </div>
+                                                    <h2 className={"measure_input_desc" + (ceilingToWindow2 !== undefined && (ceilingToWindow2 < 30 || ceilingToWindow2 > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>
                                                 </div>
                                             </div>
                                             <div className="Three_select_container">
-                                                <label className="select_label">{t("step3AIn_C")}<p className="farsi_cm">{t("select_cm")}</p></label>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.CeilingToWindow3}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                           postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged_three(selected[0], "3CArc", 2, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                temp.CeilingToWindow3 = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3CArc3", "3C", "3D");
-                                                                setCart("CeilingToWindow3", selected[0].value);
+                                                {/*<label className="select_label">{t("step3AIn_C")}<p className="farsi_cm">{t("select_cm")}</p></label>*/}
+                                                {/*<div className="select_container select_container_num">*/}
+                                                {/*    <Select*/}
+                                                {/*        className="select"*/}
+                                                {/*        placeholder={t("Please Select")}*/}
+                                                {/*        portal={document.body}*/}
+                                                {/*        dropdownPosition="bottom"*/}
+                                                {/*        dropdownHandle={false}*/}
+                                                {/*        dropdownGap={0}*/}
+                                                {/*        onDropdownOpen={() => {*/}
+                                                {/*            let temp1 = window.scrollY;*/}
+                                                {/*            window.scrollTo(window.scrollX, window.scrollY + 1);*/}
+                                                {/*            setTimeout(() => {*/}
+                                                {/*                let temp2 = window.scrollY;*/}
+                                                {/*                if (temp2 === temp1)*/}
+                                                {/*                    window.scrollTo(window.scrollX, window.scrollY - 1);*/}
+                                                {/*            }, 100);*/}
+                                                {/*        }}*/}
+                                                {/*        values={selectCustomValues.CeilingToWindow3}*/}
+                                                {/*        dropdownRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>*/}
+                                                {/*        }*/}
+                                                {/*        contentRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"*/}
+                                                {/*                                                           postfixFa=""/>*/}
+                                                {/*        }*/}
+                                                {/*        // optionRenderer={*/}
+                                                {/*        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>*/}
+                                                {/*        // }*/}
+                                                {/*        onChange={(selected) => {*/}
+                                                {/*            if (selected[0] !== undefined) {*/}
+                                                {/*                optionSelectChanged_three(selected[0], "3CArc", 2, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);*/}
+                                                {/*                let temp = JSON.parse(JSON.stringify(selectCustomValues));*/}
+                                                {/*                temp.CeilingToWindow3 = selected;*/}
+                                                {/*                setSelectCustomValues(temp);*/}
+                                                {/*                setDeps("", "3CArc3", "3C", "3D");*/}
+                                                {/*                setCart("CeilingToWindow3", selected[0].value);*/}
+                                                {/*            }*/}
+                                                {/*        }}*/}
+                                                {/*        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}*/}
+                                                {/*    />*/}
+                                                {/*</div>*/}
+                                                <div className="measure_input_container">
+                                                    <h1 className="measure_input_label">{t("step3AIn_C")}</h1>
+                                                    <div className="measure_input_field_container">
+                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                                if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                                e.preventDefault();
                                                             }
-                                                        }}
-                                                        options={SelectOptionRange(30, 400, 1, "cm", "", pageLanguage)}
-                                                    />
+                                                        }} className={"measure_input" + (ceilingToWindow3 !== undefined && (ceilingToWindow3 < 30 || ceilingToWindow3 > 400) ? " measure_input_err" : "")} type="text"
+                                                                       name="ceilingToWindow3" value={NumToFa(`${ceilingToWindow3||""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue= isNaN(newValue)?"":newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
+                                                                               setCartLoading(true);
+                                                                               setCart("CeilingToWindow3", parseInt(newValue));
+                                                                               setDeps("", "3CArc3");
+                                                                               setCeilingToWindow3(parseInt(newValue));
+                                                                               optionSelectChanged_three(parseInt(newValue), "3CArc", 2, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "CeilingToWindow3");
+                                                                               setDeps("3CArc3", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setCeilingToWindow3(undefined);
+                                                                               } else {
+                                                                                   setCeilingToWindow3(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3CArc");
+                                                                           }
+                                                                       }}/>
+                                                        <div className="measure_input_postfix">{t("cm_label")}</div>
+                                                    </div>
+                                                    <h2 className={"measure_input_desc" + (ceilingToWindow3 !== undefined && (ceilingToWindow3 < 30 || ceilingToWindow3 > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>
                                                 </div>
                                             </div>
                                         </div>
@@ -5770,47 +6386,81 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                                         </div>
                                         <div className="box100 Three_selection_container">
                                             <div className="box100">
-                                                <label className="select_label"/>
-                                                <div className="select_container select_container_num">
-                                                    <Select
-                                                        className="select"
-                                                        placeholder={t("Please Select")}
-                                                        portal={document.body}
-                                                        dropdownPosition="bottom"
-                                                        dropdownHandle={false}
-                                                        dropdownGap={0}
-                                                        onDropdownOpen={() => {
-                                                            let temp1 = window.scrollY;
-                                                            window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                            setTimeout(() => {
-                                                                let temp2 = window.scrollY;
-                                                                if (temp2 === temp1)
-                                                                    window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                            }, 100);
-                                                        }}
-                                                        values={selectCustomValues.shadeMount}
-                                                        dropdownRenderer={
-                                                            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>
-                                                        }
-                                                        contentRenderer={
-                                                            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
-                                                                                                           postfixFa=""/>
-                                                        }
-                                                        // optionRenderer={
-                                                        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                        // }
-                                                        onChange={(selected) => {
-                                                            if (selected[0] !== undefined) {
-                                                                optionSelectChanged("3DOut", selected[0], "cm", "س\u200Cم", pageLanguage);
-                                                                let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                                temp.shadeMount = selected;
-                                                                setSelectCustomValues(temp);
-                                                                setDeps("", "3DOut", "3D", "4");
-                                                                setCart("ShadeMount", selected[0].value);
+                                                {/*<label className="select_label"/>*/}
+                                                {/*<div className="select_container select_container_num">*/}
+                                                {/*    <Select*/}
+                                                {/*        className="select"*/}
+                                                {/*        placeholder={t("Please Select")}*/}
+                                                {/*        portal={document.body}*/}
+                                                {/*        dropdownPosition="bottom"*/}
+                                                {/*        dropdownHandle={false}*/}
+                                                {/*        dropdownGap={0}*/}
+                                                {/*        onDropdownOpen={() => {*/}
+                                                {/*            let temp1 = window.scrollY;*/}
+                                                {/*            window.scrollTo(window.scrollX, window.scrollY + 1);*/}
+                                                {/*            setTimeout(() => {*/}
+                                                {/*                let temp2 = window.scrollY;*/}
+                                                {/*                if (temp2 === temp1)*/}
+                                                {/*                    window.scrollTo(window.scrollX, window.scrollY - 1);*/}
+                                                {/*            }, 100);*/}
+                                                {/*        }}*/}
+                                                {/*        values={selectCustomValues.shadeMount}*/}
+                                                {/*        dropdownRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>*/}
+                                                {/*        }*/}
+                                                {/*        contentRenderer={*/}
+                                                {/*            ({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"*/}
+                                                {/*                                                           postfixFa=""/>*/}
+                                                {/*        }*/}
+                                                {/*        // optionRenderer={*/}
+                                                {/*        //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>*/}
+                                                {/*        // }*/}
+                                                {/*        onChange={(selected) => {*/}
+                                                {/*            if (selected[0] !== undefined) {*/}
+                                                {/*                optionSelectChanged("3DOut", selected[0], "cm", "س\u200Cم", pageLanguage);*/}
+                                                {/*                let temp = JSON.parse(JSON.stringify(selectCustomValues));*/}
+                                                {/*                temp.shadeMount = selected;*/}
+                                                {/*                setSelectCustomValues(temp);*/}
+                                                {/*                setDeps("", "3DOut", "3D", "4");*/}
+                                                {/*                setCart("ShadeMount", selected[0].value);*/}
+                                                {/*            }*/}
+                                                {/*        }}*/}
+                                                {/*        options={SelectOptionRange(10, 100, 1, "cm", "", pageLanguage)}*/}
+                                                {/*    />*/}
+                                                {/*</div>*/}
+                                                <div className="measure_input_container">
+                                                    <h1 className="measure_input_label">{t("Height")}</h1>
+                                                    <div className="measure_input_field_container">
+                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                                if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                                e.preventDefault();
                                                             }
-                                                        }}
-                                                        options={SelectOptionRange(10, 100, 1, "cm", "", pageLanguage)}
-                                                    />
+                                                        }} className={"measure_input" + (mount !== undefined && (mount < 10 || mount > 100) ? " measure_input_err" : "")} type="text"
+                                                                       name="mount" value={NumToFa(`${mount||""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue= isNaN(newValue)?"":newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 10 && parseInt(newValue) <= 100) {
+                                                                               setCartLoading(true);
+                                                                               setCart("ShadeMount", parseInt(newValue));
+                                                                               setDeps("", "3DOut");
+                                                                               setMount(parseInt(newValue));
+                                                                               optionSelectChanged("3DOut", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "ShadeMount");
+                                                                               setDeps("3DOut", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setMount(undefined);
+                                                                               } else {
+                                                                                   setMount(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3DOut");
+                                                                           }
+                                                                       }}/>
+                                                        <div className="measure_input_postfix">{t("cm_label")}</div>
+                                                    </div>
+                                                    <h2 className={"measure_input_desc" + (mount !== undefined && (mount < 10 || mount > 100) ? " measure_input_desc_err" : "")}>{t("Min: ")} {NumToFa(`10`, pageLanguage)} {t("cm_label")}</h2>
                                                 </div>
                                             </div>
                                         </div>
@@ -6734,7 +7384,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                         </Card>
                         
                         {/* step 7 */}
-                        <Card className={accordionActiveKey===""?"card_little_margin":"card_big_margin"}>
+                        <Card className={accordionActiveKey === "" ? "card_little_margin" : "card_big_margin"}>
                             <Card.Header>
                                 <ContextAwareToggle eventKey="7" stepNum={t("7")} stepTitle={t("zebra_step7")} stepTitle2={t("(Optional)")} stepRef="7" type="2"
                                                     required={requiredStep["7"]}
@@ -6884,7 +7534,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
             
             <Modal dialogClassName={`noPower_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["noPower"] === undefined ? false : modals["noPower"]}
-                   onHide={() => modalHandleClose(" noPower")}>
+                   onHide={() => modalHandleClose("noPower")}>
                 <Modal.Header closeButton>
                     {/*<Modal.Title>Modal heading</Modal.Title>*/}
                 </Modal.Header>
@@ -6893,7 +7543,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                     
                     <br/>
                     <div className=" text_center">
-                        <button className=" btn btn-new-dark" onClick={() => modalHandleClose(" noPower")}>{t("CONTINUE")}</button>
+                        <button className=" btn btn-new-dark" onClick={() => modalHandleClose("noPower")}>{t("CONTINUE")}</button>
                     </div>
                 </Modal.Body>
                 {/*<Modal.Footer>*/}
@@ -6903,7 +7553,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
             
             <Modal dialogClassName={`noInsideUnderstand_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["noInsideUnderstand"] === undefined ? false : modals["noInsideUnderstand"]}
-                   onHide={() => modalHandleClose(" noInsideUnderstand")}>
+                   onHide={() => modalHandleClose("noInsideUnderstand")}>
                 <Modal.Header closeButton>
                     {/*<Modal.Title>Modal heading</Modal.Title>*/}
                 </Modal.Header>
@@ -6912,7 +7562,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                     
                     {/*<br/>*/}
                     {/*<div className=" text_center">*/}
-                    {/*    <button className=" btn btn-new-dark" onClick={() => modalHandleClose(" noMount")}>{t("CONTINUE")}</button>*/}
+                    {/*    <button className=" btn btn-new-dark" onClick={() => modalHandleClose("noMount")}>{t("CONTINUE")}</button>*/}
                     {/*</div>*/}
                 </Modal.Body>
                 {/*<Modal.Footer>*/}
@@ -6922,7 +7572,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
             
             <Modal dialogClassName={`noMount_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["noMount"] === undefined ? false : modals["noMount"]}
-                   onHide={() => modalHandleClose(" noMount")}>
+                   onHide={() => modalHandleClose("noMount")}>
                 <Modal.Header closeButton>
                     {/*<Modal.Title>Modal heading</Modal.Title>*/}
                 </Modal.Header>
@@ -6931,7 +7581,26 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                     
                     <br/>
                     <div className=" text_center">
-                        <button className=" btn btn-new-dark" onClick={() => modalHandleClose(" noMount")}>{t("CONTINUE")}</button>
+                        <button className=" btn btn-new-dark" onClick={() => modalHandleClose("noMount")}>{t("CONTINUE")}</button>
+                    </div>
+                </Modal.Body>
+                {/*<Modal.Footer>*/}
+                {/*    */}
+                {/*</Modal.Footer>*/}
+            </Modal>
+            
+            <Modal dialogClassName={`noMount_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
+                   show={modals["moreThan300"] === undefined ? false : modals["moreThan300"]}
+                   onHide={() => modalHandleClose("moreThan300")}>
+                <Modal.Header closeButton>
+                    {/*<Modal.Title>Modal heading</Modal.Title>*/}
+                </Modal.Header>
+                <Modal.Body>
+                    <p>{t("moreThan300")}</p>
+                    
+                    <br/>
+                    <div className=" text_center">
+                        <button className=" btn btn-new-dark" onClick={() => modalHandleClose("moreThan300")}>{t("CONTINUE")}</button>
                     </div>
                 </Modal.Body>
                 {/*<Modal.Footer>*/}
@@ -7171,7 +7840,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
                        setSelectedFile(undefined);
                        setSelectedFileName("");
                        setEditedFileName("");
-                       modalHandleClose(" uploadImg");
+                       modalHandleClose("uploadImg");
                        setDetailsShow(false)
                    }}>
                 <Modal.Header closeButton>
@@ -7264,7 +7933,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
             <Modal dialogClassName={`upload_modal uploadPdf_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["uploadPdf"] === undefined ? false : modals["uploadPdf"]}
                    onHide={() => {
-                       modalHandleClose(" uploadPdf");
+                       modalHandleClose("uploadPdf");
                        setDetailsShow(false)
                    }}>
                 <Modal.Header closeButton>
@@ -7500,7 +8169,7 @@ function Zebra({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Query
             <Modal backdrop="static" keyboard={false} dialogClassName={`warning_modal bigSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["heightDifferent"] === undefined ? false : modals["heightDifferent"]}
                    onHide={() => {
-                       modalHandleClose(" heightDifferent");
+                       modalHandleClose("heightDifferent");
                    }}>
                 <Modal.Header>
                     {/*<div className="required"/>*/}

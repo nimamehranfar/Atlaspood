@@ -956,7 +956,7 @@ function AddressBook() {
             
             <Modal dialogClassName={`deleteAddress_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                    show={modals["deleteAddress"] === undefined ? false : modals["deleteAddress"]}
-                   onHide={() => modalHandleClose(" deleteAddress")}>
+                   onHide={() => modalHandleClose("deleteAddress")}>
                 <Modal.Header closeButton>
                     {/*<Modal.Title>Modal heading</Modal.Title>*/}
                 </Modal.Header>

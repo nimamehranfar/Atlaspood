@@ -233,7 +233,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         "values": {}, "labels": {}
     });
     const [selectCustomValues, setSelectCustomValues] = useState({
-        "width1": [], "width2": [], "width3": [], "height1": [], "height2": [], "left": [], "right": [], "width": [], "length": [], "width3A": [], "height3C": [], "shadeMount": [], "RodWidth": [], "RodToBottom": []
+        "width1": [], "width2": [], "width3": [], "height1": [], "height2": [], "left": [], "right": [], "width": [], "length": [], "Depth": [], "MouldingHeight": [], "width3A": [], "height3C": [], "shadeMount": [], "RodWidth": [], "RodToBottom": []
     });
     const [requiredStep, setRequiredStep] = useState({
         "1": false, "2": false, "3": false, "3AIn": false, "3BIn": false, "3AOut": false, "3BOut": false, "3COut": false, "3DOut": false, "4": false, "4A": false, "4B": false, "5": false, "6": false
@@ -288,6 +288,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
     const [step2C, setStep2C] = useState("");
     const [step3, setStep3] = useState("");
     const [step31, setStep31] = useState("");
+    const [step3A0, setStep3A0] = useState("");
     const [step3A, setStep3A] = useState("");
     const [step3B, setStep3B] = useState("");
     const [step3ARod, setStep3ARod] = useState("");
@@ -297,9 +298,11 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
     const [step5, setStep5] = useState("");
     const [step6, setStep6] = useState("Same Style For All Curtains");
     const [step61, setStep61] = useState("");
-    const [step6A1, setStep6A1] = useState("");
-    const [step6B1, setStep6B1] = useState("");
-    const [step6C1, setStep6C1] = useState("");
+    const [step6A, setStep6A] = useState("");
+    const [step6B, setStep6B] = useState("");
+    const [step6C, setStep6C] = useState("");
+    const [step6BHead, setStep6BHead] = useState("Rod");
+    const [step6CHead, setStep6CHead] = useState("Rod");
     const [step7, setStep7] = useState("");
     const [step8, setStep8] = useState("");
     const [step81, setStep81] = useState("");
@@ -684,6 +687,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
             let HasTrim = fabrics[key][0]["HasFaricTrim"] || true;
             let HasBorder = fabrics[key][0]["CanHasBorder"] || true;
             let DesignCode = fabrics[key][0]["DesignCode"];
+            let SamplePrice = fabrics[key][0]["SamplePrice"];
             
             const fabric = [];
             const fabric1 = [];
@@ -811,126 +815,135 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     <div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
                         <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
                             <hr/>
-                            <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(100000, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")}</p></span>
+                            <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(SamplePrice, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")}</p></span>
                         </div>
                         {fabric}
-                        {(HasTrim || HasBorder) &&
-                            <div className="fabric_design_checkbox_container width_max checkbox_style checkbox_style_inline">
-                                <input type="checkbox" name="step1Check" checked={step1Check === `${DesignCode}`}
-                                       onChange={(e) => {
-                                           if (step1 !== "" && fabrics[DesignEnName].some(obj => obj["FabricId"] === step1)) {
-                                               if (e.target.checked) {
-                                                   setStep1Check(`${DesignCode}`);
-                                               } else {
-                                                   setStep1Check("");
-                                               }
+                    </div>
+                    {(HasTrim || HasBorder) &&
+                        <div className={step1Check === `${DesignCode}` ?"fabric_design_checkbox_container width_max checkbox_style checkbox_style_inline active":"fabric_design_checkbox_container width_max checkbox_style checkbox_style_inline"}>
+                            <input type="checkbox" name="step1Check" checked={step1Check === `${DesignCode}`}
+                                   onChange={(e) => {
+                                       if (step1 !== "" && fabrics[DesignEnName].some(obj => obj["FabricId"] === step1)) {
+                                           if (e.target.checked) {
+                                               setStep1Check(`${DesignCode}`);
                                            } else {
                                                setStep1Check("");
-                                               modalHandleShow("FabricDesignNotSelected");
                                            }
-                                       }} id={`${DesignCode}`} ref={ref => (inputs.current[`trim-${DesignCode}`] = ref)}/>
-                                <label htmlFor={`${DesignCode}`} className="checkbox_label">
-                                    <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
-                                         alt=""/>
-                                    <span className="checkbox_text">
+                                       } else {
+                                           setStep1Check("");
+                                           modalHandleShow("FabricDesignNotSelected");
+                                       }
+                                   }} id={`${DesignCode}`} ref={ref => (inputs.current[`trim-${DesignCode}`] = ref)}/>
+                            <label htmlFor={`${DesignCode}`} className="checkbox_label">
+                                <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
+                                     alt=""/>
+                                <span className="checkbox_text">
                                         {HasTrim && HasBorder ? (pageLanguage1 === 'en' ? "Add a Decorative Border / Trim" : "یک حاشیه / برش تزئینی اضافه کنید") : (HasTrim ? (pageLanguage1 === 'en' ? "Add a Trim" : "یک برش اضافه کنید") : (HasBorder ? (pageLanguage1 === 'en' ? "Add a Decorative Border" : "یک حاشیه تزئینی اضافه کنید") : ""))}
                                     </span>
-                                </label>
-                            </div>
-                        }
-                    </div>
+                            </label>
+                        </div>
+                    }
                     <div className={step1Check === `${DesignCode}` ? "fabric_design_trim_border_container active" : "fabric_design_trim_border_container"}>
-                        <h1 className="fabric_design_trim_border_title">{HasTrim && HasBorder ? (pageLanguage1 === 'en' ? "Select your Decorative Border / Trim Material" : "") : (HasTrim ? (pageLanguage1 === 'en' ? "Select your Trim Material" : "") : (HasBorder ? (pageLanguage1 === 'en' ? "Select your Decorative Border" : "") : ""))}</h1>
-                        
-                        {HasBorder &&
-                            <div className="fabric_design_border_container">
-                                <h2 className="fabric_design_trim_border_title2">{pageLanguage1 === 'en' ? "DECORATIVE BORDER" : "حاشیه تزئینی"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</h2>
-                                <ul className="fabric_design_border_list">
-                                    {fabric1}
-                                </ul>
-                                {step1Border !== "" &&
-                                    <div className="fabric_design_border_checkbox_container">
-                                        <h3 className="fabric_design_trim_border_title3">{pageLanguage1 === 'en' ? "Select a border position:" : "محل نصب حاشیه را مشخص کنید:"}</h3>
-                                        <div className="box100 radio_style">
-                                            <input className={step1BorderRadio === "10 cm leading edge" ? "radio radio_checked" : "radio"} type="radio" text={t("10 cm leading edge")} value="1" name="step1bordercheck" id="border1"
-                                                   checked={step1BorderRadio === "10 cm leading edge"}
-                                                   onChange={e => {
-                                                       setStep1BorderRadio("10 cm leading edge");
-                                                       setCart("borderPosition", "10 cm leading edge");
-                                                   }} ref={ref => (inputs.current["border1"] = ref)}/>
-                                            <label htmlFor="border1">{t("10 cm leading edge")}</label>
+                        <div>
+                            <h1 className="fabric_design_trim_border_title">{HasTrim && HasBorder ? (pageLanguage1 === 'en' ? "Select your Decorative Border / Trim Material" : "") : (HasTrim ? (pageLanguage1 === 'en' ? "Select your Trim Material" : "") : (HasBorder ? (pageLanguage1 === 'en' ? "Select your Decorative Border" : "") : ""))}</h1>
+                            {HasBorder &&
+                                <div className="fabric_design_border_container">
+                                    <h2 className="fabric_design_trim_border_title2">{pageLanguage1 === 'en' ? "DECORATIVE BORDER" : "حاشیه تزئینی"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</h2>
+                                    <ul className="fabric_design_border_list">
+                                        {fabric1}
+                                    </ul>
+                                    {step1Border !== "" &&
+                                        <div className="fabric_design_border_checkbox_container">
+                                            <h3 className="fabric_design_trim_border_title3">{pageLanguage1 === 'en' ? "Select a border position:" : "محل نصب حاشیه را مشخص کنید:"}</h3>
+                                            <div className="box100 radio_style">
+                                                <input className={step1BorderRadio === "10 cm leading edge" ? "radio radio_checked" : "radio"} type="radio" text={t("10 cm leading edge")} value="1" name="step1bordercheck" id="border1"
+                                                       checked={step1BorderRadio === "10 cm leading edge"}
+                                                       onChange={e => {
+                                                           setStep1BorderRadio("10 cm leading edge");
+                                                           setCart("borderPosition", "10 cm leading edge");
+                                                       }} ref={ref => (inputs.current["border1"] = ref)}/>
+                                                <label htmlFor="border1">{t("10 cm leading edge")}</label>
+                                            </div>
+                                            <div className="box100 radio_style">
+                                                <input className={step1BorderRadio === "60 cm bottom border" ? "radio radio_checked" : "radio"} type="radio" text={t("60 cm bottom border")} value="2" name="step1bordercheck" id="border2"
+                                                       checked={step1BorderRadio === "60 cm bottom border"}
+                                                       onChange={e => {
+                                                           setStep1BorderRadio("60 cm bottom border");
+                                                           setCart("borderPosition", "60 cm bottom border");
+                                                       }} ref={ref => (inputs.current["border2"] = ref)}/>
+                                                <label htmlFor="border2">{t("60 cm bottom border")}</label>
+                                            </div>
+                                            <div className="box100 radio_style">
+                                                <input className={step1BorderRadio === "10 cm leading edge and 60 cm bottom border" ? "radio radio_checked" : "radio"} type="radio" text={t("10 cm leading edge and 60 cm bottom border")} value="3" name="step1bordercheck" id="border3"
+                                                       checked={step1BorderRadio === "10 cm leading edge and 60 cm bottom border"}
+                                                       onChange={e => {
+                                                           setStep1BorderRadio("10 cm leading edge and 60 cm bottom border");
+                                                           setCart("borderPosition", "10 cm leading edge and 60 cm bottom border");
+                                                       }} ref={ref => (inputs.current["border3"] = ref)}/>
+                                                <label htmlFor="border3">{t("10 cm leading edge and 60 cm bottom border")}</label>
+                                            </div>
                                         </div>
-                                        <div className="box100 radio_style">
-                                            <input className={step1BorderRadio === "60 cm bottom border" ? "radio radio_checked" : "radio"} type="radio" text={t("60 cm bottom border")} value="2" name="step1bordercheck" id="border2"
-                                                   checked={step1BorderRadio === "60 cm bottom border"}
-                                                   onChange={e => {
-                                                       setStep1BorderRadio("60 cm bottom border");
-                                                       setCart("borderPosition", "60 cm bottom border");
-                                                   }} ref={ref => (inputs.current["border2"] = ref)}/>
-                                            <label htmlFor="border2">{t("60 cm bottom border")}</label>
-                                        </div>
-                                        <div className="box100 radio_style">
-                                            <input className={step1BorderRadio === "10 cm leading edge and 60 cm bottom border" ? "radio radio_checked" : "radio"} type="radio" text={t("10 cm leading edge and 60 cm bottom border")} value="3" name="step1bordercheck" id="border3"
-                                                   checked={step1BorderRadio === "10 cm leading edge and 60 cm bottom border"}
-                                                   onChange={e => {
-                                                       setStep1BorderRadio("10 cm leading edge and 60 cm bottom border");
-                                                       setCart("borderPosition", "10 cm leading edge and 60 cm bottom border");
-                                                   }} ref={ref => (inputs.current["border3"] = ref)}/>
-                                            <label htmlFor="border3">{t("10 cm leading edge and 60 cm bottom border")}</label>
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-                        }
-                        {HasTrim &&
-                            <>
-                                {Object.keys(trimAccessories).map((key, index) => {
-                                    return (
-                                        <div className="fabric_design_border_container" key={"trim" + key}>
-                                            <h2 className="fabric_design_trim_border_title2">{pageLanguage1 === 'en' ? "DECORATIVE TRIM" : "برش تزئینی"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</h2>
-                                            <ul className="fabric_design_border_list">
-                                                {trimAccessories[key].map((el, i) => {
-                                                    let FabricId = el["DetailId"];
-                                                    let DesignName = convertToPersian(el["DesignName"]);
-                                                    let DesignEnName = el["DesignENName"];
-                                                    let ColorName = convertToPersian(el["ColorName"]);
-                                                    let ColorEnName = el["ColorENName"];
-                                                    let PhotoPath = "";
-                                                    el["Photos"].forEach(obj => {
-                                                        if (obj.PhotoTypeId === 4702) PhotoPath = obj.PhotoUrl;
-                                                    });
-                                                    return (
-                                                        <li className="fabric_design_border_list_item" key={"trim" + key + i}>
-                                                            <div className={`radio_group ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
-                                                                <label>
-                                                                    {/*<ReactTooltip id={"fabric" + key + j} place="top" type="light" effect="float"/>*/}
-                                                                    <input className="radio" type="radio" outline="true"
-                                                                           onChange={e => {
-                                                                               let temp = JSON.parse(JSON.stringify(trimSelected));
-                                                                               temp.selectedFabricId = FabricId;
-                                                                               temp.selectedTextEn = DesignEnName;
-                                                                               temp.selectedTextFa = DesignName;
-                                                                               temp.selectedDesignCode = DesignCode;
-                                                                               temp.selectedColorEn = ColorEnName;
-                                                                               temp.selectedColorFa = ColorName;
-                                                                               setTrimSelected(temp);
-                                                                           }} name="border-trim"
-                                                                           model-id={modelID} value={FabricId} checked={`${FabricId}` === step1Trim}
-                                                                           ref={ref => (inputs.current[`border-trim${FabricId}`] = ref)}/>
-                                                                    <div className="frame_img">
-                                                                        <img className={`img-fluid ${`${FabricId}` === step1Trim ? "img-fluid_checked" : ""}`} src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
-                                                                    </div>
-                                                                </label>
-                                                            </div>
-                                                        </li>
-                                                    )
-                                                })}
-                                            </ul>
-                                        </div>
-                                    )
-                                })}
-                            </>
-                        }
+                                    }
+                                </div>
+                            }
+                            {HasTrim &&
+                                <>
+                                    {Object.keys(trimAccessories).map((key, index) => {
+                                        return (
+                                            <div className="fabric_design_border_container" key={"trim" + key}>
+                                                <h2 className="fabric_design_trim_border_title2">{pageLanguage1 === 'en' ? "DECORATIVE TRIM" : "برش تزئینی"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</h2>
+                                                <ul className="fabric_design_border_list">
+                                                    {trimAccessories[key].map((el, i) => {
+                                                        let FabricId = el["DetailId"];
+                                                        let DesignName = convertToPersian(el["DesignName"]);
+                                                        let DesignEnName = el["DesignENName"];
+                                                        let ColorName = convertToPersian(el["ColorName"]);
+                                                        let ColorEnName = el["ColorENName"];
+                                                        let PhotoPath = "";
+                                                        el["Photos"].forEach(obj => {
+                                                            if (obj.PhotoTypeId === 4702) PhotoPath = obj.PhotoUrl;
+                                                        });
+                                                        return (
+                                                            <li className="fabric_design_border_list_item" key={"trim" + key + i}>
+                                                                <OverlayContainer classNames="Accessories_List_item_color"
+                                                                                  placement="middle"
+                                                                                  children={
+                                                                                      <div className={`radio_group ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
+                                                                                          <label>
+                                                                                              {/*<ReactTooltip id={"fabric" + key + j} place="top" type="light" effect="float"/>*/}
+                                                                                              <input className="radio" type="radio" outline="true"
+                                                                                                     onChange={e => {
+                                                                                                         let temp = JSON.parse(JSON.stringify(trimSelected));
+                                                                                                         temp.selectedFabricId = FabricId;
+                                                                                                         temp.selectedTextEn = DesignEnName;
+                                                                                                         temp.selectedTextFa = DesignName;
+                                                                                                         temp.selectedDesignCode = DesignCode;
+                                                                                                         temp.selectedColorEn = ColorEnName;
+                                                                                                         temp.selectedColorFa = ColorName;
+                                                                                                         setTrimSelected(temp);
+                                                                                                     }} name="border-trim"
+                                                                                                     model-id={modelID} value={FabricId} checked={`${FabricId}` === step1Trim}
+                                                                                                     ref={ref => (inputs.current[`border-trim${FabricId}`] = ref)}/>
+                                                                                              <div className="frame_img">
+                                                                                                  <img className={`img-fluid ${`${FabricId}` === step1Trim ? "img-fluid_checked" : ""}`} src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
+                                                                                              </div>
+                                                                                          </label>
+                                                                                      </div>}
+                                                                                  component={
+                                                                                      <div className="Accessories_List_item_color_container">
+                                                                                          <p className="Accessories_List_item_color_text">{pageLanguage1 === 'en' ? ColorEnName : ColorName}</p>
+                                                                                      </div>
+                                                                                  }/>
+                                                            </li>
+                                                        )
+                                                    })}
+                                                </ul>
+                                            </div>
+                                        )
+                                    })}
+                                </>
+                            }
+                        </div>
                     </div>
                 </React.Fragment>);
             
@@ -961,6 +974,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
             let HasTrim = fabrics[key][0]["HasFaricTrim"] || true;
             let HasBorder = fabrics[key][0]["CanHasBorder"] || true;
             let DesignCode = fabrics[key][0]["DesignCode"];
+            let SamplePrice = fabrics[key][0]["SamplePrice"];
             
             const fabric = [];
             const fabric1 = [];
@@ -1089,126 +1103,135 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     <div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
                         <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
                             <hr/>
-                            <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(100000, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")}</p></span>
+                            <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(SamplePrice, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")}</p></span>
                         </div>
                         {fabric}
-                        {(HasTrim || HasBorder) &&
-                            <div className="fabric_design_checkbox_container width_max checkbox_style checkbox_style_inline">
-                                <input type="checkbox" name="step1Check" checked={step2Check === `${DesignCode}`}
-                                       onChange={(e) => {
-                                           if (step1 !== "" && fabrics[DesignEnName].some(obj => obj["FabricId"] === step1)) {
-                                               if (e.target.checked) {
-                                                   setStep2Check(`${DesignCode}`);
-                                               } else {
-                                                   setStep2Check("");
-                                               }
+                    </div>
+                    {(HasTrim || HasBorder) &&
+                        <div className={step2Check === `${DesignCode}` ?"fabric_design_checkbox_container width_max checkbox_style checkbox_style_inline active":"fabric_design_checkbox_container width_max checkbox_style checkbox_style_inline"}>
+                            <input type="checkbox" name="step1Check" checked={step2Check === `${DesignCode}`}
+                                   onChange={(e) => {
+                                       if (step2 !== "" && fabrics[DesignEnName].some(obj => obj["FabricId"] === step2)) {
+                                           if (e.target.checked) {
+                                               setStep2Check(`${DesignCode}`);
                                            } else {
                                                setStep2Check("");
-                                               modalHandleShow("FabricDesignNotSelected");
                                            }
-                                       }} id={`${DesignCode}`} ref={ref => (inputs.current[`trim-${DesignCode}`] = ref)}/>
-                                <label htmlFor={`${DesignCode}`} className="checkbox_label">
-                                    <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
-                                         alt=""/>
-                                    <span className="checkbox_text">
+                                       } else {
+                                           setStep2Check("");
+                                           modalHandleShow("FabricDesignNotSelected");
+                                       }
+                                   }} id={`${DesignCode}`} ref={ref => (inputs.current[`trim-${DesignCode}`] = ref)}/>
+                            <label htmlFor={`${DesignCode}`} className="checkbox_label">
+                                <img className="checkbox_label_img checkmark1 img-fluid" src={require('../Images/public/checkmark1_checkbox.png')}
+                                     alt=""/>
+                                <span className="checkbox_text">
                                         {HasTrim && HasBorder ? (pageLanguage1 === 'en' ? "Add a Decorative Border / Trim" : "یک حاشیه / برش تزئینی اضافه کنید") : (HasTrim ? (pageLanguage1 === 'en' ? "Add a Trim" : "یک برش اضافه کنید") : (HasBorder ? (pageLanguage1 === 'en' ? "Add a Decorative Border" : "یک حاشیه تزئینی اضافه کنید") : ""))}
                                     </span>
-                                </label>
-                            </div>
-                        }
-                    </div>
+                            </label>
+                        </div>
+                    }
                     <div className={step2Check === `${DesignCode}` ? "fabric_design_trim_border_container active" : "fabric_design_trim_border_container"}>
-                        <h1 className="fabric_design_trim_border_title">{HasTrim && HasBorder ? (pageLanguage1 === 'en' ? "Select your Decorative Border / Trim Material" : "") : (HasTrim ? (pageLanguage1 === 'en' ? "Select your Trim Material" : "") : (HasBorder ? (pageLanguage1 === 'en' ? "Select your Decorative Border" : "") : ""))}</h1>
-                        
-                        {HasBorder &&
-                            <div className="fabric_design_border_container">
-                                <h2 className="fabric_design_trim_border_title2">{pageLanguage1 === 'en' ? "DECORATIVE BORDER" : "حاشیه تزئینی"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</h2>
-                                <ul className="fabric_design_border_list">
-                                    {fabric1}
-                                </ul>
-                                {step2Border !== "" &&
-                                    <div className="fabric_design_border_checkbox_container">
-                                        <h3 className="fabric_design_trim_border_title3">{pageLanguage1 === 'en' ? "Select a border position:" : "محل نصب حاشیه را مشخص کنید:"}</h3>
-                                        <div className="box100 radio_style">
-                                            <input className="radio" type="radio" text={t("10 cm leading edge")} value="1" name="step1bordercheck" id="border1"
-                                                   checked={step2BorderRadio === "10 cm leading edge"}
-                                                   onChange={e => {
-                                                       setStep2BorderRadio("10 cm leading edge");
-                                                       setCart("borderPosition2", "10 cm leading edge");
-                                                   }} ref={ref => (inputs.current["border1"] = ref)}/>
-                                            <label htmlFor="border1">{t("10 cm leading edge")}</label>
+                        <div>
+                            <h1 className="fabric_design_trim_border_title">{HasTrim && HasBorder ? (pageLanguage1 === 'en' ? "Select your Decorative Border / Trim Material" : "") : (HasTrim ? (pageLanguage1 === 'en' ? "Select your Trim Material" : "") : (HasBorder ? (pageLanguage1 === 'en' ? "Select your Decorative Border" : "") : ""))}</h1>
+                            {HasBorder &&
+                                <div className="fabric_design_border_container">
+                                    <h2 className="fabric_design_trim_border_title2">{pageLanguage1 === 'en' ? "DECORATIVE BORDER" : "حاشیه تزئینی"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</h2>
+                                    <ul className="fabric_design_border_list">
+                                        {fabric1}
+                                    </ul>
+                                    {step2Border !== "" &&
+                                        <div className="fabric_design_border_checkbox_container">
+                                            <h3 className="fabric_design_trim_border_title3">{pageLanguage1 === 'en' ? "Select a border position:" : "محل نصب حاشیه را مشخص کنید:"}</h3>
+                                            <div className="box100 radio_style">
+                                                <input className="radio" type="radio" text={t("10 cm leading edge")} value="1" name="step1bordercheck" id="border1"
+                                                       checked={step2BorderRadio === "10 cm leading edge"}
+                                                       onChange={e => {
+                                                           setStep2BorderRadio("10 cm leading edge");
+                                                           setCart("borderPosition2", "10 cm leading edge");
+                                                       }} ref={ref => (inputs.current["border1"] = ref)}/>
+                                                <label htmlFor="border1">{t("10 cm leading edge")}</label>
+                                            </div>
+                                            <div className="box100 radio_style">
+                                                <input className="radio" type="radio" text={t("60 cm bottom border")} value="2" name="step1bordercheck" id="border2"
+                                                       checked={step2BorderRadio === "60 cm bottom border"}
+                                                       onChange={e => {
+                                                           setStep2BorderRadio("60 cm bottom border");
+                                                           setCart("borderPosition2", "60 cm bottom border");
+                                                       }} ref={ref => (inputs.current["border2"] = ref)}/>
+                                                <label htmlFor="border2">{t("60 cm bottom border")}</label>
+                                            </div>
+                                            <div className="box100 radio_style">
+                                                <input className="radio" type="radio" text={t("10 cm leading edge and 60 cm bottom border")} value="3" name="step1bordercheck" id="border3"
+                                                       checked={step2BorderRadio === "10 cm leading edge and 60 cm bottom border"}
+                                                       onChange={e => {
+                                                           setStep2BorderRadio("10 cm leading edge and 60 cm bottom border");
+                                                           setCart("borderPosition2", "10 cm leading edge and 60 cm bottom border");
+                                                       }} ref={ref => (inputs.current["border3"] = ref)}/>
+                                                <label htmlFor="border3">{t("10 cm leading edge and 60 cm bottom border")}</label>
+                                            </div>
                                         </div>
-                                        <div className="box100 radio_style">
-                                            <input className="radio" type="radio" text={t("60 cm bottom border")} value="2" name="step1bordercheck" id="border2"
-                                                   checked={step2BorderRadio === "60 cm bottom border"}
-                                                   onChange={e => {
-                                                       setStep2BorderRadio("60 cm bottom border");
-                                                       setCart("borderPosition2", "60 cm bottom border");
-                                                   }} ref={ref => (inputs.current["border2"] = ref)}/>
-                                            <label htmlFor="border2">{t("60 cm bottom border")}</label>
-                                        </div>
-                                        <div className="box100 radio_style">
-                                            <input className="radio" type="radio" text={t("10 cm leading edge and 60 cm bottom border")} value="3" name="step1bordercheck" id="border3"
-                                                   checked={step2BorderRadio === "10 cm leading edge and 60 cm bottom border"}
-                                                   onChange={e => {
-                                                       setStep2BorderRadio("10 cm leading edge and 60 cm bottom border");
-                                                       setCart("borderPosition2", "10 cm leading edge and 60 cm bottom border");
-                                                   }} ref={ref => (inputs.current["border3"] = ref)}/>
-                                            <label htmlFor="border3">{t("10 cm leading edge and 60 cm bottom border")}</label>
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-                        }
-                        {HasTrim &&
-                            <>
-                                {Object.keys(trimAccessories).map((key, index) => {
-                                    return (
-                                        <div className="fabric_design_border_container" key={"trim" + key}>
-                                            <h2 className="fabric_design_trim_border_title2">{pageLanguage1 === 'en' ? "DECORATIVE TRIM" : "برش تزئینی"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</h2>
-                                            <ul className="fabric_design_border_list">
-                                                {trimAccessories[key].map((el, i) => {
-                                                    let FabricId = el["DetailId"];
-                                                    let DesignName = convertToPersian(el["DesignName"]);
-                                                    let DesignEnName = el["DesignENName"];
-                                                    let ColorName = convertToPersian(el["ColorName"]);
-                                                    let ColorEnName = el["ColorENName"];
-                                                    let PhotoPath = "";
-                                                    el["Photos"].forEach(obj => {
-                                                        if (obj.PhotoTypeId === 4702) PhotoPath = obj.PhotoUrl;
-                                                    });
-                                                    return (
-                                                        <li className="fabric_design_border_list_item" key={"trim" + key + i}>
-                                                            <div className={`radio_group ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
-                                                                <label>
-                                                                    {/*<ReactTooltip id={"fabric" + key + j} place="top" type="light" effect="float"/>*/}
-                                                                    <input className="radio" type="radio" outline="true"
-                                                                           onChange={e => {
-                                                                               let temp = JSON.parse(JSON.stringify(trimSelected2));
-                                                                               temp.selectedFabricId = FabricId;
-                                                                               temp.selectedTextEn = DesignEnName;
-                                                                               temp.selectedTextFa = DesignName;
-                                                                               temp.selectedDesignCode = DesignCode;
-                                                                               temp.selectedColorEn = ColorEnName;
-                                                                               temp.selectedColorFa = ColorName;
-                                                                               setTrimSelected2(temp);
-                                                                           }} name="border-trim"
-                                                                           model-id={modelID} value={FabricId} checked={`${FabricId}` === step2Trim}
-                                                                           ref={ref => (inputs.current[`border-trim${FabricId}`] = ref)}/>
-                                                                    <div className="frame_img">
-                                                                        <img className={`img-fluid ${`${FabricId}` === step2Trim ? "img-fluid_checked" : ""}`} src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
-                                                                    </div>
-                                                                </label>
-                                                            </div>
-                                                        </li>
-                                                    )
-                                                })}
-                                            </ul>
-                                        </div>
-                                    )
-                                })}
-                            </>
-                        }
+                                    }
+                                </div>
+                            }
+                            {HasTrim &&
+                                <>
+                                    {Object.keys(trimAccessories).map((key, index) => {
+                                        return (
+                                            <div className="fabric_design_border_container" key={"trim" + key}>
+                                                <h2 className="fabric_design_trim_border_title2">{pageLanguage1 === 'en' ? "DECORATIVE TRIM" : "برش تزئینی"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</h2>
+                                                <ul className="fabric_design_border_list">
+                                                    {trimAccessories[key].map((el, i) => {
+                                                        let FabricId = el["DetailId"];
+                                                        let DesignName = convertToPersian(el["DesignName"]);
+                                                        let DesignEnName = el["DesignENName"];
+                                                        let ColorName = convertToPersian(el["ColorName"]);
+                                                        let ColorEnName = el["ColorENName"];
+                                                        let PhotoPath = "";
+                                                        el["Photos"].forEach(obj => {
+                                                            if (obj.PhotoTypeId === 4702) PhotoPath = obj.PhotoUrl;
+                                                        });
+                                                        return (
+                                                            <li className="fabric_design_border_list_item" key={"trim" + key + i}>
+                                                                <OverlayContainer classNames="Accessories_List_item_color"
+                                                                                  placement="middle"
+                                                                                  children={
+                                                                                      <div className={`radio_group ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
+                                                                                          <label>
+                                                                                              {/*<ReactTooltip id={"fabric" + key + j} place="top" type="light" effect="float"/>*/}
+                                                                                              <input className="radio" type="radio" outline="true"
+                                                                                                     onChange={e => {
+                                                                                                         let temp = JSON.parse(JSON.stringify(trimSelected2));
+                                                                                                         temp.selectedFabricId = FabricId;
+                                                                                                         temp.selectedTextEn = DesignEnName;
+                                                                                                         temp.selectedTextFa = DesignName;
+                                                                                                         temp.selectedDesignCode = DesignCode;
+                                                                                                         temp.selectedColorEn = ColorEnName;
+                                                                                                         temp.selectedColorFa = ColorName;
+                                                                                                         setTrimSelected2(temp);
+                                                                                                     }} name="border-trim"
+                                                                                                     model-id={modelID} value={FabricId} checked={`${FabricId}` === step2Trim}
+                                                                                                     ref={ref => (inputs.current[`border-trim${FabricId}`] = ref)}/>
+                                                                                              <div className="frame_img">
+                                                                                                  <img className={`img-fluid ${`${FabricId}` === step2Trim ? "img-fluid_checked" : ""}`} src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
+                                                                                              </div>
+                                                                                          </label>
+                                                                                      </div>}
+                                                                                  component={
+                                                                                      <div className="Accessories_List_item_color_container">
+                                                                                          <p className="Accessories_List_item_color_text">{pageLanguage1 === 'en' ? ColorEnName : ColorName}</p>
+                                                                                      </div>
+                                                                                  }/>
+                                                            </li>
+                                                        )
+                                                    })}
+                                                </ul>
+                                            </div>
+                                        )
+                                    })}
+                                </>
+                            }
+                        </div>
                     </div>
                 </React.Fragment>);
             
@@ -1237,6 +1260,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
             let fabrics = sheers;
             let DesignName = convertToPersian(fabrics[key][0].DesignName);
             let DesignEnName = fabrics[key][0].DesignEnName;
+            let SamplePrice = fabrics[key][0]["SamplePrice"];
             
             const fabric = [];
             for (let j = 0; j < fabrics[key].length; j++) {
@@ -1332,7 +1356,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
             fabricList.push(<div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key}>
                 <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
                     <hr/>
-                    <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(100000, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")}</p></span>
+                    <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(SamplePrice, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")}</p></span>
                 </div>
                 {fabric}
             </div>);
@@ -1361,6 +1385,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
             let fabrics = sheers2;
             let DesignName = convertToPersian(fabrics[key][0].DesignName);
             let DesignEnName = fabrics[key][0].DesignEnName;
+            let SamplePrice = fabrics[key][0]["SamplePrice"];
             
             const fabric = [];
             for (let j = 0; j < fabrics[key].length; j++) {
@@ -1456,7 +1481,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
             fabricList.push(<div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + key}>
                 <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
                     <hr/>
-                    <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(100000, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")}</p></span>
+                    <span><p>{pageLanguage1 === 'en' ? "DESIGN NAME" : "نام طرح"}: {pageLanguage1 === 'en' ? DesignEnName : DesignName}</p><span className="fabric_seperator">&nbsp;|&nbsp;</span><p>{pageLanguage1 === 'en' ? "FROM" : "شروع از"}: {GetPrice(SamplePrice, pageLanguage1, pageLanguage1 === "en" ? "Tomans" : "تومان")}</p></span>
                 </div>
                 {fabric}
             </div>);
@@ -3946,7 +3971,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     setSelectedFile(undefined);
                     setSelectedFileName("");
                     setEditedFileName("");
-                    modalHandleClose(" uploadImg");
+                    modalHandleClose("uploadImg");
                     setDetailsShow(false);
                 }).catch(err => {
                 console.log(err);
@@ -3959,7 +3984,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                             setSelectedFile(undefined);
                             setSelectedFileName("");
                             setEditedFileName("");
-                            modalHandleClose(" uploadImg");
+                            modalHandleClose("uploadImg");
                             setDetailsShow(false);
                             
                             dispatch({
@@ -4424,50 +4449,76 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                             
                             if (temp["hasRod"] !== undefined) {
                                 setStep31(temp["hasRod"].toString());
+                                depSetTempArr = new Set([...setGetDeps("3A0,3A", "3,31", depSetTempArr)]);
                                 if (!temp["hasRod"]) {
                                     let scenario = 0;
+                                    if (temp["Mount"]) {
+                                        setStep3A0(temp["Mount"].toString());
+                                        if (temp["Mount"] === "Ceiling") {
+                                            let refIndex = inputs.current["3A01"].getAttribute('ref-num');
+                                            tempLabels[refIndex] = inputs.current["3A01"].getAttribute('text');
+                                            tempValue[refIndex] = inputs.current["3A01"].value;
+                                            depSetTempArr = new Set([...setGetDeps("", "3A0", depSetTempArr)]);
+                                        } else if (temp["Mount"] === "Wall") {
+                                            let refIndex = inputs.current["3A02"].getAttribute('ref-num');
+                                            tempLabels[refIndex] = inputs.current["3A02"].getAttribute('text');
+                                            tempValue[refIndex] = inputs.current["3A02"].value;
+                                            depSetTempArr = new Set([...setGetDeps("", "3A0", depSetTempArr)]);
+                                        } else {
+                                            let refIndex = inputs.current["3A03"].getAttribute('ref-num');
+                                            tempLabels[refIndex] = inputs.current["3A03"].getAttribute('text');
+                                            tempValue[refIndex] = inputs.current["3A03"].value;
+                                            depSetTempArr = new Set([...setGetDeps("", "3A0", depSetTempArr)]);
+                                        }
+                                        setStepSelectedLabel(tempLabels);
+                                        setStepSelectedValue(tempValue);
+                                    }
                                     if (temp["CurtainPosition"]) {
                                         setStep3A(temp["CurtainPosition"].toString());
                                         if (temp["CurtainPosition"] === "Standard") {
                                             let refIndex = inputs.current["3A1"].getAttribute('ref-num');
                                             tempLabels[refIndex] = inputs.current["3A1"].getAttribute('text');
                                             tempValue[refIndex] = inputs.current["3A1"].value;
-                                            if (temp["Mount"]) {
-                                                setSelectedMountOutsideType(temp["Mount"] ? [{
-                                                    value: temp["Mount"],
-                                                    label: optionsOutside[pageLanguage].find(opt => opt.value === temp["Mount"]).label
-                                                }] : []);
-                                            }
+                                            // if (temp["Mount"]) {
+                                            //     setSelectedMountOutsideType(temp["Mount"] ? [{
+                                            //         value: temp["Mount"],
+                                            //         label: optionsOutside[pageLanguage].find(opt => opt.value === temp["Mount"]).label
+                                            //     }] : []);
+                                            // }
+                                            depSetTempArr = new Set([...setGetDeps("", "3A", depSetTempArr)]);
                                         } else if (temp["CurtainPosition"] === "Wall to Wall") {
                                             let refIndex = inputs.current["3A2"].getAttribute('ref-num');
                                             tempLabels[refIndex] = inputs.current["3A2"].getAttribute('text');
                                             tempValue[refIndex] = inputs.current["3A2"].value;
-                                            if (temp["Mount"]) {
-                                                setSelectedMountOutsideType2(temp["Mount"] ? [{
-                                                    value: temp["Mount"],
-                                                    label: optionsOutside[pageLanguage].find(opt => opt.value === temp["Mount"]).label
-                                                }] : []);
-                                            }
+                                            // if (temp["Mount"]) {
+                                            //     setSelectedMountOutsideType2(temp["Mount"] ? [{
+                                            //         value: temp["Mount"],
+                                            //         label: optionsOutside[pageLanguage].find(opt => opt.value === temp["Mount"]).label
+                                            //     }] : []);
+                                            // }
+                                            depSetTempArr = new Set([...setGetDeps("", "3A", depSetTempArr)]);
                                         } else if (temp["CurtainPosition"] === "Left Corner Window") {
                                             let refIndex = inputs.current["3A3"].getAttribute('ref-num');
                                             tempLabels[refIndex] = inputs.current["3A3"].getAttribute('text');
                                             tempValue[refIndex] = inputs.current["3A3"].value;
-                                            if (temp["Mount"]) {
-                                                setSelectedMountOutsideType3(temp["Mount"] ? [{
-                                                    value: temp["Mount"],
-                                                    label: optionsOutside[pageLanguage].find(opt => opt.value === temp["Mount"]).label
-                                                }] : []);
-                                            }
+                                            // if (temp["Mount"]) {
+                                            //     setSelectedMountOutsideType3(temp["Mount"] ? [{
+                                            //         value: temp["Mount"],
+                                            //         label: optionsOutside[pageLanguage].find(opt => opt.value === temp["Mount"]).label
+                                            //     }] : []);
+                                            // }
+                                            depSetTempArr = new Set([...setGetDeps("", "3A", depSetTempArr)]);
                                         } else {
                                             let refIndex = inputs.current["3A4"].getAttribute('ref-num');
                                             tempLabels[refIndex] = inputs.current["3A4"].getAttribute('text');
                                             tempValue[refIndex] = inputs.current["3A4"].value;
-                                            if (temp["Mount"]) {
-                                                setSelectedMountOutsideType4(temp["Mount"] ? [{
-                                                    value: temp["Mount"],
-                                                    label: optionsOutside[pageLanguage].find(opt => opt.value === temp["Mount"]).label
-                                                }] : []);
-                                            }
+                                            // if (temp["Mount"]) {
+                                            //     setSelectedMountOutsideType4(temp["Mount"] ? [{
+                                            //         value: temp["Mount"],
+                                            //         label: optionsOutside[pageLanguage].find(opt => opt.value === temp["Mount"]).label
+                                            //     }] : []);
+                                            // }
+                                            depSetTempArr = new Set([...setGetDeps("", "3A", depSetTempArr)]);
                                         }
                                         if (temp["Mount"]) {
                                             if (temp["FinishedLengthType"]) {
@@ -4773,7 +4824,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                 tempLabels["3DRod"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
                                             }
                                             
-                                            depSetTempArr = new Set([...setGetDeps((tempWidth !== undefined ? "" : "3BRod,") + (tempHeight !== undefined ? "" : "3CRod,") + (temp["CeilingToFloor"] !== undefined ? "" : "3DRod,"), "31,3B,3B1", depSetTempArr)]);
+                                            depSetTempArr = new Set([...setGetDeps((tempWidth !== undefined ? "" : "3BRod,") + (tempHeight !== undefined ? "" : "3CRod,") + (temp["CeilingToFloor"] !== undefined ? "" : "3DRod,"), "31,3ARod,3ARod1", depSetTempArr)]);
                                             setSelectCustomValues(selectValues);
                                             setStepSelectedLabel(tempLabels);
                                             setStepSelectedValue(tempValue);
@@ -4807,12 +4858,14 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                 tempLabels["3DRod"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["CeilingToFloor"]}`) + postfixFa : temp["CeilingToFloor"] + postfixEn;
                                             }
                                             
-                                            depSetTempArr = new Set([...setGetDeps((tempWidth !== undefined ? "" : "3BRod,") + (tempHeight !== undefined ? "" : "3CRodFloor,") + (temp["CeilingToFloor"] !== undefined ? "" : "3DRod,"), "31,3B,3B1", depSetTempArr)]);
+                                            depSetTempArr = new Set([...setGetDeps((tempWidth !== undefined ? "" : "3BRod,") + (tempHeight !== undefined ? "" : "3CRodFloor,") + (temp["CeilingToFloor"] !== undefined ? "" : "3DRod,"), "31,3ARod", depSetTempArr)]);
                                             setSelectCustomValues(selectValues);
                                             setStepSelectedLabel(tempLabels);
                                             setStepSelectedValue(tempValue);
                                             
                                         }
+                                    } else{
+                                        depSetTempArr = new Set([...setGetDeps("3ARod", "", depSetTempArr)]);
                                     }
                                     
                                 }
@@ -5430,11 +5483,11 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         if (!pageLoad && !rodsLoad && !rodsLoad2) {
             setStep6("Same Style For All Curtains");
             setStep61("");
-            setStep6A1("");
-            setStep6B1("");
-            setStep6C1("");
-            setDeps("61", "6,6A1,6B1,6C1");
-            setCart("", "", "PanelType");
+            setStep6A("");
+            setStep6B("");
+            setStep6C("");
+            setDeps("61", "6,6A,6B,6C");
+            setCart("", "", "PanelType,PanelTypeA,PanelTypeB,PanelTypeC");
             // selectChanged(undefined, "6");
             if (cartValues["WidthCart"] && parseInt(cartValues["WidthCart"]) > 0) {
                 getRails(parseInt(cartValues["WidthCart"]));
@@ -7969,7 +8022,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    setMeasurementsNextStep("4");
                                                    setDeps("311,312", "3,31,3A,3A1,3B,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3ARod,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
                                                    deleteSpecialSelects();
-                                                   setCart("calcMeasurements", false, "WidthCart,HeightCart,hasRod,CurtainPosition,Mount,FinishedLengthType,Width3C,ExtensionLeft,ExtensionRight,ShadeMount,Height3E,WindowToFloor,CeilingToFloor,RodWidth,RodToBottom,RodToFloor,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3");
+                                                   setCart("calcMeasurements", false, "WidthCart,HeightCart,hasRod,CurtainPosition,Mount,Depth,MouldingHeight,FinishedLengthType,Width3C,ExtensionLeft,ExtensionRight,ShadeMount,Height3E,WindowToFloor,CeilingToFloor,RodWidth,RodToBottom,RodToFloor,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3");
                                                }} ref={ref => (inputs.current["31"] = ref)}/>
                                         <label htmlFor="31">{t("I have my own measurements.")}</label>
                                     </div>
@@ -7987,8 +8040,8 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                }}/>
                                         <label htmlFor="32">{t("Calculate my measurements.")}</label>
                                     </div>
-                                    
-                                    {step3 === "false" && <div className="own_measurements_container">
+    
+                                    <div className={step3 === "false" ? "own_measurements_container" : "noDisplay"}>
                                         <div className="own_measurements_width">
                                             <label className="select_label">{t("Width")}<p className="farsi_cm">{t("select_cm")}</p></label>
                                             <div className="select_container select_container_num">
@@ -8067,7 +8120,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                 />
                                             </div>
                                         </div>
-                                    </div>}
+                                    </div>
                                     
                                     {/*{step3 === "false" &&*/}
                                     {/*    <div className="own_measurements_container grommet_own_measurements_container">*/}
@@ -8264,12 +8317,13 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             <input className="radio" type="radio" value="1" name="step31" ref-num="31" id="311" checked={step31 === "true"}
                                                    onChange={e => {
                                                        setStep31("true");
+                                                       setStep3A0("");
                                                        setStep3A("");
                                                        setStep3B("");
                                                        deleteSpecialSelects();
-                                                       selectChanged(e, "3A,3B,3C,3D,3E,3EFloor,3F,3G,3ARod,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling,3EStandardCeilingFloor");
-                                                       setDeps("3ARod", "31,3B,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3A,3A1,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
-                                                       setCart("hasRod", true, "CurtainPosition,Mount,FinishedLengthType,Width3C,ExtensionLeft,ExtensionRight,ShadeMount,Height3E,WindowToFloor,CeilingToFloor,RodWidth,RodToBottom,RodToFloor,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3");
+                                                       selectChanged(e, "3A0,3A,3B,3C,3D,3E,3EFloor,3F,3G,3ARod,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling,3EStandardCeilingFloor");
+                                                       setDeps("3ARod", "31,3B,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3A0,3A,3A1,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
+                                                       setCart("hasRod", true, "CurtainPosition,Mount,Depth,MouldingHeight,FinishedLengthType,Width3C,ExtensionLeft,ExtensionRight,ShadeMount,Height3E,WindowToFloor,CeilingToFloor,RodWidth,RodToBottom,RodToFloor,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3");
                                                        setMeasurementsNextStep("3A");
                                                    }} ref={ref => (inputs.current["311"] = ref)}/>
                                             <label htmlFor="311">{t("grommet_has_rod")}</label>
@@ -8282,13 +8336,14 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             <input className="radio" type="radio" value="2" name="step31" ref-num="31" id="312" checked={step31 === "false"}
                                                    onChange={e => {
                                                        setStep31("false");
+                                                       setStep3A0("");
                                                        setStep3A("");
                                                        setStep3B("");
                                                        deleteSpecialSelects();
-                                                       selectChanged(e, "3A,3B,3C,3D,3E,3EFloor,3F,3G,3ARod,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling,3EStandardCeilingFloor");
-                                                       setDeps("3A", "31,3B,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3ARod,3A1,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
-                                                       setCart("hasRod", false, "CurtainPosition,Mount,FinishedLengthType,Width3C,ExtensionLeft,ExtensionRight,ShadeMount,Height3E,WindowToFloor,CeilingToFloor,RodWidth,RodToBottom,RodToFloor,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3");
-                                                       setMeasurementsNextStep("3A");
+                                                       selectChanged(e, "3A0,3A,3B,3C,3D,3E,3EFloor,3F,3G,3ARod,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling,3EStandardCeilingFloor");
+                                                       setDeps("3A0,3A", "31,3B,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3ARod,3A1,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
+                                                       setCart("hasRod", false, "CurtainPosition,Mount,Depth,MouldingHeight,FinishedLengthType,Width3C,ExtensionLeft,ExtensionRight,ShadeMount,Height3E,WindowToFloor,CeilingToFloor,RodWidth,RodToBottom,RodToFloor,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3");
+                                                       setMeasurementsNextStep("3A0");
                                                    }} ref={ref => (inputs.current["312"] = ref)}/>
                                             <label htmlFor="312">{t("grommet_no_rod")}</label>
                                         </div>
@@ -8327,10 +8382,155 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                         </Accordion.Collapse>
                     </Card>
                     
+                    {/* step 4A0 */}
+                    <Card className={step3 === "true" && step31 === "false" ? "" : "noDisplay"}>
+                        <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
+                            <ContextAwareToggle eventKey="3A0" stepNum={t("4A")} stepTitle={t("zebra_step2")} stepRef="3A0" type="1" required={requiredStep["3A0"]}
+                                                stepSelected={stepSelectedLabel["3A0"] === undefined ? "" : stepSelectedLabel["3A0"]}/>
+                        </Card.Header>
+                        <Accordion.Collapse eventKey="3A0">
+                            <Card.Body>
+                                <div className="card_body card_body_radio card_body_radio_camera card_body_radio_small_img">
+                                    <div className="box33 radio_style">
+                                        <img src={require('../Images/public/no_image.svg').default} className="img-fluid" alt=""/>
+                                        <input className="radio" type="radio" text={t("Ceiling")} value="1" name="step3A0" ref-num="3A0" id="3A01"
+                                               checked={step3A0 === "Ceiling"}
+                                               onChange={e => {
+                                                   setStep3A0("Ceiling");
+                                                   setStep3B("");
+                                                   setDeps("3B", "3A0,3A11,3A12");
+                                                   setCart("Mount", "Ceiling","Depth,MouldingHeight");
+                                                   selectChanged(e,"3B");
+                                                   let temp = JSON.parse(JSON.stringify(selectCustomValues));
+                                                   temp.Depth = [];
+                                                   temp.MouldingHeight = [];
+                                                   setSelectCustomValues(temp);
+                                               }} ref={ref => (inputs.current["3A01"] = ref)}/>
+                                        <label htmlFor="3A01">{t("Ceiling")}
+                                        </label>
+                                    </div>
+                                    <div className="box33 radio_style">
+                                        <img src={require('../Images/public/no_image.svg').default} className="img-fluid" alt=""/>
+                                        <input className="radio" type="radio" text={t("Wall")} value="2" name="step3A0" ref-num="3A0" id="3A02"
+                                               checked={step3A0 === "Wall"}
+                                               onChange={e => {
+                                                   setStep3A0("Wall");
+                                                   setStep3B("");
+                                                   setDeps("3B", "3A0,3A11,3A12");
+                                                   setCart("Mount", "Wall","Depth,MouldingHeight");
+                                                   selectChanged(e,"3B");
+                                                   let temp = JSON.parse(JSON.stringify(selectCustomValues));
+                                                   temp.Depth = [];
+                                                   temp.MouldingHeight = [];
+                                                   setSelectCustomValues(temp);
+                                               }} ref={ref => (inputs.current["3A02"] = ref)}/>
+                                        <label htmlFor="3A02">{t("Wall")}
+                                        </label>
+                                    </div>
+                                    <div className="box33 radio_style">
+                                        <img src={require('../Images/public/no_image.svg').default} className="img-fluid" alt=""/>
+                                        <input className="radio" type="radio" text={t("Moulding")} value="3" name="step3A0" ref-num="3A0" id="3A03"
+                                               checked={step3A0 === "Moulding"}
+                                               onChange={e => {
+                                                   setStep3A0("Moulding");
+                                                   setStep3B("");
+                                                   setDeps("3A11,3A12,3B", "3A0");
+                                                   setCart("Mount", "Moulding");
+                                                   selectChanged(e,"3B");
+                                               }} ref={ref => (inputs.current["3A03"] = ref)}/>
+                                        <label htmlFor="3A03">{t("mount_MouldingMount")}
+                                        </label>
+                                    </div>
+    
+                                    <div className={step3A0 === "Moulding" ? "own_measurements_container" : "noDisplay"}>
+                                        <div className="own_measurements_width">
+                                            <label className="select_label">{t("Depth")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                            <div className="select_container select_container_num">
+                                                <Select
+                                                    className="select"
+                                                    placeholder={t("Please Select")}
+                                                    portal={document.body}
+                                                    dropdownPosition="bottom"
+                                                    dropdownHandle={false}
+                                                    dropdownGap={0}
+                                                    values={selectCustomValues.Depth}
+                                                    onDropdownOpen={() => {
+                                                        let temp1 = window.scrollY;
+                                                        window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                        setTimeout(() => {
+                                                            let temp2 = window.scrollY;
+                                                            if (temp2 === temp1) window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                        }, 100);
+                                                    }}
+                                                    dropdownRenderer={({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>}
+                                                    contentRenderer={({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                                    postfixFa=""/>}
+                                                    // optionRenderer={
+                                                    //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                    // }
+                                                    onChange={(selected) => {
+                                                        if (selected[0] !== undefined) {
+                                                            let temp = JSON.parse(JSON.stringify(selectCustomValues));
+                                                            temp.Depth = selected;
+                                                            setSelectCustomValues(temp);
+                                                            setDeps("", "3A11");
+                                                            setCart("Depth", selected[0].value);
+                                                        }
+                                                    }}
+                                                    options={SelectOptionRange(1, 50, 1, "cm", "", pageLanguage)}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="own_measurements_Length">
+                                            <label className="select_label">{t("Length_step3")}<p className="farsi_cm">{t("select_cm")}</p></label>
+                                            <div className="select_container select_container_num">
+                                                <Select
+                                                    className="select"
+                                                    placeholder={t("Please Select")}
+                                                    portal={document.body}
+                                                    dropdownPosition="bottom"
+                                                    dropdownHandle={false}
+                                                    dropdownGap={0}
+                                                    values={selectCustomValues.MouldingHeight}
+                                                    onDropdownOpen={() => {
+                                                        let temp1 = window.scrollY;
+                                                        window.scrollTo(window.scrollX, window.scrollY + 1);
+                                                        setTimeout(() => {
+                                                            let temp2 = window.scrollY;
+                                                            if (temp2 === temp1) window.scrollTo(window.scrollX, window.scrollY - 1);
+                                                        }, 100);
+                                                    }}
+                                                    dropdownRenderer={({props, state, methods}) => <CustomDropdownWithSearch props={props} state={state} methods={methods}/>}
+                                                    contentRenderer={({props, state, methods}) => <CustomControlNum props={props} state={state} methods={methods} postfix="cm"
+                                                                                                                    postfixFa=""/>}
+                                                    // optionRenderer={
+                                                    //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
+                                                    // }
+                                                    onChange={(selected) => {
+                                                        if (selected[0] !== undefined) {
+                                                            let temp = JSON.parse(JSON.stringify(selectCustomValues));
+                                                            temp.MouldingHeight = selected;
+                                                            setSelectCustomValues(temp);
+                                                            setDeps("", "3A12");
+                                                            setCart("MouldingHeight", selected[0].value);
+                                                        }
+                                                    }}
+                                                    options={SelectOptionRange(1, 50, 1, "cm", "", pageLanguage)}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <NextStep currentStep="3A0" eventKey="3A">{t("NEXT STEP")}</NextStep>
+                                </div>
+                            </Card.Body>
+                        </Accordion.Collapse>
+                    </Card>
+                    
                     {/* step 4A */}
                     <Card className={step3 === "true" && step31 === "false" ? "" : "noDisplay"}>
                         <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
-                            <ContextAwareToggle eventKey="3A" stepNum={t("4A")} stepTitle={t("grommet_step3A")} stepRef="3A" type="1" required={requiredStep["3A"]}
+                            <ContextAwareToggle eventKey="3A" stepNum={t("4B")} stepTitle={t("grommet_step3A")} stepRef="3A" type="1" required={requiredStep["3A"]}
                                                 stepSelected={stepSelectedLabel["3A"] === undefined ? "" : stepSelectedLabel["3A"]}/>
                         </Card.Header>
                         <Accordion.Collapse eventKey="3A">
@@ -8343,13 +8543,13 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                onChange={e => {
                                                    setStep3A("Standard");
                                                    setStep3B("");
-                                                   setSelectedMountOutsideType([]);
-                                                   setSelectedMountOutsideType2([]);
-                                                   setSelectedMountOutsideType3([]);
-                                                   setSelectedMountOutsideType4([]);
+                                                   // setSelectedMountOutsideType([]);
+                                                   // setSelectedMountOutsideType2([]);
+                                                   // setSelectedMountOutsideType3([]);
+                                                   // setSelectedMountOutsideType4([]);
                                                    selectChanged(e, "3B,3C,3D,3E,3EFloor,3F,3G,3ARod,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling,3EStandardCeilingFloor");
                                                    deleteSpecialSelects();
-                                                   setDeps("3A1,3B", "3A,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3ARod,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
+                                                   setDeps("3B", "3A,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3ARod,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
                                                    setCart("CurtainPosition", "Standard", "Mount,FinishedLengthType,Width3C,ExtensionLeft,ExtensionRight,ShadeMount,Height3E,WindowToFloor,CeilingToFloor,RodWidth,RodToBottom,RodToFloor,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3");
                                                }} ref={ref => (inputs.current["3A1"] = ref)}/>
                                         <label htmlFor="3A1">{t("Standard")}</label>
@@ -8361,229 +8561,20 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                onChange={e => {
                                                    setStep3A("Wall to Wall");
                                                    setStep3B("");
-                                                   setSelectedMountOutsideType([]);
-                                                   setSelectedMountOutsideType2([]);
-                                                   setSelectedMountOutsideType3([]);
-                                                   setSelectedMountOutsideType4([]);
+                                                   // setSelectedMountOutsideType([]);
+                                                   // setSelectedMountOutsideType2([]);
+                                                   // setSelectedMountOutsideType3([]);
+                                                   // setSelectedMountOutsideType4([]);
                                                    selectChanged(e, "3B,3C,3D,3E,3EFloor,3F,3G,3ARod,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling,3EStandardCeilingFloor");
-                                                   setDeps("3A1,3B", "3A,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3ARod,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
+                                                   setDeps("3B", "3A,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3ARod,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
                                                    setCart("CurtainPosition", "Wall to Wall", "Mount,FinishedLengthType,Width3C,ExtensionLeft,ExtensionRight,ShadeMount,Height3E,WindowToFloor,CeilingToFloor,RodWidth,RodToBottom,RodToFloor,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3");
                                                }} ref={ref => (inputs.current["3A2"] = ref)}/>
                                         <label htmlFor="3A2">{t("Wall to Wall")}</label>
                                     </div>
-                                    <div className={step3A === "Standard" || step3A === "Wall to Wall" ? "selection_section" : "noDisplay"}>
-                                        <div className="select_container_box">
-                                            <div className={step3A === "Standard" ? (mountErr1 ? "select_container select_container_red" : "select_container") : "noDisplay"}>
-                                                <h1>{t("Mount Type")}</h1>
-                                                <Select
-                                                    className="select"
-                                                    placeholder={t("Please Select")}
-                                                    portal={document.body}
-                                                    dropdownPosition="bottom"
-                                                    dropdownHandle={false}
-                                                    dropdownGap={0}
-                                                    values={selectedMountOutsideType}
-                                                    onDropdownOpen={() => {
-                                                        let temp1 = window.scrollY;
-                                                        window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                        setTimeout(() => {
-                                                            let temp2 = window.scrollY;
-                                                            if (temp2 === temp1) window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                        }, 100);
-                                                    }}
-                                                    dropdownRenderer={({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>}
-                                                    contentRenderer={({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>}
-                                                    // optionRenderer={
-                                                    //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                    // }
-                                                    onChange={(selected) => {
-                                                        if (selected.length) {
-                                                            setStep3B("");
-                                                            selectChanged(undefined, "3B,3C,3D,3E,3EFloor,3F,3G,3ARod,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling,3EStandardCeilingFloor");
-                                                            setDeps("3B", "84,8A4,8B4,8C4,3A1,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3ARod,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
-                                                            setSelectedMountOutsideType(selected);
-                                                            setCart("Mount", selected[0].value, "FinishedLengthType,Width3C,ExtensionLeft,ExtensionRight,ShadeMount,Height3E,WindowToFloor,CeilingToFloor,RodWidth,RodToBottom,RodToFloor,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3");
-                                                            setMountErr1(false);
-                                                        }
-                                                    }}
-                                                    options={optionsOutside[pageLanguage]}
-                                                />
-                                                {mountErr1 &&
-                                                    <h2>{t("Required Field")}</h2>
-                                                }
-                                            </div>
-                                        </div>
-                                        <div className="select_container_box">
-                                            <div
-                                                className={step3A === "Wall to Wall" ? (mountErr1 ? "select_container select_container_red" : "select_container") : "noDisplay"}>
-                                                <h1>{t("Mount Type")}</h1>
-                                                <Select
-                                                    className="select"
-                                                    placeholder={t("Please Select")}
-                                                    portal={document.body}
-                                                    dropdownPosition="bottom"
-                                                    dropdownHandle={false}
-                                                    dropdownGap={0}
-                                                    values={selectedMountOutsideType2}
-                                                    onDropdownOpen={() => {
-                                                        let temp1 = window.scrollY;
-                                                        window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                        setTimeout(() => {
-                                                            let temp2 = window.scrollY;
-                                                            if (temp2 === temp1) window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                        }, 100);
-                                                    }}
-                                                    dropdownRenderer={({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>}
-                                                    contentRenderer={({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>}
-                                                    // optionRenderer={
-                                                    //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                    // }
-                                                    onChange={(selected) => {
-                                                        if (selected.length) {
-                                                            setStep3B("");
-                                                            selectChanged(undefined, "3B,3C,3D,3E,3EFloor,3F,3G,3ARod,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling,3EStandardCeilingFloor");
-                                                            setDeps("3B", "84,8A4,8B4,8C4,3A1,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3ARod,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
-                                                            setSelectedMountOutsideType2(selected);
-                                                            setCart("Mount", selected[0].value, "FinishedLengthType,Width3C,ExtensionLeft,ExtensionRight,ShadeMount,Height3E,WindowToFloor,CeilingToFloor,RodWidth,RodToBottom,RodToFloor,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3");
-                                                            setMountErr1(false);
-                                                        }
-                                                    }}
-                                                    options={optionsOutside[pageLanguage]}
-                                                />
-                                                {mountErr1 &&
-                                                    <h2>{t("Required Field")}</h2>
-                                                }
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="box50 radio_style">
-                                        <img src={require('../Images/public/no_image.svg').default} className="img-fluid half_margin" alt=""/>
-                                        <input className="radio" type="radio" text={t("Left Corner Window")} value="3" name="step3A" ref-num="3A" id="3A3"
-                                               checked={step3A === "Left Corner Window"}
-                                               onChange={e => {
-                                                   setStep3A("Left Corner Window");
-                                                   setStep3B("");
-                                                   setSelectedMountOutsideType([]);
-                                                   setSelectedMountOutsideType2([]);
-                                                   setSelectedMountOutsideType3([]);
-                                                   setSelectedMountOutsideType4([]);
-                                                   selectChanged(e, "3B,3C,3D,3E,3EFloor,3F,3G,3ARod,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling,3EStandardCeilingFloor");
-                                                   setDeps("3A1,3B", "3A,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3ARod,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
-                                                   setCart("CurtainPosition", "Left Corner Window", "Mount,FinishedLengthType,Width3C,ExtensionLeft,ExtensionRight,ShadeMount,Height3E,WindowToFloor,CeilingToFloor,RodWidth,RodToBottom,RodToFloor,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3");
-                                               }} ref={ref => (inputs.current["3A3"] = ref)}/>
-                                        <label htmlFor="3A3">{t("Left Corner Window")}</label>
-                                    </div>
-                                    <div className="box50 radio_style">
-                                        <img src={require('../Images/public/no_image.svg').default} className="img-fluid half_margin" alt=""/>
-                                        <input className="radio" type="radio" text={t("Right Corner Window")} value="4" name="step3A" ref-num="3A" id="3A4"
-                                               checked={step3A === "Right Corner Window"}
-                                               onChange={e => {
-                                                   setStep3A("Right Corner Window");
-                                                   setStep3B("");
-                                                   setSelectedMountOutsideType([]);
-                                                   setSelectedMountOutsideType2([]);
-                                                   setSelectedMountOutsideType3([]);
-                                                   setSelectedMountOutsideType4([]);
-                                                   selectChanged(e, "3B,3C,3D,3E,3EFloor,3F,3G,3ARod,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling,3EStandardCeilingFloor");
-                                                   setDeps("3A1,3B", "3A,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3ARod,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
-                                                   setCart("CurtainPosition", "Right Corner Window", "Mount,FinishedLengthType,Width3C,ExtensionLeft,ExtensionRight,ShadeMount,Height3E,WindowToFloor,CeilingToFloor,RodWidth,RodToBottom,RodToFloor,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3");
-                                               }} ref={ref => (inputs.current["3A4"] = ref)}/>
-                                        <label htmlFor="3A4">{t("Right Corner Window")}</label>
-                                    </div>
-                                    <div className={step3A === "Left Corner Window" || step3A === "Right Corner Window" ? "selection_section" : "noDisplay"}>
-                                        <div className="select_container_box">
-                                            <div
-                                                className={step3A === "Left Corner Window" ? (mountErr1 ? "select_container select_container_red" : "select_container") : "noDisplay"}>
-                                                <h1>{t("Mount Type")}</h1>
-                                                <Select
-                                                    className="select"
-                                                    placeholder={t("Please Select")}
-                                                    portal={document.body}
-                                                    dropdownPosition="bottom"
-                                                    dropdownHandle={false}
-                                                    dropdownGap={0}
-                                                    values={selectedMountOutsideType3}
-                                                    onDropdownOpen={() => {
-                                                        let temp1 = window.scrollY;
-                                                        window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                        setTimeout(() => {
-                                                            let temp2 = window.scrollY;
-                                                            if (temp2 === temp1) window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                        }, 100);
-                                                    }}
-                                                    dropdownRenderer={({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>}
-                                                    contentRenderer={({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>}
-                                                    // optionRenderer={
-                                                    //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                    // }
-                                                    onChange={(selected) => {
-                                                        if (selected.length) {
-                                                            setStep3B("");
-                                                            selectChanged(undefined, "3B,3C,3D,3E,3EFloor,3F,3G,3ARod,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling,3EStandardCeilingFloor");
-                                                            setDeps("3B", "84,8A4,8B4,8C4,3A1,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3ARod,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
-                                                            setSelectedMountOutsideType3(selected);
-                                                            setCart("Mount", selected[0].value, "FinishedLengthType,Width3C,ExtensionLeft,ExtensionRight,ShadeMount,Height3E,WindowToFloor,CeilingToFloor,RodWidth,RodToBottom,RodToFloor,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3");
-                                                            setMountErr1(false);
-                                                        }
-                                                    }}
-                                                    options={optionsOutside[pageLanguage]}
-                                                />
-                                                {mountErr1 &&
-                                                    <h2>{t("Required Field")}</h2>
-                                                }
-                                            </div>
-                                        </div>
-                                        <div className="select_container_box">
-                                            <div
-                                                className={step3A === "Right Corner Window" ? (mountErr1 ? "select_container select_container_red" : "select_container") : "noDisplay"}>
-                                                <h1>{t("Mount Type")}</h1>
-                                                <Select
-                                                    className="select"
-                                                    placeholder={t("Please Select")}
-                                                    portal={document.body}
-                                                    dropdownPosition="bottom"
-                                                    dropdownHandle={false}
-                                                    dropdownGap={0}
-                                                    values={selectedMountOutsideType4}
-                                                    onDropdownOpen={() => {
-                                                        let temp1 = window.scrollY;
-                                                        window.scrollTo(window.scrollX, window.scrollY + 1);
-                                                        setTimeout(() => {
-                                                            let temp2 = window.scrollY;
-                                                            if (temp2 === temp1) window.scrollTo(window.scrollX, window.scrollY - 1);
-                                                        }, 100);
-                                                    }}
-                                                    dropdownRenderer={({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>}
-                                                    contentRenderer={({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>}
-                                                    // optionRenderer={
-                                                    //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>
-                                                    // }
-                                                    onChange={(selected) => {
-                                                        if (selected.length) {
-                                                            setStep3B("");
-                                                            selectChanged(undefined, "3B,3C,3D,3E,3EFloor,3F,3G,3ARod,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling,3EStandardCeilingFloor");
-                                                            setDeps("3B", "84,8A4,8B4,8C4,3A1,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3ARod,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
-                                                            setSelectedMountOutsideType4(selected);
-                                                            setCart("Mount", selected[0].value, "FinishedLengthType,Width3C,ExtensionLeft,ExtensionRight,ShadeMount,Height3E,WindowToFloor,CeilingToFloor,RodWidth,RodToBottom,RodToFloor,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3");
-                                                            setMountErr1(false);
-                                                        }
-                                                    }}
-                                                    options={optionsOutside[pageLanguage]}
-                                                />
-                                                {mountErr1 &&
-                                                    <h2>{t("Required Field")}</h2>
-                                                }
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    {/*<div className={step3A !== "" ? "same_row_selection" : "noDisplay"}>*/}
-                                    {/*    <div className="same_row_selection_left">*/}
-                                    {/*        <p>{t("Mount Type")}</p>*/}
-                                    {/*    </div>*/}
-                                    {/*    <div className="same_row_selection_right">*/}
-                                    {/*        <div className="select_container">*/}
+                                    {/*<div className={step3A === "Standard" || step3A === "Wall to Wall" ? "selection_section" : "noDisplay"}>*/}
+                                    {/*    <div className="select_container_box">*/}
+                                    {/*        <div className={step3A === "Standard" ? (mountErr1 ? "select_container select_container_red" : "select_container") : "noDisplay"}>*/}
+                                    {/*            <h1>{t("Mount Type")}</h1>*/}
                                     {/*            <Select*/}
                                     {/*                className="select"*/}
                                     {/*                placeholder={t("Please Select")}*/}
@@ -8597,48 +8588,206 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                     {/*                    window.scrollTo(window.scrollX, window.scrollY + 1);*/}
                                     {/*                    setTimeout(() => {*/}
                                     {/*                        let temp2 = window.scrollY;*/}
-                                    {/*                        if (temp2 === temp1)*/}
-                                    {/*                            window.scrollTo(window.scrollX, window.scrollY - 1);*/}
+                                    {/*                        if (temp2 === temp1) window.scrollTo(window.scrollX, window.scrollY - 1);*/}
                                     {/*                    }, 100);*/}
                                     {/*                }}*/}
-                                    {/*                dropdownRenderer={*/}
-                                    {/*                    ({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>*/}
-                                    {/*                }*/}
-                                    {/*                contentRenderer={*/}
-                                    {/*                    ({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>*/}
-                                    {/*                }*/}
+                                    {/*                dropdownRenderer={({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>}*/}
+                                    {/*                contentRenderer={({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>}*/}
                                     {/*                // optionRenderer={*/}
                                     {/*                //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>*/}
                                     {/*                // }*/}
                                     {/*                onChange={(selected) => {*/}
-                                    {/*                    if (selected[0]) {*/}
-                                    {/*                        setDeps("", "3A1");*/}
+                                    {/*                    if (selected.length) {*/}
+                                    {/*                        setStep3B("");*/}
+                                    {/*                        selectChanged(undefined, "3B,3C,3D,3E,3EFloor,3F,3G,3ARod,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling,3EStandardCeilingFloor");*/}
+                                    {/*                        setDeps("3B", "84,8A4,8B4,8C4,3A1,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3ARod,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");*/}
                                     {/*                        setSelectedMountOutsideType(selected);*/}
-                                    {/*                        setCart("Mount", selected[0].value);*/}
+                                    {/*                        setCart("Mount", selected[0].value, "FinishedLengthType,Width3C,ExtensionLeft,ExtensionRight,ShadeMount,Height3E,WindowToFloor,CeilingToFloor,RodWidth,RodToBottom,RodToFloor,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3");*/}
+                                    {/*                        setMountErr1(false);*/}
                                     {/*                    }*/}
                                     {/*                }}*/}
                                     {/*                options={optionsOutside[pageLanguage]}*/}
                                     {/*            />*/}
+                                    {/*            {mountErr1 &&*/}
+                                    {/*                <h2>{t("Required Field")}</h2>*/}
+                                    {/*            }*/}
+                                    {/*        </div>*/}
+                                    {/*    </div>*/}
+                                    {/*    <div className="select_container_box">*/}
+                                    {/*        <div*/}
+                                    {/*            className={step3A === "Wall to Wall" ? (mountErr1 ? "select_container select_container_red" : "select_container") : "noDisplay"}>*/}
+                                    {/*            <h1>{t("Mount Type")}</h1>*/}
+                                    {/*            <Select*/}
+                                    {/*                className="select"*/}
+                                    {/*                placeholder={t("Please Select")}*/}
+                                    {/*                portal={document.body}*/}
+                                    {/*                dropdownPosition="bottom"*/}
+                                    {/*                dropdownHandle={false}*/}
+                                    {/*                dropdownGap={0}*/}
+                                    {/*                values={selectedMountOutsideType2}*/}
+                                    {/*                onDropdownOpen={() => {*/}
+                                    {/*                    let temp1 = window.scrollY;*/}
+                                    {/*                    window.scrollTo(window.scrollX, window.scrollY + 1);*/}
+                                    {/*                    setTimeout(() => {*/}
+                                    {/*                        let temp2 = window.scrollY;*/}
+                                    {/*                        if (temp2 === temp1) window.scrollTo(window.scrollX, window.scrollY - 1);*/}
+                                    {/*                    }, 100);*/}
+                                    {/*                }}*/}
+                                    {/*                dropdownRenderer={({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>}*/}
+                                    {/*                contentRenderer={({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>}*/}
+                                    {/*                // optionRenderer={*/}
+                                    {/*                //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>*/}
+                                    {/*                // }*/}
+                                    {/*                onChange={(selected) => {*/}
+                                    {/*                    if (selected.length) {*/}
+                                    {/*                        setStep3B("");*/}
+                                    {/*                        selectChanged(undefined, "3B,3C,3D,3E,3EFloor,3F,3G,3ARod,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling,3EStandardCeilingFloor");*/}
+                                    {/*                        setDeps("3B", "84,8A4,8B4,8C4,3A1,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3ARod,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");*/}
+                                    {/*                        setSelectedMountOutsideType2(selected);*/}
+                                    {/*                        setCart("Mount", selected[0].value, "FinishedLengthType,Width3C,ExtensionLeft,ExtensionRight,ShadeMount,Height3E,WindowToFloor,CeilingToFloor,RodWidth,RodToBottom,RodToFloor,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3");*/}
+                                    {/*                        setMountErr1(false);*/}
+                                    {/*                    }*/}
+                                    {/*                }}*/}
+                                    {/*                options={optionsOutside[pageLanguage]}*/}
+                                    {/*            />*/}
+                                    {/*            {mountErr1 &&*/}
+                                    {/*                <h2>{t("Required Field")}</h2>*/}
+                                    {/*            }*/}
                                     {/*        </div>*/}
                                     {/*    </div>*/}
                                     {/*</div>*/}
                                     
-                                    <NextStep
-                                        eventKey={selectedMountOutsideType.length === 0 && selectedMountOutsideType2.length === 0 && selectedMountOutsideType3.length === 0 && selectedMountOutsideType4.length === 0 ? "3A" : "3B"}
-                                        onClick={() => {
-                                            if (selectedMountOutsideType.length === 0 && selectedMountOutsideType2.length === 0 && selectedMountOutsideType3.length === 0 && selectedMountOutsideType4.length === 0) {
-                                                setMountErr1(true);
-                                            }
-                                        }}>{t("NEXT STEP")}</NextStep>
+                                    <div className="box50 radio_style">
+                                        <img src={require('../Images/public/no_image.svg').default} className="img-fluid half_margin" alt=""/>
+                                        <input className="radio" type="radio" text={t("Left Corner Window")} value="3" name="step3A" ref-num="3A" id="3A3"
+                                               checked={step3A === "Left Corner Window"}
+                                               onChange={e => {
+                                                   setStep3A("Left Corner Window");
+                                                   setStep3B("");
+                                                   // setSelectedMountOutsideType([]);
+                                                   // setSelectedMountOutsideType2([]);
+                                                   // setSelectedMountOutsideType3([]);
+                                                   // setSelectedMountOutsideType4([]);
+                                                   selectChanged(e, "3B,3C,3D,3E,3EFloor,3F,3G,3ARod,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling,3EStandardCeilingFloor");
+                                                   setDeps("3B", "3A,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3ARod,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
+                                                   setCart("CurtainPosition", "Left Corner Window", "Mount,FinishedLengthType,Width3C,ExtensionLeft,ExtensionRight,ShadeMount,Height3E,WindowToFloor,CeilingToFloor,RodWidth,RodToBottom,RodToFloor,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3");
+                                               }} ref={ref => (inputs.current["3A3"] = ref)}/>
+                                        <label htmlFor="3A3">{t("Left Corner Window")}</label>
+                                    </div>
+                                    <div className="box50 radio_style">
+                                        <img src={require('../Images/public/no_image.svg').default} className="img-fluid half_margin" alt=""/>
+                                        <input className="radio" type="radio" text={t("Right Corner Window")} value="4" name="step3A" ref-num="3A" id="3A4"
+                                               checked={step3A === "Right Corner Window"}
+                                               onChange={e => {
+                                                   setStep3A("Right Corner Window");
+                                                   setStep3B("");
+                                                   // setSelectedMountOutsideType([]);
+                                                   // setSelectedMountOutsideType2([]);
+                                                   // setSelectedMountOutsideType3([]);
+                                                   // setSelectedMountOutsideType4([]);
+                                                   selectChanged(e, "3B,3C,3D,3E,3EFloor,3F,3G,3ARod,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling,3EStandardCeilingFloor");
+                                                   setDeps("3B", "3A,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3ARod,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
+                                                   setCart("CurtainPosition", "Right Corner Window", "Mount,FinishedLengthType,Width3C,ExtensionLeft,ExtensionRight,ShadeMount,Height3E,WindowToFloor,CeilingToFloor,RodWidth,RodToBottom,RodToFloor,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3");
+                                               }} ref={ref => (inputs.current["3A4"] = ref)}/>
+                                        <label htmlFor="3A4">{t("Right Corner Window")}</label>
+                                    </div>
+                                    {/*<div className={step3A === "Left Corner Window" || step3A === "Right Corner Window" ? "selection_section" : "noDisplay"}>*/}
+                                    {/*    <div className="select_container_box">*/}
+                                    {/*        <div*/}
+                                    {/*            className={step3A === "Left Corner Window" ? (mountErr1 ? "select_container select_container_red" : "select_container") : "noDisplay"}>*/}
+                                    {/*            <h1>{t("Mount Type")}</h1>*/}
+                                    {/*            <Select*/}
+                                    {/*                className="select"*/}
+                                    {/*                placeholder={t("Please Select")}*/}
+                                    {/*                portal={document.body}*/}
+                                    {/*                dropdownPosition="bottom"*/}
+                                    {/*                dropdownHandle={false}*/}
+                                    {/*                dropdownGap={0}*/}
+                                    {/*                values={selectedMountOutsideType3}*/}
+                                    {/*                onDropdownOpen={() => {*/}
+                                    {/*                    let temp1 = window.scrollY;*/}
+                                    {/*                    window.scrollTo(window.scrollX, window.scrollY + 1);*/}
+                                    {/*                    setTimeout(() => {*/}
+                                    {/*                        let temp2 = window.scrollY;*/}
+                                    {/*                        if (temp2 === temp1) window.scrollTo(window.scrollX, window.scrollY - 1);*/}
+                                    {/*                    }, 100);*/}
+                                    {/*                }}*/}
+                                    {/*                dropdownRenderer={({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>}*/}
+                                    {/*                contentRenderer={({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>}*/}
+                                    {/*                // optionRenderer={*/}
+                                    {/*                //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>*/}
+                                    {/*                // }*/}
+                                    {/*                onChange={(selected) => {*/}
+                                    {/*                    if (selected.length) {*/}
+                                    {/*                        setStep3B("");*/}
+                                    {/*                        selectChanged(undefined, "3B,3C,3D,3E,3EFloor,3F,3G,3ARod,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling,3EStandardCeilingFloor");*/}
+                                    {/*                        setDeps("3B", "84,8A4,8B4,8C4,3A1,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3ARod,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");*/}
+                                    {/*                        setSelectedMountOutsideType3(selected);*/}
+                                    {/*                        setCart("Mount", selected[0].value, "FinishedLengthType,Width3C,ExtensionLeft,ExtensionRight,ShadeMount,Height3E,WindowToFloor,CeilingToFloor,RodWidth,RodToBottom,RodToFloor,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3");*/}
+                                    {/*                        setMountErr1(false);*/}
+                                    {/*                    }*/}
+                                    {/*                }}*/}
+                                    {/*                options={optionsOutside[pageLanguage]}*/}
+                                    {/*            />*/}
+                                    {/*            {mountErr1 &&*/}
+                                    {/*                <h2>{t("Required Field")}</h2>*/}
+                                    {/*            }*/}
+                                    {/*        </div>*/}
+                                    {/*    </div>*/}
+                                    {/*    <div className="select_container_box">*/}
+                                    {/*        <div*/}
+                                    {/*            className={step3A === "Right Corner Window" ? (mountErr1 ? "select_container select_container_red" : "select_container") : "noDisplay"}>*/}
+                                    {/*            <h1>{t("Mount Type")}</h1>*/}
+                                    {/*            <Select*/}
+                                    {/*                className="select"*/}
+                                    {/*                placeholder={t("Please Select")}*/}
+                                    {/*                portal={document.body}*/}
+                                    {/*                dropdownPosition="bottom"*/}
+                                    {/*                dropdownHandle={false}*/}
+                                    {/*                dropdownGap={0}*/}
+                                    {/*                values={selectedMountOutsideType4}*/}
+                                    {/*                onDropdownOpen={() => {*/}
+                                    {/*                    let temp1 = window.scrollY;*/}
+                                    {/*                    window.scrollTo(window.scrollX, window.scrollY + 1);*/}
+                                    {/*                    setTimeout(() => {*/}
+                                    {/*                        let temp2 = window.scrollY;*/}
+                                    {/*                        if (temp2 === temp1) window.scrollTo(window.scrollX, window.scrollY - 1);*/}
+                                    {/*                    }, 100);*/}
+                                    {/*                }}*/}
+                                    {/*                dropdownRenderer={({props, state, methods}) => <CustomDropdown props={props} state={state} methods={methods}/>}*/}
+                                    {/*                contentRenderer={({props, state, methods}) => <CustomControl props={props} state={state} methods={methods}/>}*/}
+                                    {/*                // optionRenderer={*/}
+                                    {/*                //     ({ item, props, state, methods }) => <CustomOption item={item} props={props} state={state} methods={methods}/>*/}
+                                    {/*                // }*/}
+                                    {/*                onChange={(selected) => {*/}
+                                    {/*                    if (selected.length) {*/}
+                                    {/*                        setStep3B("");*/}
+                                    {/*                        selectChanged(undefined, "3B,3C,3D,3E,3EFloor,3F,3G,3ARod,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling,3EStandardCeilingFloor");*/}
+                                    {/*                        setDeps("3B", "84,8A4,8B4,8C4,3A1,3B1,3C,3D1,3D2,3E,3EFloor,3F,3G,3ARod,3ARod1,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");*/}
+                                    {/*                        setSelectedMountOutsideType4(selected);*/}
+                                    {/*                        setCart("Mount", selected[0].value, "FinishedLengthType,Width3C,ExtensionLeft,ExtensionRight,ShadeMount,Height3E,WindowToFloor,CeilingToFloor,RodWidth,RodToBottom,RodToFloor,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3");*/}
+                                    {/*                        setMountErr1(false);*/}
+                                    {/*                    }*/}
+                                    {/*                }}*/}
+                                    {/*                options={optionsOutside[pageLanguage]}*/}
+                                    {/*            />*/}
+                                    {/*            {mountErr1 &&*/}
+                                    {/*                <h2>{t("Required Field")}</h2>*/}
+                                    {/*            }*/}
+                                    {/*        </div>*/}
+                                    {/*    </div>*/}
+                                    {/*</div>*/}
+    
+                                    <NextStep currentStep="3A" eventKey="3B">{t("NEXT STEP")}</NextStep>
                                 </div>
                             </Card.Body>
                         </Accordion.Collapse>
                     </Card>
                     
                     {/* step 4B */}
-                    <Card className={step3 === "true" && step31 === "false" ? "" : "noDisplay"}>
+                    <Card className={step3 === "true" && step31 === "false" && step3A0!=="" && step3A!=="" ? "" : "noDisplay"}>
                         <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
-                            <ContextAwareToggle eventKey="3B" stepNum={t("4B")} stepTitle={t("dk_step2A")} stepRef="3B" type="1" required={requiredStep["3B"]}
+                            <ContextAwareToggle eventKey="3B" stepNum={t("4C")} stepTitle={t("dk_step2A")} stepRef="3B" type="1" required={requiredStep["3B"]}
                                                 stepSelected={stepSelectedLabel["3B"] === undefined ? "" : stepSelectedLabel["3B"]}/>
                         </Card.Header>
                         <Accordion.Collapse eventKey="3B">
@@ -8657,13 +8806,13 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    deleteSpecialSelects();
                                                    setCart("FinishedLengthType", "Sill", "WindowToFloor,RodWidth,Width3C,Height3E,RodToBottom,RodToFloor,CeilingToFloor,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3");
                                             
-                                                   if (cartValues["Mount"] === "Ceiling" && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window")) {
+                                                   if ((step3A0 === "Ceiling" || step3A0 === "Moulding") && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window")) {
                                                        setDeps("3C,3D1,3D2,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3", "3B,3B1,3E,3F,3G,3EFloor,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
                                                        selectChanged(e, "3E,3F,3G,3EFloor,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeilingFloor");
-                                                   } else if (step3A === "Wall to Wall" && cartValues["Mount"] === "Wall") {
+                                                   } else if (step3A === "Wall to Wall" && step3A0 === "Wall") {
                                                        setDeps("3C,3E,3F,3G", "3B,3B1,3D1,3D2,3EFloor,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
                                                        selectChanged(e, "3D,3EFloor,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling,3EStandardCeilingFloor");
-                                                   } else if (step3A === "Wall to Wall" && cartValues["Mount"] === "Ceiling") {
+                                                   } else if (step3A === "Wall to Wall" && (step3A0 === "Ceiling" || step3A0 === "Moulding")) {
                                                        setDeps("3C,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3", "3B,3B1,3D1,3D2,3E,3F,3G,3EFloor,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
                                                        selectChanged(e, "3D,3E,3F,3G,3EFloor,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeilingFloor");
                                                    } else {
@@ -8684,13 +8833,13 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    setStep3B1("");
                                                    setCart("FinishedLengthType", "Apron", "WindowToFloor,RodWidth,Width3C,Height3E,RodToBottom,RodToFloor,CeilingToFloor,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3");
                                             
-                                                   if (cartValues["Mount"] === "Ceiling" && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window")) {
+                                                   if ((step3A0 === "Ceiling" || step3A0 === "Moulding") && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window")) {
                                                        setDeps("3B1,3C,3D1,3D2,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3", "3B,3E,3F,3G,3EFloor,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
                                                        selectChanged(e, "3E,3F,3G,3EFloor,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeilingFloor");
-                                                   } else if (step3A === "Wall to Wall" && cartValues["Mount"] === "Wall") {
+                                                   } else if (step3A === "Wall to Wall" && step3A0 === "Wall") {
                                                        setDeps("3B1,3C,3E,3F,3G", "3B,3D1,3D2,3EFloor,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
                                                        selectChanged(e, "3D,3EFloor,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling,3EStandardCeilingFloor");
-                                                   } else if (step3A === "Wall to Wall" && cartValues["Mount"] === "Ceiling") {
+                                                   } else if (step3A === "Wall to Wall" && (step3A0 === "Ceiling" || step3A0 === "Moulding")) {
                                                        setDeps("3B1,3C,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3", "3B,3D1,3D2,3E,3F,3G,3EFloor,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
                                                        selectChanged(e, "3D,3E,3F,3G,3EFloor,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeilingFloor");
                                                    } else {
@@ -8710,13 +8859,13 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    deleteSpecialSelects();
                                                    setCart("FinishedLengthType", "Floor", "Height3E,RodWidth,Width3C,Height3E,RodToBottom,RodToFloor,CeilingToFloor,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3");
                                             
-                                                   if (cartValues["Mount"] === "Ceiling" && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window")) {
+                                                   if ((step3A0 === "Ceiling" || step3A0 === "Moulding") && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window")) {
                                                        setDeps("3C,3D1,3D2,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3", "3B,3B1,3E,3F,3G,3EFloor,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3");
                                                        selectChanged(e, "3E,3F,3G,3EFloor,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling");
-                                                   } else if (step3A === "Wall to Wall" && cartValues["Mount"] === "Wall") {
+                                                   } else if (step3A === "Wall to Wall" && step3A0 === "Wall") {
                                                        setDeps("3C,3EFloor,3F,3G", "3B,3B1,3D1,3D2,3E,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
                                                        selectChanged(e, "3D,3E,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling,3EStandardCeilingFloor");
-                                                   } else if (step3A === "Wall to Wall" && cartValues["Mount"] === "Ceiling") {
+                                                   } else if (step3A === "Wall to Wall" && (step3A0 === "Ceiling" || step3A0 === "Moulding")) {
                                                        setDeps("3C,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3", "3B,3B1,3D1,3D2,3E,3F,3G,3EFloor,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3");
                                                        selectChanged(e, "3D,3E,3F,3G,3EFloor,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling");
                                                    } else {
@@ -8737,13 +8886,13 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    deleteSpecialSelects();
                                                    setCart("FinishedLengthType", "Slight Puddle", "Height3E,RodWidth,Width3C,Height3E,RodToBottom,RodToFloor,CeilingToFloor,CeilingToWindow1,CeilingToWindow2,CeilingToWindow3,CeilingToFloor1,CeilingToFloor2,CeilingToFloor3");
                                             
-                                                   if (cartValues["Mount"] === "Ceiling" && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window")) {
+                                                   if ((step3A0 === "Ceiling" || step3A0 === "Moulding") && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window")) {
                                                        setDeps("3C,3D1,3D2,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3", "3B,3B1,3E,3F,3G,3EFloor,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3");
                                                        selectChanged(e, "3E,3F,3G,3EFloor,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling");
-                                                   } else if (step3A === "Wall to Wall" && cartValues["Mount"] === "Wall") {
+                                                   } else if (step3A === "Wall to Wall" && step3A0 === "Wall") {
                                                        setDeps("3C,3EFloor,3F,3G", "3B,3B1,3D1,3D2,3E,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3");
                                                        selectChanged(e, "3D,3E,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling,3EStandardCeilingFloor");
-                                                   } else if (step3A === "Wall to Wall" && cartValues["Mount"] === "Ceiling") {
+                                                   } else if (step3A === "Wall to Wall" && (step3A0 === "Ceiling" || step3A0 === "Moulding")) {
                                                        setDeps("3C,3EStandardCeilingFloor1,3EStandardCeilingFloor2,3EStandardCeilingFloor3", "3B,3B1,3D1,3D2,3E,3F,3G,3EFloor,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling1,3EStandardCeiling2,3EStandardCeiling3");
                                                        selectChanged(e, "3D,3E,3F,3G,3EFloor,3BRod,3CRod,3CRodFloor,3DRod,3EStandardCeiling");
                                                    } else {
@@ -8805,9 +8954,9 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     
                     {/* step 4C*/}
                     <Card
-                        className={step3 === "true" && step31 === "false" && step3A !== "" && step3B !== "" && cartValues["Mount"] !== undefined ? "" : "noDisplay"}>
+                        className={step3 === "true" && step31 === "false" && step3A !== "" && step3B !== "" && step3A0 !== "" ? "" : "noDisplay"}>
                         <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
-                            <ContextAwareToggle eventKey="3C" stepNum={t("4C")} stepTitle={step3A === "Wall to Wall" ? t("grommet_width_wall") : t("dk_step2B")} stepRef="3C"
+                            <ContextAwareToggle eventKey="3C" stepNum={t("4D")} stepTitle={step3A === "Wall to Wall" ? t("grommet_width_wall") : t("dk_step2B")} stepRef="3C"
                                                 type="2" required={requiredStep["3C"]}
                                                 stepSelected={stepSelectedLabel["3C"] === undefined ? "" : stepSelectedLabel["3C"]}/>
                         </Card.Header>
@@ -8867,9 +9016,9 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     
                     {/* step 4D*/}
                     <Card
-                        className={step3 === "true" && step31 === "false" && step3A !== "" && step3B !== "" && cartValues["Mount"] !== undefined && !(step3A === "Wall to Wall") ? "" : "noDisplay"}>
+                        className={step3 === "true" && step31 === "false" && step3A !== "" && step3B !== "" && step3A0 !== "" && !(step3A === "Wall to Wall") ? "" : "noDisplay"}>
                         <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
-                            <ContextAwareToggle eventKey="3D" stepNum={t("4D")} stepTitle={t("dk_step2CCeiling")} stepRef="3D" type="2"
+                            <ContextAwareToggle eventKey="3D" stepNum={t("4E")} stepTitle={t("dk_step2CCeiling")} stepRef="3D" type="2"
                                                 required={requiredStep["3D"]}
                                                 stepSelected={stepSelectedLabel["3D"] === undefined ? "" : stepSelectedLabel["3D"]}/>
                         </Card.Header>
@@ -9034,9 +9183,9 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     
                     {/* step 4E*/}
                     <Card
-                        className={step3 === "true" && step31 === "false" && step3A !== "" && step3B !== "" && cartValues["Mount"] !== undefined && !(cartValues["Mount"] === "Ceiling" && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window")) && !(step3A === "Wall to Wall" && cartValues["Mount"] === "Ceiling") && (step3B === "Sill" || step3B === "Apron") ? "" : "noDisplay"}>
+                        className={step3 === "true" && step31 === "false" && step3A !== "" && step3B !== "" && step3A0 !== "" && !((step3A0 === "Ceiling" || step3A0 === "Moulding") && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window")) && !(step3A === "Wall to Wall" && (step3A0 === "Ceiling" || step3A0 === "Moulding")) && (step3B === "Sill" || step3B === "Apron") ? "" : "noDisplay"}>
                         <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
-                            <ContextAwareToggle eventKey="3E" stepNum={step3A === "Wall to Wall" ? t("4D") : t("4E")} stepTitle={t("dk_step2EWall")} stepRef="3E" type="2"
+                            <ContextAwareToggle eventKey="3E" stepNum={step3A === "Wall to Wall" ? t("4E") : t("4F")} stepTitle={t("dk_step2EWall")} stepRef="3E" type="2"
                                                 required={requiredStep["3E"]}
                                                 stepSelected={stepSelectedLabel["3E"] === undefined ? "" : stepSelectedLabel["3E"]}/>
                         </Card.Header>
@@ -9096,9 +9245,9 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     
                     {/* step 4EFloor */}
                     <Card
-                        className={step3 === "true" && step31 === "false" && step3A !== "" && step3B !== "" && cartValues["Mount"] !== undefined && !(cartValues["Mount"] === "Ceiling" && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window")) && !(step3A === "Wall to Wall" && cartValues["Mount"] === "Ceiling") && (step3B === "Floor" || step3B === "Slight Puddle") ? "" : "noDisplay"}>
+                        className={step3 === "true" && step31 === "false" && step3A !== "" && step3B !== "" && step3A0 !== "" && !((step3A0 === "Ceiling" || step3A0 === "Moulding") && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window")) && !(step3A === "Wall to Wall" && (step3A0 === "Ceiling" || step3A0 === "Moulding")) && (step3B === "Floor" || step3B === "Slight Puddle") ? "" : "noDisplay"}>
                         <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
-                            <ContextAwareToggle eventKey="3E" stepNum={step3A === "Wall to Wall" ? t("4D") : t("4E")} stepTitle={t("dk_step2DWall")} stepRef="3EFloor" type="2"
+                            <ContextAwareToggle eventKey="3E" stepNum={step3A === "Wall to Wall" ? t("4E") : t("4F")} stepTitle={t("dk_step2DWall")} stepRef="3EFloor" type="2"
                                                 required={requiredStep["3EFloor"]}
                                                 stepSelected={stepSelectedLabel["3EFloor"] === undefined ? "" : stepSelectedLabel["3EFloor"]}/>
                         </Card.Header>
@@ -9160,9 +9309,9 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     
                     {/* step 4EStandardCeiling */}
                     <Card
-                        className={step3 === "true" && step31 === "false" && (cartValues["Mount"] === "Ceiling" && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window") || (step3A === "Wall to Wall" && cartValues["Mount"] === "Ceiling")) && step3B !== "" && cartValues["Mount"] !== undefined && (step3B === "Sill" || step3B === "Apron") ? "" : "noDisplay"}>
+                        className={step3 === "true" && step31 === "false" && ((step3A0 === "Ceiling" || step3A0 === "Moulding") && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window") || (step3A === "Wall to Wall" && (step3A0 === "Ceiling" || step3A0 === "Moulding"))) && step3B !== "" && step3A0 !== "" && (step3B === "Sill" || step3B === "Apron") ? "" : "noDisplay"}>
                         <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
-                            <ContextAwareToggle eventKey="3E" stepNum={step3A === "Wall to Wall" ? t("4D") : t("4E")} stepTitle={t("dk_step2D_sill")}
+                            <ContextAwareToggle eventKey="3E" stepNum={step3A === "Wall to Wall" ? t("4E") : t("4F")} stepTitle={t("dk_step2D_sill")}
                                                 stepRef="3EStandardCeiling" type="2" required={requiredStep["3EStandardCeiling"]}
                                                 stepSelected={stepSelectedLabel["3EStandardCeiling"] === undefined ? "" : stepSelectedLabel["3EStandardCeiling"]}/>
                         </Card.Header>
@@ -9170,9 +9319,9 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                             <Card.Body>
                                 <div className="card_body">
                                     <div className="box100">
-                                        <p className="step_selection_title">{t("dk_step2D_title")}</p>
+                                        <p className="step_selection_title">{step3A0 === "Moulding"?t("arc_step2D_title"):t("dk_step2D_title")}</p>
                                         <img
-                                            src={pageLanguage === 'fa' ? require('../Images/drapery/dk/new_ceiling_to_window_3_fa.svg').default : require('../Images/drapery/dk/new_ceiling_to_window_3.svg').default}
+                                            src={pageLanguage === 'fa' ? (step3A0 === "Moulding"?require('../Images/drapery/dk/new_ceiling_to_window_3_arc_fa.svg').default:require('../Images/drapery/dk/new_ceiling_to_window_3_fa.svg').default) : (step3A0 === "Moulding"?require('../Images/drapery/dk/new_ceiling_to_window_3_arc.svg').default:require('../Images/drapery/dk/new_ceiling_to_window_3.svg').default)}
                                             className="img-fluid tall_curtain_image" alt=""/>
                                     </div>
                                     <div className="box100 Three_selection_container">
@@ -9302,9 +9451,9 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     
                     {/* step 4EStandardCeilingFloor */}
                     <Card
-                        className={step3 === "true" && step31 === "false" && (cartValues["Mount"] === "Ceiling" && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window") || (step3A === "Wall to Wall" && cartValues["Mount"] === "Ceiling")) && step3B !== "" && cartValues["Mount"] !== undefined && (step3B === "Floor" || step3B === "Slight Puddle") ? "" : "noDisplay"}>
+                        className={step3 === "true" && step31 === "false" && ((step3A0 === "Ceiling" || step3A0 === "Moulding") && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window") || (step3A === "Wall to Wall" && (step3A0 === "Ceiling" || step3A0 === "Moulding"))) && step3B !== "" && step3A0 !== "" && (step3B === "Floor" || step3B === "Slight Puddle") ? "" : "noDisplay"}>
                         <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
-                            <ContextAwareToggle eventKey="3E" stepNum={step3A === "Wall to Wall" ? t("4D") : t("4E")} stepTitle={t("dk_step2E")}
+                            <ContextAwareToggle eventKey="3E" stepNum={step3A === "Wall to Wall" ? t("4E") : t("4F")} stepTitle={t("dk_step2E")}
                                                 stepRef="3EStandardCeilingFloor" type="2" required={requiredStep["3EStandardCeilingFloor"]}
                                                 stepSelected={stepSelectedLabel["3EStandardCeilingFloor"] === undefined ? "" : stepSelectedLabel["3EStandardCeilingFloor"]}/>
                         </Card.Header>
@@ -9312,9 +9461,9 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                             <Card.Body>
                                 <div className="card_body">
                                     <div className="box100">
-                                        <p className="step_selection_title">{t("dk_step2E_title")}</p>
+                                        <p className="step_selection_title">{step3A0 === "Moulding"?t("arc_step2E_title"):t("dk_step2E_title")}</p>
                                         <img
-                                            src={pageLanguage === 'fa' ? require('../Images/drapery/dk/new_ceiling_to_floor_3_fa.svg').default : require('../Images/drapery/dk/new_ceiling_to_floor_3.svg').default}
+                                            src={pageLanguage === 'fa' ? (step3A0 === "Moulding"?require('../Images/drapery/dk/new_ceiling_to_floor_3_arc_fa.svg').default:require('../Images/drapery/dk/new_ceiling_to_floor_3_fa.svg').default) : (step3A0 === "Moulding"?require('../Images/drapery/dk/new_ceiling_to_floor_3_arc.svg').default:require('../Images/drapery/dk/new_ceiling_to_floor_3.svg').default)}
                                             className="img-fluid tall_curtain_image" alt=""/>
                                     </div>
                                     <div className="box100 Three_selection_container">
@@ -9444,9 +9593,9 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     
                     {/* step 4F */}
                     <Card
-                        className={step3 === "true" && step31 === "false" && step3A !== "" && step3B !== "" && cartValues["Mount"] !== undefined && !(cartValues["Mount"] === "Ceiling" && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window")) && !(step3A === "Wall to Wall" && cartValues["Mount"] === "Ceiling") ? "" : "noDisplay"}>
+                        className={step3 === "true" && step31 === "false" && step3A !== "" && step3B !== "" && step3A0 !== "" && !((step3A0 === "Ceiling" || step3A0 === "Moulding") && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window")) && !(step3A === "Wall to Wall" && (step3A0 === "Ceiling" || step3A0 === "Moulding")) ? "" : "noDisplay"}>
                         <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
-                            <ContextAwareToggle eventKey="3F" stepNum={step3A === "Wall to Wall" ? t("4E") : t("4F")} stepTitle={t("dk_step2FWall")} stepRef="3F" type="2"
+                            <ContextAwareToggle eventKey="3F" stepNum={step3A === "Wall to Wall" ? t("4F") : t("4G")} stepTitle={t("dk_step2FWall")} stepRef="3F" type="2"
                                                 required={requiredStep["3F"]}
                                                 stepSelected={stepSelectedLabel["3F"] === undefined ? "" : stepSelectedLabel["3F"]}/>
                         </Card.Header>
@@ -9519,9 +9668,9 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     
                     {/* step 4G*/}
                     <Card
-                        className={step3 === "true" && step31 === "false" && step3A !== "" && step3B !== "" && cartValues["Mount"] !== undefined && !(step3A === "Wall to" + " Wall" && cartValues["Mount"] === "Ceiling") && !(cartValues["Mount"] === "Ceiling" && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window")) ? "" : "noDisplay"}>
+                        className={step3 === "true" && step31 === "false" && step3A !== "" && step3B !== "" && step3A0 !== "" && !(step3A === "Wall to Wall" && (step3A0 === "Ceiling" || step3A0 === "Moulding")) && !((step3A0 === "Ceiling" || step3A0 === "Moulding") && (step3A === "Standard" || step3A === "Left Corner Window" || step3A === "Right Corner Window")) ? "" : "noDisplay"}>
                         <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
-                            <ContextAwareToggle eventKey="3G" stepNum={step3A === "Wall to Wall" ? t("4F") : t("4G")} stepTitle={t("dk_step2FWall2")} stepRef="3G" type="2"
+                            <ContextAwareToggle eventKey="3G" stepNum={step3A === "Wall to Wall" ? t("4G") : t("4H")} stepTitle={t("dk_step2FWall2")} stepRef="3G" type="2"
                                                 required={requiredStep["3G"]}
                                                 stepSelected={stepSelectedLabel["3G"] === undefined ? "" : stepSelectedLabel["3G"]}/>
                         </Card.Header>
@@ -10211,6 +10360,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                     <div className="card_body_info_body">
                                         <p className="card_body_info_text">{cartValues["WidthCart"] === undefined && step5 === "" ? t("panel_type_text1") : (cartValues["WidthCart"] === undefined && step5 !== "" ? t("panel_type_text2") : t("panel_type_text3"))}</p>
                                     </div>
+                                    <NextStep currentStep="6" eventKey="7">{t("NEXT STEP")}</NextStep>
                                 </div>
                                 <div className={cartValues["WidthCart"] !== undefined && step5 !== "" ? "card_body card_body_radio" : "noDisplay"}>
                                     <div className="box33 radio_style">
@@ -10218,12 +10368,12 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                checked={step6 === "Same Style For All Curtains"}
                                                onChange={e => {
                                                    setStep6("Same Style For All Curtains");
-                                                   setStep6A1("");
-                                                   setStep6B1("");
-                                                   setStep6C1("");
+                                                   setStep6A("");
+                                                   setStep6B("");
+                                                   setStep6C("");
                                                    selectChanged(e);
-                                                   setDeps("61", "6,6A1,6B1,6C1");
-                                                   setCart("PanelTypeOption", "Same Style For All Curtains");
+                                                   setDeps("61", "6,6A,6B,6C");
+                                                   setCart("PanelTypeOption", "Same Style For All Curtains","PanelTypeA,PanelTypeB,PanelTypeC");
                                                }} ref={ref => (inputs.current["61"] = ref)}/>
                                         <label htmlFor="61">{t("PanelType1")}</label>
                                     </div>
@@ -10231,13 +10381,23 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         <input className="radio" type="radio" text={t("PanelType2")} value="2" name="step6" ref-num="6" id="62"
                                                checked={step6 === "Customize Style Per Curtain"}
                                                onChange={e => {
-                                                   setStep6("Customize Style Per Curtain");
-                                                   setStep6A1("");
-                                                   setStep6B1("");
-                                                   setStep6C1("");
-                                                   selectChanged(e);
-                                                   setDeps("6A1,6B1,6C1", "6,61");
-                                                   setCart("PanelTypeOption", "Customize Style Per Curtain");
+                                                   if (step2A === "" || step2B === "" || (step2B !== "None" && step2B1 === "") || (step2B !== "None" && step2C === "")) {
+                                                       setStep6("Same Style For All Curtains");
+                                                       setStep6A("");
+                                                       setStep6B("");
+                                                       setStep6C("");
+                                                       modalHandleShow("noPrivacyLayer");
+                                                       setDeps("", "6A,6B,6C");
+                                                   } else {
+                                                       setStep6("Customize Style Per Curtain");
+                                                       setStep61("");
+                                                       setStep6A("");
+                                                       setStep6B("");
+                                                       setStep6C("");
+                                                       selectChanged(e);
+                                                       setDeps("6A,6B,6C", "6,61");
+                                                       setCart("PanelTypeOption", "Customize Style Per Curtain","PanelType");
+                                                   }
                                                }} ref={ref => (inputs.current["62"] = ref)}/>
                                         <label htmlFor="62">{t("PanelType2")}</label>
                                     </div>
@@ -10274,11 +10434,26 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                }} ref={ref => (inputs.current["612"] = ref)}/>
                                         <label htmlFor="612">{t("Single Panel, Right")}</label>
                                     </div>
-                                    <div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 160 ? (parseInt(cartValues["WidthCart"]) > 320 ? "box33 radio_style" : "box33 radio_style radio_recommended") : "box33 radio_style") : "box33 radio_style"}>
+                                    <div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 160 && parseInt(cartValues["WidthCart"]) <= 320 ? "box33 radio_style" : "noDisplay") : "noDisplay"}>
+                                        <img
+                                            src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_free_hanging.svg').default : require('../Images/drapery/grommet/panel_type_free_hanging.svg').default}
+                                            className="img-fluid height_auto" alt=""/>
+                                        <input className="radio" type="radio" text={t("Free Hanging")} value="3" name="step61" ref-num="6" id="613"
+                                               checked={step61 === "Free Hanging"}
+                                               onChange={e => {
+                                                   setStep61("Free Hanging");
+                                                   setDeps("", "61");
+                                                   setCart("PanelType", "Free Hanging");
+                                                   selectChanged(e);
+                                               }} ref={ref => (inputs.current["613"] = ref)}/>
+                                        <label htmlFor="613">{t("Free Hanging")}</label>
+                                        <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
+                                    </div>
+                                    <div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 160 ? (parseInt(cartValues["WidthCart"]) > 320 ? "noDisplay" : "box33 radio_style radio_recommended") : "box33 radio_style") : "box33 radio_style"}>
                                         <img
                                             src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_both.svg').default : require('../Images/drapery/grommet/panel_type_both.svg').default}
                                             className="img-fluid height_auto" alt=""/>
-                                        <input className="radio" type="radio" text={t("Pair, Split Draw")} value="3" name="step61" ref-num="6" id="613"
+                                        <input className="radio" type="radio" text={t("Pair, Split Draw")} value="4" name="step61" ref-num="6" id="614"
                                                checked={step61 === "Pair, Split Draw"}
                                                onChange={e => {
                                                    setStep61("Pair, Split Draw");
@@ -10288,42 +10463,41 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    if (step5 === "Full" && parseInt(cartValues["WidthCart"]) > 320) {
                                                        modalHandleShow("panelTypeWarning");
                                                    }
-                                               }} ref={ref => (inputs.current["613"] = ref)}/>
-                                        <label htmlFor="613">{t("Pair, Split Draw")}</label>
+                                               }} ref={ref => (inputs.current["614"] = ref)}/>
+                                        <label htmlFor="614">{t("Pair, Split Draw")}</label>
                                         <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
                                     </div>
-                                    <div
-                                        className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 320 ? "box33 radio_style radio_recommended" : "noDisplay") : "noDisplay"}>
+                                    <div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 320 ? "box33 radio_style" : "noDisplay") : "noDisplay"}>
+                                        <img
+                                            src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_three.svg').default : require('../Images/drapery/grommet/panel_type_three.svg').default}
+                                            className="img-fluid height_auto" alt=""/>
+                                        <input className="radio" type="radio" text={t("Three Panel, Split Draw")} value="5" name="step61" ref-num="6" id="615"
+                                               checked={step61 === "Three Panel, Split Draw"}
+                                               onChange={e => {
+                                                   setStep61("Three Panel, Split Draw");
+                                                   setDeps("", "61");
+                                                   setCart("PanelType", "Three Panel, Split Draw");
+                                                   selectChanged(e);
+                                               }} ref={ref => (inputs.current["615"] = ref)}/>
+                                        <label htmlFor="615">{t("Three Panel, Split Draw")}</label>
+                                        <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
+                                    </div>
+                                    <div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 320 ? "box33 radio_style radio_recommended" : "noDisplay") : "noDisplay"}>
                                         <img
                                             src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_four.svg').default : require('../Images/drapery/grommet/panel_type_four.svg').default}
-                                            className="img-fluid height_auto width_max" alt=""/>
-                                        <input className="radio" type="radio" text={t("Four Panel, Split Draw")} value="4" name="step61" ref-num="6" id="614"
+                                            className="img-fluid height_auto" alt=""/>
+                                        <input className="radio" type="radio" text={t("Four Panel, Split Draw")} value="6" name="step61" ref-num="6" id="616"
                                                checked={step61 === "Four Panel, Split Draw"}
                                                onChange={e => {
                                                    setStep61("Four Panel, Split Draw");
                                                    setDeps("", "61");
                                                    setCart("PanelType", "Four Panel, Split Draw");
                                                    selectChanged(e);
-                                               }} ref={ref => (inputs.current["614"] = ref)}/>
-                                        <label htmlFor="614">{t("Four Panel, Split Draw")}</label>
+                                               }} ref={ref => (inputs.current["616"] = ref)}/>
+                                        <label htmlFor="616">{t("Four Panel, Split Draw")}</label>
                                         <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
                                     </div>
-                                    <div
-                                        className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 160 && parseInt(cartValues["WidthCart"]) <= 320 ? "box33 radio_style" : "noDisplay") : "noDisplay"}>
-                                        <img
-                                            src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_four.svg').default : require('../Images/drapery/grommet/panel_type_four.svg').default}
-                                            className="img-fluid height_auto width_max" alt=""/>
-                                        <input className="radio" type="radio" text={t("Free Hanging")} value="5" name="step61" ref-num="6" id="615"
-                                               checked={step61 === "Free Hanging"}
-                                               onChange={e => {
-                                                   setStep61("Free Hanging");
-                                                   setDeps("", "61");
-                                                   setCart("PanelType", "Free Hanging");
-                                                   selectChanged(e);
-                                               }} ref={ref => (inputs.current["615"] = ref)}/>
-                                        <label htmlFor="615">{t("Free Hanging")}</label>
-                                        <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
-                                    </div>
+                                    <NextStep currentStep="6" eventKey="7">{t("NEXT STEP")}</NextStep>
                                 </div>
                                 
                                 <div className={cartValues["WidthCart"] !== undefined && step5 !== "" && step6 === "Customize Style Per Curtain" ? "card_body_panel_type special_farsi_card_body" : "noDisplay"}>
@@ -10331,223 +10505,338 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         <div className="box100">
                                             <p className="step_selection_title">{t("Drapery Curtain Panel Type")}</p>
                                         </div>
-                                        <div className={parseInt(cartValues["WidthCart"]) < 320 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"}>
+                                        <div className={parseInt(cartValues["WidthCart"]) <= 160 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"}>
                                             <img
                                                 src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_left.svg').default : require('../Images/drapery/grommet/panel_type_left.svg').default}
                                                 className="img-fluid height_auto" alt=""/>
-                                            <input className="radio" type="radio" text={t("Single Panel, Left")} value="1" name="step6A1" ref-num="6" id="6A11"
-                                                   checked={step6A1 === "Single Panel, Left"}
+                                            <input className="radio" type="radio" text={t("Single Panel, Left")} value="1" name="step6A" ref-num="6" id="6A1"
+                                                   checked={step6A === "Single Panel, Left"}
                                                    onChange={e => {
-                                                       setStep6A1("Single Panel, Left");
-                                                       setDeps("", "6A1");
+                                                       setStep6A("Single Panel, Left");
+                                                       setDeps("", "6A");
                                                        setCart("PanelTypeA", "Single Panel, Left");
                                                        selectChanged(e);
-                                                       if (step5 === "Full" && parseInt(cartValues["WidthCart"]) >= 180) {
-                                                           modalHandleShow("panelTypeWarning");
-                                                       }
-                                                   }} ref={ref => (inputs.current["6A11"] = ref)}/>
-                                            <label htmlFor="6A11">{t("Single Panel, Left")}</label>
+                                                   }} ref={ref => (inputs.current["6A1"] = ref)}/>
+                                            <label htmlFor="6A1">{t("Single Panel, Left")}</label>
                                         </div>
-                                        <div className={parseInt(cartValues["WidthCart"]) < 320 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"}>
+                                        <div className={parseInt(cartValues["WidthCart"]) <= 160 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"}>
                                             <img
                                                 src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_right.svg').default : require('../Images/drapery/grommet/panel_type_right.svg').default}
                                                 className="img-fluid height_auto" alt=""/>
-                                            <input className="radio" type="radio" text={t("Single Panel, Right")} value="2" name="step6A1" ref-num="6" id="6A12"
-                                                   checked={step6A1 === "Single Panel, Right"}
+                                            <input className="radio" type="radio" text={t("Single Panel, Right")} value="2" name="step6A" ref-num="6" id="6A2"
+                                                   checked={step6A === "Single Panel, Right"}
                                                    onChange={e => {
-                                                       setStep6A1("Single Panel, Right");
-                                                       setDeps("", "6A1");
+                                                       setStep6A("Single Panel, Right");
+                                                       setDeps("", "6A");
                                                        setCart("PanelTypeA", "Single Panel, Right");
                                                        selectChanged(e);
-                                                       if (step5 === "Full" && parseInt(cartValues["WidthCart"]) >= 180) {
-                                                           modalHandleShow("panelTypeWarning");
-                                                       }
-                                                   }} ref={ref => (inputs.current["6A12"] = ref)}/>
-                                            <label htmlFor="6A12">{t("Single Panel, Right")}</label>
+                                                   }} ref={ref => (inputs.current["6A2"] = ref)}/>
+                                            <label htmlFor="6A2">{t("Single Panel, Right")}</label>
                                         </div>
-                                        <div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) >= 180 ? (parseInt(cartValues["WidthCart"]) > 320 ? "box33" + " radio_style" : "box33 radio_style radio_recommended") : "box33 radio_style") : "box33 radio_style"}>
+                                        <div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 160 && parseInt(cartValues["WidthCart"]) <= 320 ? "box33 radio_style" : "noDisplay") : "noDisplay"}>
+                                            <img
+                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_free_hanging.svg').default : require('../Images/drapery/grommet/panel_type_free_hanging.svg').default}
+                                                className="img-fluid height_auto" alt=""/>
+                                            <input className="radio" type="radio" text={t("Free Hanging")} value="3" name="step6A" ref-num="6" id="6A3"
+                                                   checked={step6A === "Free Hanging"}
+                                                   onChange={e => {
+                                                       setStep6A("Free Hanging");
+                                                       setDeps("", "6A");
+                                                       setCart("PanelTypeA", "Free Hanging");
+                                                       selectChanged(e);
+                                                   }} ref={ref => (inputs.current["6A3"] = ref)}/>
+                                            <label htmlFor="6A3">{t("Free Hanging")}</label>
+                                            <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
+                                        </div>
+                                        <div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 160 ? (parseInt(cartValues["WidthCart"]) > 320 ? "noDisplay" : "box33 radio_style radio_recommended") : "box33 radio_style") : "box33 radio_style"}>
                                             <img
                                                 src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_both.svg').default : require('../Images/drapery/grommet/panel_type_both.svg').default}
                                                 className="img-fluid height_auto" alt=""/>
-                                            <input className="radio" type="radio" text={t("Pair, Split Draw")} value="3" name="step6A1" ref-num="6" id="6A13"
-                                                   checked={step6A1 === "Pair, Split Draw"}
+                                            <input className="radio" type="radio" text={t("Pair, Split Draw")} value="4" name="step6A" ref-num="6A" id="6A4"
+                                                   checked={step6A === "Pair, Split Draw"}
                                                    onChange={e => {
-                                                       setStep6A1("Pair, Split Draw");
-                                                       setDeps("", "6A1");
+                                                       setStep6A("Pair, Split Draw");
+                                                       setDeps("", "6A");
                                                        setCart("PanelTypeA", "Pair, Split Draw");
                                                        selectChanged(e);
-                                                       if (step5 === "Full" && parseInt(cartValues["WidthCart"]) >= 320) {
+                                                       if (step5 === "Full" && parseInt(cartValues["WidthCart"]) > 320) {
                                                            modalHandleShow("panelTypeWarning");
                                                        }
-                                                   }} ref={ref => (inputs.current["6A13"] = ref)}/>
-                                            <label htmlFor="6A13">{t("Pair, Split Draw")}</label>
+                                                   }} ref={ref => (inputs.current["6A4"] = ref)}/>
+                                            <label htmlFor="6A4">{t("Pair, Split Draw")}</label>
                                             <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
                                         </div>
-                                        <div
-                                            className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) >= 320 ? "box33 radio_style radio_recommended" : "noDisplay") : "noDisplay"}>
+                                        <div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 320 ? "box33 radio_style" : "noDisplay") : "noDisplay"}>
+                                            <img
+                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_three.svg').default : require('../Images/drapery/grommet/panel_type_three.svg').default}
+                                                className="img-fluid height_auto" alt=""/>
+                                            <input className="radio" type="radio" text={t("Three Panel, Split Draw")} value="5" name="step6A" ref-num="6" id="6A5"
+                                                   checked={step6A === "Three Panel, Split Draw"}
+                                                   onChange={e => {
+                                                       setStep6A("Three Panel, Split Draw");
+                                                       setDeps("", "6A");
+                                                       setCart("PanelTypeA", "Three Panel, Split Draw");
+                                                       selectChanged(e);
+                                                   }} ref={ref => (inputs.current["6A5"] = ref)}/>
+                                            <label htmlFor="6A5">{t("Three Panel, Split Draw")}</label>
+                                            <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
+                                        </div>
+                                        <div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 320 ? "box33 radio_style radio_recommended" : "noDisplay") : "noDisplay"}>
                                             <img
                                                 src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_four.svg').default : require('../Images/drapery/grommet/panel_type_four.svg').default}
-                                                className="img-fluid height_auto width_max" alt=""/>
-                                            <input className="radio" type="radio" text={t("Four Panel, Split Draw")} value="4" name="step6A1" ref-num="6" id="6A14"
-                                                   checked={step6A1 === "Four Panel, Split Draw"}
+                                                className="img-fluid height_auto" alt=""/>
+                                            <input className="radio" type="radio" text={t("Four Panel, Split Draw")} value="6" name="step6A" ref-num="6" id="6A6"
+                                                   checked={step6A === "Four Panel, Split Draw"}
                                                    onChange={e => {
-                                                       setStep6A1("Four Panel, Split Draw");
-                                                       setDeps("", "6A1");
+                                                       setStep6A("Four Panel, Split Draw");
+                                                       setDeps("", "6A");
                                                        setCart("PanelTypeA", "Four Panel, Split Draw");
                                                        selectChanged(e);
-                                                   }} ref={ref => (inputs.current["6A14"] = ref)}/>
-                                            <label htmlFor="6A14">{t("Four Panel, Split Draw")}</label>
+                                                   }} ref={ref => (inputs.current["6A6"] = ref)}/>
+                                            <label htmlFor="6A6">{t("Four Panel, Split Draw")}</label>
                                             <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
                                         </div>
                                     </div>
                                     <div className="card_body card_body_radio Customize_Style_container">
                                         <div className="box100">
                                             <p className="step_selection_title">{t("Sheer Curtain Panel Type")}</p>
+                                            <div className="grommet_curtain_button_container">
+                                                <div className="dk_curtain_symmetric_buttons">
+                                                    <button className={`dk_curtain_symmetric_button_left btn ${step6BHead==="Rod" ? "dk_curtain_symmetric_button_on" : ""}`}
+                                                            onClick={() => {
+                                                                setStep6BHead("Rod");
+                                                                setStep6B("");
+                                                                setDeps("6B", "");
+                                                                setCart("", "", "PanelTypeB");
+                                                            }}>
+                                                        {t("Rod")}
+                                                    </button>
+                                                    <button className={`dk_curtain_symmetric_button_right btn ${step6BHead==="Track" ? "dk_curtain_symmetric_button_on" : ""}`}
+                                                            onClick={() => {
+                                                                setStep6BHead("Track");
+                                                                setStep6B("");
+                                                                setDeps("6B", "");
+                                                                setCart("", "", "PanelTypeB");
+                                                            }}>
+                                                        {t("Track")}
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className={parseInt(cartValues["WidthCart"]) < 320 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"}>
+                                        
+                                        <div className={step6BHead==="Rod" ?(parseInt(cartValues["WidthCart"]) <= 160 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"):"box33 radio_style"}>
                                             <img
                                                 src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_left.svg').default : require('../Images/drapery/grommet/panel_type_left.svg').default}
                                                 className="img-fluid height_auto" alt=""/>
-                                            <input className="radio" type="radio" text={t("Single Panel, Left")} value="1" name="step6B1" ref-num="6" id="6B11"
-                                                   checked={step6B1 === "Single Panel, Left"}
+                                            <input className="radio" type="radio" text={t("Single Panel, Left")} value="1" name="step6B" ref-num="6" id="6B1"
+                                                   checked={step6B === "Single Panel, Left"}
                                                    onChange={e => {
-                                                       setStep6B1("Single Panel, Left");
-                                                       setDeps("", "6B1");
+                                                       setStep6B("Single Panel, Left");
+                                                       setDeps("", "6B");
                                                        setCart("PanelTypeB", "Single Panel, Left");
                                                        selectChanged(e);
-                                                       if (step5 === "Full" && parseInt(cartValues["WidthCart"]) >= 180) {
-                                                           modalHandleShow("panelTypeWarning");
-                                                       }
-                                                   }} ref={ref => (inputs.current["6B11"] = ref)}/>
-                                            <label htmlFor="6B11">{t("Single Panel, Left")}</label>
+                                                   }} ref={ref => (inputs.current["6B1"] = ref)}/>
+                                            <label htmlFor="6B1">{t("Single Panel, Left")}</label>
                                         </div>
-                                        <div className={parseInt(cartValues["WidthCart"]) < 320 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"}>
+                                        <div className={step6BHead==="Rod" ?(parseInt(cartValues["WidthCart"]) <= 160 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"):"box33 radio_style"}>
                                             <img
                                                 src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_right.svg').default : require('../Images/drapery/grommet/panel_type_right.svg').default}
                                                 className="img-fluid height_auto" alt=""/>
-                                            <input className="radio" type="radio" text={t("Single Panel, Right")} value="2" name="step6B1" ref-num="6" id="6B12"
-                                                   checked={step6B1 === "Single Panel, Right"}
+                                            <input className="radio" type="radio" text={t("Single Panel, Right")} value="2" name="step6B" ref-num="6" id="6B2"
+                                                   checked={step6B === "Single Panel, Right"}
                                                    onChange={e => {
-                                                       setStep6B1("Single Panel, Right");
-                                                       setDeps("", "6B1");
+                                                       setStep6B("Single Panel, Right");
+                                                       setDeps("", "6B");
                                                        setCart("PanelTypeB", "Single Panel, Right");
                                                        selectChanged(e);
-                                                       if (step5 === "Full" && parseInt(cartValues["WidthCart"]) >= 180) {
-                                                           modalHandleShow("panelTypeWarning");
-                                                       }
-                                                   }} ref={ref => (inputs.current["6B12"] = ref)}/>
-                                            <label htmlFor="6B12">{t("Single Panel, Right")}</label>
+                                                   }} ref={ref => (inputs.current["6B2"] = ref)}/>
+                                            <label htmlFor="6B2">{t("Single Panel, Right")}</label>
                                         </div>
-                                        <div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) >= 180 ? (parseInt(cartValues["WidthCart"]) > 320 ? "box33" + " radio_style" : "box33 radio_style radio_recommended") : "box33 radio_style") : "box33 radio_style"}>
+                                        <div className={step6BHead==="Rod" ?(step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 160 && parseInt(cartValues["WidthCart"]) <= 320 ? "box33 radio_style" : "noDisplay") : "noDisplay"):"noDisplay"}>
+                                            <img
+                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_free_hanging.svg').default : require('../Images/drapery/grommet/panel_type_free_hanging.svg').default}
+                                                className="img-fluid height_auto" alt=""/>
+                                            <input className="radio" type="radio" text={t("Free Hanging")} value="3" name="step6B" ref-num="6" id="6B3"
+                                                   checked={step6B === "Free Hanging"}
+                                                   onChange={e => {
+                                                       setStep6B("Free Hanging");
+                                                       setDeps("", "6B");
+                                                       setCart("PanelTypeB", "Free Hanging");
+                                                       selectChanged(e);
+                                                   }} ref={ref => (inputs.current["6B3"] = ref)}/>
+                                            <label htmlFor="6B3">{t("Free Hanging")}</label>
+                                            <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
+                                        </div>
+                                        <div className={step6BHead==="Rod" ?(step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 160 ? (parseInt(cartValues["WidthCart"]) > 320 ? "noDisplay" : "box33 radio_style radio_recommended") : "box33 radio_style") : "box33 radio_style"):"box33 radio_style"}>
                                             <img
                                                 src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_both.svg').default : require('../Images/drapery/grommet/panel_type_both.svg').default}
                                                 className="img-fluid height_auto" alt=""/>
-                                            <input className="radio" type="radio" text={t("Pair, Split Draw")} value="3" name="step6B1" ref-num="6" id="6B13"
-                                                   checked={step6B1 === "Pair, Split Draw"}
+                                            <input className="radio" type="radio" text={t("Pair, Split Draw")} value="4" name="step6B" ref-num="6B" id="6B4"
+                                                   checked={step6B === "Pair, Split Draw"}
                                                    onChange={e => {
-                                                       setStep6B1("Pair, Split Draw");
-                                                       setDeps("", "6B1");
+                                                       setStep6B("Pair, Split Draw");
+                                                       setDeps("", "6B");
                                                        setCart("PanelTypeB", "Pair, Split Draw");
                                                        selectChanged(e);
-                                                       if (step5 === "Full" && parseInt(cartValues["WidthCart"]) >= 320) {
+                                                       if (step5 === "Full" && parseInt(cartValues["WidthCart"]) > 320) {
                                                            modalHandleShow("panelTypeWarning");
                                                        }
-                                                   }} ref={ref => (inputs.current["6B13"] = ref)}/>
-                                            <label htmlFor="6B13">{t("Pair, Split Draw")}</label>
+                                                   }} ref={ref => (inputs.current["6B4"] = ref)}/>
+                                            <label htmlFor="6B4">{t("Pair, Split Draw")}</label>
                                             <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
                                         </div>
-                                        <div
-                                            className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) >= 320 ? "box33 radio_style radio_recommended" : "noDisplay") : "noDisplay"}>
+                                        <div className={step6BHead==="Rod" ?(step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 320 ? "box33 radio_style" : "noDisplay") : "noDisplay"):"noDisplay"}>
+                                            <img
+                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_three.svg').default : require('../Images/drapery/grommet/panel_type_three.svg').default}
+                                                className="img-fluid height_auto" alt=""/>
+                                            <input className="radio" type="radio" text={t("Three Panel, Split Draw")} value="5" name="step6B" ref-num="6" id="6B5"
+                                                   checked={step6B === "Three Panel, Split Draw"}
+                                                   onChange={e => {
+                                                       setStep6B("Three Panel, Split Draw");
+                                                       setDeps("", "6B");
+                                                       setCart("PanelTypeB", "Three Panel, Split Draw");
+                                                       selectChanged(e);
+                                                   }} ref={ref => (inputs.current["6B5"] = ref)}/>
+                                            <label htmlFor="6B5">{t("Three Panel, Split Draw")}</label>
+                                            <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
+                                        </div>
+                                        <div className={step6BHead==="Rod" ?(step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 320 ? "box33 radio_style radio_recommended" : "noDisplay") : "noDisplay"):"noDisplay"}>
                                             <img
                                                 src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_four.svg').default : require('../Images/drapery/grommet/panel_type_four.svg').default}
-                                                className="img-fluid height_auto width_max" alt=""/>
-                                            <input className="radio" type="radio" text={t("Four Panel, Split Draw")} value="4" name="step6B1" ref-num="6" id="6B14"
-                                                   checked={step6B1 === "Four Panel, Split Draw"}
+                                                className="img-fluid height_auto" alt=""/>
+                                            <input className="radio" type="radio" text={t("Four Panel, Split Draw")} value="6" name="step6B" ref-num="6" id="6B6"
+                                                   checked={step6B === "Four Panel, Split Draw"}
                                                    onChange={e => {
-                                                       setStep6B1("Four Panel, Split Draw");
-                                                       setDeps("", "6B1");
+                                                       setStep6B("Four Panel, Split Draw");
+                                                       setDeps("", "6B");
                                                        setCart("PanelTypeB", "Four Panel, Split Draw");
                                                        selectChanged(e);
-                                                   }} ref={ref => (inputs.current["6B14"] = ref)}/>
-                                            <label htmlFor="6B14">{t("Four Panel, Split Draw")}</label>
+                                                   }} ref={ref => (inputs.current["6B6"] = ref)}/>
+                                            <label htmlFor="6B6">{t("Four Panel, Split Draw")}</label>
                                             <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
                                         </div>
                                     </div>
                                     <div className="card_body card_body_radio Customize_Style_container">
                                         <div className="box100">
                                             <p className="step_selection_title">{t("Privacy Layer Panel Type")}</p>
+                                            <div className="grommet_curtain_button_container">
+                                                <div className="dk_curtain_symmetric_buttons">
+                                                    <button className={`dk_curtain_symmetric_button_left btn ${step6CHead==="Rod" ? "dk_curtain_symmetric_button_on" : ""}`}
+                                                            onClick={() => {
+                                                                setStep6CHead("Rod");
+                                                                setStep6C("");
+                                                                setDeps("6C", "");
+                                                                setCart("", "", "PanelTypeC");
+                                                            }}>
+                                                        {t("Rod")}
+                                                    </button>
+                                                    <button className={`dk_curtain_symmetric_button_right btn ${step6CHead==="Track" ? "dk_curtain_symmetric_button_on" : ""}`}
+                                                            onClick={() => {
+                                                                setStep6CHead("Track");
+                                                                setStep6C("");
+                                                                setDeps("6C", "");
+                                                                setCart("", "", "PanelTypeC");
+                                                            }}>
+                                                        {t("Track")}
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className={parseInt(cartValues["WidthCart"]) < 320 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"}>
+                                        
+                                        <div className={step6CHead==="Rod" ?(parseInt(cartValues["WidthCart"]) <= 160 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"):"box33 radio_style"}>
                                             <img
                                                 src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_left.svg').default : require('../Images/drapery/grommet/panel_type_left.svg').default}
                                                 className="img-fluid height_auto" alt=""/>
-                                            <input className="radio" type="radio" text={t("Single Panel, Left")} value="1" name="step6C1" ref-num="6" id="6C11"
-                                                   checked={step6C1 === "Single Panel, Left"}
+                                            <input className="radio" type="radio" text={t("Single Panel, Left")} value="1" name="step6C" ref-num="6" id="6C1"
+                                                   checked={step6C === "Single Panel, Left"}
                                                    onChange={e => {
-                                                       setStep6C1("Single Panel, Left");
-                                                       setDeps("", "6C1");
+                                                       setStep6C("Single Panel, Left");
+                                                       setDeps("", "6C");
                                                        setCart("PanelTypeC", "Single Panel, Left");
                                                        selectChanged(e);
-                                                       if (step5 === "Full" && parseInt(cartValues["WidthCart"]) >= 180) {
-                                                           modalHandleShow("panelTypeWarning");
-                                                       }
-                                                   }} ref={ref => (inputs.current["6C11"] = ref)}/>
-                                            <label htmlFor="6C11">{t("Single Panel, Left")}</label>
+                                                   }} ref={ref => (inputs.current["6C1"] = ref)}/>
+                                            <label htmlFor="6C1">{t("Single Panel, Left")}</label>
                                         </div>
-                                        <div className={parseInt(cartValues["WidthCart"]) < 320 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"}>
+                                        <div className={step6CHead==="Rod" ?(parseInt(cartValues["WidthCart"]) <= 160 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"):"box33 radio_style"}>
                                             <img
                                                 src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_right.svg').default : require('../Images/drapery/grommet/panel_type_right.svg').default}
                                                 className="img-fluid height_auto" alt=""/>
-                                            <input className="radio" type="radio" text={t("Single Panel, Right")} value="2" name="step6C1" ref-num="6" id="6C12"
-                                                   checked={step6C1 === "Single Panel, Right"}
+                                            <input className="radio" type="radio" text={t("Single Panel, Right")} value="2" name="step6C" ref-num="6" id="6C2"
+                                                   checked={step6C === "Single Panel, Right"}
                                                    onChange={e => {
-                                                       setStep6C1("Single Panel, Right");
-                                                       setDeps("", "6C1");
+                                                       setStep6C("Single Panel, Right");
+                                                       setDeps("", "6C");
                                                        setCart("PanelTypeC", "Single Panel, Right");
                                                        selectChanged(e);
-                                                       if (step5 === "Full" && parseInt(cartValues["WidthCart"]) >= 180) {
-                                                           modalHandleShow("panelTypeWarning");
-                                                       }
-                                                   }} ref={ref => (inputs.current["6C12"] = ref)}/>
-                                            <label htmlFor="6C12">{t("Single Panel, Right")}</label>
+                                                   }} ref={ref => (inputs.current["6C2"] = ref)}/>
+                                            <label htmlFor="6C2">{t("Single Panel, Right")}</label>
                                         </div>
-                                        <div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) >= 180 ? (parseInt(cartValues["WidthCart"]) > 320 ? "box33" + " radio_style" : "box33 radio_style radio_recommended") : "box33 radio_style") : "box33 radio_style"}>
+                                        <div className={step6CHead==="Rod" ?(step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 160 && parseInt(cartValues["WidthCart"]) <= 320 ? "box33 radio_style" : "noDisplay") : "noDisplay"):"noDisplay"}>
+                                            <img
+                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_free_hanging.svg').default : require('../Images/drapery/grommet/panel_type_free_hanging.svg').default}
+                                                className="img-fluid height_auto" alt=""/>
+                                            <input className="radio" type="radio" text={t("Free Hanging")} value="3" name="step6C" ref-num="6" id="6C3"
+                                                   checked={step6C === "Free Hanging"}
+                                                   onChange={e => {
+                                                       setStep6C("Free Hanging");
+                                                       setDeps("", "6C");
+                                                       setCart("PanelTypeC", "Free Hanging");
+                                                       selectChanged(e);
+                                                   }} ref={ref => (inputs.current["6C3"] = ref)}/>
+                                            <label htmlFor="6C3">{t("Free Hanging")}</label>
+                                            <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
+                                        </div>
+                                        <div className={step6CHead==="Rod" ?(step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 160 ? (parseInt(cartValues["WidthCart"]) > 320 ? "noDisplay" : "box33 radio_style radio_recommended") : "box33 radio_style") : "box33 radio_style"):"box33 radio_style"}>
                                             <img
                                                 src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_both.svg').default : require('../Images/drapery/grommet/panel_type_both.svg').default}
                                                 className="img-fluid height_auto" alt=""/>
-                                            <input className="radio" type="radio" text={t("Pair, Split Draw")} value="3" name="step6C1" ref-num="6" id="6C13"
-                                                   checked={step6C1 === "Pair, Split Draw"}
+                                            <input className="radio" type="radio" text={t("Pair, Split Draw")} value="4" name="step6C" ref-num="6C" id="6C4"
+                                                   checked={step6C === "Pair, Split Draw"}
                                                    onChange={e => {
-                                                       setStep6C1("Pair, Split Draw");
-                                                       setDeps("", "6C1");
+                                                       setStep6C("Pair, Split Draw");
+                                                       setDeps("", "6C");
                                                        setCart("PanelTypeC", "Pair, Split Draw");
                                                        selectChanged(e);
-                                                       if (step5 === "Full" && parseInt(cartValues["WidthCart"]) >= 320) {
+                                                       if (step5 === "Full" && parseInt(cartValues["WidthCart"]) > 320) {
                                                            modalHandleShow("panelTypeWarning");
                                                        }
-                                                   }} ref={ref => (inputs.current["6C13"] = ref)}/>
-                                            <label htmlFor="6C13">{t("Pair, Split Draw")}</label>
+                                                   }} ref={ref => (inputs.current["6C4"] = ref)}/>
+                                            <label htmlFor="6C4">{t("Pair, Split Draw")}</label>
                                             <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
                                         </div>
-                                        <div
-                                            className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) >= 320 ? "box33 radio_style radio_recommended" : "noDisplay") : "noDisplay"}>
+                                        <div className={step6CHead==="Rod" ?(step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 320 ? "box33 radio_style" : "noDisplay") : "noDisplay"):"noDisplay"}>
+                                            <img
+                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_three.svg').default : require('../Images/drapery/grommet/panel_type_three.svg').default}
+                                                className="img-fluid height_auto" alt=""/>
+                                            <input className="radio" type="radio" text={t("Three Panel, Split Draw")} value="5" name="step6C" ref-num="6" id="6C5"
+                                                   checked={step6C === "Three Panel, Split Draw"}
+                                                   onChange={e => {
+                                                       setStep6C("Three Panel, Split Draw");
+                                                       setDeps("", "6C");
+                                                       setCart("PanelTypeC", "Three Panel, Split Draw");
+                                                       selectChanged(e);
+                                                   }} ref={ref => (inputs.current["6C5"] = ref)}/>
+                                            <label htmlFor="6C5">{t("Three Panel, Split Draw")}</label>
+                                            <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
+                                        </div>
+                                        <div className={step6CHead==="Rod" ?(step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 320 ? "box33 radio_style radio_recommended" : "noDisplay") : "noDisplay"):"noDisplay"}>
                                             <img
                                                 src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_four.svg').default : require('../Images/drapery/grommet/panel_type_four.svg').default}
-                                                className="img-fluid height_auto width_max" alt=""/>
-                                            <input className="radio" type="radio" text={t("Four Panel, Split Draw")} value="4" name="step6C1" ref-num="6" id="6C14"
-                                                   checked={step6C1 === "Four Panel, Split Draw"}
+                                                className="img-fluid height_auto" alt=""/>
+                                            <input className="radio" type="radio" text={t("Four Panel, Split Draw")} value="6" name="step6C" ref-num="6" id="6C6"
+                                                   checked={step6C === "Four Panel, Split Draw"}
                                                    onChange={e => {
-                                                       setStep6C1("Four Panel, Split Draw");
-                                                       setDeps("", "6C1");
+                                                       setStep6C("Four Panel, Split Draw");
+                                                       setDeps("", "6C");
                                                        setCart("PanelTypeC", "Four Panel, Split Draw");
                                                        selectChanged(e);
-                                                   }} ref={ref => (inputs.current["6C14"] = ref)}/>
-                                            <label htmlFor="6C14">{t("Four Panel, Split Draw")}</label>
+                                                   }} ref={ref => (inputs.current["6C6"] = ref)}/>
+                                            <label htmlFor="6C6">{t("Four Panel, Split Draw")}</label>
                                             <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
                                         </div>
+                                        <NextStep currentStep="6" eventKey="7">{t("NEXT STEP")}</NextStep>
                                     </div>
                                 </div>
-                                <NextStep currentStep="6" eventKey="7">{t("NEXT STEP")}</NextStep>
                                 {cartValues["WidthCart"] !== undefined && step5 !== "" && <div className="accordion_help">
                                     <div className="help_container">
                                         <div className="help_column help_left_column">
@@ -12595,7 +12884,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         
         <Modal dialogClassName={`noPower_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                show={modals["noPower"] === undefined ? false : modals["noPower"]}
-               onHide={() => modalHandleClose(" noPower")}>
+               onHide={() => modalHandleClose("noPower")}>
             <Modal.Header closeButton>
                 {/*<Modal.Title>Modal heading</Modal.Title>*/}
             </Modal.Header>
@@ -12604,7 +12893,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 
                 <br/>
                 <div className=" text_center">
-                    <button className=" btn btn-new-dark" onClick={() => modalHandleClose(" noPower")}>{t("CONTINUE")}</button>
+                    <button className=" btn btn-new-dark" onClick={() => modalHandleClose("noPower")}>{t("CONTINUE")}</button>
                 </div>
             </Modal.Body>
             {/*<Modal.Footer>*/}
@@ -12630,7 +12919,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         
         <Modal dialogClassName={`warning_modal2 bigSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                show={modals["panelTypeWarning"] === undefined ? false : modals["panelTypeWarning"]}
-               onHide={() => modalHandleClose(" panelTypeWarning")}>
+               onHide={() => modalHandleClose("panelTypeWarning")}>
             <Modal.Header closeButton>
                 {/*<Modal.Title>Modal heading</Modal.Title>*/}
             </Modal.Header>
@@ -12660,7 +12949,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         
         <Modal dialogClassName={`warning_modal2 bigSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                show={modals["SheerHeaderStyleWarning"] === undefined ? false : modals["SheerHeaderStyleWarning"]}
-               onHide={() => modalHandleClose(" SheerHeaderStyleWarning")}>
+               onHide={() => modalHandleClose("SheerHeaderStyleWarning")}>
             <Modal.Header closeButton>
                 {/*<Modal.Title>Modal heading</Modal.Title>*/}
             </Modal.Header>
@@ -12692,7 +12981,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         
         <Modal dialogClassName={`warning_modal2 bigSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                show={modals["SheerHeaderStyleWarning2"] === undefined ? false : modals["SheerHeaderStyleWarning2"]}
-               onHide={() => modalHandleClose(" SheerHeaderStyleWarning2")}>
+               onHide={() => modalHandleClose("SheerHeaderStyleWarning2")}>
             <Modal.Header closeButton>
                 {/*<Modal.Title>Modal heading</Modal.Title>*/}
             </Modal.Header>
@@ -12724,7 +13013,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         
         <Modal dialogClassName={`noInsideUnderstand_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                show={modals["noInsideUnderstand"] === undefined ? false : modals["noInsideUnderstand"]}
-               onHide={() => modalHandleClose(" noInsideUnderstand")}>
+               onHide={() => modalHandleClose("noInsideUnderstand")}>
             <Modal.Header closeButton>
                 {/*<Modal.Title>Modal heading</Modal.Title>*/}
             </Modal.Header>
@@ -12733,7 +13022,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 
                 {/*<br/>*/}
                 {/*<div className=" text_center">*/}
-                {/*    <button className=" btn btn-new-dark" onClick={() => modalHandleClose(" noMount")}>{t("CONTINUE")}</button>*/}
+                {/*    <button className=" btn btn-new-dark" onClick={() => modalHandleClose("noMount")}>{t("CONTINUE")}</button>*/}
                 {/*</div>*/}
             </Modal.Body>
             {/*<Modal.Footer>*/}
@@ -12758,7 +13047,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         
         <Modal dialogClassName={`noMount_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                show={modals["noPrivacyLayer"] === undefined ? false : modals["noPrivacyLayer"]}
-               onHide={() => modalHandleClose(" noPrivacyLayer")}>
+               onHide={() => modalHandleClose("noPrivacyLayer")}>
             <Modal.Header closeButton>
                 {/*<Modal.Title>Modal heading</Modal.Title>*/}
             </Modal.Header>
@@ -12767,7 +13056,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 
                 <br/>
                 <div className=" text_center">
-                    <button className=" btn btn-new-dark" onClick={() => modalHandleClose(" noPrivacyLayer")}>{t("CONTINUE")}</button>
+                    <button className=" btn btn-new-dark" onClick={() => modalHandleClose("noPrivacyLayer")}>{t("CONTINUE")}</button>
                 </div>
             </Modal.Body>
             {/*<Modal.Footer>*/}
@@ -12777,7 +13066,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         
         <Modal dialogClassName={`noMount_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                show={modals["noMeasurements"] === undefined ? false : modals["noMeasurements"]}
-               onHide={() => modalHandleClose(" noMeasurements")}>
+               onHide={() => modalHandleClose("noMeasurements")}>
             <Modal.Header closeButton>
                 {/*<Modal.Title>Modal heading</Modal.Title>*/}
             </Modal.Header>
@@ -12786,7 +13075,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 
                 <br/>
                 <div className=" text_center">
-                    <button className=" btn btn-new-dark" onClick={() => modalHandleClose(" noMeasurements")}>{t("CONTINUE")}</button>
+                    <button className=" btn btn-new-dark" onClick={() => modalHandleClose("noMeasurements")}>{t("CONTINUE")}</button>
                 </div>
             </Modal.Body>
             {/*<Modal.Footer>*/}
@@ -12796,7 +13085,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         
         <Modal dialogClassName={`noMount_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                show={modals["mountAllChange"] === undefined ? false : modals["mountAllChange"]}
-               onHide={() => modalHandleClose(" mountAllChange")}>
+               onHide={() => modalHandleClose("mountAllChange")}>
             <Modal.Header closeButton>
                 {/*<Modal.Title>Modal heading</Modal.Title>*/}
             </Modal.Header>
@@ -12805,7 +13094,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 
                 <br/>
                 <div className=" text_center">
-                    <button className=" btn btn-new-dark" onClick={() => modalHandleClose(" mountAllChange")}>{t("CONTINUE")}</button>
+                    <button className=" btn btn-new-dark" onClick={() => modalHandleClose("mountAllChange")}>{t("CONTINUE")}</button>
                 </div>
             </Modal.Body>
             {/*<Modal.Footer>*/}
@@ -12972,7 +13261,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                    setSelectedFile(undefined);
                    setSelectedFileName("");
                    setEditedFileName("");
-                   modalHandleClose(" uploadImg");
+                   modalHandleClose("uploadImg");
                    setDetailsShow(false)
                }}>
             <Modal.Header closeButton>
@@ -13065,7 +13354,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         <Modal dialogClassName={`upload_modal uploadPdf_modal mediumSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                show={modals["uploadPdf"] === undefined ? false : modals["uploadPdf"]}
                onHide={() => {
-                   modalHandleClose(" uploadPdf");
+                   modalHandleClose("uploadPdf");
                    setDetailsShow(false)
                }}>
             <Modal.Header closeButton>
@@ -13301,7 +13590,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         <Modal backdrop="static" keyboard={false} dialogClassName={`warning_modal bigSizeModal ${pageLanguage === 'fa' ? "font_farsi" : "font_en"}`}
                show={modals["heightDifferent"] === undefined ? false : modals["heightDifferent"]}
                onHide={() => {
-                   modalHandleClose(" heightDifferent");
+                   modalHandleClose("heightDifferent");
                }}>
             <Modal.Header>
                 {/*<div className="required"/>*/}

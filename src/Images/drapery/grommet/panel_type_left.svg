@@ -2,28 +2,30 @@
 <!-- Generator: Adobe Illustrator 18.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="433.9px" height="729px" viewBox="0 0 433.9 729" enable-background="new 0 0 433.9 729" xml:space="preserve">
+	 width="709.2px" height="729px" viewBox="0 0 709.2 729" enable-background="new 0 0 709.2 729" xml:space="preserve">
 <g>
-	<rect x="76.8" y="96.4" fill="#FFFFFF" stroke="#464545" stroke-width="3" width="280.2" height="389"/>
-	<rect x="99.9" y="119.5" fill="none" stroke="#464545" stroke-width="3" width="234" height="342.8"/>
-</g>
-<g>
-	<rect x="23.9" y="34.5" fill="#FFFFFF" stroke="#464545" stroke-width="1.7037" width="404.4" height="13"/>
-</g>
-<rect x="407.8" y="32.5" fill="#FFFFFF" stroke="#464545" stroke-width="1.5" width="24" height="17"/>
-<rect x="2.1" y="32.5" fill="#FFFFFF" stroke="#464545" stroke-width="1.5" width="24" height="17"/>
-<g>
-	<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9532" stroke-miterlimit="10" d="M246.1,674c0,0-7.7,8.2-15.6,8.3
-		c-7.9,0.1-14.6-7.3-14.6-7.3V52.4c0,0,4.9,0,15.1,0c10.2,0,15.1,0,15.1,0V674z"/>
-	<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9525" stroke-miterlimit="10" d="M215.9,675c-4.6-2.4-8.1,0.5-8.1,0.5
-		s-5.2,6.8-13.2,6.8s-13.2-7.3-13.2-7.3V52.4h34.5V675z"/>
-	<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9525" stroke-miterlimit="10" d="M181.4,675c-4.6-2.4-8.1,0.5-8.1,0.5
-		s-5.2,6.8-13.2,6.8s-13.2-7.3-13.2-7.3V52.4h34.5V675z"/>
-	<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9525" stroke-miterlimit="10" d="M146.9,675c-4.6-2.4-8.1,0.5-8.1,0.5
-		s-5.2,6.8-13.2,6.8s-13.2-7.3-13.2-7.3V52.4h34.5V675z"/>
-	<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9525" stroke-miterlimit="10" d="M112.4,675c-4.6-2.4-8.1,0.5-8.1,0.5
-		s-5.2,6.8-13.2,6.8S77.9,675,77.9,675V52.4h34.5V675z"/>
-	<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9525" stroke-miterlimit="10" d="M77.9,675c-4.6-2.4-8.1,0.5-8.1,0.5
-		s-5.2,6.8-13.2,6.8S43.4,675,43.4,675V52.4h34.5V675z"/>
+	<g>
+		<rect x="214.5" y="96.4" fill="#FFFFFF" stroke="#464545" stroke-width="3" width="280.2" height="389"/>
+		<rect x="237.6" y="119.5" fill="none" stroke="#464545" stroke-width="3" width="234" height="342.8"/>
+	</g>
+	<g>
+		<rect x="161.6" y="34.5" fill="#FFFFFF" stroke="#464545" stroke-width="1.7037" width="404.4" height="13"/>
+	</g>
+	<rect x="545.5" y="32.5" fill="#FFFFFF" stroke="#464545" stroke-width="1.5" width="24" height="17"/>
+	<rect x="139.7" y="32.5" fill="#FFFFFF" stroke="#464545" stroke-width="1.5" width="24" height="17"/>
+	<g>
+		<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9532" stroke-miterlimit="10" d="M383.7,674c0,0-7.7,8.2-15.6,8.3
+			c-7.9,0.1-14.6-7.3-14.6-7.3V52.4c0,0,4.9,0,15.1,0c10.2,0,15.1,0,15.1,0V674z"/>
+		<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9525" stroke-miterlimit="10" d="M353.5,675c-4.6-2.4-8.1,0.5-8.1,0.5
+			s-5.2,6.8-13.2,6.8S319,675,319,675V52.4h34.5V675z"/>
+		<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9525" stroke-miterlimit="10" d="M319,675c-4.6-2.4-8.1,0.5-8.1,0.5
+			s-5.2,6.8-13.2,6.8s-13.2-7.3-13.2-7.3V52.4H319V675z"/>
+		<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9525" stroke-miterlimit="10" d="M284.5,675c-4.6-2.4-8.1,0.5-8.1,0.5
+			s-5.2,6.8-13.2,6.8S250,675,250,675V52.4h34.5V675z"/>
+		<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9525" stroke-miterlimit="10" d="M250,675c-4.6-2.4-8.1,0.5-8.1,0.5
+			s-5.2,6.8-13.2,6.8s-13.2-7.3-13.2-7.3V52.4H250V675z"/>
+		<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9525" stroke-miterlimit="10" d="M215.5,675c-4.6-2.4-8.1,0.5-8.1,0.5
+			s-5.2,6.8-13.2,6.8S181,675,181,675V52.4h34.5V675z"/>
+	</g>
 </g>
 </svg>
