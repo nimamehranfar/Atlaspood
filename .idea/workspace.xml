@@ -2,25 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="200ae4a2-413a-4eda-9bd3-7e6393833ac7" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/grommet/panel_type_free_hanging.svg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Images/drapery/grommet/panel_type_three.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/doopsalta2.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/doopsalta2.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/jsLibraryMappings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jsLibraryMappings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/locales/en/translation.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/en/translation.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/locales/fa/translation.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/locales/fa/translation.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Components/AddressBook.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Components/AddressBook.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/grommet/panel_type_both.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/grommet/panel_type_both.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/grommet/panel_type_four.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/grommet/panel_type_four.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/grommet/panel_type_left.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/grommet/panel_type_left.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Images/drapery/grommet/panel_type_right.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/grommet/panel_type_right.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Images/drapery/grommet/panel_type_free_hanging.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/Images/drapery/grommet/panel_type_free_hanging.svg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Page Components/DK.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Page Components/DK.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Page Components/DK2.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Page Components/DK2.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Page Components/DualRoller.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Page Components/DualRoller.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Page Components/Grommet.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Page Components/Grommet.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Page Components/Grommet2.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Page Components/Grommet2.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Page Components/Grommet3.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Page Components/Grommet3.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Page Components/Roller.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Page Components/Roller.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Page Components/Zebra.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/Page Components/Zebra.js" afterDir="false" />
     </list>
@@ -695,6 +683,19 @@
       <workItem from="1691952319929" duration="6244000" />
       <workItem from="1692038052724" duration="2210000" />
       <workItem from="1692042932328" duration="83000" />
+      <workItem from="1692124380171" duration="6619000" />
+      <workItem from="1692214042182" duration="2090000" />
+      <workItem from="1692295851053" duration="2500000" />
+      <workItem from="1692471415270" duration="3316000" />
+      <workItem from="1692550496883" duration="4091000" />
+      <workItem from="1692647931675" duration="1436000" />
+      <workItem from="1692717422102" duration="4487000" />
+      <workItem from="1692820490422" duration="3866000" />
+      <workItem from="1692879973372" duration="3537000" />
+      <workItem from="1693082754959" duration="3199000" />
+      <workItem from="1693167005887" duration="3954000" />
+      <workItem from="1693256905118" duration="1012000" />
+      <workItem from="1693296005417" duration="5646000" />
     </task>
     <servers />
   </component>

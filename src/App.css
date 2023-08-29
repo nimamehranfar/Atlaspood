@@ -595,6 +595,7 @@ img, svg, object:not(.popover_camera):not(.intractable) {
 .mid_header {
     width: 95%;
     margin: auto;
+    user-select: none;
 }
 
 .mid_header .col-lg-12 {
@@ -836,6 +837,7 @@ img, svg, object:not(.popover_camera):not(.intractable) {
 .menu {
     position: relative;
     padding: 0 3em 0 3em;
+    user-select: none;
 }
 
 .menu ul {
@@ -2261,7 +2263,7 @@ span.model_info_price_off {
     /*padding-inline-end: 0.8125rem;*/
     /*padding-inline-start: 0.8125rem;*/
     margin-top: 1.1rem;
-    max-height: 27.5rem;
+    max-height: 20rem;
     overflow-y: scroll;
 }
 
@@ -2389,9 +2391,9 @@ span.model_info_price_off {
 .radio_style input[type="radio"].radio_checked + label::after {
     position: absolute;
     content: '';
-    top: 0.90625rem;
-    right: 0.25rem;
-    left: unset;
+    top: 0.71875rem;
+    left: 0.25rem;
+    right: unset;
     width: 0.5rem;
     height: 0.5rem;
     margin-top: -0.25rem;
@@ -2409,7 +2411,7 @@ span.model_info_price_off {
     text-align: initial;
     padding-inline-end: 0.8125rem;
     padding-inline-start: 0.8125rem;
-    margin: 0 0 0.625rem 0;
+    margin: 0 0 1.625rem 0;
 }
 
 .font_farsi .material_detail .material_traits {
@@ -7650,6 +7652,10 @@ h4 .accordion .cart_agree_measurement{
     font-weight: 500;
 }
 
+.grommet_curtain_button_container .dk_curtain_symmetric_button_left, .grommet_curtain_button_container .dk_curtain_symmetric_button_right{
+   font-size: 0.875rem;
+}
+
 .dk_curtain_symmetric_button_left {
     position: relative;
 }
@@ -9305,7 +9311,7 @@ height: 11.1875rem;
 
 .radio_recommended{
     position: relative;
-    margin-top: 3rem;
+    margin-top: 3rem !important;
 }
 
 .radio_recommended .radio_recommended_text{
@@ -9315,7 +9321,7 @@ height: 11.1875rem;
 .card_body_panel_type{
     padding: 1.0625rem 0;
     border-top: 0.09375rem solid #dedbd4;
-    margin: 0.7rem 1.125rem 0;
+    margin: 0.875rem 1.125rem 0;
     align-items: flex-end;
 }
 
@@ -9860,7 +9866,7 @@ height: 11.1875rem;
 
 .Customize_Style_container{
     padding: 1.0625rem 0 0;
-    margin: 0.7rem 0 0;
+    margin: 0.875rem 0 0;
     border-top: 0.09375rem solid #dedbd4;
     align-items: flex-end;
 }
@@ -9972,7 +9978,7 @@ height: 11.1875rem;
 }
 
 .fabric_design_border_checkbox_container .radio_style label::before {
-    border: 0.0625rem solid #000000;
+    border: 0.125rem solid #949494;
 }
 
 .accordion .card.card_little_margin{
@@ -9987,6 +9993,7 @@ height: 11.1875rem;
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-top: 1rem;
 }
 
 .card_body_panel_type .radio_style label{
@@ -10057,4 +10064,23 @@ height: 11.1875rem;
 
 .grommet_curtain_button_container{
     width: 10.9375rem;
+}
+
+.dk_curtain_symmetric_button_right.crossed{
+    pointer-events: none;
+    background: linear-gradient(to top right, rgba(0,0,0,0) 0%, rgba(0,0,0,0) calc(50% - 0.125rem), #d2d2d2 50%, rgba(0,0,0,0) calc(50% + 0.125rem), rgba(0,0,0,0) 100%);
+}
+
+.fabric_design_border_checkbox_container .radio_style input[type="radio"]:hover + label::after{
+    background: unset;
+}
+
+.fabric_design_border_checkbox_container .radio_style input[type="radio"].radio_checked + label::after{
+     background: #393736 !important;
+ }
+
+.card_body.card_body_info hr{
+    margin-inline-start: 0.8125rem;
+    margin-inline-end: 0.8125rem;
+    width: unset;
 }

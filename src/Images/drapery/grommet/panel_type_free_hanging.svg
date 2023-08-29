@@ -3,8 +3,10 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="710px" height="729px" viewBox="0 0 710 729" enable-background="new 0 0 710 729" xml:space="preserve">
-<rect x="175" y="96.4" fill="none" stroke="#464545" stroke-width="3" width="360" height="389"/>
-<rect x="199" y="119.5" fill="none" stroke="#464545" stroke-width="3.056" width="312" height="342.8"/>
+<g>
+	<rect x="195" y="96.4" fill="none" stroke="#464545" stroke-width="2.8284" width="320" height="389"/>
+	<rect x="216.3" y="119.5" fill="none" stroke="#464545" stroke-width="2.8813" width="277.4" height="342.8"/>
+</g>
 <g>
 	<g>
 		<g>
@@ -17,12 +19,12 @@
 <rect x="96" y="32.5" fill="#FFFFFF" stroke="#464545" stroke-width="1.5" width="24" height="17"/>
 <g>
 	<g>
-		<line fill="none" stroke="#464545" stroke-width="3.4305" x1="216.8" y1="220.7" x2="493.2" y2="220.7"/>
+		<line fill="none" stroke="#464545" stroke-width="3.1051" x1="229.9" y1="220" x2="480.1" y2="220"/>
 		<g>
-			<polygon fill="#464545" points="219.8,231 202,220.7 219.8,210.4 			"/>
+			<polygon fill="#464545" points="232.6,229.2 216.5,220 232.6,210.7 			"/>
 		</g>
 		<g>
-			<polygon fill="#464545" points="490.2,231 508,220.7 490.2,210.4 			"/>
+			<polygon fill="#464545" points="477.4,229.2 493.5,220 477.4,210.7 			"/>
 		</g>
 	</g>
 </g>

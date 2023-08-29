@@ -4990,12 +4990,15 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                     <h1 className="measure_input_label">{t("Width")}</h1>
                                                     <div className="measure_input_field_container">
                                                         <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
-                                                            if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                            if (e.keyCode === 13) {
+                                                                inputs.current["Height"].focus();
+                                                            }
+                                                            else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (width !== undefined && (width < 30 || width > 300) ? " measure_input_err" : "")} type="text"
-                                                                       name="width" value={NumToFa(`${width || ""}`, pageLanguage)}
-                                                                       onChange={(e) => {
+                                                                       name="width" value={NumToFa(`${width || ""}`, pageLanguage)} onChange={()=>{}}
+                                                                       onBlur={(e) => {
                                                                            let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
                                                                            newValue = isNaN(newValue) ? "" : newValue;
                                                                            if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 300) {
@@ -5024,13 +5027,13 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("Height")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput inputRef={ref => (inputs.current["Height"] = ref)} debounceTimeout={500} onKeyDown={(e) => {
                                                             if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (height !== undefined && (height < 30 || height > 400) ? " measure_input_err" : "")} type="text"
-                                                                       name="width" value={NumToFa(`${height || ""}`, pageLanguage)}
-                                                                       onChange={(e) => {
+                                                                       name="width" value={NumToFa(`${height || ""}`, pageLanguage)} onChange={()=>{}}
+                                                                       onBlur={(e) => {
                                                                            let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
                                                                            newValue = isNaN(newValue) ? "" : newValue;
                                                                            if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
@@ -5123,12 +5126,15 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                     <h1 className="measure_input_label">{t("step3AIn_A")}</h1>
                                                     <div className="measure_input_field_container">
                                                         <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
-                                                            if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                            if (e.keyCode === 13) {
+                                                                inputs.current["width2"].focus();
+                                                            }
+                                                            else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (width1 !== undefined && (width1 < 30 || width1 > 300) ? " measure_input_err" : "")} type="text"
-                                                                       name="width1" value={NumToFa(`${width1||""}`, pageLanguage)}
-                                                                       onChange={(e) => {
+                                                                       name="width1" value={NumToFa(`${width1||""}`, pageLanguage)} onChange={()=>{}}
+                                                                       onBlur={(e) => {
                                                                            let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
                                                                            newValue= isNaN(newValue)?"":newValue;
                                                                            if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 300) {
@@ -5158,13 +5164,16 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("step3AIn_B")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
-                                                            if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                        <DebounceInput inputRef={ref => (inputs.current["width2"] = ref)} debounceTimeout={500} onKeyDown={(e) => {
+                                                            if (e.keyCode === 13) {
+                                                                inputs.current["width2"].focus();
+                                                            }
+                                                            else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (width2 !== undefined && (width2 < 30 || width2 > 300) ? " measure_input_err" : "")} type="text"
-                                                                       name="width2" value={NumToFa(`${width2||""}`, pageLanguage)}
-                                                                       onChange={(e) => {
+                                                                       name="width2" value={NumToFa(`${width2||""}`, pageLanguage)} onChange={()=>{}}
+                                                                       onBlur={(e) => {
                                                                            let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
                                                                            newValue= isNaN(newValue)?"":newValue;
                                                                            if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 300) {
@@ -5194,13 +5203,13 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("step3AIn_C")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput inputRef={ref => (inputs.current["width3"] = ref)} debounceTimeout={500} onKeyDown={(e) => {
                                                             if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (width3 !== undefined && (width3 < 30 || width3 > 300) ? " measure_input_err" : "")} type="text"
-                                                                       name="width3" value={NumToFa(`${width3||""}`, pageLanguage)}
-                                                                       onChange={(e) => {
+                                                                       name="width3" value={NumToFa(`${width3||""}`, pageLanguage)} onChange={()=>{}}
+                                                                       onBlur={(e) => {
                                                                            let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
                                                                            newValue= isNaN(newValue)?"":newValue;
                                                                            if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 300) {
@@ -5270,8 +5279,8 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (height1 !== undefined && (height1 < 30 || height1 > 400) ? " measure_input_err" : "")} type="text"
-                                                                       name="height1" value={NumToFa(`${height1||""}`, pageLanguage)}
-                                                                       onChange={(e) => {
+                                                                       name="height1" value={NumToFa(`${height1||""}`, pageLanguage)} onChange={()=>{}}
+                                                                       onBlur={(e) => {
                                                                            let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
                                                                            newValue= isNaN(newValue)?"":newValue;
                                                                            if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
@@ -5306,8 +5315,8 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (height2 !== undefined && (height2 < 30 || height2 > 400) ? " measure_input_err" : "")} type="text"
-                                                                       name="height2" value={NumToFa(`${height2||""}`, pageLanguage)}
-                                                                       onChange={(e) => {
+                                                                       name="height2" value={NumToFa(`${height2||""}`, pageLanguage)} onChange={()=>{}}
+                                                                       onBlur={(e) => {
                                                                            let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
                                                                            newValue= isNaN(newValue)?"":newValue;
                                                                            if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
@@ -5342,8 +5351,8 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (height3 !== undefined && (height3 < 30 || height3 > 400) ? " measure_input_err" : "")} type="text"
-                                                                       name="height3" value={NumToFa(`${height3||""}`, pageLanguage)}
-                                                                       onChange={(e) => {
+                                                                       name="height3" value={NumToFa(`${height3||""}`, pageLanguage)} onChange={()=>{}}
+                                                                       onBlur={(e) => {
                                                                            let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
                                                                            newValue= isNaN(newValue)?"":newValue;
                                                                            if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
@@ -5413,8 +5422,8 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (width3A !== undefined && (width3A < 30 || width3A > 290) ? " measure_input_err" : "")} type="text"
-                                                                       name="width3A" value={NumToFa(`${width3A||""}`, pageLanguage)}
-                                                                       onChange={(e) => {
+                                                                       name="width3A" value={NumToFa(`${width3A||""}`, pageLanguage)} onChange={()=>{}}
+                                                                       onBlur={(e) => {
                                                                            let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
                                                                            newValue= isNaN(newValue)?"":newValue;
                                                                            if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 290) {
@@ -5479,15 +5488,18 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                     <h1 className="measure_input_label">{t("Left")}</h1>
                                                     <div className="measure_input_field_container">
                                                         <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
-                                                            if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                            if (e.keyCode === 13) {
+                                                                inputs.current["Right"].focus();
+                                                            }
+                                                            else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
-                                                        }} className={"measure_input" + (left !== undefined && (left < 1 || left > 10) ? " measure_input_err" : "")} type="text"
-                                                                       name="Left" value={NumToFa(`${left||""}`, pageLanguage)}
-                                                                       onChange={(e) => {
+                                                        }} className={"measure_input" + (left !== undefined && (left < 1 || left > 1000) ? " measure_input_err" : "")} type="text"
+                                                                       name="Left" value={NumToFa(`${left||""}`, pageLanguage)} onChange={()=>{}}
+                                                                       onBlur={(e) => {
                                                                            let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
                                                                            newValue= isNaN(newValue)?"":newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 10) {
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000) {
                                                                                setCartLoading(true);
                                                                                setCart("ExtensionLeft", parseInt(newValue));
                                                                                setDeps("", "3BOut1");
@@ -5514,16 +5526,16 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("Right")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput inputRef={ref => (inputs.current["Right"] = ref)} debounceTimeout={500} onKeyDown={(e) => {
                                                             if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
-                                                        }} className={"measure_input" + (right !== undefined && (right < 1 || right > 10) ? " measure_input_err" : "")} type="text"
-                                                                       name="Right" value={NumToFa(`${right||""}`, pageLanguage)}
-                                                                       onChange={(e) => {
+                                                        }} className={"measure_input" + (right !== undefined && (right < 1 || right > 1000) ? " measure_input_err" : "")} type="text"
+                                                                       name="Right" value={NumToFa(`${right||""}`, pageLanguage)} onChange={()=>{}}
+                                                                       onBlur={(e) => {
                                                                            let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
                                                                            newValue= isNaN(newValue)?"":newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 10) {
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000) {
                                                                                setCartLoading(true);
                                                                                setCart("ExtensionRight", parseInt(newValue));
                                                                                setDeps("", "3BOut2");
@@ -5590,8 +5602,8 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (height3C !== undefined && (height3C < 30 || height3C > 400) ? " measure_input_err" : "")} type="text"
-                                                                       name="height3C" value={NumToFa(`${height3C||""}`, pageLanguage)}
-                                                                       onChange={(e) => {
+                                                                       name="height3C" value={NumToFa(`${height3C||""}`, pageLanguage)} onChange={()=>{}}
+                                                                       onBlur={(e) => {
                                                                            let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
                                                                            newValue= isNaN(newValue)?"":newValue;
                                                                            if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
@@ -5646,12 +5658,15 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                     <h1 className="measure_input_label">{t("step3AIn_A")}</h1>
                                                     <div className="measure_input_field_container">
                                                         <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
-                                                            if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                            if (e.keyCode === 13) {
+                                                                inputs.current["ceilingToWindow2"].focus();
+                                                            }
+                                                            else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (ceilingToWindow1 !== undefined && (ceilingToWindow1 < 30 || ceilingToWindow1 > 400) ? " measure_input_err" : "")} type="text"
-                                                                       name="ceilingToWindow1" value={NumToFa(`${ceilingToWindow1||""}`, pageLanguage)}
-                                                                       onChange={(e) => {
+                                                                       name="ceilingToWindow1" value={NumToFa(`${ceilingToWindow1||""}`, pageLanguage)} onChange={()=>{}}
+                                                                       onBlur={(e) => {
                                                                            let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
                                                                            newValue= isNaN(newValue)?"":newValue;
                                                                            if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
@@ -5681,13 +5696,16 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("step3AIn_B")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
-                                                            if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                        <DebounceInput inputRef={ref => (inputs.current["ceilingToWindow2"] = ref)} debounceTimeout={500} onKeyDown={(e) => {
+                                                            if (e.keyCode === 13) {
+                                                                inputs.current["ceilingToWindow3"].focus();
+                                                            }
+                                                            else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (ceilingToWindow2 !== undefined && (ceilingToWindow2 < 30 || ceilingToWindow2 > 400) ? " measure_input_err" : "")} type="text"
-                                                                       name="ceilingToWindow2" value={NumToFa(`${ceilingToWindow2||""}`, pageLanguage)}
-                                                                       onChange={(e) => {
+                                                                       name="ceilingToWindow2" value={NumToFa(`${ceilingToWindow2||""}`, pageLanguage)} onChange={()=>{}}
+                                                                       onBlur={(e) => {
                                                                            let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
                                                                            newValue= isNaN(newValue)?"":newValue;
                                                                            if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
@@ -5717,13 +5735,13 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("step3AIn_C")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput inputRef={ref => (inputs.current["ceilingToWindow3"] = ref)} debounceTimeout={500} onKeyDown={(e) => {
                                                             if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (ceilingToWindow3 !== undefined && (ceilingToWindow3 < 30 || ceilingToWindow3 > 400) ? " measure_input_err" : "")} type="text"
-                                                                       name="ceilingToWindow3" value={NumToFa(`${ceilingToWindow3||""}`, pageLanguage)}
-                                                                       onChange={(e) => {
+                                                                       name="ceilingToWindow3" value={NumToFa(`${ceilingToWindow3||""}`, pageLanguage)} onChange={()=>{}}
+                                                                       onBlur={(e) => {
                                                                            let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
                                                                            newValue= isNaN(newValue)?"":newValue;
                                                                            if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
@@ -5826,8 +5844,8 @@ function Roller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Quer
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (mount !== undefined && (mount < 10 || mount > 100) ? " measure_input_err" : "")} type="text"
-                                                                       name="mount" value={NumToFa(`${mount||""}`, pageLanguage)}
-                                                                       onChange={(e) => {
+                                                                       name="mount" value={NumToFa(`${mount||""}`, pageLanguage)} onChange={()=>{}}
+                                                                       onBlur={(e) => {
                                                                            let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
                                                                            newValue= isNaN(newValue)?"":newValue;
                                                                            if (newValue && newValue !== "" && parseInt(newValue) >= 10 && parseInt(newValue) <= 100) {
