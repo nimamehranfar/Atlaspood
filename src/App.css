@@ -566,10 +566,10 @@ img, svg, object:not(.popover_camera):not(.intractable) {
     text-align: center;
     font-size: 0.688rem;
     height: 2.438rem;
-    transition: height 0.6s ease-in-out;
-    -webkit-transition: height 0.6s ease-in-out;
-    -moz-transition: height 0.6s ease-in-out;
-    -o-transition: height 0.6s ease-in-out;
+    transition: height 0.6s ease-out;
+    -webkit-transition: height 0.6s ease-out;
+    -moz-transition: height 0.6s ease-out;
+    -o-transition: height 0.6s ease-out;
 }
 
 .top_title {
@@ -605,10 +605,10 @@ img, svg, object:not(.popover_camera):not(.intractable) {
     height: 6rem;
     align-content: space-between;
     align-items: center;
-    -webkit-transition: height 0.6s ease-in-out;
-    -moz-transition: height 0.6s ease-in-out;
-    -o-transition: height 0.6s ease-in-out;
-    transition: height 0.6s ease-in-out;
+    -webkit-transition: height 0.6s ease-out;
+    -moz-transition: height 0.6s ease-out;
+    -o-transition: height 0.6s ease-out;
+    transition: height 0.6s ease-out;
 }
 
 .mid_header_left {
@@ -621,10 +621,10 @@ img, svg, object:not(.popover_camera):not(.intractable) {
 
 .Logo {
     width: 20rem;
-    -webkit-transition: width 0.3s ease-in-out;
-    -moz-transition: width 0.3s ease-in-out;
-    -o-transition: width 0.3s ease-in-out;
-    transition: width 0.3s ease-in-out;
+    -webkit-transition: width 0.3s ease-out;
+    -moz-transition: width 0.3s ease-out;
+    -o-transition: width 0.3s ease-out;
+    transition: width 0.3s ease-out;
 }
 
 .Logo svg{
@@ -671,7 +671,7 @@ img, svg, object:not(.popover_camera):not(.intractable) {
     letter-spacing: 0.056rem;
     outline: none;
     border-radius: 0;
-    transition: all 0.5s ease-in-out;
+    transition: all 0.5s ease-out;
     color: #49443e;
     margin-bottom: -0.188rem;
 }
@@ -9257,6 +9257,11 @@ height: 11.1875rem;
     height: max-content;
 }
 
+.card-body .card_body.card_body_radio_medium_img .radio_style img{
+    width: 10rem;
+    height: max-content;
+}
+
 .card_body.card_body_info{
     padding-top: 0;
 }
@@ -9329,10 +9334,19 @@ height: 11.1875rem;
     max-height: 50rem;
     padding-inline-start: 0.8125rem;
     padding-inline-end: 0.8125rem;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 .card_body_hardware>.box33{
     /*width: 33%;*/
+    max-width: 100%;
+    padding-inline-start: 3.5625rem;
+}
+
+.card_body_hardware>.box50{
+    max-width: 100%;
+    padding-inline-start: 3.5625rem;
 }
 
 .card_body_hardware .step_selection_title{
@@ -9519,8 +9533,13 @@ height: 11.1875rem;
     width: 50%;
 }
 
-.select_container.disabled, .select_label.disabled {
+.select_container.disabled, .select_label.disabled , .measure_input_container.disabled {
     opacity: 0.7;
+}
+
+.measure_input_container.disabled input{
+    pointer-events: none;
+    user-select: none;
 }
 
 .card_body_4_grommet .selection_section .select_container{
@@ -10001,7 +10020,11 @@ height: 11.1875rem;
 }
 
 .card_body_panel_type .radio_style img {
-    width: 11rem !important;
+    width: 9.375rem !important;
+}
+
+.card_body_panel_type .radio_style.box50 img {
+    width: 15.0625rem !important;
 }
 
 .measure_input_container {

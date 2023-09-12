@@ -4055,6 +4055,36 @@
         ]
       },
       {
+        "cart": "Depth",
+        "title": "Depth",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "Depth",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "MouldingHeight",
+        "title": "MouldingHeight",
+        "titleValue": null,
+        "titlePostfix": "cm",
+        "order": -1,
+        "apiLabel": "MouldingHeight",
+        "apiValue": null,
+        "measurements": true,
+        "lang": [
+          "en",
+          "en",
+          "fa"
+        ]
+      },
+      {
         "cart": "Width",
         "title": "Width",
         "titleValue": null,
@@ -4536,6 +4566,45 @@
         "titlePostfix": "",
         "order": 18,
         "apiLabel": "PanelType",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "PanelTypeA",
+        "title": "Panel TypeA",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "PanelTypeA",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "PanelTypeB",
+        "title": "Panel TypeB",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "PanelTypeB",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "PanelTypeC",
+        "title": "Panel TypeC",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "PanelTypeC",
         "apiValue": null,
         "lang": [
           "en",

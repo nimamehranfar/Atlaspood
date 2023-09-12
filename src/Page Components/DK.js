@@ -5735,35 +5735,35 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("Width")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                             if (e.keyCode === 13) {
                                                                 inputs.current["Height"].focus();
-                                                            }
-                                                            else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                            } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (width !== undefined && (width < 30 || width > 300) ? " measure_input_err" : "")} type="text"
-                                                                       name="width" value={NumToFa(`${width || ""}`, pageLanguage)} onChange={() => {
-                                                        }}
-                                                                       onBlur={(e) => {
-                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                           newValue = isNaN(newValue) ? "" : newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 300) {
-                                                                               setCartLoading(true);
-                                                                               setCart("Width", parseInt(newValue));
-                                                                               setDeps("", "21");
-                                                                               setWidth(parseInt(newValue));
-                                                                           } else {
-                                                                               setCartLoading(true);
-                                                                               setCart("", "", "Width");
-                                                                               setDeps("21", "");
-                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                                   setWidth(undefined);
-                                                                               } else {
+                                                                       name="width" value={NumToFa(`${width || ""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           setTimeout(() => {
+                                                                               let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                               newValue = isNaN(newValue) ? "" : newValue;
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 300) {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("Width", parseInt(newValue));
+                                                                                   setDeps("", "21");
                                                                                    setWidth(parseInt(newValue));
+                                                                               } else {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("", "", "Width");
+                                                                                   setDeps("21", "");
+                                                                                   if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                       setWidth(undefined);
+                                                                                   } else {
+                                                                                       setWidth(parseInt(newValue));
+                                                                                   }
+                                                                                   setWindowSize("");
                                                                                }
-                                                                               setWindowSize("");
-                                                                           }
+                                                                           }, 300);
                                                                        }}/>
                                                         <div className="measure_input_postfix">{t("cm_label")}</div>
                                                     </div>
@@ -5779,27 +5779,28 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (height !== undefined && (height < 30 || height > 400) ? " measure_input_err" : "")} type="text"
-                                                                       name="width" value={NumToFa(`${height || ""}`, pageLanguage)} onChange={() => {
-                                                        }}
-                                                                       onBlur={(e) => {
-                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                           newValue = isNaN(newValue) ? "" : newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
-                                                                               setCartLoading(true);
-                                                                               setCart("Height", parseInt(newValue));
-                                                                               setDeps("", "22");
-                                                                               setHeight(parseInt(newValue));
-                                                                           } else {
-                                                                               setCartLoading(true);
-                                                                               setCart("", "", "Height");
-                                                                               setDeps("22", "");
-                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                                   setHeight(undefined);
-                                                                               } else {
+                                                                       name="width" value={NumToFa(`${height || ""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           setTimeout(() => {
+                                                                               let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                               newValue = isNaN(newValue) ? "" : newValue;
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("Height", parseInt(newValue));
+                                                                                   setDeps("", "22");
                                                                                    setHeight(parseInt(newValue));
+                                                                               } else {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("", "", "Height");
+                                                                                   setDeps("22", "");
+                                                                                   if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                       setHeight(undefined);
+                                                                                   } else {
+                                                                                       setHeight(parseInt(newValue));
+                                                                                   }
+                                                                                   setWindowSize("");
                                                                                }
-                                                                               setWindowSize("");
-                                                                           }
+                                                                           }, 300);
                                                                        }}/>
                                                         <div className="measure_input_postfix">{t("cm_label")}</div>
                                                     </div>
@@ -5808,7 +5809,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                             </div>
                                         </div>
                                         
-                                        <NextStep currentStep="2" eventKey={measurementsNextStep} onClick={()=>
+                                        <NextStep currentStep="2" eventKey={measurementsNextStep} onClick={() =>
                                             console.log("click1")}>{t("NEXT STEP")}</NextStep>
                                     </div>
                                     
@@ -6036,33 +6037,34 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("Width")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                             if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (width2B !== undefined && (width2B < 30 || width2B > 290) ? " measure_input_err" : "")} type="text"
-                                                                       name="Width2B" value={NumToFa(`${width2B || ""}`, pageLanguage)} onChange={() => {
-                                                        }}
-                                                                       onBlur={(e) => {
-                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                           newValue = isNaN(newValue) ? "" : newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 290) {
-                                                                               setCartLoading(true);
-                                                                               setCart("Width2B", parseInt(newValue));
-                                                                               setDeps("", "2B");
-                                                                               setWidth2B(parseInt(newValue));
-                                                                               optionSelectChanged("2B", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
-                                                                           } else {
-                                                                               setCartLoading(true);
-                                                                               setCart("", "", "Width2B");
-                                                                               setDeps("2B", "");
-                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                                   setWidth2B(undefined);
-                                                                               } else {
+                                                                       name="Width2B" value={NumToFa(`${width2B || ""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           setTimeout(() => {
+                                                                               let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                               newValue = isNaN(newValue) ? "" : newValue;
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 290) {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("Width2B", parseInt(newValue));
+                                                                                   setDeps("", "2B");
                                                                                    setWidth2B(parseInt(newValue));
+                                                                                   optionSelectChanged("2B", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
+                                                                               } else {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("", "", "Width2B");
+                                                                                   setDeps("2B", "");
+                                                                                   if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                       setWidth2B(undefined);
+                                                                                   } else {
+                                                                                       setWidth2B(parseInt(newValue));
+                                                                                   }
+                                                                                   selectChanged(undefined, "2B");
                                                                                }
-                                                                               selectChanged(undefined, "2B");
-                                                                           }
+                                                                           }, 300);
                                                                        }}/>
                                                         <div className="measure_input_postfix">{t("cm_label")}</div>
                                                     </div>
@@ -6184,36 +6186,36 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("Left")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                             if (e.keyCode === 13) {
                                                                 inputs.current["Right"].focus();
-                                                            }
-                                                            else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                            } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (left !== undefined && (left < 1 || left > 1000) ? " measure_input_err" : "")} type="text"
-                                                                       name="Left" value={NumToFa(`${left || ""}`, pageLanguage)} onChange={() => {
-                                                        }}
-                                                                       onBlur={(e) => {
-                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                           newValue = isNaN(newValue) ? "" : newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000) {
-                                                                               setCartLoading(true);
-                                                                               setCart("ExtensionLeft", parseInt(newValue));
-                                                                               setDeps("", "2C1");
-                                                                               setLeft(parseInt(newValue));
-                                                                               optionSelectChanged_LeftRight(parseInt(newValue), "2C", true, "cm", "س\u200Cم", pageLanguage);
-                                                                           } else {
-                                                                               setCartLoading(true);
-                                                                               setCart("", "", "ExtensionLeft");
-                                                                               setDeps("2C1", "");
-                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                                   setLeft(undefined);
-                                                                               } else {
+                                                                       name="Left" value={NumToFa(`${left || ""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           setTimeout(() => {
+                                                                               let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                               newValue = isNaN(newValue) ? "" : newValue;
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000) {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("ExtensionLeft", parseInt(newValue));
+                                                                                   setDeps("", "2C1");
                                                                                    setLeft(parseInt(newValue));
+                                                                                   optionSelectChanged_LeftRight(parseInt(newValue), "2C", true, "cm", "س\u200Cم", pageLanguage);
+                                                                               } else {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("", "", "ExtensionLeft");
+                                                                                   setDeps("2C1", "");
+                                                                                   if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                       setLeft(undefined);
+                                                                                   } else {
+                                                                                       setLeft(parseInt(newValue));
+                                                                                   }
+                                                                                   selectChanged(undefined, "2C");
                                                                                }
-                                                                               selectChanged(undefined, "2C");
-                                                                           }
+                                                                           }, 300);
                                                                        }}/>
                                                         <div className="measure_input_postfix">{t("cm_label")}</div>
                                                     </div>
@@ -6229,28 +6231,29 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (right !== undefined && (right < 1 || right > 1000) ? " measure_input_err" : "")} type="text"
-                                                                       name="Right" value={NumToFa(`${right || ""}`, pageLanguage)} onChange={() => {
-                                                        }}
-                                                                       onBlur={(e) => {
-                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                           newValue = isNaN(newValue) ? "" : newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000) {
-                                                                               setCartLoading(true);
-                                                                               setCart("ExtensionRight", parseInt(newValue));
-                                                                               setDeps("", "2C2");
-                                                                               setRight(parseInt(newValue));
-                                                                               optionSelectChanged_LeftRight(parseInt(newValue), "2C", false, "cm", "س\u200Cم", pageLanguage);
-                                                                           } else {
-                                                                               setCartLoading(true);
-                                                                               setCart("", "", "ExtensionRight");
-                                                                               setDeps("2C2", "");
-                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                                   setRight(undefined);
-                                                                               } else {
+                                                                       name="Right" value={NumToFa(`${right || ""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           setTimeout(() => {
+                                                                               let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                               newValue = isNaN(newValue) ? "" : newValue;
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000) {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("ExtensionRight", parseInt(newValue));
+                                                                                   setDeps("", "2C2");
                                                                                    setRight(parseInt(newValue));
+                                                                                   optionSelectChanged_LeftRight(parseInt(newValue), "2C", false, "cm", "س\u200Cم", pageLanguage);
+                                                                               } else {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("", "", "ExtensionRight");
+                                                                                   setDeps("2C2", "");
+                                                                                   if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                       setRight(undefined);
+                                                                                   } else {
+                                                                                       setRight(parseInt(newValue));
+                                                                                   }
+                                                                                   selectChanged(undefined, "2C");
                                                                                }
-                                                                               selectChanged(undefined, "2C");
-                                                                           }
+                                                                           }, 300);
                                                                        }}/>
                                                         <div className="measure_input_postfix">{t("cm_label")}</div>
                                                     </div>
@@ -6387,36 +6390,36 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("Left")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                             if (e.keyCode === 13) {
                                                                 inputs.current["Right1"].focus();
-                                                            }
-                                                            else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                            } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (left !== undefined && (left < 1 || left > 1000) ? " measure_input_err" : "")} type="text"
-                                                                       name="Left" value={NumToFa(`${left || ""}`, pageLanguage)} onChange={() => {
-                                                        }}
-                                                                       onBlur={(e) => {
-                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                           newValue = isNaN(newValue) ? "" : newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000) {
-                                                                               setCartLoading(true);
-                                                                               setCart("ExtensionLeft", parseInt(newValue));
-                                                                               setDeps("", "2CCeiling1");
-                                                                               setLeft(parseInt(newValue));
-                                                                               optionSelectChanged_LeftRight(parseInt(newValue), "2CCeiling", true, "cm", "س\u200Cم", pageLanguage);
-                                                                           } else {
-                                                                               setCartLoading(true);
-                                                                               setCart("", "", "ExtensionLeft");
-                                                                               setDeps("2CCeiling1", "");
-                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                                   setLeft(undefined);
-                                                                               } else {
+                                                                       name="Left" value={NumToFa(`${left || ""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           setTimeout(() => {
+                                                                               let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                               newValue = isNaN(newValue) ? "" : newValue;
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000) {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("ExtensionLeft", parseInt(newValue));
+                                                                                   setDeps("", "2CCeiling1");
                                                                                    setLeft(parseInt(newValue));
+                                                                                   optionSelectChanged_LeftRight(parseInt(newValue), "2CCeiling", true, "cm", "س\u200Cم", pageLanguage);
+                                                                               } else {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("", "", "ExtensionLeft");
+                                                                                   setDeps("2CCeiling1", "");
+                                                                                   if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                       setLeft(undefined);
+                                                                                   } else {
+                                                                                       setLeft(parseInt(newValue));
+                                                                                   }
+                                                                                   selectChanged(undefined, "2CCeiling");
                                                                                }
-                                                                               selectChanged(undefined, "2CCeiling");
-                                                                           }
+                                                                           }, 300);
                                                                        }}/>
                                                         <div className="measure_input_postfix">{t("cm_label")}</div>
                                                     </div>
@@ -6432,28 +6435,29 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (right !== undefined && (right < 1 || right > 1000) ? " measure_input_err" : "")} type="text"
-                                                                       name="Right" value={NumToFa(`${right || ""}`, pageLanguage)} onChange={() => {
-                                                        }}
-                                                                       onBlur={(e) => {
-                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                           newValue = isNaN(newValue) ? "" : newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000) {
-                                                                               setCartLoading(true);
-                                                                               setCart("ExtensionRight", parseInt(newValue));
-                                                                               setDeps("", "2CCeiling2");
-                                                                               setRight(parseInt(newValue));
-                                                                               optionSelectChanged_LeftRight(parseInt(newValue), "2CCeiling", false, "cm", "س\u200Cم", pageLanguage);
-                                                                           } else {
-                                                                               setCartLoading(true);
-                                                                               setCart("", "", "ExtensionRight");
-                                                                               setDeps("2CCeiling2", "");
-                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                                   setRight(undefined);
-                                                                               } else {
+                                                                       name="Right" value={NumToFa(`${right || ""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           setTimeout(() => {
+                                                                               let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                               newValue = isNaN(newValue) ? "" : newValue;
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000) {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("ExtensionRight", parseInt(newValue));
+                                                                                   setDeps("", "2CCeiling2");
                                                                                    setRight(parseInt(newValue));
+                                                                                   optionSelectChanged_LeftRight(parseInt(newValue), "2CCeiling", false, "cm", "س\u200Cم", pageLanguage);
+                                                                               } else {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("", "", "ExtensionRight");
+                                                                                   setDeps("2CCeiling2", "");
+                                                                                   if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                       setRight(undefined);
+                                                                                   } else {
+                                                                                       setRight(parseInt(newValue));
+                                                                                   }
+                                                                                   selectChanged(undefined, "2CCeiling");
                                                                                }
-                                                                               selectChanged(undefined, "2CCeiling");
-                                                                           }
+                                                                           }, 300);
                                                                        }}/>
                                                         <div className="measure_input_postfix">{t("cm_label")}</div>
                                                     </div>
@@ -6635,36 +6639,36 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("step3AIn_A")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                             if (e.keyCode === 13) {
                                                                 inputs.current["ceilingToWindow2"].focus();
-                                                            }
-                                                            else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                            } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (ceilingToWindow1 !== undefined && (ceilingToWindow1 < 30 || ceilingToWindow1 > 400) ? " measure_input_err" : "")} type="text"
-                                                                       name="ceilingToWindow1" value={NumToFa(`${ceilingToWindow1 || ""}`, pageLanguage)} onChange={() => {
-                                                        }}
-                                                                       onBlur={(e) => {
-                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                           newValue = isNaN(newValue) ? "" : newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
-                                                                               setCartLoading(true);
-                                                                               setCart("CeilingToWindow1", parseInt(newValue));
-                                                                               setDeps("", "2D1");
-                                                                               setCeilingToWindow1(parseInt(newValue));
-                                                                               optionSelectChanged_three(parseInt(newValue), "2D", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                           } else {
-                                                                               setCartLoading(true);
-                                                                               setCart("", "", "CeilingToWindow1");
-                                                                               setDeps("2D1", "");
-                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                                   setCeilingToWindow1(undefined);
-                                                                               } else {
+                                                                       name="ceilingToWindow1" value={NumToFa(`${ceilingToWindow1 || ""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           setTimeout(() => {
+                                                                               let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                               newValue = isNaN(newValue) ? "" : newValue;
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("CeilingToWindow1", parseInt(newValue));
+                                                                                   setDeps("", "2D1");
                                                                                    setCeilingToWindow1(parseInt(newValue));
+                                                                                   optionSelectChanged_three(parseInt(newValue), "2D", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                               } else {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("", "", "CeilingToWindow1");
+                                                                                   setDeps("2D1", "");
+                                                                                   if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                       setCeilingToWindow1(undefined);
+                                                                                   } else {
+                                                                                       setCeilingToWindow1(parseInt(newValue));
+                                                                                   }
+                                                                                   selectChanged(undefined, "2D");
                                                                                }
-                                                                               selectChanged(undefined, "2D");
-                                                                           }
+                                                                           }, 300);
                                                                        }}/>
                                                         <div className="measure_input_postfix">{t("cm_label")}</div>
                                                     </div>
@@ -6678,33 +6682,33 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                         <DebounceInput inputRef={ref => (inputs.current["ceilingToWindow2"] = ref)} debounceTimeout={500} onKeyDown={(e) => {
                                                             if (e.keyCode === 13) {
                                                                 inputs.current["ceilingToWindow3"].focus();
-                                                            }
-                                                            else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                            } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (ceilingToWindow2 !== undefined && (ceilingToWindow2 < 30 || ceilingToWindow2 > 400) ? " measure_input_err" : "")} type="text"
-                                                                       name="ceilingToWindow2" value={NumToFa(`${ceilingToWindow2 || ""}`, pageLanguage)} onChange={() => {
-                                                        }}
-                                                                       onBlur={(e) => {
-                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                           newValue = isNaN(newValue) ? "" : newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
-                                                                               setCartLoading(true);
-                                                                               setCart("CeilingToWindow2", parseInt(newValue));
-                                                                               setDeps("", "2D2");
-                                                                               setCeilingToWindow2(parseInt(newValue));
-                                                                               optionSelectChanged_three(parseInt(newValue), "2D", 1, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                           } else {
-                                                                               setCartLoading(true);
-                                                                               setCart("", "", "CeilingToWindow2");
-                                                                               setDeps("2D2", "");
-                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                                   setCeilingToWindow2(undefined);
-                                                                               } else {
+                                                                       name="ceilingToWindow2" value={NumToFa(`${ceilingToWindow2 || ""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           setTimeout(() => {
+                                                                               let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                               newValue = isNaN(newValue) ? "" : newValue;
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("CeilingToWindow2", parseInt(newValue));
+                                                                                   setDeps("", "2D2");
                                                                                    setCeilingToWindow2(parseInt(newValue));
+                                                                                   optionSelectChanged_three(parseInt(newValue), "2D", 1, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                               } else {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("", "", "CeilingToWindow2");
+                                                                                   setDeps("2D2", "");
+                                                                                   if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                       setCeilingToWindow2(undefined);
+                                                                                   } else {
+                                                                                       setCeilingToWindow2(parseInt(newValue));
+                                                                                   }
+                                                                                   selectChanged(undefined, "2D");
                                                                                }
-                                                                               selectChanged(undefined, "2D");
-                                                                           }
+                                                                           }, 300);
                                                                        }}/>
                                                         <div className="measure_input_postfix">{t("cm_label")}</div>
                                                     </div>
@@ -6720,28 +6724,29 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (ceilingToWindow3 !== undefined && (ceilingToWindow3 < 30 || ceilingToWindow3 > 400) ? " measure_input_err" : "")} type="text"
-                                                                       name="ceilingToWindow3" value={NumToFa(`${ceilingToWindow3 || ""}`, pageLanguage)} onChange={() => {
-                                                        }}
-                                                                       onBlur={(e) => {
-                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                           newValue = isNaN(newValue) ? "" : newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
-                                                                               setCartLoading(true);
-                                                                               setCart("CeilingToWindow3", parseInt(newValue));
-                                                                               setDeps("", "2D3");
-                                                                               setCeilingToWindow3(parseInt(newValue));
-                                                                               optionSelectChanged_three(parseInt(newValue), "2D", 2, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                           } else {
-                                                                               setCartLoading(true);
-                                                                               setCart("", "", "CeilingToWindow3");
-                                                                               setDeps("2D3", "");
-                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                                   setCeilingToWindow3(undefined);
-                                                                               } else {
+                                                                       name="ceilingToWindow3" value={NumToFa(`${ceilingToWindow3 || ""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           setTimeout(() => {
+                                                                               let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                               newValue = isNaN(newValue) ? "" : newValue;
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("CeilingToWindow3", parseInt(newValue));
+                                                                                   setDeps("", "2D3");
                                                                                    setCeilingToWindow3(parseInt(newValue));
+                                                                                   optionSelectChanged_three(parseInt(newValue), "2D", 2, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                               } else {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("", "", "CeilingToWindow3");
+                                                                                   setDeps("2D3", "");
+                                                                                   if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                       setCeilingToWindow3(undefined);
+                                                                                   } else {
+                                                                                       setCeilingToWindow3(parseInt(newValue));
+                                                                                   }
+                                                                                   selectChanged(undefined, "2D");
                                                                                }
-                                                                               selectChanged(undefined, "2D");
-                                                                           }
+                                                                           }, 300);
                                                                        }}/>
                                                         <div className="measure_input_postfix">{t("cm_label")}</div>
                                                     </div>
@@ -7023,36 +7028,36 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("step3AIn_A")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                             if (e.keyCode === 13) {
                                                                 inputs.current["ceilingToFloor2"].focus();
-                                                            }
-                                                            else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                            } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (ceilingToFloor1 !== undefined && (ceilingToFloor1 < 30 || ceilingToFloor1 > 400) ? " measure_input_err" : "")} type="text"
-                                                                       name="ceilingToFloor1" value={NumToFa(`${ceilingToFloor1 || ""}`, pageLanguage)} onChange={() => {
-                                                        }}
-                                                                       onBlur={(e) => {
-                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                           newValue = isNaN(newValue) ? "" : newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
-                                                                               setCartLoading(true);
-                                                                               setCart("CeilingToFloor1", parseInt(newValue));
-                                                                               setDeps("", "2DFloor1");
-                                                                               setCeilingToFloor1(parseInt(newValue));
-                                                                               optionSelectChanged_three(parseInt(newValue), "2DFloor", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                           } else {
-                                                                               setCartLoading(true);
-                                                                               setCart("", "", "CeilingToFloor1");
-                                                                               setDeps("2DFloor1", "");
-                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                                   setCeilingToFloor1(undefined);
-                                                                               } else {
+                                                                       name="ceilingToFloor1" value={NumToFa(`${ceilingToFloor1 || ""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           setTimeout(() => {
+                                                                               let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                               newValue = isNaN(newValue) ? "" : newValue;
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("CeilingToFloor1", parseInt(newValue));
+                                                                                   setDeps("", "2DFloor1");
                                                                                    setCeilingToFloor1(parseInt(newValue));
+                                                                                   optionSelectChanged_three(parseInt(newValue), "2DFloor", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                               } else {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("", "", "CeilingToFloor1");
+                                                                                   setDeps("2DFloor1", "");
+                                                                                   if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                       setCeilingToFloor1(undefined);
+                                                                                   } else {
+                                                                                       setCeilingToFloor1(parseInt(newValue));
+                                                                                   }
+                                                                                   selectChanged(undefined, "2DFloor");
                                                                                }
-                                                                               selectChanged(undefined, "2DFloor");
-                                                                           }
+                                                                           }, 300);
                                                                        }}/>
                                                         <div className="measure_input_postfix">{t("cm_label")}</div>
                                                     </div>
@@ -7063,36 +7068,36 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("step3AIn_B")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput inputRef={ref => (inputs.current["CeilingToFloor2"] = ref)} debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput inputRef={ref => (inputs.current["ceilingToFloor2"] = ref)} debounceTimeout={500} onKeyDown={(e) => {
                                                             if (e.keyCode === 13) {
                                                                 inputs.current["ceilingToFloor3"].focus();
-                                                            }
-                                                            else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                            } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (ceilingToFloor2 !== undefined && (ceilingToFloor2 < 30 || ceilingToFloor2 > 400) ? " measure_input_err" : "")} type="text"
-                                                                       name="ceilingToFloor2" value={NumToFa(`${ceilingToFloor2 || ""}`, pageLanguage)} onChange={() => {
-                                                        }}
-                                                                       onBlur={(e) => {
-                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                           newValue = isNaN(newValue) ? "" : newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
-                                                                               setCartLoading(true);
-                                                                               setCart("CeilingToFloor2", parseInt(newValue));
-                                                                               setDeps("", "2DFloor2");
-                                                                               setCeilingToFloor2(parseInt(newValue));
-                                                                               optionSelectChanged_three(parseInt(newValue), "2DFloor", 1, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                           } else {
-                                                                               setCartLoading(true);
-                                                                               setCart("", "", "CeilingToFloor2");
-                                                                               setDeps("2DFloor2", "");
-                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                                   setCeilingToFloor2(undefined);
-                                                                               } else {
+                                                                       name="ceilingToFloor2" value={NumToFa(`${ceilingToFloor2 || ""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           setTimeout(() => {
+                                                                               let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                               newValue = isNaN(newValue) ? "" : newValue;
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("CeilingToFloor2", parseInt(newValue));
+                                                                                   setDeps("", "2DFloor2");
                                                                                    setCeilingToFloor2(parseInt(newValue));
+                                                                                   optionSelectChanged_three(parseInt(newValue), "2DFloor", 1, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                               } else {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("", "", "CeilingToFloor2");
+                                                                                   setDeps("2DFloor2", "");
+                                                                                   if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                       setCeilingToFloor2(undefined);
+                                                                                   } else {
+                                                                                       setCeilingToFloor2(parseInt(newValue));
+                                                                                   }
+                                                                                   selectChanged(undefined, "2DFloor");
                                                                                }
-                                                                               selectChanged(undefined, "2DFloor");
-                                                                           }
+                                                                           }, 300);
                                                                        }}/>
                                                         <div className="measure_input_postfix">{t("cm_label")}</div>
                                                     </div>
@@ -7103,33 +7108,34 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("step3AIn_C")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput inputRef={ref => (inputs.current["CeilingToFloor3"] = ref)} debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput inputRef={ref => (inputs.current["ceilingToFloor3"] = ref)} debounceTimeout={500} onKeyDown={(e) => {
                                                             if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (ceilingToFloor3 !== undefined && (ceilingToFloor3 < 30 || ceilingToFloor3 > 400) ? " measure_input_err" : "")} type="text"
-                                                                       name="ceilingToFloor3" value={NumToFa(`${ceilingToFloor3 || ""}`, pageLanguage)} onChange={() => {
-                                                        }}
-                                                                       onBlur={(e) => {
-                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                           newValue = isNaN(newValue) ? "" : newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
-                                                                               setCartLoading(true);
-                                                                               setCart("CeilingToFloor3", parseInt(newValue));
-                                                                               setDeps("", "2DFloor3");
-                                                                               setCeilingToFloor3(parseInt(newValue));
-                                                                               optionSelectChanged_three(parseInt(newValue), "2DFloor", 2, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                           } else {
-                                                                               setCartLoading(true);
-                                                                               setCart("", "", "CeilingToFloor3");
-                                                                               setDeps("2DFloor3", "");
-                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                                   setCeilingToFloor3(undefined);
-                                                                               } else {
+                                                                       name="ceilingToFloor3" value={NumToFa(`${ceilingToFloor3 || ""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           setTimeout(() => {
+                                                                               let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                               newValue = isNaN(newValue) ? "" : newValue;
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("CeilingToFloor3", parseInt(newValue));
+                                                                                   setDeps("", "2DFloor3");
                                                                                    setCeilingToFloor3(parseInt(newValue));
+                                                                                   optionSelectChanged_three(parseInt(newValue), "2DFloor", 2, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                               } else {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("", "", "CeilingToFloor3");
+                                                                                   setDeps("2DFloor3", "");
+                                                                                   if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                       setCeilingToFloor3(undefined);
+                                                                                   } else {
+                                                                                       setCeilingToFloor3(parseInt(newValue));
+                                                                                   }
+                                                                                   selectChanged(undefined, "2DFloor");
                                                                                }
-                                                                               selectChanged(undefined, "2DFloor");
-                                                                           }
+                                                                           }, 300);
                                                                        }}/>
                                                         <div className="measure_input_postfix">{t("cm_label")}</div>
                                                     </div>
@@ -7220,33 +7226,34 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("Height")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                             if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (height2D !== undefined && (height2D < 30 || height2D > 400) ? " measure_input_err" : "")} type="text"
-                                                                       name="height2D" value={NumToFa(`${height2D || ""}`, pageLanguage)} onChange={() => {
-                                                        }}
-                                                                       onBlur={(e) => {
-                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                           newValue = isNaN(newValue) ? "" : newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
-                                                                               setCartLoading(true);
-                                                                               setCart("Height2D", parseInt(newValue));
-                                                                               setDeps("", "2DWall");
-                                                                               setHeight2D(parseInt(newValue));
-                                                                               optionSelectChanged("2DWall", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
-                                                                           } else {
-                                                                               setCartLoading(true);
-                                                                               setCart("", "", "Height2D");
-                                                                               setDeps("2DWall", "");
-                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                                   setHeight2D(undefined);
-                                                                               } else {
+                                                                       name="height2D" value={NumToFa(`${height2D || ""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           setTimeout(() => {
+                                                                               let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                               newValue = isNaN(newValue) ? "" : newValue;
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("Height2D", parseInt(newValue));
+                                                                                   setDeps("", "2DWall");
                                                                                    setHeight2D(parseInt(newValue));
+                                                                                   optionSelectChanged("2DWall", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
+                                                                               } else {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("", "", "Height2D");
+                                                                                   setDeps("2DWall", "");
+                                                                                   if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                       setHeight2D(undefined);
+                                                                                   } else {
+                                                                                       setHeight2D(parseInt(newValue));
+                                                                                   }
+                                                                                   selectChanged(undefined, "2DWall");
                                                                                }
-                                                                               selectChanged(undefined, "2DWall");
-                                                                           }
+                                                                           }, 300);
                                                                        }}/>
                                                         <div className="measure_input_postfix">{t("cm_label")}</div>
                                                     </div>
@@ -7327,33 +7334,34 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("Height")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                             if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (mount !== undefined && (mount < 10 || mount > 100) ? " measure_input_err" : "")} type="text"
-                                                                       name="mount" value={NumToFa(`${mount || ""}`, pageLanguage)} onChange={() => {
-                                                        }}
-                                                                       onBlur={(e) => {
-                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                           newValue = isNaN(newValue) ? "" : newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 10 && parseInt(newValue) <= 100) {
-                                                                               setCartLoading(true);
-                                                                               setCart("ShadeMount", parseInt(newValue));
-                                                                               setDeps("", "2EWall");
-                                                                               setMount(parseInt(newValue));
-                                                                               optionSelectChanged("2EWall", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
-                                                                           } else {
-                                                                               setCartLoading(true);
-                                                                               setCart("", "", "ShadeMount");
-                                                                               setDeps("2EWall", "");
-                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                                   setMount(undefined);
-                                                                               } else {
+                                                                       name="mount" value={NumToFa(`${mount || ""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           setTimeout(() => {
+                                                                               let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                               newValue = isNaN(newValue) ? "" : newValue;
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 10 && parseInt(newValue) <= 100) {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("ShadeMount", parseInt(newValue));
+                                                                                   setDeps("", "2EWall");
                                                                                    setMount(parseInt(newValue));
+                                                                                   optionSelectChanged("2EWall", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
+                                                                               } else {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("", "", "ShadeMount");
+                                                                                   setDeps("2EWall", "");
+                                                                                   if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                       setMount(undefined);
+                                                                                   } else {
+                                                                                       setMount(parseInt(newValue));
+                                                                                   }
+                                                                                   selectChanged(undefined, "2EWall");
                                                                                }
-                                                                               selectChanged(undefined, "2EWall");
-                                                                           }
+                                                                           }, 300);
                                                                        }}/>
                                                         <div className="measure_input_postfix">{t("cm_label")}</div>
                                                     </div>
@@ -7445,37 +7453,38 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 <div className="measure_input_container">
                                                     {/*<h1 className="measure_input_label">{t("step3AIn_A")}</h1>*/}
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                             if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
-                                                        }} className={"measure_input" + (ceilingToFloor !== undefined && (ceilingToFloor < 30 || ceilingToFloor > 400) ? " measure_input_err" : "")} type="text"
-                                                                       name="ceilingToFloor" value={NumToFa(`${ceilingToFloor || ""}`, pageLanguage)} onChange={() => {
-                                                        }}
-                                                                       onBlur={(e) => {
-                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                           newValue = isNaN(newValue) ? "" : newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
-                                                                               setCartLoading(true);
-                                                                               setCart("CeilingToFloor", parseInt(newValue));
-                                                                               setDeps("", "2FWall");
-                                                                               setCeilingToFloor(parseInt(newValue));
-                                                                               optionSelectChanged("2FWall", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
-                                                                           } else {
-                                                                               setCartLoading(true);
-                                                                               setCart("", "", "CeilingToFloor");
-                                                                               setDeps("2FWall", "");
-                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                                   setCeilingToFloor(undefined);
-                                                                               } else {
+                                                        }} className={"measure_input" + (ceilingToFloor !== undefined && (ceilingToFloor < 30 || ceilingToFloor > 1000 || (cartValues["HeightCart"] && (ceilingToFloor > +cartValues["HeightCart"]))) ? " measure_input_err" : "")} type="text"
+                                                                       name="ceilingToFloor" value={NumToFa(`${ceilingToFloor || ""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           setTimeout(() => {
+                                                                               let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                               newValue = isNaN(newValue) ? "" : newValue;
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 1000 && !(cartValues["HeightCart"] && (ceilingToFloor > +cartValues["HeightCart"]))) {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("CeilingToFloor", parseInt(newValue));
+                                                                                   setDeps("", "2FWall");
                                                                                    setCeilingToFloor(parseInt(newValue));
+                                                                                   optionSelectChanged("2FWall", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
+                                                                               } else {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("", "", "CeilingToFloor");
+                                                                                   setDeps("2FWall", "");
+                                                                                   if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                       setCeilingToFloor(undefined);
+                                                                                   } else {
+                                                                                       setCeilingToFloor(parseInt(newValue));
+                                                                                   }
+                                                                                   selectChanged(undefined, "2FWall");
                                                                                }
-                                                                               selectChanged(undefined, "2FWall");
-                                                                           }
+                                                                           }, 300);
                                                                        }}/>
                                                         <div className="measure_input_postfix">{t("cm_label")}</div>
                                                     </div>
-                                                    <h2 className={"measure_input_desc" + (ceilingToFloor !== undefined && (ceilingToFloor < 30 || ceilingToFloor > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>
+                                                    <h2 className={"measure_input_desc" + (ceilingToFloor !== undefined && (ceilingToFloor < 30 || ceilingToFloor > 1000 || (cartValues["HeightCart"] && (ceilingToFloor > +cartValues["HeightCart"]))) ? " measure_input_desc_err" : "")}>{(cartValues["HeightCart"] && (ceilingToFloor > +cartValues["HeightCart"]))?t("roomHeight_more_than_height"):""}</h2>
                                                 </div>
                                             </div>
                                         </div>
@@ -7553,33 +7562,34 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 <div className="measure_input_container">
                                                     {/*<h1 className="measure_input_label">{t("step3AIn_A")}</h1>*/}
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                             if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (windowToFloor !== undefined && (windowToFloor < 30 || windowToFloor > 400) ? " measure_input_err" : "")} type="text"
-                                                                       name="windowToFloor1" value={NumToFa(`${windowToFloor || ""}`, pageLanguage)} onChange={() => {
-                                                        }}
-                                                                       onBlur={(e) => {
-                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                           newValue = isNaN(newValue) ? "" : newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
-                                                                               setCartLoading(true);
-                                                                               setCart("WindowToFloor", parseInt(newValue));
-                                                                               setDeps("", "2DWallFloor");
-                                                                               setWindowToFloor(parseInt(newValue));
-                                                                               optionSelectChanged("2DWallFloor", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
-                                                                           } else {
-                                                                               setCartLoading(true);
-                                                                               setCart("", "", "WindowToFloor");
-                                                                               setDeps("2DWallFloor", "");
-                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                                   setWindowToFloor(undefined);
-                                                                               } else {
+                                                                       name="windowToFloor1" value={NumToFa(`${windowToFloor || ""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           setTimeout(() => {
+                                                                               let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                               newValue = isNaN(newValue) ? "" : newValue;
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("WindowToFloor", parseInt(newValue));
+                                                                                   setDeps("", "2DWallFloor");
                                                                                    setWindowToFloor(parseInt(newValue));
+                                                                                   optionSelectChanged("2DWallFloor", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
+                                                                               } else {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("", "", "WindowToFloor");
+                                                                                   setDeps("2DWallFloor", "");
+                                                                                   if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                       setWindowToFloor(undefined);
+                                                                                   } else {
+                                                                                       setWindowToFloor(parseInt(newValue));
+                                                                                   }
+                                                                                   selectChanged(undefined, "2DWallFloor");
                                                                                }
-                                                                               selectChanged(undefined, "2DWallFloor");
-                                                                           }
+                                                                           }, 300);
                                                                        }}/>
                                                         <div className="measure_input_postfix">{t("cm_label")}</div>
                                                     </div>
@@ -7661,33 +7671,34 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("Height")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                             if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (mount !== undefined && (mount < 10 || mount > 100) ? " measure_input_err" : "")} type="text"
-                                                                       name="mount" value={NumToFa(`${mount || ""}`, pageLanguage)} onChange={() => {
-                                                        }}
-                                                                       onBlur={(e) => {
-                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                           newValue = isNaN(newValue) ? "" : newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 10 && parseInt(newValue) <= 100) {
-                                                                               setCartLoading(true);
-                                                                               setCart("ShadeMount", parseInt(newValue));
-                                                                               setDeps("", "2EWallFloor");
-                                                                               setMount(parseInt(newValue));
-                                                                               optionSelectChanged("2EWallFloor", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
-                                                                           } else {
-                                                                               setCartLoading(true);
-                                                                               setCart("", "", "ShadeMount");
-                                                                               setDeps("2EWallFloor", "");
-                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                                   setMount(undefined);
-                                                                               } else {
+                                                                       name="mount" value={NumToFa(`${mount || ""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           setTimeout(() => {
+                                                                               let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                               newValue = isNaN(newValue) ? "" : newValue;
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 10 && parseInt(newValue) <= 100) {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("ShadeMount", parseInt(newValue));
+                                                                                   setDeps("", "2EWallFloor");
                                                                                    setMount(parseInt(newValue));
+                                                                                   optionSelectChanged("2EWallFloor", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
+                                                                               } else {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("", "", "ShadeMount");
+                                                                                   setDeps("2EWallFloor", "");
+                                                                                   if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                       setMount(undefined);
+                                                                                   } else {
+                                                                                       setMount(parseInt(newValue));
+                                                                                   }
+                                                                                   selectChanged(undefined, "2EWallFloor");
                                                                                }
-                                                                               selectChanged(undefined, "2EWallFloor");
-                                                                           }
+                                                                           }, 300);
                                                                        }}/>
                                                         <div className="measure_input_postfix">{t("cm_label")}</div>
                                                     </div>
@@ -7780,37 +7791,38 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 <div className="measure_input_container">
                                                     {/*<h1 className="measure_input_label">{t("step3AIn_A")}</h1>*/}
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                             if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
-                                                        }} className={"measure_input" + (ceilingToFloor !== undefined && (ceilingToFloor < 30 || ceilingToFloor > 400) ? " measure_input_err" : "")} type="text"
-                                                                       name="ceilingToFloor" value={NumToFa(`${ceilingToFloor || ""}`, pageLanguage)} onChange={() => {
-                                                        }}
-                                                                       onBlur={(e) => {
-                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                           newValue = isNaN(newValue) ? "" : newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
-                                                                               setCartLoading(true);
-                                                                               setCart("CeilingToFloor", parseInt(newValue));
-                                                                               setDeps("", "2FWallFloor");
-                                                                               setCeilingToFloor(parseInt(newValue));
-                                                                               optionSelectChanged("2FWallFloor", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
-                                                                           } else {
-                                                                               setCartLoading(true);
-                                                                               setCart("", "", "CeilingToFloor");
-                                                                               setDeps("2FWallFloor", "");
-                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                                   setCeilingToFloor(undefined);
-                                                                               } else {
+                                                        }} className={"measure_input" + (ceilingToFloor !== undefined && (ceilingToFloor < 30 || ceilingToFloor > 1000 || (cartValues["HeightCart"] && (ceilingToFloor > +cartValues["HeightCart"]))) ? " measure_input_err" : "")} type="text"
+                                                                       name="ceilingToFloor" value={NumToFa(`${ceilingToFloor || ""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           setTimeout(() => {
+                                                                               let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                               newValue = isNaN(newValue) ? "" : newValue;
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 1000 && !(cartValues["HeightCart"] && (ceilingToFloor > +cartValues["HeightCart"]))) {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("CeilingToFloor", parseInt(newValue));
+                                                                                   setDeps("", "2FWallFloor");
                                                                                    setCeilingToFloor(parseInt(newValue));
+                                                                                   optionSelectChanged("2FWallFloor", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
+                                                                               } else {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("", "", "CeilingToFloor");
+                                                                                   setDeps("2FWallFloor", "");
+                                                                                   if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                       setCeilingToFloor(undefined);
+                                                                                   } else {
+                                                                                       setCeilingToFloor(parseInt(newValue));
+                                                                                   }
+                                                                                   selectChanged(undefined, "2FWallFloor");
                                                                                }
-                                                                               selectChanged(undefined, "2FWallFloor");
-                                                                           }
+                                                                           }, 300);
                                                                        }}/>
                                                         <div className="measure_input_postfix">{t("cm_label")}</div>
                                                     </div>
-                                                    <h2 className={"measure_input_desc" + (ceilingToFloor !== undefined && (ceilingToFloor < 30 || ceilingToFloor > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>
+                                                    <h2 className={"measure_input_desc" + (ceilingToFloor !== undefined && (ceilingToFloor < 30 || ceilingToFloor > 1000 || (cartValues["HeightCart"] && (ceilingToFloor > +cartValues["HeightCart"]))) ? " measure_input_desc_err" : "")}>{(cartValues["HeightCart"] && (ceilingToFloor > +cartValues["HeightCart"]))?t("roomHeight_more_than_height"):""}</h2>
                                                 </div>
                                             </div>
                                         </div>
@@ -7974,36 +7986,36 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("step3AIn_A")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                             if (e.keyCode === 13) {
                                                                 inputs.current["width2"].focus();
-                                                            }
-                                                            else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                            } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (width1 !== undefined && (width1 < 30 || width1 > 300) ? " measure_input_err" : "")} type="text"
-                                                                       name="width1" value={NumToFa(`${width1 || ""}`, pageLanguage)} onChange={() => {
-                                                        }}
-                                                                       onBlur={(e) => {
-                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                           newValue = isNaN(newValue) ? "" : newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 300) {
-                                                                               setCartLoading(true);
-                                                                               setCart("Width1", parseInt(newValue));
-                                                                               setDeps("", "2AIn1");
-                                                                               setWidth1(parseInt(newValue));
-                                                                               optionSelectChanged_three(parseInt(newValue), "2AIn", 0, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                           } else {
-                                                                               setCartLoading(true);
-                                                                               setCart("", "", "Width1");
-                                                                               setDeps("2AIn1", "");
-                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                                   setWidth1(undefined);
-                                                                               } else {
+                                                                       name="width1" value={NumToFa(`${width1 || ""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           setTimeout(() => {
+                                                                               let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                               newValue = isNaN(newValue) ? "" : newValue;
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 300) {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("Width1", parseInt(newValue));
+                                                                                   setDeps("", "2AIn1");
                                                                                    setWidth1(parseInt(newValue));
+                                                                                   optionSelectChanged_three(parseInt(newValue), "2AIn", 0, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                               } else {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("", "", "Width1");
+                                                                                   setDeps("2AIn1", "");
+                                                                                   if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                       setWidth1(undefined);
+                                                                                   } else {
+                                                                                       setWidth1(parseInt(newValue));
+                                                                                   }
+                                                                                   selectChanged(undefined, "2AIn");
                                                                                }
-                                                                               selectChanged(undefined, "2AIn");
-                                                                           }
+                                                                           }, 300);
                                                                        }}/>
                                                         <div className="measure_input_postfix">{t("cm_label")}</div>
                                                     </div>
@@ -8017,33 +8029,33 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                         <DebounceInput inputRef={ref => (inputs.current["width2"] = ref)} debounceTimeout={500} onKeyDown={(e) => {
                                                             if (e.keyCode === 13) {
                                                                 inputs.current["width2"].focus();
-                                                            }
-                                                            else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                            } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (width2 !== undefined && (width2 < 30 || width2 > 300) ? " measure_input_err" : "")} type="text"
-                                                                       name="width2" value={NumToFa(`${width2 || ""}`, pageLanguage)} onChange={() => {
-                                                        }}
-                                                                       onBlur={(e) => {
-                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                           newValue = isNaN(newValue) ? "" : newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 300) {
-                                                                               setCartLoading(true);
-                                                                               setCart("Width2", parseInt(newValue));
-                                                                               setDeps("", "2AIn2");
-                                                                               setWidth2(parseInt(newValue));
-                                                                               optionSelectChanged_three(parseInt(newValue), "2AIn", 1, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                           } else {
-                                                                               setCartLoading(true);
-                                                                               setCart("", "", "Width2");
-                                                                               setDeps("2AIn2", "");
-                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                                   setWidth2(undefined);
-                                                                               } else {
+                                                                       name="width2" value={NumToFa(`${width2 || ""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           setTimeout(() => {
+                                                                               let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                               newValue = isNaN(newValue) ? "" : newValue;
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 300) {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("Width2", parseInt(newValue));
+                                                                                   setDeps("", "2AIn2");
                                                                                    setWidth2(parseInt(newValue));
+                                                                                   optionSelectChanged_three(parseInt(newValue), "2AIn", 1, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                               } else {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("", "", "Width2");
+                                                                                   setDeps("2AIn2", "");
+                                                                                   if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                       setWidth2(undefined);
+                                                                                   } else {
+                                                                                       setWidth2(parseInt(newValue));
+                                                                                   }
+                                                                                   selectChanged(undefined, "2AIn");
                                                                                }
-                                                                               selectChanged(undefined, "2AIn");
-                                                                           }
+                                                                           }, 300);
                                                                        }}/>
                                                         <div className="measure_input_postfix">{t("cm_label")}</div>
                                                     </div>
@@ -8059,28 +8071,29 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (width3 !== undefined && (width3 < 30 || width3 > 300) ? " measure_input_err" : "")} type="text"
-                                                                       name="width3" value={NumToFa(`${width3 || ""}`, pageLanguage)} onChange={() => {
-                                                        }}
-                                                                       onBlur={(e) => {
-                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                           newValue = isNaN(newValue) ? "" : newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 300) {
-                                                                               setCartLoading(true);
-                                                                               setCart("Width3", parseInt(newValue));
-                                                                               setDeps("", "2AIn3");
-                                                                               setWidth3(parseInt(newValue));
-                                                                               optionSelectChanged_three(parseInt(newValue), "2AIn", 2, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                           } else {
-                                                                               setCartLoading(true);
-                                                                               setCart("", "", "Width3");
-                                                                               setDeps("2AIn3", "");
-                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                                   setWidth3(undefined);
-                                                                               } else {
+                                                                       name="width3" value={NumToFa(`${width3 || ""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           setTimeout(() => {
+                                                                               let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                               newValue = isNaN(newValue) ? "" : newValue;
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 300) {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("Width3", parseInt(newValue));
+                                                                                   setDeps("", "2AIn3");
                                                                                    setWidth3(parseInt(newValue));
+                                                                                   optionSelectChanged_three(parseInt(newValue), "2AIn", 2, true, "widthDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                               } else {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("", "", "Width3");
+                                                                                   setDeps("2AIn3", "");
+                                                                                   if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                       setWidth3(undefined);
+                                                                                   } else {
+                                                                                       setWidth3(parseInt(newValue));
+                                                                                   }
+                                                                                   selectChanged(undefined, "2AIn");
                                                                                }
-                                                                               selectChanged(undefined, "2AIn");
-                                                                           }
+                                                                           }, 300);
                                                                        }}/>
                                                         <div className="measure_input_postfix">{t("cm_label")}</div>
                                                     </div>
@@ -8260,33 +8273,34 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("step3BIn_A")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                             if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (height1 !== undefined && (height1 < 30 || height1 > 400) ? " measure_input_err" : "")} type="text"
-                                                                       name="height1" value={NumToFa(`${height1 || ""}`, pageLanguage)} onChange={() => {
-                                                        }}
-                                                                       onBlur={(e) => {
-                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                           newValue = isNaN(newValue) ? "" : newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
-                                                                               setCartLoading(true);
-                                                                               setCart("Height1", parseInt(newValue));
-                                                                               setDeps("", "2BIn1");
-                                                                               setHeight1(parseInt(newValue));
-                                                                               optionSelectChanged_three(parseInt(newValue), "2BIn", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                           } else {
-                                                                               setCartLoading(true);
-                                                                               setCart("", "", "Height1");
-                                                                               setDeps("2BIn1", "");
-                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                                   setHeight1(undefined);
-                                                                               } else {
+                                                                       name="height1" value={NumToFa(`${height1 || ""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           setTimeout(() => {
+                                                                               let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                               newValue = isNaN(newValue) ? "" : newValue;
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("Height1", parseInt(newValue));
+                                                                                   setDeps("", "2BIn1");
                                                                                    setHeight1(parseInt(newValue));
+                                                                                   optionSelectChanged_three(parseInt(newValue), "2BIn", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                               } else {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("", "", "Height1");
+                                                                                   setDeps("2BIn1", "");
+                                                                                   if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                       setHeight1(undefined);
+                                                                                   } else {
+                                                                                       setHeight1(parseInt(newValue));
+                                                                                   }
+                                                                                   selectChanged(undefined, "2BIn");
                                                                                }
-                                                                               selectChanged(undefined, "2BIn");
-                                                                           }
+                                                                           }, 300);
                                                                        }}/>
                                                         <div className="measure_input_postfix">{t("cm_label")}</div>
                                                     </div>
@@ -8297,33 +8311,34 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("step3BIn_B")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                             if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (height2 !== undefined && (height2 < 30 || height2 > 400) ? " measure_input_err" : "")} type="text"
-                                                                       name="height2" value={NumToFa(`${height2 || ""}`, pageLanguage)} onChange={() => {
-                                                        }}
-                                                                       onBlur={(e) => {
-                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                           newValue = isNaN(newValue) ? "" : newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
-                                                                               setCartLoading(true);
-                                                                               setCart("Height2", parseInt(newValue));
-                                                                               setDeps("", "2BIn2");
-                                                                               setHeight2(parseInt(newValue));
-                                                                               optionSelectChanged_three(parseInt(newValue), "2BIn", 1, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                           } else {
-                                                                               setCartLoading(true);
-                                                                               setCart("", "", "Height2");
-                                                                               setDeps("2BIn2", "");
-                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                                   setHeight2(undefined);
-                                                                               } else {
+                                                                       name="height2" value={NumToFa(`${height2 || ""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           setTimeout(() => {
+                                                                               let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                               newValue = isNaN(newValue) ? "" : newValue;
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("Height2", parseInt(newValue));
+                                                                                   setDeps("", "2BIn2");
                                                                                    setHeight2(parseInt(newValue));
+                                                                                   optionSelectChanged_three(parseInt(newValue), "2BIn", 1, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                               } else {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("", "", "Height2");
+                                                                                   setDeps("2BIn2", "");
+                                                                                   if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                       setHeight2(undefined);
+                                                                                   } else {
+                                                                                       setHeight2(parseInt(newValue));
+                                                                                   }
+                                                                                   selectChanged(undefined, "2BIn");
                                                                                }
-                                                                               selectChanged(undefined, "2BIn");
-                                                                           }
+                                                                           }, 300);
                                                                        }}/>
                                                         <div className="measure_input_postfix">{t("cm_label")}</div>
                                                     </div>
@@ -8334,33 +8349,34 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("step3BIn_C")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                             if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (height3 !== undefined && (height3 < 30 || height3 > 400) ? " measure_input_err" : "")} type="text"
-                                                                       name="height3" value={NumToFa(`${height3 || ""}`, pageLanguage)} onChange={() => {
-                                                        }}
-                                                                       onBlur={(e) => {
-                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                           newValue = isNaN(newValue) ? "" : newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
-                                                                               setCartLoading(true);
-                                                                               setCart("Height3", parseInt(newValue));
-                                                                               setDeps("", "2BIn3");
-                                                                               setHeight3(parseInt(newValue));
-                                                                               optionSelectChanged_three(parseInt(newValue), "2BIn", 2, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                           } else {
-                                                                               setCartLoading(true);
-                                                                               setCart("", "", "Height3");
-                                                                               setDeps("2BIn3", "");
-                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                                   setHeight3(undefined);
-                                                                               } else {
+                                                                       name="height3" value={NumToFa(`${height3 || ""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           setTimeout(() => {
+                                                                               let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                               newValue = isNaN(newValue) ? "" : newValue;
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("Height3", parseInt(newValue));
+                                                                                   setDeps("", "2BIn3");
                                                                                    setHeight3(parseInt(newValue));
+                                                                                   optionSelectChanged_three(parseInt(newValue), "2BIn", 2, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                               } else {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("", "", "Height3");
+                                                                                   setDeps("2BIn3", "");
+                                                                                   if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                       setHeight3(undefined);
+                                                                                   } else {
+                                                                                       setHeight3(parseInt(newValue));
+                                                                                   }
+                                                                                   selectChanged(undefined, "2BIn");
                                                                                }
-                                                                               selectChanged(undefined, "2BIn");
-                                                                           }
+                                                                           }, 300);
                                                                        }}/>
                                                         <div className="measure_input_postfix">{t("cm_label")}</div>
                                                     </div>
@@ -8962,7 +8978,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                             </div>
                                             <div className="room_select">
                                                 <label className="select_label">{t("Window Description")}</label>
-                                                <DebounceInput debounceTimeout={500} onKeyDown={() => setCartLoading(true)} type="text" placeholder={t("Window Description")}
+                                                <DebounceInput debounceTimeout={2000} onKeyDown={() => setCartLoading(true)} type="text" placeholder={t("Window Description")}
                                                                className="form-control window_name" name="order_window_name"
                                                                value={roomLabelText}
                                                                onChange={(e) => {
@@ -10041,7 +10057,7 @@ function DK({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryStr
                                 </div>
                                 <div className="room_select">
                                     <label className="select_label">{t("Window Description")}</label>
-                                    <DebounceInput debounceTimeout={500} onKeyDown={() => setCartLoading(true)} type="text" placeholder={t("Window Description")}
+                                    <DebounceInput debounceTimeout={2000} onKeyDown={() => setCartLoading(true)} type="text" placeholder={t("Window Description")}
                                                    className="form-control window_name" name="order_window_name"
                                                    value={roomLabelText}
                                                    onChange={(e) => {

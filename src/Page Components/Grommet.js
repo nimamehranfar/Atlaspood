@@ -166,10 +166,10 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
     const [accordionActiveKey, setAccordionActiveKey] = useState("");
     const [roomLabelText, setRoomLabelText] = useState("");
     const [fabricSelected, setFabricSelected] = useState({
-        selectedFabricId: 0, selectedTextEn: "", selectedTextFa: "", selectedColorEn: "", selectedColorFa: "", selectedHasTrim: false, selectedPhoto: ""
+        selectedFabricId: 0, selectedTextEn: "", selectedTextFa: "", selectedDesignCode: "", selectedColorEn: "", selectedColorFa: "", selectedHasTrim: false, selectedPhoto: ""
     });
     const [fabricSelected2, setFabricSelected2] = useState({
-        selectedFabricId: 0, selectedTextEn: "", selectedTextFa: "", selectedColorEn: "", selectedColorFa: "", selectedHasTrim: false, selectedPhoto: ""
+        selectedFabricId: 0, selectedTextEn: "", selectedTextFa: "", selectedDesignCode: "", selectedColorEn: "", selectedColorFa: "", selectedHasTrim: false, selectedPhoto: ""
     });
     const [borderSelected, setBorderSelected] = useState({
         selectedFabricId: 0, selectedTextEn: "", selectedTextFa: "", selectedDesignCode: "", selectedColorEn: "", selectedColorFa: "", selectedHasTrim: false, selectedPhoto: ""
@@ -240,12 +240,6 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
     const [height, setHeight] = useState(undefined);
     const [depth, setDepth] = useState(undefined);
     const [mouldingHeight, setMouldingHeight] = useState(undefined);
-    const [width1, setWidth1] = useState(undefined);
-    const [width2, setWidth2] = useState(undefined);
-    const [width3, setWidth3] = useState(undefined);
-    const [height1, setHeight1] = useState(undefined);
-    const [height2, setHeight2] = useState(undefined);
-    const [height3, setHeight3] = useState(undefined);
     const [rodToBottom, setRodToBottom] = useState(undefined);
     const [rodToFloor, setRodToFloor] = useState(undefined);
     const [windowToFloor, setWindowToFloor] = useState(undefined);
@@ -324,7 +318,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
     const [step3ARod1, setStep3ARod1] = useState("");
     const [step4, setStep4] = useState("");
     const [step5, setStep5] = useState("");
-    const [step6, setStep6] = useState("Same Style For All Curtains");
+    const [step6, setStep6] = useState("");
     const [step61, setStep61] = useState("");
     const [step6A, setStep6A] = useState("");
     const [step6B, setStep6B] = useState("");
@@ -712,8 +706,8 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         Object.keys(fabrics).forEach((key, index) => {
             let DesignName = convertToPersian(fabrics[key][0]["DesignName"]);
             let DesignEnName = fabrics[key][0]["DesignEnName"];
-            let HasTrim = fabrics[key][0]["HasFaricTrim"] || true;
-            let HasBorder = fabrics[key][0]["CanHasBorder"] || true;
+            let HasTrim = fabrics[key][0]["HasFaricTrim"];
+            let HasBorder = fabrics[key][0]["CanHasBorder"];
             let DesignCode = fabrics[key][0]["DesignCode"];
             let SamplePrice = fabrics[key][0]["SamplePrice"];
             
@@ -723,8 +717,10 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 let FabricId = fabrics[key][j].FabricId;
                 // console.log(fabrics,key);
                 let PhotoPath = "";
+                let PhotoPath2 = "";
                 fabrics[key][j].FabricPhotos.forEach(obj => {
                     if (obj.PhotoTypeId === 4702) PhotoPath = obj.PhotoUrl;
+                    if (obj.PhotoTypeId === 4709) PhotoPath2 = obj.PhotoUrl;
                 });
                 
                 let FabricOnModelPhotoUrl = fabrics[key][j].FabricOnModelPhotoUrl;
@@ -775,6 +771,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                    temp.selectedFabricId = FabricId;
                                    temp.selectedTextEn = DesignEnName;
                                    temp.selectedTextFa = DesignName;
+                                   temp.selectedDesignCode = DesignCode;
                                    temp.selectedColorEn = ColorEnName;
                                    temp.selectedColorFa = ColorName;
                                    temp.selectedHasTrim = HasTrim;
@@ -788,7 +785,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                model-id={modelID} value={FabricId} text-en={DesignEnName} text-fa={DesignName} checked={`${FabricId}` === step1}
                                ref={ref => (inputs.current[`1${FabricId}`] = ref)}/>
                         <div className="frame_img">
-                            <img className={`img-fluid ${`${FabricId}` === step1 ? "img-fluid_checked" : ""}`} src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
+                            <img className={`img-fluid ${`${FabricId}` === step1 ? "img-fluid_checked" : ""}`} src={`https://api.atlaspood.ir/${PhotoPath2}`} alt=""/>
                         </div>
                     </label>
                     <div className={`fabric_name_container ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
@@ -848,7 +845,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                         {fabric}
                     </div>
                     {(HasTrim || HasBorder) &&
-                        <div className={step1Check === `${DesignCode}` ?"fabric_design_checkbox_container width_max checkbox_style checkbox_style_inline active":"fabric_design_checkbox_container width_max checkbox_style checkbox_style_inline"}>
+                        <div className={step1Check === `${DesignCode}` ? "fabric_design_checkbox_container width_max checkbox_style checkbox_style_inline active" : "fabric_design_checkbox_container width_max checkbox_style checkbox_style_inline"}>
                             <input type="checkbox" name="step1Check" checked={step1Check === `${DesignCode}`}
                                    onChange={(e) => {
                                        if (step1 !== "" && fabrics[DesignEnName].some(obj => obj["FabricId"] === step1)) {
@@ -999,8 +996,8 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
             let fabrics = fabrics2;
             let DesignName = convertToPersian(fabrics[key][0]["DesignName"]);
             let DesignEnName = fabrics[key][0]["DesignEnName"];
-            let HasTrim = fabrics[key][0]["HasFaricTrim"] || true;
-            let HasBorder = fabrics[key][0]["CanHasBorder"] || true;
+            let HasTrim = fabrics[key][0]["HasFaricTrim"];
+            let HasBorder = fabrics[key][0]["CanHasBorder"];
             let DesignCode = fabrics[key][0]["DesignCode"];
             let SamplePrice = fabrics[key][0]["SamplePrice"];
             
@@ -1010,8 +1007,10 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 let FabricId = fabrics[key][j].FabricId;
                 // console.log(fabrics,key);
                 let PhotoPath = "";
+                let PhotoPath2 = "";
                 fabrics[key][j].FabricPhotos.forEach(obj => {
                     if (obj.PhotoTypeId === 4702) PhotoPath = obj.PhotoUrl;
+                    if (obj.PhotoTypeId === 4709) PhotoPath2 = obj.PhotoUrl;
                 });
                 
                 let FabricOnModelPhotoUrl = fabrics[key][j].FabricOnModelPhotoUrl;
@@ -1062,6 +1061,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                    temp.selectedFabricId = FabricId;
                                    temp.selectedTextEn = DesignEnName;
                                    temp.selectedTextFa = DesignName;
+                                   temp.selectedDesignCode = DesignCode;
                                    temp.selectedColorEn = ColorEnName;
                                    temp.selectedColorFa = ColorName;
                                    temp.selectedHasTrim = HasTrim;
@@ -1075,7 +1075,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                model-id={modelID} value={FabricId} text-en={DesignEnName} text-fa={DesignName} checked={`${FabricId}` === step2}
                                ref={ref => (inputs.current[`15${FabricId}`] = ref)}/>
                         <div className="frame_img">
-                            <img className={`img-fluid ${`${FabricId}` === step2 ? "img-fluid_checked" : ""}`} src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
+                            <img className={`img-fluid ${`${FabricId}` === step2 ? "img-fluid_checked" : ""}`} src={`https://api.atlaspood.ir/${PhotoPath2}`} alt=""/>
                         </div>
                     </label>
                     <div className={`fabric_name_container ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
@@ -1136,7 +1136,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                         {fabric}
                     </div>
                     {(HasTrim || HasBorder) &&
-                        <div className={step2Check === `${DesignCode}` ?"fabric_design_checkbox_container width_max checkbox_style checkbox_style_inline active":"fabric_design_checkbox_container width_max checkbox_style checkbox_style_inline"}>
+                        <div className={step2Check === `${DesignCode}` ? "fabric_design_checkbox_container width_max checkbox_style checkbox_style_inline active" : "fabric_design_checkbox_container width_max checkbox_style checkbox_style_inline"}>
                             <input type="checkbox" name="step1Check" checked={step2Check === `${DesignCode}`}
                                    onChange={(e) => {
                                        if (step2 !== "" && fabrics[DesignEnName].some(obj => obj["FabricId"] === step2)) {
@@ -1295,8 +1295,10 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 let FabricId = fabrics[key][j].FabricId;
                 // console.log(fabrics,key);
                 let PhotoPath = "";
+                let PhotoPath2 = "";
                 fabrics[key][j].FabricPhotos.forEach(obj => {
                     if (obj.PhotoTypeId === 4702) PhotoPath = obj.PhotoUrl;
+                    if (obj.PhotoTypeId === 4709) PhotoPath2 = obj.PhotoUrl;
                 });
                 
                 let FabricOnModelPhotoUrl = fabrics[key][j].FabricOnModelPhotoUrl;
@@ -1362,7 +1364,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                model-id={modelID} value={FabricId} text-en={DesignEnName} text-fa={DesignName} checked={`${FabricId}` === step2B1}
                                ref={ref => (inputs.current[`1${FabricId}`] = ref)}/>
                         <div className="frame_img">
-                            <img className={`img-fluid ${`${FabricId}` === step2B1 ? "img-fluid_checked" : ""}`} src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
+                            <img className={`img-fluid ${`${FabricId}` === step2B1 ? "img-fluid_checked" : ""}`} src={`https://api.atlaspood.ir/${PhotoPath2}`} alt=""/>
                         </div>
                     </label>
                     <div className={`fabric_name_container ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
@@ -1420,8 +1422,10 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 let FabricId = fabrics[key][j].FabricId;
                 // console.log(fabrics,key);
                 let PhotoPath = "";
+                let PhotoPath2 = "";
                 fabrics[key][j].FabricPhotos.forEach(obj => {
                     if (obj.PhotoTypeId === 4702) PhotoPath = obj.PhotoUrl;
+                    if (obj.PhotoTypeId === 4709) PhotoPath2 = obj.PhotoUrl;
                 });
                 
                 let FabricOnModelPhotoUrl = fabrics[key][j].FabricOnModelPhotoUrl;
@@ -1487,7 +1491,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                model-id={modelID} value={FabricId} text-en={DesignEnName} text-fa={DesignName} checked={`${FabricId}` === step2B1}
                                ref={ref => (inputs.current[`15${FabricId}`] = ref)}/>
                         <div className="frame_img">
-                            <img className={`img-fluid ${`${FabricId}` === step2B1 ? "img-fluid_checked" : ""}`} src={`https://api.atlaspood.ir/${PhotoPath}`} alt=""/>
+                            <img className={`img-fluid ${`${FabricId}` === step2B1 ? "img-fluid_checked" : ""}`} src={`https://api.atlaspood.ir/${PhotoPath2}`} alt=""/>
                         </div>
                     </label>
                     <div className={`fabric_name_container ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
@@ -1888,7 +1892,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         });
         Promise.all(promiseArr).then(() => {
             setTracksList(rodList);
-            if(rodList.length===0){
+            if (rodList.length === 0) {
                 setStep6BHead("Rod");
                 setStep6B("");
                 setDeps("6B", "");
@@ -1897,7 +1901,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
         });
         Promise.all(promiseArr2).then(() => {
             setTracksList2(rodList2);
-            if(rodList2.length===0){
+            if (rodList2.length === 0) {
                 setStep6CHead("Rod");
                 setStep6C("");
                 setDeps("6C", "");
@@ -2146,12 +2150,42 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
     }
     
     function optionSelectChanged_three(obj, refIndex, position, isMin, modalRef, postfixEn, postfixFa, pageLang) {
-        if (obj !== undefined) {
+        if (obj !== undefined && typeof selected === 'object') {
             let temp = JSON.parse(JSON.stringify(stepSelectedOptions));
-            if (temp.labels[refIndex] === undefined) temp.labels[refIndex] = [];
-            if (temp.values[refIndex] === undefined) temp.values[refIndex] = [];
+            if (temp.labels[refIndex] === undefined)
+                temp.labels[refIndex] = [];
+            if (temp.values[refIndex] === undefined)
+                temp.values[refIndex] = [];
             temp.labels[refIndex][position] = obj.label;
             temp.values[refIndex][position] = parseFloat(obj.value);
+            setStepSelectedOptions(temp);
+            
+            if (temp.values[refIndex].filter(function (e) {
+                return e
+            }).length === 3) {
+                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                if (isMin) {
+                    let tempMin = temp.values[refIndex][temp.values[refIndex].indexOf(Math.min(...temp.values[refIndex]))];
+                    tempLabels[refIndex] = pageLang === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMin}`) + postfixFa : tempMin + postfixEn;
+                } else {
+                    let tempMax = temp.values[refIndex][temp.values[refIndex].indexOf(Math.min(...temp.values[refIndex]))];
+                    tempLabels[refIndex] = pageLang === "fa" ? NumberToPersianWord.convertEnToPe(`${tempMax}`) + postfixFa : tempMax + postfixEn;
+                }
+                setStepSelectedLabel(tempLabels);
+                let minValue = Math.min(...temp.values[refIndex]);
+                let maxValue = Math.max(...temp.values[refIndex]);
+                if (maxValue - minValue >= 2) {
+                    modalHandleShow(modalRef);
+                }
+            }
+        } else if (obj !== undefined) {
+            let temp = JSON.parse(JSON.stringify(stepSelectedOptions));
+            if (temp.labels[refIndex] === undefined)
+                temp.labels[refIndex] = [];
+            if (temp.values[refIndex] === undefined)
+                temp.values[refIndex] = [];
+            temp.labels[refIndex][position] = obj;
+            temp.values[refIndex][position] = parseFloat(obj);
             setStepSelectedOptions(temp);
             
             if (temp.values[refIndex].filter(function (e) {
@@ -2176,7 +2210,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
     }
     
     function optionSelectChanged_WidthLength(obj, refIndex, isWidth, postfixEn, postfixFa, pageLang) {
-        if (obj !== undefined) {
+        if (obj !== undefined && typeof selected === 'object') {
             if (isWidth) {
                 let temp = JSON.parse(JSON.stringify(widthLength));
                 temp.width = obj.value;
@@ -2198,11 +2232,13 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     // setStepSelectedLabel(tempLabels);
                 }
             }
+        } else if (obj !== undefined) {
+        
         }
     }
     
     function optionSelectChanged_LeftRight(obj, refIndex, isLeft, postfixEn, postfixFa, pageLang, secondVal) {
-        if (obj !== undefined) {
+        if (obj !== undefined && typeof obj === 'object') {
             if (isLeft) {
                 let temp = JSON.parse(JSON.stringify(leftRight));
                 temp.left = obj.value;
@@ -2230,17 +2266,54 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     setStepSelectedLabel(tempLabels);
                 }
             }
+        } else if (obj !== undefined) {
+            if (isLeft) {
+                let temp = JSON.parse(JSON.stringify(leftRight));
+                temp.left = obj;
+                if (secondVal !== undefined) {
+                    temp.right = secondVal;
+                }
+                setLeftRight(temp);
+                
+                if (temp.right !== "" && temp.left !== "") {
+                    let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                    tempLabels[refIndex] = pageLang === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp.right}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp.left}`) + postfixFa}` : `Left: ${temp.left + postfixEn}\u00A0\u00A0\u00A0Right: ${temp.right + postfixEn}`;
+                    setStepSelectedLabel(tempLabels);
+                }
+            } else {
+                let temp = JSON.parse(JSON.stringify(leftRight));
+                temp.right = obj;
+                if (secondVal !== undefined) {
+                    temp.left = secondVal;
+                }
+                setLeftRight(temp);
+                
+                if (temp.right !== "" && temp.left !== "") {
+                    let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+                    tempLabels[refIndex] = pageLang === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp.right}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp.left}`) + postfixFa}` : `Left: ${temp.left + postfixEn}\u00A0\u00A0\u00A0Right: ${temp.right + postfixEn}`;
+                    setStepSelectedLabel(tempLabels);
+                }
+            }
         }
     }
     
     function optionSelectChanged(refIndex, selected, postfixEn, postfixFa, pageLang) {
-        if (selected !== undefined) {
+        if (selected !== undefined && typeof selected === 'object') {
             let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
             tempLabels[refIndex] = pageLang === "fa" ? `${NumberToPersianWord.convertEnToPe(`${selected.value}`) + postfixFa}` : `${selected.value + postfixEn}`;
             setStepSelectedLabel(tempLabels);
             
             let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
             tempValue[refIndex] = selected.value;
+            // console.log(tempValue);
+            setStepSelectedValue(tempValue);
+        } else if (selected !== undefined) {
+            let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+            tempLabels[refIndex] = pageLang === "fa" ? `${NumberToPersianWord.convertEnToPe(`${selected}`) + postfixFa}` : `${selected + postfixEn}`;
+            setStepSelectedLabel(tempLabels);
+            
+            let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
+            tempValue[refIndex] = selected;
             // console.log(tempValue);
             setStepSelectedValue(tempValue);
         }
@@ -3192,13 +3265,13 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             let objLabel = "";
                                             if (key === "ControlType" && cartValues["ControlType"] === "Motorized") {
                                                 objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(cartValues[key].toString())} / ${t(cartValues["MotorType"].toString())}`).toString() : `${t(cartValues[key].toString())} / ${t(cartValues["MotorType"].toString())}`;
-                                            } else if (key === "Hardware" && cartValues["Hardware"] === "Same Hardware For All Curtains") {
+                                            } else if (key === "Hardware" && cartValues["Hardware"] === "I Want Same Hardware For All Curtains") {
                                                 objLabel = t(cartValues[key].toString()) + " / " + (pageLanguage === "fa" ? cartValues["RailDesignFa"] : cartValues["RailDesignEn"]) + " / " + (pageLanguage === "fa" ? cartValues["RailColorFa"] : cartValues["RailColorEn"]) + " / " + t(cartValues["BatonOption"]);
-                                            } else if (key === "DraperyHardware" && cartValues["DraperyHardware"] !== "None") {
+                                            } else if (key === "DraperyHardware" && cartValues["DraperyHardware"] !== "I Have My Own Hardware") {
                                                 objLabel = t(cartValues[key].toString()) + " / " + (pageLanguage === "fa" ? cartValues["RailDesignFaA"] : cartValues["RailDesignEnA"]) + " / " + (pageLanguage === "fa" ? cartValues["RailColorFaA"] : cartValues["RailColorEnA"]) + " / " + t(cartValues["BatonOptionA"]);
-                                            } else if (key === "SheerHardware" && cartValues["SheerHardware"] !== "None") {
+                                            } else if (key === "SheerHardware" && cartValues["SheerHardware"] !== "I Have My Own Hardware") {
                                                 objLabel = t(cartValues[key].toString()) + " / " + (pageLanguage === "fa" ? cartValues["RailDesignFaB"] : cartValues["RailDesignEnB"]) + " / " + (pageLanguage === "fa" ? cartValues["RailColorFaB"] : cartValues["RailColorEnB"]) + " / " + t(cartValues["BatonOptionB"]);
-                                            } else if (key === "PrivacyLayerHardware" && cartValues["PrivacyLayerHardware"] !== "None") {
+                                            } else if (key === "PrivacyLayerHardware" && cartValues["PrivacyLayerHardware"] !== "I Have My Own Hardware") {
                                                 objLabel = t(cartValues[key].toString()) + " / " + (pageLanguage === "fa" ? cartValues["RailDesignFaC"] : cartValues["RailDesignEnC"]) + " / " + (pageLanguage === "fa" ? cartValues["RailColorFaC"] : cartValues["RailColorEnC"]) + " / " + t(cartValues["BatonOptionC"]);
                                             } else if (tempObj["titleValue"] === null || true) {
                                                 if (tempObj["titlePostfix"] === "") {
@@ -4323,6 +4396,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                         temp1.selectedFabricId = tempFabric.FabricId;
                         temp1.selectedTextEn = tempFabric.DesignEnName;
                         temp1.selectedTextFa = tempFabric.DesignName;
+                        temp1.selectedDesignCode = tempFabric.DesignCode;
                         temp1.selectedColorEn = tempFabric.ColorEnName;
                         temp1.selectedColorFa = tempFabric.ColorName;
                         temp1.selectedHasTrim = tempFabric.HasTrim;
@@ -4338,6 +4412,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                         temp1.selectedFabricId = tempFabric2.FabricId;
                         temp1.selectedTextEn = tempFabric2.DesignEnName;
                         temp1.selectedTextFa = tempFabric2.DesignName;
+                        temp1.selectedDesignCode = tempFabric.DesignCode;
                         temp1.selectedColorEn = tempFabric2.ColorEnName;
                         temp1.selectedColorFa = tempFabric2.ColorName;
                         temp1.selectedHasTrim = tempFabric2.HasTrim;
@@ -4474,7 +4549,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                             tempValue[refIndex] = inputs.current["31"].value;
                             setStepSelectedLabel(tempLabels);
                             setStepSelectedValue(tempValue);
-    
+                            
                             // selectValues["width"] = temp["Width"] ? [{value: temp["Width"]}] : [];
                             // selectValues["length"] = temp["Height"] ? [{value: temp["Height"]}] : [];
                             setWidth(temp["Width"] ? temp["Width"] : undefined);
@@ -4511,6 +4586,8 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             tempLabels[refIndex] = inputs.current["3A03"].getAttribute('text');
                                             tempValue[refIndex] = inputs.current["3A03"].value;
                                             depSetTempArr = new Set([...setGetDeps("", "3A0", depSetTempArr)]);
+                                            setDepth(temp["Depth"] ? temp["Depth"] : undefined);
+                                            setMouldingHeight(temp["MouldingHeight"] ? temp["MouldingHeight"] : undefined);
                                         }
                                         setStepSelectedLabel(tempLabels);
                                         setStepSelectedValue(tempValue);
@@ -4628,7 +4705,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                 if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
                                                     tempLabels["3D"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
                                                 }
-    
+                                                
                                                 let tempHeight = changeLang ? temp["CeilingToWindow1"] : temp["Height"];
                                                 let tempHeight2 = changeLang ? temp["CeilingToWindow2"] : temp["Height2"];
                                                 let tempHeight3 = changeLang ? temp["CeilingToWindow3"] : temp["Height3"];
@@ -4648,7 +4725,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             } else if (scenario === 2) {
                                                 let tempWidth = changeLang ? temp["Width3C"] : temp["Width"];
                                                 let tempHeight = changeLang ? temp["Height3E"] : temp["Height"];
-    
+                                                
                                                 // selectValues["Width3C"] = tempWidth ? [{value: tempWidth}] : [];
                                                 setWidth3C(tempWidth ? tempWidth : undefined);
                                                 if (tempWidth) {
@@ -4660,13 +4737,13 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                 if (tempHeight) {
                                                     tempLabels["3E"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
                                                 }
-    
+                                                
                                                 // selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
                                                 setMount(temp["ShadeMount"] ? temp["ShadeMount"] : undefined);
                                                 if (temp["ShadeMount"] !== undefined) {
                                                     tempLabels["3F"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["ShadeMount"]}`) + postfixFa : temp["ShadeMount"] + postfixEn;
                                                 }
-    
+                                                
                                                 // selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
                                                 setCeilingToFloor(temp["CeilingToFloor"] ? temp["CeilingToFloor"] : undefined);
                                                 if (temp["CeilingToFloor"] !== undefined) {
@@ -4677,13 +4754,13 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                 
                                             } else if (scenario === 3) {
                                                 let tempWidth = changeLang ? temp["Width3C"] : temp["Width"];
-    
+                                                
                                                 // selectValues["Width3C"] = tempWidth ? [{value: tempWidth}] : [];
                                                 setWidth3C(tempWidth ? tempWidth : undefined);
                                                 if (tempWidth) {
                                                     tempLabels["3C"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
                                                 }
-    
+                                                
                                                 let tempHeight = changeLang ? temp["CeilingToWindow1"] : temp["Height"];
                                                 let tempHeight2 = changeLang ? temp["CeilingToWindow2"] : temp["Height2"];
                                                 let tempHeight3 = changeLang ? temp["CeilingToWindow3"] : temp["Height3"];
@@ -4703,13 +4780,13 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             } else if (scenario === 4) {
                                                 let tempWidth = changeLang ? temp["Width3C"] : temp["Width"];
                                                 let tempHeight = changeLang ? temp["Height3E"] : temp["Height"];
-    
+                                                
                                                 // selectValues["Width3C"] = tempWidth ? [{value: tempWidth}] : [];
                                                 setWidth3C(tempWidth ? tempWidth : undefined);
                                                 if (tempWidth) {
                                                     tempLabels["3C"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
                                                 }
-    
+                                                
                                                 // selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
                                                 // selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
                                                 setLeft(temp["ExtensionLeft"] ? temp["ExtensionLeft"] : undefined);
@@ -4717,19 +4794,19 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                 if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
                                                     tempLabels["3D"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
                                                 }
-    
+                                                
                                                 // selectValues["Height3E"] = tempHeight ? [{value: tempHeight}] : [];
                                                 setHeight3E(tempHeight ? tempHeight : undefined);
                                                 if (tempHeight) {
                                                     tempLabels["3E"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
                                                 }
-    
+                                                
                                                 // selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
                                                 setMount(temp["ShadeMount"] ? temp["ShadeMount"] : undefined);
                                                 if (temp["ShadeMount"] !== undefined) {
                                                     tempLabels["3F"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["ShadeMount"]}`) + postfixFa : temp["ShadeMount"] + postfixEn;
                                                 }
-    
+                                                
                                                 // selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
                                                 setCeilingToFloor(temp["CeilingToFloor"] ? temp["CeilingToFloor"] : undefined);
                                                 if (temp["CeilingToFloor"] !== undefined) {
@@ -4740,13 +4817,13 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                 
                                             } else if (scenario === 5) {
                                                 let tempWidth = changeLang ? temp["Width3C"] : temp["Width"];
-    
+                                                
                                                 // selectValues["Width3C"] = tempWidth ? [{value: tempWidth}] : [];
                                                 setWidth3C(tempWidth ? tempWidth : undefined);
                                                 if (tempWidth) {
                                                     tempLabels["3C"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
                                                 }
-    
+                                                
                                                 // selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
                                                 // selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
                                                 setLeft(temp["ExtensionLeft"] ? temp["ExtensionLeft"] : undefined);
@@ -4754,7 +4831,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                 if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
                                                     tempLabels["3D"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
                                                 }
-    
+                                                
                                                 let tempHeight = changeLang ? temp["CeilingToFloor1"] : temp["Height"];
                                                 let tempHeight2 = changeLang ? temp["CeilingToFloor2"] : temp["Height2"];
                                                 let tempHeight3 = changeLang ? temp["CeilingToFloor3"] : temp["Height3"];
@@ -4774,25 +4851,25 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             } else if (scenario === 6) {
                                                 let tempWidth = changeLang ? temp["Width3C"] : temp["Width"];
                                                 let tempHeight = changeLang ? temp["WindowToFloor"] : temp["Height"];
-    
+                                                
                                                 // selectValues["Width3C"] = tempWidth ? [{value: tempWidth}] : [];
                                                 setWidth3C(tempWidth ? tempWidth : undefined);
                                                 if (tempWidth) {
                                                     tempLabels["3C"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
                                                 }
-    
+                                                
                                                 // selectValues["WindowToFloor"] = tempHeight ? [{value: tempHeight}] : [];
                                                 setWindowToFloor(tempHeight ? tempHeight : undefined);
                                                 if (tempHeight) {
                                                     tempLabels["3EFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
                                                 }
-    
+                                                
                                                 // selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
                                                 setMount(temp["ShadeMount"] ? temp["ShadeMount"] : undefined);
                                                 if (temp["ShadeMount"] !== undefined) {
                                                     tempLabels["3F"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["ShadeMount"]}`) + postfixFa : temp["ShadeMount"] + postfixEn;
                                                 }
-    
+                                                
                                                 // selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
                                                 setCeilingToFloor(temp["CeilingToFloor"] ? temp["CeilingToFloor"] : undefined);
                                                 if (temp["CeilingToFloor"] !== undefined) {
@@ -4803,7 +4880,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                 
                                             } else if (scenario === 7) {
                                                 let tempWidth = changeLang ? temp["Width3C"] : temp["Width"];
-    
+                                                
                                                 // selectValues["Width3C"] = tempWidth ? [{value: tempWidth}] : [];
                                                 setWidth3C(tempWidth ? tempWidth : undefined);
                                                 if (tempWidth) {
@@ -4828,13 +4905,13 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             } else {
                                                 let tempWidth = changeLang ? temp["Width3C"] : temp["Width"];
                                                 let tempHeight = changeLang ? temp["WindowToFloor"] : temp["Height"];
-    
+                                                
                                                 // selectValues["Width3C"] = tempWidth ? [{value: tempWidth}] : [];
                                                 setWidth3C(tempWidth ? tempWidth : undefined);
                                                 if (tempWidth) {
                                                     tempLabels["3C"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempWidth}`) + postfixFa : tempWidth + postfixEn;
                                                 }
-    
+                                                
                                                 // selectValues["left"] = temp["ExtensionLeft"] ? [{value: temp["ExtensionLeft"]}] : [];
                                                 // selectValues["right"] = temp["ExtensionRight"] ? [{value: temp["ExtensionRight"]}] : [];
                                                 setLeft(temp["ExtensionLeft"] ? temp["ExtensionLeft"] : undefined);
@@ -4842,19 +4919,19 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                 if (temp["ExtensionLeft"] !== undefined && temp["ExtensionRight"] !== undefined) {
                                                     tempLabels["3D"] = pageLanguage === "fa" ? `راست:  ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionRight"]}`) + postfixFa}\u00A0\u00A0\u00A0چپ: ${NumberToPersianWord.convertEnToPe(`${temp["ExtensionLeft"]}`) + postfixFa}` : `Left: ${temp["ExtensionLeft"] + postfixEn}\u00A0\u00A0\u00A0Right: ${temp["ExtensionRight"] + postfixEn}`;
                                                 }
-    
+                                                
                                                 // selectValues["WindowToFloor"] = tempHeight ? [{value: tempHeight}] : [];
                                                 setWindowToFloor(tempHeight ? tempHeight : undefined);
                                                 if (tempHeight) {
                                                     tempLabels["3EFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
                                                 }
-    
+                                                
                                                 // selectValues["ShadeMount"] = temp["ShadeMount"] ? [{value: temp["ShadeMount"]}] : [];
                                                 setMount(temp["ShadeMount"] ? temp["ShadeMount"] : undefined);
                                                 if (temp["ShadeMount"] !== undefined) {
                                                     tempLabels["3F"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${temp["ShadeMount"]}`) + postfixFa : temp["ShadeMount"] + postfixEn;
                                                 }
-    
+                                                
                                                 // selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
                                                 setCeilingToFloor(temp["CeilingToFloor"] ? temp["CeilingToFloor"] : undefined);
                                                 if (temp["CeilingToFloor"] !== undefined) {
@@ -4900,7 +4977,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             if (tempHeight) {
                                                 tempLabels["3CRod"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
                                             }
-    
+                                            
                                             // selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
                                             setCeilingToFloor(temp["CeilingToFloor"] ? temp["CeilingToFloor"] : undefined);
                                             if (temp["CeilingToFloor"] !== undefined) {
@@ -4925,7 +5002,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             
                                             let tempWidth = changeLang ? temp["RodWidth"] : temp["Width"];
                                             let tempHeight = changeLang ? temp["RodToFloor"] : temp["Height"];
-    
+                                            
                                             // selectValues["RodWidth"] = tempWidth ? [{value: tempWidth}] : [];
                                             setRodWidth(tempWidth ? tempWidth : undefined);
                                             if (tempWidth) {
@@ -4937,7 +5014,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             if (tempHeight) {
                                                 tempLabels["3CRodFloor"] = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${tempHeight}`) + postfixFa : tempHeight + postfixEn;
                                             }
-    
+                                            
                                             // selectValues["CeilingToFloor"] = temp["CeilingToFloor"] ? [{value: temp["CeilingToFloor"]}] : [];
                                             setCeilingToFloor(temp["CeilingToFloor"] ? temp["CeilingToFloor"] : undefined);
                                             if (temp["CeilingToFloor"] !== undefined) {
@@ -4950,7 +5027,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             setStepSelectedValue(tempValue);
                                             
                                         }
-                                    } else{
+                                    } else {
                                         depSetTempArr = new Set([...setGetDeps("3ARod", "", depSetTempArr)]);
                                     }
                                     
@@ -4998,31 +5075,165 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                         setStepSelectedValue(tempValue);
                     }
                     
-                    if (temp["PanelType"]) {
-                        setStep61(temp["PanelType"]);
-                        if (temp["PanelType"] === "Single Panel, Left") {
-                            let refIndex = inputs.current["611"].getAttribute('ref-num');
-                            tempLabels[refIndex] = inputs.current["611"].getAttribute('text');
-                            tempValue[refIndex] = inputs.current["611"].value;
+                    if (temp["PanelTypeOption"]) {
+                        setStep6(temp["PanelTypeOption"]);
+                        if (temp["PanelTypeOption"] === "Same Style For All Curtains") {
+                            let refIndex = inputs.current["61"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["61"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["61"].value;
                             depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
-                        } else if (temp["PanelType"] === "Single Panel, Right") {
-                            let refIndex = inputs.current["612"].getAttribute('ref-num');
-                            tempLabels[refIndex] = inputs.current["612"].getAttribute('text');
-                            tempValue[refIndex] = inputs.current["612"].value;
-                            depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
-                        } else if (temp["PanelType"] === "Pair, Split Draw") {
-                            let refIndex = inputs.current["613"].getAttribute('ref-num');
-                            tempLabels[refIndex] = inputs.current["613"].getAttribute('text');
-                            tempValue[refIndex] = inputs.current["613"].value;
-                            depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
+                            
+                            if (temp["PanelType"]) {
+                                setStep61(temp["PanelType"]);
+                                if (temp["PanelType"] === "Single Panel, Left") {
+                                    let refIndex = inputs.current["611"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["611"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["611"].value;
+                                    depSetTempArr = new Set([...setGetDeps("", "61", depSetTempArr)]);
+                                } else if (temp["PanelType"] === "Single Panel, Right") {
+                                    let refIndex = inputs.current["612"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["612"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["612"].value;
+                                    depSetTempArr = new Set([...setGetDeps("", "61", depSetTempArr)]);
+                                } else if (temp["PanelType"] === "Single, Free Hanging") {
+                                    let refIndex = inputs.current["613"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["613"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["613"].value;
+                                    depSetTempArr = new Set([...setGetDeps("", "61", depSetTempArr)]);
+                                } else if (temp["PanelType"] === "Pair, Free Hanging") {
+                                    let refIndex = inputs.current["614"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["614"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["614"].value;
+                                    depSetTempArr = new Set([...setGetDeps("", "61", depSetTempArr)]);
+                                } else if (temp["PanelType"] === "Pair, Split Draw") {
+                                    let refIndex = inputs.current["615"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["615"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["615"].value;
+                                    depSetTempArr = new Set([...setGetDeps("", "61", depSetTempArr)]);
+                                } else {
+                                    let refIndex = inputs.current["616"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["616"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["616"].value;
+                                    depSetTempArr = new Set([...setGetDeps("", "61", depSetTempArr)]);
+                                }
+                                setStepSelectedLabel(tempLabels);
+                                setStepSelectedValue(tempValue);
+                            }
                         } else {
-                            let refIndex = inputs.current["614"].getAttribute('ref-num');
-                            tempLabels[refIndex] = inputs.current["614"].getAttribute('text');
-                            tempValue[refIndex] = inputs.current["614"].value;
+                            let refIndex = inputs.current["62"].getAttribute('ref-num');
+                            tempLabels[refIndex] = inputs.current["62"].getAttribute('text');
+                            tempValue[refIndex] = inputs.current["62"].value;
                             depSetTempArr = new Set([...setGetDeps("", "6", depSetTempArr)]);
+                            
+                            if (temp["PanelTypeA"]) {
+                                setStep6A(temp["PanelTypeA"]);
+                                if (temp["PanelTypeA"] === "Single Panel, Left") {
+                                    let refIndex = inputs.current["6A1"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["6A1"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["6A1"].value;
+                                    depSetTempArr = new Set([...setGetDeps("", "6A", depSetTempArr)]);
+                                } else if (temp["PanelTypeA"] === "Single Panel, Right") {
+                                    let refIndex = inputs.current["6A2"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["6A2"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["6A2"].value;
+                                    depSetTempArr = new Set([...setGetDeps("", "6A", depSetTempArr)]);
+                                } else if (temp["PanelTypeA"] === "Single, Free Hanging") {
+                                    let refIndex = inputs.current["6A3"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["6A3"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["6A3"].value;
+                                    depSetTempArr = new Set([...setGetDeps("", "6A", depSetTempArr)]);
+                                } else if (temp["PanelTypeA"] === "Pair, Free Hanging") {
+                                    let refIndex = inputs.current["6A4"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["6A4"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["6A4"].value;
+                                    depSetTempArr = new Set([...setGetDeps("", "6A", depSetTempArr)]);
+                                } else if (temp["PanelTypeA"] === "Pair, Split Draw") {
+                                    let refIndex = inputs.current["6A5"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["6A5"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["6A5"].value;
+                                    depSetTempArr = new Set([...setGetDeps("", "6A", depSetTempArr)]);
+                                } else {
+                                    let refIndex = inputs.current["6A6"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["6A6"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["6A6"].value;
+                                    depSetTempArr = new Set([...setGetDeps("", "6A", depSetTempArr)]);
+                                }
+                                setStepSelectedLabel(tempLabels);
+                                setStepSelectedValue(tempValue);
+                            }
+                            if (temp["PanelTypeB"]) {
+                                setStep6B(temp["PanelTypeB"]);
+                                if (temp["PanelTypeB"] === "Single Panel, Left") {
+                                    let refIndex = inputs.current["6B1"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["6B1"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["6B1"].value;
+                                    depSetTempArr = new Set([...setGetDeps("", "6B", depSetTempArr)]);
+                                } else if (temp["PanelTypeB"] === "Single Panel, Right") {
+                                    let refIndex = inputs.current["6B2"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["6B2"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["6B2"].value;
+                                    depSetTempArr = new Set([...setGetDeps("", "6B", depSetTempArr)]);
+                                } else if (temp["PanelTypeB"] === "Single, Free Hanging") {
+                                    let refIndex = inputs.current["6B3"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["6B3"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["6B3"].value;
+                                    depSetTempArr = new Set([...setGetDeps("", "6B", depSetTempArr)]);
+                                } else if (temp["PanelTypeB"] === "Pair, Free Hanging") {
+                                    let refIndex = inputs.current["6B4"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["6B4"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["6B4"].value;
+                                    depSetTempArr = new Set([...setGetDeps("", "6B", depSetTempArr)]);
+                                } else if (temp["PanelTypeB"] === "Pair, Split Draw") {
+                                    let refIndex = inputs.current["6B5"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["6B5"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["6B5"].value;
+                                    depSetTempArr = new Set([...setGetDeps("", "6B", depSetTempArr)]);
+                                } else {
+                                    let refIndex = inputs.current["6B6"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["6B6"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["6B6"].value;
+                                    depSetTempArr = new Set([...setGetDeps("", "6B", depSetTempArr)]);
+                                }
+                                setStepSelectedLabel(tempLabels);
+                                setStepSelectedValue(tempValue);
+                            }
+                            if (temp["PanelTypeC"]) {
+                                setStep6C(temp["PanelTypeC"]);
+                                if (temp["PanelTypeC"] === "Single Panel, Left") {
+                                    let refIndex = inputs.current["6C1"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["6C1"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["6C1"].value;
+                                    depSetTempArr = new Set([...setGetDeps("", "6C", depSetTempArr)]);
+                                } else if (temp["PanelTypeC"] === "Single Panel, Right") {
+                                    let refIndex = inputs.current["6C2"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["6C2"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["6C2"].value;
+                                    depSetTempArr = new Set([...setGetDeps("", "6C", depSetTempArr)]);
+                                } else if (temp["PanelTypeC"] === "Single, Free Hanging") {
+                                    let refIndex = inputs.current["6C3"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["6C3"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["6C3"].value;
+                                    depSetTempArr = new Set([...setGetDeps("", "6C", depSetTempArr)]);
+                                } else if (temp["PanelTypeC"] === "Pair, Free Hanging") {
+                                    let refIndex = inputs.current["6C4"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["6C4"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["6C4"].value;
+                                    depSetTempArr = new Set([...setGetDeps("", "6C", depSetTempArr)]);
+                                } else if (temp["PanelTypeC"] === "Pair, Split Draw") {
+                                    let refIndex = inputs.current["6C5"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["6C5"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["6C5"].value;
+                                    depSetTempArr = new Set([...setGetDeps("", "6C", depSetTempArr)]);
+                                } else {
+                                    let refIndex = inputs.current["6C6"].getAttribute('ref-num');
+                                    tempLabels[refIndex] = inputs.current["6C6"].getAttribute('text');
+                                    tempValue[refIndex] = inputs.current["6C6"].value;
+                                    depSetTempArr = new Set([...setGetDeps("", "6C", depSetTempArr)]);
+                                }
+                                setStepSelectedLabel(tempLabels);
+                                setStepSelectedValue(tempValue);
+                            }
                         }
-                        setStepSelectedLabel(tempLabels);
-                        setStepSelectedValue(tempValue);
                     }
                     
                     if (temp["GrommetFinish"]) {
@@ -5050,13 +5261,13 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     let tempExtended = extendedTitle;
                     if (temp["Hardware"]) {
                         setStep8(temp["Hardware"]);
-                        if (temp["Hardware"] === "None") {
+                        if (temp["Hardware"] === "I Have My Own Hardware") {
                             let refIndex = inputs.current["81"].getAttribute('ref-num');
                             tempLabels[refIndex] = inputs.current["81"].getAttribute('text');
                             tempValue[refIndex] = inputs.current["81"].value;
                             tempExtended["8"] = [];
                             depSetTempArr = new Set([...setGetDeps("", "8", depSetTempArr)]);
-                        } else if (temp["Hardware"] === "Same Hardware For All Curtains") {
+                        } else if (temp["Hardware"] === "I Want Same Hardware For All Curtains") {
                             let refIndex = inputs.current["82"].getAttribute('ref-num');
                             tempLabels[refIndex] = inputs.current["82"].getAttribute('text');
                             tempValue[refIndex] = inputs.current["82"].value;
@@ -5102,7 +5313,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                             
                             if (temp["DraperyHardware"]) {
                                 setStep8A(temp["DraperyHardware"]);
-                                if (temp["DraperyHardware"] === "None") {
+                                if (temp["DraperyHardware"] === "I Have My Own Hardware") {
                                     let refIndex = inputs.current["8A1"].getAttribute('ref-num');
                                     tempLabels[refIndex] = inputs.current["8A1"].getAttribute('text');
                                     tempValue[refIndex] = inputs.current["8A1"].value;
@@ -5149,7 +5360,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                             
                             if (temp["SheerHardware"]) {
                                 setStep8B(temp["SheerHardware"]);
-                                if (temp["SheerHardware"] === "None") {
+                                if (temp["SheerHardware"] === "I Have My Own Hardware") {
                                     let refIndex = inputs.current["8B1"].getAttribute('ref-num');
                                     tempLabels[refIndex] = inputs.current["8B1"].getAttribute('text');
                                     tempValue[refIndex] = inputs.current["8B1"].value;
@@ -5227,7 +5438,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                             
                             if (temp["PrivacyLayerHardware"]) {
                                 setStep8C(temp["PrivacyLayerHardware"]);
-                                if (temp["PrivacyLayerHardware"] === "None") {
+                                if (temp["PrivacyLayerHardware"] === "I Have My Own Hardware") {
                                     let refIndex = inputs.current["8C1"].getAttribute('ref-num');
                                     tempLabels[refIndex] = inputs.current["8C1"].getAttribute('text');
                                     tempValue[refIndex] = inputs.current["8C1"].value;
@@ -5567,10 +5778,9 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
     
     useEffect(() => {
         if (!pageLoad && !rodsLoad && !rodsLoad2) {
-            setStep6("Same Style For All Curtains");
+            setStep6("");
             let tempExtended = extendedTitle;
-            tempExtended["6"][0] = "Same Style For All Curtains";
-            tempExtended["6"].splice(1, 3);
+            tempExtended["6"]=[];
             setExtendedTitle(tempExtended);
             setStep61("");
             setStep6A("");
@@ -5603,6 +5813,12 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
             // setCart("PhotoUrl", fabricSelected.selectedPhoto);
             setDeps("", "1");
             setStep1(fabricSelected.selectedFabricId.toString());
+            if(step1Check !== `${fabricSelected.selectedDesignCode}`){
+                setStep1Check("");
+                setStep1Border("");
+                setStep1BorderRadio("");
+                setStep1Trim("");
+            }
         }
     }, [fabricSelected]);
     
@@ -5620,6 +5836,12 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
             // setCart("PhotoUrl", fabricSelected2.selectedPhoto);
             setDeps("", "2");
             setStep2(fabricSelected2.selectedFabricId.toString());
+            if(step2Check !== `${fabricSelected2.selectedDesignCode}`){
+                setStep2Check("");
+                setStep2Border("");
+                setStep2BorderRadio("");
+                setStep2Trim("");
+            }
         }
     }, [fabricSelected2]);
     
@@ -6863,7 +7085,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                 } else {
                     setTracksList([]);
                     setTracksList2([]);
-    
+                    
                     setStep6BHead("Rod");
                     setStep6CHead("Rod");
                     setStep6B("");
@@ -7689,7 +7911,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         <input className="radio" type="radio" text={t("Grommet")} value="1" name="step2A" ref-num="2A" id="2A1"
                                                checked={step2A === "Grommet"}
                                                onChange={e => {
-                                                   if ((step2A === "Inverted Box Pleat" || step2A === "Pencil Pleat") && step8 === "Customize Hardware Per Curtain") {
+                                                   if ((step2A === "Inverted Box Pleat" || step2A === "Pencil Pleat") && step8 === "I Want Customize Hardware Per Curtain") {
                                                        modalHandleShow("SheerHeaderStyleWarning");
                                                        setSheerHeaderStyleTemp({
                                                            stepValue: "Grommet",
@@ -7740,7 +7962,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         <input className="radio" type="radio" text={t("Inverted Box Pleat")} value="2" name="step2A" ref-num="2A" id="2A2"
                                                checked={step2A === "Inverted Box Pleat"}
                                                onChange={e => {
-                                                   if ((step2A === "Grommet" || step2A === "Rod Pocket") && step8 === "Customize Hardware Per Curtain") {
+                                                   if ((step2A === "Grommet" || step2A === "Rod Pocket") && step8 === "I Want Customize Hardware Per Curtain") {
                                                        modalHandleShow("SheerHeaderStyleWarning");
                                                        setSheerHeaderStyleTemp({
                                                            stepValue: "Inverted Box Pleat",
@@ -7791,7 +8013,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         <input className="radio" type="radio" text={t("Pencil Pleat")} value="3" name="step2A" ref-num="2A" id="2A3"
                                                checked={step2A === "Pencil Pleat"}
                                                onChange={e => {
-                                                   if ((step2A === "Grommet" || step2A === "Rod Pocket") && step8 === "Customize Hardware Per Curtain") {
+                                                   if ((step2A === "Grommet" || step2A === "Rod Pocket") && step8 === "I Want Customize Hardware Per Curtain") {
                                                        modalHandleShow("SheerHeaderStyleWarning");
                                                        setSheerHeaderStyleTemp({
                                                            stepValue: "Pencil Pleat",
@@ -7914,7 +8136,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    setStep2B("None");
                                                    setStep2B1("");
                                                    setStep2C("");
-                                                   if (step8 === "Customize Hardware Per Curtain") {
+                                                   if (step8 === "I Want Customize Hardware Per Curtain") {
                                                        clearHardwareSteps();
                                                        // if (step31 !== "false") {
                                                        //     selectChanged(e, "8,8A,8B,8C");
@@ -7943,7 +8165,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                onChange={e => {
                                                    setStep2B("Semi Sheer");
                                                    setStep2B1("");
-                                                   if (step8 === "Customize Hardware Per Curtain") {
+                                                   if (step8 === "I Want Customize Hardware Per Curtain") {
                                                        clearHardwareSteps();
                                                        // if (step31 !== "false") {
                                                        //     selectChanged(e, "8,8A,8B,8C");
@@ -7972,7 +8194,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                onChange={e => {
                                                    setStep2B("Opaque");
                                                    setStep2B1("");
-                                                   if (step8 === "Customize Hardware Per Curtain") {
+                                                   if (step8 === "I Want Customize Hardware Per Curtain") {
                                                        clearHardwareSteps();
                                                        // if (step31 !== "false") {
                                                        //     selectChanged(e, "8,8A,8B,8C");
@@ -8025,7 +8247,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         <input className="radio" type="radio" text={t("Grommet")} value="1" name="step2C" ref-num="2C" id="2C1"
                                                checked={step2C === "Grommet"}
                                                onChange={e => {
-                                                   if ((step2C === "Inverted Box Pleat" || step2C === "Pencil Pleat") && step8 === "Customize Hardware Per Curtain") {
+                                                   if ((step2C === "Inverted Box Pleat" || step2C === "Pencil Pleat") && step8 === "I Want Customize Hardware Per Curtain") {
                                                        modalHandleShow("SheerHeaderStyleWarning2");
                                                        setSheerHeaderStyleTemp2({
                                                            stepValue: "Grommet",
@@ -8049,7 +8271,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         <input className="radio" type="radio" text={t("Inverted Box Pleat")} value="2" name="step2C" ref-num="2C" id="2C2"
                                                checked={step2C === "Inverted Box Pleat"}
                                                onChange={e => {
-                                                   if ((step2C === "Grommet" || step2C === "Rod Pocket") && step8 === "Customize Hardware Per Curtain") {
+                                                   if ((step2C === "Grommet" || step2C === "Rod Pocket") && step8 === "I Want Customize Hardware Per Curtain") {
                                                        modalHandleShow("SheerHeaderStyleWarning2");
                                                        setSheerHeaderStyleTemp2({
                                                            stepValue: "Inverted Box Pleat",
@@ -8073,7 +8295,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         <input className="radio" type="radio" text={t("Pencil Pleat")} value="3" name="step2C" ref-num="2C" id="2C3"
                                                checked={step2C === "Pencil Pleat"}
                                                onChange={e => {
-                                                   if ((step2C === "Grommet" || step2C === "Rod Pocket") && step8 === "Customize Hardware Per Curtain") {
+                                                   if ((step2C === "Grommet" || step2C === "Rod Pocket") && step8 === "I Want Customize Hardware Per Curtain") {
                                                        modalHandleShow("SheerHeaderStyleWarning2");
                                                        setSheerHeaderStyleTemp2({
                                                            stepValue: "Pencil Pleat",
@@ -8138,79 +8360,82 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                }}/>
                                         <label htmlFor="32">{t("Calculate my measurements.")}</label>
                                     </div>
-    
+                                    
                                     <div className={step3 === "false" ? "own_measurements_container" : "noDisplay"}>
                                         <div className="own_measurements_width">
                                             <div className="measure_input_container">
                                                 <h1 className="measure_input_label">{t("Width")}</h1>
                                                 <div className="measure_input_field_container">
-                                                    <DebounceInput debounceTimeout={0} onKeyDown={(e) => {
+                                                    <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                         if (e.keyCode === 13) {
                                                             inputs.current["Height"].focus();
-                                                        }
-                                                        else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                        } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                             e.preventDefault();
                                                         }
-                                                    }} className={"measure_input" + (width !== undefined && (width < 30 || width > 300) ? " measure_input_err" : "")} type="text"
-                                                                   name="width" value={NumToFa(`${width||""}`, pageLanguage)} onChange={()=>{}}
-                                                                   onBlur={(e) => {
-                                                                       let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                       newValue= isNaN(newValue)?"":newValue;
-                                                                       if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 300) {
-                                                                           setCartLoading(true);
-                                                                           setCart("Width", parseInt(newValue));
-                                                                           setDeps("", "31");
-                                                                           setWidth(parseInt(newValue));
-                                                                       } else {
-                                                                           setCartLoading(true);
-                                                                           setCart("", "", "Width");
-                                                                           setDeps("31", "");
-                                                                           if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                               setWidth(undefined);
-                                                                           } else {
+                                                    }} className={"measure_input" + (width !== undefined && (width < 1 || width > 1000) ? " measure_input_err" : "")} type="text"
+                                                                   name="width" value={NumToFa(`${width || ""}`, pageLanguage)}
+                                                                   onChange={(e) => {
+                                                                       setTimeout(() => {
+                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue = isNaN(newValue) ? "" : newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000) {
+                                                                               setCartLoading(true);
+                                                                               setCart("Width", parseInt(newValue));
+                                                                               setDeps("", "31");
                                                                                setWidth(parseInt(newValue));
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "Width");
+                                                                               setDeps("31", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setWidth(undefined);
+                                                                               } else {
+                                                                                   setWidth(parseInt(newValue));
+                                                                               }
+                                                                               setWindowSize("");
                                                                            }
-                                                                           setWindowSize("");
-                                                                       }
+                                                                       }, 300);
                                                                    }}/>
                                                     <div className="measure_input_postfix">{t("cm_label")}</div>
                                                 </div>
-                                                <h2 className={"measure_input_desc" + (width !== undefined && (width < 30 || width > 300) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 300`, pageLanguage)} {t("cm_label")}</h2>
+                                                {/*<h2 className={"measure_input_desc" + (width !== undefined && (width < 30 || width > 1000) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 1000`, pageLanguage)} {t("cm_label")}</h2>*/}
                                             </div>
                                         </div>
                                         <div className="own_measurements_Length">
                                             <div className="measure_input_container">
                                                 <h1 className="measure_input_label">{t("Height")}</h1>
                                                 <div className="measure_input_field_container">
-                                                    <DebounceInput inputRef={ref => (inputs.current["Height"] = ref)} debounceTimeout={0} onKeyDown={(e) => {
+                                                    <DebounceInput inputRef={ref => (inputs.current["Height"] = ref)} debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                         if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                             e.preventDefault();
                                                         }
-                                                    }} className={"measure_input" + (height !== undefined && (height < 30 || height > 400) ? " measure_input_err" : "")} type="text"
-                                                                   name="width" value={NumToFa(`${height||""}`, pageLanguage)} onChange={()=>{}}
-                                                                   onBlur={(e) => {
-                                                                       let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                       newValue= isNaN(newValue)?"":newValue;
-                                                                       if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
-                                                                           setCartLoading(true);
-                                                                           setCart("Height", parseInt(newValue));
-                                                                           setDeps("", "32");
-                                                                           setHeight(parseInt(newValue));
-                                                                       } else {
-                                                                           setCartLoading(true);
-                                                                           setCart("", "", "Height");
-                                                                           setDeps("32", "");
-                                                                           if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                               setHeight(undefined);
-                                                                           } else {
+                                                    }} className={"measure_input" + (height !== undefined && (height < 1 || height > 1000) ? " measure_input_err" : "")} type="text"
+                                                                   name="width" value={NumToFa(`${height || ""}`, pageLanguage)}
+                                                                   onChange={(e) => {
+                                                                       setTimeout(() => {
+                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue = isNaN(newValue) ? "" : newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000) {
+                                                                               setCartLoading(true);
+                                                                               setCart("Height", parseInt(newValue));
+                                                                               setDeps("", "32");
                                                                                setHeight(parseInt(newValue));
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "Height");
+                                                                               setDeps("32", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setHeight(undefined);
+                                                                               } else {
+                                                                                   setHeight(parseInt(newValue));
+                                                                               }
+                                                                               setWindowSize("");
                                                                            }
-                                                                           setWindowSize("");
-                                                                       }
+                                                                       }, 300);
                                                                    }}/>
                                                     <div className="measure_input_postfix">{t("cm_label")}</div>
                                                 </div>
-                                                <h2 className={"measure_input_desc" + (height !== undefined && (height < 30 || height > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>
+                                                {/*<h2 className={"measure_input_desc" + (height !== undefined && (height < 30 || height > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>*/}
                                             </div>
                                         </div>
                                     </div>
@@ -8483,41 +8708,41 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                         </Card.Header>
                         <Accordion.Collapse eventKey="3A0">
                             <Card.Body>
-                                <div className="card_body card_body_radio card_body_radio_camera card_body_radio_small_img">
-                                    <div className="box33 radio_style">
-                                        <img src={require('../Images/drapery/grommet/mount_ceiling.svg').default} className="img-fluid" alt=""/>
-                                        <input className="radio" type="radio" text={t("Ceiling")} value="1" name="step3A0" ref-num="3A0" id="3A01"
-                                               checked={step3A0 === "Ceiling"}
-                                               onChange={e => {
-                                                   setStep3A0("Ceiling");
-                                                   setStep3B("");
-                                                   setDeps("3B", "3A0,3A11,3A12");
-                                                   setCart("Mount", "Ceiling","Depth,MouldingHeight");
-                                                   selectChanged(e,"3B");
-                                                   let temp = JSON.parse(JSON.stringify(selectCustomValues));
-                                                   temp.Depth = [];
-                                                   temp.MouldingHeight = [];
-                                                   setSelectCustomValues(temp);
-                                               }} ref={ref => (inputs.current["3A01"] = ref)}/>
-                                        <label htmlFor="3A01">{t("Ceiling")}
-                                        </label>
-                                    </div>
+                                <div className="card_body card_body_radio card_body_radio_camera card_body_radio_medium_img">
                                     <div className="box33 radio_style">
                                         <img src={require('../Images/drapery/grommet/mount_wall.svg').default} className="img-fluid" alt=""/>
-                                        <input className="radio" type="radio" text={t("Wall")} value="2" name="step3A0" ref-num="3A0" id="3A02"
+                                        <input className="radio" type="radio" text={t("Wall")} value="1" name="step3A0" ref-num="3A0" id="3A01"
                                                checked={step3A0 === "Wall"}
                                                onChange={e => {
                                                    setStep3A0("Wall");
                                                    setStep3B("");
                                                    setDeps("3B", "3A0,3A11,3A12");
-                                                   setCart("Mount", "Wall","Depth,MouldingHeight");
-                                                   selectChanged(e,"3B");
+                                                   setCart("Mount", "Wall", "Depth,MouldingHeight");
+                                                   selectChanged(e, "3B");
+                                                   let temp = JSON.parse(JSON.stringify(selectCustomValues));
+                                                   temp.Depth = [];
+                                                   temp.MouldingHeight = [];
+                                                   setSelectCustomValues(temp);
+                                               }} ref={ref => (inputs.current["3A01"] = ref)}/>
+                                        <label htmlFor="3A01">{t("Wall")}
+                                        </label>
+                                    </div>
+                                    <div className="box33 radio_style">
+                                        <img src={require('../Images/drapery/grommet/mount_ceiling.svg').default} className="img-fluid" alt=""/>
+                                        <input className="radio" type="radio" text={t("Ceiling")} value="2" name="step3A0" ref-num="3A0" id="3A02"
+                                               checked={step3A0 === "Ceiling"}
+                                               onChange={e => {
+                                                   setStep3A0("Ceiling");
+                                                   setStep3B("");
+                                                   setDeps("3B", "3A0,3A11,3A12");
+                                                   setCart("Mount", "Ceiling", "Depth,MouldingHeight");
+                                                   selectChanged(e, "3B");
                                                    let temp = JSON.parse(JSON.stringify(selectCustomValues));
                                                    temp.Depth = [];
                                                    temp.MouldingHeight = [];
                                                    setSelectCustomValues(temp);
                                                }} ref={ref => (inputs.current["3A02"] = ref)}/>
-                                        <label htmlFor="3A02">{t("Wall")}
+                                        <label htmlFor="3A02">{t("Ceiling")}
                                         </label>
                                     </div>
                                     <div className="box33 radio_style">
@@ -8529,12 +8754,12 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    setStep3B("");
                                                    setDeps("3A11,3A12,3B", "3A0");
                                                    setCart("Mount", "Moulding");
-                                                   selectChanged(e,"3B");
+                                                   selectChanged(e, "3B");
                                                }} ref={ref => (inputs.current["3A03"] = ref)}/>
                                         <label htmlFor="3A03">{t("mount_MouldingMount")}
                                         </label>
                                     </div>
-    
+                                    
                                     <div className={step3A0 === "Moulding" ? "own_measurements_container" : "noDisplay"}>
                                         <div className="own_measurements_width">
                                             {/*<label className="select_label">{t("Depth")}<p className="farsi_cm">{t("select_cm")}</p></label>*/}
@@ -8576,35 +8801,37 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             <div className="measure_input_container">
                                                 <h1 className="measure_input_label">{t("Depth")}</h1>
                                                 <div className="measure_input_field_container">
-                                                    <DebounceInput debounceTimeout={0} onKeyDown={(e) => {
+                                                    <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                         if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                             e.preventDefault();
                                                         }
-                                                    }} className={"measure_input" + (depth !== undefined && (depth < 1 || depth > 50) ? " measure_input_err" : "")} type="text"
-                                                                   name="width" value={NumToFa(`${depth||""}`, pageLanguage)} onChange={()=>{}}
-                                                                   onBlur={(e) => {
-                                                                       let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                       newValue= isNaN(newValue)?"":newValue;
-                                                                       if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 50) {
-                                                                           setCartLoading(true);
-                                                                           setCart("Depth", parseInt(newValue));
-                                                                           setDeps("", "3A11");
-                                                                           setDepth(parseInt(newValue));
-                                                                       } else {
-                                                                           setCartLoading(true);
-                                                                           setCart("", "", "Depth");
-                                                                           setDeps("3A11", "");
-                                                                           if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                               setDepth(undefined);
-                                                                           } else {
+                                                    }} className={"measure_input" + (depth !== undefined && (depth < 20 || depth > 50) ? " measure_input_err" : "")} type="text"
+                                                                   name="width" value={NumToFa(`${depth || ""}`, pageLanguage)}
+                                                                   onChange={(e) => {
+                                                                       setTimeout(() => {
+                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue = isNaN(newValue) ? "" : newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 20 && parseInt(newValue) <= 50) {
+                                                                               setCartLoading(true);
+                                                                               setCart("Depth", parseInt(newValue));
+                                                                               setDeps("", "3A11");
                                                                                setDepth(parseInt(newValue));
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "Depth");
+                                                                               setDeps("3A11", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setDepth(undefined);
+                                                                               } else {
+                                                                                   setDepth(parseInt(newValue));
+                                                                               }
+                                                                               setWindowSize("");
                                                                            }
-                                                                           setWindowSize("");
-                                                                       }
+                                                                       }, 300);
                                                                    }}/>
                                                     <div className="measure_input_postfix">{t("cm_label")}</div>
                                                 </div>
-                                                <h2 className={"measure_input_desc" + (depth !== undefined && (depth < 1 || depth > 50) ? " measure_input_desc_err" : "")}>{NumToFa(`1 - 50`, pageLanguage)} {t("cm_label")}</h2>
+                                                <h2 className={"measure_input_desc" + (depth !== undefined && (depth < 20 || depth > 50) ? " measure_input_desc_err" : "")}>{NumToFa(`1 - 50`, pageLanguage)} {t("cm_label")}</h2>
                                             </div>
                                         </div>
                                         <div className="own_measurements_Length">
@@ -8647,35 +8874,37 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             <div className="measure_input_container">
                                                 <h1 className="measure_input_label">{t("MouldingHeight")}</h1>
                                                 <div className="measure_input_field_container">
-                                                    <DebounceInput debounceTimeout={0} onKeyDown={(e) => {
+                                                    <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                         if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                             e.preventDefault();
                                                         }
-                                                    }} className={"measure_input" + (mouldingHeight !== undefined && (mouldingHeight < 1 || mouldingHeight > 50) ? " measure_input_err" : "")} type="text"
-                                                                   name="width" value={NumToFa(`${mouldingHeight||""}`, pageLanguage)} onChange={()=>{}}
-                                                                   onBlur={(e) => {
-                                                                       let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                       newValue= isNaN(newValue)?"":newValue;
-                                                                       if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 50) {
-                                                                           setCartLoading(true);
-                                                                           setCart("MouldingHeight", parseInt(newValue));
-                                                                           setDeps("", "3A12");
-                                                                           setMouldingHeight(parseInt(newValue));
-                                                                       } else {
-                                                                           setCartLoading(true);
-                                                                           setCart("", "", "MouldingHeight");
-                                                                           setDeps("3A12", "");
-                                                                           if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                               setMouldingHeight(undefined);
-                                                                           } else {
+                                                    }} className={"measure_input" + (mouldingHeight !== undefined && (mouldingHeight < 1 || mouldingHeight > 40) ? " measure_input_err" : "")} type="text"
+                                                                   name="width" value={NumToFa(`${mouldingHeight || ""}`, pageLanguage)}
+                                                                   onChange={(e) => {
+                                                                       setTimeout(() => {
+                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue = isNaN(newValue) ? "" : newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 40) {
+                                                                               setCartLoading(true);
+                                                                               setCart("MouldingHeight", parseInt(newValue));
+                                                                               setDeps("", "3A12");
                                                                                setMouldingHeight(parseInt(newValue));
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "MouldingHeight");
+                                                                               setDeps("3A12", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setMouldingHeight(undefined);
+                                                                               } else {
+                                                                                   setMouldingHeight(parseInt(newValue));
+                                                                               }
+                                                                               setWindowSize("");
                                                                            }
-                                                                           setWindowSize("");
-                                                                       }
+                                                                       }, 300);
                                                                    }}/>
                                                     <div className="measure_input_postfix">{t("cm_label")}</div>
                                                 </div>
-                                                <h2 className={"measure_input_desc" + (mouldingHeight !== undefined && (mouldingHeight < 1 || mouldingHeight > 50) ? " measure_input_desc_err" : "")}>{NumToFa(`1 - 50`, pageLanguage)} {t("cm_label")}</h2>
+                                                <h2 className={"measure_input_desc" + (mouldingHeight !== undefined && (mouldingHeight < 1 || mouldingHeight > 40) ? " measure_input_desc_err" : "")}>{NumToFa(`1 - 50`, pageLanguage)} {t("cm_label")}</h2>
                                             </div>
                                         </div>
                                     </div>
@@ -8936,7 +9165,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                     {/*        </div>*/}
                                     {/*    </div>*/}
                                     {/*</div>*/}
-    
+                                    
                                     <NextStep currentStep="3A" eventKey="3B">{t("NEXT STEP")}</NextStep>
                                 </div>
                             </Card.Body>
@@ -8944,7 +9173,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     </Card>
                     
                     {/* step 4B */}
-                    <Card className={step3 === "true" && step31 === "false" && step3A0!=="" && step3A!=="" ? "" : "noDisplay"}>
+                    <Card className={step3 === "true" && step31 === "false" && step3A0 !== "" && step3A !== "" ? "" : "noDisplay"}>
                         <Card.Header className={[...depSet].findIndex(el => el.startsWith("3")) === -1 && (!accordionActiveKey.startsWith("3")) ? "hidden" : ""}>
                             <ContextAwareToggle eventKey="3B" stepNum={t("4C")} stepTitle={t("dk_step2A")} stepRef="3B" type="1" required={requiredStep["3B"]}
                                                 stepSelected={stepSelectedLabel["3B"] === undefined ? "" : stepSelectedLabel["3B"]}/>
@@ -9131,36 +9360,38 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             <div className="measure_input_container">
                                                 <h1 className="measure_input_label">{t("Width")}</h1>
                                                 <div className="measure_input_field_container">
-                                                    <DebounceInput debounceTimeout={0} onKeyDown={(e) => {
+                                                    <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                         if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                             e.preventDefault();
                                                         }
-                                                    }} className={"measure_input" + (width3C !== undefined && (width3C < 30 || width3C > 290) ? " measure_input_err" : "")} type="text"
-                                                                   name="width3C" value={NumToFa(`${width3C||""}`, pageLanguage)} onChange={()=>{}}
-                                                                   onBlur={(e) => {
-                                                                       let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                       newValue= isNaN(newValue)?"":newValue;
-                                                                       if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 290) {
-                                                                           setCartLoading(true);
-                                                                           setCart("Width3C", parseInt(newValue));
-                                                                           setDeps("", "3C");
-                                                                           setWidth3C(parseInt(newValue));
-                                                                           optionSelectChanged("3C", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
-                                                                       } else {
-                                                                           setCartLoading(true);
-                                                                           setCart("", "", "Width3C");
-                                                                           setDeps("3C", "");
-                                                                           if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                               setWidth3C(undefined);
-                                                                           } else {
+                                                    }} className={"measure_input" + (width3C !== undefined && (width3C < 1 || width3C > 1000) ? " measure_input_err" : "")} type="text"
+                                                                   name="width3C" value={NumToFa(`${width3C || ""}`, pageLanguage)}
+                                                                   onChange={(e) => {
+                                                                       setTimeout(() => {
+                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue = isNaN(newValue) ? "" : newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000) {
+                                                                               setCartLoading(true);
+                                                                               setCart("Width3C", parseInt(newValue));
+                                                                               setDeps("", "3C");
                                                                                setWidth3C(parseInt(newValue));
+                                                                               optionSelectChanged("3C", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "Width3C");
+                                                                               setDeps("3C", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setWidth3C(undefined);
+                                                                               } else {
+                                                                                   setWidth3C(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3C");
                                                                            }
-                                                                           selectChanged(undefined, "3C");
-                                                                       }
+                                                                       }, 300);
                                                                    }}/>
                                                     <div className="measure_input_postfix">{t("cm_label")}</div>
                                                 </div>
-                                                <h2 className={"measure_input_desc" + (width3C !== undefined && (width3C < 30 || width3C > 290) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 290`, pageLanguage)} {t("cm_label")}</h2>
+                                                {/*<h2 className={"measure_input_desc" + (width3C !== undefined && (width3C < 30 || width3C > 290) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 290`, pageLanguage)} {t("cm_label")}</h2>*/}
                                             </div>
                                         </div>
                                     </div>
@@ -9232,50 +9463,51 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             {/*        options={SelectOptionRange(1, 50, 1, "cm", "", pageLanguage)}*/}
                                             {/*    />*/}
                                             {/*</div>*/}
-                                            <div className="measure_input_container">
+                                            <div className={step3A === "Left Corner Window" ?"measure_input_container disabled":"measure_input_container"}>
                                                 <h1 className="measure_input_label">{t("Left")}</h1>
                                                 <div className="measure_input_field_container">
-                                                    <DebounceInput debounceTimeout={0} onKeyDown={(e) => {
+                                                    <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                         if (e.keyCode === 13) {
                                                             inputs.current["Right"].focus();
-                                                        }
-                                                        else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                        } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                             e.preventDefault();
                                                         }
                                                     }} className={"measure_input" + (left !== undefined && (left < 1 || left > 1000) ? " measure_input_err" : "")} type="text"
-                                                                   name="Left" value={NumToFa(`${left||""}`, pageLanguage)} onChange={()=>{}}
-                                                                   onBlur={(e) => {
-                                                                       let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                       newValue= isNaN(newValue)?"":newValue;
-                                                                       if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000) {
-                                                                           setCartLoading(true);
-                                                                           if (step3A === "Right Corner Window") {
-                                                                               optionSelectChanged_LeftRight(parseInt(newValue), "3D", true, "cm", "س\u200Cم", pageLanguage, 0);
-                                                                               setDeps("", "3D1,3D2");
-                                                                               setCart("ExtensionLeft", parseInt(newValue), "", "ExtensionRight", [0]);
-                                                                           } else {
-                                                                               setCart("ExtensionLeft", parseInt(newValue));
-                                                                               setDeps("", "3D1");
-                                                                               optionSelectChanged_LeftRight(parseInt(newValue), "3D", true, "cm", "س\u200Cم", pageLanguage);
-                                                                           }
-                                                                           setLeft(parseInt(newValue));
-                                                                       } else {
-                                                                           setCartLoading(true);
-                                                                           if (step3A === "Right Corner Window") {
-                                                                               optionSelectChanged_LeftRight(parseInt(newValue), "3D", true, "cm", "س\u200Cم", pageLanguage, 0);
-                                                                               setDeps("3D1,3D2", "");
-                                                                               setCart("", "", "ExtensionLeft,ExtensionRight");
-                                                                           } else {
-                                                                               setCart("", "", "ExtensionLeft");
-                                                                               setDeps("3D1", "");
-                                                                           }
-                                                                           if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                               setLeft(undefined);
-                                                                           } else {
+                                                                   name="Left" value={NumToFa(`${left || ""}`, pageLanguage)} disabled={step3A === "Left Corner Window"}
+                                                                   onChange={(e) => {
+                                                                       setTimeout(() => {
+                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue = isNaN(newValue) ? "" : newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000) {
+                                                                               setCartLoading(true);
+                                                                               if (step3A === "Right Corner Window") {
+                                                                                   optionSelectChanged_LeftRight(parseInt(newValue), "3D", true, "cm", "س\u200Cم", pageLanguage, 0);
+                                                                                   setDeps("", "3D1,3D2");
+                                                                                   setCart("ExtensionLeft", parseInt(newValue), "", "ExtensionRight", [0]);
+                                                                               } else {
+                                                                                   setCart("ExtensionLeft", parseInt(newValue));
+                                                                                   setDeps("", "3D1");
+                                                                                   optionSelectChanged_LeftRight(parseInt(newValue), "3D", true, "cm", "س\u200Cم", pageLanguage);
+                                                                               }
                                                                                setLeft(parseInt(newValue));
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               if (step3A === "Right Corner Window") {
+                                                                                   // optionSelectChanged_LeftRight(parseInt(newValue), "3D", true, "cm", "س\u200Cم", pageLanguage, 0);
+                                                                                   setDeps("3D1,3D2", "");
+                                                                                   setCart("", "", "ExtensionLeft,ExtensionRight");
+                                                                               } else {
+                                                                                   setCart("", "", "ExtensionLeft");
+                                                                                   setDeps("3D1", "");
+                                                                               }
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setLeft(undefined);
+                                                                               } else {
+                                                                                   setLeft(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3D");
                                                                            }
-                                                                           selectChanged(undefined, "3D");
-                                                                       }
+                                                                       }, 300);
                                                                    }}/>
                                                     <div className="measure_input_postfix">{t("cm_label")}</div>
                                                 </div>
@@ -9347,47 +9579,49 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             {/*        options={SelectOptionRange(1, 50, 1, "cm", "", pageLanguage)}*/}
                                             {/*    />*/}
                                             {/*</div>*/}
-                                            <div className="measure_input_container">
+                                            <div className={step3A === "Right Corner Window" ?"measure_input_container disabled":"measure_input_container"}>
                                                 <h1 className="measure_input_label">{t("Right")}</h1>
                                                 <div className="measure_input_field_container">
-                                                    <DebounceInput inputRef={ref => (inputs.current["Right"] = ref)} debounceTimeout={0} onKeyDown={(e) => {
+                                                    <DebounceInput inputRef={ref => (inputs.current["Right"] = ref)} debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                         if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                             e.preventDefault();
                                                         }
                                                     }} className={"measure_input" + (right !== undefined && (right < 1 || right > 1000) ? " measure_input_err" : "")} type="text"
-                                                                   name="right" value={NumToFa(`${right||""}`, pageLanguage)} onChange={()=>{}}
-                                                                   onBlur={(e) => {
-                                                                       let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                       newValue= isNaN(newValue)?"":newValue;
-                                                                       if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000) {
-                                                                           setCartLoading(true);
-                                                                           if (step3A === "Right Corner Window") {
-                                                                               optionSelectChanged_LeftRight(parseInt(newValue), "3D", false, "cm", "س\u200Cم", pageLanguage, 0);
-                                                                               setDeps("", "3D2,3D1");
-                                                                               setCart("ExtensionRight", parseInt(newValue), "", "ExtensionLeft", [0]);
-                                                                           } else {
-                                                                               setCart("ExtensionRight", parseInt(newValue));
-                                                                               setDeps("", "3D2");
-                                                                               optionSelectChanged_LeftRight(parseInt(newValue), "3D", false, "cm", "س\u200Cم", pageLanguage);
-                                                                           }
-                                                                           setRight(parseInt(newValue));
-                                                                       } else {
-                                                                           setCartLoading(true);
-                                                                           if (step3A === "Right Corner Window") {
-                                                                               optionSelectChanged_LeftRight(parseInt(newValue), "3D", false, "cm", "س\u200Cم", pageLanguage, 0);
-                                                                               setDeps("3D2,3D1", "");
-                                                                               setCart("", "", "ExtensionRight,ExtensionLeft");
-                                                                           } else {
-                                                                               setCart("", "", "ExtensionRight");
-                                                                               setDeps("3D2", "");
-                                                                           }
-                                                                           if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                               setRight(undefined);
-                                                                           } else {
+                                                                   name="right" value={NumToFa(`${right || ""}`, pageLanguage)} disabled={step3A === "Right Corner Window"}
+                                                                   onChange={(e) => {
+                                                                       setTimeout(() => {
+                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue = isNaN(newValue) ? "" : newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000) {
+                                                                               setCartLoading(true);
+                                                                               if (step3A === "Left Corner Window") {
+                                                                                   optionSelectChanged_LeftRight(parseInt(newValue), "3D", false, "cm", "س\u200Cم", pageLanguage, 0);
+                                                                                   setDeps("", "3D2,3D1");
+                                                                                   setCart("ExtensionRight", parseInt(newValue), "", "ExtensionLeft", [0]);
+                                                                               } else {
+                                                                                   setCart("ExtensionRight", parseInt(newValue));
+                                                                                   setDeps("", "3D2");
+                                                                                   optionSelectChanged_LeftRight(parseInt(newValue), "3D", false, "cm", "س\u200Cم", pageLanguage);
+                                                                               }
                                                                                setRight(parseInt(newValue));
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               if (step3A === "Left Corner Window") {
+                                                                                   // optionSelectChanged_LeftRight(parseInt(newValue), "3D", false, "cm", "س\u200Cم", pageLanguage, 0);
+                                                                                   setDeps("3D2,3D1", "");
+                                                                                   setCart("", "", "ExtensionRight,ExtensionLeft");
+                                                                               } else {
+                                                                                   setCart("", "", "ExtensionRight");
+                                                                                   setDeps("3D2", "");
+                                                                               }
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setRight(undefined);
+                                                                               } else {
+                                                                                   setRight(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3D");
                                                                            }
-                                                                           selectChanged(undefined, "3D");
-                                                                       }
+                                                                       }, 300);
                                                                    }}/>
                                                     <div className="measure_input_postfix">{t("cm_label")}</div>
                                                 </div>
@@ -9452,36 +9686,38 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             <div className="measure_input_container">
                                                 <h1 className="measure_input_label">{t("Height")}</h1>
                                                 <div className="measure_input_field_container">
-                                                    <DebounceInput debounceTimeout={0} onKeyDown={(e) => {
+                                                    <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                         if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                             e.preventDefault();
                                                         }
-                                                    }} className={"measure_input" + (height3E !== undefined && (height3E < 30 || height3E > 400) ? " measure_input_err" : "")} type="text"
-                                                                   name="height3E" value={NumToFa(`${height3E||""}`, pageLanguage)} onChange={()=>{}}
-                                                                   onBlur={(e) => {
-                                                                       let newValue=NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                       newValue= isNaN(newValue)?"":newValue;
-                                                                       if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
-                                                                           setCartLoading(true);
-                                                                           setCart("Height3E", parseInt(newValue));
-                                                                           setDeps("", "3E");
-                                                                           setHeight3E(parseInt(newValue));
-                                                                           optionSelectChanged("3E", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
-                                                                       } else {
-                                                                           setCartLoading(true);
-                                                                           setCart("", "", "Height3E");
-                                                                           setDeps("3E", "");
-                                                                           if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                               setHeight3E(undefined);
-                                                                           } else {
+                                                    }} className={"measure_input" + (height3E !== undefined && (height3E < 1 || height3E > 1000) ? " measure_input_err" : "")} type="text"
+                                                                   name="height3E" value={NumToFa(`${height3E || ""}`, pageLanguage)}
+                                                                   onChange={(e) => {
+                                                                       setTimeout(() => {
+                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue = isNaN(newValue) ? "" : newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000) {
+                                                                               setCartLoading(true);
+                                                                               setCart("Height3E", parseInt(newValue));
+                                                                               setDeps("", "3E");
                                                                                setHeight3E(parseInt(newValue));
+                                                                               optionSelectChanged("3E", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "Height3E");
+                                                                               setDeps("3E", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setHeight3E(undefined);
+                                                                               } else {
+                                                                                   setHeight3E(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3E");
                                                                            }
-                                                                           selectChanged(undefined, "3E");
-                                                                       }
+                                                                       }, 300);
                                                                    }}/>
                                                     <div className="measure_input_postfix">{t("cm_label")}</div>
                                                 </div>
-                                                <h2 className={"measure_input_desc" + (height3E !== undefined && (height3E < 30 || height3E > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>
+                                                {/*<h2 className={"measure_input_desc" + (height3E !== undefined && (height3E < 30 || height3E > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>*/}
                                             </div>
                                         </div>
                                     </div>
@@ -9552,39 +9788,40 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                     <div className="box100 Three_selection_container">
                                         <div className="box100">
                                             <div className="measure_input_container">
-                                                <h1 className="measure_input_label">{t("step3AIn_A")}</h1>
+                                                {/*<h1 className="measure_input_label">{t("step3AIn_A")}</h1>*/}
                                                 <div className="measure_input_field_container">
-                                                    <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                    <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                         if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                             e.preventDefault();
                                                         }
-                                                    }} className={"measure_input" + (windowToFloor !== undefined && (windowToFloor < 30 || windowToFloor > 400) ? " measure_input_err" : "")} type="text"
-                                                                   name="windowToFloor1" value={NumToFa(`${windowToFloor || ""}`, pageLanguage)} onChange={() => {
-                                                    }}
-                                                                   onBlur={(e) => {
-                                                                       let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                       newValue = isNaN(newValue) ? "" : newValue;
-                                                                       if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
-                                                                           setCartLoading(true);
-                                                                           setCart("WindowToFloor", parseInt(newValue));
-                                                                           setDeps("", "3EFloor");
-                                                                           setWindowToFloor(parseInt(newValue));
-                                                                           optionSelectChanged_three(parseInt(newValue), "3EFloor", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                       } else {
-                                                                           setCartLoading(true);
-                                                                           setCart("", "", "WindowToFloor");
-                                                                           setDeps("3EFloor", "");
-                                                                           if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                               setWindowToFloor(undefined);
-                                                                           } else {
+                                                    }} className={"measure_input" + (windowToFloor !== undefined && (windowToFloor < 1 || windowToFloor > 1000) ? " measure_input_err" : "")} type="text"
+                                                                   name="windowToFloor1" value={NumToFa(`${windowToFloor || ""}`, pageLanguage)}
+                                                                   onChange={(e) => {
+                                                                       setTimeout(() => {
+                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue = isNaN(newValue) ? "" : newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000) {
+                                                                               setCartLoading(true);
+                                                                               setCart("WindowToFloor", parseInt(newValue));
+                                                                               setDeps("", "3EFloor");
                                                                                setWindowToFloor(parseInt(newValue));
+                                                                               optionSelectChanged("3EFloor", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "WindowToFloor");
+                                                                               setDeps("3EFloor", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setWindowToFloor(undefined);
+                                                                               } else {
+                                                                                   setWindowToFloor(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3EFloor");
                                                                            }
-                                                                           selectChanged(undefined, "3EFloor");
-                                                                       }
+                                                                       }, 300);
                                                                    }}/>
                                                     <div className="measure_input_postfix">{t("cm_label")}</div>
                                                 </div>
-                                                <h2 className={"measure_input_desc" + (windowToFloor !== undefined && (windowToFloor < 30 || windowToFloor > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>
+                                                {/*<h2 className={"measure_input_desc" + (windowToFloor !== undefined && (windowToFloor < 30 || windowToFloor > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>*/}
                                             </div>
                                         </div>
                                     </div>
@@ -9606,9 +9843,9 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                             <Card.Body>
                                 <div className="card_body">
                                     <div className="box100">
-                                        <p className="step_selection_title">{step3A0 === "Moulding"?t("arc_step2D_title"):t("dk_step2D_title")}</p>
+                                        <p className="step_selection_title">{step3A0 === "Moulding" ? t("arc_step2D_title") : t("dk_step2D_title")}</p>
                                         <img
-                                            src={pageLanguage === 'fa' ? (step3A0 === "Moulding"?require('../Images/drapery/dk/new_ceiling_to_window_3_arc_fa.svg').default:require('../Images/drapery/dk/new_ceiling_to_window_3_fa.svg').default) : (step3A0 === "Moulding"?require('../Images/drapery/dk/new_ceiling_to_window_3_arc.svg').default:require('../Images/drapery/dk/new_ceiling_to_window_3.svg').default)}
+                                            src={pageLanguage === 'fa' ? (step3A0 === "Moulding" ? require('../Images/drapery/dk/new_ceiling_to_window_3_arc_fa.svg').default : require('../Images/drapery/dk/new_ceiling_to_window_3_fa.svg').default) : (step3A0 === "Moulding" ? require('../Images/drapery/dk/new_ceiling_to_window_3_arc.svg').default : require('../Images/drapery/dk/new_ceiling_to_window_3.svg').default)}
                                             className="img-fluid tall_curtain_image" alt=""/>
                                     </div>
                                     {/*<div className="box100 Three_selection_container">*/}
@@ -9735,117 +9972,118 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             <div className="measure_input_container">
                                                 <h1 className="measure_input_label">{t("step3AIn_A")}</h1>
                                                 <div className="measure_input_field_container">
-                                                    <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                    <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                         if (e.keyCode === 13) {
                                                             inputs.current["ceilingToWindow2"].focus();
-                                                        }
-                                                        else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                        } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                             e.preventDefault();
                                                         }
-                                                    }} className={"measure_input" + (ceilingToWindow1 !== undefined && (ceilingToWindow1 < 30 || ceilingToWindow1 > 400) ? " measure_input_err" : "")} type="text"
-                                                                   name="ceilingToWindow1" value={NumToFa(`${ceilingToWindow1 || ""}`, pageLanguage)} onChange={() => {
-                                                    }}
-                                                                   onBlur={(e) => {
-                                                                       let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                       newValue = isNaN(newValue) ? "" : newValue;
-                                                                       if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
-                                                                           setCartLoading(true);
-                                                                           setCart("CeilingToWindow1", parseInt(newValue));
-                                                                           setDeps("", "3EStandardCeiling1");
-                                                                           setCeilingToWindow1(parseInt(newValue));
-                                                                           optionSelectChanged_three(parseInt(newValue), "3EStandardCeiling", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                       } else {
-                                                                           setCartLoading(true);
-                                                                           setCart("", "", "CeilingToWindow1");
-                                                                           setDeps("3EStandardCeiling1", "");
-                                                                           if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                               setCeilingToWindow1(undefined);
-                                                                           } else {
+                                                    }} className={"measure_input" + (ceilingToWindow1 !== undefined && (ceilingToWindow1 < 1 || ceilingToWindow1 > 1000) ? " measure_input_err" : "")} type="text"
+                                                                   name="ceilingToWindow1" value={NumToFa(`${ceilingToWindow1 || ""}`, pageLanguage)}
+                                                                   onChange={(e) => {
+                                                                       setTimeout(() => {
+                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue = isNaN(newValue) ? "" : newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000) {
+                                                                               setCartLoading(true);
+                                                                               setCart("CeilingToWindow1", parseInt(newValue));
+                                                                               setDeps("", "3EStandardCeiling1");
                                                                                setCeilingToWindow1(parseInt(newValue));
+                                                                               optionSelectChanged_three(parseInt(newValue), "3EStandardCeiling", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "CeilingToWindow1");
+                                                                               setDeps("3EStandardCeiling1", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setCeilingToWindow1(undefined);
+                                                                               } else {
+                                                                                   setCeilingToWindow1(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3EStandardCeiling");
                                                                            }
-                                                                           selectChanged(undefined, "3EStandardCeiling");
-                                                                       }
+                                                                       }, 300);
                                                                    }}/>
                                                     <div className="measure_input_postfix">{t("cm_label")}</div>
                                                 </div>
-                                                <h2 className={"measure_input_desc" + (ceilingToWindow1 !== undefined && (ceilingToWindow1 < 30 || ceilingToWindow1 > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>
+                                                {/*<h2 className={"measure_input_desc" + (ceilingToWindow1 !== undefined && (ceilingToWindow1 < 30 || ceilingToWindow1 > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>*/}
                                             </div>
                                         </div>
                                         <div className="Three_select_container">
                                             <div className="measure_input_container">
                                                 <h1 className="measure_input_label">{t("step3AIn_B")}</h1>
                                                 <div className="measure_input_field_container">
-                                                    <DebounceInput inputRef={ref => (inputs.current["ceilingToWindow2"] = ref)} debounceTimeout={500} onKeyDown={(e) => {
+                                                    <DebounceInput inputRef={ref => (inputs.current["ceilingToWindow2"] = ref)} debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                         if (e.keyCode === 13) {
                                                             inputs.current["ceilingToWindow3"].focus();
-                                                        }
-                                                        else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                        } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                             e.preventDefault();
                                                         }
-                                                    }} className={"measure_input" + (ceilingToWindow2 !== undefined && (ceilingToWindow2 < 30 || ceilingToWindow2 > 400) ? " measure_input_err" : "")} type="text"
-                                                                   name="ceilingToWindow2" value={NumToFa(`${ceilingToWindow2 || ""}`, pageLanguage)} onChange={() => {
-                                                    }}
-                                                                   onBlur={(e) => {
-                                                                       let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                       newValue = isNaN(newValue) ? "" : newValue;
-                                                                       if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
-                                                                           setCartLoading(true);
-                                                                           setCart("CeilingToWindow2", parseInt(newValue));
-                                                                           setDeps("", "3EStandardCeiling2");
-                                                                           setCeilingToWindow2(parseInt(newValue));
-                                                                           optionSelectChanged_three(parseInt(newValue), "3EStandardCeiling", 1, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                       } else {
-                                                                           setCartLoading(true);
-                                                                           setCart("", "", "CeilingToWindow2");
-                                                                           setDeps("3EStandardCeiling2", "");
-                                                                           if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                               setCeilingToWindow2(undefined);
-                                                                           } else {
+                                                    }} className={"measure_input" + (ceilingToWindow2 !== undefined && (ceilingToWindow2 < 1 || ceilingToWindow2 > 1000) ? " measure_input_err" : "")} type="text"
+                                                                   name="ceilingToWindow2" value={NumToFa(`${ceilingToWindow2 || ""}`, pageLanguage)}
+                                                                   onChange={(e) => {
+                                                                       setTimeout(() => {
+                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue = isNaN(newValue) ? "" : newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000) {
+                                                                               setCartLoading(true);
+                                                                               setCart("CeilingToWindow2", parseInt(newValue));
+                                                                               setDeps("", "3EStandardCeiling2");
                                                                                setCeilingToWindow2(parseInt(newValue));
+                                                                               optionSelectChanged_three(parseInt(newValue), "3EStandardCeiling", 1, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "CeilingToWindow2");
+                                                                               setDeps("3EStandardCeiling2", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setCeilingToWindow2(undefined);
+                                                                               } else {
+                                                                                   setCeilingToWindow2(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3EStandardCeiling");
                                                                            }
-                                                                           selectChanged(undefined, "3EStandardCeiling");
-                                                                       }
+                                                                       }, 300);
                                                                    }}/>
                                                     <div className="measure_input_postfix">{t("cm_label")}</div>
                                                 </div>
-                                                <h2 className={"measure_input_desc" + (ceilingToWindow2 !== undefined && (ceilingToWindow2 < 30 || ceilingToWindow2 > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>
+                                                {/*<h2 className={"measure_input_desc" + (ceilingToWindow2 !== undefined && (ceilingToWindow2 < 30 || ceilingToWindow2 > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>*/}
                                             </div>
                                         </div>
                                         <div className="Three_select_container">
                                             <div className="measure_input_container">
                                                 <h1 className="measure_input_label">{t("step3AIn_C")}</h1>
                                                 <div className="measure_input_field_container">
-                                                    <DebounceInput inputRef={ref => (inputs.current["ceilingToWindow3"] = ref)} debounceTimeout={500} onKeyDown={(e) => {
+                                                    <DebounceInput inputRef={ref => (inputs.current["ceilingToWindow3"] = ref)} debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                         if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                             e.preventDefault();
                                                         }
-                                                    }} className={"measure_input" + (ceilingToWindow3 !== undefined && (ceilingToWindow3 < 30 || ceilingToWindow3 > 400) ? " measure_input_err" : "")} type="text"
-                                                                   name="ceilingToWindow3" value={NumToFa(`${ceilingToWindow3 || ""}`, pageLanguage)} onChange={() => {
-                                                    }}
-                                                                   onBlur={(e) => {
-                                                                       let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                       newValue = isNaN(newValue) ? "" : newValue;
-                                                                       if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
-                                                                           setCartLoading(true);
-                                                                           setCart("CeilingToWindow3", parseInt(newValue));
-                                                                           setDeps("", "3EStandardCeiling3");
-                                                                           setCeilingToWindow3(parseInt(newValue));
-                                                                           optionSelectChanged_three(parseInt(newValue), "3EStandardCeiling", 2, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                       } else {
-                                                                           setCartLoading(true);
-                                                                           setCart("", "", "CeilingToWindow3");
-                                                                           setDeps("3EStandardCeiling3", "");
-                                                                           if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                               setCeilingToWindow3(undefined);
-                                                                           } else {
+                                                    }} className={"measure_input" + (ceilingToWindow3 !== undefined && (ceilingToWindow3 < 1 || ceilingToWindow3 > 1000) ? " measure_input_err" : "")} type="text"
+                                                                   name="ceilingToWindow3" value={NumToFa(`${ceilingToWindow3 || ""}`, pageLanguage)}
+                                                                   onChange={(e) => {
+                                                                       setTimeout(() => {
+                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue = isNaN(newValue) ? "" : newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000) {
+                                                                               setCartLoading(true);
+                                                                               setCart("CeilingToWindow3", parseInt(newValue));
+                                                                               setDeps("", "3EStandardCeiling3");
                                                                                setCeilingToWindow3(parseInt(newValue));
+                                                                               optionSelectChanged_three(parseInt(newValue), "3EStandardCeiling", 2, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "CeilingToWindow3");
+                                                                               setDeps("3EStandardCeiling3", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setCeilingToWindow3(undefined);
+                                                                               } else {
+                                                                                   setCeilingToWindow3(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3EStandardCeiling");
                                                                            }
-                                                                           selectChanged(undefined, "3EStandardCeiling");
-                                                                       }
+                                                                       }, 300);
                                                                    }}/>
                                                     <div className="measure_input_postfix">{t("cm_label")}</div>
                                                 </div>
-                                                <h2 className={"measure_input_desc" + (ceilingToWindow3 !== undefined && (ceilingToWindow3 < 30 || ceilingToWindow3 > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>
+                                                {/*<h2 className={"measure_input_desc" + (ceilingToWindow3 !== undefined && (ceilingToWindow3 < 30 || ceilingToWindow3 > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>*/}
                                             </div>
                                         </div>
                                     </div>
@@ -9867,9 +10105,9 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                             <Card.Body>
                                 <div className="card_body">
                                     <div className="box100">
-                                        <p className="step_selection_title">{step3A0 === "Moulding"?t("arc_step2E_title"):t("dk_step2E_title")}</p>
+                                        <p className="step_selection_title">{step3A0 === "Moulding" ? t("arc_step2E_title") : t("dk_step2E_title")}</p>
                                         <img
-                                            src={pageLanguage === 'fa' ? (step3A0 === "Moulding"?require('../Images/drapery/dk/new_ceiling_to_floor_3_arc_fa.svg').default:require('../Images/drapery/dk/new_ceiling_to_floor_3_fa.svg').default) : (step3A0 === "Moulding"?require('../Images/drapery/dk/new_ceiling_to_floor_3_arc.svg').default:require('../Images/drapery/dk/new_ceiling_to_floor_3.svg').default)}
+                                            src={pageLanguage === 'fa' ? (step3A0 === "Moulding" ? require('../Images/drapery/dk/new_ceiling_to_floor_3_arc_fa.svg').default : require('../Images/drapery/dk/new_ceiling_to_floor_3_fa.svg').default) : (step3A0 === "Moulding" ? require('../Images/drapery/dk/new_ceiling_to_floor_3_arc.svg').default : require('../Images/drapery/dk/new_ceiling_to_floor_3.svg').default)}
                                             className="img-fluid tall_curtain_image" alt=""/>
                                     </div>
                                     {/*<div className="box100 Three_selection_container">*/}
@@ -9996,117 +10234,118 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             <div className="measure_input_container">
                                                 <h1 className="measure_input_label">{t("step3AIn_A")}</h1>
                                                 <div className="measure_input_field_container">
-                                                    <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                    <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                         if (e.keyCode === 13) {
                                                             inputs.current["ceilingToFloor2"].focus();
-                                                        }
-                                                        else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                        } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                             e.preventDefault();
                                                         }
-                                                    }} className={"measure_input" + (ceilingToFloor1 !== undefined && (ceilingToFloor1 < 30 || ceilingToFloor1 > 400) ? " measure_input_err" : "")} type="text"
-                                                                   name="ceilingToFloor1" value={NumToFa(`${ceilingToFloor1 || ""}`, pageLanguage)} onChange={() => {
-                                                    }}
-                                                                   onBlur={(e) => {
-                                                                       let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                       newValue = isNaN(newValue) ? "" : newValue;
-                                                                       if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
-                                                                           setCartLoading(true);
-                                                                           setCart("CeilingToFloor1", parseInt(newValue));
-                                                                           setDeps("", "3EStandardCeilingFloor1");
-                                                                           setCeilingToFloor1(parseInt(newValue));
-                                                                           optionSelectChanged_three(parseInt(newValue), "3EStandardCeilingFloor", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                       } else {
-                                                                           setCartLoading(true);
-                                                                           setCart("", "", "CeilingToFloor1");
-                                                                           setDeps("3EStandardCeilingFloor1", "");
-                                                                           if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                               setCeilingToFloor1(undefined);
-                                                                           } else {
+                                                    }} className={"measure_input" + (ceilingToFloor1 !== undefined && (ceilingToFloor1 < 1 || ceilingToFloor1 > 1000) ? " measure_input_err" : "")} type="text"
+                                                                   name="ceilingToFloor1" value={NumToFa(`${ceilingToFloor1 || ""}`, pageLanguage)}
+                                                                   onChange={(e) => {
+                                                                       setTimeout(() => {
+                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue = isNaN(newValue) ? "" : newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000) {
+                                                                               setCartLoading(true);
+                                                                               setCart("CeilingToFloor1", parseInt(newValue));
+                                                                               setDeps("", "3EStandardCeilingFloor1");
                                                                                setCeilingToFloor1(parseInt(newValue));
+                                                                               optionSelectChanged_three(parseInt(newValue), "3EStandardCeilingFloor", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "CeilingToFloor1");
+                                                                               setDeps("3EStandardCeilingFloor1", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setCeilingToFloor1(undefined);
+                                                                               } else {
+                                                                                   setCeilingToFloor1(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3EStandardCeilingFloor");
                                                                            }
-                                                                           selectChanged(undefined, "3EStandardCeilingFloor");
-                                                                       }
+                                                                       }, 300);
                                                                    }}/>
                                                     <div className="measure_input_postfix">{t("cm_label")}</div>
                                                 </div>
-                                                <h2 className={"measure_input_desc" + (ceilingToFloor1 !== undefined && (ceilingToFloor1 < 30 || ceilingToFloor1 > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>
+                                                {/*<h2 className={"measure_input_desc" + (ceilingToFloor1 !== undefined && (ceilingToFloor1 < 30 || ceilingToFloor1 > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>*/}
                                             </div>
                                         </div>
                                         <div className="Three_select_container">
                                             <div className="measure_input_container">
                                                 <h1 className="measure_input_label">{t("step3AIn_B")}</h1>
                                                 <div className="measure_input_field_container">
-                                                    <DebounceInput inputRef={ref => (inputs.current["CeilingToFloor2"] = ref)} debounceTimeout={500} onKeyDown={(e) => {
+                                                    <DebounceInput inputRef={ref => (inputs.current["ceilingToFloor2"] = ref)} debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                         if (e.keyCode === 13) {
                                                             inputs.current["ceilingToFloor3"].focus();
-                                                        }
-                                                        else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                        } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                             e.preventDefault();
                                                         }
-                                                    }} className={"measure_input" + (ceilingToFloor2 !== undefined && (ceilingToFloor2 < 30 || ceilingToFloor2 > 400) ? " measure_input_err" : "")} type="text"
-                                                                   name="ceilingToFloor2" value={NumToFa(`${ceilingToFloor2 || ""}`, pageLanguage)} onChange={() => {
-                                                    }}
-                                                                   onBlur={(e) => {
-                                                                       let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                       newValue = isNaN(newValue) ? "" : newValue;
-                                                                       if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
-                                                                           setCartLoading(true);
-                                                                           setCart("CeilingToFloor2", parseInt(newValue));
-                                                                           setDeps("", "3EStandardCeilingFloor2");
-                                                                           setCeilingToFloor2(parseInt(newValue));
-                                                                           optionSelectChanged_three(parseInt(newValue), "3EStandardCeilingFloor", 1, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                       } else {
-                                                                           setCartLoading(true);
-                                                                           setCart("", "", "CeilingToFloor2");
-                                                                           setDeps("3EStandardCeilingFloor2", "");
-                                                                           if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                               setCeilingToFloor2(undefined);
-                                                                           } else {
+                                                    }} className={"measure_input" + (ceilingToFloor2 !== undefined && (ceilingToFloor2 < 1 || ceilingToFloor2 > 1000) ? " measure_input_err" : "")} type="text"
+                                                                   name="ceilingToFloor2" value={NumToFa(`${ceilingToFloor2 || ""}`, pageLanguage)}
+                                                                   onChange={(e) => {
+                                                                       setTimeout(() => {
+                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue = isNaN(newValue) ? "" : newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000) {
+                                                                               setCartLoading(true);
+                                                                               setCart("CeilingToFloor2", parseInt(newValue));
+                                                                               setDeps("", "3EStandardCeilingFloor2");
                                                                                setCeilingToFloor2(parseInt(newValue));
+                                                                               optionSelectChanged_three(parseInt(newValue), "3EStandardCeilingFloor", 1, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "CeilingToFloor2");
+                                                                               setDeps("3EStandardCeilingFloor2", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setCeilingToFloor2(undefined);
+                                                                               } else {
+                                                                                   setCeilingToFloor2(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3EStandardCeilingFloor");
                                                                            }
-                                                                           selectChanged(undefined, "3EStandardCeilingFloor");
-                                                                       }
+                                                                       }, 300);
                                                                    }}/>
                                                     <div className="measure_input_postfix">{t("cm_label")}</div>
                                                 </div>
-                                                <h2 className={"measure_input_desc" + (ceilingToFloor2 !== undefined && (ceilingToFloor2 < 30 || ceilingToFloor2 > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>
+                                                {/*<h2 className={"measure_input_desc" + (ceilingToFloor2 !== undefined && (ceilingToFloor2 < 30 || ceilingToFloor2 > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>*/}
                                             </div>
                                         </div>
                                         <div className="Three_select_container">
                                             <div className="measure_input_container">
                                                 <h1 className="measure_input_label">{t("step3AIn_C")}</h1>
                                                 <div className="measure_input_field_container">
-                                                    <DebounceInput inputRef={ref => (inputs.current["CeilingToFloor3"] = ref)} debounceTimeout={500} onKeyDown={(e) => {
+                                                    <DebounceInput inputRef={ref => (inputs.current["ceilingToFloor3"] = ref)} debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                         if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                             e.preventDefault();
                                                         }
-                                                    }} className={"measure_input" + (ceilingToFloor3 !== undefined && (ceilingToFloor3 < 30 || ceilingToFloor3 > 400) ? " measure_input_err" : "")} type="text"
-                                                                   name="ceilingToFloor3" value={NumToFa(`${ceilingToFloor3 || ""}`, pageLanguage)} onChange={() => {
-                                                    }}
-                                                                   onBlur={(e) => {
-                                                                       let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                       newValue = isNaN(newValue) ? "" : newValue;
-                                                                       if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
-                                                                           setCartLoading(true);
-                                                                           setCart("CeilingToFloor3", parseInt(newValue));
-                                                                           setDeps("", "3EStandardCeilingFloor3");
-                                                                           setCeilingToFloor3(parseInt(newValue));
-                                                                           optionSelectChanged_three(parseInt(newValue), "3EStandardCeilingFloor", 2, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                       } else {
-                                                                           setCartLoading(true);
-                                                                           setCart("", "", "CeilingToFloor3");
-                                                                           setDeps("3EStandardCeilingFloor3", "");
-                                                                           if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                               setCeilingToFloor3(undefined);
-                                                                           } else {
+                                                    }} className={"measure_input" + (ceilingToFloor3 !== undefined && (ceilingToFloor3 < 1 || ceilingToFloor3 > 1000) ? " measure_input_err" : "")} type="text"
+                                                                   name="ceilingToFloor3" value={NumToFa(`${ceilingToFloor3 || ""}`, pageLanguage)}
+                                                                   onChange={(e) => {
+                                                                       setTimeout(() => {
+                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue = isNaN(newValue) ? "" : newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000) {
+                                                                               setCartLoading(true);
+                                                                               setCart("CeilingToFloor3", parseInt(newValue));
+                                                                               setDeps("", "3EStandardCeilingFloor3");
                                                                                setCeilingToFloor3(parseInt(newValue));
+                                                                               optionSelectChanged_three(parseInt(newValue), "3EStandardCeilingFloor", 2, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "CeilingToFloor3");
+                                                                               setDeps("3EStandardCeilingFloor3", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setCeilingToFloor3(undefined);
+                                                                               } else {
+                                                                                   setCeilingToFloor3(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3EStandardCeilingFloor");
                                                                            }
-                                                                           selectChanged(undefined, "3EStandardCeilingFloor");
-                                                                       }
+                                                                       }, 300);
                                                                    }}/>
                                                     <div className="measure_input_postfix">{t("cm_label")}</div>
                                                 </div>
-                                                <h2 className={"measure_input_desc" + (ceilingToFloor3 !== undefined && (ceilingToFloor3 < 30 || ceilingToFloor3 > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>
+                                                {/*<h2 className={"measure_input_desc" + (ceilingToFloor3 !== undefined && (ceilingToFloor3 < 30 || ceilingToFloor3 > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>*/}
                                             </div>
                                         </div>
                                     </div>
@@ -10175,33 +10414,34 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             <div className="measure_input_container">
                                                 <h1 className="measure_input_label">{t("Height")}</h1>
                                                 <div className="measure_input_field_container">
-                                                    <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                    <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                         if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                             e.preventDefault();
                                                         }
                                                     }} className={"measure_input" + (mount !== undefined && (mount < 10 || mount > 100) ? " measure_input_err" : "")} type="text"
-                                                                   name="mount" value={NumToFa(`${mount || ""}`, pageLanguage)} onChange={() => {
-                                                    }}
-                                                                   onBlur={(e) => {
-                                                                       let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                       newValue = isNaN(newValue) ? "" : newValue;
-                                                                       if (newValue && newValue !== "" && parseInt(newValue) >= 10 && parseInt(newValue) <= 100) {
-                                                                           setCartLoading(true);
-                                                                           setCart("ShadeMount", parseInt(newValue));
-                                                                           setDeps("", "3F");
-                                                                           setMount(parseInt(newValue));
-                                                                           optionSelectChanged("3F", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
-                                                                       } else {
-                                                                           setCartLoading(true);
-                                                                           setCart("", "", "ShadeMount");
-                                                                           setDeps("3F", "");
-                                                                           if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                               setMount(undefined);
-                                                                           } else {
+                                                                   name="mount" value={NumToFa(`${mount || ""}`, pageLanguage)}
+                                                                   onChange={(e) => {
+                                                                       setTimeout(() => {
+                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue = isNaN(newValue) ? "" : newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 10 && parseInt(newValue) <= 100) {
+                                                                               setCartLoading(true);
+                                                                               setCart("ShadeMount", parseInt(newValue));
+                                                                               setDeps("", "3F");
                                                                                setMount(parseInt(newValue));
+                                                                               optionSelectChanged("3F", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "ShadeMount");
+                                                                               setDeps("3F", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setMount(undefined);
+                                                                               } else {
+                                                                                   setMount(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3F");
                                                                            }
-                                                                           selectChanged(undefined, "3F");
-                                                                       }
+                                                                       }, 300);
                                                                    }}/>
                                                     <div className="measure_input_postfix">{t("cm_label")}</div>
                                                 </div>
@@ -10285,37 +10525,38 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             <div className="measure_input_container">
                                                 {/*<h1 className="measure_input_label">{t("step3AIn_A")}</h1>*/}
                                                 <div className="measure_input_field_container">
-                                                    <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                    <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                         if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                             e.preventDefault();
                                                         }
-                                                    }} className={"measure_input" + (ceilingToFloor !== undefined && (ceilingToFloor < 30 || ceilingToFloor > 400) ? " measure_input_err" : "")} type="text"
-                                                                   name="ceilingToFloor" value={NumToFa(`${ceilingToFloor || ""}`, pageLanguage)} onChange={() => {
-                                                    }}
-                                                                   onBlur={(e) => {
-                                                                       let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                       newValue = isNaN(newValue) ? "" : newValue;
-                                                                       if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
-                                                                           setCartLoading(true);
-                                                                           setCart("CeilingToFloor", parseInt(newValue));
-                                                                           setDeps("", "3G");
-                                                                           setCeilingToFloor(parseInt(newValue));
-                                                                           optionSelectChanged_three(parseInt(newValue), "3G", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                       } else {
-                                                                           setCartLoading(true);
-                                                                           setCart("", "", "CeilingToFloor");
-                                                                           setDeps("3G", "");
-                                                                           if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                               setCeilingToFloor(undefined);
-                                                                           } else {
+                                                    }} className={"measure_input" + (ceilingToFloor !== undefined && (ceilingToFloor < 1 || ceilingToFloor > 1000 || (cartValues["HeightCart"] && (ceilingToFloor < +cartValues["HeightCart"]))) ? " measure_input_err" : "")} type="text"
+                                                                   name="ceilingToFloor" value={NumToFa(`${ceilingToFloor || ""}`, pageLanguage)}
+                                                                   onChange={(e) => {
+                                                                       setTimeout(() => {
+                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue = isNaN(newValue) ? "" : newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000 && !(cartValues["HeightCart"] && (parseInt(newValue) < +cartValues["HeightCart"]))) {
+                                                                               setCartLoading(true);
+                                                                               setCart("CeilingToFloor", parseInt(newValue));
+                                                                               setDeps("", "3G");
                                                                                setCeilingToFloor(parseInt(newValue));
+                                                                               optionSelectChanged("3G", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "CeilingToFloor");
+                                                                               setDeps("3G", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setCeilingToFloor(undefined);
+                                                                               } else {
+                                                                                   setCeilingToFloor(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3G");
                                                                            }
-                                                                           selectChanged(undefined, "3G");
-                                                                       }
+                                                                       }, 300);
                                                                    }}/>
                                                     <div className="measure_input_postfix">{t("cm_label")}</div>
                                                 </div>
-                                                <h2 className={"measure_input_desc" + (ceilingToFloor !== undefined && (ceilingToFloor < 30 || ceilingToFloor > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>
+                                                {/*<h2 className={"measure_input_desc" + (ceilingToFloor !== undefined && (ceilingToFloor < 1 || ceilingToFloor > 1000 || (cartValues["HeightCart"] && (ceilingToFloor < +cartValues["HeightCart"]))) ? " measure_input_desc_err" : "")}>{(cartValues["HeightCart"] && (ceilingToFloor < +cartValues["HeightCart"]))?t("roomHeight_more_than_height"):""}</h2>*/}
                                             </div>
                                         </div>
                                     </div>
@@ -10504,36 +10745,39 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             <div className="measure_input_container">
                                                 <h1 className="measure_input_label">{t("Width")}</h1>
                                                 <div className="measure_input_field_container">
-                                                    <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                    <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                         if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                             e.preventDefault();
                                                         }
-                                                    }} className={"measure_input" + (rodWidth !== undefined && (rodWidth < 30 || rodWidth > 300) ? " measure_input_err" : "")} type="text"
-                                                                   name="rodWidth" value={NumToFa(`${rodWidth || ""}`, pageLanguage)} onChange={() => {
-                                                    }}
-                                                                   onBlur={(e) => {
-                                                                       let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                       newValue = isNaN(newValue) ? "" : newValue;
-                                                                       if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 300) {
-                                                                           setCartLoading(true);
-                                                                           setCart("RodWidth", parseInt(newValue));
-                                                                           setDeps("", "3BRod");
-                                                                           setRodWidth(parseInt(newValue));
-                                                                       } else {
-                                                                           setCartLoading(true);
-                                                                           setCart("", "", "RodWidth");
-                                                                           setDeps("3BRod", "");
-                                                                           if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                               setRodWidth(undefined);
-                                                                           } else {
+                                                    }} className={"measure_input" + (rodWidth !== undefined && (rodWidth < 1 || rodWidth > 1000) ? " measure_input_err" : "")} type="text"
+                                                                   name="rodWidth" value={NumToFa(`${rodWidth || ""}`, pageLanguage)}
+                                                                   onChange={(e) => {
+                                                                       setTimeout(() => {
+                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue = isNaN(newValue) ? "" : newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000) {
+                                                                               setCartLoading(true);
+                                                                               setCart("RodWidth", parseInt(newValue));
+                                                                               setDeps("", "3BRod");
                                                                                setRodWidth(parseInt(newValue));
+                                                                               optionSelectChanged("3BRod", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
+    
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "RodWidth");
+                                                                               setDeps("3BRod", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setRodWidth(undefined);
+                                                                               } else {
+                                                                                   setRodWidth(parseInt(newValue));
+                                                                               }
+                                                                               setWindowSize("");
                                                                            }
-                                                                           setWindowSize("");
-                                                                       }
+                                                                       }, 300);
                                                                    }}/>
                                                     <div className="measure_input_postfix">{t("cm_label")}</div>
                                                 </div>
-                                                <h2 className={"measure_input_desc" + (rodWidth !== undefined && (rodWidth < 30 || rodWidth > 300) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 300`, pageLanguage)} {t("cm_label")}</h2>
+                                                {/*<h2 className={"measure_input_desc" + (rodWidth !== undefined && (rodWidth < 30 || rodWidth > 300) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 300`, pageLanguage)} {t("cm_label")}</h2>*/}
                                             </div>
                                         </div>
                                     </div>
@@ -10659,37 +10903,38 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             <div className="measure_input_container">
                                                 <h1 className="measure_input_label">{t("Height")}</h1>
                                                 <div className="measure_input_field_container">
-                                                    <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                    <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                         if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                             e.preventDefault();
                                                         }
-                                                    }} className={"measure_input" + (rodToBottom !== undefined && (rodToBottom < 30 || rodToBottom > 400) ? " measure_input_err" : "")} type="text"
-                                                                   name="rodToBottom1" value={NumToFa(`${rodToBottom || ""}`, pageLanguage)} onChange={() => {
-                                                    }}
-                                                                   onBlur={(e) => {
-                                                                       let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                       newValue = isNaN(newValue) ? "" : newValue;
-                                                                       if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
-                                                                           setCartLoading(true);
-                                                                           setCart("RodToBottom", parseInt(newValue));
-                                                                           setDeps("", "3CRod");
-                                                                           setRodToBottom(parseInt(newValue));
-                                                                           optionSelectChanged_three(parseInt(newValue), "3CRod", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                       } else {
-                                                                           setCartLoading(true);
-                                                                           setCart("", "", "RodToBottom");
-                                                                           setDeps("3CRod", "");
-                                                                           if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                               setRodToBottom(undefined);
-                                                                           } else {
+                                                    }} className={"measure_input" + (rodToBottom !== undefined && (rodToBottom < 1 || rodToBottom > 1000) ? " measure_input_err" : "")} type="text"
+                                                                   name="rodToBottom1" value={NumToFa(`${rodToBottom || ""}`, pageLanguage)}
+                                                                   onChange={(e) => {
+                                                                       setTimeout(() => {
+                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue = isNaN(newValue) ? "" : newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000) {
+                                                                               setCartLoading(true);
+                                                                               setCart("RodToBottom", parseInt(newValue));
+                                                                               setDeps("", "3CRod");
                                                                                setRodToBottom(parseInt(newValue));
+                                                                               optionSelectChanged("3CRod", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "RodToBottom");
+                                                                               setDeps("3CRod", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setRodToBottom(undefined);
+                                                                               } else {
+                                                                                   setRodToBottom(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3CRod");
                                                                            }
-                                                                           selectChanged(undefined, "3CRod");
-                                                                       }
+                                                                       }, 300);
                                                                    }}/>
                                                     <div className="measure_input_postfix">{t("cm_label")}</div>
                                                 </div>
-                                                <h2 className={"measure_input_desc" + (rodToBottom !== undefined && (rodToBottom < 30 || rodToBottom > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>
+                                                {/*<h2 className={"measure_input_desc" + (rodToBottom !== undefined && (rodToBottom < 30 || rodToBottom > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>*/}
                                             </div>
                                         </div>
                                     </div>
@@ -10758,37 +11003,38 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             <div className="measure_input_container">
                                                 <h1 className="measure_input_label">{t("Height")}</h1>
                                                 <div className="measure_input_field_container">
-                                                    <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                    <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                         if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                             e.preventDefault();
                                                         }
-                                                    }} className={"measure_input" + (rodToFloor !== undefined && (rodToFloor < 30 || rodToFloor > 400) ? " measure_input_err" : "")} type="text"
-                                                                   name="rodToFloor1" value={NumToFa(`${rodToFloor || ""}`, pageLanguage)} onChange={() => {
-                                                    }}
-                                                                   onBlur={(e) => {
-                                                                       let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                       newValue = isNaN(newValue) ? "" : newValue;
-                                                                       if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
-                                                                           setCartLoading(true);
-                                                                           setCart("RodToFloor", parseInt(newValue));
-                                                                           setDeps("", "3CRodFloor");
-                                                                           setRodToFloor(parseInt(newValue));
-                                                                           optionSelectChanged_three(parseInt(newValue), "3CRodFloor", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                       } else {
-                                                                           setCartLoading(true);
-                                                                           setCart("", "", "RodToFloor");
-                                                                           setDeps("3CRodFloor", "");
-                                                                           if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                               setRodToFloor(undefined);
-                                                                           } else {
+                                                    }} className={"measure_input" + (rodToFloor !== undefined && (rodToFloor < 1 || rodToFloor > 1000) ? " measure_input_err" : "")} type="text"
+                                                                   name="rodToFloor1" value={NumToFa(`${rodToFloor || ""}`, pageLanguage)}
+                                                                   onChange={(e) => {
+                                                                       setTimeout(() => {
+                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue = isNaN(newValue) ? "" : newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000) {
+                                                                               setCartLoading(true);
+                                                                               setCart("RodToFloor", parseInt(newValue));
+                                                                               setDeps("", "3CRodFloor");
                                                                                setRodToFloor(parseInt(newValue));
+                                                                               optionSelectChanged("3CRodFloor", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "RodToFloor");
+                                                                               setDeps("3CRodFloor", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setRodToFloor(undefined);
+                                                                               } else {
+                                                                                   setRodToFloor(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3CRodFloor");
                                                                            }
-                                                                           selectChanged(undefined, "3CRodFloor");
-                                                                       }
+                                                                       }, 300);
                                                                    }}/>
                                                     <div className="measure_input_postfix">{t("cm_label")}</div>
                                                 </div>
-                                                <h2 className={"measure_input_desc" + (rodToFloor !== undefined && (rodToFloor < 30 || rodToFloor > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>
+                                                {/*<h2 className={"measure_input_desc" + (rodToFloor !== undefined && (rodToFloor < 30 || rodToFloor > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>*/}
                                             </div>
                                         </div>
                                     </div>
@@ -10856,37 +11102,38 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             <div className="measure_input_container">
                                                 {/*<h1 className="measure_input_label">{t("step3AIn_A")}</h1>*/}
                                                 <div className="measure_input_field_container">
-                                                    <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                    <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                         if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                             e.preventDefault();
                                                         }
-                                                    }} className={"measure_input" + (ceilingToFloor !== undefined && (ceilingToFloor < 30 || ceilingToFloor > 400) ? " measure_input_err" : "")} type="text"
-                                                                   name="ceilingToFloor" value={NumToFa(`${ceilingToFloor || ""}`, pageLanguage)} onChange={() => {
-                                                    }}
-                                                                   onBlur={(e) => {
-                                                                       let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                       newValue = isNaN(newValue) ? "" : newValue;
-                                                                       if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
-                                                                           setCartLoading(true);
-                                                                           setCart("CeilingToFloor", parseInt(newValue));
-                                                                           setDeps("", "3DRod");
-                                                                           setCeilingToFloor(parseInt(newValue));
-                                                                           optionSelectChanged_three(parseInt(newValue), "3DRod", 0, true, "heightDifferent", "cm", "س\u200Cم", pageLanguage);
-                                                                       } else {
-                                                                           setCartLoading(true);
-                                                                           setCart("", "", "CeilingToFloor");
-                                                                           setDeps("3DRod", "");
-                                                                           if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                               setCeilingToFloor(undefined);
-                                                                           } else {
+                                                    }} className={"measure_input" + (ceilingToFloor !== undefined && (ceilingToFloor < 1 || ceilingToFloor > 1000 || (cartValues["HeightCart"] && (ceilingToFloor < +cartValues["HeightCart"]))) ? " measure_input_err" : "")} type="text"
+                                                                   name="ceilingToFloor" value={NumToFa(`${ceilingToFloor || ""}`, pageLanguage)}
+                                                                   onChange={(e) => {
+                                                                       setTimeout(() => {
+                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                           newValue = isNaN(newValue) ? "" : newValue;
+                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 1 && parseInt(newValue) <= 1000 && !(cartValues["HeightCart"] && (parseInt(newValue) < +cartValues["HeightCart"]))) {
+                                                                               setCartLoading(true);
+                                                                               setCart("CeilingToFloor", parseInt(newValue));
+                                                                               setDeps("", "3DRod");
                                                                                setCeilingToFloor(parseInt(newValue));
+                                                                               optionSelectChanged("3DRod", parseInt(newValue), "cm", "س\u200Cم", pageLanguage);
+                                                                           } else {
+                                                                               setCartLoading(true);
+                                                                               setCart("", "", "CeilingToFloor");
+                                                                               setDeps("3DRod", "");
+                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                   setCeilingToFloor(undefined);
+                                                                               } else {
+                                                                                   setCeilingToFloor(parseInt(newValue));
+                                                                               }
+                                                                               selectChanged(undefined, "3DRod");
                                                                            }
-                                                                           selectChanged(undefined, "3DRod");
-                                                                       }
+                                                                       }, 300);
                                                                    }}/>
                                                     <div className="measure_input_postfix">{t("cm_label")}</div>
                                                 </div>
-                                                <h2 className={"measure_input_desc" + (ceilingToFloor !== undefined && (ceilingToFloor < 30 || ceilingToFloor > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>
+                                                {/*<h2 className={"measure_input_desc" + (ceilingToFloor !== undefined && (ceilingToFloor < 1 || ceilingToFloor > 1000 || (cartValues["HeightCart"] && (ceilingToFloor > +cartValues["HeightCart"]))) ? " measure_input_desc_err" : "")}>{(cartValues["HeightCart"] && (ceilingToFloor > +cartValues["HeightCart"]))?t("roomHeight_more_than_height"):""}</h2>*/}
                                             </div>
                                         </div>
                                     </div>
@@ -11106,12 +11353,12 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    setStep6B("");
                                                    setStep6C("");
                                                    let tempExtended = extendedTitle;
-                                                   tempExtended["6"][0] = "Same Style For All Curtains";
+                                                   tempExtended["6"][0] = t("Same Style For All Curtains");
                                                    tempExtended["6"].splice(1, 3);
                                                    setExtendedTitle(tempExtended);
                                                    selectChanged(e);
                                                    setDeps("61", "6,6A,6B,6C");
-                                                   setCart("PanelTypeOption", "Same Style For All Curtains","PanelTypeA,PanelTypeB,PanelTypeC");
+                                                   setCart("PanelTypeOption", "Same Style For All Curtains", "PanelTypeA,PanelTypeB,PanelTypeC");
                                                }} ref={ref => (inputs.current["61"] = ref)}/>
                                         <label htmlFor="61">{t("PanelType1")}</label>
                                     </div>
@@ -11120,16 +11367,16 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                checked={step6 === "Customize Style Per Curtain"}
                                                onChange={e => {
                                                    if (step2A === "" || step2B === "" || (step2B !== "None" && step2B1 === "") || (step2B !== "None" && step2C === "")) {
-                                                       setStep6("Same Style For All Curtains");
+                                                       setStep6("");
                                                        setStep6A("");
                                                        setStep6B("");
                                                        setStep6C("");
                                                        let tempExtended = extendedTitle;
-                                                       tempExtended["6"][0] = "Same Style For All Curtains";
-                                                       tempExtended["6"].splice(1, 3);
+                                                       tempExtended["6"]=[];
                                                        setExtendedTitle(tempExtended);
                                                        modalHandleShow("noPrivacyLayer");
-                                                       setDeps("", "6A,6B,6C");
+                                                       setDeps("6", "6A,6B,6C");
+                                                       selectUncheck(e);
                                                    } else {
                                                        setStep6("Customize Style Per Curtain");
                                                        setStep61("");
@@ -11142,11 +11389,12 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setExtendedTitle(tempExtended);
                                                        selectChanged(e);
                                                        setDeps("6A,6B,6C", "6,61");
-                                                       setCart("PanelTypeOption", "Customize Style Per Curtain","PanelType");
+                                                       setCart("PanelTypeOption", "Customize Style Per Curtain", "PanelType");
                                                    }
                                                }} ref={ref => (inputs.current["62"] = ref)}/>
                                         <label htmlFor="62">{t("PanelType2")}</label>
                                     </div>
+                                    {step6 === "" && <NextStep currentStep="6" eventKey="7">{t("NEXT STEP")}</NextStep>}
                                 </div>
                                 <div className={cartValues["WidthCart"] !== undefined && step5 !== "" && step6 === "Same Style For All Curtains" ? "card_body card_body_radio card_body_panel_type special_farsi_card_body" : "noDisplay"}>
                                     <div className="box100">
@@ -11190,25 +11438,43 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         <img
                                             src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_free_hanging.svg').default : require('../Images/drapery/grommet/panel_type_free_hanging.svg').default}
                                             className="img-fluid height_auto" alt=""/>
-                                        <input className="radio" type="radio" text={t("Free Hanging")} value="3" name="step61" ref-num="6" id="613"
-                                               checked={step61 === "Free Hanging"}
+                                        <input className="radio" type="radio" text={t("Single, Free Hanging")} value="3" name="step61" ref-num="6" id="613"
+                                               checked={step61 === "Single, Free Hanging"}
                                                onChange={e => {
-                                                   setStep61("Free Hanging");
+                                                   setStep61("Single, Free Hanging");
                                                    let tempExtended = extendedTitle;
-                                                   tempExtended["6"][1] = <li key="2" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("All Curtains")}</span><span className="step_title_extended_list_item_text">{t("Free Hanging")}</span></li>;
+                                                   tempExtended["6"][1] = <li key="2" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("All Curtains")}</span><span className="step_title_extended_list_item_text">{t("Single, Free Hanging")}</span></li>;
                                                    setExtendedTitle(tempExtended);
                                                    setDeps("", "61");
-                                                   setCart("PanelType", "Free Hanging");
+                                                   setCart("PanelType", "Single, Free Hanging");
                                                    selectChanged(e);
                                                }} ref={ref => (inputs.current["613"] = ref)}/>
-                                        <label htmlFor="613">{t("Free Hanging")}</label>
+                                        <label htmlFor="613">{t("Single, Free Hanging")}</label>
+                                        <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
+                                    </div>
+                                    <div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 160 && parseInt(cartValues["WidthCart"]) <= 320 ? "box33 radio_style" : "noDisplay") : "noDisplay"}>
+                                        <img
+                                            src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_free_hanging2.svg').default : require('../Images/drapery/grommet/panel_type_free_hanging2.svg').default}
+                                            className="img-fluid height_auto" alt=""/>
+                                        <input className="radio" type="radio" text={t("Pair, Free Hanging")} value="4" name="step61" ref-num="6" id="614"
+                                               checked={step61 === "Pair, Free Hanging"}
+                                               onChange={e => {
+                                                   setStep61("Pair, Free Hanging");
+                                                   let tempExtended = extendedTitle;
+                                                   tempExtended["6"][1] = <li key="2" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("All Curtains")}</span><span className="step_title_extended_list_item_text">{t("Single, Free Hanging")}</span></li>;
+                                                   setExtendedTitle(tempExtended);
+                                                   setDeps("", "61");
+                                                   setCart("PanelType", "Pair, Free Hanging");
+                                                   selectChanged(e);
+                                               }} ref={ref => (inputs.current["614"] = ref)}/>
+                                        <label htmlFor="614">{t("Pair, Free Hanging")}</label>
                                         <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
                                     </div>
                                     <div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 160 ? (parseInt(cartValues["WidthCart"]) > 320 ? "noDisplay" : "box33 radio_style radio_recommended") : "box33 radio_style") : "box33 radio_style"}>
                                         <img
-                                            src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_both.svg').default : require('../Images/drapery/grommet/panel_type_both.svg').default}
+                                            src={parseInt(cartValues["WidthCart"]) > 160 ? (pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_both2.svg').default : require('../Images/drapery/grommet/panel_type_both2.svg').default) :(pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_both.svg').default : require('../Images/drapery/grommet/panel_type_both.svg').default)}
                                             className="img-fluid height_auto" alt=""/>
-                                        <input className="radio" type="radio" text={t("Pair, Split Draw")} value="4" name="step61" ref-num="6" id="614"
+                                        <input className="radio" type="radio" text={t("Pair, Split Draw")} value="5" name="step61" ref-num="6" id="615"
                                                checked={step61 === "Pair, Split Draw"}
                                                onChange={e => {
                                                    setStep61("Pair, Split Draw");
@@ -11221,15 +11487,15 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    if (step5 === "Full" && parseInt(cartValues["WidthCart"]) > 320) {
                                                        modalHandleShow("panelTypeWarning");
                                                    }
-                                               }} ref={ref => (inputs.current["614"] = ref)}/>
-                                        <label htmlFor="614">{t("Pair, Split Draw")}</label>
+                                               }} ref={ref => (inputs.current["615"] = ref)}/>
+                                        <label htmlFor="615">{t("Pair, Split Draw")}</label>
                                         <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
                                     </div>
-                                    <div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 320 ? "box33 radio_style" : "noDisplay") : "noDisplay"}>
+                                    <div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 320 ? "box50 radio_style" : "noDisplay") : "noDisplay"}>
                                         <img
                                             src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_three.svg').default : require('../Images/drapery/grommet/panel_type_three.svg').default}
                                             className="img-fluid height_auto" alt=""/>
-                                        <input className="radio" type="radio" text={t("Three Panel, Split Draw")} value="5" name="step61" ref-num="6" id="615"
+                                        <input className="radio" type="radio" text={t("Three Panel, Split Draw")} value="6" name="step61" ref-num="6" id="616"
                                                checked={step61 === "Three Panel, Split Draw"}
                                                onChange={e => {
                                                    setStep61("Three Panel, Split Draw");
@@ -11239,28 +11505,28 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    setDeps("", "61");
                                                    setCart("PanelType", "Three Panel, Split Draw");
                                                    selectChanged(e);
-                                               }} ref={ref => (inputs.current["615"] = ref)}/>
-                                        <label htmlFor="615">{t("Three Panel, Split Draw")}</label>
-                                        <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
-                                    </div>
-                                    <div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 320 ? "box33 radio_style radio_recommended" : "noDisplay") : "noDisplay"}>
-                                        <img
-                                            src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_four.svg').default : require('../Images/drapery/grommet/panel_type_four.svg').default}
-                                            className="img-fluid height_auto" alt=""/>
-                                        <input className="radio" type="radio" text={t("Four Panel, Split Draw")} value="6" name="step61" ref-num="6" id="616"
-                                               checked={step61 === "Four Panel, Split Draw"}
-                                               onChange={e => {
-                                                   setStep61("Four Panel, Split Draw");
-                                                   let tempExtended = extendedTitle;
-                                                   tempExtended["6"][1] = <li key="2" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("All Curtains")}</span><span className="step_title_extended_list_item_text">{t("Four Panel, Split Draw")}</span></li>;
-                                                   setExtendedTitle(tempExtended);
-                                                   setDeps("", "61");
-                                                   setCart("PanelType", "Four Panel, Split Draw");
-                                                   selectChanged(e);
                                                }} ref={ref => (inputs.current["616"] = ref)}/>
-                                        <label htmlFor="616">{t("Four Panel, Split Draw")}</label>
+                                        <label htmlFor="616">{t("Three Panel, Split Draw")}</label>
                                         <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
                                     </div>
+                                    {/*<div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 320 ? "box50 radio_style radio_recommended" : "noDisplay") : "noDisplay"}>*/}
+                                    {/*    <img*/}
+                                    {/*        src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_four.svg').default : require('../Images/drapery/grommet/panel_type_four.svg').default}*/}
+                                    {/*        className="img-fluid height_auto" alt=""/>*/}
+                                    {/*    <input className="radio" type="radio" text={t("Four Panel, Split Draw")} value="7" name="step61" ref-num="6" id="617"*/}
+                                    {/*           checked={step61 === "Four Panel, Split Draw"}*/}
+                                    {/*           onChange={e => {*/}
+                                    {/*               setStep61("Four Panel, Split Draw");*/}
+                                    {/*               let tempExtended = extendedTitle;*/}
+                                    {/*               tempExtended["6"][1] = <li key="2" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("All Curtains")}</span><span className="step_title_extended_list_item_text">{t("Four Panel, Split Draw")}</span></li>;*/}
+                                    {/*               setExtendedTitle(tempExtended);*/}
+                                    {/*               setDeps("", "61");*/}
+                                    {/*               setCart("PanelType", "Four Panel, Split Draw");*/}
+                                    {/*               selectChanged(e);*/}
+                                    {/*           }} ref={ref => (inputs.current["617"] = ref)}/>*/}
+                                    {/*    <label htmlFor="617">{t("Four Panel, Split Draw")}</label>*/}
+                                    {/*    <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>*/}
+                                    {/*</div>*/}
                                     <NextStep currentStep="6" eventKey="7">{t("NEXT STEP")}</NextStep>
                                 </div>
                                 
@@ -11317,25 +11583,43 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             <img
                                                 src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_free_hanging.svg').default : require('../Images/drapery/grommet/panel_type_free_hanging.svg').default}
                                                 className="img-fluid height_auto" alt=""/>
-                                            <input className="radio" type="radio" text={t("Free Hanging")} value="3" name="step6A" ref-num="6" id="6A3"
-                                                   checked={step6A === "Free Hanging"}
+                                            <input className="radio" type="radio" text={t("Single, Free Hanging")} value="3" name="step6A" ref-num="6" id="6A3"
+                                                   checked={step6A === "Single, Free Hanging"}
                                                    onChange={e => {
-                                                       setStep6A("Free Hanging");
+                                                       setStep6A("Single, Free Hanging");
                                                        let tempExtended = extendedTitle;
-                                                       tempExtended["6"][1] = <li key="2" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Drapery Curtain")}</span><span className="step_title_extended_list_item_text">{t("Free Hanging")}</span></li>;
+                                                       tempExtended["6"][1] = <li key="2" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Drapery Curtain")}</span><span className="step_title_extended_list_item_text">{t("Single, Free Hanging")}</span></li>;
                                                        setExtendedTitle(tempExtended);
                                                        setDeps("", "6A");
-                                                       setCart("PanelTypeA", "Free Hanging");
+                                                       setCart("PanelTypeA", "Single, Free Hanging");
                                                        selectChanged(e);
                                                    }} ref={ref => (inputs.current["6A3"] = ref)}/>
-                                            <label htmlFor="6A3">{t("Free Hanging")}</label>
+                                            <label htmlFor="6A3">{t("Single, Free Hanging")}</label>
+                                            <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
+                                        </div>
+                                        <div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 160 && parseInt(cartValues["WidthCart"]) <= 320 ? "box33 radio_style" : "noDisplay") : "noDisplay"}>
+                                            <img
+                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_free_hanging2.svg').default : require('../Images/drapery/grommet/panel_type_free_hanging2.svg').default}
+                                                className="img-fluid height_auto" alt=""/>
+                                            <input className="radio" type="radio" text={t("Pair, Free Hanging")} value="4" name="step6A" ref-num="6" id="6A4"
+                                                   checked={step6A === "Pair, Free Hanging"}
+                                                   onChange={e => {
+                                                       setStep6A("Pair, Free Hanging");
+                                                       let tempExtended = extendedTitle;
+                                                       tempExtended["6"][1] = <li key="2" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("All Curtains")}</span><span className="step_title_extended_list_item_text">{t("Single, Free Hanging")}</span></li>;
+                                                       setExtendedTitle(tempExtended);
+                                                       setDeps("", "6A");
+                                                       setCart("PanelTypeA", "Pair, Free Hanging");
+                                                       selectChanged(e);
+                                                   }} ref={ref => (inputs.current["6A4"] = ref)}/>
+                                            <label htmlFor="6A4">{t("Pair, Free Hanging")}</label>
                                             <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
                                         </div>
                                         <div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 160 ? (parseInt(cartValues["WidthCart"]) > 320 ? "noDisplay" : "box33 radio_style radio_recommended") : "box33 radio_style") : "box33 radio_style"}>
                                             <img
-                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_both.svg').default : require('../Images/drapery/grommet/panel_type_both.svg').default}
+                                                src={parseInt(cartValues["WidthCart"]) > 160 ? (pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_both2.svg').default : require('../Images/drapery/grommet/panel_type_both2.svg').default) :(pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_both.svg').default : require('../Images/drapery/grommet/panel_type_both.svg').default)}
                                                 className="img-fluid height_auto" alt=""/>
-                                            <input className="radio" type="radio" text={t("Pair, Split Draw")} value="4" name="step6A" ref-num="6A" id="6A4"
+                                            <input className="radio" type="radio" text={t("Pair, Split Draw")} value="5" name="step6A" ref-num="6A" id="6A5"
                                                    checked={step6A === "Pair, Split Draw"}
                                                    onChange={e => {
                                                        setStep6A("Pair, Split Draw");
@@ -11348,15 +11632,15 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        if (step5 === "Full" && parseInt(cartValues["WidthCart"]) > 320) {
                                                            modalHandleShow("panelTypeWarning");
                                                        }
-                                                   }} ref={ref => (inputs.current["6A4"] = ref)}/>
-                                            <label htmlFor="6A4">{t("Pair, Split Draw")}</label>
+                                                   }} ref={ref => (inputs.current["6A5"] = ref)}/>
+                                            <label htmlFor="6A5">{t("Pair, Split Draw")}</label>
                                             <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
                                         </div>
-                                        <div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 320 ? "box33 radio_style" : "noDisplay") : "noDisplay"}>
+                                        <div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 320 ? "box50 radio_style" : "noDisplay") : "noDisplay"}>
                                             <img
                                                 src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_three.svg').default : require('../Images/drapery/grommet/panel_type_three.svg').default}
                                                 className="img-fluid height_auto" alt=""/>
-                                            <input className="radio" type="radio" text={t("Three Panel, Split Draw")} value="5" name="step6A" ref-num="6" id="6A5"
+                                            <input className="radio" type="radio" text={t("Three Panel, Split Draw")} value="6" name="step6A" ref-num="6" id="6A6"
                                                    checked={step6A === "Three Panel, Split Draw"}
                                                    onChange={e => {
                                                        setStep6A("Three Panel, Split Draw");
@@ -11366,35 +11650,35 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setDeps("", "6A");
                                                        setCart("PanelTypeA", "Three Panel, Split Draw");
                                                        selectChanged(e);
-                                                   }} ref={ref => (inputs.current["6A5"] = ref)}/>
-                                            <label htmlFor="6A5">{t("Three Panel, Split Draw")}</label>
-                                            <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
-                                        </div>
-                                        <div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 320 ? "box33 radio_style radio_recommended" : "noDisplay") : "noDisplay"}>
-                                            <img
-                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_four.svg').default : require('../Images/drapery/grommet/panel_type_four.svg').default}
-                                                className="img-fluid height_auto" alt=""/>
-                                            <input className="radio" type="radio" text={t("Four Panel, Split Draw")} value="6" name="step6A" ref-num="6" id="6A6"
-                                                   checked={step6A === "Four Panel, Split Draw"}
-                                                   onChange={e => {
-                                                       setStep6A("Four Panel, Split Draw");
-                                                       let tempExtended = extendedTitle;
-                                                       tempExtended["6"][1] = <li key="2" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Drapery Curtain")}</span><span className="step_title_extended_list_item_text">{t("Four Panel, Split Draw")}</span></li>;
-                                                       setExtendedTitle(tempExtended);
-                                                       setDeps("", "6A");
-                                                       setCart("PanelTypeA", "Four Panel, Split Draw");
-                                                       selectChanged(e);
                                                    }} ref={ref => (inputs.current["6A6"] = ref)}/>
-                                            <label htmlFor="6A6">{t("Four Panel, Split Draw")}</label>
+                                            <label htmlFor="6A6">{t("Three Panel, Split Draw")}</label>
                                             <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
                                         </div>
+                                        {/*<div className={step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 320 ? "box50 radio_style radio_recommended" : "noDisplay") : "noDisplay"}>*/}
+                                        {/*    <img*/}
+                                        {/*        src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_four.svg').default : require('../Images/drapery/grommet/panel_type_four.svg').default}*/}
+                                        {/*        className="img-fluid height_auto" alt=""/>*/}
+                                        {/*    <input className="radio" type="radio" text={t("Four Panel, Split Draw")} value="7" name="step6A" ref-num="6" id="6A7"*/}
+                                        {/*           checked={step6A === "Four Panel, Split Draw"}*/}
+                                        {/*           onChange={e => {*/}
+                                        {/*               setStep6A("Four Panel, Split Draw");*/}
+                                        {/*               let tempExtended = extendedTitle;*/}
+                                        {/*               tempExtended["6"][1] = <li key="2" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Drapery Curtain")}</span><span className="step_title_extended_list_item_text">{t("Four Panel, Split Draw")}</span></li>;*/}
+                                        {/*               setExtendedTitle(tempExtended);*/}
+                                        {/*               setDeps("", "6A");*/}
+                                        {/*               setCart("PanelTypeA", "Four Panel, Split Draw");*/}
+                                        {/*               selectChanged(e);*/}
+                                        {/*           }} ref={ref => (inputs.current["6A7"] = ref)}/>*/}
+                                        {/*    <label htmlFor="6A7">{t("Four Panel, Split Draw")}</label>*/}
+                                        {/*    <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>*/}
+                                        {/*</div>*/}
                                     </div>
                                     <div className="card_body card_body_radio Customize_Style_container">
                                         <div className="box100">
                                             <p className="step_selection_title">{t("Sheer Curtain Panel Type")}</p>
                                             <div className="grommet_curtain_button_container">
                                                 <div className="dk_curtain_symmetric_buttons">
-                                                    <button className={`dk_curtain_symmetric_button_left btn ${step6BHead==="Rod" ? "dk_curtain_symmetric_button_on" : ""}`}
+                                                    <button className={`dk_curtain_symmetric_button_left btn ${step6BHead === "Rod" ? "dk_curtain_symmetric_button_on" : ""}`}
                                                             onClick={() => {
                                                                 setStep6BHead("Rod");
                                                                 setStep6B("");
@@ -11403,7 +11687,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                             }}>
                                                         {t("Rod")}
                                                     </button>
-                                                    <button className={`dk_curtain_symmetric_button_right btn ${step6BHead==="Track" ? "dk_curtain_symmetric_button_on" : ""} ${tracksList.length > 0 ?"":"crossed"}`}
+                                                    <button className={`dk_curtain_symmetric_button_right btn ${step6BHead === "Track" ? "dk_curtain_symmetric_button_on" : ""} ${tracksList.length > 0 ? "" : "crossed"}`}
                                                             onClick={() => {
                                                                 setStep6BHead("Track");
                                                                 setStep6B("");
@@ -11416,7 +11700,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             </div>
                                         </div>
                                         
-                                        <div className={step6BHead==="Rod" ?(parseInt(cartValues["WidthCart"]) <= 160 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"):"box33 radio_style"}>
+                                        <div className={step6BHead === "Rod" ? (parseInt(cartValues["WidthCart"]) <= 160 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay") : "box33 radio_style"}>
                                             <img
                                                 src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_left.svg').default : require('../Images/drapery/grommet/panel_type_left.svg').default}
                                                 className="img-fluid height_auto" alt=""/>
@@ -11433,7 +11717,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    }} ref={ref => (inputs.current["6B1"] = ref)}/>
                                             <label htmlFor="6B1">{t("Single Panel, Left")}</label>
                                         </div>
-                                        <div className={step6BHead==="Rod" ?(parseInt(cartValues["WidthCart"]) <= 160 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"):"box33 radio_style"}>
+                                        <div className={step6BHead === "Rod" ? (parseInt(cartValues["WidthCart"]) <= 160 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay") : "box33 radio_style"}>
                                             <img
                                                 src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_right.svg').default : require('../Images/drapery/grommet/panel_type_right.svg').default}
                                                 className="img-fluid height_auto" alt=""/>
@@ -11450,29 +11734,47 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    }} ref={ref => (inputs.current["6B2"] = ref)}/>
                                             <label htmlFor="6B2">{t("Single Panel, Right")}</label>
                                         </div>
-                                        <div className={step6BHead==="Rod" ?(step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 160 && parseInt(cartValues["WidthCart"]) <= 320 ? "box33 radio_style" : "noDisplay") : "noDisplay"):"noDisplay"}>
+                                        <div className={step6BHead === "Rod" ? (step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 160 && parseInt(cartValues["WidthCart"]) <= 320 ? "box33 radio_style" : "noDisplay") : "noDisplay") : "noDisplay"}>
                                             <img
                                                 src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_free_hanging.svg').default : require('../Images/drapery/grommet/panel_type_free_hanging.svg').default}
                                                 className="img-fluid height_auto" alt=""/>
-                                            <input className="radio" type="radio" text={t("Free Hanging")} value="3" name="step6B" ref-num="6" id="6B3"
-                                                   checked={step6B === "Free Hanging"}
+                                            <input className="radio" type="radio" text={t("Single, Free Hanging")} value="3" name="step6B" ref-num="6" id="6B3"
+                                                   checked={step6B === "Single, Free Hanging"}
                                                    onChange={e => {
-                                                       setStep6B("Free Hanging");
+                                                       setStep6B("Single, Free Hanging");
                                                        let tempExtended = extendedTitle;
-                                                       tempExtended["6"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Sheer Panel")}</span><span className="step_title_extended_list_item_text">{t("Free Hanging")}</span></li>;
+                                                       tempExtended["6"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Sheer Panel")}</span><span className="step_title_extended_list_item_text">{t("Single, Free Hanging")}</span></li>;
                                                        setExtendedTitle(tempExtended);
                                                        setDeps("", "6B");
-                                                       setCart("PanelTypeB", "Free Hanging");
+                                                       setCart("PanelTypeB", "Single, Free Hanging");
                                                        selectChanged(e);
                                                    }} ref={ref => (inputs.current["6B3"] = ref)}/>
-                                            <label htmlFor="6B3">{t("Free Hanging")}</label>
+                                            <label htmlFor="6B3">{t("Single, Free Hanging")}</label>
                                             <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
                                         </div>
-                                        <div className={step6BHead==="Rod" ?(step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 160 ? (parseInt(cartValues["WidthCart"]) > 320 ? "noDisplay" : "box33 radio_style radio_recommended") : "box33 radio_style") : "box33 radio_style"):"box33 radio_style"}>
+                                        <div className={step6BHead === "Rod" ? (step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 160 && parseInt(cartValues["WidthCart"]) <= 320 ? "box33 radio_style" : "noDisplay") : "noDisplay") : "noDisplay"}>
                                             <img
-                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_both.svg').default : require('../Images/drapery/grommet/panel_type_both.svg').default}
+                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_free_hanging2.svg').default : require('../Images/drapery/grommet/panel_type_free_hanging2.svg').default}
                                                 className="img-fluid height_auto" alt=""/>
-                                            <input className="radio" type="radio" text={t("Pair, Split Draw")} value="4" name="step6B" ref-num="6B" id="6B4"
+                                            <input className="radio" type="radio" text={t("Pair, Free Hanging")} value="4" name="step6B" ref-num="6" id="6B4"
+                                                   checked={step6B === "Pair, Free Hanging"}
+                                                   onChange={e => {
+                                                       setStep6B("Pair, Free Hanging");
+                                                       let tempExtended = extendedTitle;
+                                                       tempExtended["6"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("All Curtains")}</span><span className="step_title_extended_list_item_text">{t("Single, Free Hanging")}</span></li>;
+                                                       setExtendedTitle(tempExtended);
+                                                       setDeps("", "6B");
+                                                       setCart("PanelTypeB", "Pair, Free Hanging");
+                                                       selectChanged(e);
+                                                   }} ref={ref => (inputs.current["6B4"] = ref)}/>
+                                            <label htmlFor="6B4">{t("Pair, Free Hanging")}</label>
+                                            <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
+                                        </div>
+                                        <div className={step6BHead === "Rod" ? (step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 160 ? (parseInt(cartValues["WidthCart"]) > 320 ? "noDisplay" : "box33 radio_style radio_recommended") : "box33 radio_style") : "box33 radio_style") : "box33 radio_style"}>
+                                            <img
+                                                src={(parseInt(cartValues["WidthCart"]) > 160 && step6BHead === "Rod") ? (pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_both2.svg').default : require('../Images/drapery/grommet/panel_type_both2.svg').default) :(pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_both.svg').default : require('../Images/drapery/grommet/panel_type_both.svg').default)}
+                                                className="img-fluid height_auto" alt=""/>
+                                            <input className="radio" type="radio" text={t("Pair, Split Draw")} value="5" name="step6B" ref-num="6B" id="6B5"
                                                    checked={step6B === "Pair, Split Draw"}
                                                    onChange={e => {
                                                        setStep6B("Pair, Split Draw");
@@ -11485,15 +11787,15 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        if (step5 === "Full" && parseInt(cartValues["WidthCart"]) > 320) {
                                                            modalHandleShow("panelTypeWarning");
                                                        }
-                                                   }} ref={ref => (inputs.current["6B4"] = ref)}/>
-                                            <label htmlFor="6B4">{t("Pair, Split Draw")}</label>
+                                                   }} ref={ref => (inputs.current["6B5"] = ref)}/>
+                                            <label htmlFor="6B5">{t("Pair, Split Draw")}</label>
                                             <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
                                         </div>
-                                        <div className={step6BHead==="Rod" ?(step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 320 ? "box33 radio_style" : "noDisplay") : "noDisplay"):"noDisplay"}>
+                                        <div className={step6BHead === "Rod" ? (step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 320 ? "box50 radio_style" : "noDisplay") : "noDisplay") : "noDisplay"}>
                                             <img
                                                 src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_three.svg').default : require('../Images/drapery/grommet/panel_type_three.svg').default}
                                                 className="img-fluid height_auto" alt=""/>
-                                            <input className="radio" type="radio" text={t("Three Panel, Split Draw")} value="5" name="step6B" ref-num="6" id="6B5"
+                                            <input className="radio" type="radio" text={t("Three Panel, Split Draw")} value="6" name="step6B" ref-num="6" id="6B6"
                                                    checked={step6B === "Three Panel, Split Draw"}
                                                    onChange={e => {
                                                        setStep6B("Three Panel, Split Draw");
@@ -11503,35 +11805,35 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setDeps("", "6B");
                                                        setCart("PanelTypeB", "Three Panel, Split Draw");
                                                        selectChanged(e);
-                                                   }} ref={ref => (inputs.current["6B5"] = ref)}/>
-                                            <label htmlFor="6B5">{t("Three Panel, Split Draw")}</label>
-                                            <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
-                                        </div>
-                                        <div className={step6BHead==="Rod" ?(step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 320 ? "box33 radio_style radio_recommended" : "noDisplay") : "noDisplay"):"noDisplay"}>
-                                            <img
-                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_four.svg').default : require('../Images/drapery/grommet/panel_type_four.svg').default}
-                                                className="img-fluid height_auto" alt=""/>
-                                            <input className="radio" type="radio" text={t("Four Panel, Split Draw")} value="6" name="step6B" ref-num="6" id="6B6"
-                                                   checked={step6B === "Four Panel, Split Draw"}
-                                                   onChange={e => {
-                                                       setStep6B("Four Panel, Split Draw");
-                                                       let tempExtended = extendedTitle;
-                                                       tempExtended["6"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Sheer Panel")}</span><span className="step_title_extended_list_item_text">{t("Four Panel, Split Draw")}</span></li>;
-                                                       setExtendedTitle(tempExtended);
-                                                       setDeps("", "6B");
-                                                       setCart("PanelTypeB", "Four Panel, Split Draw");
-                                                       selectChanged(e);
                                                    }} ref={ref => (inputs.current["6B6"] = ref)}/>
-                                            <label htmlFor="6B6">{t("Four Panel, Split Draw")}</label>
+                                            <label htmlFor="6B6">{t("Three Panel, Split Draw")}</label>
                                             <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
                                         </div>
+                                        {/*<div className={step6BHead === "Rod" ? (step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 320 ? "box50 radio_style radio_recommended" : "noDisplay") : "noDisplay") : "noDisplay"}>*/}
+                                        {/*    <img*/}
+                                        {/*        src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_four.svg').default : require('../Images/drapery/grommet/panel_type_four.svg').default}*/}
+                                        {/*        className="img-fluid height_auto" alt=""/>*/}
+                                        {/*    <input className="radio" type="radio" text={t("Four Panel, Split Draw")} value="7" name="step6B" ref-num="6" id="6B7"*/}
+                                        {/*           checked={step6B === "Four Panel, Split Draw"}*/}
+                                        {/*           onChange={e => {*/}
+                                        {/*               setStep6B("Four Panel, Split Draw");*/}
+                                        {/*               let tempExtended = extendedTitle;*/}
+                                        {/*               tempExtended["6"][2] = <li key="3" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Sheer Panel")}</span><span className="step_title_extended_list_item_text">{t("Four Panel, Split Draw")}</span></li>;*/}
+                                        {/*               setExtendedTitle(tempExtended);*/}
+                                        {/*               setDeps("", "6B");*/}
+                                        {/*               setCart("PanelTypeB", "Four Panel, Split Draw");*/}
+                                        {/*               selectChanged(e);*/}
+                                        {/*           }} ref={ref => (inputs.current["6B7"] = ref)}/>*/}
+                                        {/*    <label htmlFor="6B7">{t("Four Panel, Split Draw")}</label>*/}
+                                        {/*    <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>*/}
+                                        {/*</div>*/}
                                     </div>
                                     <div className="card_body card_body_radio Customize_Style_container">
                                         <div className="box100">
                                             <p className="step_selection_title">{t("Privacy Layer Panel Type")}</p>
                                             <div className="grommet_curtain_button_container">
                                                 <div className="dk_curtain_symmetric_buttons">
-                                                    <button className={`dk_curtain_symmetric_button_left btn ${step6CHead==="Rod" ? "dk_curtain_symmetric_button_on" : ""}`}
+                                                    <button className={`dk_curtain_symmetric_button_left btn ${step6CHead === "Rod" ? "dk_curtain_symmetric_button_on" : ""}`}
                                                             onClick={() => {
                                                                 setStep6CHead("Rod");
                                                                 setStep6C("");
@@ -11540,7 +11842,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                             }}>
                                                         {t("Rod")}
                                                     </button>
-                                                    <button className={`dk_curtain_symmetric_button_right btn ${step6CHead==="Track" ? "dk_curtain_symmetric_button_on" : ""} ${tracksList2.length > 0 ?"":"crossed"}`}
+                                                    <button className={`dk_curtain_symmetric_button_right btn ${step6CHead === "Track" ? "dk_curtain_symmetric_button_on" : ""} ${tracksList2.length > 0 ? "" : "crossed"}`}
                                                             onClick={() => {
                                                                 setStep6CHead("Track");
                                                                 setStep6C("");
@@ -11553,7 +11855,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             </div>
                                         </div>
                                         
-                                        <div className={step6CHead==="Rod" ?(parseInt(cartValues["WidthCart"]) <= 160 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"):"box33 radio_style"}>
+                                        <div className={step6CHead === "Rod" ? (parseInt(cartValues["WidthCart"]) <= 160 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay") : "box33 radio_style"}>
                                             <img
                                                 src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_left.svg').default : require('../Images/drapery/grommet/panel_type_left.svg').default}
                                                 className="img-fluid height_auto" alt=""/>
@@ -11570,7 +11872,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    }} ref={ref => (inputs.current["6C1"] = ref)}/>
                                             <label htmlFor="6C1">{t("Single Panel, Left")}</label>
                                         </div>
-                                        <div className={step6CHead==="Rod" ?(parseInt(cartValues["WidthCart"]) <= 160 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay"):"box33 radio_style"}>
+                                        <div className={step6CHead === "Rod" ? (parseInt(cartValues["WidthCart"]) <= 160 || step5 === "Decorative" ? "box33 radio_style" : "noDisplay") : "box33 radio_style"}>
                                             <img
                                                 src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_right.svg').default : require('../Images/drapery/grommet/panel_type_right.svg').default}
                                                 className="img-fluid height_auto" alt=""/>
@@ -11587,29 +11889,47 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    }} ref={ref => (inputs.current["6C2"] = ref)}/>
                                             <label htmlFor="6C2">{t("Single Panel, Right")}</label>
                                         </div>
-                                        <div className={step6CHead==="Rod" ?(step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 160 && parseInt(cartValues["WidthCart"]) <= 320 ? "box33 radio_style" : "noDisplay") : "noDisplay"):"noDisplay"}>
+                                        <div className={step6CHead === "Rod" ? (step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 160 && parseInt(cartValues["WidthCart"]) <= 320 ? "box33 radio_style" : "noDisplay") : "noDisplay") : "noDisplay"}>
                                             <img
                                                 src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_free_hanging.svg').default : require('../Images/drapery/grommet/panel_type_free_hanging.svg').default}
                                                 className="img-fluid height_auto" alt=""/>
-                                            <input className="radio" type="radio" text={t("Free Hanging")} value="3" name="step6C" ref-num="6" id="6C3"
-                                                   checked={step6C === "Free Hanging"}
+                                            <input className="radio" type="radio" text={t("Single, Free Hanging")} value="3" name="step6C" ref-num="6" id="6C3"
+                                                   checked={step6C === "Single, Free Hanging"}
                                                    onChange={e => {
-                                                       setStep6C("Free Hanging");
+                                                       setStep6C("Single, Free Hanging");
                                                        let tempExtended = extendedTitle;
-                                                       tempExtended["6"][3] = <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Privacy Layer")}</span><span className="step_title_extended_list_item_text">{t("Free Hanging")}</span></li>;
+                                                       tempExtended["6"][3] = <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Privacy Layer")}</span><span className="step_title_extended_list_item_text">{t("Single, Free Hanging")}</span></li>;
                                                        setExtendedTitle(tempExtended);
                                                        setDeps("", "6C");
-                                                       setCart("PanelTypeC", "Free Hanging");
+                                                       setCart("PanelTypeC", "Single, Free Hanging");
                                                        selectChanged(e);
                                                    }} ref={ref => (inputs.current["6C3"] = ref)}/>
-                                            <label htmlFor="6C3">{t("Free Hanging")}</label>
+                                            <label htmlFor="6C3">{t("Single, Free Hanging")}</label>
                                             <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
                                         </div>
-                                        <div className={step6CHead==="Rod" ?(step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 160 ? (parseInt(cartValues["WidthCart"]) > 320 ? "noDisplay" : "box33 radio_style radio_recommended") : "box33 radio_style") : "box33 radio_style"):"box33 radio_style"}>
+                                        <div className={step6CHead === "Rod" ? (step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 160 && parseInt(cartValues["WidthCart"]) <= 320 ? "box33 radio_style" : "noDisplay") : "noDisplay") : "noDisplay"}>
                                             <img
-                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_both.svg').default : require('../Images/drapery/grommet/panel_type_both.svg').default}
+                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_free_hanging2.svg').default : require('../Images/drapery/grommet/panel_type_free_hanging2.svg').default}
                                                 className="img-fluid height_auto" alt=""/>
-                                            <input className="radio" type="radio" text={t("Pair, Split Draw")} value="4" name="step6C" ref-num="6C" id="6C4"
+                                            <input className="radio" type="radio" text={t("Pair, Free Hanging")} value="4" name="step6C" ref-num="6" id="6C4"
+                                                   checked={step6C === "Pair, Free Hanging"}
+                                                   onChange={e => {
+                                                       setStep6C("Pair, Free Hanging");
+                                                       let tempExtended = extendedTitle;
+                                                       tempExtended["6"][3] = <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("All Curtains")}</span><span className="step_title_extended_list_item_text">{t("Single, Free Hanging")}</span></li>;
+                                                       setExtendedTitle(tempExtended);
+                                                       setDeps("", "6C");
+                                                       setCart("PanelTypeC", "Pair, Free Hanging");
+                                                       selectChanged(e);
+                                                   }} ref={ref => (inputs.current["6C4"] = ref)}/>
+                                            <label htmlFor="6C4">{t("Pair, Free Hanging")}</label>
+                                            <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
+                                        </div>
+                                        <div className={step6CHead === "Rod" ? (step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 160 ? (parseInt(cartValues["WidthCart"]) > 320 ? "noDisplay" : "box33 radio_style radio_recommended") : "box33 radio_style") : "box33 radio_style") : "box33 radio_style"}>
+                                            <img
+                                                src={(parseInt(cartValues["WidthCart"]) > 160 && step6CHead === "Rod") ? (pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_both2.svg').default : require('../Images/drapery/grommet/panel_type_both2.svg').default) :(pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_both.svg').default : require('../Images/drapery/grommet/panel_type_both.svg').default)}
+                                                className="img-fluid height_auto" alt=""/>
+                                            <input className="radio" type="radio" text={t("Pair, Split Draw")} value="5" name="step6C" ref-num="6C" id="6C5"
                                                    checked={step6C === "Pair, Split Draw"}
                                                    onChange={e => {
                                                        setStep6C("Pair, Split Draw");
@@ -11622,15 +11942,15 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        if (step5 === "Full" && parseInt(cartValues["WidthCart"]) > 320) {
                                                            modalHandleShow("panelTypeWarning");
                                                        }
-                                                   }} ref={ref => (inputs.current["6C4"] = ref)}/>
-                                            <label htmlFor="6C4">{t("Pair, Split Draw")}</label>
+                                                   }} ref={ref => (inputs.current["6C5"] = ref)}/>
+                                            <label htmlFor="6C5">{t("Pair, Split Draw")}</label>
                                             <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
                                         </div>
-                                        <div className={step6CHead==="Rod" ?(step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 320 ? "box33 radio_style" : "noDisplay") : "noDisplay"):"noDisplay"}>
+                                        <div className={step6CHead === "Rod" ? (step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 320 ? "box50 radio_style" : "noDisplay") : "noDisplay") : "noDisplay"}>
                                             <img
                                                 src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_three.svg').default : require('../Images/drapery/grommet/panel_type_three.svg').default}
                                                 className="img-fluid height_auto" alt=""/>
-                                            <input className="radio" type="radio" text={t("Three Panel, Split Draw")} value="5" name="step6C" ref-num="6" id="6C5"
+                                            <input className="radio" type="radio" text={t("Three Panel, Split Draw")} value="6" name="step6C" ref-num="6" id="6C6"
                                                    checked={step6C === "Three Panel, Split Draw"}
                                                    onChange={e => {
                                                        setStep6C("Three Panel, Split Draw");
@@ -11640,28 +11960,28 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setDeps("", "6C");
                                                        setCart("PanelTypeC", "Three Panel, Split Draw");
                                                        selectChanged(e);
-                                                   }} ref={ref => (inputs.current["6C5"] = ref)}/>
-                                            <label htmlFor="6C5">{t("Three Panel, Split Draw")}</label>
-                                            <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
-                                        </div>
-                                        <div className={step6CHead==="Rod" ?(step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 320 ? "box33 radio_style radio_recommended" : "noDisplay") : "noDisplay"):"noDisplay"}>
-                                            <img
-                                                src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_four.svg').default : require('../Images/drapery/grommet/panel_type_four.svg').default}
-                                                className="img-fluid height_auto" alt=""/>
-                                            <input className="radio" type="radio" text={t("Four Panel, Split Draw")} value="6" name="step6C" ref-num="6" id="6C6"
-                                                   checked={step6C === "Four Panel, Split Draw"}
-                                                   onChange={e => {
-                                                       setStep6C("Four Panel, Split Draw");
-                                                       let tempExtended = extendedTitle;
-                                                       tempExtended["6"][3] = <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Privacy Layer")}</span><span className="step_title_extended_list_item_text">{t("Four Panel, Split Draw")}</span></li>;
-                                                       setExtendedTitle(tempExtended);
-                                                       setDeps("", "6C");
-                                                       setCart("PanelTypeC", "Four Panel, Split Draw");
-                                                       selectChanged(e);
                                                    }} ref={ref => (inputs.current["6C6"] = ref)}/>
-                                            <label htmlFor="6C6">{t("Four Panel, Split Draw")}</label>
+                                            <label htmlFor="6C6">{t("Three Panel, Split Draw")}</label>
                                             <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>
                                         </div>
+                                        {/*<div className={step6CHead === "Rod" ? (step5 === "Full" ? (parseInt(cartValues["WidthCart"]) > 320 ? "box50 radio_style radio_recommended" : "noDisplay") : "noDisplay") : "noDisplay"}>*/}
+                                        {/*    <img*/}
+                                        {/*        src={pageLanguage === "fa" ? require('../Images/drapery/grommet/panel_type_four.svg').default : require('../Images/drapery/grommet/panel_type_four.svg').default}*/}
+                                        {/*        className="img-fluid height_auto" alt=""/>*/}
+                                        {/*    <input className="radio" type="radio" text={t("Four Panel, Split Draw")} value="7" name="step6C" ref-num="6" id="6C7"*/}
+                                        {/*           checked={step6C === "Four Panel, Split Draw"}*/}
+                                        {/*           onChange={e => {*/}
+                                        {/*               setStep6C("Four Panel, Split Draw");*/}
+                                        {/*               let tempExtended = extendedTitle;*/}
+                                        {/*               tempExtended["6"][3] = <li key="4" className="step_title_extended_list_item"><span className="step_title_extended_list_item_title">{t("Privacy Layer")}</span><span className="step_title_extended_list_item_text">{t("Four Panel, Split Draw")}</span></li>;*/}
+                                        {/*               setExtendedTitle(tempExtended);*/}
+                                        {/*               setDeps("", "6C");*/}
+                                        {/*               setCart("PanelTypeC", "Four Panel, Split Draw");*/}
+                                        {/*               selectChanged(e);*/}
+                                        {/*           }} ref={ref => (inputs.current["6C7"] = ref)}/>*/}
+                                        {/*    <label htmlFor="6C7">{t("Four Panel, Split Draw")}</label>*/}
+                                        {/*    <div className="radio_recommended_text">{t("RECOMMENDED FOR YOUR MEASUREMENTS")}</div>*/}
+                                        {/*</div>*/}
                                         <NextStep currentStep="6" eventKey="7">{t("NEXT STEP")}</NextStep>
                                     </div>
                                 </div>
@@ -11872,7 +12192,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                 <div className="card_body card_body_radio card_body_hardware">
                                     <div className="box33 radio_style">
                                         <input className="radio" type="radio" text={t("hardware1")} value="1" name="step8" ref-num="8" id="81" outline="true"
-                                               checked={step8 === "None"}
+                                               checked={step8 === "I Have My Own Hardware"}
                                                onChange={e => {
                                                    setStep81("");
                                                    setStep82("");
@@ -11882,22 +12202,22 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    setStep8B("");
                                                    setStep8C("");
                                                    let tempExtended = extendedTitle;
-                                                   tempExtended["8"] = [t("None")];
+                                                   tempExtended["8"] = [t("I Have My Own Hardware")];
                                                    tempExtended["8A"] = [];
                                                    tempExtended["8B"] = [];
                                                    tempExtended["8C"] = [];
                                                    setExtendedTitle(tempExtended);
                                                    selectChanged(e);
-                                                   setStep8("None");
+                                                   setStep8("I Have My Own Hardware");
                                                    setHardwareNextStep("9");
                                                    setDeps("", "8,81,82,83,84,8A,8A1,8A2,8A3,8A4,8B,8B1,8B2,8B3,8B5,8B51,8C,8C1,8C2,8C3,8C5,8C51");
-                                                   setCart("Hardware", "None", "RailId,BatonOption,RailDesign,RailDesignEn,RailDesignFa,RailColorEn,RailColorFa,RodColor,mount8,BatonOptionA,RailDesignA,RailDesignEnA,RailDesignFaA,RailColorEnA,RailColorFaA,RodColorA,MountA,RailIdB,BatonOptionB,RailDesignB,RailDesignEnB,RailDesignFaB,RailColorEnB,RailColorFaB,RodColorB,MountB,RailIdC,BatonOptionC,RailDesignC,RailDesignEnC,RailDesignFaC,RailColorEnC,RailColorFaC,RodColorC,MountC,hasPower,MotorPosition,RemoteName,MotorChannels");
+                                                   setCart("Hardware", "I Have My Own Hardware", "RailId,BatonOption,RailDesign,RailDesignEn,RailDesignFa,RailColorEn,RailColorFa,RodColor,mount8,BatonOptionA,RailDesignA,RailDesignEnA,RailDesignFaA,RailColorEnA,RailColorFaA,RodColorA,MountA,RailIdB,BatonOptionB,RailDesignB,RailDesignEnB,RailDesignFaB,RailColorEnB,RailColorFaB,RodColorB,MountB,RailIdC,BatonOptionC,RailDesignC,RailDesignEnC,RailDesignFaC,RailColorEnC,RailColorFaC,RodColorC,MountC,hasPower,MotorPosition,RemoteName,MotorChannels");
                                                }} ref={ref => (inputs.current["81"] = ref)}/>
                                         <label htmlFor="81">{t("hardware1")}</label>
                                     </div>
                                     <div className="box33 radio_style">
                                         <input className="radio" type="radio" text={t("hardware2")} value="2" name="step8" ref-num="8" id="82" outline="true"
-                                               checked={step8 === "Same Hardware For All Curtains"}
+                                               checked={step8 === "I Want Same Hardware For All Curtains"}
                                                onChange={e => {
                                                    setStep8A("");
                                                    setStep8B("");
@@ -11917,7 +12237,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    } else {
                                                        selectChanged(e);
                                                        setTimeout(() => {
-                                                           setStep8("Same Hardware For All Curtains");
+                                                           setStep8("I Want Same Hardware For All Curtains");
                                                        }, 300);
                                                        tempExtended["8"] = [t("hardware2")];
                                                        setHardwareNextStep("9");
@@ -11926,7 +12246,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        } else {
                                                            setDeps("81,82,83,84", "8,8A,8A1,8A2,8A3,8A4,8B,8B1,8B2,8B3,8C,8C1,8C2,8C3");
                                                        }
-                                                       setCart("Hardware", "Same Hardware For All Curtains", "BatonOptionA,RailDesignA,RailDesignEnA,RailDesignFaA,RailColorEnA,RailColorFaA,RodColorA,MountA,RailIdB,BatonOptionB,RailDesignB,RailDesignEnB,RailDesignFaB,RailColorEnB,RailColorFaB,RodColorB,MountB,RailIdC,BatonOptionC,RailDesignC,RailDesignEnC,RailDesignFaC,RailColorEnC,RailColorFaC,RodColorC,MountC,hasPower,MotorPosition,RemoteName,MotorChannels");
+                                                       setCart("Hardware", "I Want Same Hardware For All Curtains", "BatonOptionA,RailDesignA,RailDesignEnA,RailDesignFaA,RailColorEnA,RailColorFaA,RodColorA,MountA,RailIdB,BatonOptionB,RailDesignB,RailDesignEnB,RailDesignFaB,RailColorEnB,RailColorFaB,RodColorB,MountB,RailIdC,BatonOptionC,RailDesignC,RailDesignEnC,RailDesignFaC,RailColorEnC,RailColorFaC,RodColorC,MountC,hasPower,MotorPosition,RemoteName,MotorChannels");
                                                    }
                                                    setExtendedTitle(tempExtended);
                                                }} ref={ref => (inputs.current["82"] = ref)}/>
@@ -11934,7 +12254,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                     </div>
                                     <div className="box33 radio_style">
                                         <input className="radio" type="radio" text={t("hardware3")} value="3" name="step8" ref-num="8" id="83" outline="true"
-                                               checked={step8 === "Customize Hardware Per Curtain"}
+                                               checked={step8 === "I Want Customize Hardware Per Curtain"}
                                                onChange={e => {
                                                    setStep81("");
                                                    setStep82("");
@@ -11958,14 +12278,14 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    } else {
                                                        setHardwareNextStep("8A");
                                                        selectChanged(e);
-                                                       setStep8("Customize Hardware Per Curtain");
+                                                       setStep8("I Want Customize Hardware Per Curtain");
                                                        tempExtended["8"] = [t("hardware3")];
                                                        if (step2B === "None") {
                                                            setDeps("8A,8B", "8,81,82,83,84,8C");
                                                        } else {
                                                            setDeps("8A,8B,8C", "8,81,82,83,84");
                                                        }
-                                                       setCart("Hardware", "Customize Hardware Per Curtain", "RailId,BatonOption,RailDesign,RailDesignEn,RailDesignFa,RailColorEn,RailColorFa,RodColor,Mount8");
+                                                       setCart("Hardware", "I Want Customize Hardware Per Curtain", "RailId,BatonOption,RailDesign,RailDesignEn,RailDesignFa,RailColorEn,RailColorFa,RodColor,Mount8");
                                                    }
                                                    setExtendedTitle(tempExtended);
                                                }} ref={ref => (inputs.current["83"] = ref)}/>
@@ -11973,10 +12293,10 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                     </div>
                                     
                                     {/* step 9 Questions */}
-                                    <div className={step8 === "Same Hardware For All Curtains" ? "card_body card_body_radio card_body_Rod" : "noDisplay"}>
+                                    <div className={step8 === "I Want Same Hardware For All Curtains" ? "card_body card_body_radio card_body_Rod" : "noDisplay"}>
                                         {rodsList}
                                     </div>
-                                    <div className={step8 === "Same Hardware For All Curtains" && step81 !== "" ? "card_body card_body_radio card_body_Rod_color" : "noDisplay"}>
+                                    <div className={step8 === "I Want Same Hardware For All Curtains" && step81 !== "" ? "card_body card_body_radio card_body_Rod_color" : "noDisplay"}>
                                         <div className="box100">
                                             <p className="step_selection_title">{t("step8_rod_finish_title")}</p>
                                         </div>
@@ -12119,7 +12439,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                     {/*    </div>*/}
                                     {/*</div>*/}
                                     <div
-                                        className={step8 === "Same Hardware For All Curtains" && step81 !== "" ? "card_body card_body_radio card_body_baton" : "noDisplay"}>
+                                        className={step8 === "I Want Same Hardware For All Curtains" && step81 !== "" ? "card_body card_body_radio card_body_baton" : "noDisplay"}>
                                         <div className="box100">
                                             <p className="step_selection_title">{t("Baton Option")}</p>
                                         </div>
@@ -12171,7 +12491,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                         </div>
                                     </div>
                                     
-                                    <div className={step8 === "Same Hardware For All Curtains" && step81 !== "" && step31 !== "false" ? "card_body" + " card_body_radio card_body_rod_mount" : "noDisplay"}>
+                                    <div className={step8 === "I Want Same Hardware For All Curtains" && step81 !== "" && step31 !== "false" ? "card_body" + " card_body_radio card_body_rod_mount" : "noDisplay"}>
                                         <div className="box100">
                                             <p className="step_selection_title">{t("step8_rod_mount_title")}</p>
                                         </div>
@@ -12212,7 +12532,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     </Card>
                     
                     {/* step 9A */}
-                    <Card className={step8 === "Customize Hardware Per Curtain" ? "" : "noDisplay"}>
+                    <Card className={step8 === "I Want Customize Hardware Per Curtain" ? "" : "noDisplay"}>
                         {/*<Card.Header className={[...depSet].findIndex(el => el.startsWith("8A")) === -1 && (!accordionActiveKey.startsWith("8")) ? "hidden" : ""}>*/}
                         <Card.Header>
                             <ContextAwareToggle eventKey="8A" stepNum={t("9A")} stepTitle={t("grommet_step8A")} stepRef="8A" type="1" required={requiredStep["8A"]}
@@ -12229,18 +12549,18 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    setStep8A2("");
                                                    setStep8A3("");
                                                    setStep8A4("");
-                                                   setStep8A("None");
+                                                   setStep8A("I Have My Own Hardware");
                                                    let tempExtended = extendedTitle;
-                                                   tempExtended["8A"] = [t("None")];
+                                                   tempExtended["8A"] = [t("I Have My Own Hardware")];
                                                    setExtendedTitle(tempExtended);
                                                    setDeps("", "8A,8A1,8A2,8A3,8A4");
-                                                   setCart("DraperyHardware", "None", "BatonOptionA,RailDesignA,RailDesignEnA,RailDesignFaA,RailColorEnA,RailColorFaA,RodColorA,MountA");
+                                                   setCart("DraperyHardware", "I Have My Own Hardware", "BatonOptionA,RailDesignA,RailDesignEnA,RailDesignFaA,RailColorEnA,RailColorFaA,RodColorA,MountA");
                                                    selectChanged(e);
                                                }} ref={ref => (inputs.current["8A1"] = ref)}/>
-                                        <label htmlFor="8A1">{t("None")}</label>
+                                        <label htmlFor="8A1">{t("I Have My Own Hardware")}</label>
                                     </div>
                                     <div className="box50 radio_style">
-                                        <input className="radio" type="radio" text={t("Rod")} value="2" name="step8A" ref-num="8A" id="8A2"
+                                        <input className="radio" type="radio" text={t("drapery_Rod")} value="2" name="step8A" ref-num="8A" id="8A2"
                                                checked={step8A === "Rod"}
                                                onChange={e => {
                                                    let tempExtended = extendedTitle;
@@ -12259,7 +12579,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setTimeout(() => {
                                                            setStep8A("Rod");
                                                        }, 300);
-                                                       tempExtended["8A"] = [t("Rod")];
+                                                       tempExtended["8A"] = [t("drapery_Rod")];
                                                        setCart("DraperyHardware", "Rod");
                                                        selectChanged(e);
                                                        if (step84 === "" && step31 !== "false") {
@@ -12270,21 +12590,21 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                    }
                                                    setExtendedTitle(tempExtended);
                                                }} ref={ref => (inputs.current["8A2"] = ref)}/>
-                                        <label htmlFor="8A2">{t("Rod")}</label>
+                                        <label htmlFor="8A2">{t("drapery_Rod")}</label>
                                     </div>
                                     
                                     {/* step 9 Questions */}
-                                    <div className={step8A !== "None" && step8A !== "" ? "card_body card_body_radio card_body_Rod" : "noDisplay"}>
+                                    <div className={step8A !== "I Have My Own Hardware" && step8A !== "" ? "card_body card_body_radio card_body_Rod" : "noDisplay"}>
                                         {rodsList2}
                                     </div>
                                     <div
-                                        className={step8A !== "None" && step8A !== "" && step8A1 !== "" ? "card_body card_body_radio card_body_Rod_color bracket_color" : "noDisplay"}>
+                                        className={step8A !== "I Have My Own Hardware" && step8A !== "" && step8A1 !== "" ? "card_body card_body_radio card_body_Rod_color bracket_color" : "noDisplay"}>
                                         <div className="box100">
                                             <p className="step_selection_title">{t("step8_rod_finish_title")}</p>
                                         </div>
                                         {rodsColorList2}
                                     </div>
-                                    {/*<div className={step8A !== "None" && step8A !== "" && step8A1 !== "" ? "same_row_selection" : "noDisplay"}>*/}
+                                    {/*<div className={step8A !== "I Have My Own Hardware" && step8A !== "" && step8A1 !== "" ? "same_row_selection" : "noDisplay"}>*/}
                                     {/*    <div className="same_row_selection_left">*/}
                                     {/*        <p>{t("Baton Option")}</p>*/}
                                     {/*        &nbsp;*/}
@@ -12331,7 +12651,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                     {/*    </div>*/}
                                     {/*</div>*/}
                                     <div
-                                        className={step8A !== "None" && step8A !== "" && step8A1 !== "" ? "card_body card_body_radio card_body_baton" : "noDisplay"}>
+                                        className={step8A !== "I Have My Own Hardware" && step8A !== "" && step8A1 !== "" ? "card_body card_body_radio card_body_baton" : "noDisplay"}>
                                         <div className="box100">
                                             <p className="step_selection_title">{t("Baton Option")}</p>
                                         </div>
@@ -12416,7 +12736,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                     {/*    </div>*/}
                                     {/*    <div className="box33 radio_style"/>*/}
                                     {/*</div>*/}
-                                    <div className={step8A !== "None" && step8A !== "" && step8A1 !== "" && step31 !== "false" ? "card_body" + " card_body_radio card_body_rod_mount" : "noDisplay"}>
+                                    <div className={step8A !== "I Have My Own Hardware" && step8A !== "" && step8A1 !== "" && step31 !== "false" ? "card_body" + " card_body_radio card_body_rod_mount" : "noDisplay"}>
                                         <div className="box100">
                                             <p className="step_selection_title">{t("step8_rod_mount_title")}</p>
                                         </div>
@@ -12424,7 +12744,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             <input className="radio" type="radio" text={t("Wall")} value="1" name="step8A4" ref-num="84" id="8A41"
                                                    checked={step84 === "Wall"}
                                                    onChange={e => {
-                                                       if (step84 !== "" && ((step8B !== "None" && step8B !== "") || (step8C !== "None" && step8C !== ""))) {
+                                                       if (step84 !== "" && ((step8B !== "I Have My Own Hardware" && step8B !== "") || (step8C !== "I Have My Own Hardware" && step8C !== ""))) {
                                                            modalHandleShow("mountAllChange");
                                                        }
                                                        setStep84("Wall");
@@ -12441,7 +12761,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             <input className="radio" type="radio" text={t("Ceiling")} value="2" name="step8A4" ref-num="84" id="8A42"
                                                    checked={step84 === "Ceiling"}
                                                    onChange={e => {
-                                                       if (step84 !== "" && ((step8B !== "None" && step8B !== "") || (step8C !== "None" && step8C !== ""))) {
+                                                       if (step84 !== "" && ((step8B !== "I Have My Own Hardware" && step8B !== "") || (step8C !== "I Have My Own Hardware" && step8C !== ""))) {
                                                            modalHandleShow("mountAllChange");
                                                        }
                                                        setStep84("Ceiling");
@@ -12463,7 +12783,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     </Card>
                     
                     {/* step 9B */}
-                    <Card className={step8 === "Customize Hardware Per Curtain" ? "" : "noDisplay"}>
+                    <Card className={step8 === "I Want Customize Hardware Per Curtain" ? "" : "noDisplay"}>
                         {/*<Card.Header className={[...depSet].findIndex(el => el.startsWith("8B")) === -1 && (!accordionActiveKey.startsWith("8")) ? "hidden" : ""}>*/}
                         <Card.Header>
                             <ContextAwareToggle eventKey="8B" stepNum={t("9B")} stepTitle={t("grommet_step8B")} stepRef="8B" type="1" required={requiredStep["8B"]}
@@ -12473,25 +12793,25 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                             <Card.Body>
                                 <div className="card_body card_body_radio card_body_hardware">
                                     <div className="box33 radio_style">
-                                        <input className="radio" type="radio" text={t("None")} value="1" name="step8B" ref-num="8B" id="8B1"
-                                               checked={step8B === "None"}
+                                        <input className="radio" type="radio" text={t("I Have My Own Hardware")} value="1" name="step8B" ref-num="8B" id="8B1"
+                                               checked={step8B === "I Have My Own Hardware"}
                                                onChange={e => {
                                                    setStep8B1("");
                                                    setStep8B2("");
                                                    setStep8B3("");
                                                    // setStep8B4("");
-                                                   setStep8B("None");
+                                                   setStep8B("I Have My Own Hardware");
                                                    let tempExtended = extendedTitle;
-                                                   tempExtended["8B"] = [t("None")];
+                                                   tempExtended["8B"] = [t("I Have My Own Hardware")];
                                                    setExtendedTitle(tempExtended);
                                                    setDeps("", "8B,8B1,8B2,8B3");
-                                                   setCart("SheerHardware", "None", "RailIdB,BatonOptionB,RailDesignB,RailDesignEnB,RailDesignFaB,RailColorEnB,RailColorFaB,RodColorB,MountB");
+                                                   setCart("SheerHardware", "I Have My Own Hardware", "RailIdB,BatonOptionB,RailDesignB,RailDesignEnB,RailDesignFaB,RailColorEnB,RailColorFaB,RodColorB,MountB");
                                                    selectChanged(e);
                                                }} ref={ref => (inputs.current["8B1"] = ref)}/>
-                                        <label htmlFor="8B1">{t("None")}</label>
+                                        <label htmlFor="8B1">{t("I Have My Own Hardware")}</label>
                                     </div>
                                     <div className={tracksList.length > 0 ? "box33 radio_style" : "noDisplay"}>
-                                        <input className="radio" type="radio" text={t("Track")} value="2" name="step8B" ref-num="8B" id="8B2"
+                                        <input className="radio" type="radio" text={t("sheer_Track")} value="2" name="step8B" ref-num="8B" id="8B2"
                                                checked={step8B === "Track"}
                                                onChange={e => {
                                                    setStep8B1("");
@@ -12502,7 +12822,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setStep8B("Track");
                                                    }, 300);
                                                    let tempExtended = extendedTitle;
-                                                   tempExtended["8B"] = [t("Track")];
+                                                   tempExtended["8B"] = [t("sheer_Track")];
                                                    setExtendedTitle(tempExtended);
                                                    // setDeps("8B1,8B2,8B3", "8B");
                                                    setCart("SheerHardware", "Track", "RailIdB,BatonOptionB,RailDesignB,RailDesignEnB,RailDesignFaB,RailColorEnB,RailColorFaB,RodColorB,MountB");
@@ -12513,10 +12833,10 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setDeps("8B1,8B2,8B3", "8B");
                                                    }
                                                }} ref={ref => (inputs.current["8B2"] = ref)}/>
-                                        <label htmlFor="8B2">{t("Track")}</label>
+                                        <label htmlFor="8B2">{t("sheer_Track")}</label>
                                     </div>
                                     <div className={rodsList3.length > 0 ? "box33 radio_style" : "noDisplay"}>
-                                        <input className="radio" type="radio" text={t("Rod")} value="3" name="step8B" ref-num="8B" id="8B3"
+                                        <input className="radio" type="radio" text={t("sheer_Rod")} value="3" name="step8B" ref-num="8B" id="8B3"
                                                checked={step8B === "Rod"}
                                                onChange={e => {
                                                    setStep8B1("");
@@ -12527,7 +12847,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setStep8B("Rod");
                                                    }, 300);
                                                    let tempExtended = extendedTitle;
-                                                   tempExtended["8B"] = [t("Rod")];
+                                                   tempExtended["8B"] = [t("sheer_Rod")];
                                                    setExtendedTitle(tempExtended);
                                                    // setDeps("8B1,8B2,8B3", "8B");
                                                    setCart("SheerHardware", "Rod", "RailIdB,BatonOptionB,RailDesignB,RailDesignEnB,RailDesignFaB,RailColorEnB,RailColorFaB,RodColorB,MountB");
@@ -12538,21 +12858,21 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setDeps("8B1,8B2,8B3", "8B");
                                                    }
                                                }} ref={ref => (inputs.current["8B3"] = ref)}/>
-                                        <label htmlFor="8B3">{t("Rod")}</label>
+                                        <label htmlFor="8B3">{t("sheer_Rod")}</label>
                                     </div>
                                     
                                     {/* step 9 Questions */}
-                                    <div className={step8B !== "None" && step8B !== "" ? "card_body card_body_radio card_body_Rod" : "noDisplay"}>
+                                    <div className={step8B !== "I Have My Own Hardware" && step8B !== "" ? "card_body card_body_radio card_body_Rod" : "noDisplay"}>
                                         {step8B === "Rod" ? rodsList3 : tracksList}
                                     </div>
                                     <div
-                                        className={step8B !== "None" && step8B !== "" && step8B1 !== "" && !is8BMotor ? "card_body card_body_radio card_body_Rod_color bracket_color" : "noDisplay"}>
+                                        className={step8B !== "I Have My Own Hardware" && step8B !== "" && step8B1 !== "" && !is8BMotor ? "card_body card_body_radio card_body_Rod_color bracket_color" : "noDisplay"}>
                                         <div className="box100">
                                             <p className="step_selection_title">{step8B === "Rod" ? t("step8_rod_finish_title") : t("step8_rod_finish_title_track")}</p>
                                         </div>
                                         {rodsColorList3}
                                     </div>
-                                    {/*<div className={step8B !== "None" && step8B !== "" ? "same_row_selection" : "noDisplay"}>*/}
+                                    {/*<div className={step8B !== "I Have My Own Hardware" && step8B !== "" ? "same_row_selection" : "noDisplay"}>*/}
                                     {/*    <div className="same_row_selection_left">*/}
                                     {/*        <p>{t("Baton Option")}</p>*/}
                                     {/*        &nbsp;*/}
@@ -12599,7 +12919,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                     {/*    </div>*/}
                                     {/*</div>*/}
                                     <div
-                                        className={step8B !== "None" && step8B !== "" && step8B1 !== "" && !is8BMotor ? "card_body card_body_radio card_body_baton" : "noDisplay"}>
+                                        className={step8B !== "I Have My Own Hardware" && step8B !== "" && step8B1 !== "" && !is8BMotor ? "card_body card_body_radio card_body_baton" : "noDisplay"}>
                                         <div className="box100">
                                             <p className="step_selection_title">{step8B === "Track" ? t("Control Type") : t("Baton Option")}</p>
                                         </div>
@@ -12666,7 +12986,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             </label>
                                         </div>
                                     </div>
-                                    <div className={step8B !== "None" && step8B !== "" && step8B1 !== "" && !is8BMotor && step31 !== "false" ? "card_body" + " card_body_radio card_body_rod_mount" : "noDisplay"}>
+                                    <div className={step8B !== "I Have My Own Hardware" && step8B !== "" && step8B1 !== "" && !is8BMotor && step31 !== "false" ? "card_body" + " card_body_radio card_body_rod_mount" : "noDisplay"}>
                                         <div className="box100">
                                             <p className="step_selection_title">{t("step8_rod_mount_title")}</p>
                                         </div>
@@ -12674,7 +12994,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             <input className="radio" type="radio" text={t("Wall")} value="1" name="step8B4" ref-num="84" id="8B41"
                                                    checked={step84 === "Wall"}
                                                    onChange={e => {
-                                                       if (step84 !== "" && ((step8A !== "None" && step8A !== "") || (step8C !== "None" && step8C !== ""))) {
+                                                       if (step84 !== "" && ((step8A !== "I Have My Own Hardware" && step8A !== "") || (step8C !== "I Have My Own Hardware" && step8C !== ""))) {
                                                            modalHandleShow("mountAllChange");
                                                        }
                                                        setStep84("Wall");
@@ -12691,7 +13011,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             <input className="radio" type="radio" text={t("Ceiling")} value="2" name="step8B4" ref-num="84" id="8B42"
                                                    checked={step84 === "Ceiling"}
                                                    onChange={e => {
-                                                       if (step84 !== "" && ((step8A !== "None" && step8A !== "") || (step8C !== "None" && step8C !== ""))) {
+                                                       if (step84 !== "" && ((step8A !== "I Have My Own Hardware" && step8A !== "") || (step8C !== "I Have My Own Hardware" && step8C !== ""))) {
                                                            modalHandleShow("mountAllChange");
                                                        }
                                                        setStep84("Ceiling");
@@ -12915,7 +13235,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     </Card>
                     
                     {/* step 9C */}
-                    <Card className={step8 === "Customize Hardware Per Curtain" && step2B !== "None" ? "" : "noDisplay"}>
+                    <Card className={step8 === "I Want Customize Hardware Per Curtain" && step2B !== "None" ? "" : "noDisplay"}>
                         {/*<Card.Header className={[...depSet].findIndex(el => el.startsWith("8C")) === -1 && (!accordionActiveKey.startsWith("8")) ? "hidden" : ""}>*/}
                         <Card.Header>
                             <ContextAwareToggle eventKey="8C" stepNum={t("9C")} stepTitle={t("grommet_step8C")} stepRef="8C" type="1" required={requiredStep["8C"]}
@@ -12925,25 +13245,25 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                             <Card.Body>
                                 <div className="card_body card_body_radio card_body_hardware">
                                     <div className="box33 radio_style">
-                                        <input className="radio" type="radio" text={t("None")} value="1" name="step8C" ref-num="8C" id="8C1"
-                                               checked={step8C === "None"}
+                                        <input className="radio" type="radio" text={t("I Have My Own Hardware")} value="1" name="step8C" ref-num="8C" id="8C1"
+                                               checked={step8C === "I Have My Own Hardware"}
                                                onChange={e => {
                                                    setStep8C1("");
                                                    setStep8C2("");
                                                    setStep8C3("");
                                                    // setStep8C4("");
-                                                   setStep8C("None");
+                                                   setStep8C("I Have My Own Hardware");
                                                    let tempExtended = extendedTitle;
-                                                   tempExtended["8C"] = [t("None")];
+                                                   tempExtended["8C"] = [t("I Have My Own Hardware")];
                                                    setExtendedTitle(tempExtended);
                                                    setDeps("", "8C,8C1,8C2,8C3");
-                                                   setCart("PrivacyLayerHardware", "None", "RailIdC,BatonOptionC,RailDesignC,RailDesignEnC,RailDesignFaC,RailColorEnC,RailColorFaC,RodColorC,MountC");
+                                                   setCart("PrivacyLayerHardware", "I Have My Own Hardware", "RailIdC,BatonOptionC,RailDesignC,RailDesignEnC,RailDesignFaC,RailColorEnC,RailColorFaC,RodColorC,MountC");
                                                    selectChanged(e);
                                                }} ref={ref => (inputs.current["8C1"] = ref)}/>
-                                        <label htmlFor="8C1">{t("None")}</label>
+                                        <label htmlFor="8C1">{t("I Have My Own Hardware")}</label>
                                     </div>
                                     <div className={tracksList2.length > 0 ? "box33 radio_style" : "noDisplay"}>
-                                        <input className="radio" type="radio" text={t("Track")} value="2" name="step8C" ref-num="8C" id="8C2"
+                                        <input className="radio" type="radio" text={t("pl_Track")} value="2" name="step8C" ref-num="8C" id="8C2"
                                                checked={step8C === "Track"}
                                                onChange={e => {
                                                    setStep8C1("");
@@ -12954,7 +13274,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setStep8C("Track");
                                                    }, 300);
                                                    let tempExtended = extendedTitle;
-                                                   tempExtended["8C"] = [t("Track")];
+                                                   tempExtended["8C"] = [t("pl_Track")];
                                                    setExtendedTitle(tempExtended);
                                                    // setDeps("8C1,8C2,8C3", "8C");
                                                    setCart("PrivacyLayerHardware", "Track", "RailIdC,BatonOptionC,RailDesignC,RailDesignEnC,RailDesignFaC,RailColorEnC,RailColorFaC,RodColorC,MountC");
@@ -12965,10 +13285,10 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setDeps("8C1,8C2,8C3", "8C");
                                                    }
                                                }} ref={ref => (inputs.current["8C2"] = ref)}/>
-                                        <label htmlFor="8C2">{t("Track")}</label>
+                                        <label htmlFor="8C2">{t("pl_Track")}</label>
                                     </div>
                                     <div className={rodsList4.length > 0 ? "box33 radio_style" : "noDisplay"}>
-                                        <input className="radio" type="radio" text={t("Rod")} value="3" name="step8C" ref-num="8C" id="8C3"
+                                        <input className="radio" type="radio" text={t("pl_Rod")} value="3" name="step8C" ref-num="8C" id="8C3"
                                                checked={step8C === "Rod"}
                                                onChange={e => {
                                                    setStep8C1("");
@@ -12979,7 +13299,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setStep8C("Rod");
                                                    }, 300);
                                                    let tempExtended = extendedTitle;
-                                                   tempExtended["8C"] = [t("Rod")];
+                                                   tempExtended["8C"] = [t("pl_Rod")];
                                                    setExtendedTitle(tempExtended);
                                                    // setDeps("8C1,8C2,8C3", "8C");
                                                    setCart("PrivacyLayerHardware", "Rod", "RailIdC,BatonOptionC,RailDesignC,RailDesignEnC,RailDesignFaC,RailColorEnC,RailColorFaC,RodColorC,MountC");
@@ -12990,21 +13310,21 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                                        setDeps("8C1,8C2,8C3", "8C");
                                                    }
                                                }} ref={ref => (inputs.current["8C3"] = ref)}/>
-                                        <label htmlFor="8C3">{t("Rod")}</label>
+                                        <label htmlFor="8C3">{t("pl_Rod")}</label>
                                     </div>
                                     
                                     {/* step 9 Questions */}
-                                    <div className={step8C !== "None" && step8C !== "" ? "card_body card_body_radio card_body_Rod" : "noDisplay"}>
+                                    <div className={step8C !== "I Have My Own Hardware" && step8C !== "" ? "card_body card_body_radio card_body_Rod" : "noDisplay"}>
                                         {step8C === "Rod" ? rodsList4 : tracksList2}
                                     </div>
                                     <div
-                                        className={step8C !== "None" && step8C !== "" && step8C1 !== "" && !is8CMotor ? "card_body card_body_radio card_body_Rod_color bracket_color" : "noDisplay"}>
+                                        className={step8C !== "I Have My Own Hardware" && step8C !== "" && step8C1 !== "" && !is8CMotor ? "card_body card_body_radio card_body_Rod_color bracket_color" : "noDisplay"}>
                                         <div className="box100">
                                             <p className="step_selection_title">{step8C === "Rod" ? t("step8_rod_finish_title") : t("step8_rod_finish_title_track")}</p>
                                         </div>
                                         {rodsColorList4}
                                     </div>
-                                    {/*<div className={step8C !== "None" && step8C !== "" ? "same_row_selection" : "noDisplay"}>*/}
+                                    {/*<div className={step8C !== "I Have My Own Hardware" && step8C !== "" ? "same_row_selection" : "noDisplay"}>*/}
                                     {/*    <div className="same_row_selection_left">*/}
                                     {/*        <p>{t("Baton Option")}</p>*/}
                                     {/*        &nbsp;*/}
@@ -13051,7 +13371,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                     {/*    </div>*/}
                                     {/*</div>*/}
                                     <div
-                                        className={step8C !== "None" && step8C !== "" && step8C1 !== "" && !is8CMotor ? "card_body card_body_radio card_body_baton" : "noDisplay"}>
+                                        className={step8C !== "I Have My Own Hardware" && step8C !== "" && step8C1 !== "" && !is8CMotor ? "card_body card_body_radio card_body_baton" : "noDisplay"}>
                                         <div className="box100">
                                             <p className="step_selection_title">{step8C === "Track" ? t("Control Type") : t("Baton Option")}</p>
                                         </div>
@@ -13118,7 +13438,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             </label>
                                         </div>
                                     </div>
-                                    <div className={step8C !== "None" && step8C !== "" && step8C1 !== "" && !is8CMotor && step31 !== "false" ? "card_body" + " card_body_radio card_body_rod_mount" : "noDisplay"}>
+                                    <div className={step8C !== "I Have My Own Hardware" && step8C !== "" && step8C1 !== "" && !is8CMotor && step31 !== "false" ? "card_body" + " card_body_radio card_body_rod_mount" : "noDisplay"}>
                                         <div className="box100">
                                             <p className="step_selection_title">{t("step8_rod_mount_title")}</p>
                                         </div>
@@ -13126,7 +13446,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             <input className="radio" type="radio" text={t("Wall")} value="1" name="step8C4" ref-num="84" id="8C41"
                                                    checked={step84 === "Wall"}
                                                    onChange={e => {
-                                                       if (step84 !== "" && ((step8A !== "None" && step8A !== "") || (step8B !== "None" && step8B !== ""))) {
+                                                       if (step84 !== "" && ((step8A !== "I Have My Own Hardware" && step8A !== "") || (step8B !== "I Have My Own Hardware" && step8B !== ""))) {
                                                            modalHandleShow("mountAllChange");
                                                        }
                                                        setStep84("Wall");
@@ -13143,7 +13463,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                                             <input className="radio" type="radio" text={t("Ceiling")} value="2" name="step8C4" ref-num="84" id="8C42"
                                                    checked={step84 === "Ceiling"}
                                                    onChange={e => {
-                                                       if (step84 !== "" && ((step8A !== "None" && step8A !== "") || (step8B !== "None" && step8B !== ""))) {
+                                                       if (step84 !== "" && ((step8A !== "I Have My Own Hardware" && step8A !== "") || (step8B !== "I Have My Own Hardware" && step8B !== ""))) {
                                                            modalHandleShow("mountAllChange");
                                                        }
                                                        setStep84("Ceiling");
@@ -13580,7 +13900,7 @@ function Grommet({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, Que
                     </Card>
                     
                     {/* step 12 */}
-                    <Card className={accordionActiveKey===""?"card_little_margin":"card_big_margin"}>
+                    <Card className={accordionActiveKey === "" ? "card_little_margin" : "card_big_margin"}>
                         <Card.Header>
                             <ContextAwareToggle eventKey="11" stepNum={t("12")} stepTitle={t("zebra_step7")} stepTitle2={t("(Optional)")} stepRef="11" type="2"
                                                 required={requiredStep["11"]}

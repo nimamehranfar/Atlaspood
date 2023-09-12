@@ -5666,35 +5666,35 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("Width")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                             if (e.keyCode === 13) {
                                                                 inputs.current["Height"].focus();
-                                                            }
-                                                            else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                            } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (width !== undefined && (width < 30 || width > 300) ? " measure_input_err" : "")} type="text"
-                                                                       name="width" value={NumToFa(`${width || ""}`, pageLanguage)} onChange={() => {
-                                                        }}
-                                                                       onBlur={(e) => {
-                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                           newValue = isNaN(newValue) ? "" : newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 300) {
-                                                                               setCartLoading(true);
-                                                                               setCart("Width", parseInt(newValue));
-                                                                               setDeps("", "21");
-                                                                               setWidth(parseInt(newValue));
-                                                                           } else {
-                                                                               setCartLoading(true);
-                                                                               setCart("", "", "Width");
-                                                                               setDeps("21", "");
-                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                                   setWidth(undefined);
-                                                                               } else {
+                                                                       name="width" value={NumToFa(`${width || ""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           setTimeout(() => {
+                                                                               let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                               newValue = isNaN(newValue) ? "" : newValue;
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 300) {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("Width", parseInt(newValue));
+                                                                                   setDeps("", "21");
                                                                                    setWidth(parseInt(newValue));
+                                                                               } else {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("", "", "Width");
+                                                                                   setDeps("21", "");
+                                                                                   if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                       setWidth(undefined);
+                                                                                   } else {
+                                                                                       setWidth(parseInt(newValue));
+                                                                                   }
+                                                                                   setWindowSize("");
                                                                                }
-                                                                               setWindowSize("");
-                                                                           }
+                                                                           }, 300);
                                                                        }}/>
                                                         <div className="measure_input_postfix">{t("cm_label")}</div>
                                                     </div>
@@ -5710,27 +5710,28 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (height !== undefined && (height < 30 || height > 400) ? " measure_input_err" : "")} type="text"
-                                                                       name="width" value={NumToFa(`${height || ""}`, pageLanguage)} onChange={() => {
-                                                        }}
-                                                                       onBlur={(e) => {
-                                                                           let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
-                                                                           newValue = isNaN(newValue) ? "" : newValue;
-                                                                           if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
-                                                                               setCartLoading(true);
-                                                                               setCart("Height", parseInt(newValue));
-                                                                               setDeps("", "22");
-                                                                               setHeight(parseInt(newValue));
-                                                                           } else {
-                                                                               setCartLoading(true);
-                                                                               setCart("", "", "Height");
-                                                                               setDeps("22", "");
-                                                                               if (newValue === "" || isNaN(parseInt(newValue))) {
-                                                                                   setHeight(undefined);
-                                                                               } else {
+                                                                       name="width" value={NumToFa(`${height || ""}`, pageLanguage)}
+                                                                       onChange={(e) => {
+                                                                           setTimeout(() => {
+                                                                               let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
+                                                                               newValue = isNaN(newValue) ? "" : newValue;
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("Height", parseInt(newValue));
+                                                                                   setDeps("", "22");
                                                                                    setHeight(parseInt(newValue));
+                                                                               } else {
+                                                                                   setCartLoading(true);
+                                                                                   setCart("", "", "Height");
+                                                                                   setDeps("22", "");
+                                                                                   if (newValue === "" || isNaN(parseInt(newValue))) {
+                                                                                       setHeight(undefined);
+                                                                                   } else {
+                                                                                       setHeight(parseInt(newValue));
+                                                                                   }
+                                                                                   setWindowSize("");
                                                                                }
-                                                                               setWindowSize("");
-                                                                           }
+                                                                           }, 300);
                                                                        }}/>
                                                         <div className="measure_input_postfix">{t("cm_label")}</div>
                                                     </div>
@@ -5919,7 +5920,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                     <div className="measure_input_container">
                                                         <h1 className="measure_input_label">{t("Width")}</h1>
                                                         <div className="measure_input_field_container">
-                                                            <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                            <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                                 if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                     e.preventDefault();
                                                                 }
@@ -5979,11 +5980,10 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                     <div className="measure_input_container">
                                                         <h1 className="measure_input_label">{t("Left")}</h1>
                                                         <div className="measure_input_field_container">
-                                                            <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                            <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                                 if (e.keyCode === 13) {
                                                                     inputs.current["Right"].focus();
-                                                                }
-                                                                else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                                } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                     e.preventDefault();
                                                                 }
                                                             }} className={"measure_input" + (left !== undefined && (left < 1 || left > 1000) ? " measure_input_err" : "")} type="text"
@@ -6093,11 +6093,10 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                     <div className="measure_input_container">
                                                         <h1 className="measure_input_label">{t("Left")}</h1>
                                                         <div className="measure_input_field_container">
-                                                            <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                            <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                                 if (e.keyCode === 13) {
                                                                     inputs.current["Right1"].focus();
-                                                                }
-                                                                else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                                } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                     e.preventDefault();
                                                                 }
                                                             }} className={"measure_input" + (left !== undefined && (left < 1 || left > 1000) ? " measure_input_err" : "")} type="text"
@@ -6208,11 +6207,10 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                     <div className="measure_input_container">
                                                         <h1 className="measure_input_label">{t("step3AIn_A")}</h1>
                                                         <div className="measure_input_field_container">
-                                                            <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                            <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                                 if (e.keyCode === 13) {
                                                                     inputs.current["ceilingToWindow2"].focus();
-                                                                }
-                                                                else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                                } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                     e.preventDefault();
                                                                 }
                                                             }} className={"measure_input" + (ceilingToWindow1 !== undefined && (ceilingToWindow1 < 30 || ceilingToWindow1 > 400) ? " measure_input_err" : "")} type="text"
@@ -6251,8 +6249,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             <DebounceInput inputRef={ref => (inputs.current["ceilingToWindow2"] = ref)} debounceTimeout={500} onKeyDown={(e) => {
                                                                 if (e.keyCode === 13) {
                                                                     inputs.current["ceilingToWindow3"].focus();
-                                                                }
-                                                                else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                                } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                     e.preventDefault();
                                                                 }
                                                             }} className={"measure_input" + (ceilingToWindow2 !== undefined && (ceilingToWindow2 < 30 || ceilingToWindow2 > 400) ? " measure_input_err" : "")} type="text"
@@ -6463,11 +6460,10 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                     <div className="measure_input_container">
                                                         <h1 className="measure_input_label">{t("step3AIn_A")}</h1>
                                                         <div className="measure_input_field_container">
-                                                            <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                            <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                                 if (e.keyCode === 13) {
                                                                     inputs.current["ceilingToFloor2"].focus();
-                                                                }
-                                                                else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                                } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                     e.preventDefault();
                                                                 }
                                                             }} className={"measure_input" + (ceilingToFloor1 !== undefined && (ceilingToFloor1 < 30 || ceilingToFloor1 > 400) ? " measure_input_err" : "")} type="text"
@@ -6503,11 +6499,10 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                     <div className="measure_input_container">
                                                         <h1 className="measure_input_label">{t("step3AIn_B")}</h1>
                                                         <div className="measure_input_field_container">
-                                                            <DebounceInput inputRef={ref => (inputs.current["CeilingToFloor2"] = ref)} debounceTimeout={500} onKeyDown={(e) => {
+                                                            <DebounceInput inputRef={ref => (inputs.current["ceilingToFloor2"] = ref)} debounceTimeout={500} onKeyDown={(e) => {
                                                                 if (e.keyCode === 13) {
                                                                     inputs.current["ceilingToFloor3"].focus();
-                                                                }
-                                                                else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                                } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                     e.preventDefault();
                                                                 }
                                                             }} className={"measure_input" + (ceilingToFloor2 !== undefined && (ceilingToFloor2 < 30 || ceilingToFloor2 > 400) ? " measure_input_err" : "")} type="text"
@@ -6543,7 +6538,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                     <div className="measure_input_container">
                                                         <h1 className="measure_input_label">{t("step3AIn_C")}</h1>
                                                         <div className="measure_input_field_container">
-                                                            <DebounceInput inputRef={ref => (inputs.current["CeilingToFloor3"] = ref)} debounceTimeout={500} onKeyDown={(e) => {
+                                                            <DebounceInput inputRef={ref => (inputs.current["ceilingToFloor3"] = ref)} debounceTimeout={500} onKeyDown={(e) => {
                                                                 if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                     e.preventDefault();
                                                                 }
@@ -6615,7 +6610,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                     <div className="measure_input_container">
                                                         <h1 className="measure_input_label">{t("Height")}</h1>
                                                         <div className="measure_input_field_container">
-                                                            <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                            <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                                 if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                     e.preventDefault();
                                                                 }
@@ -6677,7 +6672,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                     <div className="measure_input_container">
                                                         <h1 className="measure_input_label">{t("Height")}</h1>
                                                         <div className="measure_input_field_container">
-                                                            <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                            <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                                 if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                     e.preventDefault();
                                                                 }
@@ -6750,17 +6745,17 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                     <div className="measure_input_container">
                                                         {/*<h1 className="measure_input_label">{t("step3AIn_A")}</h1>*/}
                                                         <div className="measure_input_field_container">
-                                                            <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                            <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                                 if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                     e.preventDefault();
                                                                 }
-                                                            }} className={"measure_input" + (ceilingToFloor !== undefined && (ceilingToFloor < 30 || ceilingToFloor > 400) ? " measure_input_err" : "")} type="text"
+                                                            }} className={"measure_input" + (ceilingToFloor !== undefined && (ceilingToFloor < 30 || ceilingToFloor > 1000 || (cartValues["HeightCart"] && (ceilingToFloor > +cartValues["HeightCart"]))) ? " measure_input_err" : "")} type="text"
                                                                            name="ceilingToFloor" value={NumToFa(`${ceilingToFloor || ""}`, pageLanguage)} onChange={() => {
                                                             }}
                                                                            onBlur={(e) => {
                                                                                let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
                                                                                newValue = isNaN(newValue) ? "" : newValue;
-                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 1000 && !(cartValues["HeightCart"] && (ceilingToFloor > +cartValues["HeightCart"]))) {
                                                                                    setCartLoading(true);
                                                                                    setCart("CeilingToFloor", parseInt(newValue));
                                                                                    setDeps("", "2FWall");
@@ -6780,7 +6775,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                                            }}/>
                                                             <div className="measure_input_postfix">{t("cm_label")}</div>
                                                         </div>
-                                                        <h2 className={"measure_input_desc" + (ceilingToFloor !== undefined && (ceilingToFloor < 30 || ceilingToFloor > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>
+                                                        <h2 className={"measure_input_desc" + (ceilingToFloor !== undefined && (ceilingToFloor < 30 || ceilingToFloor > 1000 || (cartValues["HeightCart"] && (ceilingToFloor > +cartValues["HeightCart"]))) ? " measure_input_desc_err" : "")}>{(cartValues["HeightCart"] && (ceilingToFloor > +cartValues["HeightCart"]))?t("roomHeight_more_than_height"):""}</h2>
                                                     </div>
                                                 </div>
                                             </div>
@@ -6813,7 +6808,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                     <div className="measure_input_container">
                                                         <h1 className="measure_input_label">{t("step3AIn_A")}</h1>
                                                         <div className="measure_input_field_container">
-                                                            <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                            <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                                 if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                     e.preventDefault();
                                                                 }
@@ -6876,7 +6871,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                     <div className="measure_input_container">
                                                         <h1 className="measure_input_label">{t("Height")}</h1>
                                                         <div className="measure_input_field_container">
-                                                            <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                            <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                                 if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                     e.preventDefault();
                                                                 }
@@ -6950,17 +6945,17 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                     <div className="measure_input_container">
                                                         {/*<h1 className="measure_input_label">{t("step3AIn_A")}</h1>*/}
                                                         <div className="measure_input_field_container">
-                                                            <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                            <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                                 if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                     e.preventDefault();
                                                                 }
-                                                            }} className={"measure_input" + (ceilingToFloor !== undefined && (ceilingToFloor < 30 || ceilingToFloor > 400) ? " measure_input_err" : "")} type="text"
+                                                            }} className={"measure_input" + (ceilingToFloor !== undefined && (ceilingToFloor < 30 || ceilingToFloor > 1000 || (cartValues["HeightCart"] && (ceilingToFloor > +cartValues["HeightCart"]))) ? " measure_input_err" : "")} type="text"
                                                                            name="ceilingToFloor" value={NumToFa(`${ceilingToFloor || ""}`, pageLanguage)} onChange={() => {
                                                             }}
                                                                            onBlur={(e) => {
                                                                                let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
                                                                                newValue = isNaN(newValue) ? "" : newValue;
-                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 400) {
+                                                                               if (newValue && newValue !== "" && parseInt(newValue) >= 30 && parseInt(newValue) <= 1000 && !(cartValues["HeightCart"] && (ceilingToFloor > +cartValues["HeightCart"]))) {
                                                                                    setCartLoading(true);
                                                                                    setCart("CeilingToFloor", parseInt(newValue));
                                                                                    setDeps("", "2FWallFloor");
@@ -6980,7 +6975,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                                            }}/>
                                                             <div className="measure_input_postfix">{t("cm_label")}</div>
                                                         </div>
-                                                        <h2 className={"measure_input_desc" + (ceilingToFloor !== undefined && (ceilingToFloor < 30 || ceilingToFloor > 400) ? " measure_input_desc_err" : "")}>{NumToFa(`30 - 400`, pageLanguage)} {t("cm_label")}</h2>
+                                                        <h2 className={"measure_input_desc" + (ceilingToFloor !== undefined && (ceilingToFloor < 30 || ceilingToFloor > 1000 || (cartValues["HeightCart"] && (ceilingToFloor > +cartValues["HeightCart"]))) ? " measure_input_desc_err" : "")}>{(cartValues["HeightCart"] && (ceilingToFloor > +cartValues["HeightCart"]))?t("roomHeight_more_than_height"):""}</h2>
                                                     </div>
                                                 </div>
                                             </div>
@@ -7012,11 +7007,10 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                     <div className="measure_input_container">
                                                         <h1 className="measure_input_label">{t("step3AIn_A")}</h1>
                                                         <div className="measure_input_field_container">
-                                                            <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                            <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                                 if (e.keyCode === 13) {
                                                                     inputs.current["width2"].focus();
-                                                                }
-                                                                else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                                } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                     e.preventDefault();
                                                                 }
                                                             }} className={"measure_input" + (width1 !== undefined && (width1 < 30 || width1 > 300) ? " measure_input_err" : "")} type="text"
@@ -7055,8 +7049,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                             <DebounceInput inputRef={ref => (inputs.current["width2"] = ref)} debounceTimeout={500} onKeyDown={(e) => {
                                                                 if (e.keyCode === 13) {
                                                                     inputs.current["width2"].focus();
-                                                                }
-                                                                else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                                } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                     e.preventDefault();
                                                                 }
                                                             }} className={"measure_input" + (width2 !== undefined && (width2 < 30 || width2 > 300) ? " measure_input_err" : "")} type="text"
@@ -7166,7 +7159,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                     <div className="measure_input_container">
                                                         <h1 className="measure_input_label">{t("step3BIn_A")}</h1>
                                                         <div className="measure_input_field_container">
-                                                            <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                            <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                                 if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                     e.preventDefault();
                                                                 }
@@ -7203,7 +7196,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                     <div className="measure_input_container">
                                                         <h1 className="measure_input_label">{t("step3BIn_B")}</h1>
                                                         <div className="measure_input_field_container">
-                                                            <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                            <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                                 if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                     e.preventDefault();
                                                                 }
@@ -7240,7 +7233,7 @@ function DK2({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QuerySt
                                                     <div className="measure_input_container">
                                                         <h1 className="measure_input_label">{t("step3BIn_C")}</h1>
                                                         <div className="measure_input_field_container">
-                                                            <DebounceInput debounceTimeout={500} onKeyDown={(e) => {
+                                                            <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
                                                                 if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                     e.preventDefault();
                                                                 }
