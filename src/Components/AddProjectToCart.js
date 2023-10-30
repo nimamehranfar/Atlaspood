@@ -9,8 +9,8 @@ import {useLocation} from "react-router-dom";
 import UserProjects from "./UserProjects";
 
 
-const baseURLAddProjectToCart = "https://api.atlaspood.ir/cart/AddSewingPreorder";
-const baseURLEditProject = "https://api.atlaspood.ir/SewingPreorder/Edit";
+const baseURLAddProjectToCart = "https://api.atlaspood.ir/cart/AddSewingOrder";
+const baseURLEditProject = "https://api.atlaspood.ir/SewingOrder/Edit";
 const baseURLGetCart = "https://api.atlaspood.ir/cart/GetAll";
 
 
@@ -35,7 +35,83 @@ async function AddProjectToCart(cartValues, SewingModelId, price, ModelNameEn, M
                 }
             }
         });
-        tempPostObj["Price"] = price;
+    
+        tempPostObj["SewingOrderDetails"] = [];
+        for (let i = 0; i < 3; i++) {
+            tempPostObj["SewingOrderDetails"][i] = {};
+            tempPostObj["SewingOrderDetails"][i]["IsLowWrinkle"] = true;
+            tempPostObj["SewingOrderDetails"][i]["IsCoverAll"] = true;
+            tempPostObj["SewingOrderDetails"][i]["IsAltogether"] = true;
+        }
+    
+    
+        tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
+        tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = `${SewingModelId}`;
+    
+        tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2302;
+        tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = `0002`;
+    
+        tempPostObj["SewingOrderDetails"][2]["CurtainPartId"] = 2301;
+        tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
+    
+        Object.keys(temp).forEach(key => {
+            if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
+                let tempObj = userProjects.find(obj => obj["cart"] === key);
+                // console.log(key,userProjects.find(obj => obj["cart"] === key));
+                if (tempObj) {
+                    for (let i = 0; i < 3; i++) {
+                        let j = +i + +2;
+                        if (tempObj["apiLabel" + j] !== undefined) {
+                            if (tempObj["apiValue" + j] === null) {
+                                tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = temp[key];
+                                // console.log(i,tempObj["cart"],tempPostObj["SewingOrderDetails"],tempPostObj["SewingOrderDetails"][i]);
+                            } else {
+                                tempPostObj["SewingOrderDetails"][i][tempObj["apiLabel" + j]] = tempObj["apiValue" + j][temp[key]];
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        tempPostObj["SewingOrderDetails"][0]["Accessories"] = [];
+        tempPostObj["SewingOrderDetails"][1]["Accessories"] = [];
+        tempPostObj["SewingOrderDetails"][2]["Accessories"] = [];
+        Object.keys(temp).forEach(key => {
+            if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
+                let tempObj = userProjects.find(obj => obj["cart"] === key);
+                if (tempObj) {
+                    if (tempObj["apiAcc"] !== undefined) {
+                        if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
+                            tempPostObj["SewingOrderDetails"][0]["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
+                        } else if (tempObj["apiAcc"] === "value") {
+                            let pushObj = tempObj["apiAccValue"] || {};
+                            pushObj["SewingAccessoryValue"] = temp[key].toString();
+                            tempPostObj["SewingOrderDetails"][0]["Accessories"].push(pushObj);
+                        }
+                    }
+                    if (tempObj["apiAcc2"] !== undefined) {
+                        if (tempObj["apiAcc2"] === true && tempObj["apiAccValue2"][temp[key]]) {
+                            tempPostObj["SewingOrderDetails"][1]["Accessories"].push(tempObj["apiAccValue2"][temp[key]]);
+                        } else if (tempObj["apiAcc"] === "value") {
+                            let pushObj = tempObj["apiAccValue2"] || {};
+                            pushObj["SewingAccessoryValue"] = temp[key].toString();
+                            tempPostObj["SewingOrderDetails"][1]["Accessories"].push(pushObj);
+                        }
+                    }
+                    if (tempObj["apiAcc3"] !== undefined) {
+                        if (tempObj["apiAcc3"] === true && tempObj["apiAccValue3"][temp[key]]) {
+                            tempPostObj["SewingOrderDetails"][2]["Accessories"].push(tempObj["apiAccValue3"][temp[key]]);
+                        } else if (tempObj["apiAcc"] === "value") {
+                            let pushObj = tempObj["apiAccValue3"] || {};
+                            pushObj["SewingAccessoryValue"] = temp[key].toString();
+                            tempPostObj["SewingOrderDetails"][2]["Accessories"].push(pushObj);
+                        }
+                    }
+                }
+            }
+        });
+        
         tempPostObj["ModelNameEn"] = ModelNameEn;
         tempPostObj["ModelNameFa"] = ModelNameFa;
         // if(tempPostObj["CalcWindowSize"]===false){
@@ -56,48 +132,51 @@ async function AddProjectToCart(cartValues, SewingModelId, price, ModelNameEn, M
             tempPostObj["TransportationAmount"]=0;
         }
         
-        tempPostObj["Accessories"] = [];
-        Object.keys(temp).forEach(key => {
-            if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
-                let tempObj = userProjects.find(obj => obj["cart"] === key);
-                if (tempObj) {
-                    if (tempObj["apiAcc"] !== undefined) {
-                        if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
-                            tempPostObj["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
-                        } else {
-                        
-                        }
-                    }
-                }
-            }
-        });
+        // tempPostObj["Accessories"] = [];
+        // Object.keys(temp).forEach(key => {
+        //     if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
+        //         let tempObj = userProjects.find(obj => obj["cart"] === key);
+        //         if (tempObj) {
+        //             if (tempObj["apiAcc"] !== undefined) {
+        //                 if (tempObj["apiAcc"] === true && tempObj["apiAccValue"][temp[key]]) {
+        //                     tempPostObj["Accessories"].push(tempObj["apiAccValue"][temp[key]]);
+        //                 } else {
+        //
+        //                 }
+        //             }
+        //         }
+        //     }
+        // });
         if (customAcc!==undefined && Array.isArray(customAcc) && customAcc.length > 0) {
-            tempPostObj["Accessories"].push(...customAcc);
+            tempPostObj["SewingOrderDetails"][0]["Accessories"].push(...customAcc);
         }
         else if(customAcc!==undefined && Object.keys(customAcc).length > 0){
-            tempPostObj["Accessories"].push(customAcc);
+            tempPostObj["SewingOrderDetails"][0]["Accessories"].push(customAcc);
         }
-        tempPostObj["Accessories"]=tempPostObj["Accessories"].filter(n => n);
-        
-        tempPostObj["SewingModelId"] = SewingModelId;
+        tempPostObj["SewingOrderDetails"][0]["Accessories"]=tempPostObj["SewingOrderDetails"][0]["Accessories"].filter(n => n);
+        tempPostObj["SewingOrderDetails"][1]["Accessories"]=tempPostObj["SewingOrderDetails"][1]["Accessories"].filter(n => n);
+        tempPostObj["SewingOrderDetails"][2]["Accessories"]=tempPostObj["SewingOrderDetails"][2]["Accessories"].filter(n => n);
+    
+        tempPostObj["SewingModelId"] = `${SewingModelId}`;
         tempPostObj["isCompleted"] = isCompleted;
         tempPostObj["WindowCount"] = 1;
         tempPostObj["Count"] = 1;
-        tempPostObj["IsLowWrinkle"] = true;
-        tempPostObj["IsCoverAll"] = true;
-        tempPostObj["IsAltogether"] = true;
         tempPostObj["IsActive"] = true;
         tempPostObj["Price"] = price;
         tempPostObj["WindowDescription"] = tempPostObj["WindowName"];
         // tempObj["hasAutomate"] = tempPostObj["hasAutomate"] === undefined ? false : tempPostObj["hasAutomate"];
-    
-        tempPostObj["PreorderText"] = JSON.parse(JSON.stringify(tempPostObj));
+        
+        for (let i = tempPostObj["SewingOrderDetails"].length - 1; i >= 0; i--) {
+            if (tempPostObj["SewingOrderDetails"] && tempPostObj["SewingOrderDetails"][i] && tempPostObj["SewingOrderDetails"][i]["FabricId"] === undefined) {
+                tempPostObj["SewingOrderDetails"].splice(i, 1);
+            }
+        }
         
         if (cartProjectIndex && cartProjectIndex !== -1) {
-            tempPostObj["SewingPreorderId"] = cartProjectIndex;
+            tempPostObj["SewingOrderId"] = cartProjectIndex;
         }
-        if (tempPostObj["SewingPreorderId"] && (tempPostObj["SewingPreorderId"] === -1 || tempPostObj["SewingPreorderId"] === "-1")) {
-            delete tempPostObj["SewingPreorderId"];
+        if (tempPostObj["SewingOrderId"] && (tempPostObj["SewingOrderId"] === -1 || tempPostObj["SewingOrderId"] === "-1")) {
+            delete tempPostObj["SewingOrderId"];
         }
     
         Files[0]=Files[0].filter(x => !!x);
@@ -120,6 +199,8 @@ async function AddProjectToCart(cartValues, SewingModelId, price, ModelNameEn, M
                 })
             });
         }
+        
+        tempPostObj["PreorderText"] = JSON.parse(JSON.stringify(tempPostObj));
     
         if(returnObj){
             resolve(tempPostObj);

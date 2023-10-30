@@ -938,11 +938,11 @@ function Header() {
                         // setTimeout(function () {
                         GetUserProjectData(obj).then((temp) => {
                             let projectObj = obj["PreorderText"];
-                            AddProjectToCart(temp, projectObj["SewingModelId"], projectObj["Price"], temp["ModelNameEn"], temp["ModelNameFa"], [temp["uploadedImagesFile"] ? temp["uploadedImagesFile"] : [], temp["uploadedImagesURL"] ? temp["uploadedImagesURL"] : [], temp["uploadedPDFFile"] ? temp["uploadedPDFFile"] : [], temp["uploadedPDFURL"] ? temp["uploadedPDFURL"] : []], projectObj["SewingPreorderId"], undefined, navigate, true, temp["Accessories"][0], true).then((temp2) => {
+                            AddProjectToCart(temp, projectObj["SewingModelId"], projectObj["Price"], temp["ModelNameEn"], temp["ModelNameFa"], [temp["uploadedImagesFile"] ? temp["uploadedImagesFile"] : [], temp["uploadedImagesURL"] ? temp["uploadedImagesURL"] : [], temp["uploadedPDFFile"] ? temp["uploadedPDFFile"] : [], temp["uploadedPDFURL"] ? temp["uploadedPDFURL"] : []], projectObj["SewingOrderId"], undefined, navigate, true, temp["Accessories"][0], true).then((temp2) => {
                                 tempArr.push({
                                     "TypeId": 6403,
                                     "Count": 1,
-                                    "SewingPreorder": temp2
+                                    "SewingOrder": temp2
                                 });
                                 resolve();
                             }).catch((err) => {
@@ -990,11 +990,11 @@ function Header() {
                         // setTimeout(function () {
                         GetUserProjectData(obj).then((temp) => {
                             let projectObj = obj["PreorderText"];
-                            AddProjectToCart(temp, projectObj["SewingModelId"], projectObj["Price"], temp["ModelNameEn"], temp["ModelNameFa"], [temp["uploadedImagesFile"] ? temp["uploadedImagesFile"] : [], temp["uploadedImagesURL"] ? temp["uploadedImagesURL"] : [], temp["uploadedPDFFile"] ? temp["uploadedPDFFile"] : [], temp["uploadedPDFURL"] ? temp["uploadedPDFURL"] : []], projectObj["SewingPreorderId"], undefined, navigate, true, temp["Accessories"][0], true).then((temp2) => {
+                            AddProjectToCart(temp, projectObj["SewingModelId"], projectObj["Price"], temp["ModelNameEn"], temp["ModelNameFa"], [temp["uploadedImagesFile"] ? temp["uploadedImagesFile"] : [], temp["uploadedImagesURL"] ? temp["uploadedImagesURL"] : [], temp["uploadedPDFFile"] ? temp["uploadedPDFFile"] : [], temp["uploadedPDFURL"] ? temp["uploadedPDFURL"] : []], projectObj["SewingOrderId"], undefined, navigate, true, temp["Accessories"][0], true).then((temp2) => {
                                 tempArr.push({
                                     "TypeId": 6403,
                                     "Count": 1,
-                                    "SewingPreorder": temp2
+                                    "SewingOrder": temp2
                                 });
                                 resolve();
                             }).catch((err) => {

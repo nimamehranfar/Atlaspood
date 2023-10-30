@@ -97,19 +97,19 @@ function CustomCurtain() {
         promise1.then(() => {
             if(specialID){
                 if (modelID === "0326" && specialID==="1") {
-                    setPageModel(<DK2 CatID={catID} ModelID={modelID} SpecialId={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem} QueryString={queryObj}
+                    setPageModel(<DK2 CatID={catID} ModelID={modelID} PageType={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem} QueryString={queryObj}
                                      Parameters={parameters} PageId={websitePageItemId}/>)
                 } else if(modelID === "0099"){
                     if(specialID==="Drapery&Sheers") {
-                        setPageModel(<Grommet CatID={catID} ModelID={modelID} SpecialId={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem}
+                        setPageModel(<Grommet CatID={catID} ModelID={modelID} PageType={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem}
                                               QueryString={queryObj}
                                               Parameters={parameters} PageId={websitePageItemId}/>)
                     }else if(specialID==="DraperyOnly") {
-                        setPageModel(<Grommet2 CatID={catID} ModelID={modelID} SpecialId={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem}
+                        setPageModel(<Grommet2 CatID={catID} ModelID={modelID} PageType={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem}
                                               QueryString={queryObj}
                                               Parameters={parameters} PageId={websitePageItemId}/>)
                     }else if(specialID==="SheersOnly") {
-                        setPageModel(<Grommet3 CatID={catID} ModelID={modelID} SpecialId={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem}
+                        setPageModel(<Grommet3 CatID={catID} ModelID={modelID} PageType={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem}
                                               QueryString={queryObj}
                                               Parameters={parameters} PageId={websitePageItemId}/>)
                     }
@@ -117,19 +117,19 @@ function CustomCurtain() {
             }
             else {
                 if (modelID === "0303") {
-                    setPageModel(<Zebra CatID={catID} ModelID={modelID} SpecialId={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem} QueryString={queryObj}
+                    setPageModel(<Zebra CatID={catID} ModelID={modelID} PageType={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem} QueryString={queryObj}
                                         Parameters={parameters} PageId={websitePageItemId}/>)
                 } else if (modelID === "0324") {
-                    setPageModel(<Roller CatID={catID} ModelID={modelID} SpecialId={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem} QueryString={queryObj}
+                    setPageModel(<Roller CatID={catID} ModelID={modelID} PageType={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem} QueryString={queryObj}
                                          Parameters={parameters} PageId={websitePageItemId}/>)
                 } else if (modelID === "0325") {
-                    setPageModel(<DualRoller CatID={catID} ModelID={modelID} SpecialId={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem} QueryString={queryObj}
+                    setPageModel(<DualRoller CatID={catID} ModelID={modelID} PageType={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem} QueryString={queryObj}
                                              Parameters={parameters} PageId={websitePageItemId}/>)
                 } else if (modelID === "0326") {
-                    setPageModel(<DK CatID={catID} ModelID={modelID} SpecialId={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem} QueryString={queryObj}
+                    setPageModel(<DK CatID={catID} ModelID={modelID} PageType={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem} QueryString={queryObj}
                                      Parameters={parameters} PageId={websitePageItemId}/>)
                 } else if (modelID === "0099") {
-                    setPageModel(<Grommet CatID={catID} ModelID={modelID} SpecialId={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem} QueryString={queryObj}
+                    setPageModel(<Grommet CatID={catID} ModelID={modelID} PageType={specialID} ProjectId={projectId} EditIndex={editIndex} PageItem={pageItem} QueryString={queryObj}
                                      Parameters={parameters} PageId={websitePageItemId}/>)
                 }
             }

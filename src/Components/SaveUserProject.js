@@ -7,8 +7,8 @@ import {LOGIN, LOGOUT} from "../Actions/types";
 import {useDispatch} from "react-redux";
 import store from "../store";
 
-const baseURLAddProject = "https://api.atlaspood.ir/SewingPreorder/Add";
-const baseURLEditProject = "https://api.atlaspood.ir/SewingPreorder/Edit";
+const baseURLAddProject = "https://api.atlaspood.ir/SewingOrder/Add";
+const baseURLEditProject = "https://api.atlaspood.ir/SewingOrder/Edit";
 
 
 async function SaveUserProject(depSet, cartValues, Files, SewingModelId, price, ModelNameEn, ModelNameFa, projectData, customMotorAcc) {

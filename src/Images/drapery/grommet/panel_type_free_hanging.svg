@@ -9,16 +9,6 @@
 </g>
 <g>
 	<g>
-		<g>
-			<rect x="30" y="10.9" fill="#FFFFFF" width="470" height="13"/>
-			<rect x="30" y="10.9" fill="none" stroke="#464545" stroke-width="1.7037" width="470" height="13"/>
-		</g>
-	</g>
-</g>
-<rect x="500" y="8.9" fill="#FFFFFF" stroke="#464545" stroke-width="1.5" width="24" height="17"/>
-<rect x="6" y="8.9" fill="#FFFFFF" stroke="#464545" stroke-width="1.5" width="24" height="17"/>
-<g>
-	<g>
 		<line fill="none" stroke="#464545" stroke-width="3.1051" x1="139.9" y1="196.4" x2="390.1" y2="196.4"/>
 		<g>
 			<polygon fill="#464545" points="142.6,205.7 126.5,196.4 142.6,187.1 			"/>
@@ -41,5 +31,12 @@
 		s5.2,6.8,13.2,6.8s13.2-7.3,13.2-7.3V28.8h-34.5V652.4z"/>
 	<path fill="#DADADA" stroke="#706F6F" stroke-width="0.9532" stroke-miterlimit="10" d="M334,651.4c0,0,7.7,8.2,15.6,8.3
 		c7.9,0.1,14.6-7.3,14.6-7.3V28.8c0,0-4.9,0-15.1,0c-10.2,0-15.1,0-15.1,0V651.4z"/>
+</g>
+<g>
+	<g>
+		<rect x="72" y="10.8" fill="#FFFFFF" stroke="#464545" stroke-width="1.7037" width="404.4" height="13"/>
+	</g>
+	<rect x="455.8" y="8.8" fill="#FFFFFF" stroke="#464545" stroke-width="1.5" width="24" height="17"/>
+	<rect x="50.1" y="8.8" fill="#FFFFFF" stroke="#464545" stroke-width="1.5" width="24" height="17"/>
 </g>
 </svg>

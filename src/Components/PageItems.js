@@ -395,7 +395,7 @@ function PageItems() {
             let UrlLinkArr = UrlLink.split('/');
             let Link = UrlLinkArr[0] ? UrlLinkArr[0] : "";
             let selectedModel = models.find(opt => opt.value === Link) ? [{"value": Link, "label": models.find(opt => opt.value === Link).label}] : []
-            let SpecialId = UrlLinkArr[1] ? UrlLinkArr[1] : "";
+            let PageType = UrlLinkArr[1] ? UrlLinkArr[1] : "";
             
             let ModelDesigns = pageItems[i].ModelDesigns ? pageItems[i].ModelDesigns : [];
             let Fabrics = pageItems[i].Fabrics ? pageItems[i].Fabrics : {};
@@ -660,9 +660,9 @@ function PageItems() {
                         </div>
                         
                         <label className="input">
-                            <input type="text" defaultValue={SpecialId} onChange={e => setSelection(i, "SpecialId", e.target.value.replace(/\s/g, '').replace(/\//g, ''))}
+                            <input type="text" defaultValue={PageType} onChange={e => setSelection(i, "PageType", e.target.value.replace(/\s/g, '').replace(/\//g, ''))}
                                    placeholder="Type Something..."/>
-                            <span className="input__label">Special Id</span>
+                            <span className="input__label">Page Type</span>
                         </label>
                     </div>
                     <div className="pageItems_large_inputs pageItems_grow pageItem_input_clearable">
@@ -1993,15 +1993,15 @@ function PageItems() {
             let UrlLink = pageItems[refIndex].Link ? pageItems[refIndex].Link : "";
             let UrlLinkArr = UrlLink.split('/');
             let Link = UrlLinkArr[0] ? UrlLinkArr[0] : "";
-            let SpecialId = UrlLinkArr[1] ? UrlLinkArr[1] : "";
+            let PageType = UrlLinkArr[1] ? UrlLinkArr[1] : "";
             
             if (fieldName === "Link") {
-                if (SpecialId !== "") {
-                    tempPageItems[refIndex]["Link"] = value + "/" + SpecialId;
+                if (PageType !== "") {
+                    tempPageItems[refIndex]["Link"] = value + "/" + PageType;
                 } else {
                     tempPageItems[refIndex]["Link"] = value;
                 }
-            } else if (fieldName === "SpecialId") {
+            } else if (fieldName === "PageType") {
                 if (Link !== "") {
                     tempPageItems[refIndex]["Link"] = Link + "/" + value;
                 } else {

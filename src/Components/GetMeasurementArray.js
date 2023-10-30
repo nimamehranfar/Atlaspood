@@ -936,7 +936,7 @@ function GetMeasurementArray({modelId, cartValues}) {
                                 </div>
                             </span>
                             <span className="cart_agree_measurement_row_bottom">
-                                <p className="cart_agree_measurement_row_bottom_left">{t("Curtain Dimension= ")}{NumToFa((cartValues["WidthCart"]) + t("Zebra Measurements W") + " \u00d7 " + (cartValues["HeightCart"]) + t("Zebra Measurements H") + t("Zebra Measurements cm"))}</p>
+                                {/*<p className="cart_agree_measurement_row_bottom_left">{t("Curtain Dimension= ")}{NumToFa((cartValues["WidthCart"]) + t("Zebra Measurements W") + " \u00d7 " + (cartValues["HeightCart"]) + t("Zebra Measurements H") + t("Zebra Measurements cm"))}</p>*/}
                                 {/*<p className="cart_agree_measurement_row_bottom_right">{t("dk sill text")}</p>*/}
                             </span>
                         </li>);
@@ -1014,22 +1014,22 @@ function GetMeasurementArray({modelId, cartValues}) {
                 } else{
                     let scenario = 0;
                     if (cartValues["FinishedLengthType"] === "Sill" || cartValues["FinishedLengthType"] === "Apron") {
-                        if (cartValues["Mount"] === "Ceiling" && (cartValues["CurtainPosition"] === "Standard" || cartValues["CurtainPosition"] === "Left Corner Window" || cartValues["CurtainPosition"] === "Right Corner Window")) {
+                        if ((cartValues["Mount"] === "Ceiling" || cartValues["Mount"] === "Moulding") && (cartValues["CurtainPosition"] === "Standard" || cartValues["CurtainPosition"] === "Left Corner Window" || cartValues["CurtainPosition"] === "Right Corner Window")) {
                             scenario = 1;
-                        } else if (cartValues["CurtainPosition"] === "Wall to Wall" && cartValues["Mount"] === "Wall") {
+                        } else if ( cartValues["Mount"] === "Wall" && cartValues["CurtainPosition"] === "Wall to Wall") {
                             scenario = 2;
-                        } else if (cartValues["CurtainPosition"] === "Wall to Wall" && cartValues["Mount"] === "Ceiling") {
+                        } else if ( (cartValues["Mount"] === "Ceiling" || cartValues["Mount"] === "Moulding") && cartValues["CurtainPosition"] === "Wall to Wall" ) {
                             scenario = 3;
                         } else {
                             scenario = 4;
                         }
         
                     } else {
-                        if (cartValues["Mount"] === "Ceiling" && (cartValues["CurtainPosition"] === "Standard" || cartValues["CurtainPosition"] === "Left Corner Window" || cartValues["CurtainPosition"] === "Right Corner Window")) {
+                        if ((cartValues["Mount"] === "Ceiling" || cartValues["Mount"] === "Moulding") && (cartValues["CurtainPosition"] === "Standard" || cartValues["CurtainPosition"] === "Left Corner Window" || cartValues["CurtainPosition"] === "Right Corner Window")) {
                             scenario = 5;
-                        } else if (cartValues["CurtainPosition"] === "Wall to Wall" && cartValues["Mount"] === "Wall") {
+                        } else if ( cartValues["Mount"] === "Wall" && cartValues["CurtainPosition"] === "Wall to Wall") {
                             scenario = 6;
-                        } else if (cartValues["CurtainPosition"] === "Wall to Wall" && cartValues["Mount"] === "Ceiling") {
+                        } else if ( (cartValues["Mount"] === "Ceiling" || cartValues["Mount"] === "Moulding") && cartValues["CurtainPosition"] === "Wall to Wall" ) {
                             scenario = 7;
                         } else {
                             scenario = 8;
@@ -1047,7 +1047,7 @@ function GetMeasurementArray({modelId, cartValues}) {
                                     <h2 className="cart_agree_item_desc"/>
                                 </div>
                                 <div className="cart_agree_measurement_row_section">
-                                    <h1 className="cart_agree_item_title">{t("Extension(L)")}</h1>
+                                    <h1 className="cart_agree_item_title">{t("Stack Width(L)")}</h1>
                                     <h2 className="cart_agree_item_desc">{NumToFa(cartValues["ExtensionLeft"])}</h2>
                                 </div>
                                 <div className="cart_agree_measurement_row_section">
@@ -1055,7 +1055,7 @@ function GetMeasurementArray({modelId, cartValues}) {
                                     <h2 className="cart_agree_item_desc"/>
                                 </div>
                                 <div className="cart_agree_measurement_row_section">
-                                    <h1 className="cart_agree_item_title">{t("Extension(R)")}</h1>
+                                    <h1 className="cart_agree_item_title">{t("Stack Width(R)")}</h1>
                                     <h2 className="cart_agree_item_desc">{NumToFa(cartValues["ExtensionRight"])}</h2>
                                 </div>
                                 <div className="cart_agree_measurement_row_section">
@@ -1141,7 +1141,7 @@ function GetMeasurementArray({modelId, cartValues}) {
                                 </div>
                             </span>
                             <span className="cart_agree_measurement_row_bottom">
-                                <p className="cart_agree_measurement_row_bottom_left">{t("Curtain Dimension= ")}{NumToFa((cartValues["WidthCart"]) + t("Zebra Measurements W") + " \u00d7 " + (cartValues["HeightCart"]) + t("Zebra Measurements H") + t("Zebra Measurements cm"))}</p>
+                                {/*<p className="cart_agree_measurement_row_bottom_left">{t("Curtain Dimension= ")}{NumToFa((cartValues["WidthCart"]) + t("Zebra Measurements W") + " \u00d7 " + (cartValues["HeightCart"]) + t("Zebra Measurements H") + t("Zebra Measurements cm"))}</p>*/}
                                 {/*<p className="cart_agree_measurement_row_bottom_right">{t("dk sill text")}</p>*/}
                             </span>
                         </li>);
@@ -1208,7 +1208,7 @@ function GetMeasurementArray({modelId, cartValues}) {
                                     <h2 className="cart_agree_item_desc"/>
                                 </div>
                                 <div className="cart_agree_measurement_row_section">
-                                    <h1 className="cart_agree_item_title">{t("Extension(L)")}</h1>
+                                    <h1 className="cart_agree_item_title">{t("Stack Width(L)")}</h1>
                                     <h2 className="cart_agree_item_desc">{NumToFa(cartValues["ExtensionLeft"])}</h2>
                                 </div>
                                 <div className="cart_agree_measurement_row_section">
@@ -1216,7 +1216,7 @@ function GetMeasurementArray({modelId, cartValues}) {
                                     <h2 className="cart_agree_item_desc"/>
                                 </div>
                                 <div className="cart_agree_measurement_row_section">
-                                    <h1 className="cart_agree_item_title">{t("Extension(R)")}</h1>
+                                    <h1 className="cart_agree_item_title">{t("Stack Width(R)")}</h1>
                                     <h2 className="cart_agree_item_desc">{NumToFa(cartValues["ExtensionRight"])}</h2>
                                 </div>
                                 <div className="cart_agree_measurement_row_section">
@@ -1267,7 +1267,7 @@ function GetMeasurementArray({modelId, cartValues}) {
                                     <h2 className="cart_agree_item_desc"/>
                                 </div>
                                 <div className="cart_agree_measurement_row_section">
-                                    <h1 className="cart_agree_item_title">{t("Extension(L)")}</h1>
+                                    <h1 className="cart_agree_item_title">{t("Stack Width(L)")}</h1>
                                     <h2 className="cart_agree_item_desc">{NumToFa(cartValues["ExtensionLeft"])}</h2>
                                 </div>
                                 <div className="cart_agree_measurement_row_section">
@@ -1275,7 +1275,7 @@ function GetMeasurementArray({modelId, cartValues}) {
                                     <h2 className="cart_agree_item_desc"/>
                                 </div>
                                 <div className="cart_agree_measurement_row_section">
-                                    <h1 className="cart_agree_item_title">{t("Extension(R)")}</h1>
+                                    <h1 className="cart_agree_item_title">{t("Stack Width(R)")}</h1>
                                     <h2 className="cart_agree_item_desc">{NumToFa(cartValues["ExtensionRight"])}</h2>
                                 </div>
                                 <div className="cart_agree_measurement_row_section">
@@ -1341,7 +1341,7 @@ function GetMeasurementArray({modelId, cartValues}) {
                             <span className="cart_agree_measurement_row">
                                 <div className="cart_agree_measurement_row_section">
                                     <h1 className="cart_agree_item_title">{t("Window Height")}</h1>
-                                    <h2 className="cart_agree_item_desc">{NumToFa(cartValues["WindowToFloor"] ? cartValues["Height3E"] : cartValues["Height"])}</h2>
+                                    <h2 className="cart_agree_item_desc">{NumToFa(cartValues["WindowToFloor"] ? cartValues["WindowToFloor"] : cartValues["Height"])}</h2>
                                 </div>
                                 <div className="cart_agree_measurement_row_section">
                                     <h1 className="cart_agree_item_title cart_agree_measurement_row_operator"/>
@@ -1361,7 +1361,7 @@ function GetMeasurementArray({modelId, cartValues}) {
                                 </div>
                             </span>
                             <span className="cart_agree_measurement_row_bottom">
-                                <p className="cart_agree_measurement_row_bottom_left">{t("Curtain Dimension= ")}{NumToFa((cartValues["WidthCart"]) + t("Zebra Measurements W") + " \u00d7 " + (cartValues["HeightCart"]) + t("Zebra Measurements H") + t("Zebra Measurements cm"))}</p>
+                                {/*<p className="cart_agree_measurement_row_bottom_left">{t("Curtain Dimension= ")}{NumToFa((cartValues["WidthCart"]) + t("Zebra Measurements W") + " \u00d7 " + (cartValues["HeightCart"]) + t("Zebra Measurements H") + t("Zebra Measurements cm"))}</p>*/}
                                 {/*<p className="cart_agree_measurement_row_bottom_right">{t("dk sill text")}</p>*/}
                             </span>
                         </li>);
@@ -1428,7 +1428,7 @@ function GetMeasurementArray({modelId, cartValues}) {
                                     <h2 className="cart_agree_item_desc"/>
                                 </div>
                                 <div className="cart_agree_measurement_row_section">
-                                    <h1 className="cart_agree_item_title">{t("Extension(L)")}</h1>
+                                    <h1 className="cart_agree_item_title">{t("Stack Width(L)")}</h1>
                                     <h2 className="cart_agree_item_desc">{NumToFa(cartValues["ExtensionLeft"])}</h2>
                                 </div>
                                 <div className="cart_agree_measurement_row_section">
@@ -1436,7 +1436,7 @@ function GetMeasurementArray({modelId, cartValues}) {
                                     <h2 className="cart_agree_item_desc"/>
                                 </div>
                                 <div className="cart_agree_measurement_row_section">
-                                    <h1 className="cart_agree_item_title">{t("Extension(R)")}</h1>
+                                    <h1 className="cart_agree_item_title">{t("Stack Width(R)")}</h1>
                                     <h2 className="cart_agree_item_desc">{NumToFa(cartValues["ExtensionRight"])}</h2>
                                 </div>
                                 <div className="cart_agree_measurement_row_section">

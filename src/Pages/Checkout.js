@@ -346,7 +346,7 @@ function Checkout() {
                                 "ProductEnName": null,
                                 "ProductGroupId": null,
                                 "ProductDesignCode": null,
-                                "SewingPreorderId": index,
+                                "SewingOrderId": index,
                                 "PhotoUrl": null,
                                 "ProductDesignEnName": null,
                                 "ProductDesignName": null,
@@ -356,8 +356,8 @@ function Checkout() {
                                 "UnitPrice": draperies[index]["Price"],
                                 "Amount": draperies[index]["Price"] * draperies[index]["Count"],
                                 "PayableAmount": draperies[index]["Price"] * draperies[index]["Count"],
-                                "SewingPreorder": {
-                                    "SewingPreorderId": index,
+                                "SewingOrder": {
+                                    "SewingOrderId": index,
                                     "IsCompleted": true,
                                     ...draperies[index]
                                 }
@@ -758,14 +758,14 @@ function Checkout() {
             let tempNoShip = true;
             let promise2 = new Promise((resolve, reject) => {
                 drapery.sort(function (a, b) {
-                    return b["CartDetailId"] - a["CartDetailId"] || b["SewingPreorderId"] - a["SewingPreorderId"];
+                    return b["CartDetailId"] - a["CartDetailId"] || b["SewingOrderId"] - a["SewingOrderId"];
                 }).forEach((tempObj, i) => {
-                    let projectDataObj = projectData[drapery[i]["SewingPreorder"]["SewingModelId"]];
+                    let projectDataObj = projectData[drapery[i]["SewingOrder"]["SewingOrderDetails"][0]["SewingModelId"]];
                     let desc = [];
-                    let projectId = drapery[i]["SewingPreorderId"];
+                    let projectId = drapery[i]["SewingOrderId"];
                     drapery[i]["PreorderText"] = {};
                     // let obj={};
-                    let obj = drapery[i]["SewingPreorder"]["PreorderText"];
+                    let obj = drapery[i]["SewingOrder"]["PreorderText"] || {};
                     let fabricColorFa = obj["FabricColorFa"];
                     let fabricColor = obj["FabricColorEn"];
                     let fabricDesignFa = obj["FabricDesignFa"];

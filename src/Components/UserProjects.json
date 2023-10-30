@@ -165,7 +165,7 @@
         },
         "titlePostfix": "",
         "order": 2,
-        "apiLabel": "MountPositionId",
+        "apiLabel": "MountPosition",
         "apiValue": {
           "Inside": 4801,
           "Outside": 4802,
@@ -378,7 +378,7 @@
         "titleValue": null,
         "titlePostfix": "cm",
         "order": -1,
-        "apiLabel": "LeftWidthExt",
+        "apiLabel": "LeftStackWidth",
         "apiValue": null,
         "measurements": true,
         "lang": [
@@ -392,7 +392,7 @@
         "titleValue": null,
         "titlePostfix": "cm",
         "order": -1,
-        "apiLabel": "RightWidthExt",
+        "apiLabel": "RightStackWidth",
         "apiValue": null,
         "measurements": true,
         "lang": [
@@ -448,7 +448,7 @@
         "titleValue": null,
         "titlePostfix": "cm",
         "order": -1,
-        "apiLabel": "HeightOfRodMount",
+        "apiLabel": "RodMountHeight",
         "apiValue": null,
         "measurements": true,
         "lang": [
@@ -965,7 +965,7 @@
         },
         "titlePostfix": "",
         "order": 2,
-        "apiLabel": "MountPositionId",
+        "apiLabel": "MountPosition",
         "apiValue": {
           "Inside": 4801,
           "Outside": 4802,
@@ -1178,7 +1178,7 @@
         "titleValue": null,
         "titlePostfix": "cm",
         "order": -1,
-        "apiLabel": "LeftWidthExt",
+        "apiLabel": "LeftStackWidth",
         "apiValue": null,
         "measurements": true,
         "lang": [
@@ -1192,7 +1192,7 @@
         "titleValue": null,
         "titlePostfix": "cm",
         "order": -1,
-        "apiLabel": "RightWidthExt",
+        "apiLabel": "RightStackWidth",
         "apiValue": null,
         "measurements": true,
         "lang": [
@@ -1248,7 +1248,7 @@
         "titleValue": null,
         "titlePostfix": "cm",
         "order": -1,
-        "apiLabel": "HeightOfRodMount",
+        "apiLabel": "RodMountHeight",
         "apiValue": null,
         "measurements": true,
         "lang": [
@@ -1962,7 +1962,7 @@
         },
         "titlePostfix": "",
         "order": 2,
-        "apiLabel": "MountPositionId",
+        "apiLabel": "MountPosition",
         "apiValue": {
           "Inside": 4801,
           "Outside": 4802,
@@ -2175,7 +2175,7 @@
         "titleValue": null,
         "titlePostfix": "cm",
         "order": -1,
-        "apiLabel": "LeftWidthExt",
+        "apiLabel": "LeftStackWidth",
         "apiValue": null,
         "measurements": true,
         "lang": [
@@ -2189,7 +2189,7 @@
         "titleValue": null,
         "titlePostfix": "cm",
         "order": -1,
-        "apiLabel": "RightWidthExt",
+        "apiLabel": "RightStackWidth",
         "apiValue": null,
         "measurements": true,
         "lang": [
@@ -2245,7 +2245,7 @@
         "titleValue": null,
         "titlePostfix": "cm",
         "order": -1,
-        "apiLabel": "HeightOfRodMount",
+        "apiLabel": "RodMountHeight",
         "apiValue": null,
         "measurements": true,
         "lang": [
@@ -2826,14 +2826,14 @@
         ]
       },
       {
-        "cart": "SpecialId",
-        "title": "SpecialId",
+        "cart": "PageType",
+        "title": "PageType",
         "titleValue": null,
         "titlePostfix": "",
         "order": -1,
-        "apiLabel": "SpecialId",
+        "apiLabel": "PageType",
         "apiValue": null,
-        "apiLabel2": "SpecialId",
+        "apiLabel2": "PageType",
         "apiValue2": null,
         "lang": [
           "en",
@@ -2950,7 +2950,7 @@
         },
         "titlePostfix": "",
         "order": 0,
-        "apiLabel": "MountPositionId",
+        "apiLabel": "MountPosition",
         "apiValue": {
           "Inside": 4801,
           "Outside": 4802,
@@ -3204,7 +3204,7 @@
         "titleValue": null,
         "titlePostfix": "cm",
         "order": -1,
-        "apiLabel": "LeftWidthExt",
+        "apiLabel": "LeftStackWidth",
         "apiValue": null,
         "measurements": true,
         "lang": [
@@ -3218,7 +3218,7 @@
         "titleValue": null,
         "titlePostfix": "cm",
         "order": -1,
-        "apiLabel": "RightWidthExt",
+        "apiLabel": "RightStackWidth",
         "apiValue": null,
         "measurements": true,
         "lang": [
@@ -3344,7 +3344,7 @@
         "titleValue": null,
         "titlePostfix": "cm",
         "order": -1,
-        "apiLabel": "HeightOfRodMount",
+        "apiLabel": "RodMountHeight",
         "apiValue": null,
         "measurements": true,
         "lang": [
@@ -3710,14 +3710,14 @@
         ]
       },
       {
-        "cart": "SpecialId",
-        "title": "SpecialId",
+        "cart": "PageType",
+        "title": "PageType",
         "titleValue": null,
         "titlePostfix": "",
         "order": -1,
-        "apiLabel": "SpecialId",
+        "apiLabel": "PageType",
         "apiValue": null,
-        "apiLabel2": "SpecialId",
+        "apiLabel2": "PageType",
         "apiValue2": null,
         "lang": [
           "en",
@@ -3784,6 +3784,170 @@
         "order": -1,
         "apiLabel": "PhotoUrl",
         "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "BorderOrTrimId",
+        "title": "BorderOrTrimId",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "BorderOrTrimId",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "borderPosition",
+        "title": "borderPosition",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "borderPosition",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "BorderOrTrimId2",
+        "title": "BorderOrTrimId2",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "BorderOrTrimId2",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "borderPosition2",
+        "title": "borderPosition2",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "borderPosition2",
+        "apiValue": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "HandCurtainId",
+        "title": "HandCurtainId",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "HandCurtainId",
+        "apiValue": null,
+        "apiLabel2": "HandCurtainId",
+        "apiValue2": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "HandCurtainEn",
+        "title": "Matching Tieback",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 24,
+        "apiLabel": "HandCurtainEn",
+        "apiValue": null,
+        "fabric": 1,
+        "lang": [
+          "en"
+        ]
+      },
+      {
+        "cart": "HandCurtainFa",
+        "title": "دوخت کمر پرده",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 24,
+        "apiLabel": "HandCurtainFa",
+        "apiValue": null,
+        "fabric": 1,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "HandCurtainNum",
+        "title": "HandCurtainNum",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "HandCurtainNum",
+        "apiValue": null,
+        "apiLabel2": "HandCurtainNum",
+        "apiValue2": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "HandCurtainId2",
+        "title": "HandCurtainId",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "HandCurtainId2",
+        "apiValue": null,
+        "apiLabel3": "HandCurtainId",
+        "apiValue3": null,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "HandCurtainEn2",
+        "title": "Matching Tieback",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 25,
+        "apiLabel": "HandCurtainEn2",
+        "apiValue": null,
+        "fabric": 2,
+        "lang": [
+          "en"
+        ]
+      },
+      {
+        "cart": "HandCurtainFa2",
+        "title": "دوخت کمر پرده",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 25,
+        "apiLabel": "HandCurtainFa2",
+        "apiValue": null,
+        "fabric": 2,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "HandCurtainNum2",
+        "title": "HandCurtainNum",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "HandCurtainNum2",
+        "apiValue": null,
+        "apiLabel3": "HandCurtainNum",
+        "apiValue3": null,
         "lang": [
           "en",
           "fa"
@@ -3925,6 +4089,102 @@
         ]
       },
       {
+        "cart": "BorderOrTrimDesignFa",
+        "title": "BorderOrTrim",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "BorderOrTrimDesignFa",
+        "apiValue": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "BorderOrTrimDesignEn",
+        "title": "BorderOrTrim",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "BorderOrTrimDesignEn",
+        "apiValue": null,
+        "lang": [
+          "en"
+        ]
+      },
+      {
+        "cart": "BorderOrTrimColorEn",
+        "title": "Color",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "BorderOrTrimColorEn",
+        "apiValue": null,
+        "lang": [
+          "en"
+        ]
+      },
+      {
+        "cart": "BorderOrTrimColorFa",
+        "title": "Color",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "BorderOrTrimColorFa",
+        "apiValue": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "BorderOrTrimDesignFa2",
+        "title": "BorderOrTrim",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "BorderOrTrimDesignFa2",
+        "apiValue": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
+        "cart": "BorderOrTrimDesignEn2",
+        "title": "BorderOrTrim",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "BorderOrTrimDesignEn2",
+        "apiValue": null,
+        "lang": [
+          "en"
+        ]
+      },
+      {
+        "cart": "BorderOrTrimColorEn2",
+        "title": "Color",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "BorderOrTrimColorEn2",
+        "apiValue": null,
+        "lang": [
+          "en"
+        ]
+      },
+      {
+        "cart": "BorderOrTrimColorFa2",
+        "title": "Color",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": -1,
+        "apiLabel": "BorderOrTrimColorFa2",
+        "apiValue": null,
+        "lang": [
+          "fa"
+        ]
+      },
+      {
         "cart": "SheersDesignFa",
         "title": "Fabric",
         "titleValue": null,
@@ -3974,12 +4234,13 @@
       },
       {
         "cart": "SheerHeaderStyle",
-        "title": "Sheer Header Style",
+        "title": "Header Style",
         "titleValue": null,
         "titlePostfix": "",
         "order": 6,
         "apiLabel": "SheerHeaderStyle",
         "apiValue": null,
+        "fabric": 2,
         "lang": [
           "en",
           "fa"
@@ -4000,12 +4261,13 @@
       },
       {
         "cart": "PrivacyLayerHeaderStyle",
-        "title": "Privacy Layer Header Style",
+        "title": "Header Style",
         "titleValue": null,
         "titlePostfix": "",
         "order": 8,
         "apiLabel": "PrivacyLayerHeaderStyle",
         "apiValue": null,
+        "fabric": 3,
         "lang": [
           "en",
           "fa"
@@ -4021,8 +4283,8 @@
           "4903": "Right Corner Window"
         },
         "titlePostfix": "",
-        "order": 9,
-        "apiLabel": "CurtainPositionId",
+        "order": 10,
+        "apiLabel": "CurtainPosition",
         "apiValue": {
           "Standard": 4901,
           "Wall to Wall": 4902,
@@ -4036,21 +4298,22 @@
       },
       {
         "cart": "Mount",
-        "title": "Mount",
+        "title": "Mount Position",
         "titleValue": {
-          "true": "Wall",
-          "false": "Ceiling"
+          "4801": "Ceiling",
+          "4802": "Wall",
+          "4803": "Moulding"
         },
         "titlePostfix": "",
-        "order": 10,
-        "apiLabel": "IsWalled",
+        "order": 9,
+        "apiLabel": "MountPosition",
         "apiValue": {
-          "Wall": true,
-          "Ceiling": false
+          "Ceiling": 4801,
+          "Wall": 4802,
+          "Moulding": 4803
         },
-        "apiLabel2": "IsWalled",
-        "apiValue2": null,
         "lang": [
+          "en",
           "fa"
         ]
       },
@@ -4325,7 +4588,7 @@
         "titleValue": null,
         "titlePostfix": "cm",
         "order": -1,
-        "apiLabel": "LeftWidthExt",
+        "apiLabel": "LeftStackWidth",
         "apiValue": null,
         "measurements": true,
         "lang": [
@@ -4339,7 +4602,7 @@
         "titleValue": null,
         "titlePostfix": "cm",
         "order": -1,
-        "apiLabel": "RightWidthExt",
+        "apiLabel": "RightStackWidth",
         "apiValue": null,
         "measurements": true,
         "lang": [
@@ -4465,7 +4728,7 @@
         "titleValue": null,
         "titlePostfix": "cm",
         "order": -1,
-        "apiLabel": "HeightOfRodMount",
+        "apiLabel": "RodMountHeight",
         "apiValue": null,
         "measurements": true,
         "lang": [
@@ -4528,6 +4791,7 @@
           "Standard Lining": null,
           "Privacy Lining": 90909101
         },
+        "fabric": 1,
         "lang": [
           "en",
           "fa"
@@ -4541,6 +4805,7 @@
         "order": 16,
         "apiLabel": "PanelCoverage",
         "apiValue": null,
+        "fabric": 1,
         "lang": [
           "en",
           "fa"
@@ -4551,7 +4816,7 @@
         "title": "Panel Type Option",
         "titleValue": null,
         "titlePostfix": "",
-        "order": 17,
+        "order": -1,
         "apiLabel": "PanelTypeOption",
         "apiValue": null,
         "lang": [
@@ -4560,26 +4825,23 @@
         ]
       },
       {
-        "cart": "PanelType",
+        "cart": "PanelTypeA",
         "title": "Panel Type",
         "titleValue": null,
         "titlePostfix": "",
         "order": 18,
-        "apiLabel": "PanelType",
-        "apiValue": null,
-        "lang": [
-          "en",
-          "fa"
-        ]
-      },
-      {
-        "cart": "PanelTypeA",
-        "title": "Panel TypeA",
-        "titleValue": null,
-        "titlePostfix": "",
-        "order": -1,
         "apiLabel": "PanelTypeA",
         "apiValue": null,
+        "apiLabel2": "PanelTypeId",
+        "apiValue2": {
+          "Single Panel, Left": 1,
+          "Single Panel, Right": 2,
+          "Single, Free Hanging": 3,
+          "Pair, Free Hanging": 4,
+          "Pair, Split Draw": 5,
+          "Three Panel, Split Draw": 6
+        },
+        "fabric": 1,
         "lang": [
           "en",
           "fa"
@@ -4587,12 +4849,22 @@
       },
       {
         "cart": "PanelTypeB",
-        "title": "Panel TypeB",
+        "title": "Panel Type",
         "titleValue": null,
         "titlePostfix": "",
-        "order": -1,
+        "order": 19,
         "apiLabel": "PanelTypeB",
         "apiValue": null,
+        "apiLabel3": "PanelTypeId",
+        "apiValue3": {
+          "Single Panel, Left": 1,
+          "Single Panel, Right": 2,
+          "Single, Free Hanging": 3,
+          "Pair, Free Hanging": 4,
+          "Pair, Split Draw": 5,
+          "Three Panel, Split Draw": 6
+        },
+        "fabric": 2,
         "lang": [
           "en",
           "fa"
@@ -4600,12 +4872,22 @@
       },
       {
         "cart": "PanelTypeC",
-        "title": "Panel TypeC",
+        "title": "Panel Type",
         "titleValue": null,
         "titlePostfix": "",
-        "order": -1,
+        "order": 20,
         "apiLabel": "PanelTypeC",
         "apiValue": null,
+        "apiLabel4": "PanelTypeId",
+        "apiValue4": {
+          "Single Panel, Left": 1,
+          "Single Panel, Right": 2,
+          "Single, Free Hanging": 3,
+          "Pair, Free Hanging": 4,
+          "Pair, Split Draw": 5,
+          "Three Panel, Split Draw": 6
+        },
+        "fabric": 3,
         "lang": [
           "en",
           "fa"
@@ -4616,9 +4898,10 @@
         "title": "Grommet Finish",
         "titleValue": null,
         "titlePostfix": "",
-        "order": 19,
+        "order": 21,
         "apiLabel": "GrommetFinish",
         "apiValue": null,
+        "fabric": 1,
         "lang": [
           "en",
           "fa"
@@ -4629,7 +4912,7 @@
         "title": "Hardware",
         "titleValue": null,
         "titlePostfix": "",
-        "order": 20,
+        "order": -1,
         "apiLabel": "Hardware",
         "apiValue": null,
         "lang": [
@@ -4799,33 +5082,28 @@
         ]
       },
       {
-        "cart": "Mount8",
-        "title": "Mount",
-        "titleValue": {
-          "true": "Wall",
-          "false": "Ceiling"
-        },
+        "cart": "DraperyHardware",
+        "title": "Hardware",
+        "titleValue": null,
         "titlePostfix": "",
-        "order": 10,
-        "apiLabel": "IsWalled",
-        "apiValue": {
-          "Wall": true,
-          "Ceiling": false
-        },
-        "apiLabel2": "IsWalled",
-        "apiValue2": null,
+        "order": 23,
+        "apiLabel": "DraperyHardware",
+        "apiValue": null,
+        "fabric": 1,
         "lang": [
+          "en",
           "fa"
         ]
       },
       {
-        "cart": "DraperyHardware",
-        "title": "Drapery Hardware",
+        "cart": "hardwareDrapery",
+        "title": "Hardware",
         "titleValue": null,
         "titlePostfix": "",
-        "order": 21,
-        "apiLabel": "DraperyHardware",
+        "order": 23,
+        "apiLabel": "hardwareDrapery",
         "apiValue": null,
+        "fabric": 1,
         "lang": [
           "en",
           "fa"
@@ -4946,12 +5224,27 @@
       },
       {
         "cart": "SheerHardware",
-        "title": "Sheer Hardware",
+        "title": "Hardware",
         "titleValue": null,
         "titlePostfix": "",
-        "order": 22,
+        "order": 24,
         "apiLabel": "SheerHardware",
         "apiValue": null,
+        "fabric": 2,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "hardwareSheer",
+        "title": "Hardware",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 24,
+        "apiLabel": "hardwareSheer",
+        "apiValue": null,
+        "fabric": 2,
         "lang": [
           "en",
           "fa"
@@ -5071,13 +5364,98 @@
         ]
       },
       {
-        "cart": "PrivacyLayerHardware",
-        "title": "Privacy Layer Hardware",
+        "cart": "hasPowerB",
+        "title": "",
         "titleValue": null,
         "titlePostfix": "",
-        "order": 23,
+        "order": 29,
+        "apiLabel": "hasPowerB",
+        "apiValue": null,
+        "fabric": 2,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "MotorPositionB",
+        "title": "Motor Position",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 30,
+        "apiLabel": "MotorPositionB",
+        "apiValue": null,
+        "fabric": 2,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "RemoteNameB",
+        "title": "Remote Name",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 31,
+        "apiLabel": "RemoteNameB",
+        "apiValue": null,
+        "apiAcc": "value",
+        "apiAccValue": {
+          "SewingAccessoryId": 8,
+          "SewingModelAccessoryId": 0,
+          "SewingAccessoryValue": null,
+          "Qty": 1
+        },
+        "fabric": 2,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "MotorChannelsB",
+        "title": "Motor Channels",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 32,
+        "apiLabel": "MotorChannelsB",
+        "apiValue": null,
+        "apiAcc": "value",
+        "apiAccValue": {
+          "SewingAccessoryId": 9,
+          "SewingModelAccessoryId": 0,
+          "SewingAccessoryValue": null,
+          "Qty": 1
+        },
+        "fabric": 2,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "PrivacyLayerHardware",
+        "title": "Hardware",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 25,
         "apiLabel": "PrivacyLayerHardware",
         "apiValue": null,
+        "fabric": 3,
+        "lang": [
+          "en",
+          "fa"
+        ]
+      },
+      {
+        "cart": "hardwarePrivacyLayer",
+        "title": "Hardware",
+        "titleValue": null,
+        "titlePostfix": "",
+        "order": 25,
+        "apiLabel": "hardwarePrivacyLayer",
+        "apiValue": null,
+        "fabric": 3,
         "lang": [
           "en",
           "fa"
@@ -5197,38 +5575,40 @@
         ]
       },
       {
-        "cart": "hasPower",
+        "cart": "hasPowerC",
         "title": "",
         "titleValue": null,
         "titlePostfix": "",
         "order": 29,
-        "apiLabel": "hasPower",
+        "apiLabel": "hasPowerC",
         "apiValue": null,
+        "fabric": 3,
         "lang": [
           "en",
           "fa"
         ]
       },
       {
-        "cart": "MotorPosition",
+        "cart": "MotorPositionC",
         "title": "Motor Position",
         "titleValue": null,
         "titlePostfix": "",
         "order": 30,
-        "apiLabel": "MotorPosition",
+        "apiLabel": "MotorPositionC",
         "apiValue": null,
+        "fabric": 3,
         "lang": [
           "en",
           "fa"
         ]
       },
       {
-        "cart": "RemoteName",
+        "cart": "RemoteNameC",
         "title": "Remote Name",
         "titleValue": null,
         "titlePostfix": "",
         "order": 31,
-        "apiLabel": "RemoteName",
+        "apiLabel": "RemoteNameC",
         "apiValue": null,
         "apiAcc": "value",
         "apiAccValue": {
@@ -5237,18 +5617,19 @@
           "SewingAccessoryValue": null,
           "Qty": 1
         },
+        "fabric": 3,
         "lang": [
           "en",
           "fa"
         ]
       },
       {
-        "cart": "MotorChannels",
+        "cart": "MotorChannelsC",
         "title": "Motor Channels",
         "titleValue": null,
         "titlePostfix": "",
         "order": 32,
-        "apiLabel": "MotorChannels",
+        "apiLabel": "MotorChannelsC",
         "apiValue": null,
         "apiAcc": "value",
         "apiAccValue": {
@@ -5257,6 +5638,7 @@
           "SewingAccessoryValue": null,
           "Qty": 1
         },
+        "fabric": 3,
         "lang": [
           "en",
           "fa"

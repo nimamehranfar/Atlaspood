@@ -26,7 +26,7 @@ function Footer() {
                                     <li>
                                         <img src={require('../Images/public/phone.svg').default} className="img-fluid svg"
                                              alt=""/>
-                                        <a href="tel:02188908817">(021) 88908817</a></li>
+                                        <a href="tel:02188908817">{t("Teh_tel")}</a></li>
                                     <li>
                                         <img src={require('../Images/public/mail.svg').default} className="img-fluid svg"
                                              alt=""/>

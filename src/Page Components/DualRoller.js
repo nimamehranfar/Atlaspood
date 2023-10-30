@@ -56,13 +56,13 @@ const baseURLPrice = "https://api.atlaspood.ir/Sewing/GetSewingOrderPrice";
 const baseURLZipCode = "https://api.atlaspood.ir/Sewing/HasInstall";
 const baseURLHasZipCode = "https://api.atlaspood.ir/Cart/GetAlreadyZipCode/1";
 const baseURLFreeShipping = "https://api.atlaspood.ir/WebsiteSetting/GetFreeShippingAmount";
-const baseURGetProject = "https://api.atlaspood.ir/SewingPreorder/GetById";
+const baseURGetProject = "https://api.atlaspood.ir/SewingOrder/GetById";
 const baseURLGetCart = "https://api.atlaspood.ir/cart/GetAll";
 const baseURLGetRemoteNames = "https://api.atlaspood.ir/cart/GetRemoteNames";
 const baseURLUploadImg = "https://api.atlaspood.ir/SewingOrderAttachment/ImageUpload";
 const baseURLUploadPdf = "https://api.atlaspood.ir/SewingOrderAttachment/PdfUpload";
 const baseURLDeleteFile = "https://api.atlaspood.ir/SewingOrderAttachment/Delete";
-const baseURLEditProject = "https://api.atlaspood.ir/SewingPreorder/Edit";
+const baseURLEditProject = "https://api.atlaspood.ir/SewingOrder/Edit";
 const baseURLDeleteBasketProject = "https://api.atlaspood.ir/Cart/DeleteItem";
 
 const baseURLAddSwatch = "https://api.atlaspood.ir/Cart/Add";
@@ -71,14 +71,14 @@ const baseURLFilterType = "https://api.atlaspood.ir/Sewing/GetModelDesignType";
 const baseURLFilterPrice = "https://api.atlaspood.ir/BaseType/GetPriceLevel";
 
 
-function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, QueryString, Parameters, PageId}) {
+function DualRoller({CatID, ModelID, PageType, ProjectId, EditIndex, PageItem, QueryString, Parameters, PageId}) {
     const {t} = useTranslation();
     const location = useLocation();
     const [pageLanguage, setPageLanguage] = React.useState(location.pathname.split('').slice(1, 3).join(''));
     const firstRender = useRef(true);
     const [catID, setCatID] = useState(CatID);
     const [modelID, setModelID] = useState(ModelID);
-    const [specialId, setSpecialId] = useState(SpecialId);
+    const [pageType, setPageType] = useState(PageType);
     const [projectId, setProjectId] = useState(ProjectId);
     const [editIndex, setEditIndex] = useState(EditIndex);
     const [pageItem, setPageItem] = useState(PageItem);
@@ -210,23 +210,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
     const [height3C, setHeight3C] = useState(undefined);
     const [mount, setMount] = useState(undefined);
     
-    const [requiredStep, setRequiredStep] = useState({
-        "1": false,
-        "15": false,
-        "2": false,
-        "3": false,
-        "3AIn": false,
-        "3BIn": false,
-        "3AOut": false,
-        "3BOut": false,
-        "3COut": false,
-        "3DOut": false,
-        "4": false,
-        "4A": false,
-        "4B": false,
-        "5": false,
-        "6": false
-    });
+    const [requiredStep, setRequiredStep] = useState({});
     const [cartValues, setCartValues] = useState({});
     const [cartStateAgree, setCartStateAgree] = useState(false);
     const [cartAgreeDescription, setCartAgreeDescription] = useState(false);
@@ -265,6 +249,8 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
     const [filterTypes, setFilterTypes] = useState([...queryString["types"]]);
     const [filterPrices, setFilterPrices] = useState([...queryString["prices"]]);
     const [filterDesigns, setFilterDesigns] = useState([...queryString["designs"]]);
+    
+    const [isClearAll, setIsClearAll] = useState(false);
     
     const [step1, setStep1] = useState("");
     const [step15, setStep15] = useState("");
@@ -356,68 +342,90 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
             
             setFabrics(tempFabrics);
             setFabrics2(tempFabrics);
+            setTimeout(() => {
+                setIsClearAll(false);
+            }, 1000);
         }).catch(err => {
             console.log(err);
+            setTimeout(() => {
+                setIsClearAll(false);
+            }, 1000);
         });
     };
     
-    function getFabricsWithFilter() {
-        let paramObj = {modelId: modelID, searchString: searchText};
-        
-        let promise1 = new Promise((resolve, reject) => {
-            if (filterColors.length > 0) {
-                paramObj["colorIds"] = [];
-                filterColors.forEach((filter_id, index) => {
-                    paramObj["colorIds"] = [...paramObj["colorIds"], filter_id];
-                    if (index === filterColors.length - 1) {
-                        resolve();
-                    }
-                });
-            } else {
-                resolve();
-            }
-        });
-        let promise2 = new Promise((resolve, reject) => {
-            if (filterPatterns.length > 0) {
-                paramObj["patternTypeIds"] = [];
-                filterPatterns.forEach((filter_id, index) => {
-                    paramObj["patternTypeIds"] = [...paramObj["patternTypeIds"], filter_id];
-                    if (index === filterPatterns.length - 1) {
-                        resolve();
-                    }
-                });
-            } else {
-                resolve();
-            }
-        });
-        let promise3 = new Promise((resolve, reject) => {
-            if (filterTypes.length > 0) {
-                paramObj["typeIds"] = [];
-                filterTypes.forEach((filter_id, index) => {
-                    paramObj["typeIds"] = [...paramObj["typeIds"], filter_id];
-                    if (index === filterTypes.length - 1) {
-                        resolve();
-                    }
-                });
-            } else {
-                resolve();
-            }
-        });
-        let promise4 = new Promise((resolve, reject) => {
-            if (filterPrices.length > 0) {
-                paramObj["priceLevelIds"] = [];
-                filterPrices.forEach((filter_id, index) => {
-                    paramObj["priceLevelIds"] = [...paramObj["priceLevelIds"], filter_id];
-                    if (index === filterPrices.length - 1) {
-                        resolve();
-                    }
-                });
-            } else {
-                resolve();
-            }
-        });
-        
-        Promise.all([promise1, promise2, promise3, promise4]).then(() => {
+    function getFabricsWithFilter(clearAll) {
+        if (clearAll) {
+            getFabrics();
+        } else {
+            let paramObj = {modelId: modelID, searchString: searchText};
+            
+            let promise1 = new Promise((resolve, reject) => {
+                if (filterColors.length > 0) {
+                    paramObj["colorIds"] = [];
+                    filterColors.forEach((filter_id, index) => {
+                        paramObj["colorIds"] = [...paramObj["colorIds"], filter_id];
+                        if (index === filterColors.length - 1) {
+                            resolve();
+                        }
+                    });
+                } else {
+                    resolve();
+                }
+            });
+            let promise2 = new Promise((resolve, reject) => {
+                if (filterPatterns.length > 0) {
+                    paramObj["patternTypeIds"] = [];
+                    filterPatterns.forEach((filter_id, index) => {
+                        paramObj["patternTypeIds"] = [...paramObj["patternTypeIds"], filter_id];
+                        if (index === filterPatterns.length - 1) {
+                            resolve();
+                        }
+                    });
+                } else {
+                    resolve();
+                }
+            });
+            let promise3 = new Promise((resolve, reject) => {
+                if (filterTypes.length > 0) {
+                    paramObj["typeIds"] = [];
+                    filterTypes.forEach((filter_id, index) => {
+                        paramObj["typeIds"] = [...paramObj["typeIds"], filter_id];
+                        if (index === filterTypes.length - 1) {
+                            resolve();
+                        }
+                    });
+                } else {
+                    resolve();
+                }
+            });
+            let promise4 = new Promise((resolve, reject) => {
+                if (filterPrices.length > 0) {
+                    paramObj["priceLevelIds"] = [];
+                    filterPrices.forEach((filter_id, index) => {
+                        paramObj["priceLevelIds"] = [...paramObj["priceLevelIds"], filter_id];
+                        if (index === filterPrices.length - 1) {
+                            resolve();
+                        }
+                    });
+                } else {
+                    resolve();
+                }
+            });
+            let promise5 = new Promise((resolve, reject) => {
+                if (filterDesigns.length > 0) {
+                    paramObj["designs"] = [];
+                    filterDesigns.forEach((filter_id, index) => {
+                        paramObj["designs"] = [...paramObj["designs"], filter_id];
+                        if (index === filterDesigns.length - 1) {
+                            resolve();
+                        }
+                    });
+                } else {
+                    resolve();
+                }
+            });
+            
+            Promise.all([promise1, promise2, promise3, promise4, promise5]).then(() => {
             // console.log(filterColors,paramObj);
             axios.get(baseURLFabrics, {
                 params: paramObj,
@@ -438,6 +446,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                 console.log(err);
             });
         })
+        }
     }
     
     const getCats = () => {
@@ -749,6 +758,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
         let NylonPercent = fabricObj["NylonPercent"] || 0;
         let ConttonPercent = fabricObj["ConttonPercent"] || 0;
         let LinenPercent = fabricObj["LinenPercent"] || 0;
+        let FabricWidth = fabricObj["FabricWidth"] || 0;
         let ColorName = convertToPersian(fabricObj["ColorName"]);
         let ColorEnName = fabricObj["ColorEnName"];
         let SwatchId = fabricObj["SwatchId"] ? fabricObj["SwatchId"] : -1;
@@ -787,6 +797,10 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                     {ConttonPercent > 0 && <p className="zoom_modal_header_Contents_item">{ConttonPercent + "%"} {t("Contton")}</p>}
                     {LinenPercent > 0 && <p className="zoom_modal_header_Contents_item">{LinenPercent + "%"} {t("Linen")}</p>}
                 </div>
+                <div className="zoom_modal_header_Contents_container">
+                    <h1 className="zoom_modal_header_Contents">{t("Fabric Width")}</h1>
+                    {FabricWidth > 0 && <p className="zoom_modal_header_Contents_item">{FabricWidth + "cm"}</p>}
+                </div>
             </div>
         );
         
@@ -813,30 +827,25 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
     function ContextAwareToggle({stepNum, stepTitle, stepTitle2, stepSelected, eventKey, callback, stepRef, type, required, cartCustomText}) {
         const {activeEventKey} = useContext(AccordionContext);
         
-        const decoratedOnClick = useAccordionButton(
-            eventKey,
-            () => {
-                callback && callback(eventKey);
-                activeEventKey === eventKey ? setAccordionActiveKey("") : setAccordionActiveKey(eventKey);
-                // setTimeout(() => {
-                //     if (isCurrentEventKey)
-                //         window.scrollTo(window.scrollX, window.scrollY + 1);
-                //     else
-                //         window.scrollTo(window.screenX, window.scrollY - 1)
-                // }, 500);
-            },
-        );
+        const decoratedOnClick = useAccordionButton(eventKey, () => {
+            callback && callback(eventKey);
+            activeEventKey === eventKey ? setAccordionActiveKey("") : setAccordionActiveKey(eventKey);
+            
+            setTimeout(() => {
+                if (stepHeaders.current[stepRef] !== undefined && stepHeaders.current[stepRef] !== null)
+                    stepHeaders.current[stepRef].scrollIntoView();
+            }, 500);
+        },);
         
         const isCurrentEventKey = activeEventKey === eventKey;
         
-        if (stepSelected !== "" && required) {
-            let temp = JSON.parse(JSON.stringify(requiredStep));
-            setTimeout(() => {
-                temp[stepRef] = false;
-                setRequiredStep(temp);
-            }, 1000);
-            
-        }
+        // if (stepSelected !== "" && required) {
+        //     let temp = JSON.parse(JSON.stringify(requiredStep));
+        //     setTimeout(() => {
+        //         temp[stepRef] = false;
+        //         setRequiredStep(temp);
+        //     }, 1000);
+        // }
         
         return (
             <div className={`w-100 h-100 steps_header ${isCurrentEventKey ? 'steps_header_active' : ''}`}
@@ -852,36 +861,31 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                 {/*<div className="steps_header_selected_container">*/}
                 {/*    <PopoverStickOnHover classNames="step_label_popover"*/}
                 {/*                         placement="bottom"*/}
-                {/*                         children={<div className="steps_header_selected"*/}
-                {/*                                        ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? stepSelected : null}</div>}*/}
+                {/*                         children={<div className={"steps_header_selected"+ (stepSelected===t("Invalid Measurements")?" steps_header_selected_red":"")}*/}
+                {/*                                        ref={ref => (selectedTitle.current[stepNum] = ref)}>{stepSelected}</div>}*/}
                 {/*                         component={*/}
                 {/*                             <div className="step_label_popover_container">*/}
-                {/*                                 <div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? stepSelected : null}</div>*/}
+                {/*                                 <div className={"steps_header_selected"+ (stepSelected===t("Invalid Measurements")?" steps_header_selected_red":"")} ref={ref => (selectedTitle.current[stepNum] = ref)}>{stepSelected}</div>*/}
                 {/*                             </div>*/}
                 {/*                         }/>*/}
                 {/*</div>*/}
                 <div className="steps_header_selected_container">
-                    <div className="steps_header_selected" onMouseEnter={() => {
-                        if (selectedTitle.current[stepNum].clientWidth < selectedTitle.current[stepNum].scrollWidth) {
+                    <div className="steps_header_selected_title_container">
+                        <div className={"steps_header_selected" + (stepSelected === t("Invalid Measurements") ? " steps_header_selected_red" : "")} onMouseEnter={() => {
+                            if (selectedTitle.current[stepNum].clientWidth < selectedTitle.current[stepNum].scrollWidth) {
+                                let temp = JSON.parse(JSON.stringify(headerTruncated))
+                                temp[stepNum] = true;
+                                setHeaderTruncated(temp);
+                            }
+                        }} onMouseLeave={() => {
                             let temp = JSON.parse(JSON.stringify(headerTruncated))
-                            temp[stepNum] = true;
+                            temp[stepNum] = false;
                             setHeaderTruncated(temp);
-                        }
-                    }} onMouseLeave={() => {
-                        let temp = JSON.parse(JSON.stringify(headerTruncated))
-                        temp[stepNum] = false;
-                        setHeaderTruncated(temp);
-                    }} ref={ref => (selectedTitle.current[stepNum] = ref)}>{showLabels ? stepSelected : null}</div>
-                    {headerTruncated[stepNum] && <div className="header_tooltip">{stepSelected}</div>}
-                    {/*{showLabels &&*/}
-                    {/*    <TruncateMarkup lines={1} tokenize="words" onTruncate={()=>setHeaderTruncated(true)}>*/}
-                    {/*        <div className="steps_header_selected" ref={ref => (selectedTitle.current[stepNum] = ref)}>{stepSelected}</div>*/}
-                    {/*    </TruncateMarkup>*/}
-                    {/*}*/}
+                        }} ref={ref => (selectedTitle.current[stepNum] = ref)}>{stepSelected}</div>
+                        {headerTruncated[stepNum] && <div className="header_tooltip">{stepSelected}</div>}
+                    </div>
+                    {required && <div className="stepRequired"/>}
                 </div>
-                {required && stepSelected === "" &&
-                    <div className="stepRequired"/>
-                }
             </div>
         );
     }
@@ -915,9 +919,9 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                 callback && callback(eventKey);
                 setAccordionActiveKey(eventKey);
                 setTimeout(() => {
-                    if (currentStep && stepHeaders.current[currentStep] !== undefined)
+                    if (currentStep && stepHeaders.current[currentStep] !== undefined && stepHeaders.current[currentStep] !== null)
                         stepHeaders.current[currentStep].scrollIntoView();
-                }, 500);
+                }, 800);
             },
         );
         return (
@@ -954,6 +958,13 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
         setFilterPrices([]);
     }
     
+    useEffect(() => {
+        if (isClearAll) {
+            clearAllFilters();
+            getFabricsWithFilter(true);
+        }
+    }, [isClearAll]);
+    
     function clearFilters(e) {
         let refIndex = e.target.getAttribute('text');
         filterCheckboxes.current[refIndex].forEach(obj => {
@@ -979,7 +990,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
     }
     
     function optionSelectChanged_three(obj, refIndex, position, isMin, modalRef, postfixEn, postfixFa, pageLang) {
-        if (obj !== undefined && typeof selected === 'object') {
+        if (obj !== undefined && typeof obj === 'object') {
             let temp = JSON.parse(JSON.stringify(stepSelectedOptions));
             if (temp.labels[refIndex] === undefined)
                 temp.labels[refIndex] = [];
@@ -1036,10 +1047,15 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                 }
             }
         }
+        let temp = JSON.parse(JSON.stringify(requiredStep));
+        if (requiredStep[refIndex]) {
+            temp[refIndex] = false;
+        }
+        setRequiredStep(temp);
     }
     
     function optionSelectChanged_WidthLength(obj, refIndex, isWidth, postfixEn, postfixFa, pageLang) {
-        if (obj !== undefined && typeof selected === 'object') {
+        if (obj !== undefined && typeof obj === 'object') {
             if (isWidth) {
                 let temp = JSON.parse(JSON.stringify(widthLength));
                 temp.width = obj.value;
@@ -1062,15 +1078,18 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                 }
             }
         } else if (obj !== undefined) {
-        
+            
         }
     }
     
-    function optionSelectChanged_LeftRight(obj, refIndex, isLeft, postfixEn, postfixFa, pageLang) {
+    function optionSelectChanged_LeftRight(obj, refIndex, isLeft, postfixEn, postfixFa, pageLang, secondVal) {
         if (obj !== undefined && typeof obj === 'object') {
             if (isLeft) {
                 let temp = JSON.parse(JSON.stringify(leftRight));
                 temp.left = obj.value;
+                if (secondVal !== undefined) {
+                    temp.right = secondVal;
+                }
                 setLeftRight(temp);
                 
                 if (temp.right !== "" && temp.left !== "") {
@@ -1081,6 +1100,9 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
             } else {
                 let temp = JSON.parse(JSON.stringify(leftRight));
                 temp.right = obj.value;
+                if (secondVal !== undefined) {
+                    temp.left = secondVal;
+                }
                 setLeftRight(temp);
                 
                 if (temp.right !== "" && temp.left !== "") {
@@ -1093,6 +1115,9 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
             if (isLeft) {
                 let temp = JSON.parse(JSON.stringify(leftRight));
                 temp.left = obj;
+                if (secondVal !== undefined) {
+                    temp.right = secondVal;
+                }
                 setLeftRight(temp);
                 
                 if (temp.right !== "" && temp.left !== "") {
@@ -1103,6 +1128,9 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
             } else {
                 let temp = JSON.parse(JSON.stringify(leftRight));
                 temp.right = obj;
+                if (secondVal !== undefined) {
+                    temp.left = secondVal;
+                }
                 setLeftRight(temp);
                 
                 if (temp.right !== "" && temp.left !== "") {
@@ -1112,6 +1140,11 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                 }
             }
         }
+        let temp = JSON.parse(JSON.stringify(requiredStep));
+        if (requiredStep[refIndex]) {
+            temp[refIndex] = false;
+        }
+        setRequiredStep(temp);
     }
     
     function optionSelectChanged(refIndex, selected, postfixEn, postfixFa, pageLang) {
@@ -1134,34 +1167,58 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
             // console.log(tempValue);
             setStepSelectedValue(tempValue);
         }
+        let temp = JSON.parse(JSON.stringify(requiredStep));
+        if (requiredStep[refIndex]) {
+            temp[refIndex] = false;
+        }
+        setRequiredStep(temp);
     }
     
-    function selectChanged(e, nums) {
+    function selectChanged(e, nums, customText, secondRefIndex, secText) {
         let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
         let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
-        
-        if (e) {
+        let temp = JSON.parse(JSON.stringify(requiredStep));
+        if (e && customText) {
+            tempLabels[e] = customText;
+            
+            if (secondRefIndex !== undefined) {
+                let tempArr1 = secondRefIndex.split(',');
+                tempArr1.forEach((ref, index) => {
+                    if (ref !== undefined) {
+                        tempLabels[ref] = secText[index]
+                    }
+                });
+            }
+            if (tempLabels[e] !== "" && requiredStep[e]) {
+                temp[e] = false;
+            }
+        } else if (e) {
             // console.log(e.target.value);
             let refIndex = e.target.getAttribute('ref-num');
             // selectedTitle.current[refIndex].innerHTML = e.target.getAttribute('text');
             tempLabels[refIndex] = e.target.getAttribute('text');
-            
             tempValue[refIndex] = e.target.value;
+            
+            if (requiredStep[refIndex]) {
+                temp[refIndex] = false;
+            }
         }
         if (nums !== undefined) {
             let tempArr = nums.split(',');
             tempArr.forEach(num => {
                 if (num !== undefined) {
-                    if (tempValue[num] !== undefined)
-                        delete tempValue[num];
-                    if (tempLabels[num] !== undefined)
-                        delete tempLabels[num];
+                    if (tempValue[num] !== undefined) delete tempValue[num];
+                    if (tempLabels[num] !== undefined) delete tempLabels[num];
+                    if (tempLabels[num] !== "" && requiredStep[num]) {
+                        temp[num] = false;
+                    }
                 }
             });
         }
         // console.log(tempValue);
         setStepSelectedLabel(tempLabels);
         setStepSelectedValue(tempValue);
+        setRequiredStep(temp);
     }
     
     function setBasketNumber(cart, refIndex, numValue, type, minusPlus) {
@@ -1171,7 +1228,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
             let tempProjectContainer = temp.find(opt => opt["CartDetailId"] === refIndex);
             
             if (Object.keys(tempProjectContainer).length !== 0) {
-                let tempProject = tempProjectContainer["SewingPreorder"];
+                let tempProject = tempProjectContainer["SewingOrder"];
                 tempProject["Count"] = tempProject["WindowCount"];
                 if (minusPlus !== undefined) {
                     if (tempProject["Count"] + minusPlus <= 0 || tempProject["Count"] + minusPlus > 10)
@@ -1478,7 +1535,6 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
             return el != null;
         });
         
-        
         let promise2 = new Promise((resolve, reject) => {
             if (step3 !== "" && !pageLoad && !(motorLoad && refIndex === "MotorType") && refIndex !== "ZipCode") {
                 
@@ -1502,54 +1558,40 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                             setTransportPrice(response.data["TransportationAmount"] ? response.data["TransportationAmount"] : 0);
                             setHasInstall(!!(response.data["TransportationAmount"]))
                         }
-                        // console.log("1");
                         
-                        // setCart("HeightCart", totalHeight, "", "WidthCart", [totalWidth]);
-                        if (step2 === "Inside" && step3 === "true") {
-                            if (temp["Width1"] !== undefined && temp["Width2"] !== undefined && temp["Width3"] !== undefined && temp["Height1"] !== undefined && temp["Height2"] !== undefined && temp["Height3"] !== undefined) {
-                                // console.log("2");
-                                getWindowSize(response.data["WindowWidth"], response.data["WindowHeight"]);
-                                temp["WindowWidth"] = response.data["WindowWidth"];
-                                temp["WindowHeight"] = response.data["WindowHeight"];
-                                temp["WidthCart"] = response.data["Width"];
-                                temp["HeightCart"] = response.data["Height"];
-                                
-                            }
-                        } else if (step2 === "Outside" && step3 === "true") {
-                            if (temp["Width3A"] !== undefined && temp["Height3C"] !== undefined && temp["ExtensionRight"] !== undefined && temp["ExtensionLeft"] !== undefined && temp["ShadeMount"] !== undefined) {
-                                getWindowSize(response.data["WindowWidth"], response.data["WindowHeight"]);
-                                temp["WindowWidth"] = response.data["WindowWidth"];
-                                temp["WindowHeight"] = response.data["WindowHeight"];
-                                temp["WidthCart"] = response.data["Width"];
-                                temp["HeightCart"] = response.data["Height"];
-                                // console.log("3");
-                            }
-                        } else {
-                            getWindowSize(response.data["WindowWidth"], response.data["WindowHeight"]);
-                            temp["WindowWidth"] = response.data["WindowWidth"];
-                            temp["WindowHeight"] = response.data["WindowHeight"];
-                            temp["WidthCart"] = response.data["Width"];
-                            temp["HeightCart"] = response.data["Height"];
-                            // console.log("4");
-                        }
+                        getWindowSize(response.data["WindowWidth"], response.data["WindowHeight"]);
+                        temp["WindowWidth"] = response.data["WindowWidth"];
+                        temp["WindowHeight"] = response.data["WindowHeight"];
+                        temp["WidthCart"] = response.data["Width"];
+                        temp["HeightCart"] = response.data["Height"];
                         resolve();
                     }).catch(err => {
                     setPrice(0);
-                    if (temp["HeightCart"] !== undefined)
-                        delete temp["HeightCart"];
-                    if (temp["WidthCart"] !== undefined)
-                        delete temp["WidthCart"];
                     setFabricQty(0);
-                    resolve();
+                    resolve(1);
                     // console.log(err);
                 });
             } else {
                 resolve();
             }
         });
-        promise2.then(() => {
+        promise2.then((res) => {
             if (!pageLoad) {
-                setCartValues(temp);
+                if (res === undefined) {
+                    setCartValues(temp);
+                } else if (res === 1) {
+                    if (temp["HeightCart"] !== undefined)
+                        delete temp["HeightCart"];
+                    if (temp["WidthCart"] !== undefined)
+                        delete temp["WidthCart"];
+                    
+                    if (temp["WindowHeight"] !== undefined)
+                        delete temp["WindowHeight"];
+                    if (temp["WindowWidth"] !== undefined)
+                        delete temp["WindowWidth"];
+                    
+                    setCartValues(temp);
+                }
             }
             setCartLoading(false);
         });
@@ -1714,6 +1756,11 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                             delete temp["HeightCart"];
                         if (temp["WidthCart"] !== undefined)
                             delete temp["WidthCart"];
+                        
+                        if (temp["WindowHeight"] !== undefined)
+                            delete temp["WindowHeight"];
+                        if (temp["WindowWidth"] !== undefined)
+                            delete temp["WindowWidth"];
                         // console.log(err);
                         setCartValues(temp);
                         setTimeout(() => {
@@ -1914,7 +1961,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                     }
                     if (steps.current[dependency] !== undefined && steps.current[dependency] !== null) {
                         temp[dependency] = true;
-                        delete tempLabels[dependency];
+                        // delete tempLabels[dependency];
                     }
                 });
                 
@@ -2246,9 +2293,9 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                 let promise1 = new Promise((resolve, reject) => {
                     if (draperies.length) {
                         draperies.sort(function (a, b) {
-                            return b["CartDetailId"] - a["CartDetailId"] || b["SewingPreorderId"] - a["SewingPreorderId"];
+                            return b["CartDetailId"] - a["CartDetailId"] || b["SewingOrderId"] - a["SewingOrderId"];
                         }).forEach((tempObj, i) => {
-                            let obj = draperies[i]["SewingPreorder"]["PreorderText"];
+                            let obj = draperies[i]["SewingOrder"]["PreorderText"] || {};
                             let sodFabrics = obj["SodFabrics"] ? obj["SodFabrics"] : [];
                             let roomName = (obj["WindowName"] === undefined || obj["WindowName"] === "") ? "" : " / " + obj["WindowName"];
                             if (obj["SewingModelId"] === "0326") {
@@ -2293,7 +2340,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                             onClick={() => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], 0, 0, -1)}>–
                                                     </button>
                                                     <input type="text" className="basket_qty_num"
-                                                           value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${draperies[i]["SewingPreorder"]["WindowCount"]}`) : draperies[i]["SewingPreorder"]["WindowCount"]}
+                                                           value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${draperies[i]["SewingOrder"]["WindowCount"]}`) : draperies[i]["SewingOrder"]["WindowCount"]}
                                                            onChange={(e) => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], NumberToPersianWord.convertPeToEn(`${e.target.value}`))}/>
                                                     <button type="text" className="basket_qty_plus"
                                                             onClick={() => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], 0, 0, 1)}>+
@@ -2330,7 +2377,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                             onClick={() => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], 0, 0, -1)}>–
                                                     </button>
                                                     <input type="text" className="basket_qty_num"
-                                                           value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${draperies[i]["SewingPreorder"]["WindowCount"]}`) : draperies[i]["SewingPreorder"]["WindowCount"]}
+                                                           value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${draperies[i]["SewingOrder"]["WindowCount"]}`) : draperies[i]["SewingOrder"]["WindowCount"]}
                                                            onChange={(e) => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], NumberToPersianWord.convertPeToEn(`${e.target.value}`))}/>
                                                     <button type="text" className="basket_qty_plus"
                                                             onClick={() => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], 0, 0, 1)}>+
@@ -2784,37 +2831,40 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
     }
     
     function roomLabelChanged(changedValue, refIndex, isText) {
+        let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
+        let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
+        let tempSelect = JSON.parse(JSON.stringify(roomLabelSelect));
+        let temp = JSON.parse(JSON.stringify(requiredStep));
         if (isText) {
             if (roomLabelSelect.label !== "") {
-                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
                 if (changedValue === "") {
                     tempLabels[refIndex] = roomLabelSelect.label;
                 } else {
                     tempLabels[refIndex] = roomLabelSelect.label + " - " + changedValue;
                 }
-                setStepSelectedLabel(tempLabels);
             }
         } else {
-            let tempSelect = JSON.parse(JSON.stringify(roomLabelSelect));
             tempSelect.label = changedValue.label;
             tempSelect.value = changedValue.value;
-            setRoomLabelSelect(tempSelect);
             
-            let tempValue = JSON.parse(JSON.stringify(stepSelectedValue));
             tempValue[refIndex] = changedValue.value;
-            setStepSelectedValue(tempValue);
             
             if (changedValue.label !== "") {
-                let tempLabels = JSON.parse(JSON.stringify(stepSelectedLabel));
                 if (roomLabelText === "") {
                     tempLabels[refIndex] = changedValue.label;
                 } else {
                     tempLabels[refIndex] = changedValue.label + " - " + roomLabelText;
                 }
-                setStepSelectedLabel(tempLabels);
             }
         }
-        
+        if (tempLabels[refIndex] !== "" && requiredStep[refIndex]) {
+            temp[refIndex] = false;
+        }
+    
+        setStepSelectedLabel(tempLabels);
+        setStepSelectedValue(tempValue);
+        setRoomLabelSelect(tempSelect);
+        setRequiredStep(temp);
     }
     
     function uploadImg(file) {
@@ -4197,6 +4247,12 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
             // setCart("PhotoUrl", fabricSelected.selectedPhoto);
             setDeps("", "1");
             setStep1(fabricSelected.selectedFabricId.toString());
+            let temp = JSON.parse(JSON.stringify(requiredStep));
+            if (tempLabels["1"] !== "" && requiredStep["1"]) {
+                temp["1"] = false;
+            }
+            setRequiredStep(temp);
+    
         }
     }, [fabricSelected]);
     
@@ -4214,6 +4270,12 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
             // setCart("PhotoUrl", fabricSelected2.selectedPhoto);
             setDeps("", "15");
             setStep15(fabricSelected2.selectedFabricId.toString());
+            let temp = JSON.parse(JSON.stringify(requiredStep));
+            if (tempLabels["2"] !== "" && requiredStep["2"]) {
+                temp["2"] = false;
+            }
+            setRequiredStep(temp);
+    
         }
     }, [fabricSelected2]);
     
@@ -4226,17 +4288,33 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
             } else {
                 setFabricsList([]);
             }
+        }).catch(() => {
+            if (Object.keys(fabrics).length) {
+                setTimeout(() => {
+                    renderFabrics({});
+                }, 100);
+            } else {
+                setFabricsList([]);
+            }
         });
     }, [step1]);
     
     useEffect(() => {
         getCart().then((temp) => {
-            if (Object.keys(fabrics).length) {
+            if (Object.keys(fabrics2).length) {
                 setTimeout(() => {
                     renderFabrics2(temp);
                 }, 100);
             } else {
-                setFabricsList([]);
+                setFabricsList2([]);
+            }
+        }).catch(() => {
+            if (Object.keys(fabrics2).length) {
+                setTimeout(() => {
+                    renderFabrics2({});
+                }, 100);
+            } else {
+                setFabricsList2([]);
             }
         });
     }, [step15]);
@@ -4453,7 +4531,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
     
     useEffect(() => {
         if (pageLoad === false) {
-            setCart("", "");
+            setCart(undefined, undefined);
         }
     }, [pageLoad]);
     
@@ -4471,8 +4549,8 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
     useEffect(() => {
         if (pageItem) {
             setDefaultFabricPhoto(pageItem["MainImageUrl"]);
-            if (specialId) {
-                setCart("PhotoUrl", pageItem["MainImageUrl"], "", "SpecialId,PageId", [specialId, pageId]);
+            if (pageType) {
+                setCart("PhotoUrl", pageItem["MainImageUrl"], "", "PageType,PageId", [pageType, pageId]);
             } else {
                 setCart("PhotoUrl", pageItem["MainImageUrl"], "", "PageId", [pageId]);
             }
@@ -4552,7 +4630,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                 setZipcode(temp);
                 setZipcodeButton(true);
                 setHasInstall(true);
-                setCart("", "", "ZipCode");
+               // setCart("", "", "ZipCode");
             } else {
                 setHasZipcode("");
                 setZipcode("");
@@ -4608,17 +4686,38 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
     useEffect(() => {
         setLang().then(() => {
             if (pageLanguage !== '') {
-                if (Object.keys(fabrics).length) {
+                if (Object.keys(fabrics).length || Object.keys(fabrics2).length) {
                     getCart().then((temp) => {
                         getHasZipcode();
                         setTimeout(() => {
                             renderFabrics(temp);
                             renderFabrics2(temp);
-                            getRemoteNames();
+                        }, 100);
+                    }).catch(() => {
+                        getHasZipcode();
+                        setTimeout(() => {
+                            renderFabrics({});
+                            renderFabrics2({});
                         }, 100);
                     });
                 } else {
-                    setFabricsList([]);
+                    let pageLanguage1 = location.pathname.split('').slice(1, 3).join('');
+                    setFabricsList([<div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + "empty"}>
+                        <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
+                            <h5 className="empty_fabrics">{pageLanguage1 === 'en' ? "Sorry, no matching fabrics.\nTo view more results, try clearing your filters." : ""}</h5>
+                            <button className="empty_fabrics_btn white_btn btn" onClick={() => {
+                                setFabricsList([<div className={`material_detail ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`} key={"fabric" + "empty"}>
+                                    <div className={`material_traits ${pageLanguage1 === 'fa' ? "font_farsi" : "font_en"}`}>
+                                        <h5 className="empty_fabrics">{pageLanguage1 === 'en' ? "Sorry, no matching fabrics.\nTo view more results, try clearing your filters." : ""}</h5>
+                                        <button className="empty_fabrics_btn white_btn btn">{pageLanguage1 === 'fa' ? "" : "CLEARING"}</button>
+                                    </div>
+                                </div>]);
+                                setTimeout(() => {
+                                    setIsClearAll(true);
+                                }, 300);
+                            }}>{pageLanguage1 === 'fa' ? "" : "CLEAR ALL FILTERS"}</button>
+                        </div>
+                    </div>]);
                 }
             }
         });
@@ -4648,7 +4747,9 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
     }, [filterChanged]);
     
     useEffect(() => {
-        getFabricsWithFilter();
+        if (!isClearAll) {
+            getFabricsWithFilter();
+        }
     }, [filterColors, filterPatterns, filterTypes, filterPrices, searchText]);
     
     useEffect(() => {
@@ -5479,7 +5580,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("Width")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
+                                                        <DebounceInput debounceTimeout={1500} autoComplete="off" onKeyDown={(e) => {
                                                             if (e.keyCode === 13) {
                                                                 inputs.current["Height"].focus();
                                                             } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
@@ -5518,12 +5619,12 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("Height")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput inputRef={ref => (inputs.current["Height"] = ref)} debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput inputRef={ref => (inputs.current["Height"] = ref)} debounceTimeout={1500} onKeyDown={(e) => {
                                                             if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (height !== undefined && (height < 30 || height > 400) ? " measure_input_err" : "")} type="text"
-                                                                       name="width" value={NumToFa(`${height || ""}`, pageLanguage)}
+                                                                       name="height" value={NumToFa(`${height || ""}`, pageLanguage)}
                                                                        onChange={(e) => {
                                                                            setTimeout(() => {
                                                                                let newValue = NumberToPersianWord.convertPeToEn(e.target.value);
@@ -5618,7 +5719,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("step3AIn_A")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
+                                                        <DebounceInput debounceTimeout={1500} autoComplete="off" onKeyDown={(e) => {
                                                             if (e.keyCode === 13) {
                                                                 inputs.current["width2"].focus();
                                                             } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
@@ -5642,10 +5743,11 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                                    setDeps("3AIn1", "");
                                                                                    if (newValue === "" || isNaN(parseInt(newValue))) {
                                                                                        setWidth1(undefined);
+                                                                                       selectChanged(undefined, "3AIn");
                                                                                    } else {
                                                                                        setWidth1(parseInt(newValue));
+                                                                                       selectChanged("3AIn", undefined, t("Invalid Measurements"));
                                                                                    }
-                                                                                   selectChanged(undefined, "3AIn");
                                                                                }
                                                                            }, 300);
                                                                        }}/>
@@ -5658,9 +5760,9 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("step3AIn_B")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput inputRef={ref => (inputs.current["width2"] = ref)} debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput inputRef={ref => (inputs.current["width2"] = ref)} debounceTimeout={1500} onKeyDown={(e) => {
                                                             if (e.keyCode === 13) {
-                                                                inputs.current["width2"].focus();
+                                                                inputs.current["width3"].focus();
                                                             } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
@@ -5682,10 +5784,11 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                                    setDeps("3AIn2", "");
                                                                                    if (newValue === "" || isNaN(parseInt(newValue))) {
                                                                                        setWidth2(undefined);
+                                                                                       selectChanged(undefined, "3AIn");
                                                                                    } else {
                                                                                        setWidth2(parseInt(newValue));
+                                                                                       selectChanged("3AIn", undefined, t("Invalid Measurements"));
                                                                                    }
-                                                                                   selectChanged(undefined, "3AIn");
                                                                                }
                                                                            }, 300);
                                                                        }}/>
@@ -5698,7 +5801,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("step3AIn_C")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput inputRef={ref => (inputs.current["width3"] = ref)} debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput inputRef={ref => (inputs.current["width3"] = ref)} debounceTimeout={1500} onKeyDown={(e) => {
                                                             if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
@@ -5720,10 +5823,11 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                                    setDeps("3AIn3", "");
                                                                                    if (newValue === "" || isNaN(parseInt(newValue))) {
                                                                                        setWidth3(undefined);
+                                                                                       selectChanged(undefined, "3AIn");
                                                                                    } else {
                                                                                        setWidth3(parseInt(newValue));
+                                                                                       selectChanged("3AIn", undefined, t("Invalid Measurements"));
                                                                                    }
-                                                                                   selectChanged(undefined, "3AIn");
                                                                                }
                                                                            }, 300);
                                                                        }}/>
@@ -5772,8 +5876,10 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("step3BIn_A")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
-                                                            if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                        <DebounceInput debounceTimeout={1500} autoComplete="off" onKeyDown={(e) => {
+                                                            if (e.keyCode === 13) {
+                                                                inputs.current["height2"].focus();
+                                                            } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (height1 !== undefined && (height1 < 30 || height1 > 400) ? " measure_input_err" : "")} type="text"
@@ -5794,10 +5900,11 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                                    setDeps("3BIn1", "");
                                                                                    if (newValue === "" || isNaN(parseInt(newValue))) {
                                                                                        setHeight1(undefined);
+                                                                                       selectChanged(undefined, "3BIn");
                                                                                    } else {
                                                                                        setHeight1(parseInt(newValue));
+                                                                                       selectChanged("3BIn", undefined, t("Invalid Measurements"));
                                                                                    }
-                                                                                   selectChanged(undefined, "3BIn");
                                                                                }
                                                                            }, 300);
                                                                        }}/>
@@ -5810,8 +5917,10 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("step3BIn_B")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
-                                                            if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
+                                                        <DebounceInput inputRef={ref => (inputs.current["height2"] = ref)} debounceTimeout={1500} autoComplete="off" onKeyDown={(e) => {
+                                                            if (e.keyCode === 13) {
+                                                                inputs.current["height3"].focus();
+                                                            } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
                                                         }} className={"measure_input" + (height2 !== undefined && (height2 < 30 || height2 > 400) ? " measure_input_err" : "")} type="text"
@@ -5832,10 +5941,11 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                                    setDeps("3BIn2", "");
                                                                                    if (newValue === "" || isNaN(parseInt(newValue))) {
                                                                                        setHeight2(undefined);
+                                                                                       selectChanged(undefined, "3BIn");
                                                                                    } else {
                                                                                        setHeight2(parseInt(newValue));
+                                                                                       selectChanged("3BIn", undefined, t("Invalid Measurements"));
                                                                                    }
-                                                                                   selectChanged(undefined, "3BIn");
                                                                                }
                                                                            }, 300);
                                                                        }}/>
@@ -5848,7 +5958,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("step3BIn_C")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
+                                                        <DebounceInput inputRef={ref => (inputs.current["height3"] = ref)} debounceTimeout={1500} autoComplete="off" onKeyDown={(e) => {
                                                             if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
@@ -5870,10 +5980,11 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                                    setDeps("3BIn3", "");
                                                                                    if (newValue === "" || isNaN(parseInt(newValue))) {
                                                                                        setHeight3(undefined);
+                                                                                       selectChanged(undefined, "3BIn");
                                                                                    } else {
                                                                                        setHeight3(parseInt(newValue));
+                                                                                       selectChanged("3BIn", undefined, t("Invalid Measurements"));
                                                                                    }
-                                                                                   selectChanged(undefined, "3BIn");
                                                                                }
                                                                            }, 300);
                                                                        }}/>
@@ -5922,7 +6033,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("Width")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
+                                                        <DebounceInput debounceTimeout={1500} autoComplete="off" onKeyDown={(e) => {
                                                             if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
@@ -5944,10 +6055,11 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                                    setDeps("3AOut", "");
                                                                                    if (newValue === "" || isNaN(parseInt(newValue))) {
                                                                                        setWidth3A(undefined);
+                                                                                       selectChanged(undefined, "3AOut");
                                                                                    } else {
                                                                                        setWidth3A(parseInt(newValue));
+                                                                                       selectChanged("3AOut", undefined, t("Invalid Measurements"));
                                                                                    }
-                                                                                   selectChanged(undefined, "3AOut");
                                                                                }
                                                                            }, 300);
                                                                        }}/>
@@ -5995,7 +6107,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("Left")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
+                                                        <DebounceInput debounceTimeout={1500} autoComplete="off" onKeyDown={(e) => {
                                                             if (e.keyCode === 13) {
                                                                 inputs.current["Right"].focus();
                                                             } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
@@ -6019,10 +6131,11 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                                    setDeps("3BOut1", "");
                                                                                    if (newValue === "" || isNaN(parseInt(newValue))) {
                                                                                        setLeft(undefined);
+                                                                                       selectChanged(undefined, "3BOut");
                                                                                    } else {
                                                                                        setLeft(parseInt(newValue));
+                                                                                       selectChanged("3BOut", undefined, t("Invalid Measurements"));
                                                                                    }
-                                                                                   selectChanged(undefined, "3BOut");
                                                                                }
                                                                            }, 300);
                                                                        }}/>
@@ -6035,7 +6148,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("Right")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput inputRef={ref => (inputs.current["Right"] = ref)} debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput inputRef={ref => (inputs.current["Right"] = ref)} debounceTimeout={1500} onKeyDown={(e) => {
                                                             if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
@@ -6057,10 +6170,11 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                                    setDeps("3BOut2", "");
                                                                                    if (newValue === "" || isNaN(parseInt(newValue))) {
                                                                                        setRight(undefined);
+                                                                                       selectChanged(undefined, "3BOut");
                                                                                    } else {
                                                                                        setRight(parseInt(newValue));
+                                                                                       selectChanged("3BOut", undefined, t("Invalid Measurements"));
                                                                                    }
-                                                                                   selectChanged(undefined, "3BOut");
                                                                                }
                                                                            }, 300);
                                                                        }}/>
@@ -6109,7 +6223,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("Height")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
+                                                        <DebounceInput debounceTimeout={1500} autoComplete="off" onKeyDown={(e) => {
                                                             if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
@@ -6131,10 +6245,11 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                                    setDeps("3COut", "");
                                                                                    if (newValue === "" || isNaN(parseInt(newValue))) {
                                                                                        setHeight3C(undefined);
+                                                                                       selectChanged(undefined, "3COut");
                                                                                    } else {
                                                                                        setHeight3C(parseInt(newValue));
+                                                                                       selectChanged("3COut", undefined, t("Invalid Measurements"));
                                                                                    }
-                                                                                   selectChanged(undefined, "3COut");
                                                                                }
                                                                            }, 300);
                                                                        }}/>
@@ -6172,7 +6287,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("step3AIn_A")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
+                                                        <DebounceInput debounceTimeout={1500} autoComplete="off" onKeyDown={(e) => {
                                                             if (e.keyCode === 13) {
                                                                 inputs.current["ceilingToWindow2"].focus();
                                                             } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
@@ -6196,10 +6311,11 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                                    setDeps("3CArc1", "");
                                                                                    if (newValue === "" || isNaN(parseInt(newValue))) {
                                                                                        setCeilingToWindow1(undefined);
+                                                                                       selectChanged(undefined, "3CArc");
                                                                                    } else {
                                                                                        setCeilingToWindow1(parseInt(newValue));
+                                                                                       selectChanged("3CArc", undefined, t("Invalid Measurements"));
                                                                                    }
-                                                                                   selectChanged(undefined, "3CArc");
                                                                                }
                                                                            }, 300);
                                                                        }}/>
@@ -6212,7 +6328,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("step3AIn_B")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput inputRef={ref => (inputs.current["ceilingToWindow2"] = ref)} debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput inputRef={ref => (inputs.current["ceilingToWindow2"] = ref)} debounceTimeout={1500} onKeyDown={(e) => {
                                                             if (e.keyCode === 13) {
                                                                 inputs.current["ceilingToWindow3"].focus();
                                                             } else if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
@@ -6236,10 +6352,11 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                                    setDeps("3CArc2", "");
                                                                                    if (newValue === "" || isNaN(parseInt(newValue))) {
                                                                                        setCeilingToWindow2(undefined);
+                                                                                       selectChanged(undefined, "3CArc");
                                                                                    } else {
                                                                                        setCeilingToWindow2(parseInt(newValue));
+                                                                                       selectChanged("3CArc", undefined, t("Invalid Measurements"));
                                                                                    }
-                                                                                   selectChanged(undefined, "3CArc");
                                                                                }
                                                                            }, 300);
                                                                        }}/>
@@ -6252,7 +6369,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("step3AIn_C")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput inputRef={ref => (inputs.current["ceilingToWindow3"] = ref)} debounceTimeout={500} onKeyDown={(e) => {
+                                                        <DebounceInput inputRef={ref => (inputs.current["ceilingToWindow3"] = ref)} debounceTimeout={1500} onKeyDown={(e) => {
                                                             if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
@@ -6274,10 +6391,11 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                                    setDeps("3CArc3", "");
                                                                                    if (newValue === "" || isNaN(parseInt(newValue))) {
                                                                                        setCeilingToWindow3(undefined);
+                                                                                       selectChanged(undefined, "3CArc");
                                                                                    } else {
                                                                                        setCeilingToWindow3(parseInt(newValue));
+                                                                                       selectChanged("3CArc", undefined, t("Invalid Measurements"));
                                                                                    }
-                                                                                   selectChanged(undefined, "3CArc");
                                                                                }
                                                                            }, 300);
                                                                        }}/>
@@ -6359,7 +6477,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                 <div className="measure_input_container">
                                                     <h1 className="measure_input_label">{t("Height")}</h1>
                                                     <div className="measure_input_field_container">
-                                                        <DebounceInput debounceTimeout={2000} autoComplete="off" onKeyDown={(e) => {
+                                                        <DebounceInput debounceTimeout={1500} autoComplete="off" onKeyDown={(e) => {
                                                             if (!/[0-9]/.test(NumberToPersianWord.convertPeToEn(e.key)) && e.keyCode !== 8 && e.keyCode !== 46 && e.keyCode !== 37 && e.keyCode !== 39 && e.keyCode !== 13) {
                                                                 e.preventDefault();
                                                             }
@@ -6381,10 +6499,11 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                                                    setDeps("3DOut", "");
                                                                                    if (newValue === "" || isNaN(parseInt(newValue))) {
                                                                                        setMount(undefined);
+                                                                                       selectChanged(undefined, "3DOut");
                                                                                    } else {
                                                                                        setMount(parseInt(newValue));
+                                                                                       selectChanged("3DOut", undefined, t("Invalid Measurements"));
                                                                                    }
-                                                                                   selectChanged(undefined, "3DOut");
                                                                                }
                                                                            }, 300);
                                                                        }}/>
@@ -6675,11 +6794,13 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                                     </div>
                                                 }
                                                 {(remoteNames.length === 1 || remoteNames.length === 0) &&
-                                                    <DebounceInput debounceTimeout={2000} onKeyDown={() => setCartLoading(true)} className="Remote_name" type="text"
+                                                    <DebounceInput debounceTimeout={1500} onKeyDown={() => setCartLoading(true)} className="Remote_name" type="text"
                                                                    name="Remote_name" value={remoteName}
                                                                    placeholder={t("Enter a name for your remote")} onChange={(e) => {
-                                                        setCart("RemoteName", e.target.value);
-                                                        setRemoteName(Capitalize(e.target.value));
+                                                        setTimeout(() => {
+                                                            setCart("RemoteName", e.target.value);
+                                                            setRemoteName(Capitalize(e.target.value));
+                                                        }, 300);
                                                     }}/>
                                                 }
                                             </div>
@@ -6690,11 +6811,13 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                             }
                                             {showRemoteName &&
                                                 <div className="motorized_option_right">
-                                                    <DebounceInput debounceTimeout={2000} onKeyDown={() => setCartLoading(true)} className="Remote_name" type="text"
+                                                    <DebounceInput debounceTimeout={1500} onKeyDown={() => setCartLoading(true)} className="Remote_name" type="text"
                                                                    name="Remote_name" value={remoteName}
                                                                    placeholder={t("Enter a name for your remote")} onChange={(e) => {
-                                                        setCart("RemoteName", e.target.value);
-                                                        setRemoteName(Capitalize(e.target.value));
+                                                        setTimeout(() => {
+                                                            setCart("RemoteName", e.target.value);
+                                                            setRemoteName(Capitalize(e.target.value));
+                                                        }, 300);
                                                     }}/>
                                                 </div>
                                             }
@@ -8137,7 +8260,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                             </div>
                                             <div className="room_select">
                                                 <label className="select_label">{t("Window Description")}</label>
-                                                <DebounceInput debounceTimeout={2000} onKeyDown={() => setCartLoading(true)} type="text" placeholder={t("Window Description")}
+                                                <DebounceInput debounceTimeout={1500} onKeyDown={() => setCartLoading(true)} type="text" placeholder={t("Window Description")}
                                                                className="form-control window_name" name="order_window_name"
                                                                value={roomLabelText}
                                                                onChange={(e) => {
@@ -8177,7 +8300,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                         <Card className={accordionActiveKey === "" ? "card_little_margin" : "card_big_margin"}>
                             <Card.Header>
                                 <ContextAwareToggle eventKey="9" stepNum={t("9")} stepTitle={t("zebra_step7")} stepTitle2={t("(Optional)")} stepRef="9" type="2"
-                                                    required={requiredStep["9"]}
+                                                    required={false}
                                                     stepSelected={stepSelectedLabel["9"] === undefined ? "" : stepSelectedLabel["9"]}/>
                             </Card.Header>
                             <Accordion.Collapse eventKey="9">
@@ -9219,7 +9342,7 @@ function DualRoller({CatID, ModelID, SpecialId, ProjectId, EditIndex, PageItem, 
                                 </div>
                                 <div className="room_select">
                                     <label className="select_label">{t("Window Description")}</label>
-                                    <DebounceInput debounceTimeout={2000} onKeyDown={() => setCartLoading(true)} type="text" placeholder={t("Window Description")}
+                                    <DebounceInput debounceTimeout={1500} onKeyDown={() => setCartLoading(true)} type="text" placeholder={t("Window Description")}
                                                    className="form-control window_name" name="order_window_name"
                                                    value={roomLabelText}
                                                    onChange={(e) => {

@@ -27,10 +27,10 @@ import SaveUserProject from "../Components/SaveUserProject";
 
 const baseURLPrice = "https://api.atlaspood.ir/Sewing/GetSewingOrderPrice";
 const baseURLGetCart = "https://api.atlaspood.ir/cart/GetAll";
-const baseURLEditProject = "https://api.atlaspood.ir/SewingPreorder/Edit";
+const baseURLEditProject = "https://api.atlaspood.ir/SewingOrder/Edit";
 const baseURLDeleteBasketProject = "https://api.atlaspood.ir/Cart/DeleteItem";
 const baseURLSaveForLaterBasketProject = "https://api.atlaspood.ir/Cart/SaveForLater";
-const baseURLAddProjectToCart = "https://api.atlaspood.ir/cart/AddSewingPreorder";
+const baseURLAddProjectToCart = "https://api.atlaspood.ir/cart/AddSewingOrder";
 const baseURLDeleteFile = "https://api.atlaspood.ir/SewingOrderAttachment/Delete";
 const baseURLFreeShipping = "https://api.atlaspood.ir/WebsiteSetting/GetFreeShippingAmount";
 const baseURLChangeZipcode = "https://api.atlaspood.ir/Cart/ChangeZipCode";
@@ -120,7 +120,7 @@ function Basket() {
             let temp = JSON.parse(JSON.stringify(cart))["CartDetails"];
             let tempProjectContainer = temp.find(opt => opt["CartDetailId"] === refIndex);
             if (Object.keys(tempProjectContainer).length !== 0) {
-                let tempProject = tempProjectContainer["SewingPreorder"];
+                let tempProject = tempProjectContainer["SewingOrder"];
                 tempProject["Count"] = tempProject["WindowCount"];
                 tempProject["PreorderText"]["InstallAmount"] = 0;
                 tempProject["PreorderText"]["TransportationAmount"] = 0;
@@ -170,7 +170,7 @@ function Basket() {
             let tempProjectContainer = temp.find(opt => opt["CartDetailId"] === refIndex);
             
             if (Object.keys(tempProjectContainer).length !== 0) {
-                let tempProject = tempProjectContainer["SewingPreorder"];
+                let tempProject = tempProjectContainer["SewingOrder"];
                 tempProject["Count"] = tempProject["WindowCount"];
                 if (minusPlus !== undefined) {
                     if (tempProject["Count"] + minusPlus <= 0 || tempProject["Count"] + minusPlus > 10)
@@ -386,10 +386,10 @@ function Basket() {
         }
     }
     
-    function copyItem(indexOrObj, pageId, SpecialId) {
+    function copyItem(indexOrObj, pageId, PageType) {
         if (isLoggedIn) {
             let tempObj = JSON.parse(JSON.stringify(indexOrObj));
-            delete tempObj["SewingPreorderId"];
+            delete tempObj["SewingOrderId"];
             delete tempObj["IsCompleted"];
             delete tempObj["WindowName"];
             delete tempObj["WindowDescription"];
@@ -408,12 +408,12 @@ function Basket() {
             // copyBagObject(indexOrObj);
             sessionStorage.setItem("cartCopy", JSON.stringify(tempObj));
             setTimeout(() => {
-                navigate("/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[tempObj["SewingModelId"]]["route"] + (SpecialId ? "/" + SpecialId : "") + "/Page-ID/" + pageId)
+                navigate("/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[tempObj["PreorderText"]["SewingModelId"]]["route"] + (PageType ? "/" + PageType : "") + "/Page-ID/" + pageId)
             }, 200);
             
         } else {
             let tempObj = JSON.parse(JSON.stringify(drapery[indexOrObj]));
-            delete tempObj["SewingPreorderId"];
+            delete tempObj["SewingOrderId"];
             delete tempObj["IsCompleted"];
             delete tempObj["WindowName"];
             delete tempObj["WindowDescription"];
@@ -448,7 +448,7 @@ function Basket() {
             // }
             sessionStorage.setItem("cartCopy", JSON.stringify(tempObj));
             setTimeout(() => {
-                navigate("/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[tempObj["SewingModelId"]]["route"] + (SpecialId ? "/" + SpecialId : "") + "/Page-ID/" + pageId)
+                navigate("/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[tempObj["PreorderText"]["SewingModelId"]]["route"] + (PageType ? "/" + PageType : "") + "/Page-ID/" + pageId)
             }, 200);
             
         }
@@ -563,7 +563,7 @@ function Basket() {
     function deleteFileFromProject(obj, projectId) {
         let temp = JSON.parse(JSON.stringify(drapery));
         console.log(drapery);
-        let tempProject = temp.find(opt => opt["SewingPreorderId"] === projectId)["SewingPreorder"];
+        let tempProject = temp.find(opt => opt["SewingOrderId"] === projectId)["SewingOrder"];
         let tempFileIndex = tempProject["SewingOrderAttachments"].findIndex(opt => opt["FileUrl"] === obj.value);
         
         tempProject["SewingOrderAttachments"].splice(tempFileIndex, 1);
@@ -721,13 +721,13 @@ function Basket() {
                 let tempNoShip = true;
                 let promise2 = new Promise((resolve, reject) => {
                     drapery.sort(function (a, b) {
-                        return b["CartDetailId"] - a["CartDetailId"] || b["SewingPreorderId"] - a["SewingPreorderId"];
+                        return b["CartDetailId"] - a["CartDetailId"] || b["SewingOrderId"] - a["SewingOrderId"];
                     }).forEach((tempObj, i) => {
-                        let projectDataObj = projectData[drapery[i]["SewingPreorder"]["SewingModelId"]];
+                        let projectDataObj = projectData[drapery[i]["SewingOrder"]["PreorderText"]["SewingModelId"]];
                         let desc = [];
-                        let projectId = drapery[i]["SewingPreorderId"];
+                        let projectId = drapery[i]["SewingOrderId"];
                         // let obj={};
-                        let obj = drapery[i]["SewingPreorder"]["PreorderText"] || {};
+                        let obj = drapery[i]["SewingOrder"]["PreorderText"] || {};
                         let fabricColorFa = obj["FabricColorFa"];
                         let fabricColor = obj["FabricColorEn"];
                         let fabricDesignFa = obj["FabricDesignFa"];
@@ -738,8 +738,8 @@ function Basket() {
                         let roomName = obj["RoomNameEn"];
                         let WindowName = obj["WindowName"] === undefined ? "" : obj["WindowName"];
                         let photoUrl = obj["PhotoUrl"];
-                        let SewingModelId = obj["SewingModelId"];
-                        let zipcode = drapery[i]["SewingPreorder"]["ZipCode"];
+                        let SewingModelId = drapery[i]["SewingOrder"]["PreorderText"]["SewingModelId"];
+                        let zipcode = drapery[i]["SewingOrder"]["ZipCode"];
                         obj["Price"] = drapery[i]["PayableAmount"];
                         
                         if (tempNoShip) {
@@ -756,13 +756,13 @@ function Basket() {
                         // let roomName = "";
                         // let WindowName = "";
                         // let photoUrl = "";
-                        let InstallAmount = drapery[i]["SewingPreorder"]["InstallAmount"] ? drapery[i]["SewingPreorder"]["InstallAmount"] : 0;
-                        // let SewingModelId = drapery[i]["SewingPreorder"]["SewingModelId"];
+                        let InstallAmount = drapery[i]["SewingOrder"]["InstallAmount"] ? drapery[i]["SewingOrder"]["InstallAmount"] : 0;
+                        // let SewingModelId = drapery[i]["SewingOrder"]["SewingOrderDetails"][0]["SewingModelId"];
                         // obj["InstallAmount"] = drapery[i]["InstallAmount"]?obj["InstallAmount"]:0;
                         // obj["WindowCount"] = drapery[i]["Count"];
                         // console.log(obj["WindowCount"]);
                         
-                        let uploadedFiles = drapery[i]["SewingPreorder"]["SewingOrderAttachments"];
+                        let uploadedFiles = drapery[i]["SewingOrder"]["SewingOrderAttachments"];
                         let tempSelectArr = [];
                         
                         if (uploadedFiles && uploadedFiles.length > 0) {
@@ -794,8 +794,8 @@ function Basket() {
                                         } else if (tempObj["apiLabel"] === "WindowWidth" && tempObj["measurements"]) {
                                             if (firstMeasurements) {
                                                 firstMeasurements = false;
-                                                GetUserProjectData(drapery[i]["SewingPreorder"], true).then((temp) => {
-                                                    // console.log(temp,drapery[i]["SewingPreorder"]);
+                                                GetUserProjectData(drapery[i]["SewingOrder"], true).then((temp) => {
+                                                    // console.log(temp,drapery[i]["SewingOrder"]);
                                                     desc[tempObj["order"]] =
                                                         <div className="basket_item_title_desc" key={index}>
                                                             <h3>{t("Measurements")}&nbsp;</h3>
@@ -846,14 +846,24 @@ function Basket() {
                                             let apiValue = obj[tempObj["apiLabel"]] === null ? "null" : obj[tempObj["apiLabel"]].toString();
                                             if (tempObj["apiLabel"] === "ControlType" && obj["ControlType"] === "Motorized") {
                                                 objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(obj[tempObj["apiLabel"]].toString())} / ${t(obj["MotorType"].toString())}`).toString() : `${t(obj[tempObj["apiLabel"]].toString())} / ${t(obj["MotorType"].toString())}`;
-                                            } else if (SewingModelId === "0099" &&tempObj["apiLabel"] === "Hardware" && obj["Hardware"] === "Same Hardware For All Curtains") {
-                                                objLabel = t(obj[tempObj["apiLabel"]].toString()) + " / " + (pageLanguage === "fa" ?obj["RailDesignFa"].toString():obj["RailDesignEn"].toString()) + " / " + (pageLanguage === "fa" ?obj["RailColorFa"].toString():obj["RailColorEn"].toString()) + " / " + t(obj["BatonOption"].toString());
-                                            } else if (SewingModelId === "0099" &&tempObj["apiLabel"] === "DraperyHardware" && obj["DraperyHardware"] !== "None") {
-                                                objLabel = t(obj[tempObj["apiLabel"]].toString()) + " / " + (pageLanguage === "fa" ?obj["RailDesignFaA"].toString():obj["RailDesignEnA"].toString()) + " / " + (pageLanguage === "fa" ?obj["RailColorFaA"].toString():obj["RailColorEnA"].toString()) + " / " + t(obj["BatonOptionA"].toString());
-                                            } else if (SewingModelId === "0099" &&tempObj["apiLabel"] === "SheerHardware" && obj["SheerHardware"] !== "None") {
-                                                objLabel = t(obj[tempObj["apiLabel"]].toString()) + " / " + (pageLanguage === "fa" ?obj["RailDesignFaB"].toString():obj["RailDesignEnB"].toString()) + " / " + (pageLanguage === "fa" ?obj["RailColorFaB"].toString():obj["RailColorEnB"].toString()) + " / " + t(obj["BatonOptionB"].toString());
-                                            } else if (SewingModelId === "0099" &&tempObj["apiLabel"] === "PrivacyLayerHardware" && obj["PrivacyLayerHardware"] !== "None") {
-                                                objLabel = t(obj[tempObj["apiLabel"]].toString()) + " / " + (pageLanguage === "fa" ?obj["RailDesignFaC"].toString():obj["RailDesignEnC"].toString()) + " / " + (pageLanguage === "fa" ?obj["RailColorFaC"].toString():obj["RailColorEnC"].toString()) + " / " + t(obj["BatonOptionC"].toString());
+                                            } else if (SewingModelId === "0099" && tempObj["apiLabel"] === "DraperyHardware" && obj["DraperyHardware"] !== "None") {
+                                                objLabel = t(obj[tempObj["apiLabel"]].toString()) + " / " + (pageLanguage === "fa" ? obj["RailDesignFaA"] : obj["RailDesignEnA"]) + " \n " + (pageLanguage === "fa" ? obj["RailColorFaA"] : obj["RailColorEnA"]) + " / " + t(obj["BatonOptionA"]);
+                                            } else if (SewingModelId === "0099" && tempObj["apiLabel"] === "SheerHardware" && obj["SheerHardware"] !== "None") {
+                                                if (obj["RailDesignEnB"] === "Motorized Track") {
+                                                    objLabel = t(obj[tempObj["apiLabel"]].toString()) + " / " + (pageLanguage === "fa" ? obj["RailDesignFaB"] : obj["RailDesignEnB"]);
+                                                } else {
+                                                    objLabel = t(obj[tempObj["apiLabel"]].toString()) + " / " + (pageLanguage === "fa" ? obj["RailDesignFaB"] : obj["RailDesignEnB"]) + " \n " + (pageLanguage === "fa" ? obj["RailColorFaB"] : obj["RailColorEnB"]) + " / " + t(obj["BatonOptionB"]);
+                                                }
+                                            } else if (SewingModelId === "0099" && tempObj["apiLabel"] === "PrivacyLayerHardware" && obj["PrivacyLayerHardware"] !== "None") {
+                                                if (obj["RailDesignEnC"] === "Motorized Track") {
+                                                    objLabel = t(obj[tempObj["apiLabel"]].toString()) + " / " + (pageLanguage === "fa" ? obj["RailDesignFaC"] : obj["RailDesignEnC"]);
+                                                } else {
+                                                    objLabel = t(obj[tempObj["apiLabel"]].toString()) + " / " + (pageLanguage === "fa" ? obj["RailDesignFaC"] : obj["RailDesignEnC"]) + " \n " + (pageLanguage === "fa" ? obj["RailColorFaC"] : obj["RailColorEnC"]) + " / " + t(obj["BatonOptionC"]);
+                                                }
+                                            } else if (SewingModelId === "0099" && tempObj["apiLabel"] === "HandCurtainEn" || tempObj["apiLabel"] === "HandCurtainFa") {
+                                                objLabel =t("agree_Qty") + NumToFa(obj["HandCurtainNum"], pageLanguage);
+                                            } else if (SewingModelId === "0099" && tempObj["apiLabel"] === "HandCurtainEn2" || tempObj["apiLabel"] === "HandCurtainFa2") {
+                                                objLabel = t("agree_Qty") + NumToFa(obj["HandCurtainNum2"], pageLanguage);
                                             } else if (tempObj["titleValue"] === null) {
                                                 if (tempObj["titlePostfix"] === "") {
                                                     objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(apiValue)}`).toString() : t(apiValue);
@@ -961,20 +971,20 @@ function Basket() {
                                             </div>
                                             <div className="basket_item_desc_button">
                                                 <Link className="btn basket_desc_button"
-                                                      to={"/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[drapery[i]["SewingPreorder"]["SewingModelId"]]["route"] + (obj["SpecialId"] ? "/" + obj["SpecialId"] : "") + "/Bag-Projects/" + drapery[i]["SewingPreorderId"] + "/Page-ID/" + obj["PageId"]}>{t("EDIT")}</Link>
-                                                <button className="basket_desc_button" onClick={() => copyItem(drapery[i]["SewingPreorder"], obj["PageId"], obj["SpecialId"])}>{t("COPY")}</button>
+                                                      to={"/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[drapery[i]["SewingOrder"]["PreorderText"]["SewingModelId"]]["route"] + (obj["PageType"] ? "/" + obj["PageType"] : "") + "/Bag-Projects/" + drapery[i]["SewingOrderId"] + "/Page-ID/" + obj["PageId"]}>{t("EDIT")}</Link>
+                                                <button className="basket_desc_button" onClick={() => copyItem(drapery[i]["SewingOrder"], obj["PageId"], obj["PageType"])}>{t("COPY")}</button>
                                             </div>
                                             {zipcode && zipcode !== "" &&
                                                 <div className="basket_zipcode_container">
                                                     <div className="basket_zipcode_left">
                                                         <h1 className="basket_zipcode_title">{t("basket_zipcode_text1")}</h1>
-                                                        {(zipcodeId === -1 || zipcodeId !== drapery[i]["SewingPreorderId"]) &&
+                                                        {(zipcodeId === -1 || zipcodeId !== drapery[i]["SewingOrderId"]) &&
                                                             <div className="basket_zipcode_change_container">
                                                                 <h2 className="basket_zipcode_title2">{t("basket_zipcode_text3")}{pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${zipcode}`) : zipcode}&nbsp;|&nbsp;</h2>
-                                                                <h2 className="basket_zipcode_title3 text_underline" onClick={() => setZipcodeId(drapery[i]["SewingPreorderId"])}>{t("Change")}</h2>
+                                                                <h2 className="basket_zipcode_title3 text_underline" onClick={() => setZipcodeId(drapery[i]["SewingOrderId"])}>{t("Change")}</h2>
                                                             </div>
                                                         }
-                                                        {zipcodeId === drapery[i]["SewingPreorderId"] &&
+                                                        {zipcodeId === drapery[i]["SewingOrderId"] &&
                                                             <div className="basket_zipcode_change_input_container">
                                                                 <input className="zipcode_input form-control" type="text" name="zipcode_input" defaultValue={zipcodeAll}
                                                                        placeholder={t("Enter Zip Code")} onChange={(e) => {
@@ -988,7 +998,7 @@ function Basket() {
                                                                 </button>
                                                             </div>
                                                         }
-                                                        {zipcodeId === drapery[i]["SewingPreorderId"] && hasInstall === false &&
+                                                        {zipcodeId === drapery[i]["SewingOrderId"] && hasInstall === false &&
                                                             <h3 className="basket_zipcode_err">{t("basket_zipcode_err")}</h3>
                                                         }
                                                         <button className="basket_zipcode_btn text_underline"
@@ -1131,7 +1141,7 @@ function Basket() {
                             // let obj = obj1["PreorderText"];
                             GetUserProjectData(obj).then((temp) => {
                                 tempPostObj["WindowCount"] = 1;
-                                tempPostObj["SewingModelId"] = obj["SewingModelId"];
+                                tempPostObj["SewingModelId"] = obj["PreorderText"]["SewingModelId"];
                                 Object.keys(temp).forEach(key => {
                                     if (temp[key] !== undefined && temp[key] !== null && temp[key] !== "") {
                                         let tempObj = userProjects.find(obj => obj["cart"] === key);
@@ -1156,10 +1166,10 @@ function Basket() {
                                 
                                 
                                 tempPostObj["SewingOrderDetails"][0]["CurtainPartId"] = 2303;
-                                tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = obj["SewingModelId"];
+                                tempPostObj["SewingOrderDetails"][0]["SewingModelId"] = obj["PreorderText"]["SewingModelId"];
                                 
                                 tempPostObj["SewingOrderDetails"][1]["CurtainPartId"] = 2302;
-                                tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = obj["SewingModelId"]==="0325" ? obj["SewingModelId"]:`0002`;
+                                tempPostObj["SewingOrderDetails"][1]["SewingModelId"] = obj["PreorderText"]["SewingModelId"]==="0325" ? obj["PreorderText"]["SewingModelId"]:`0002`;
                                 
                                 tempPostObj["SewingOrderDetails"][2]["CurtainPartId"] = 2301;
                                 tempPostObj["SewingOrderDetails"][2]["SewingModelId"] = `0002`;
@@ -1360,14 +1370,24 @@ function Basket() {
                                             let apiValue = obj[tempObj["apiLabel"]] === null ? "null" : obj[tempObj["apiLabel"]].toString();
                                             if (tempObj["apiLabel"] === "ControlType" && obj["ControlType"] === "Motorized") {
                                                 objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(obj[key].toString())} / ${t(obj["MotorType"].toString())}`).toString() : `${t(obj[key].toString())} / ${t(obj["MotorType"].toString())}`;
-                                            } else if (SewingModelId === "0099" &&key === "Hardware" && obj["Hardware"] === "Same Hardware For All Curtains") {
-                                                objLabel = t(obj[key].toString()) + " / " + (pageLanguage === "fa" ?obj["RailDesignFa"].toString():obj["RailDesignEn"].toString()) + " / " + (pageLanguage === "fa" ?obj["RailColorFa"].toString():obj["RailColorEn"].toString()) + " / " + t(obj["BatonOption"].toString());
-                                            } else if (SewingModelId === "0099" &&key === "DraperyHardware" && obj["DraperyHardware"] !== "None") {
-                                                objLabel = t(obj[key].toString()) + " / " + (pageLanguage === "fa" ?obj["RailDesignFaA"].toString():obj["RailDesignEnA"].toString()) + " / " + (pageLanguage === "fa" ?obj["RailColorFaA"].toString():obj["RailColorEnA"].toString()) + " / " + t(obj["BatonOptionA"].toString());
-                                            } else if (SewingModelId === "0099" &&key === "SheerHardware" && obj["SheerHardware"] !== "None") {
-                                                objLabel = t(obj[key].toString()) + " / " + (pageLanguage === "fa" ?obj["RailDesignFaB"].toString():obj["RailDesignEnB"].toString()) + " / " + (pageLanguage === "fa" ?obj["RailColorFaB"].toString():obj["RailColorEnB"].toString()) + " / " + t(obj["BatonOptionB"].toString());
-                                            } else if (SewingModelId === "0099" &&key === "PrivacyLayerHardware" && obj["PrivacyLayerHardware"] !== "None") {
-                                                objLabel = t(obj[key].toString()) + " / " + (pageLanguage === "fa" ?obj["RailDesignFaC"].toString():obj["RailDesignEnC"].toString()) + " / " + (pageLanguage === "fa" ?obj["RailColorFaC"].toString():obj["RailColorEnC"].toString()) + " / " + t(obj["BatonOptionC"].toString());
+                                            } else if (SewingModelId === "0099" && key === "DraperyHardware" && obj["DraperyHardware"] !== "None") {
+                                                objLabel = t(obj[key].toString()) + " / " + (pageLanguage === "fa" ? obj["RailDesignFaA"] : obj["RailDesignEnA"]) + " \n " + (pageLanguage === "fa" ? obj["RailColorFaA"] : obj["RailColorEnA"]) + " / " + t(obj["BatonOptionA"]);
+                                            } else if (SewingModelId === "0099" && key === "SheerHardware" && obj["SheerHardware"] !== "None") {
+                                                if (obj["RailDesignEnB"] === "Motorized Track") {
+                                                    objLabel = t(obj[key].toString()) + " / " + (pageLanguage === "fa" ? obj["RailDesignFaB"] : obj["RailDesignEnB"]);
+                                                } else {
+                                                    objLabel = t(obj[key].toString()) + " / " + (pageLanguage === "fa" ? obj["RailDesignFaB"] : obj["RailDesignEnB"]) + " \n " + (pageLanguage === "fa" ? obj["RailColorFaB"] : obj["RailColorEnB"]) + " / " + t(obj["BatonOptionB"]);
+                                                }
+                                            } else if (SewingModelId === "0099" && key === "PrivacyLayerHardware" && obj["PrivacyLayerHardware"] !== "None") {
+                                                if (obj["RailDesignEnC"] === "Motorized Track") {
+                                                    objLabel = t(obj[key].toString()) + " / " + (pageLanguage === "fa" ? obj["RailDesignFaC"] : obj["RailDesignEnC"]);
+                                                } else {
+                                                    objLabel = t(obj[key].toString()) + " / " + (pageLanguage === "fa" ? obj["RailDesignFaC"] : obj["RailDesignEnC"]) + " \n " + (pageLanguage === "fa" ? obj["RailColorFaC"] : obj["RailColorEnC"]) + " / " + t(obj["BatonOptionC"]);
+                                                }
+                                            } else if (SewingModelId === "0099" && key === "HandCurtainEn" || key === "HandCurtainFa") {
+                                                objLabel =t("agree_Qty") + NumToFa(obj["HandCurtainNum"], pageLanguage);
+                                            } else if (SewingModelId === "0099" && key === "HandCurtainEn2" || key === "HandCurtainFa2") {
+                                                objLabel = t("agree_Qty") + NumToFa(obj["HandCurtainNum2"], pageLanguage);
                                             } else if (tempObj["titleValue"] === null) {
                                                 if (tempObj["titlePostfix"] === "") {
                                                     objLabel = pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${t(apiValue.toString())}`).toString() : t(apiValue.toString());
@@ -1467,8 +1487,8 @@ function Basket() {
                                                 </div>
                                                 <div className="basket_item_desc_button">
                                                     <Link className="btn basket_desc_button"
-                                                          to={"/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[obj["SewingModelId"]]["route"] + (obj["SpecialId"] ? "/" + obj["SpecialId"] : "") + "/Bag-Projects/" + index + "/Page-ID/" + obj["PageId"]}>{t("EDIT")}</Link>
-                                                    <button className="basket_desc_button" onClick={() => copyItem(index, obj["PageId"], obj["SpecialId"])}>{t("COPY")}</button>
+                                                          to={"/" + pageLanguage + JSON.parse(JSON.stringify(UserProjects))[obj["SewingModelId"]]["route"] + (obj["PageType"] ? "/" + obj["PageType"] : "") + "/Bag-Projects/" + index + "/Page-ID/" + obj["PageId"]}>{t("EDIT")}</Link>
+                                                    <button className="basket_desc_button" onClick={() => copyItem(index, obj["PageId"], obj["PageType"])}>{t("COPY")}</button>
                                                 </div>
                                                 {zipcode &&
                                                     <div className="basket_zipcode_container">
@@ -1646,7 +1666,7 @@ function Basket() {
                 if (swatchOnly === undefined) {
                     let draperies = cart["CartDetails"].filter((object1) => {
                         return object1["TypeId"] === 6403;
-                    });
+                    }).filter(object1 => object1["SewingOrder"]).filter(object1 => object1["SewingOrder"]["PreorderText"]);
                     
                     let swatches = cart["CartDetails"].filter((object1) => {
                         return object1["TypeId"] === 6402;

@@ -43,7 +43,7 @@ function App({t}) {
     };
     onsubmit = (event) => {
         event.preventDefault();
-        if (user1.pass === "1401atlas") {
+        if (user1.pass === "atlas1402") {
             setuser({success: true});
         }
     };

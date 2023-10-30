@@ -25,9 +25,9 @@ import {Accordion, AccordionContext, useAccordionButton} from "react-bootstrap";
 import {CapitalizeAllWords} from "../Components/TextTransform";
 import GetMeasurementArray from "../Components/GetMeasurementArray";
 
-const baseURLGetProjects = "https://api.atlaspood.ir/SewingPreorder/GetAll";
-const baseURLEditProject = "https://api.atlaspood.ir/SewingPreorder/Edit";
-const baseURLDeleteProject = "https://api.atlaspood.ir/SewingPreorder/Delete";
+const baseURLGetProjects = "https://api.atlaspood.ir/SewingOrder/GetAll";
+const baseURLEditProject = "https://api.atlaspood.ir/SewingOrder/Edit";
+const baseURLDeleteProject = "https://api.atlaspood.ir/SewingOrder/Delete";
 const baseURLDeleteBasketProject = "https://api.atlaspood.ir/Cart/DeleteItem";
 const baseURLPrice = "https://api.atlaspood.ir/Sewing/GetSewingOrderPrice";
 const baseURLFreeShipping = "https://api.atlaspood.ir/WebsiteSetting/GetFreeShippingAmount";
@@ -127,7 +127,7 @@ function Projects() {
                 let projectDataObj = projectData[userProjects[i]["SewingModelId"]];
                 let SewingModelId = userProjects[i]["SewingModelId"];
                 let tempArr = [];
-                let projectId = userProjects[i]["SewingPreorderId"];
+                let projectId = userProjects[i]["SewingOrderId"];
                 let uploadedFiles = userProjects[i]["SewingOrderAttachments"];
                 let tempSelectArr = [];
                 
@@ -153,7 +153,7 @@ function Projects() {
                     let promiseArr = [];
                     
                     projectDataObj["data"].sort(function (a, b) {
-                        return b["CartDetailId"] - a["CartDetailId"] || b["SewingPreorderId"] - a["SewingPreorderId"];
+                        return b["CartDetailId"] - a["CartDetailId"] || b["SewingOrderId"] - a["SewingOrderId"];
                     }).forEach((tempObj, index) => {
                         promiseArr[index] = new Promise((resolve, reject) => {
                             if (tempObj["title"] !== "" && tempObj["lang"].indexOf(pageLanguage) > -1) {
@@ -389,7 +389,7 @@ function Projects() {
                                 {!userProjects[i]["IsCompleted"] &&
                                     <span className="basket_item_btn">
                                         <Link className="projects_add_to_cart_btn btn projects_add_to_cart_btn_long"
-                                              to={"/" + pageLanguage + projectDataObj["route"] + (userProjects[i]["PreorderText"]["SpecialId"] ? "/" + userProjects[i]["PreorderText"]["SpecialId"] : "") + "/Saved-Projects/" + userProjects[i]["SewingPreorderId"] + "/Page-ID/" + userProjects[i]["PreorderText"]["PageId"]}>{t("FINISH CONFIGURING")}</Link>
+                                              to={"/" + pageLanguage + projectDataObj["route"] + (userProjects[i]["PreorderText"]["PageType"] ? "/" + userProjects[i]["PreorderText"]["PageType"] : "") + "/Saved-Projects/" + userProjects[i]["SewingOrderId"] + "/Page-ID/" + userProjects[i]["PreorderText"]["PageId"]}>{t("FINISH CONFIGURING")}</Link>
                                 </span>
                                 }
                                 {userProjects[i]["IsCompleted"] &&
@@ -400,7 +400,7 @@ function Projects() {
                                             addProjectToBag(userProjects[i], i)
                                         }}>{t("ADD TO BAG")}</button>
                                         <Link className="projects_edit_btn btn"
-                                              to={"/" + pageLanguage + projectDataObj["route"] + (userProjects[i]["PreorderText"]["SpecialId"] ? "/" + userProjects[i]["PreorderText"]["SpecialId"] : "") + "/Saved-Projects/" + userProjects[i]["SewingPreorderId"] + "/Page-ID/" + userProjects[i]["PreorderText"]["PageId"]}>{t("EDIT")}</Link>
+                                              to={"/" + pageLanguage + projectDataObj["route"] + (userProjects[i]["PreorderText"]["PageType"] ? "/" + userProjects[i]["PreorderText"]["PageType"] : "") + "/Saved-Projects/" + userProjects[i]["SewingOrderId"] + "/Page-ID/" + userProjects[i]["PreorderText"]["PageId"]}>{t("EDIT")}</Link>
                                 </span>
                                 }
                                 <span className="basket_item_hidden2"/>
@@ -421,7 +421,7 @@ function Projects() {
     
     function setProjectCount(projectId, numValue, minusPlus) {
         let temp = JSON.parse(JSON.stringify(userProjects));
-        let tempProject = temp.find(opt => opt["SewingPreorderId"] === projectId);
+        let tempProject = temp.find(opt => opt["SewingOrderId"] === projectId);
         tempProject["Count"] = tempProject["WindowCount"];
         
         if (tempProject !== {}) {
@@ -454,7 +454,7 @@ function Projects() {
     
     function removeZipcode(refIndex) {
         let temp = JSON.parse(JSON.stringify(userProjects));
-        let tempProject = temp.find(opt => opt["SewingPreorderId"] === refIndex);
+        let tempProject = temp.find(opt => opt["SewingOrderId"] === refIndex);
         tempProject["Count"] = tempProject["WindowCount"];
         tempProject["PreorderText"]["InstallAmount"] = 0;
         tempProject["PreorderText"]["TransportationAmount"] = 0;
@@ -538,7 +538,7 @@ function Projects() {
         let tempProjectContainer = temp.find(opt => opt["CartDetailId"] === refIndex);
         
         if (Object.keys(tempProjectContainer).length !== 0) {
-            let tempProject = tempProjectContainer["SewingPreorder"];
+            let tempProject = tempProjectContainer["SewingOrder"];
             tempProject["Count"] = tempProject["WindowCount"];
             if (minusPlus !== undefined) {
                 if (tempProject["Count"] + minusPlus <= 0 || tempProject["Count"] + minusPlus > 10)
@@ -812,7 +812,7 @@ function Projects() {
                         projectsButtonRef.current[index].disabled = false;
                         projectsButtonRef.current[index].innerHTML = t("ADD TO BAG");
                         // setCartStateAgree(true);
-                        // AddProjectToCart(temp, projectObj["SewingModelId"], projectObj["Price"], temp["ModelNameEn"], temp["ModelNameFa"], [temp["uploadedImagesFile"] ? temp["uploadedImagesFile"] : [], temp["uploadedImagesURL"] ? temp["uploadedImagesURL"] : [], temp["uploadedPDFFile"] ? temp["uploadedPDFFile"] : [], temp["uploadedPDFURL"] ? temp["uploadedPDFURL"] : []], projectObj["SewingPreorderId"], undefined, navigate, true, temp["Accessories"][0]).then((temp2) => {
+                        // AddProjectToCart(temp, projectObj["SewingModelId"], projectObj["Price"], temp["ModelNameEn"], temp["ModelNameFa"], [temp["uploadedImagesFile"] ? temp["uploadedImagesFile"] : [], temp["uploadedImagesURL"] ? temp["uploadedImagesURL"] : [], temp["uploadedPDFFile"] ? temp["uploadedPDFFile"] : [], temp["uploadedPDFURL"] ? temp["uploadedPDFURL"] : []], projectObj["SewingOrderId"], undefined, navigate, true, temp["Accessories"][0]).then((temp2) => {
                         //     if (temp2 === 401) {
                         //         addProjectToBag(projectObj, index);
                         //     } else if (temp2) {
@@ -854,7 +854,7 @@ function Projects() {
     
     function addToCart_agreed(projectObj) {
         GetUserProjectData(projectObj, true).then((temp) => {
-            AddProjectToCart(temp, projectObj["SewingModelId"], projectObj["Price"], temp["ModelNameEn"], temp["ModelNameFa"], [temp["uploadedImagesFile"] ? temp["uploadedImagesFile"] : [], temp["uploadedImagesURL"] ? temp["uploadedImagesURL"] : [], temp["uploadedPDFFile"] ? temp["uploadedPDFFile"] : [], temp["uploadedPDFURL"] ? temp["uploadedPDFURL"] : []], projectObj["SewingPreorderId"], undefined, navigate, true, temp["Accessories"][0]).then((temp2) => {
+            AddProjectToCart(temp, projectObj["SewingModelId"], projectObj["Price"], temp["ModelNameEn"], temp["ModelNameFa"], [temp["uploadedImagesFile"] ? temp["uploadedImagesFile"] : [], temp["uploadedImagesURL"] ? temp["uploadedImagesURL"] : [], temp["uploadedPDFFile"] ? temp["uploadedPDFFile"] : [], temp["uploadedPDFURL"] ? temp["uploadedPDFURL"] : []], projectObj["SewingOrderId"], undefined, navigate, true, temp["Accessories"][0]).then((temp2) => {
                 if (temp2 === 401) {
                     addToCart_agreed(projectObj);
                 } else if (temp2) {
@@ -927,9 +927,9 @@ function Projects() {
             let promise1 = new Promise((resolve, reject) => {
                 if (draperies.length) {
                     draperies.sort(function (a, b) {
-                        return b["CartDetailId"] - a["CartDetailId"] || b["SewingPreorderId"] - a["SewingPreorderId"];
+                        return b["CartDetailId"] - a["CartDetailId"] || b["SewingOrderId"] - a["SewingOrderId"];
                     }).forEach((tempObj, i) => {
-                        let obj = draperies[i]["SewingPreorder"]["PreorderText"];
+                        let obj = draperies[i]["SewingOrder"]["PreorderText"] || {};
                         let sodFabrics = obj["SodFabrics"] ? obj["SodFabrics"] : [];
                         let roomName = (obj["WindowName"] === undefined || obj["WindowName"] === "") ? "" : " / " + obj["WindowName"];
                         if (obj["SewingModelId"] === "0326") {
@@ -974,7 +974,7 @@ function Projects() {
                                                         onClick={() => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], 0, 0, -1)}>–
                                                 </button>
                                                 <input type="text" className="basket_qty_num"
-                                                       value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${draperies[i]["SewingPreorder"]["WindowCount"]}`) : draperies[i]["SewingPreorder"]["WindowCount"]}
+                                                       value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${draperies[i]["SewingOrder"]["WindowCount"]}`) : draperies[i]["SewingOrder"]["WindowCount"]}
                                                        onChange={(e) => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], NumberToPersianWord.convertPeToEn(`${e.target.value}`))}/>
                                                 <button type="text" className="basket_qty_plus"
                                                         onClick={() => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], 0, 0, 1)}>+
@@ -1011,7 +1011,7 @@ function Projects() {
                                                         onClick={() => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], 0, 0, -1)}>–
                                                 </button>
                                                 <input type="text" className="basket_qty_num"
-                                                       value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${draperies[i]["SewingPreorder"]["WindowCount"]}`) : draperies[i]["SewingPreorder"]["WindowCount"]}
+                                                       value={pageLanguage === "fa" ? NumberToPersianWord.convertEnToPe(`${draperies[i]["SewingOrder"]["WindowCount"]}`) : draperies[i]["SewingOrder"]["WindowCount"]}
                                                        onChange={(e) => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], NumberToPersianWord.convertPeToEn(`${e.target.value}`))}/>
                                                 <button type="text" className="basket_qty_plus"
                                                         onClick={() => setBasketNumber(cartObjects, draperies[i]["CartDetailId"], 0, 0, 1)}>+
@@ -1180,7 +1180,7 @@ function Projects() {
     
     function deleteFileFromProject(obj, projectId) {
         let temp = JSON.parse(JSON.stringify(userProjects));
-        let tempProject = temp.find(opt => opt["SewingPreorderId"] === projectId);
+        let tempProject = temp.find(opt => opt["SewingOrderId"] === projectId);
         let tempFileIndex = tempProject["SewingOrderAttachments"].findIndex(opt => opt["FileUrl"] === obj.value);
         
         tempProject["SewingOrderAttachments"].splice(tempFileIndex, 1);
